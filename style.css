@@ -1,0 +1,261 @@
+body {
+  font-family: ARIAL;
+  font-size: 16px;
+  background: url(images/bg.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  height: 100%;
+}
+
+tbody.table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+}
+
+tbody.table th, tbody.table td {
+  text-align: center;
+  padding: 5px;
+  font-size: 18px;
+  vertical-align: middle !important;
+}
+
+th {
+  background: #C5CAE9;
+}
+
+hr {
+  border: none;
+  color: #212121;
+  background-color: #212121;
+  height: 2px;
+}
+
+details[open] div {
+  animation: spoiler 1s;
+}
+@keyframes spoiler {
+  0%   {opacity: 0;}
+  100% {opacity: 1;} 
+}
+
+summary {
+  font-weight: 600;
+  color: #7E57C2;
+  transition: 0.3s;
+}
+
+summary:hover {
+  cursor: pointer;
+  color: #B39DDB;
+}
+
+h1 {
+  color:#212121;
+  text-align: center; 
+}
+
+p, form, label, details {
+  font-size: 19px;
+}
+
+select, input {
+  background: #ECEFF1;
+  border: none;
+  font-size: 17px;
+  border-radius: 3px;
+  padding: 12px 17px;
+  margin-bottom: 7px;
+}
+
+.custom-file-upload {
+  background: #ECEFF1;
+  border: none;
+  font-size: 17px;
+  border-radius: 3px;
+  padding: 12px 17px;
+  margin-bottom: 7px;
+}
+
+button, .ssilka {
+  text-decoration: none;
+  box-shadow: 0 1px 4px 0 #212121;
+  color: #fff;
+  border: none;
+  border-bottom: 4px;
+  border-radius: 3px;
+  padding: 12px 17px;
+  font-size: 17px;
+  font-weight: 600;
+  transition: 0.5s;
+  background: linear-gradient(60deg, #716396, #87c2b6);
+}
+
+.thx_a {
+  text-decoration: none;
+  box-shadow: 0 2px 7px 0 #fff;
+  color: #fff;
+  border-radius: 5px;
+  padding: 17px 25px !important;
+  font-size: 21px;
+  font-weight: 600;
+  transition: 0.5s;
+  background:#43A047;
+}
+
+.thx_a:hover {
+  text-decoration: none;
+  background: #00796B;
+  color: #BDBDBD;
+}
+
+.thx {
+  display: block;
+  position: relative;
+  margin: auto 0;
+  margin-bottom: 100px;
+}
+
+button:hover {
+  text-decoration: none;
+  cursor: pointer;
+  transform: scale(1.03);
+}
+
+#centerLayer {
+  box-shadow: 0px 5px 7px 2px #212121;
+  border-radius: 7px;
+  padding: 20px;
+  background: #fff;
+  margin: 160px auto !important;
+  margin-bottom: 60px !important;
+  max-width: 800px !important;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-file-upload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.modal {
+  display: flex;
+  position: fixed;
+  left: 0;
+  top: -100%;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  -webkit-transition: top 0s .7s, opacity .7s 0s;
+  transition: top 0s .7s, opacity .7s 0s;
+}
+
+.modal:target {
+  top: 0;
+  opacity: 1;
+  -webkit-transition: none;
+  transition: none;
+}
+
+.modal figure {
+  width: 100%;
+  max-width: 530px;
+  position: relative;
+  padding: 1.8em;
+  opacity: 0;
+  background-color: white;
+  -webkit-transition: opacity .7s;
+  transition: opacity .7s;
+}
+
+figure > div {
+  margin-top: 6px;
+  font-size: 18px;
+}
+
+.successFastAdd {
+  color: green;
+  font-weight: 600;
+}
+
+.modal.example figure {
+  background: #f9f5f5;
+  border-radius: 4px;
+  padding-top: 8px;
+  box-shadow: 0px 3px 5px 1px #424242;
+}
+
+.modal.example figure h2 {
+  margin-top: 0;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #dcd7d7;
+}
+
+.modal:target figure {
+  opacity: 1;
+}
+
+.modal.example .compatibg-ukastywise {
+  text-decoration: none;
+  position: absolute;
+  right: 8px;
+  top: -9px;
+  font-size: 41px;
+  transition: 0.3s;
+  color: #9E9E9E;
+}
+
+.compatibg-ukastywise:hover {
+  color: #ef5350 !important;
+}
+
+.modal .nedismiseg {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-color: rgba(10, 10, 10, 0.37);
+  content: "";
+  cursor: default;
+  visibility: hidden;
+}
+
+.modal:target .nedismiseg {
+  visibility: visible;
+}
+
+.closeSettings {
+  margin-top: 15px;
+  float: left;
+}
+
+.retryFastAdd {
+  margin-top: 15px;
+  float: right;
+}
+
+.authvk {
+  color: #42A5F5;
+  transition: 0.3s;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.authvk:hover {
+  color: #1976D2;
+  transform: none;
+}
+
+input[name="checkbox"] {
+  transform: scale(1.3);
+}

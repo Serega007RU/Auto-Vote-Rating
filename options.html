@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, maximum-scale=1.0, minimum-scale=1.0">
+  <title>Настройки Auto Vote Minecraft Rating</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+	<div class="modal example" id="addFastProject">
+	  <a href="#/" class="nedismiseg"></a>
+	  <figure>
+	   <h2>Заголовок модального окна<a href="#/" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
+	    <div id=modaltext>Загрузка...</div>
+	  </figure>
+	</div>
+
+  <div id="centerLayer">
+  <h1><img style="padding-right:10px;" align="top" width="42px" src="/images/icon64.png" alt="">Настройки A.V.M.R.</h1>
+  <hr>
+  <div style="margin:7px 0; font-size: 19px; font-weight: 600" id="save">&nbsp;</div>
+  <form id="addProject">
+    <select required id="project">
+      <option value="" selected disabled>Выберите сайт</option>
+      <option value="TopCraft">TopCraft</option>
+      <option value="McTOP">McTOP</option>
+      <option value="MCRate">MCRate</option>
+      <option value="MinecraftRating">MinecraftRating</option>
+      <option value="MonitoringMinecraft">MonitoringMinecraft</option>
+      <option value="FairTop">FairTop</option>
+      <option value="Custom">Кастомное</option>
+    </select>
+    <input name="nick" id="nick" required placeholder="Ваш никнейм" type="text"></input>
+    <input name="id" id="id" required placeholder="ID проекта" type="text"><span style="cursor: help;" title="ID проекта можно достать из адресной строки находясь на странице проекта, например:&#xA;на TopCraft для McSkill ID: 218&#xA;на McTOP для Borealis ID: 2241&#xA;на MCRate для MinecraftOnly ID: 5154&#xA;на MinecraftRating для McSkill ID: mcskill&#xA;на MonitoringMinecraft для McSkill ID: mcskill">
+      <img src="images/help.png" width="16" height="16">
+      </span></input>
+  <p>
+    <div id="submit">
+      <button id="submitAddProject" style="margin-left: 10px;" type="submit">Добавить</button>
+    </div>
+  </p>
+  </form>
+
+  <!--<button id="syncOptions", style="float: right; margin-top:-3px;">Обновить список серверов</button>-->
+    <h1>❖ Дополнительно:</h1>
+    <hr>
+    <p><u><b>Не изменяйте настройки предназначения которых не знаете!</b></u></p>
+    <p>
+    <form id="timeout" style="display: inline;">Промежуток времени между проверкой в мс:&nbsp;
+      <input name="cooldown" id="cooldown" required style="width: 80px;" type="number" min="1000"></input>
+      <div id="submit2" style="display: inline;">
+        <button style="margin-left: 10px;" type="submit">Установить</button>
+      </div>
+    </form>
+    </p>
+    <p>
+      Режим голосования:&nbsp;
+      <select required id="enabledSilentVote">
+        <option value="enabled">Тихий режим</option>
+        <option value="disabled">Режим эмуляции</option>
+      </select>
+      <span style="cursor: help;" title="Тихий режим (рекомендуется) — голосует за проекты полностью в фоновом режиме не открывая вкладки&#xA;Режим эмуляции — эмулирует реального пользователя, открывает вкладку и нажимает на кнопку голосования как реальный пользователь, лучше всего в данном режиме оставлять хотя бы одну открытую вкладку в браузере, иначе окно браузера будет открыто поверх остальных окон и может вам помешать">
+      <img src="images/help.png" width="16" height="16">
+      </span>
+    </p>
+
+    <label><input id="disabledNotifStart" type="checkbox" name="checkbox"/>Отключить уведомления о начале голосовании</label>
+    <br><label><input id="disabledNotifInfo" type="checkbox" name="checkbox"/>Отключить уведомления об успешном голосовании</label>
+    <br><label><input id="disabledNotifWarn" type="checkbox" name="checkbox"/>Отключить уведомления о предупреждениях</label>
+    <span style="cursor: help;" title="Например уведомление о том что вы уже голосовали&#xA;(это когда расширение попыталось проголосовать за проект но вы уже сами проголосовали)">
+    <img src="images/help.png" width="16" height="16">
+    </span>
+    <br><label><input id="disabledNotifError" type="checkbox" name="checkbox"/>Отключить уведомления об ошибках</label>
+    <br><label><input id="enableSyncStorage" type="checkbox" name="checkbox"/>Сохранять настройки расширения в облаке</label>
+    <span style="cursor: help;" title="Не рекомендуется включать данную настройку если у вас очень много проектов в списке добавленных проектов, у облака есть ограниченный трафик и место хранения&#xA;Для работы этой функции требуется что бы в вашем браузере был подключён аккаунт и была включена синхронизация, иначе настройки всё равно будут сохраняться локально&#xA;Позволяет синхронизировать настройки расширения с несколькоими компьютерами, не рекомендуется держать расширение включённым с этой включённой настройкой сразу на нескольких компьютерах">
+    <img src="images/help.png" width="16" height="16">
+    </span>
+    <br><label><input id="disabledCheckTime" type="checkbox" name="checkbox"/>Отключить проверку времени при старте расширения</label>
+    <br><label><input id="disableCheckProjects" type="checkbox" name="checkbox"/>Отключить проверку при добавлении проекта</label>
+    <span style="cursor: help;" title="Крайне не рекомендуется отключать эту проверку, это может вызвать ошибки в расширении и может сломать механизм авто-голосования, эта настройка отключает проверку при добавлении проекта, это отключает проверку для MCRate (как известно там можно голосовать в день только за один проект)&#xA;Также он отключает проверку на авторизацию вк&#xA;Данный параметр не сохраняется при сохранении настроек">
+    <img src="images/help.png" width="16" height="16">
+    </span>
+    <br><label><input id="priority" type="checkbox" name="checkbox"/>Добавлять проект в приоритете при добавлении проекта</label>
+    <span style="cursor: help;" title="При включении данной опции и после при добавлении проекта, проект будет в приоритете, будет всегда самым первым голосовать и без задержеки в 10 минут">
+    <img src="images/help.png" width="16" height="16">
+    </span>
+    <p>
+    <label for="file-upload" class="custom-file-upload">
+      <i class="fa fa-cloud-upload"></i>⬇ Импортировать настройки
+    </label>
+    <input id="file-upload" type="file" accept="application/json"/>
+
+    <label id="file-download"class="custom-file-upload">⬆ Экспортировать настройки</label>
+    
+    <div id="file" style="line-height: 0; font-size: 19px; font-weight: 600">&nbsp;</div>
+    
+    </span>
+    <h1>★ Список уже добавленных проектов:</h1>
+    <hr>
+    <p><details style="margin-left: 16px;">
+    <summary>TopCraft.ru</summary>
+    <div style="margin-left: 10px;" id="TopCraftList">Вы ещё не добавили ни одного проекта на этот топ
+    </div>
+    </details>
+
+    <p><details style="margin-left: 16px;">
+    <summary>McTOP.ru</summary>
+    <div style="margin-left: 10px;" id="McTOPList">Вы ещё не добавили ни одного проекта на этот топ
+    </div>
+    </details>
+
+    <p><details style="margin-left: 16px;">
+    <summary>MCRate.su</summary>
+    <div style="margin-left: 10px; margin-bottom: 10px;" id="MCRateList">Вы ещё не добавили ни одного проекта на этот топ
+    </div>
+    </details>
+
+    <p><details style="margin-left: 16px;">
+    <summary>MinecraftRating.ru</summary>
+    <div style="margin-left: 10px;" id="MinecraftRatingList">Вы ещё не добавили ни одного проекта на этот топ
+    </div>
+    </details>
+
+    <p><details style="margin-left: 16px;">
+    <summary>MonitoringMinecraft.ru</summary>
+    <div style="margin-left: 10px;" id="MonitoringMinecraftList">Вы ещё не добавили ни одного проекта на этот топ
+    </div>
+    </details>
+
+    <p><details style="margin-left: 16px;">
+    <summary>FairTop.in (по умолчанию работает в режиме эмуляции)</summary>
+    <div style="margin-left: 10px;" id="FairTopList">Вы ещё не добавили ни одного проекта на этот топ
+    </div>
+    </details>
+
+    <p><details style="margin-left: 16px;">
+    <summary>Кастомное</summary>
+    <div style="margin-left: 10px;" id="CustomList">Вы ещё не добавили ни одного проекта на этот топ
+    </div>
+    </details>
+
+    <hr style="margin-top: 20px;">
+    <div style="margin-top: 29px;" align="right">
+    <span style="float: left; font-weight: 600">Это расширение распространяется абсолютно бесплатно!</span>
+    <a class="ssilka" target="blank_" href="/reference.html">Справка</a>
+    </div>
+</div>
+<div class="thx" align="center">
+  <a class="thx_a" target="blank_" href="https://my.qiwi.com/Sergei-EV-7E02hYH">Поддержать Автора</a>
+</div>
+  <script src="options.js"></script>
+</body>
+</html>

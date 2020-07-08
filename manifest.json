@@ -1,0 +1,25 @@
+{
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlVWvJq5iqtShA8l+gsv52P1PZyWFZ4sS++yguLUl01MwUjpI2swMSi8LukdUMJeeqBdUvXHvtKA1WTeGH2R+LUX4+UXTM2vSqm1qMboGb1A6dbLCYVEStZhl5WiTP9Vocc4vauTWKRN8mPn00TxFym9EoVcdOtSdem4npnyE/CZUW5dfZr3dPqDhrbEPQgrmp0Fr+jcdW8XNhzVXHyXH6lVD5TkuR5rZhkKatw/WrQ2lHn+jU/exZu/J2InTTSdm+jyZ16Z1rt/7rD3nmOrN+aju/NI1+i9ehY3Gio4tk9zmL3HTFiRWOxFYVRVcytECBiEcPRDe2CIY7gNfVn4DDQIDAQAB",
+   "short_name": "AVMR",
+   "author": "Serega007",
+   "background": {
+      "scripts": [ "background.js" ]
+   },
+   "description": "Автоматическое голосование на майнкрафт рейтингах для Minecraft проектов",
+   "manifest_version": 2,
+   "name": "Auto Vote Minecraft Rating",
+   "options_ui": {
+      "open_in_tab": true,
+      "page": "options.html"
+   },
+   "icons": {
+      "16": "images/icon16.png",
+      "32": "images/icon32.png",
+      "48": "images/icon48.png",
+      "64": "images/icon64.png",
+      "128": "images/icon128.png"
+   },
+   "permissions": [ "cookies", "storage", "notifications", "background", "\u003Call_urls>", "tabs"],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "2.2.0"
+}
