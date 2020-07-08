@@ -932,4 +932,9 @@ v2.2.0
 https://www.planetminecraft.com/
 https://topg.org/
 https://minecraft-mp.com/
+
+https://ionmc.top/ под вопросом насчёт капчи
+
+Открытый репозиторий:
+https://gitlab.com/Serega007/auto-vote-minecraft-rating
 */
