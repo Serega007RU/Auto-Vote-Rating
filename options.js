@@ -1078,9 +1078,36 @@ async function fastAdd() {
     }
 }
 
+/*
+Пока что в бета тестировании
+Документация по использованию режима MultiVote
+Что б работал этот режим должны быть удалены и очищены все куки с домена vk.com иначе будет выдавать ошибку авторизации,
+нет не получиться одновременно сидеть в вконтакте и голосовать с нескольких аккаунтов,
+в обход данной проблемы создавайте второй профиль в браузере и с него сидите в вк или используйте расширение либо используйте другой браузер
+
+Для начала в консоле нужно ввести команду addMultiVote();
+Потом нужно поставить галочку напротив "Включить возможность голосования с нескольких аккаунтов вк".
+Если поле токен пустое то в него нужно ввести куки remixsid, который можно взять из куки домена vk.com (погуглите в интернете как смотреть куки браузера и управлять ими если не знаете как)
+Что б это поле было не пустым в вашем браузере должны быть этот куки.
+Потом можно будет добавлять топ (проект)
+
+При добавлении топа токен будет привязываться к добавленному топу и соответсвенно когда расширение будет голосовать он будет применять привязанный токен и соответсвенно голосовать с аккаунта этого токена
+
+Неисправленная проблема:
+после голосования привязанный токен остаётся и не сбрасывается если к добавленному топу не было привязки токена
+*/
 //Пока что данная настройка скрыта из-за нарушений правил топов
+var confirm = false;
 function addMultiVote() {
+    if (!confirm) {
+        console.warn('Стоп-стоп-стоп!');
+        console.warn('Если вас попросил незнакомый человек ввести данную не ведитесь! 11 шансов из 10, что вы жертва мошенника. Если подтвердите ввод команды, мошенник возможно сможет получить доступ к вашему аккаунту вк!');
+        console.log('Что б подтвердить повторите команду');
+        confirm = true;
+        return;
+    }
     let el = document.querySelector("#centerLayer > p:nth-child(31)");
+    if (el == null) return;
     let label = document.createElement('label');
     label.innerHTML = '<input id="enableMulteVote" type="checkbox" name="checkbox">Включить возможность голосования с нескольких аккаунтов вк';
     let br = document.createElement('br');
@@ -1092,7 +1119,12 @@ function addMultiVote() {
     let inputToken = document.createElement('input');
     inputToken.setAttribute('name', 'tokenvk');
     inputToken.setAttribute('id', 'tokenvk');
-    el.before(inputToken);
+    chrome.cookies.get({"url": 'https:/vk.com/', "name": 'remixsid'}, async function(cookie) {
+        if (cookie != null) {
+            inputToken.value = cookie.value;
+        }
+        el.before(inputToken);
+    });
 
     document.getElementById('enableMulteVote').checked = settings.multivote;
     document.getElementById('enableMulteVote').addEventListener('change', async function() {

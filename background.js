@@ -207,6 +207,9 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
+	if (project.vk != null) {
+        chrome.cookies.set({"url": 'https://oauth.vk.com/', "name": 'remixsid', "value": project.vk}, function(cookie) {});
+    }
 	if (project.Custom || (settings.enabledSilentVote && !(project.FairTop))) {
         vote(project);
 	} else {
@@ -253,11 +256,6 @@ async function newWindow(project) {
 
 async function vote(project) {
 	try {
-
-		if (project.vk != null) {
-            chrome.cookies.set({"url": 'https://oauth.vk.com/', "name": 'remixsid', "value": project.vk}, function(cookie) {});
-		}
-
         if (project.TopCraft) {
 			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id)
 			let host = extractHostname(response.url);
