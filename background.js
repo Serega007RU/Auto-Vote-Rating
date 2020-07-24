@@ -927,11 +927,17 @@ v2.2.0
 
 Планируется:
 Добавить следующие топы:
-https://www.planetminecraft.com/
-https://topg.org/
-https://minecraft-mp.com/
+https://www.planetminecraft.com/ фоновая капча
+https://topg.org/ фоновая капча
+https://minecraft-mp.com/ фоновая капча
+https://minecraft-server-list.com/ фоновая капча
+https://www.minestatus.net/ фоновая капча
+https://www.serverpact.com/ непонятная капча но стоит попробовать
+https://www.minecraftiplist.com/ прикольная капча но стоит попробовать (чуть посложнее чем предыдущая)
 
-https://ionmc.top/ под вопросом насчёт капчи
+https://ionmc.top/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)
+https://minecraftservers.org/ не возможно обойти капчу
+https://www.minetrack.net/на момент проверки сайт лежал
 
 Открытый репозиторий:
 https://gitlab.com/Serega007/auto-vote-minecraft-rating

@@ -235,7 +235,7 @@ async function addProjectList(project, visually) {
     } else {
         getProjectList(project).push(project);
     }
-    if (document.getElementById('tokenvk') != null && document.getElementById('tokenvk').value != null && document.getElementById('tokenvk').value != '') {
+    if (settings.multivote && document.getElementById('tokenvk') != null && document.getElementById('tokenvk').value != null && document.getElementById('tokenvk').value != '') {
         project.vk = document.getElementById('tokenvk').value;
     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
@@ -1097,13 +1097,13 @@ async function fastAdd() {
 после голосования привязанный токен остаётся и не сбрасывается если к добавленному топу не было привязки токена
 */
 //Пока что данная настройка скрыта из-за нарушений правил топов
-var confirm = false;
+var confirmWarn = false;
 function addMultiVote() {
-    if (!confirm) {
+    if (!confirmWarn && !settings.multivote) {
         console.warn('Стоп-стоп-стоп!');
         console.warn('Если вас попросил незнакомый человек ввести данную не ведитесь! 11 шансов из 10, что вы жертва мошенника. Если подтвердите ввод команды, мошенник возможно сможет получить доступ к вашему аккаунту вк!');
         console.log('Что б подтвердить повторите команду');
-        confirm = true;
+        confirmWarn = true;
         return;
     }
     let el = document.querySelector("#centerLayer > p:nth-child(31)");
