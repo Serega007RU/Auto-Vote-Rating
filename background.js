@@ -6,7 +6,14 @@ var projectsMCRate = [];
 var projectsMinecraftRating = [];
 var projectsMonitoringMinecraft = [];
 var projectsFairTop = [];
+var projectsPlanetMinecraft = [];
+var projectsTopG = [];
+var projectsMinecraftMp = [];
+var projectsMinecraftServerList = [];
+var projectsServerPact = [];
+var projectsMinecraftIpList = [];
 var projectsCustom = [];
+
 //Настройки
 var settings;
 //Где сохранять настройки
@@ -59,10 +66,32 @@ async function initializeConfig() {
     projectsMonitoringMinecraft = projectsMonitoringMinecraft.AVMRprojectsMonitoringMinecraft;
     projectsFairTop = await getValue('AVMRprojectsFairTop');
     projectsFairTop = projectsFairTop.AVMRprojectsFairTop;
+    projectsPlanetMinecraft = await getValue('AVMRprojectsPlanetMinecraft');
+    projectsPlanetMinecraft = projectsPlanetMinecraft.AVMRprojectsPlanetMinecraft;
+    projectsTopG = await getValue('AVMRprojectsTopG');
+    projectsTopG = projectsTopG.AVMRprojectsTopG;
+    projectsMinecraftMp = await getValue('AVMRprojectsMinecraftMp');
+    projectsMinecraftMp = projectsMinecraftMp.AVMRprojectsMinecraftMp;
+    projectsMinecraftServerList = await getValue('AVMRprojectsMinecraftServerList');
+    projectsMinecraftServerList = projectsMinecraftServerList.AVMRprojectsMinecraftServerList;
+    projectsServerPact = await getValue('AVMRprojectsServerPact');
+    projectsServerPact = projectsServerPact.AVMRprojectsServerPact;
+    projectsMinecraftIpList = await getValue('AVMRprojectsMinecraftIpList');
+    projectsMinecraftIpList = projectsMinecraftIpList.AVMRprojectsMinecraftIpList;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
     settings = await getValue('AVMRsettings');
     settings = settings.AVMRsettings;
+
+    //Если пользователь обновился с версии 2.2.0
+    if (projectsPlanetMinecraft == null || !(typeof projectsPlanetMinecraft[Symbol.iterator] === 'function')) {
+        projectsPlanetMinecraft = [];
+        projectsTopG = [];
+        projectsMinecraftMp = [];
+        projectsMinecraftServerList = [];
+        projectsServerPact = [];
+        projectsMinecraftIpList = [];
+    }
 
     if (settings && settings.cooldown && Number.isInteger(settings.cooldown)) cooldown = settings.cooldown;
 
@@ -154,8 +183,10 @@ async function checkOpen(project) {
     
     //Не позволяет открыть больше одной вкладки для одного топа
 	for (let value of queueProjects) {
-		if (settings.multivote) {//Не позволяет открыть больше одной вкладки для всех топов если включён режим голосования с нескольких аккаунтов вк
+		//Не позволяет открыть больше одной вкладки для всех топов если включён режим голосования с нескольких аккаунтов вк для топов где используется вк
+		if (settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
             if (queueProjects.size > 0) return;
+        //Не позволяет открыть более одной вкладки для одного топа
 		} else {
 			if (getProjectName(value) == getProjectName(project)) return;
 		}
@@ -210,8 +241,16 @@ async function newWindow(project) {
 	if (project.vk != null) {
         chrome.cookies.set({"url": 'https://oauth.vk.com/', "name": 'remixsid', "value": project.vk}, function(cookie) {});
     }
-	if (project.Custom || (settings.enabledSilentVote && !(project.FairTop))) {
-        vote(project);
+    let silentVoteMode = false;
+    if (project.Custom) {
+    	silentVoteMode = true;
+    } else if (settings.enabledSilentVote) {
+    	if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
+    		silentVoteMode = true;
+    	}
+    }
+	if (silentVoteMode) {
+        silentVote(project);
 	} else {
 		chrome.windows.getCurrent(function(win) {
 			if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {console.error('Ошибка при открытии вкладки: ' + chrome.runtime.lastError);}
@@ -221,32 +260,62 @@ async function newWindow(project) {
 				})
 			}
 			if (project.TopCraft) {
-				chrome.tabs.create({"url":"https://topcraft.ru/servers/" + project.id + "/","selected":false}, function(tab){
+				chrome.tabs.create({"url":"https://topcraft.ru/servers/" + project.id + "/", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
 			if (project.McTOP) {
-				chrome.tabs.create({"url":"https://mctop.su/servers/" + project.id + "/","selected":false}, function(tab){
+				chrome.tabs.create({"url":"https://mctop.su/servers/" + project.id + "/", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
 			if (project.MCRate) {
-				chrome.tabs.create({"url":"http://mcrate.su/rate/" + project.id,"selected":false}, function(tab){
+				chrome.tabs.create({"url":"http://mcrate.su/rate/" + project.id, "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
 			if (project.MinecraftRating) {
-				chrome.tabs.create({"url":"http://minecraftrating.ru/projects/" + project.id + "/","selected":false}, function(tab){
+				chrome.tabs.create({"url":"http://minecraftrating.ru/projects/" + project.id + "/", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
 			if (project.MonitoringMinecraft) {
-				chrome.tabs.create({"url":"http://monitoringminecraft.ru/top/" + project.id + "/vote","selected":false}, function(tab){
+				chrome.tabs.create({"url":"http://monitoringminecraft.ru/top/" + project.id + "/vote", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
 			if (project.FairTop) {
-				chrome.tabs.create({"url":"https://fairtop.in/project/" + project.id + "/","selected":false}, function(tab){
+				chrome.tabs.create({"url":"https://fairtop.in/project/" + project.id + "/", "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.PlanetMinecraft) {
+				chrome.tabs.create({"url":"https://www.planetminecraft.com/server/" + project.id + "/vote/", "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.TopG) {
+				chrome.tabs.create({"url":"https://topg.org/Minecraft/in-" + project.id, "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.MinecraftMp) {
+				chrome.tabs.create({"url":"https://minecraft-mp.com/server/" + project.id + "/vote/", "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.MinecraftServerList) {
+				chrome.tabs.create({"url":"https://minecraft-server-list.com/server/" + project.id + "/vote/", "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.ServerPact) {
+				chrome.tabs.create({"url":"https://www.serverpact.com/vote-" + project.id, "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.MinecraftIpList) {
+				chrome.tabs.create({"url":"https://www.minecraftiplist.com/index.php?action=vote&listingID=" + project.id, "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
@@ -254,7 +323,7 @@ async function newWindow(project) {
 	}
 }
 
-async function vote(project) {
+async function silentVote(project) {
 	try {
         if (project.TopCraft) {
 			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id)
@@ -520,6 +589,12 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 		if (openedProjects.get(tab.id).MinecraftRating) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftrating.js"});
 		if (openedProjects.get(tab.id).MonitoringMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/monitoringminecraft.js"});
 		if (openedProjects.get(tab.id).FairTop) chrome.tabs.executeScript(tabid, {file: "scripts/fairtop.js"});
+		if (openedProjects.get(tab.id).PlanetMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/planetminecraft.js"});
+		if (openedProjects.get(tab.id).TopG) chrome.tabs.executeScript(tabid, {file: "scripts/topg.js"});
+		if (openedProjects.get(tab.id).MinecraftMp) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftmp.js"});
+		if (openedProjects.get(tab.id).MinecraftServerList) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftserverlist.js"});
+		if (openedProjects.get(tab.id).ServerPact) chrome.tabs.executeScript(tabid, {file: "scripts/serverpact.js"});
+		if (openedProjects.get(tab.id).MinecraftIpList) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftiplist.js"});
 	}
 	//Фикс ошибки ERR_BLOCKED_BY_CLIENT если пользователь открывает настройки расширения со стороннего сайта
     else if (tab.url.includes('mdfmiljoheedihbcfiifopgmlcincadd/options.htm') && tab.url.includes('#addFastProject') && !tab.title.includes("Настройки Auto Vote Minecraft Rating") && info.status == 'complete') {
@@ -635,6 +710,12 @@ function getProjectName(project) {
 	if (project.MinecraftRating) return "MinecraftRating";
 	if (project.MonitoringMinecraft) return "MonitoringMinecraft";
 	if (project.FairTop) return "FairTop";
+	if (project.PlanetMinecraft) return "PlanetMinecraft";
+	if (project.TopG) return "TopG";
+	if (project.MinecraftMp) return "MinecraftMp";
+	if (project.MinecraftServerList) return "MinecraftServerList";
+	if (project.ServerPact) return "ServerPact";
+	if (project.MinecraftIpList) return "MinecraftIpList";
 	if (project.Custom) return "Custom";
 }
 
@@ -645,6 +726,12 @@ function getProjectList(project) {
     if (project.MinecraftRating) return projectsMinecraftRating;
     if (project.MonitoringMinecraft) return projectsMonitoringMinecraft;
     if (project.FairTop) return projectsFairTop;
+    if (project.PlanetMinecraft) return projectsPlanetMinecraft;
+    if (project.TopG) return projectsTopG;
+    if (project.MinecraftMp) return projectsMinecraftMp;
+    if (project.MinecraftServerList) return projectsMinecraftServerList;
+    if (project.ServerPact) return projectsServerPact;
+    if (project.MinecraftIpList) return projectsMinecraftIpList;
     if (project.Custom) return projectsCustom;
 }
 
@@ -731,6 +818,24 @@ function forLoopAllProjects (fuc) {
     for (proj of projectsFairTop) {
         fuc();
     }
+    for (proj of projectsPlanetMinecraft) {
+        fuc();
+    }
+    for (proj of projectsTopG) {
+        fuc();
+    }
+    for (proj of projectsMinecraftMp) {
+        fuc();
+    }
+    for (proj of projectsMinecraftServerList) {
+        fuc();
+    }
+    for (proj of projectsServerPact) {
+        fuc();
+    }
+    for (proj of projectsMinecraftIpList) {
+        fuc();
+    }
     for (proj of projectsCustom) {
         fuc();
     }
@@ -765,6 +870,12 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         if (key == 'AVMRprojectsMinecraftRating') projectsMinecraftRating = storageChange.newValue;
         if (key == 'AVMRprojectsMonitoringMinecraft') projectsMonitoringMinecraft = storageChange.newValue;
         if (key == 'AVMRprojectsFairTop') projectsFairTop = storageChange.newValue;
+        if (key == 'AVMRprojectsPlanetMinecraft') projectsPlanetMinecraft = storageChange.newValue;
+        if (key == 'AVMRprojectsTopG') projectsTopG = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftMp') projectsMinecraftMp = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftServerList') projectsMinecraftServerList = storageChange.newValue;
+        if (key == 'AVMRprojectsServerPact') projectsServerPact = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftIpList') projectsMinecraftIpList = storageChange.newValue;
         if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
         if (key == 'AVMRsettings') {
         	settings = storageChange.newValue;
@@ -925,19 +1036,64 @@ v2.2.0
 Исправлена критическая ошибка с голосованием на MonitoringMinecraft в режиме эмуляции (спасибо Ружбайка#8839 за найденный баг), если вы уже голосовали на этом топе то страница циклически перезагружалась
 Авторизация вк теперь более правильно и понятно проходит для пользователя (в отдельном модальном окне)
 
+v2.3.0
+Мелкие исправления с MultiVote
+В настройках в списке добавленных топов написано теперь "Следующее голосование после" а не "Следующее голосование в", народ немного тупит на этом (спасибо YaMotλaV)
+Изменения со списком проектов:
+- WarMine теперь на втором месте в списке проектов (вынудил KN1GHT)
+- Beemo удалён: пропал безвести
+- PublicCraft проект умер 
+Новые топы (пока в разработке):
+- PlanetMinecraft
+- TopG
+- MinecraftMp
+- MinecraftServerList
+- ServerPact
+- MinecraftIpList
+
 Планируется:
+Локализация под разные языки, первый язык: English
 Добавить следующие топы:
-https://www.planetminecraft.com/ фоновая капча
-https://topg.org/ фоновая капча
-https://minecraft-mp.com/ фоновая капча
-https://minecraft-server-list.com/ фоновая капча
-https://www.minestatus.net/ фоновая капча
-https://www.serverpact.com/ непонятная капча но стоит попробовать
-https://www.minecraftiplist.com/ прикольная капча но стоит попробовать (чуть посложнее чем предыдущая)
+https://www.planetminecraft.com/
+фоновая капча
+раз в день
+можно голосовать за все проекты разом
+
+https://topg.org/
+фоновая капча
+раз в 12 часов, время сбрасывается через 12 часов с момента голосования
+можно голосовать за все проекты разом
+
+https://minecraft-mp.com/
+фоновая капча
+время голосования сбрасывается в 00:00 по Северноамериканскому Восточному времени (UTC -5) тоесть от московского разница в -8 часов
+можно голосовать за все проекты разом
+
+https://minecraft-server-list.com/
+фоновая капча
+время голосования походу сбрасывается в 00:00 по UTC +5 тоесть от московского разница в +2 часов
+можно голосовать за все проекты разом
+
+https://www.serverpact.com/
+непонятная капча но стоит попробовать
+раз в 12 часов, время сбрасывается через 12 часов с момента голосования
+можно голосовать только за 1 проект раз в 12 часов
+
+https://www.minecraftiplist.com/
+прикольная капча но стоит попробовать (чуть посложнее чем предыдущая)
+раз в 24 часов, время сбрасывается через 24 часов с момента голосования
+можно голосовать только за 5 проектов раз в 24 часа
+попавшиеся рецепты:
+золотая лопата
+сундук
+алмазная кирка
+железный меч
 
 https://ionmc.top/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)
+https://serveur-prive.net/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)
 https://minecraftservers.org/ не возможно обойти капчу
-https://www.minetrack.net/на момент проверки сайт лежал
+https://www.minetrack.net/ на момент проверки сайт лежал
+https://www.minestatus.net/ фоновая капча и потом этот сайт лёг
 
 Открытый репозиторий:
 https://gitlab.com/Serega007/auto-vote-minecraft-rating
