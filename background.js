@@ -122,32 +122,26 @@ function checkVote() {
     let hourse = timeMoscow.getUTCHours();
 	let minutes = timeMoscow.getUTCMinutes();
     
-//  let clear = false;
 	forLoopAllProjects(function () {
 		if (proj.TopCraft || proj.McTOP || proj.FairTop || proj.MinecraftRating) {
 			//Должно соблюсти след условия: должно быть дата не равна, если сейчас 0 часов — должно быть больше 10-ти минут (или должен быть приоритет), если 1 или больше часов то пропускает
 		    if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
                 checkOpen(proj);
-//              clear = true;
 			}
 	    } else if (proj.MCRate) {
 		    if (proj.time == null || ((proj.time != date && hourse >= 2) || (proj.time != date && hourse == 1 && (proj.priority || minutes >= 10)))) {
                 checkOpen(proj);
-//              clear = true;
+			}
+	    } else if (proj.TopG) {
+			if (proj.time == null || proj.time < (Date.now() - (43200000/*+12 часов*/))) {
+                checkOpen(proj);
 			}
 		} else {
 			if (proj.time == null || proj.time < (Date.now() - (proj.Custom ? proj.timeout : 86400000/*+24 часа*/))) {
                 checkOpen(proj);
-//              clear = true;
 			}
 		}
 	});
-//	if (!clear) {
-//		if (queueProjects.size != 0) queueProjects.clear();
-//		if (openedProjects.size != 0) openedProjects.clear();
-//	    if (retryProjects.size != 0) retryProjects.clear();
-//    }
-	
 }
 
 async function checkOpen(project) {
@@ -329,7 +323,7 @@ async function silentVote(project) {
 			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id)
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект что бы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
 				return;
 			}
 			if (!host.includes('topcraft.')) {
@@ -360,7 +354,7 @@ async function silentVote(project) {
 			let response = await fetch("https://mctop.su/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id)
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект что бы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
 				return;
 			}
 			if (!host.includes('mctop.')) {
@@ -391,7 +385,7 @@ async function silentVote(project) {
 			let response = await fetch("https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=" + project.id + "&response_type=code");
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект что бы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
 				return;
 			}
 			if (!host.includes('mcrate.')) {
@@ -448,7 +442,7 @@ async function silentVote(project) {
 			let response = await fetch("https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/" + project.id + "/&state=" + project.nick + "&response_type=code&v=5.45");
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект что бы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
 				return;
 			}
 			if (!host.includes('minecraftrating.')) {
@@ -506,7 +500,7 @@ async function silentVote(project) {
 			let response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект что бы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
 				return;
 			}
 			if (!host.includes('monitoringminecraft.')) {
@@ -609,7 +603,7 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
 
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(message, sender, project) {
-	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и есои вкладка была открыта расширением
+	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         chrome.tabs.remove(sender.tab.id);
         project = openedProjects.get(sender.tab.id);
         openedProjects.delete(sender.tab.id);
@@ -650,7 +644,7 @@ async function endVote(message, sender, project) {
         	return;
         }
         let time;
-        if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.MCRate) {
+        if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.MCRate) {//Топы на которых время сбрасывается в 00:00 по МСК
             let timeMoscow = new Date(Date.now() + 10800000);
             time = (timeMoscow.getUTCMonth() + 1) + '/' + timeMoscow.getUTCDate() + '/' + timeMoscow.getUTCFullYear();
             project.time = time;
@@ -1039,10 +1033,11 @@ v2.2.0
 v2.3.0
 Мелкие исправления с MultiVote
 В настройках в списке добавленных топов написано теперь "Следующее голосование после" а не "Следующее голосование в", народ немного тупит на этом (спасибо YaMotλaV)
+Чтобы пишется слитно а не раздельно (спасибо ребятам из 300iq Squad)
 Изменения со списком проектов:
 - WarMine теперь на втором месте в списке проектов (вынудил KN1GHT)
 - Beemo удалён: пропал безвести
-- PublicCraft проект умер 
+- PublicCraft удалён: проект умер 
 Новые топы (пока в разработке):
 - PlanetMinecraft
 - TopG
@@ -1085,9 +1080,10 @@ https://www.minecraftiplist.com/
 можно голосовать только за 5 проектов раз в 24 часа
 попавшиеся рецепты:
 золотая лопата
-сундук
+сундук (дубовый)
 алмазная кирка
 железный меч
+табличка (дубовая)
 
 https://ionmc.top/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)
 https://serveur-prive.net/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)

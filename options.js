@@ -281,6 +281,8 @@ async function addProjectList(project, visually) {
             let date = new Date(new Date(project.time).getTime() - 10800000/*-3 часа*/ + 86400000/*+24 часа*/ + 3600000/*+ 1 час*/ + (project.priority ? 0 : 600000/*+10 минут*/));
             let userTimezoneOffset = date.getTimezoneOffset() * 60000;
             timeNew = new Date(date.getTime() - userTimezoneOffset);
+        } else if (project.TopG) {
+            timeNew = new Date(project.time + (43200000/*+12 часов*/));
         } else {
             timeNew = new Date(project.time + (project.Custom ? project.timeout : 86400000/*+24 часа*/));
         }
@@ -500,7 +502,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             returnAdd = true;
             return;
         } else if (proj.FairTop && choice == "FairTop" && proj.nick && project.nick && !disableCheckProjects) {
-            updateStatusAdd('<font color="red">На FairTop можно голосовать только за 1 проект, что бы голосовать за несколько проектов - запретите сайту FairTop.in сохранять куки файлы, если не знаете как это сделать - загуглите) Если вы запретили сохранять куки, отключите проверку при добавлении проекта в дополнительных настройках и попробуйте снова добавить этот проект. Будьте внимательны с айди проекта при добавлении проекта с отключенной проверкой, расширение может принять проект с несуществующим айди.</font>', true, element);
+            updateStatusAdd('<font color="red">На FairTop можно голосовать только за 1 проект, чтобы голосовать за несколько проектов - запретите сайту FairTop.in сохранять куки файлы, если не знаете как это сделать - загуглите) Если вы запретили сохранять куки, отключите проверку при добавлении проекта в дополнительных настройках и попробуйте снова добавить этот проект. Будьте внимательны с айди проекта при добавлении проекта с отключенной проверкой, расширение может принять проект с несуществующим айди.</font>', true, element);
             returnAdd = true;
             return;
         } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
@@ -524,7 +526,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         let url;
         let jsPath;
         if (project.TopCraft) {
-            url = 'http://topcraft.ru/servers/' + project.id + '/';
+            url = 'https://topcraft.ru/servers/' + project.id + '/';
             jsPath = "#project-about > table > tbody > tr:nth-child(1) > td:nth-child(2) > a";
         }
         if (project.McTOP) {
@@ -733,7 +735,7 @@ async function setCoolDown() {
     if (settings.cooldown && settings.cooldown == parseInt(document.getElementById('cooldown').value)) return;
     settings.cooldown = parseInt(document.getElementById('cooldown').value);
     await setValue('AVMRsettings', settings, true);
-    alert('Кулдаун успешно изменён. Перезапустите расширение что бы изменения вступили в силу.')
+    alert('Кулдаун успешно изменён. Перезапустите расширение чтобы изменения вступили в силу.')
 }
 
 //Статус сохранения настроек
@@ -887,7 +889,19 @@ async function setSyncValue(key, value) {
 chrome.storage.onChanged.addListener(function(changes, namespace) {
     for (var key in changes) {
         var storageChange = changes[key];
-        if (key == 'AVMRprojectsTopCraft' || key == 'AVMRprojectsMcTOP' || key == 'AVMRprojectsMCRate' || key == 'AVMRprojectsMinecraftRating' || key == 'AVMRprojectsMonitoringMinecraft' || key == 'AVMRprojectsFairTop' || key == 'AVMRprojectsCustom') {
+        if (key == 'AVMRprojectsTopCraft'
+        || key == 'AVMRprojectsMcTOP'
+        || key == 'AVMRprojectsMCRate'
+        || key == 'AVMRprojectsMinecraftRating'
+        || key == 'AVMRprojectsMonitoringMinecraft'
+        || key == 'AVMRprojectsFairTop'
+        || key == 'AVMRprojectsPlanetMinecraft'
+        || key == 'AVMRprojectsTopG'
+        || key == 'AVMRprojectsMinecraftMp'
+        || key == 'AVMRprojectsMinecraftServerList'
+        || key == 'AVMRprojectsServerPact'
+        || key == 'AVMRprojectsMinecraftIpList'
+        || key == 'AVMRprojectsCustom') {
             if (key == 'AVMRprojectsTopCraft') projectsTopCraft = storageChange.newValue;
             if (key == 'AVMRprojectsMcTOP') projectsMcTOP = storageChange.newValue;
             if (key == 'AVMRprojectsMCRate') projectsMCRate = storageChange.newValue;
