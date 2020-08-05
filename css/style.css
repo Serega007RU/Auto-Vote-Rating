@@ -1,7 +1,8 @@
 body {
   font-size: 16px;
-  background: #15181d;
+  background: #15181d !important;
   height: 100%;
+  color: #fff !important;
 }
 
 tbody.table {
@@ -219,34 +220,35 @@ input[name="checkbox"] {
 
 .container {
   margin-top: 70px;
-  background: #1e2127;
+  background: #1c1f25;
   padding: 15px;
 }
 
 .tablinks {
+  color: rgba(255, 255, 255, 0.56);
+  background: #2c2e34;
+  margin-right: 10px; 
   padding: 8px 20px;
-  background: #7483e8;
   font-size: 19px;
-  color: #fff;
   outline: none;
   border: none;
-  transition: 0.2s;
+  transition: 0.3s;
   cursor: pointer;
 }
 
 .tablinks:hover {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .active {
-  background: #74e8b8;
-  color: #212121;
+  background: #fc842f;
+  color: #fff;
 }
 
 select, input {
   background: #ECEFF1;
   border: none;
-  font-size: 17px;
+  font-size: 14px;
   border-radius: 3px;
   padding: 12px 17px;
   margin-bottom: 7px;
