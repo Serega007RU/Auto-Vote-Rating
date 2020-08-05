@@ -53,10 +53,6 @@ h1 {
   text-align: center; 
 }
 
-p, form, label, details {
-  font-size: 19px;
-}
-
 .custom-file-upload {
   background: #ECEFF1;
   border: none;
@@ -236,6 +232,10 @@ input[name="checkbox"] {
   cursor: pointer;
 }
 
+.tablinks:focus {
+  outline: 0;
+}
+
 .tablinks:hover {
   opacity: 0.85;
 }
@@ -245,11 +245,30 @@ input[name="checkbox"] {
   color: #fff;
 }
 
-select, input {
-  background: #ECEFF1;
-  border: none;
-  font-size: 14px;
-  border-radius: 3px;
-  padding: 12px 17px;
-  margin-bottom: 7px;
+select {
+  cursor: po
 }
+
+select, input {
+  background-color: #2c2e34;
+  border: none;
+  border-radius: 2px;
+  height: 48px;
+  font-size: 17px !important;
+  padding: .375rem .9rem;
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.4);
+  -webkit-transition: 0.2s;
+  -o-transition: 0.2s;
+  transition: 0.2s;
+}
+
+select:focus, input:focus {
+  border-bottom: solid 2px #fc842f;
+  outline: 0;
+}
+
+p, form, label, details {
+  font-size: 19px;
+}
+
