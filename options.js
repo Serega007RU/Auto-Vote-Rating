@@ -1409,3 +1409,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     await restoreOptions();
     fastAdd();
 });
+
+function tabSelect(evt, tabs) {
+    var i, tabcontent, tablinks;
+
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    document.getElementById(tabs).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+document.getElementById('addTab').addEventListener('click', function() {
+    tabSelect(event, 'add');
+});
+document.getElementById('settingsTab').addEventListener('click', function() {
+    tabSelect(event, 'settings');
+});
+document.getElementById('addedTab').addEventListener('click', function() {
+    tabSelect(event, 'added');
+});
+document.getElementById('helpTab').addEventListener('click', function() {
+    tabSelect(event, 'help');
+});
