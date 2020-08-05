@@ -283,6 +283,14 @@ async function addProjectList(project, visually) {
             timeNew = new Date(date.getTime() - userTimezoneOffset);
         } else if (project.TopG) {
             timeNew = new Date(project.time + (43200000/*+12 часов*/));
+        } else if (project.MinecraftMp) {
+            let date = new Date(new Date(project.time).getTime() + 18000000/*+5 часов*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
+            let userTimezoneOffset = date.getTimezoneOffset() * 60000;
+            timeNew = new Date(date.getTime() - userTimezoneOffset);
+        } else if (project.MinecraftServerList) {
+            let date = new Date(new Date(project.time).getTime() - 18000000/*-5 часов*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
+            let userTimezoneOffset = date.getTimezoneOffset() * 60000;
+            timeNew = new Date(date.getTime() - userTimezoneOffset);
         } else {
             timeNew = new Date(project.time + (project.Custom ? project.timeout : 86400000/*+24 часа*/));
         }
@@ -558,7 +566,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             jsPath = "body > main > site > div.main > div > div > div.col-lg-4 > div.widget.stacked.widget-table.action-table.nom > div.widget-content > table > tbody > tr:nth-child(7) > td:nth-child(2) > div";
         }
         if (project.MinecraftMp) {
-            url = 'https://minecraft-mp.com/server-' + project.id;
+            url = 'https://minecraft-mp.com/server-s' + project.id;
             jsPath = "body > div.content > div > div:nth-child(13) > div.col-xs-7 > table > tbody > tr:nth-child(7) > td:nth-child(2) > a"
         }
         if (project.MinecraftServerList) {
