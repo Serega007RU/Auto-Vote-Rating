@@ -229,8 +229,8 @@ input[name="checkbox"] {
   color: rgba(255, 255, 255, 0.56);
   background: #2c2e34;
   margin-right: 10px; 
-  padding: 8px 20px;
-  font-size: 19px;
+  padding: 9px 12px;
+  font-size: 18px;
   outline: none;
   border: none;
   transition: 0.3s;
@@ -251,10 +251,12 @@ input[name="checkbox"] {
 }
 
 select {
-  cursor: po
+  cursor: pointer;
 }
 
 select, input {
+  width: 100%;
+  display: block;
   background-color: #2c2e34;
   border: none;
   border-radius: 2px;
@@ -277,3 +279,38 @@ p, form, label, details {
   font-size: 19px;
 }
 
+.form-group label {
+  position: relative;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 15px;
+  top: auto;
+  left: auto;
+}
+
+.help {
+  content: url(../svg/help.svg);
+  width: 17px;
+  height: 17px;
+  margin-right: 5px;
+}
+
+.plus {
+  content: url(../svg/plus.svg);
+  width: 17px;
+  height: 17px;
+  margin-right: 5px;
+}
+
+.list {
+  content: url(../svg/list.svg);
+  width: 17px;
+  height: 17px;
+  margin-right: 5px;
+}
+
+.settings {
+  content: url(../svg/settings.svg);
+  width: 17px;
+  height: 17px;
+  margin-right: 5px;
+}

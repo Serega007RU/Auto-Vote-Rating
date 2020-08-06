@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="widtd=device-widtd, maximum-scale=1.0, minimum-scale=1.0">
-  <title>Настройки Auto Vote Minecraft Rating</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Auto Vote Minecraft Rating</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/bootstrap.css">
   <link rel="stylesheet" href="css/bootstrap-grid.css">
@@ -22,40 +22,60 @@
 <div class="container">
 
   <div id="centerLayer">
-    <button class="tablinks active" id="addTab">Добавить</button>
-    <button class="tablinks" id="addedTab">Добавленные</button>
-    <button class="tablinks" id="settingsTab">Настройки</button>
-    <button class="tablinks" id="helpTab">Справка</button>
-  
-<div id="add" class="tabcontent mt-3" style="display: block;">
-  <form id="addProject">
-    <select required id="project">
-      <option selected disabled>Выберите сайт</option>
-      <option value="TopCraft">TopCraft</option>
-      <option value="McTOP">McTOP</option>
-      <option value="MCRate">MCRate</option>
-      <option value="MinecraftRating">MinecraftRating</option>
-      <option value="MonitoringMinecraft">MonitoringMinecraft</option>
-      <option value="FairTop">FairTop</option>
-      <option value="PlanetMinecraft">PlanetMinecraft</option>
-      <option value="TopG">TopG</option>
-      <option value="MinecraftMp">MinecraftMp</option>
-      <option value="MinecraftServerList">MinecraftServerList</option>
-      <option value="ServerPact">ServerPact</option>
-      <option value="MinecraftIpList">MinecraftIpList</option>
-      <option value="Custom">Кастомное</option>
-    </select>
-    <input name="nick" id="nick" required placeholder="Ваш никнейм" type="text"></input>
-    <input name="id" id="id" required placeholder="ID проекта" type="text"><span style="cursor: help;" title="ID проекта можно достать из адресной строки находясь на странице проекта, например:&#xA;на TopCraft для McSkill ID: 218&#xA;на McTOP для Borealis ID: 2241&#xA;на MCRate для MinecraftOnly ID: 5154&#xA;на MinecraftRating для McSkill ID: mcskill&#xA;на MonitoringMinecraft для McSkill ID: mcskill">
-      <img src="images/help.png" widtd="16" height="16">
-      </span></input>
-  <div id="save">&nbsp;</div>
-  <p>
-    <div id="submit">
-      <button id="submitAddProject" type="submit">Добавить</button>
+
+    <div style="overflow-x: auto; white-space: nowrap;">
+      <button class="tablinks active" id="addTab"><i class="plus"></i>Добавить</button>
+      <button class="tablinks" id="addedTab"><i class="list"></i>Добавленные</button>
+      <button class="tablinks" id="settingsTab"><i class="settings"></i>Настройки</button>
+      <button class="tablinks" id="helpTab"><i class="help"></i>Справка</button>
     </div>
-  </p>
-  </form>
+    <hr color="#5A5A5C">
+
+<div id="add" class="tabcontent mt-3" style="display: block;">
+<div class="row">
+  <form id="addProject" style="display: contents;">
+    <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
+      <div class="form-group mb-1">
+        <label for="project">Сайт рейтинга</label>
+      </div>
+      <select required id="project">
+        <option selected disabled>Выберите сайт</option>
+        <option value="TopCraft">TopCraft</option>
+        <option value="McTOP">McTOP</option>
+        <option value="MCRate">MCRate</option>
+        <option value="MinecraftRating">MinecraftRating</option>
+        <option value="MonitoringMinecraft">MonitoringMinecraft</option>
+        <option value="FairTop">FairTop</option>
+        <option value="PlanetMinecraft">PlanetMinecraft</option>
+        <option value="TopG">TopG</option>
+        <option value="MinecraftMp">MinecraftMp</option>
+        <option value="MinecraftServerList">MinecraftServerList</option>
+        <option value="ServerPact">ServerPact</option>
+        <option value="MinecraftIpList">MinecraftIpList</option>
+        <option value="Custom">Кастомное</option>
+      </select>
+    </div>
+    <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
+      <div class="form-group mb-1">
+        <label for="nick">Ваш никнейм</label>
+      </div>
+      <input name="nick" id="nick" required placeholder="Никнейм" type="text"></input>
+    </div>
+    <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
+      <div class="form-group mb-1">
+        <label for="id">ID проекта</label>
+      </div>
+      <input name="id" id="id" required placeholder="XXXXXXXX" type="text"><span title="ID проекта можно достать из адресной строки находясь на странице проекта, например:&#xA;на TopCraft для McSkill ID: 218&#xA;на McTOP для Borealis ID: 2241&#xA;на MCRate для MinecraftOnly ID: 5154&#xA;на MinecraftRating для McSkill ID: mcskill&#xA;на MonitoringMinecraft для McSkill ID: mcskill">
+      <img src="images/help.png" widtd="16" height="16"></span>
+      </input>
+    </div>
+    <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
+      <div id="submit">
+        <button id="submitAddProject" type="submit">Добавить</button>
+      </div>
+    </div>
+  </form>  
+</div>
 </div>
 
 <div id="settings" class="tabcontent mt-3" style="display: none;">
@@ -69,7 +89,7 @@
     </form>
     </p>
     <p>
-      Режим голосования:&nbsp;
+      Режим голосования:
       <select required id="enabledSilentVote">
         <option value="enabled">Тихий режим</option>
         <option value="disabled">Режим эмуляции</option>
@@ -506,6 +526,7 @@
     <p class="mt-4">Если здесь нет вашего проекта и у вас хороший онлайн - пишите в ЛС дискорда Serega007#4476, и я добавлю ваш проект в этот список</p>
 </div>
 <a target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH">Поддержать проект</a>
+<div id="save">&nbsp;</div>
 </div>
   <script src="options.js"></script>
 </body>
