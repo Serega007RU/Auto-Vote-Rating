@@ -102,7 +102,7 @@ async function restoreOptions() {
     projectsMinecraftServerList = projectsMinecraftServerList.AVMRprojectsMinecraftServerList;
     projectsServerPact = await getValue('AVMRprojectsServerPact');
     projectsServerPact = projectsServerPact.AVMRprojectsServerPact;
-    projectsMinecraftIpList = await getValue('AVMRprojectsMinecraftIpTab');
+    projectsMinecraftIpList = await getValue('AVMRprojectsMinecraftIpList');
     projectsMinecraftIpList = projectsMinecraftIpList.AVMRprojectsMinecraftIpList;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
