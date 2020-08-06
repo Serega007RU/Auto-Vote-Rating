@@ -98,7 +98,7 @@ async function restoreOptions() {
     projectsTopG = projectsTopG.AVMRprojectsTopG;
     projectsMinecraftMp = await getValue('AVMRprojectsMinecraftMp');
     projectsMinecraftMp = projectsMinecraftMp.AVMRprojectsMinecraftMp;
-    projectsMinecraftServerList = await getValue('AVMRprojectsMinecraftServerTab');
+    projectsMinecraftServerList = await getValue('AVMRprojectsMinecraftServerList');
     projectsMinecraftServerList = projectsMinecraftServerList.AVMRprojectsMinecraftServerList;
     projectsServerPact = await getValue('AVMRprojectsServerPact');
     projectsServerPact = projectsServerPact.AVMRprojectsServerPact;
