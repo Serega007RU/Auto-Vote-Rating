@@ -124,9 +124,15 @@ function checkVote() {
             let hourse = timeMoscow.getUTCHours();
 	        let minutes = timeMoscow.getUTCMinutes();
 			//Должно соблюсти след условия: должно быть дата не равна, если сейчас 0 часов (1 на MCRate) — должно быть больше 10-ти минут (или должен быть приоритет), если 1 (2 на MCRate) или больше часов то пропускает
-		    if (proj.time == null || ((proj.time != date && hourse >= proj.MCRate ? 2 : 1) || (proj.time != date && hourse == proj.MCRate ? 1 : 0 && (proj.priority || minutes >= 10)))) {
-                checkOpen(proj);
-			}
+		    if (proj.MCRate) {
+				if (proj.time == null || ((proj.time != date && hourse >= 2) || (proj.time != date && hourse == 1 && (proj.priority || minutes >= 10)))) {
+					checkOpen(proj);
+				}
+		    } else {
+				if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
+					checkOpen(proj);
+				}
+		    }
 	    } else if (proj.TopG) {
 			if (proj.time == null || proj.time < (Date.now() - (43200000/*+12 часов*/))) {
                 checkOpen(proj);
