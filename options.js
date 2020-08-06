@@ -98,11 +98,11 @@ async function restoreOptions() {
     projectsTopG = projectsTopG.AVMRprojectsTopG;
     projectsMinecraftMp = await getValue('AVMRprojectsMinecraftMp');
     projectsMinecraftMp = projectsMinecraftMp.AVMRprojectsMinecraftMp;
-    projectsMinecraftServerList = await getValue('AVMRprojectsMinecraftServerList');
+    projectsMinecraftServerList = await getValue('AVMRprojectsMinecraftServerTab');
     projectsMinecraftServerList = projectsMinecraftServerList.AVMRprojectsMinecraftServerList;
     projectsServerPact = await getValue('AVMRprojectsServerPact');
     projectsServerPact = projectsServerPact.AVMRprojectsServerPact;
-    projectsMinecraftIpList = await getValue('AVMRprojectsMinecraftIpList');
+    projectsMinecraftIpList = await getValue('AVMRprojectsMinecraftIpTab');
     projectsMinecraftIpList = projectsMinecraftIpList.AVMRprojectsMinecraftIpList;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
@@ -1438,4 +1438,61 @@ document.getElementById('addedTab').addEventListener('click', function() {
 });
 document.getElementById('helpTab').addEventListener('click', function() {
     tabSelect(event, 'help');
+});
+
+function listSelect(evt, tabs) {
+    var x, listcontent, selectsite;
+
+    listcontent = document.getElementsByClassName("listcontent");
+    for (x = 0; x < listcontent.length; x++) {
+        listcontent[x].style.display = "none";
+    }
+
+    selectsite = document.getElementsByClassName("selectsite");
+    for (x = 0; x < selectsite.length; x++) {
+        selectsite[x].className = selectsite[x].className.replace(" activeList", "");
+    }
+
+    document.getElementById(tabs).style.display = "block";
+    evt.currentTarget.className += " activeList";
+}
+
+document.getElementById('TopCraftButton').addEventListener('click', function() {
+    listSelect(event, 'TopCraftTab');
+});
+document.getElementById('McTOPButton').addEventListener('click', function() {
+    listSelect(event, 'McTOPTab');
+});
+document.getElementById('MCRateButton').addEventListener('click', function() {
+    listSelect(event, 'MCRateTab');
+});
+document.getElementById('MinecraftRatingButton').addEventListener('click', function() {
+    listSelect(event, 'MinecraftRatingTab');
+});
+document.getElementById('MonitoringMinecraftButton').addEventListener('click', function() {
+    listSelect(event, 'MonitoringMinecraftTab');
+});
+document.getElementById('FairTopButton').addEventListener('click', function() {
+    listSelect(event, 'FairTopTab');
+});
+document.getElementById('PlanetMinecraftButton').addEventListener('click', function() {
+    listSelect(event, 'PlanetMinecraftTab');
+});
+document.getElementById('TopGButton').addEventListener('click', function() {
+    listSelect(event, 'TopGTab');
+});
+document.getElementById('MinecraftMpButton').addEventListener('click', function() {
+    listSelect(event, 'MinecraftMpTab');
+});
+document.getElementById('MinecraftServerListButton').addEventListener('click', function() {
+    listSelect(event, 'MinecraftServerListTab');
+});
+document.getElementById('ServerPactButton').addEventListener('click', function() {
+    listSelect(event, 'ServerPactTab');
+});
+document.getElementById('MinecraftIpListButton').addEventListener('click', function() {
+    listSelect(event, 'MinecraftIpListTab');
+});
+document.getElementById('CustomButton').addEventListener('click', function() {
+    listSelect(event, 'CustomTab');
 });

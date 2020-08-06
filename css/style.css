@@ -1,6 +1,6 @@
 body {
   font-size: 16px;
-  background: #15181d !important;
+  background: #121214 !important;
   height: 100%;
 }
 
@@ -15,21 +15,22 @@ tbody.table th, tbody.table td {
   padding: 10px 8px;
   font-size: 18px;
   vertical-align: middle !important;
-  border-right: solid 1px #2c2e34;
-  border-left: solid 1px #2c2e34;
+  border-right: solid 1px #2A2A2F;
+  border-left: solid 1px #2A2A2F;
 }
 
 th {
   color: #fff !important;
-  background: #2c2e34 !important;
+  background: #2A2A2F !important;
 }
 
 tr {
   background: #1b1d23;
 }
 
-tr:nth-child(odd) { background-color: #1c1f25 !important; }
+tr:nth-child(odd) { background-color: #1B1B1E !important; }
 
+border-radius: 5px;
 details[open] div {
   animation: spoiler 1s;
 }
@@ -40,7 +41,7 @@ details[open] div {
 
 summary {
   font-weight: 600;
-  color: #fc842f;
+  color: #1A7BEE;
   transition: 0.2s;
 }
 
@@ -215,26 +216,25 @@ figure > div {
   transform: none;
 }
 
-input[name="checkbox"] {
-  transform: scale(1.3);
-}
-
 .container {
   margin-top: 70px;
-  background: #1c1f25;
+  background: #1B1B1E;
   padding: 15px;
+  border-radius: 5px;
 }
 
 .tablinks {
+  display: block;
+  height: 50px;
+  width: 50px;
   color: rgba(255, 255, 255, 0.56);
-  background: #2c2e34;
-  margin-right: 10px; 
-  padding: 9px 12px;
-  font-size: 18px;
+  background: #2A2A2F;
+  font-size: 15px;
   outline: none;
   border: none;
-  transition: 0.3s;
   cursor: pointer;
+  border-radius: 2px;
+  margin-bottom: 10px;
 }
 
 .tablinks:focus {
@@ -245,9 +245,48 @@ input[name="checkbox"] {
   opacity: 0.85;
 }
 
+.selectsite {
+  width: 100%;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.56);
+  background: #2A2A2F;
+  margin-right: 10px; 
+  padding: 9px 12px;
+  font-size: 18px;
+  outline: none;
+  border: none;
+  transition: 0.3s;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.selectsite:focus {
+  outline: 0;
+}
+
+.selectsite:hover {
+  opacity: 0.85;
+}
+
 .active {
-  background: #fc842f;
+  background: #1A7BEE;
   color: #fff;
+  width: 150px;
+}
+
+.activeList {
+  background: #1A7BEE;
+  color: #fff;
+}
+
+
+.active span {
+  display: inline !important;
+}
+
+.active i {
+  float: left;
+  margin-left: 8px;
 }
 
 select {
@@ -257,7 +296,7 @@ select {
 select, input {
   width: 100%;
   display: block;
-  background-color: #2c2e34;
+  background-color: #2A2A2F;
   border: none;
   border-radius: 2px;
   height: 48px;
@@ -270,8 +309,39 @@ select, input {
   transition: 0.2s;
 }
 
+input[type="checkbox"] {
+  display: inline;
+  width: initial;
+  height: 18px;
+  margin-right: 5px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+button[type="submit"] {
+  color: rgba(255, 255, 255, 0.56);
+  background: #2A2A2F;
+  margin-right: 10px; 
+  padding: 9px 12px;
+  font-size: 18px;
+  outline: none;
+  border: none;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  opacity: 0.85;
+}
+
+button[type="submit"]:focus {
+  outline: 0;
+  background: #1A7BEE;
+  color: #fff;
+}
+
 select:focus, input:focus {
-  border-bottom: solid 2px #fc842f;
+  border-bottom: solid 2px #1A7BEE;
   outline: 0;
 }
 
