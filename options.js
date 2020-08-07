@@ -773,12 +773,12 @@ function updateStatusAdd(text, disableTimer, element) {
         }
         return;
     }
-    let status = document.getElementById("submit");
+    let status = document.getElementById("addProjectDiv");
     clearInterval(timeoutAdd);
-    status.innerHTML = '<button type="submit">Добавить</button> &nbsp;' + text;
+    status.innerHTML = text;
     if (disableTimer) return;
     timeoutAdd = setTimeout(function() {
-        status.innerHTML = '<button type="submit">Добавить</button>';
+        status.innerHTML = '&nbsp;';
     }, 3000);
 }
 
