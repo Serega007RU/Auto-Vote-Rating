@@ -608,7 +608,7 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 		if (openedProjects.get(tab.id).MinecraftIpList) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftiplist.js"});
 	}
 	//Фикс ошибки ERR_BLOCKED_BY_CLIENT если пользователь открывает настройки расширения со стороннего сайта
-    else if (tab.url.includes('mdfmiljoheedihbcfiifopgmlcincadd/options.htm') && tab.url.includes('#addFastProject') && !tab.title.includes("Настройки Auto Vote Minecraft Rating") && info.status == 'complete') {
+    else if (tab.url.includes('mdfmiljoheedihbcfiifopgmlcincadd/options.htm') && tab.url.includes('#addFastProject') && !tab.title.includes("Auto Vote Minecraft Rating") && info.status == 'complete') {
         chrome.tabs.update(tab.id, {url:tab.url});
     }
 });
