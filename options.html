@@ -9,13 +9,11 @@
 </head>
 
 <body>
-  
-<a href="#addFastProject">ОТКРЫТЬ Окно с кнопкой</a>
 
 <div class="anelumen lowingnuska" id="addFastProject">
   <a href="#/" class="nedismiseg"></a>
   <figure>
-  <h2>Заголовок<a href="#/" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
+  <h2>Быстрое добавление<a href="#/" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2><hr color="#aba4a4">
     <div id=modaltext>Загрузка...</div>
   </figure>
 </div>
@@ -100,24 +98,12 @@
       </div>
       <input class="checkbox" id="disabledNotifStart" type="checkbox" name="checkbox"/><label for="disabledNotifStart">Отключить уведомления о начале голосовании</label><br>
       <input class="checkbox" id="disabledNotifInfo" type="checkbox" name="checkbox"/><label for="disabledNotifInfo">Отключить уведомления об успешном голосовании</label><br>
-      <input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox"/><label for="disabledNotifWarn">Отключить уведомления о предупреждениях</label>
-      <span style="cursor: help;" title="Например уведомление о том что вы уже голосовали&#xA;(это когда расширение попыталось проголосовать за проект но вы уже сами проголосовали)">
-      <img src="images/help.png" widtd="16" height="16">
-      </span><br>
+      <input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox"/><label class="tooltip1" for="disabledNotifWarn">Отключить уведомления о предупреждениях<span class="tooltip1text">Например уведомление о том что вы уже голосовали&#xA;(это когда расширение попыталось проголосовать за проект но вы уже сами проголосовали)</span></label><br>
       <input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox"/><label for="disabledNotifError">Отключить уведомления об ошибках</label><br>
-      <input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox"/><label for="enableSyncStorage">Сохранять настройки расширения в облаке</label>
-      <span style="cursor: help;" title="Не рекомендуется включать данную настройку если у вас очень много проектов в списке добавленных проектов, у облака есть ограниченный трафик и место хранения&#xA;Для работы этой функции требуется что бы в вашем браузере был подключён аккаунт и была включена синхронизация, иначе настройки всё равно будут сохраняться локально&#xA;Позволяет синхронизировать настройки расширения с несколькоими компьютерами, не рекомендуется держать расширение включённым с этой включённой настройкой сразу на нескольких компьютерах">
-      <img src="images/help.png" widtd="16" height="16">
-      </span><br>
+      <input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox"/><label class="tooltip1" for="enableSyncStorage">Сохранять настройки расширения в облаке<span class="tooltip1text">Не рекомендуется включать данную настройку если у вас очень много проектов в списке добавленных проектов, у облака есть ограниченный трафик и место хранения&#xA;Для работы этой функции требуется что бы в вашем браузере был подключён аккаунт и была включена синхронизация, иначе настройки всё равно будут сохраняться локально&#xA;Позволяет синхронизировать настройки расширения с несколькоими компьютерами, не рекомендуется держать расширение включённым с этой включённой настройкой сразу на нескольких компьютерах</span></label><br>
       <input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox"/><label for="disabledCheckTime">Отключить проверку времени при старте расширения</label><br>
-      <input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox"/><label for="disableCheckProjects">Отключить проверку при добавлении проекта</label>
-      <span style="cursor: help;" title="Крайне не рекомендуется отключать эту проверку, это может вызвать ошибки в расширении и может сломать механизм авто-голосования, эта настройка отключает проверку при добавлении проекта, это отключает проверку для MCRate (как известно там можно голосовать в день только за один проект)&#xA;Также он отключает проверку на авторизацию вк&#xA;Данный параметр не сохраняется при сохранении настроек">
-      <img src="images/help.png" widtd="16" height="16">
-      </span><br>
-      <input class="checkbox" id="priority" type="checkbox" name="checkbox"/><label for="priority">Добавлять проект в приоритете при добавлении проекта</label>
-      <span style="cursor: help;" title="При включении данной опции и после при добавлении проекта, проект будет в приоритете, будет всегда самым первым голосовать и без задержеки в 10 минут">
-      <img src="images/help.png" widtd="16" height="16">
-      </span>
+      <input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox"/><label class="tooltip1" for="disableCheckProjects">Отключить проверку при добавлении проекта<span class="tooltip1text">Крайне не рекомендуется отключать эту проверку, это может вызвать ошибки в расширении и может сломать механизм авто-голосования, эта настройка отключает проверку при добавлении проекта, это отключает проверку для MCRate (как известно там можно голосовать в день только за один проект)&#xA;Также он отключает проверку на авторизацию вк&#xA;Данный параметр не сохраняется при сохранении настроек</span></label><br>
+      <input class="checkbox" id="priority" type="checkbox" name="checkbox"/><label class="tooltip1" for="priority">Добавлять проект в приоритете при добавлении проекта<span class="tooltip1text">При включении данной опции и после при добавлении проекта, проект будет в приоритете, будет всегда самым первым голосовать и без задержеки в 10 минут</span></label>
     </div>
     <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
       <div class="form-group mb-1">
@@ -131,12 +117,11 @@
         <label for="cooldown">Времени между проверками в ms.</label>
       </div>
     <form style="display: contents;" id="timeout">
-      <input name="cooldown" id="cooldown" required type="number" min="1000">
-      <div id="submit2" class="mt-3">
-        <button type="submit">Установить</button>
+      <input name="cooldown" id="cooldown" required type="number" min="1000" class="mb-2">
+      <div id="submit2" class="mt-3 mb-2">
+        <button type="submit" class="w-50" style="display: inline;">Установить</button>
       </div>
     </form>
-    <hr color="#5A5A5C">
       <div class="form-group mb-1">
         <label for="enabledSilentVote">Экспорт/Импорт</label>
       </div>

@@ -73,7 +73,7 @@ async function restoreOptions() {
     if (settingsSync) {
         settingsStorage = chrome.storage.sync;
     } else {
-    	settingsStorage = chrome.storage.local;
+        settingsStorage = chrome.storage.local;
     }
     if (settingsSync == undefined) {
         alert('Благодарим вас за установку расширения. Для последующей работы необходимо его настроить');
@@ -138,7 +138,7 @@ async function restoreOptions() {
         await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
         await setValue('AVMRprojectsCustom', projectsCustom, false);
         console.log('Настройки проектов сгенерированы');
-        updateStatusSave('<div align="center" style="color:#7CB342;">Настройки были успешно сгенерированы по умолчанию и сохранены</div>', false);
+        updateStatusSave('<div align="center" style="color:#4CAF50;">Настройки были успешно сгенерированы по умолчанию и сохранены</div>', false);
     }
     if (projectsPlanetMinecraft == null || !(typeof projectsPlanetMinecraft[Symbol.iterator] === 'function')) {
         updateStatusSave('<div>Обновляю настройки по умолчанию...</div>', true);
@@ -156,14 +156,14 @@ async function restoreOptions() {
         await setValue('AVMRprojectsServerPact', projectsServerPact, false);
         await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
         console.log('Настройки проектов обновлены');
-        updateStatusSave('<div align="center" style="color:#7CB342;">Настройки были успешно обновлены по умолчанию и сохранены</div>', false);
+        updateStatusSave('<div align="center" style="color:#4CAF50;">Настройки были успешно обновлены по умолчанию и сохранены</div>', false);
     }
     if (settings == null || settings == "") {
         updateStatusSave('<div>Генерирую настройки по умолчанию...</div>', true);
         settings = new Settings(false, false, false, false, true, false, 1000, false);
         await setValue('AVMRsettings', settings, false);
         console.log('Дополнительные настройки сгенерированы');
-        updateStatusSave('<div align="center" style="color:#7CB342;">Настройки были успешно сгенерированы по умолчанию и сохранены</div>', false);
+        updateStatusSave('<div align="center" style="color:#4CAF50;">Настройки были успешно сгенерированы по умолчанию и сохранены</div>', false);
     }
     //Поддержка новых настроек с версии 2.1.0 (или же с 2.1.1 для Opera)
     if (settings.multivote == null) {
@@ -196,8 +196,8 @@ async function restoreOptions() {
                     settingsStorage = chrome.storage.sync;
                     updateStatusSave('<div>Копирую настройки в облако...</div>', false);
                 } else {
-    	           settingsStorage = chrome.storage.local;
-    	           updateStatusSave('<div>Копирую настройки в локальное хранилище...</div>', true);
+                   settingsStorage = chrome.storage.local;
+                   updateStatusSave('<div>Копирую настройки в локальное хранилище...</div>', true);
                 }
                 await setSyncValue('AVMRenableSyncStorage', this.checked);
                 await setValue('AVMRsettings', settings, false);
@@ -267,7 +267,6 @@ async function addProjectList(project, visually) {
     let listProject = document.getElementById(getProjectName(project) + "List");
     if (listProject.innerHTML.includes("Вы ещё не добавили ни одного проекта на этот топ")) listProject.innerHTML = "";
     let html = document.createElement('div');
-    html.setAttribute("style", "margin-left: 10px; margin-bottom: 10px;");
     html.setAttribute("id", 'div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id));
     //Расчёт времени
     let text = "скоро...";
@@ -296,7 +295,7 @@ async function addProjectList(project, visually) {
         }
         if (Date.now() < timeNew.getTime()) text = ('0' + timeNew.getDate()).slice(-2) + '.' + ('0' + (timeNew.getMonth()+1)).slice(-2) + '.' + timeNew.getFullYear() + ' ' + ('0' + timeNew.getHours()).slice(-2) + ':' + ('0' + timeNew.getMinutes()).slice(-2) + ':' + ('0' + timeNew.getSeconds()).slice(-2);
     }
-    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (!project.priority ? '' : ' (В приоритете)') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">Удалить</button> <br style="margin-left: 10px;">Следующее голосование после: ' + text;
+    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (!project.priority ? '' : ' (В приоритете)') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">Удалить</button> <br>Следующее голосование после: ' + text;
     listProject.after(html)
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).addEventListener('click', function() {
         removeProjectList(project, false);
@@ -392,14 +391,14 @@ async function removeProjectList(project, visually) {
         if (key.nick == project.nick && key.id == project.id && getProjectName(key) == getProjectName(project)) {
             chrome.extension.getBackgroundPage().retryProjects.delete(key);
         }
-	}
-	for (let value of chrome.extension.getBackgroundPage().queueProjects) {
+    }
+    for (let value of chrome.extension.getBackgroundPage().queueProjects) {
         if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
         }
-	}
+    }
     //Если эта вкладка была уже открыта, он закрывает её
-	for (let [key, value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
+    for (let [key, value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
         if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key);
             chrome.tabs.remove(key);
@@ -497,11 +496,11 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     forLoopAllProjects(function () {
         if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom && !settings.multivote) {
             if (secondBonus === "") {
-                updateStatusAdd('<div align="center" style="color:#7CB342;">Этот проект у вас уже добавлен</div>', false, element);
+                updateStatusAdd('<div style="color:#4CAF50;">Этот проект у вас уже добавлен</div>', false, element);
             } else if (element != null) {
-                updateStatusAdd('<div align="center" style="color:#7CB342;">Этот проект у вас уже добавлен</div> ' + secondBonus, false, element);
+                updateStatusAdd('<div style="color:#4CAF50;">Этот проект у вас уже добавлен</div> ' + secondBonus, false, element);
             } else {
-                updateStatusAdd('<div align="center" style="color:#7CB342;">Этот проект у вас уже добавлен</div> ' + secondBonus, true, element);
+                updateStatusAdd('<div style="color:#4CAF50;">Этот проект у вас уже добавлен</div> ' + secondBonus, true, element);
             }
             returnAdd = true;
             return;
@@ -518,7 +517,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             returnAdd = true;
             return;
         } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
-            updateStatusAdd('<div align="center" style="color:#7CB342;">Этот проект у вас уже добавлен</div>', false, element);
+            updateStatusAdd('<div align="center" style="color:#4CAF50;">Этот проект у вас уже добавлен</div>', false, element);
             returnAdd = true;
             return;
         }
@@ -670,7 +669,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
 //                 if (project.TopCraft) url2 = "https://topcraft.ru/accounts/vk/login/";
 //                 if (project.McTOP) url2 = "https://mctop.su/accounts/vk/login/";
 //                 if (project.MonitoringMinecraft) url2 = "http://monitoringminecraft.ru/top/" + project.id + "/vote"
-                updateStatusAdd('<div align="center" style="color:#f44336;">Для голосования на '+getProjectName(project)+' требуется авторизация через ВК &#10140; <button class="authvk" id="authvk">Авторизоваться</button>', true, element);
+                updateStatusAdd('<div style="color:#f44336;">Для голосования на '+getProjectName(project)+' требуется авторизация через ВК <button id="authvk"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><path d="M5 12h13M12 5l7 7-7 7"/></svg>Авторизоваться</button>', true, element);
                 document.getElementById('authvk').addEventListener('click', function() {
                     if (element != null) {
                         openPoput(url2, function () {
@@ -698,14 +697,14 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     //document.getElementById('id').value = '';
 
     if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList) && settings.enabledSilentVote) {
-        updateStatusAdd('<div align="center" style="color:#7CB342;">Успешно добавлен ' + projectURL + '</div> <div align="center" style="color:#f44336;">Обращаем ваше внимание что ' + getProjectName(project) +' недоступен в режиме тихого голосования</div>', true, element);
+        updateStatusAdd('<div style="color:#4CAF50;">Успешно добавлен ' + projectURL + '</div> <div align="center" style="color:#f44336;">Обращаем ваше внимание что ' + getProjectName(project) +' недоступен в режиме тихого голосования</div>', true, element);
     } else {
         if (secondBonus === "") {
-            updateStatusAdd('<div align="center" style="color:#7CB342;">Успешно добавлен ' + projectURL + '</div>', false, element);
+            updateStatusAdd('<div style="color:#4CAF50;">Успешно добавлен ' + projectURL + '</div>', false, element);
         } else if (element != null) {
-            updateStatusAdd('<div align="center" style="color:#7CB342;">Успешно добавлен ' + projectURL + '</div> ' + secondBonus, false, element);
+            updateStatusAdd('<div style="color:#4CAF50;">Успешно добавлен ' + projectURL + '</div> ' + secondBonus, false, element);
         } else {
-            updateStatusAdd('<div align="center" style="color:#7CB342;">Успешно добавлен ' + projectURL + '</div> ' + secondBonus, true, element);
+            updateStatusAdd('<div style="color:#4CAF50;">Успешно добавлен ' + projectURL + '</div> ' + secondBonus, true, element);
         }
     }
 
@@ -767,7 +766,7 @@ function updateStatusAdd(text, disableTimer, element) {
             if (disableTimer) {
                 element.innerHTML = element.innerHTML + text;
             } else {
-                element.innerHTML = element.innerHTML.replace('<div align="center" style="color:#f44336;">✘ </div>', '<div align="center" style="color:#7CB342;">✔ </div>') + text;
+                element.innerHTML = element.innerHTML.replace('<span style="color:#f44336;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>', '<span style="color:#4CAF50;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><polyline points="20 6 9 17 4 12"></polyline></svg></span>') + text;
             }
         } else {
             element.innerHTML = element.innerHTML + ': ' + text;
@@ -784,19 +783,19 @@ function updateStatusAdd(text, disableTimer, element) {
 }
 
 function getProjectName(project) {
-	if (project.TopCraft) return "TopCraft";
-	if (project.McTOP) return "McTOP";
-	if (project.MCRate) return "MCRate";
-	if (project.MonitoringMinecraft) return "MonitoringMinecraft";
-	if (project.MinecraftRating) return "MinecraftRating";
-	if (project.FairTop) return "FairTop";
-	if (project.PlanetMinecraft) return "PlanetMinecraft";
-	if (project.TopG) return "TopG";
-	if (project.MinecraftMp) return "MinecraftMp";
-	if (project.MinecraftServerList) return "MinecraftServerList";
-	if (project.ServerPact) return "ServerPact";
-	if (project.MinecraftIpList) return "MinecraftIpList";
-	if (project.Custom) return "Custom"
+    if (project.TopCraft) return "TopCraft";
+    if (project.McTOP) return "McTOP";
+    if (project.MCRate) return "MCRate";
+    if (project.MonitoringMinecraft) return "MonitoringMinecraft";
+    if (project.MinecraftRating) return "MinecraftRating";
+    if (project.FairTop) return "FairTop";
+    if (project.PlanetMinecraft) return "PlanetMinecraft";
+    if (project.TopG) return "TopG";
+    if (project.MinecraftMp) return "MinecraftMp";
+    if (project.MinecraftServerList) return "MinecraftServerList";
+    if (project.ServerPact) return "ServerPact";
+    if (project.MinecraftIpList) return "MinecraftIpList";
+    if (project.Custom) return "Custom"
 }
 
 function getProjectList(project) {
@@ -862,7 +861,7 @@ async function setValue(key, value, updateStatus) {
                 updateStatusSave('<div align="center" style="color:#f44336;">Произошла ошибка при сохранении настроек, смотрите подробности в консоле</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
-                if (updateStatus) updateStatusSave('<div align="center" style="color:#7CB342;">Настройки успешно сохранены</div>', false);
+                if (updateStatus) updateStatusSave('<div align="center" style="color:#4CAF50;">Настройки успешно сохранены</div>', false);
                 resolve(data);
             }
         });
@@ -1129,7 +1128,7 @@ document.getElementById('file-download').addEventListener('click', () => {
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
     anchor.dataset.downloadurl = ['text/plain', anchor.download, anchor.href].join(':');
     anchor.click();
-    updateStatusFile('<div align="center" style="color:#7CB342;">Экспорт настроек успешно завершён</div>', false);
+    updateStatusFile('<div align="center" style="color:#4CAF50;">Экспорт настроек успешно завершён</div>', false);
 });
 
 //Слушатель на импорт настроек
@@ -1173,7 +1172,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     await setValue('AVMRprojectsServerPact', projectsServerPact, false);
                     await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
                     await setValue('AVMRprojectsCustom', projectsCustom, false);
-                    updateStatusSave('<div align="center" style="color:#7CB342;">Настройки успешно сохранены</div>', false);
+                    updateStatusSave('<div align="center" style="color:#4CAF50;">Настройки успешно сохранены</div>', false);
 
                     document.getElementById("disabledNotifStart").checked = settings.disabledNotifStart;
                     document.getElementById("disabledNotifInfo").checked = settings.disabledNotifInfo;
@@ -1194,7 +1193,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
 
                     await updateProjectList();
 
-                    updateStatusFile('<div align="center" style="color:#7CB342;">Импорт настроек успешно завершён</div>', false);
+                    updateStatusFile('<div align="center" style="color:#4CAF50;">Импорт настроек успешно завершён</div>', false);
                 } catch (e) {
                     console.error(e);
                     updateStatusFile('<div align="center" style="color:#f44336;">' + e + '</div>', true);
@@ -1265,13 +1264,13 @@ function getUrlVars() {
 async function fastAdd() {
     if (window.location.href.includes('addFastProject')) {
         var vars = getUrlVars();
-        if (vars['name'] != null) document.querySelector("#addFastProject > figure > h2").innerHTML = document.querySelector("#addFastProject > figure > h2").innerHTML.replace('Заголовок модального окна', getUrlVars()['name']);
+        if (vars['name'] != null) document.querySelector("#addFastProject h2").innerHTML = document.querySelector("#addFastProject h2").innerHTML.replace('Быстрое добавление', getUrlVars()['name']);
         let listFastAdd = document.getElementById('modaltext');
         listFastAdd.innerHTML = '';
         for (fastProj of getUrlProjects()) {
             let html = document.createElement('div');
             html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id);
-            html.innerHTML = '<div align="center" style="color:#f44336;">✘ </div>'+getProjectName(fastProj) + " - " + fastProj.nick + " - " + fastProj.id;
+            html.innerHTML = '<span style="color:#f44336;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>'+getProjectName(fastProj) + " - " + fastProj.nick + " - " + fastProj.id;
             listFastAdd.before(html);
             await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, false, html);
         }
@@ -1282,7 +1281,7 @@ async function fastAdd() {
             }
             document.getElementById("disabledNotifInfo").checked = settings.disabledNotifInfo;
             let html = document.createElement('div');
-            html.innerHTML = '<div align="center" style="color:#7CB342;">✔ </div>Уведомления об успешном голосовании отключены'
+            html.innerHTML = '<br><span style="color:#4CAF50;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Уведомления об успешном голосовании отключены'
             listFastAdd.before(html);
         }
         if (vars['disableNotifWarn'] != null) {
@@ -1292,7 +1291,7 @@ async function fastAdd() {
             }
             document.getElementById("disabledNotifWarn").checked = settings.disabledNotifWarn;
             let html = document.createElement('div');
-            html.innerHTML = '<div align="center" style="color:#7CB342;">✔ </div>Уведомления о предупрежденияъ отключены'
+            html.innerHTML = '<span style="color:#4CAF50;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Уведомления о предупрежденияъ отключены'
             listFastAdd.before(html);
         }
         if (vars['disableNotifStart'] != null) {
@@ -1302,13 +1301,13 @@ async function fastAdd() {
             }
             document.getElementById("disabledNotifStart").checked = settings.disabledNotifStart;
             let html = document.createElement('div');
-            html.innerHTML = '<div align="center" style="color:#7CB342;">✔ </div>Уведомления о начале голосования отключены'
+            html.innerHTML = '<span style="color:#4CAF50;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><polyline points="20 6 9 17 4 12"></polyline></svg></span>Уведомления о начале голосования отключены'
             listFastAdd.before(html);
         }
 
-        if (document.querySelector("#addFastProject").innerText.includes('✘')) {
+        if (document.querySelector("#addFastProject").innerHTML.includes('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>')) {
             let buttonRetry = document.createElement('button');
-            buttonRetry.setAttribute('class', 'retryFastAdd');
+            buttonRetry.setAttribute('class', 'col-xl-6 retryFastAdd col-lg-6');
             buttonRetry.innerHTML = 'Попробовать ещё раз';
             listFastAdd.before(buttonRetry);
             buttonRetry.addEventListener('click', () => {
@@ -1317,14 +1316,14 @@ async function fastAdd() {
         } else {
             let successFastAdd = document.createElement('div');
             successFastAdd.setAttribute('class', 'successFastAdd');
-            successFastAdd.innerHTML = 'Расширение было успешно настроено!<br>Хотите ли закрыть данную вкладку?';
-            listFastAdd.before(successFastAdd)
+            successFastAdd.innerHTML = '<br>Расширение было успешно настроено!<br>Хотите ли закрыть данную вкладку?';
+            listFastAdd.before(successFastAdd);
         }
 
 
         let buttonClose = document.createElement('button');
-        buttonClose.setAttribute('class', 'closeSettings');
-        buttonClose.innerHTML = 'Закрыть';
+        buttonClose.setAttribute('class', 'col-xl-6 closeSettings col-lg-6');
+        buttonClose.innerHTML = 'Закрыть вкладку';
 
         listFastAdd.before(buttonClose);
         buttonClose.addEventListener('click', () => {
