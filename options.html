@@ -19,26 +19,48 @@
   </figure>
 </div>
 
+<input type="checkbox" id="hmt" class="hidden-menu-ticker">
+<label class="btn-menu" for="hmt" style="display: none;">
+  <span class="first"></span>
+  <span class="second"></span>
+  <span class="third"></span>
+</label>
+<ul class="hidden-menu">
+ <label>Вкладки</label>
+  <button class="mt-4 tablinks active" id="addTab2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Добавить</button>
+  <button class="tablinks" id="addedTab2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>Добавленные</button>
+  <button class="tablinks" id="settingsTab2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>Опции</button>
+  <button class="tablinks" id="helpTab2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Справка</button>
+</ul>
 <div class="container">
 
   <div id="centerLayer">
     
-    <div style="position: fixed; left: 0;">
-      <button class="tablinks active" id="addTab"><i class="plus"></i><span style="display: none;">Добавить</span></button>
-      <button class="tablinks" id="addedTab"><i class="list"></i><span style="display: none;">Добавленные</span></button>
-      <button class="tablinks" id="settingsTab"><i class="settings"></i><span style="display: none;">Опции</span></button>
-      <button class="tablinks" id="helpTab"><i class="help"></i><span style="display: none;">Справка</span></button>
+    <div class="nav-panel">
+      <div>A.V.M.R</div>
+      <button class="tablinks active" id="addTab"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><br>Добавить</button>
+      <button class="tablinks" id="addedTab"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg><br>Добавленные</button>
+      <button class="tablinks" id="settingsTab"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg><br>Опции</button>
+      <button class="tablinks" id="helpTab"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><br>Справка</button>
     </div>
-    <hr color="#5A5A5C">
 
-<div id="add" class="tabcontent mt-3" style="display: block;">
+<div id="add" class="tabcontent" style="display: block;">
+<h4 align="center">Добавить новый проект</h3>
+<hr color="#5A5A5C">
 <div class="row">
   <form id="addProject" style="display: contents;">
-    <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
+    <div class="col-xl-4 col-lg-4 col-md-12 mb-3">
+      
+    </div>
+    <div class="col-xl-4 col-lg-4 col-md-12 mb-3">
+      <div class="form-group mb-1">
+        <label for="nick">Ваш никнейм</label>
+      </div>
+      <input name="nick" id="nick" required placeholder="Nickmame" type="text" class="mb-2">
       <div class="form-group mb-1">
         <label for="project">Сайт рейтинга</label>
       </div>
-      <select required id="project">
+      <select required id="project" class="mb-2">
         <option value="" selected disabled>Выберите сайт</option>
         <option value="TopCraft">TopCraft</option>
         <option value="McTOP">McTOP</option>
@@ -54,51 +76,45 @@
         <option value="MinecraftIpList">MinecraftIpList</option>
         <option value="Custom">Кастомное</option>
       </select>
-    </div>
-    <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
-      <div class="form-group mb-1">
-        <label for="nick">Ваш никнейм</label>
-      </div>
-      <input name="nick" id="nick" required placeholder="Nickmame" type="text">
-    </div>
-    <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
       <div class="form-group mb-1">
         <label for="id">ID проекта</label>
       </div>
       <input name="id" id="id" required placeholder="ID" type="text">
-    </div>
-    <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
-      <div id="submit">
+      <div id="submit" class="mt-3">
         <button id="submitAddProject" type="submit">Добавить</button>
       </div>
+    </div>
+    <div class="col-xl-4 col-lg-4 col-md-12 mb-3"> 
     </div>
   </form>  
 </div>
 </div>
 
-<div id="settings" class="tabcontent mt-3" style="display: none;">
+<div id="settings" class="tabcontent" style="display: none;">
+<h4 align="center">Опции</h3>
+<hr color="#5A5A5C">
 <div class="row">
-    <div class="col-xl-7 col-lg-6 col-md-12 mb-3">
+    <div class="col-xl-6 col-lg-6 col-md-12 mb-3">
       <div class="form-group mb-1">
-        <label for="id">Опциональные настройки</label>
+        <label>Настройки</label>
       </div>
-      <input id="disabledNotifStart" type="checkbox" name="checkbox"/>Отключить уведомления о начале голосовании<br>
-      <input id="disabledNotifInfo" type="checkbox" name="checkbox"/>Отключить уведомления об успешном голосовании<br>
-      <input id="disabledNotifWarn" type="checkbox" name="checkbox"/>Отключить уведомления о предупреждениях
+      <input class="checkbox" id="disabledNotifStart" type="checkbox" name="checkbox"/><label for="disabledNotifStart">Отключить уведомления о начале голосовании</label><br>
+      <input class="checkbox" id="disabledNotifInfo" type="checkbox" name="checkbox"/><label for="disabledNotifInfo">Отключить уведомления об успешном голосовании</label><br>
+      <input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox"/><label for="disabledNotifWarn">Отключить уведомления о предупреждениях</label>
       <span style="cursor: help;" title="Например уведомление о том что вы уже голосовали&#xA;(это когда расширение попыталось проголосовать за проект но вы уже сами проголосовали)">
       <img src="images/help.png" widtd="16" height="16">
       </span><br>
-      <input id="disabledNotifError" type="checkbox" name="checkbox"/>Отключить уведомления об ошибках<br>
-      <input id="enableSyncStorage" type="checkbox" name="checkbox"/>Сохранять настройки расширения в облаке
+      <input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox"/><label for="disabledNotifError">Отключить уведомления об ошибках</label><br>
+      <input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox"/><label for="enableSyncStorage">Сохранять настройки расширения в облаке</label>
       <span style="cursor: help;" title="Не рекомендуется включать данную настройку если у вас очень много проектов в списке добавленных проектов, у облака есть ограниченный трафик и место хранения&#xA;Для работы этой функции требуется что бы в вашем браузере был подключён аккаунт и была включена синхронизация, иначе настройки всё равно будут сохраняться локально&#xA;Позволяет синхронизировать настройки расширения с несколькоими компьютерами, не рекомендуется держать расширение включённым с этой включённой настройкой сразу на нескольких компьютерах">
       <img src="images/help.png" widtd="16" height="16">
       </span><br>
-      <input id="disabledCheckTime" type="checkbox" name="checkbox"/>Отключить проверку времени при старте расширения<br>
-      <input id="disableCheckProjects" type="checkbox" name="checkbox"/>Отключить проверку при добавлении проекта
+      <input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox"/><label for="disabledCheckTime">Отключить проверку времени при старте расширения</label><br>
+      <input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox"/><label for="disableCheckProjects">Отключить проверку при добавлении проекта</label>
       <span style="cursor: help;" title="Крайне не рекомендуется отключать эту проверку, это может вызвать ошибки в расширении и может сломать механизм авто-голосования, эта настройка отключает проверку при добавлении проекта, это отключает проверку для MCRate (как известно там можно голосовать в день только за один проект)&#xA;Также он отключает проверку на авторизацию вк&#xA;Данный параметр не сохраняется при сохранении настроек">
       <img src="images/help.png" widtd="16" height="16">
       </span><br>
-      <input id="priority" type="checkbox" name="checkbox"/>Добавлять проект в приоритете при добавлении проекта
+      <input class="checkbox" id="priority" type="checkbox" name="checkbox"/><label for="priority">Добавлять проект в приоритете при добавлении проекта</label>
       <span style="cursor: help;" title="При включении данной опции и после при добавлении проекта, проект будет в приоритете, будет всегда самым первым голосовать и без задержеки в 10 минут">
       <img src="images/help.png" widtd="16" height="16">
       </span>
@@ -107,7 +123,7 @@
       <div class="form-group mb-1">
         <label for="enabledSilentVote">Режим голосования</label>
       </div>
-      <select required id="enabledSilentVote" class="mb-4">
+      <select required id="enabledSilentVote" class="mb-2">
         <option value="enabled">Тихий режим</option>
         <option value="disabled">Режим эмуляции</option>
       </select>
@@ -120,20 +136,21 @@
         <button type="submit">Установить</button>
       </div>
     </form>
+    <hr color="#5A5A5C">
+      <div class="form-group mb-1">
+        <label for="enabledSilentVote">Экспорт/Импорт</label>
+      </div>
+       <label for="file-upload" class="custom-file-upload mb-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3"/></svg>Импортировать настройки</label>
+       <input id="file-upload" type="file" accept="application/json"/>
+       <label id="file-download"class="custom-file-upload"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"/></svg>Экспортировать настройки</label>
+       <div id="file">&nbsp;</div>
     </div>
+</div>   
 </div>
 
-    <label for="file-upload" class="custom-file-upload">⬇ Импортировать настройки
-    </label>
-    <input id="file-upload" type="file" accept="application/json"/>
-
-    <label id="file-download"class="custom-file-upload">⬆ Экспортировать настройки</label>
-    
-    <div id="file">&nbsp;</div>
-    
-</div>
-
-<div id="added" class="tabcontent mt-3" style="display: none;">
+<div id="added" class="tabcontent" style="display: none;">
+<h4 align="center">Ваши добавленные проекты</h3>
+<hr color="#5A5A5C">
 <div class="row">
 
   <div class="col-xl-3 col-lg-6 col-md-12 mb-3">
@@ -194,30 +211,35 @@
     </div>
 
     <div class="listcontent" id="FairTopTab" style="display: none;">
+      <p>По умолчанию не доступен в тихом режиме голосования!</p>
       <div id="FairTopList">
         Вы ещё не добавили ни одного проекта на этот топ
       </div>
     </div>
 
     <div class="listcontent" id="PlanetMinecraftTab" style="display: none;">
+      <p>По умолчанию не доступен в тихом режиме голосования!</p>
       <div id="PlanetMinecraftList">
         Вы ещё не добавили ни одного проекта на этот топ
       </div>
     </div>
 
     <div class="listcontent" id="TopGTab" style="display: none;">
+      <p>По умолчанию не доступен в тихом режиме голосования!</p>
       <div id="TopGList">
         Вы ещё не добавили ни одного проекта на этот топ
       </div>
     </div>
 
     <div class="listcontent" id="MinecraftMpTab" style="display: none;">
+      <p>По умолчанию не доступен в тихом режиме голосования!</p>
       <div id="MinecraftMpList">
         Вы ещё не добавили ни одного проекта на этот топ
       </div>
     </div>
 
     <div class="listcontent" id="MinecraftServerListTab" style="display: none;">
+      <p>По умолчанию не доступен в тихом режиме голосования!</p>
       <div id="MinecraftServerListList">
         Вы ещё не добавили ни одного проекта на этот топ
       </div>
@@ -245,321 +267,13 @@
 </div>
 </div>
 
-<div id="help" class="tabcontent mt-3" style="display: none;">
-    <h3>Список проектов где дают бонусы за голосование</h3>
-    
-    <table class="w-100">
-      <tbody class="table" align="center">
-      <tr>
-      <th>Имя проекта</th>
-      <th>TopCraft</th>
-      <th>McTop</th>
-      <th>MCRate</th>
-      <th>McRating</th>
-      <th>MonMc</th>
-      <th>FairTop.in</th>
-      </tr>
-      <tr>
-      <td>StarWay</td>
-      <td>10496</td>
-      <td>6114</td>
-      <td>8876</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>WarMine</td>
-      <td>6711</td>
-      <td>4975</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>McSKill</td>
-      <td>218</td>
-      <td></td>
-      <td></td>
-      <td>mcskill</td>
-      <td>mcskill</td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>SimpleMinecraft</td>
-      <td>1283</td>
-      <td>1</td>
-      <td>4692</td>
-      <td>smc</td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>Excalibur-Craft</td>
-      <td>308</td>
-      <td>1088</td>
-      <td>4396</td>
-      <td>excalibur-craft</td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>HunterCraft</td>
-      <td>5966</td>
-      <td>3050</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>CubixWorld</td>
-      <td>6482</td>
-      <td></td>
-      <td>7003</td>
-      <td>cubixworld</td>
-      <td>cubixworld</td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>MinecraftOnly</td>
-      <td>304</td>
-      <td>54</td>
-      <td>5154</td>
-      <td>minecraftonly</td>
-      <td>minecraftonly</td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>PentaCraft</td>
-      <td>5451</td>
-      <td>2474</td>
-      <td>6071</td>
-      <td></td>
-      <td></td>
-      <td>731</td>
-      </tr>
-      <tr>
-      <td>LavaCraft</td>
-      <td>2762</td>
-      <td>45</td>
-      <td>10</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>ShadowCraft</td>
-      <td>9597</td>
-      <td></td>
-      <td></td>
-      <td>shadowcraft</td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>MytdicalWorld</td>
-      <td>5323</td>
-      <td>1654</td>
-      <td>6099</td>
-      <td>mytdicalworld</td>
-      <td>mytdicalworld</td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>Borealis</td>
-      <td>7126</td>
-      <td>2241</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>IPlayCraft</td>
-      <td>216</td>
-      <td>5864</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>OrangeCraft</td>
-      <td>9311</td>
-      <td></td>
-      <td></td>
-      <td>orangecraft</td>
-      <td>orangecraft</td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>GamePoint</td>
-      <td>7863</td>
-      <td>4763</td>
-      <td></td>
-      <td>gamepoint</td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>Letragon</td>
-      <td>5835</td>
-      <td>397</td>
-      <td>4852</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>Arago.Games</td>
-      <td>7666</td>
-      <td>4561</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>Pixelmon.PRO</td>
-      <td>6031</td>
-      <td>4585</td>
-      <td>6434</td>
-      <td>pixelmon</td>
-      <td>pixelmonpro</td>
-      <td>1404</td>
-      </tr>
-      <tr>
-      <td>qoobworld</td>
-      <td>318</td>
-      <td>1142</td>
-      <td>1762</td>
-      <td></td>
-      <td></td>
-      <td>797</td>
-      </tr>
-      <tr>
-      <td>OneLand</td>
-      <td>9598</td>
-      <td></td>
-      <td></td>
-      <td>oneland</td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>GrandGear</td>
-      <td>9536</td>
-      <td>5516</td>
-      <td>8493</td>
-      <td></td>
-      <td>gg</td>
-      <td>1356</td>
-      </tr>
-      <tr>
-      <td>SMARTYcraft</td>
-      <td>600</td>
-      <td>317</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td>6</td>
-      </tr>
-      <tr>
-      <td>SideMC</td>
-      <td>9867</td>
-      <td></td>
-      <td></td>
-      <td>sidemc</td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>MytdicalPlanet</td>
-      <td>6287</td>
-      <td>4483</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>CenturyMine</td>
-      <td>7411</td>
-      <td>4888</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>FineMine</td>
-      <td>3254</td>
-      <td>3337</td>
-      <td>4703</td>
-      <td></td>
-      <td></td>
-      <td>354</td>
-      </tr>
-      <tr>
-      <td>FrostLand</td>
-      <td>7125</td>
-      <td>4580</td>
-      <td>7450</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>Gamai</td>
-      <td>628</td>
-      <td>1765</td>
-      <td>8428</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>Grand-Mine</td>
-      <td>1041</td>
-      <td></td>
-      <td></td>
-      <td>grand-mine</td>
-      <td>grand-mine</td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>VictoryCraft</td> <td>8179</td>
-      <td>4729</td>
-      <td></td>
-      <td>victorycraft</td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>DiverseMine</td> <td>8732</td>
-      <td>5089</td>
-      <td></td>
-      <td>diversemine</td>
-      <td></td>
-      <td></td>
-      </tr>
-      <tr>
-      <td>skolot.fun</td>
-      <td>9584</td>
-      <td>5685</td>
-      <td></td>
-      <td></td>
-      <td>skolotfun</td>
-      <td></td>
-      </tr>
-      </tbody>
-    </table>
-    
-    <p class="mt-4">Если здесь нет вашего проекта и у вас хороший онлайн - пишите в ЛС дискорда Serega007#4476, и я добавлю ваш проект в этот список</p>
+<div id="help" class="tabcontent" style="display: none;">
+<h4 align="center">Справка</h3>
+  <hr color="#5A5A5C">  
+  <p class="mt-3">Разработчики: Serega007, Qworte</p>
+  <p class="mt-3">Что бы попасть в список проектов для голосования - отпишите в ЛС дискорда Serega007#4476, стоимость добавления составляет 4 млн. рублей.</p>
 </div>
-<a target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH">Поддержать проект</a>
+<a target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH">Поддержать разработчика</a>
 <div id="save">&nbsp;</div>
 </div>
   <script src="options.js"></script>

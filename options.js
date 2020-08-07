@@ -109,7 +109,7 @@ async function restoreOptions() {
     settings = await getValue('AVMRsettings');
     settings = settings.AVMRsettings;
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
-        updateStatusSave('<font>Генерирую настройки по умолчанию...</font>', true);
+        updateStatusSave('<div>Генерирую настройки по умолчанию...</div>', true);
         projectsTopCraft = [];
         projectsMcTOP = [];
         projectsMCRate = [];
@@ -138,10 +138,10 @@ async function restoreOptions() {
         await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
         await setValue('AVMRprojectsCustom', projectsCustom, false);
         console.log('Настройки проектов сгенерированы');
-        updateStatusSave('<font color="green">Настройки были успешно сгенерированы по умолчанию и сохранены</font>', false);
+        updateStatusSave('<div align="center" style="color:#7CB342;">Настройки были успешно сгенерированы по умолчанию и сохранены</div>', false);
     }
     if (projectsPlanetMinecraft == null || !(typeof projectsPlanetMinecraft[Symbol.iterator] === 'function')) {
-        updateStatusSave('<font>Обновляю настройки по умолчанию...</font>', true);
+        updateStatusSave('<div>Обновляю настройки по умолчанию...</div>', true);
         projectsPlanetMinecraft = [];
         projectsTopG = [];
         projectsMinecraftMp = [];
@@ -156,14 +156,14 @@ async function restoreOptions() {
         await setValue('AVMRprojectsServerPact', projectsServerPact, false);
         await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
         console.log('Настройки проектов обновлены');
-        updateStatusSave('<font color="green">Настройки были успешно обновлены по умолчанию и сохранены</font>', false);
+        updateStatusSave('<div align="center" style="color:#7CB342;">Настройки были успешно обновлены по умолчанию и сохранены</div>', false);
     }
     if (settings == null || settings == "") {
-        updateStatusSave('<font>Генерирую настройки по умолчанию...</font>', true);
+        updateStatusSave('<div>Генерирую настройки по умолчанию...</div>', true);
         settings = new Settings(false, false, false, false, true, false, 1000, false);
         await setValue('AVMRsettings', settings, false);
         console.log('Дополнительные настройки сгенерированы');
-        updateStatusSave('<font color="green">Настройки были успешно сгенерированы по умолчанию и сохранены</font>', false);
+        updateStatusSave('<div align="center" style="color:#7CB342;">Настройки были успешно сгенерированы по умолчанию и сохранены</div>', false);
     }
     //Поддержка новых настроек с версии 2.1.0 (или же с 2.1.1 для Opera)
     if (settings.multivote == null) {
@@ -194,10 +194,10 @@ async function restoreOptions() {
             if (this.id == "enableSyncStorage") {
                 if (this.checked) {
                     settingsStorage = chrome.storage.sync;
-                    updateStatusSave('<font>Копирую настройки в облако...</font>', false);
+                    updateStatusSave('<div>Копирую настройки в облако...</div>', false);
                 } else {
     	           settingsStorage = chrome.storage.local;
-    	           updateStatusSave('<font>Копирую настройки в локальное хранилище...</font>', true);
+    	           updateStatusSave('<div>Копирую настройки в локальное хранилище...</div>', true);
                 }
                 await setSyncValue('AVMRenableSyncStorage', this.checked);
                 await setValue('AVMRsettings', settings, false);
@@ -217,9 +217,9 @@ async function restoreOptions() {
                 //await setValue('AVMRprojects', projects, false);
                 await chrome.extension.getBackgroundPage().initializeConfig();
                 if (this.checked) {
-                    updateStatusSave('<font>Настройки были успешно скопированы в облако</font>', false);
+                    updateStatusSave('<div>Настройки были успешно скопированы в облако</div>', false);
                 } else {
-                    updateStatusSave('<font>Настройки были успешно скопированы в локальное хранилище</font>', false);
+                    updateStatusSave('<div>Настройки были успешно скопированы в локальное хранилище</div>', false);
                 }
                 return;
             }
@@ -471,14 +471,14 @@ document.getElementById('timeout').addEventListener('submit', () => {
 });
 
 async function addProject(choice, nick, id, time, response, priorityOpt, element) {
-    updateStatusAdd('<font>Добавляю...</font>', true, element);
+    updateStatusAdd('<div>Добавляю...</div>', true, element);
     let project;
     if (choice == 'Custom') {
         let body;
         try {
             body = JSON.parse(id);
         } catch (e) {
-            updateStatusAdd('<font color="red">' + e + '</font>', true, element);
+            updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element);
             return;
         }
         project = new Project(choice, nick, body, time, response, priorityOpt);
@@ -497,28 +497,28 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     forLoopAllProjects(function () {
         if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom && !settings.multivote) {
             if (secondBonus === "") {
-                updateStatusAdd('<font color="green">Этот проект у вас уже добавлен</font>', false, element);
+                updateStatusAdd('<div align="center" style="color:#7CB342;">Этот проект у вас уже добавлен</div>', false, element);
             } else if (element != null) {
-                updateStatusAdd('<font color="green">Этот проект у вас уже добавлен</font> ' + secondBonus, false, element);
+                updateStatusAdd('<div align="center" style="color:#7CB342;">Этот проект у вас уже добавлен</div> ' + secondBonus, false, element);
             } else {
-                updateStatusAdd('<font color="green">Этот проект у вас уже добавлен</font> ' + secondBonus, true, element);
+                updateStatusAdd('<div align="center" style="color:#7CB342;">Этот проект у вас уже добавлен</div> ' + secondBonus, true, element);
             }
             returnAdd = true;
             return;
         } else if (((proj.MCRate && choice == "MCRate") || (proj.ServerPact && choice == "ServerPact")) && proj.nick && project.nick && !disableCheckProjects) {
-            updateStatusAdd('<font color="red">На ' + getProjectName(proj) + ' можно голосовать только за 1 проект</font>', false, element);
+            updateStatusAdd('<div align="center" style="color:#f44336;">На ' + getProjectName(proj) + ' можно голосовать только за 1 проект</div>', false, element);
             returnAdd = true;
             return;
         } else if (proj.FairTop && choice == "FairTop" && proj.nick && project.nick && !disableCheckProjects) {
-            updateStatusAdd('<font color="red">На FairTop можно голосовать только за 1 проект, чтобы голосовать за несколько проектов - запретите сайту FairTop.in сохранять куки файлы, если не знаете как это сделать - загуглите) Если вы запретили сохранять куки, отключите проверку при добавлении проекта в дополнительных настройках и попробуйте снова добавить этот проект. Будьте внимательны с айди проекта при добавлении проекта с отключенной проверкой, расширение может принять проект с несуществующим айди.</font>', true, element);
+            updateStatusAdd('<div align="center" style="color:#f44336;">На FairTop можно голосовать только за 1 проект, чтобы голосовать за несколько проектов - запретите сайту FairTop.in сохранять куки файлы, если не знаете как это сделать - загуглите) Если вы запретили сохранять куки, отключите проверку при добавлении проекта в дополнительных настройках и попробуйте снова добавить этот проект. Будьте внимательны с айди проекта при добавлении проекта с отключенной проверкой, расширение может принять проект с несуществующим айди.</div>', true, element);
             returnAdd = true;
             return;
         } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
-            updateStatusAdd('<font color="red">На MinecraftIpList можно голосовать только за 5 проектов за раз.</font>', true, element);
+            updateStatusAdd('<div align="center" style="color:#f44336;">На MinecraftIpList можно голосовать только за 5 проектов за раз.</div>', true, element);
             returnAdd = true;
             return;
         } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
-            updateStatusAdd('<font color="green">Этот проект у вас уже добавлен</font>', false, element);
+            updateStatusAdd('<div align="center" style="color:#7CB342;">Этот проект у вас уже добавлен</div>', false, element);
             returnAdd = true;
             return;
         }
@@ -530,7 +530,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     }
     let projectURL = '';
     if (!(disableCheckProjects || project.Custom)) {
-        updateStatusAdd('<font>Проверяю существует ли такой проект...</font>', true, element);
+        updateStatusAdd('<div>Проверяю существует ли такой проект...</div>', true, element);
         let url;
         let jsPath;
         if (project.TopCraft) {
@@ -586,25 +586,25 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             response = await fetch(url);
         } catch (e) {
            if (e == 'TypeError: Failed to fetch') {
-               updateStatusAdd('<font color="red">Кажется у вас нет подключения к интернету, смотрите подробности в консоле</font>', true, element);
+               updateStatusAdd('<div align="center" style="color:#f44336;">Кажется у вас нет подключения к интернету, смотрите подробности в консоле</div>', true, element);
                return;
            } else {
-               updateStatusAdd('<font color="red">' + e + '</font>', true, element);
+               updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element);
            }
         }
 
         if (response.status == 404) {
-            updateStatusAdd('<font color="red">Такого проекта не существует! Код состояния HTTP: ' + response.status + '</font>', true, element);
+            updateStatusAdd('<div align="center" style="color:#f44336;">Такого проекта не существует! Код состояния HTTP: ' + response.status + '</div>', true, element);
             return;
         } else if (response.redirected) {
             if (project.ServerPact) {
-                updateStatusAdd('<font color="red">Такого проекта не существует!</font>', true, element);
+                updateStatusAdd('<div align="center" style="color:#f44336;">Такого проекта не существует!</div>', true, element);
                 return;
             }
-            updateStatusAdd('<font color="red">Произошла переадресация, скорее всего такого проекта не существует! Проверьте URL: ' + response.url + '</font>', true, element);
+            updateStatusAdd('<div align="center" style="color:#f44336;">Произошла переадресация, скорее всего такого проекта не существует! Проверьте URL: ' + response.url + '</div>', true, element);
             return;
         } else if (!response.ok) {
-            updateStatusAdd('<font color="red">Не удалось соединиться с ' + getProjectName(project) + ', код состояния HTTP: ' + response.status + '</font>', true, element);
+            updateStatusAdd('<div align="center" style="color:#f44336;">Не удалось соединиться с ' + getProjectName(project) + ', код состояния HTTP: ' + response.status + '</div>', true, element);
             return;
         }
         try {
@@ -613,17 +613,17 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                 let doc = new DOMParser().parseFromString(html, "text/html");
                 if (project.MCRate) {//А зачем 404 отдавать в status код? Мы лучше отошлём 200 и только потом на странице напишем что не найдено 404
                     if (doc.querySelector("div[class=error]") != null) {
-                        updateStatusAdd('<font color="red">' + doc.querySelector("div[class=error]").textContent + '</font>', true, element);
+                        updateStatusAdd('<div align="center" style="color:#f44336;">' + doc.querySelector("div[class=error]").textContent + '</div>', true, element);
                         error = true;
                     }
                 } else if (project.ServerPact) {
                     if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > center") != null && doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > center").textContent.includes('This server does not exist')) {
-                        updateStatusAdd('<font color="red">' + 'This server does not exist.' + '</font>', true, element);
+                        updateStatusAdd('<div align="center" style="color:#f44336;">' + 'This server does not exist.' + '</div>', true, element);
                         error = true;
                     }
                 } else if (project.MinecraftIpList) {
                     if (doc.querySelector(jsPath) == null) {
-                        updateStatusAdd('<font color="red">' + 'Not found 404.' + '</font>', true, element);
+                        updateStatusAdd('<div align="center" style="color:#f44336;">' + 'Not found 404.' + '</div>', true, element);
                         error = true;
                     }
                 }
@@ -644,10 +644,10 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         } catch (e) {
             console.error(e);
         }
-        updateStatusAdd('<font>Проверка на существование проекта прошла</font>', true, element);
+        updateStatusAdd('<div>Проверка на существование проекта прошла</div>', true, element);
 
         if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
-            updateStatusAdd('<font>Проверяю авторизацию вк...</font>', true, element);
+            updateStatusAdd('<div>Проверяю авторизацию вк...</div>', true, element);
             let url2;
             if (project.TopCraft) url2 = "https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email";
             if (project.McTOP) url2 = "https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email";
@@ -659,10 +659,10 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                 response2 = await fetch(url2, {redirect: 'manual'});
             } catch (e) {
                 if (e == 'TypeError: Failed to fetch') {
-                    updateStatusAdd('<font color="red">Кажется у вас нет подключения к интернету (вы с Украины? Включите VPN и держите его включённым в момент автоголосования), смотрите подробности в консоле</font>', true, element);
+                    updateStatusAdd('<div align="center" style="color:#f44336;">Кажется у вас нет подключения к интернету (вы с Украины? Включите VPN и держите его включённым в момент автоголосования), смотрите подробности в консоле</div>', true, element);
                     return;
                 } else {
-                    updateStatusAdd('<font color="red">' + e + '</font>', true, element);
+                    updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element);
                 }
             }
 
@@ -670,7 +670,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
 //                 if (project.TopCraft) url2 = "https://topcraft.ru/accounts/vk/login/";
 //                 if (project.McTOP) url2 = "https://mctop.su/accounts/vk/login/";
 //                 if (project.MonitoringMinecraft) url2 = "http://monitoringminecraft.ru/top/" + project.id + "/vote"
-                updateStatusAdd('<font color="red">Для голосования на '+getProjectName(project)+' требуется авторизация через ВК &#10140; <button class="authvk" id="authvk">Авторизоваться</button>', true, element);
+                updateStatusAdd('<div align="center" style="color:#f44336;">Для голосования на '+getProjectName(project)+' требуется авторизация через ВК &#10140; <button class="authvk" id="authvk">Авторизоваться</button>', true, element);
                 document.getElementById('authvk').addEventListener('click', function() {
                     if (element != null) {
                         openPoput(url2, function () {
@@ -684,10 +684,10 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                 });
                 return;
             } else if (response2.status != 0) {
-                updateStatusAdd('<font color="red">Не удалось соединиться с ' + extractHostname(response.url) + ', код состояния HTTP: ' + response2.status + '</font>', true, element);
+                updateStatusAdd('<div align="center" style="color:#f44336;">Не удалось соединиться с ' + extractHostname(response.url) + ', код состояния HTTP: ' + response2.status + '</div>', true, element);
                 return;
             }
-            updateStatusAdd('<font>Проверка на авторизацию вк прошла</font>', true, element);
+            updateStatusAdd('<div>Проверка на авторизацию вк прошла</div>', true, element);
         }
     }
 
@@ -698,14 +698,14 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     //document.getElementById('id').value = '';
 
     if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList) && settings.enabledSilentVote) {
-        updateStatusAdd('<font color="green">Успешно добавлен ' + projectURL + '</font> <font color="red">Обращаем ваше внимание что ' + getProjectName(project) +' недоступен в режиме тихого голосования</font>', true, element);
+        updateStatusAdd('<div align="center" style="color:#7CB342;">Успешно добавлен ' + projectURL + '</div> <div align="center" style="color:#f44336;">Обращаем ваше внимание что ' + getProjectName(project) +' недоступен в режиме тихого голосования</div>', true, element);
     } else {
         if (secondBonus === "") {
-            updateStatusAdd('<font color="green">Успешно добавлен ' + projectURL + '</font>', false, element);
+            updateStatusAdd('<div align="center" style="color:#7CB342;">Успешно добавлен ' + projectURL + '</div>', false, element);
         } else if (element != null) {
-            updateStatusAdd('<font color="green">Успешно добавлен ' + projectURL + '</font> ' + secondBonus, false, element);
+            updateStatusAdd('<div align="center" style="color:#7CB342;">Успешно добавлен ' + projectURL + '</div> ' + secondBonus, false, element);
         } else {
-            updateStatusAdd('<font color="green">Успешно добавлен ' + projectURL + '</font> ' + secondBonus, true, element);
+            updateStatusAdd('<div align="center" style="color:#7CB342;">Успешно добавлен ' + projectURL + '</div> ' + secondBonus, true, element);
         }
     }
 
@@ -717,10 +717,10 @@ function addProjectsBonus(project) {
         document.getElementById('secondBonusMythicalWorld').addEventListener('click', async () => {
             let response = await fetch('https://mythicalworld.su/bonus');
             if (!response.ok) {
-                updateStatusAdd('<font color="red">Не удалось соединиться с https://mythicalworld.su/bonus, код состояния HTTP: ' + response.status + '</font>', true, element);
+                updateStatusAdd('<div align="center" style="color:#f44336;">Не удалось соединиться с https://mythicalworld.su/bonus, код состояния HTTP: ' + response.status + '</div>', true, element);
                 return;
             } else if (response.redirected) {
-                updateStatusAdd('<font color="red">Произошла переадресация на ' + response.url + ', похоже вы не авторизованы на данном сайте либо тут другая проблема. Проверьте данный URL</font>', true, element);
+                updateStatusAdd('<div align="center" style="color:#f44336;">Произошла переадресация на ' + response.url + ', похоже вы не авторизованы на данном сайте либо тут другая проблема. Проверьте данный URL</div>', true, element);
                 return;
             }
             await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
@@ -767,7 +767,7 @@ function updateStatusAdd(text, disableTimer, element) {
             if (disableTimer) {
                 element.innerHTML = element.innerHTML + text;
             } else {
-                element.innerHTML = element.innerHTML.replace('<font color="red">✘ </font>', '<font color="green">✔ </font>') + text;
+                element.innerHTML = element.innerHTML.replace('<div align="center" style="color:#f44336;">✘ </div>', '<div align="center" style="color:#7CB342;">✔ </div>') + text;
             }
         } else {
             element.innerHTML = element.innerHTML + ': ' + text;
@@ -846,7 +846,7 @@ async function getValue(name) {
     return new Promise(resolve => {
         settingsStorage.get(name, data => {
             if (chrome.runtime.lastError) {
-                updateStatusSave('<font color="red">Произошла ошибка при чтении настроек, смотрите подробности в консоле</font>', false);
+                updateStatusSave('<div align="center" style="color:#f44336;">Произошла ошибка при чтении настроек, смотрите подробности в консоле</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
                 resolve(data);
@@ -855,14 +855,14 @@ async function getValue(name) {
     });
 }
 async function setValue(key, value, updateStatus) {
-    if (updateStatus) updateStatusSave('<font>Сохраняю...</font>', true);
+    if (updateStatus) updateStatusSave('<div>Сохраняю...</div>', true);
     return new Promise(resolve => {
         settingsStorage.set({[key]: value}, data => {
             if (chrome.runtime.lastError) {
-                updateStatusSave('<font color="red">Произошла ошибка при сохранении настроек, смотрите подробности в консоле</font>', false);
+                updateStatusSave('<div align="center" style="color:#f44336;">Произошла ошибка при сохранении настроек, смотрите подробности в консоле</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
-                if (updateStatus) updateStatusSave('<font color="green">Настройки успешно сохранены</font>', false);
+                if (updateStatus) updateStatusSave('<div align="center" style="color:#7CB342;">Настройки успешно сохранены</div>', false);
                 resolve(data);
             }
         });
@@ -872,7 +872,7 @@ async function getSyncValue(name) {
     return new Promise(resolve => {
         chrome.storage.sync.get(name, data => {
             if (chrome.runtime.lastError) {
-                updateStatusSave('<font color="red">Произошла ошибка при чтении настроек, смотрите подробности в консоле</font>', false);
+                updateStatusSave('<div align="center" style="color:#f44336;">Произошла ошибка при чтении настроек, смотрите подробности в консоле</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
                 resolve(data);
@@ -884,7 +884,7 @@ async function setSyncValue(key, value) {
     return new Promise(resolve => {
         chrome.storage.sync.set({[key]: value}, data => {
             if (chrome.runtime.lastError) {
-                updateStatusSave('<font color="red">Произошла ошибка при сохранении настроек, смотрите подробности в консоле</font>', false);
+                updateStatusSave('<div align="center" style="color:#f44336;">Произошла ошибка при сохранении настроек, смотрите подробности в консоле</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
                 resolve(data);
@@ -1104,7 +1104,7 @@ function forLoopAllProjects (fuc, reverse) {
 
 //Слушатель на экпорт настроек
 document.getElementById('file-download').addEventListener('click', () => {
-    updateStatusFile('<font>Экспортирую настройки...</font>', true);
+    updateStatusFile('<div>Экспортирую настройки...</div>', true);
     var allSetting = {
         projectsTopCraft,
         projectsMcTOP,
@@ -1129,12 +1129,12 @@ document.getElementById('file-download').addEventListener('click', () => {
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
     anchor.dataset.downloadurl = ['text/plain', anchor.download, anchor.href].join(':');
     anchor.click();
-    updateStatusFile('<font color="green">Экспорт настроек успешно завершён</font>', false);
+    updateStatusFile('<div align="center" style="color:#7CB342;">Экспорт настроек успешно завершён</div>', false);
 });
 
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', (evt) => {
-    updateStatusFile('<font>Импортирую настройки...</font>', true);
+    updateStatusFile('<div>Импортирую настройки...</div>', true);
     try {
         if (evt.target.files.length == 0) return;
         let file = evt.target.files[0];
@@ -1158,7 +1158,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     projectsCustom = allSetting.projectsCustom;
                     settings = allSetting.settings;
 
-                    updateStatusSave('<font>Сохраняю...</font>', true);
+                    updateStatusSave('<div>Сохраняю...</div>', true);
                     await setValue('AVMRsettings', settings, false);
                     await setValue('AVMRprojectsTopCraft', projectsTopCraft, false);
                     await setValue('AVMRprojectsMcTOP', projectsMcTOP, false);
@@ -1173,7 +1173,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     await setValue('AVMRprojectsServerPact', projectsServerPact, false);
                     await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
                     await setValue('AVMRprojectsCustom', projectsCustom, false);
-                    updateStatusSave('<font color="green">Настройки успешно сохранены</font>', false);
+                    updateStatusSave('<div align="center" style="color:#7CB342;">Настройки успешно сохранены</div>', false);
 
                     document.getElementById("disabledNotifStart").checked = settings.disabledNotifStart;
                     document.getElementById("disabledNotifInfo").checked = settings.disabledNotifInfo;
@@ -1194,10 +1194,10 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
 
                     await updateProjectList();
 
-                    updateStatusFile('<font color="green">Импорт настроек успешно завершён</font>', false);
+                    updateStatusFile('<div align="center" style="color:#7CB342;">Импорт настроек успешно завершён</div>', false);
                 } catch (e) {
                     console.error(e);
-                    updateStatusFile('<font color="red">' + e + '</font>', true);
+                    updateStatusFile('<div align="center" style="color:#f44336;">' + e + '</div>', true);
                 }
             }
         })(file);
@@ -1205,7 +1205,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
         document.getElementById('file-upload').value = '';
     } catch (e) {
         console.error(e);
-        updateStatusFile('<font color="red">' + e + '</font>', true);
+        updateStatusFile('<div align="center" style="color:#f44336;">' + e + '</div>', true);
     }
 }, false);
 
@@ -1271,7 +1271,7 @@ async function fastAdd() {
         for (fastProj of getUrlProjects()) {
             let html = document.createElement('div');
             html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id);
-            html.innerHTML = '<font color="red">✘ </font>'+getProjectName(fastProj) + " - " + fastProj.nick + " - " + fastProj.id;
+            html.innerHTML = '<div align="center" style="color:#f44336;">✘ </div>'+getProjectName(fastProj) + " - " + fastProj.nick + " - " + fastProj.id;
             listFastAdd.before(html);
             await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, false, html);
         }
@@ -1282,7 +1282,7 @@ async function fastAdd() {
             }
             document.getElementById("disabledNotifInfo").checked = settings.disabledNotifInfo;
             let html = document.createElement('div');
-            html.innerHTML = '<font color="green">✔ </font>Уведомления об успешном голосовании отключены'
+            html.innerHTML = '<div align="center" style="color:#7CB342;">✔ </div>Уведомления об успешном голосовании отключены'
             listFastAdd.before(html);
         }
         if (vars['disableNotifWarn'] != null) {
@@ -1292,7 +1292,7 @@ async function fastAdd() {
             }
             document.getElementById("disabledNotifWarn").checked = settings.disabledNotifWarn;
             let html = document.createElement('div');
-            html.innerHTML = '<font color="green">✔ </font>Уведомления о предупрежденияъ отключены'
+            html.innerHTML = '<div align="center" style="color:#7CB342;">✔ </div>Уведомления о предупрежденияъ отключены'
             listFastAdd.before(html);
         }
         if (vars['disableNotifStart'] != null) {
@@ -1302,7 +1302,7 @@ async function fastAdd() {
             }
             document.getElementById("disabledNotifStart").checked = settings.disabledNotifStart;
             let html = document.createElement('div');
-            html.innerHTML = '<font color="green">✔ </font>Уведомления о начале голосования отключены'
+            html.innerHTML = '<div align="center" style="color:#7CB342;">✔ </div>Уведомления о начале голосования отключены'
             listFastAdd.before(html);
         }
 
@@ -1439,6 +1439,19 @@ document.getElementById('addedTab').addEventListener('click', function() {
 document.getElementById('helpTab').addEventListener('click', function() {
     tabSelect(event, 'help');
 });
+document.getElementById('addTab2').addEventListener('click', function() {
+    tabSelect(event, 'add');
+});
+document.getElementById('settingsTab2').addEventListener('click', function() {
+    tabSelect(event, 'settings');
+});
+document.getElementById('addedTab2').addEventListener('click', function() {
+    tabSelect(event, 'added');
+});
+document.getElementById('helpTab2').addEventListener('click', function() {
+    tabSelect(event, 'help');
+});
+
 
 function listSelect(evt, tabs) {
     var x, listcontent, selectsite;
