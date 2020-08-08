@@ -531,6 +531,7 @@ figure hr {
 }
 
 #authvk {
+  transform: translateY(-3px);
   border: none;
   color: #1A7BEE;
   transition: 0.3s;
@@ -542,7 +543,10 @@ figure hr {
 #authvk:hover {
   opacity: 0.85;
   outline: none;
-  transform: none;
+}
+
+#authvk:focus {
+  outline: 0;
 }
 
 .tooltip1 {
