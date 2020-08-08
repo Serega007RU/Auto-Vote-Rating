@@ -266,7 +266,7 @@ p, form, label, details {
   display: block;
   position: fixed;
   list-style:none;
-  padding: 10px;
+  padding: 10px 0;
   margin: 0;
   box-sizing: border-box;
   width: 240px;
@@ -339,9 +339,9 @@ p, form, label, details {
   }
 }
 
-@media (max-width: 400px) { 
-  .tooltip1text {
-    display: none;
+@media (max-width: 770px) { 
+  .tooltip1text, .tooltip1 {
+    display: none !important;
   }
 }
 
@@ -371,7 +371,7 @@ p, form, label, details {
   }
   .tablinks {
     font-size: 19px;
-    width: 220px;
+    width: 100%;
     border-radius: 3  px;
   }
 }
@@ -538,12 +538,25 @@ figure hr {
 .tooltip1 {
   position: relative;
   display: inline-block;
+  border-radius: 25px;
+  background: #1A7BEE;
+  width: 19px;
+  height: 19px;
+  cursor: help;
+  line-height: 1.1;
+  text-align: center;
+  font-size: initial !important;
+}
+
+.tooltip1:before {
+  content: "?";
+  font-weight: 600;
 }
 
 .tooltip1 .tooltip1text {
   visibility: hidden;
   width: 350px;
-  background-color: #2A2A2F;
+  background-color: #000;
   color: #fff;
   text-align: center;
   border-radius: 6px;
@@ -551,10 +564,10 @@ figure hr {
   position: absolute;
   z-index: 1;
   bottom: 125%;
-  left: 40%;
-  margin-left: -60px;
+  margin-left: -179px;
   opacity: 0;
   transition: opacity 0.3s;
+  font-size: initial !important;
 }
 
 .tooltip1 .tooltip1text::after {
@@ -565,7 +578,7 @@ figure hr {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: #2A2A2F transparent transparent transparent;
+  border-color: #000 transparent transparent transparent;
 }
 
 .tooltip1:hover .tooltip1text {
@@ -576,4 +589,58 @@ figure hr {
 #cooldown, #submit2  {
   width: 48%;
   display: inline;
+}
+
+#addProjectDiv {
+  text-align: center;
+  font-size: 15px;
+  margin-top: 10px;
+}
+
+.tooltip2 {
+  border-radius: 25px;
+  background: #1A7BEE;
+  width: 19px;
+  height: 19px;
+  cursor: help;
+  line-height: 1.1;
+  text-align: center;
+  font-size: initial !important;
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip2:before {
+  content: "?";
+  font-weight: 600;
+}
+
+.tooltip2 .tooltip2text {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 150%;
+  width: 350px;
+  margin-left: -179px;
+}
+
+.tooltip2 .tooltip2text::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent black transparent;
+}
+
+.tooltip2:hover .tooltip2text {
+  visibility: visible;
 }

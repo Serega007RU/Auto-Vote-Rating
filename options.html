@@ -25,7 +25,7 @@
   <span class="third"></span>
 </label>
 <ul class="hidden-menu">
- <label>Вкладки</label>
+ <label class="ml-2">Вкладки</label>
   <button class="mt-4 tablinks active" id="addTab2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Добавить</button>
   <button class="tablinks" id="addedTab2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>Добавленные</button>
   <button class="tablinks" id="settingsTab2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>Опции</button>
@@ -54,7 +54,7 @@
       <div class="form-group mb-1">
         <label for="nick">Ваш никнейм</label>
       </div>
-      <input name="nick" id="nick" required placeholder="Nickmame" type="text" class="mb-2">
+      <input name="nick" id="nick" required placeholder="Nickname" type="text" class="mb-2">
       <div class="form-group mb-1">
         <label for="project">Сайт рейтинга</label>
       </div>
@@ -76,15 +76,18 @@
       </select>
       <div class="form-group mb-1">
         <label for="id">ID проекта</label>
+        <span class="tooltip1"><span class="tooltip1text">ID проекта можно достать из адресной строки находясь на странице проекта, например:&#xA;на TopCraft для McSkill ID: 218&#xA;на McTOP для Borealis ID: 2241&#xA;на MCRate для MinecraftOnly ID: 5154&#xA;на MinecraftRating для McSkill ID: mcskill&#xA;на MonitoringMinecraft для McSkill ID: mcskill</span></span>
       </div>
       <input name="id" id="id" required placeholder="ID" type="text">
       <div id="submit" class="mt-3">
         <button id="submitAddProject" type="submit">Добавить</button>
       </div>
-      <div id="addProjectDiv">&nbsp;</div>
     </div>
     <div class="col-xl-4 col-lg-4 col-md-12 mb-3"> 
     </div>
+    <div class="col-xl-12 col-lg-12 col-md-12 mb-3"> 
+      <div id="addProjectDiv">&nbsp;</div>
+    </div> 
   </form>  
 </div>
 </div>
@@ -97,18 +100,30 @@
       <div class="form-group mb-1">
         <label>Настройки</label>
       </div>
-      <input class="checkbox" id="disabledNotifStart" type="checkbox" name="checkbox"/><label for="disabledNotifStart">Отключить уведомления о начале голосовании</label><br>
-      <input class="checkbox" id="disabledNotifInfo" type="checkbox" name="checkbox"/><label for="disabledNotifInfo">Отключить уведомления об успешном голосовании</label><br>
-      <input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox"/><label class="tooltip1" for="disabledNotifWarn">Отключить уведомления о предупреждениях<span class="tooltip1text">Например уведомление о том что вы уже голосовали&#xA;(это когда расширение попыталось проголосовать за проект но вы уже сами проголосовали)</span></label><br>
-      <input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox"/><label for="disabledNotifError">Отключить уведомления об ошибках</label><br>
-      <input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox"/><label class="tooltip1" for="enableSyncStorage">Сохранять настройки расширения в облаке<span class="tooltip1text">Не рекомендуется включать данную настройку если у вас очень много проектов в списке добавленных проектов, у облака есть ограниченный трафик и место хранения&#xA;Для работы этой функции требуется что бы в вашем браузере был подключён аккаунт и была включена синхронизация, иначе настройки всё равно будут сохраняться локально&#xA;Позволяет синхронизировать настройки расширения с несколькоими компьютерами, не рекомендуется держать расширение включённым с этой включённой настройкой сразу на нескольких компьютерах</span></label><br>
+      <input class="checkbox" id="disabledNotifStart" type="checkbox" name="checkbox"/>
+        <label for="disabledNotifStart">Отключить уведомления о начале голосовании</label><br>
+      <input class="checkbox" id="disabledNotifInfo" type="checkbox" name="checkbox"/>
+        <label for="disabledNotifInfo">Отключить уведомления об успешном голосовании</label><br>
+      <input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox"/>
+        <label for="disabledNotifWarn">Отключить уведомления о предупреждениях</label>
+        <span class="tooltip1 ml-1"><span class="tooltip1text">Например уведомление о том что вы уже голосовали&#xA;(это когда расширение попыталось проголосовать за проект но вы уже сами проголосовали)</span></span><br>
+      <input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox"/>
+        <label for="disabledNotifError">Отключить уведомления об ошибках</label><br>
+      <input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox"/>
+        <label for="enableSyncStorage">Сохранять настройки расширения в облаке</label>
+        <span class="tooltip1 ml-1"><span class="tooltip1text">Не рекомендуется включать данную настройку если у вас очень много проектов в списке добавленных проектов, у облака есть ограниченный трафик и место хранения&#xA;Для работы этой функции требуется что бы в вашем браузере был подключён аккаунт и была включена синхронизация, иначе настройки всё равно будут сохраняться локально&#xA;Позволяет синхронизировать настройки расширения с несколькоими компьютерами, не рекомендуется держать расширение включённым с этой включённой настройкой сразу на нескольких компьютерах</span></span><br>
       <input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox"/><label for="disabledCheckTime">Отключить проверку времени при старте расширения</label><br>
-      <input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox"/><label class="tooltip1" for="disableCheckProjects">Отключить проверку при добавлении проекта<span class="tooltip1text">Крайне не рекомендуется отключать эту проверку, это может вызвать ошибки в расширении и может сломать механизм авто-голосования, эта настройка отключает проверку при добавлении проекта, это отключает проверку для MCRate (как известно там можно голосовать в день только за один проект)&#xA;Также он отключает проверку на авторизацию вк&#xA;Данный параметр не сохраняется при сохранении настроек</span></label><br>
-      <input class="checkbox" id="priority" type="checkbox" name="checkbox"/><label class="tooltip1" for="priority">Добавлять проект в приоритете при добавлении проекта<span class="tooltip1text">При включении данной опции и после при добавлении проекта, проект будет в приоритете, будет всегда самым первым голосовать и без задержеки в 10 минут</span></label>
+      <input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox"/>
+        <label for="disableCheckProjects">Отключить проверку при добавлении проекта</label>
+        <span class="tooltip1 ml-1"><span class="tooltip1text">Крайне не рекомендуется отключать эту проверку, это может вызвать ошибки в расширении и может сломать механизм авто-голосования, эта настройка отключает проверку при добавлении проекта, это отключает проверку для MCRate (как известно там можно голосовать в день только за один проект)&#xA;Также он отключает проверку на авторизацию вк&#xA;Данный параметр не сохраняется при сохранении настроек</span></span><br>
+      <input class="checkbox" id="priority" type="checkbox" name="checkbox"/>
+        <label for="priority">Добавлять проект в приоритете при добавлении проекта</label>
+        <span class="tooltip1 ml-1"><span class="tooltip1text">При включении данной опции и после при добавлении проекта, проект будет в приоритете, будет всегда самым первым голосовать и без задержеки в 10 минут</span></span>
     </div>
     <div class="col-xl-4 col-lg-6 col-md-12 mb-3">
       <div class="form-group mb-1">
         <label for="enabledSilentVote">Режим голосования</label>
+        <span class="tooltip2"><span class="tooltip2text">Тихий режим (рекомендуется) — голосует за проекты полностью в фоновом режиме не открывая вкладки&#xA;Режим эмуляции — эмулирует реального пользователя, открывает вкладку и нажимает на кнопку голосования как реальный пользователь, лучше всего в данном режиме оставлять хотя бы одну открытую вкладку в браузере, иначе окно браузера будет открыто поверх остальных окон и может вам помешать</span></span>
       </div>
       <select required id="enabledSilentVote" class="mb-2">
         <option value="enabled">Тихий режим</option>

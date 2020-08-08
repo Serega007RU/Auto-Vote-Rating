@@ -509,7 +509,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             returnAdd = true;
             return;
         } else if (proj.FairTop && choice == "FairTop" && proj.nick && project.nick && !disableCheckProjects) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">На FairTop можно голосовать только за 1 проект, чтобы голосовать за несколько проектов - запретите сайту FairTop.in сохранять куки файлы, если не знаете как это сделать - загуглите) Если вы запретили сохранять куки, отключите проверку при добавлении проекта в дополнительных настройках и попробуйте снова добавить этот проект. Будьте внимательны с айди проекта при добавлении проекта с отключенной проверкой, расширение может принять проект с несуществующим айди.</div>', true, element);
+            updateStatusAdd('<div align="center" style="color:#f44336;">На FairTop можно голосовать только за 1 проект, чтобы голосовать за несколько проектов - запретите сайту FairTop.in сохранять куки файлы, если не знаете как это сделать - загуглите) Если вы запретили сохранять куки, отключите проверку при добавлении проекта в дополнительных настройках и попробуйте снова добавить этот проект. Будьте внимательны с ID проекта при добавлении проекта с отключенной проверкой, расширение может принять проект с несуществующим ID.</div>', true, element);
             returnAdd = true;
             return;
         } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
@@ -845,7 +845,7 @@ async function getValue(name) {
     return new Promise(resolve => {
         settingsStorage.get(name, data => {
             if (chrome.runtime.lastError) {
-                updateStatusSave('<div align="center" style="color:#f44336;">Произошла ошибка при чтении настроек, смотрите подробности в консоле</div>', false);
+                updateStatusSave('<div style="color:#f44336;">Произошла ошибка при чтении настроек, смотрите подробности в консоле</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
                 resolve(data);
@@ -858,10 +858,10 @@ async function setValue(key, value, updateStatus) {
     return new Promise(resolve => {
         settingsStorage.set({[key]: value}, data => {
             if (chrome.runtime.lastError) {
-                updateStatusSave('<div align="center" style="color:#f44336;">Произошла ошибка при сохранении настроек, смотрите подробности в консоле</div>', false);
+                updateStatusSave('<div style="color:#f44336;">Произошла ошибка при сохранении настроек, смотрите подробности в консоле</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
-                if (updateStatus) updateStatusSave('<div align="center" style="color:#4CAF50;">Настройки успешно сохранены</div>', false);
+                if (updateStatus) updateStatusSave('<div style="color:#4CAF50;">Настройки успешно сохранены</div>', false);
                 resolve(data);
             }
         });
@@ -871,7 +871,7 @@ async function getSyncValue(name) {
     return new Promise(resolve => {
         chrome.storage.sync.get(name, data => {
             if (chrome.runtime.lastError) {
-                updateStatusSave('<div align="center" style="color:#f44336;">Произошла ошибка при чтении настроек, смотрите подробности в консоле</div>', false);
+                updateStatusSave('<div style="color:#f44336;">Произошла ошибка при чтении настроек, смотрите подробности в консоле</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
                 resolve(data);
@@ -883,7 +883,7 @@ async function setSyncValue(key, value) {
     return new Promise(resolve => {
         chrome.storage.sync.set({[key]: value}, data => {
             if (chrome.runtime.lastError) {
-                updateStatusSave('<div align="center" style="color:#f44336;">Произошла ошибка при сохранении настроек, смотрите подробности в консоле</div>', false);
+                updateStatusSave('<div style="color:#f44336;">Произошла ошибка при сохранении настроек, смотрите подробности в консоле</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
                 resolve(data);
@@ -1172,7 +1172,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     await setValue('AVMRprojectsServerPact', projectsServerPact, false);
                     await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
                     await setValue('AVMRprojectsCustom', projectsCustom, false);
-                    updateStatusSave('<div align="center" style="color:#4CAF50;">Настройки успешно сохранены</div>', false);
+                    updateStatusSave('<div style="color:#4CAF50;">Настройки успешно сохранены</div>', false);
 
                     document.getElementById("disabledNotifStart").checked = settings.disabledNotifStart;
                     document.getElementById("disabledNotifInfo").checked = settings.disabledNotifInfo;
