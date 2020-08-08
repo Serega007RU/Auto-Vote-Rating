@@ -130,6 +130,10 @@ select:focus, input:focus {
   outline: 0;
 }
 
+form {
+  display: contents;
+}
+
 p, form, label, details {
   font-size: 19px;
 }
@@ -577,7 +581,7 @@ figure hr {
   padding: 5px;
   position: absolute;
   z-index: 1;
-  bottom: 125%;
+  bottom: 145%;
   margin-left: -179px;
   opacity: 0;
   transition: opacity 0.3s;
@@ -639,7 +643,7 @@ figure hr {
   padding: 5px 0;
   position: absolute;
   z-index: 1;
-  top: 150%;
+  top: 155%;
   width: 350px;
   margin-left: -179px;
 }
@@ -662,3 +666,4 @@ figure hr {
 #idSelector {
   height: 83px;
 }
+

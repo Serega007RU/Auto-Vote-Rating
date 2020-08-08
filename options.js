@@ -1409,6 +1409,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     fastAdd();
 });
 
+//Переключение между вкладками
 function tabSelect(evt, tabs) {
     var i, tabcontent, tablinks;
 
@@ -1426,6 +1427,7 @@ function tabSelect(evt, tabs) {
     evt.currentTarget.className += " active";
 }
 
+//Слушателей кнопок для переключения вкладок
 document.getElementById('addTab').addEventListener('click', function() {
     tabSelect(event, 'add');
 });
@@ -1452,6 +1454,7 @@ document.getElementById('helpTab2').addEventListener('click', function() {
 });
 
 
+//Переключение между списками добавленных проектов
 function listSelect(evt, tabs) {
     var x, listcontent, selectsite;
 
@@ -1469,6 +1472,7 @@ function listSelect(evt, tabs) {
     evt.currentTarget.className += " activeList";
 }
 
+//Слушатели кнопок списка доавленных проектов
 document.getElementById('TopCraftButton').addEventListener('click', function() {
     listSelect(event, 'TopCraftTab');
 });
@@ -1509,6 +1513,7 @@ document.getElementById('CustomButton').addEventListener('click', function() {
     listSelect(event, 'CustomTab');
 });
 
+//Тут насрал Серега, не знаю, что это  -\_(O_o)_/-
 var buttons = document.querySelectorAll(".toggle-button");
 var modal = document.querySelector("#modal");
 
@@ -1518,6 +1523,8 @@ var modal = document.querySelector("#modal");
   })
 });
 
+
+//Генерация поля ввода ID
 var selectedTop = document.getElementById("project");
 
 selectedTop.addEventListener("click", function() {
@@ -1530,7 +1537,7 @@ selectedTop.addEventListener("click", function() {
 });
 
 selectedTop.addEventListener("change", function() {
-    var label = '<div class="form-group mb-1"><label for="id">ID проекта</label> <span class="tooltip1"><span class="tooltip1text">ID проекта можно достать из адресной строки находясь на странице проекта, например:&#xA;на TopCraft для McSkill ID: 218&#xA;на McTOP для Borealis ID: 2241&#xA;на MCRate для MinecraftOnly ID: 5154&#xA;на MinecraftRating для McSkill ID: mcskill&#xA;на MonitoringMinecraft для McSkill ID: mcskill</span></span></div>';
+    var label = '<div class="form-group mb-1"><label for="id">ID проекта</label> <span class="tooltip1"><span class="tooltip1text">ID проекта можно получить из адресной строки находясь на странице проекта, например: На TopCraft для StarWay ID: 10496</span></span></div>';
     var input = '<input name="id" id="id" required placeholder="Введите ID" type="text">';
     var dataInput = '<input name="id" id="id" placeholder="Введите ID или выберите из списка" list="idlist"><datalist id="idlist">';
     if(selectedTop.value == "TopCraft") {
@@ -1557,9 +1564,5 @@ selectedTop.addEventListener("change", function() {
        idSelector.innerHTML = label + input;
     } else if(selectedTop.value == "MinecraftIpList") {
        idSelector.innerHTML = label + input;
-    } else if(selectedTop.value == "Custom") {
-       idSelector.innerHTML = 'Выбран Custom';
     }
 });
-
-
