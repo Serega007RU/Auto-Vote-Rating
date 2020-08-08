@@ -483,6 +483,16 @@ p, form, label, details {
   opacity: 1;
 }
 
+.anelumen:target ~ input ~ label ~ ul ~ div .tooltip1 {
+   position: initial;
+}
+
+.anelumen:target ~ input ~ label ~ ul ~ div .nav-panel, .anelumen:target ~ input ~ label {
+   display: none !important;
+}
+
+
+
 figure svg {
   margin-right: 5px;
 }
