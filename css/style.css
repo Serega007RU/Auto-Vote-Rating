@@ -658,3 +658,7 @@ figure hr {
 .tooltip2:hover .tooltip2text {
   visibility: visible;
 }
+
+#idSelector {
+  height: 83px;
+}
