@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Auto Vote Minecraft Rating</title>
+	<title data-resource="appName"></title>
 	<link rel="stylesheet" href="css/style.css">
 	<link rel="stylesheet" href="css/bootstrap.css"> </head>
 
@@ -12,28 +12,28 @@
 	<div class="anelumen lowingnuska" id="addFastProject">
 		<a href="#/" class="nedismiseg"></a>
 		<figure>
-			<h2>Быстрое добавление<a href="#/" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
+			<h2 data-resource="fastAdd"><a href="#/" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
 			<hr color="#aba4a4">
-			<div id=modaltext>Загрузка...</div>
+			<div data-resource="load" id=modaltext></div>
 		</figure>
 	</div>
 	<input type="checkbox" id="hmt" class="hidden-menu-ticker">
 	<label class="btn-menu" for="hmt" style="display: none;"> <span class="first"></span> <span class="second"></span> <span class="third"></span> </label>
 	<ul class="hidden-menu">
-		<label class="ml-2">Вкладки</label>
-		<button class="mt-4 tablinks active" id="addTab2">
+		<label data-resource="tabs" class="ml-2"></label>
+		<button data-resource="addButton" class="mt-4 tablinks active" id="addTab2">
 			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 				<line x1="12" y1="5" x2="12" y2="19"></line>
 				<line x1="5" y1="12" x2="19" y2="12"></line>
-			</svg>Добавить</button>
-		<button class="tablinks" id="addedTab2">
+			</svg></button>
+		<button data-resource="addedButton" class="tablinks" id="addedTab2">
 			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 				<rect x="3" y="3" width="7" height="7"></rect>
 				<rect x="14" y="3" width="7" height="7"></rect>
 				<rect x="14" y="14" width="7" height="7"></rect>
 				<rect x="3" y="14" width="7" height="7"></rect>
-			</svg>Добавленные</button>
-		<button class="tablinks" id="settingsTab2">
+			</svg></button>
+		<button data-resource="optionsButton" class="tablinks" id="settingsTab2">
 			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 				<line x1="4" y1="21" x2="4" y2="14"></line>
 				<line x1="4" y1="10" x2="4" y2="3"></line>
@@ -44,33 +44,33 @@
 				<line x1="1" y1="14" x2="7" y2="14"></line>
 				<line x1="9" y1="8" x2="15" y2="8"></line>
 				<line x1="17" y1="16" x2="23" y2="16"></line>
-			</svg>Опции</button>
-		<button class="tablinks" id="helpTab2">
+			</svg></button>
+		<button data-resource="help" class="tablinks" id="helpTab2">
 			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 				<circle cx="12" cy="12" r="10"></circle>
 				<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
 				<line x1="12" y1="17" x2="12.01" y2="17"></line>
-			</svg>Справка</button>
+			</svg></button>
 	</ul>
 	<div class="container">
 		<div id="centerLayer">
 			<div class="nav-panel">
 				<div>A.V.M.R</div>
-				<button class="tablinks active" id="addTab">
+				<button data-resource="addButton" class="tablinks active" id="addTab">
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 						<line x1="12" y1="5" x2="12" y2="19"></line>
 						<line x1="5" y1="12" x2="19" y2="12"></line>
 					</svg>
-					<br>Добавить</button>
-				<button class="tablinks" id="addedTab">
+					<br></button>
+				<button data-resource="addedButton" class="tablinks" id="addedTab">
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 						<rect x="3" y="3" width="7" height="7"></rect>
 						<rect x="14" y="3" width="7" height="7"></rect>
 						<rect x="14" y="14" width="7" height="7"></rect>
 						<rect x="3" y="14" width="7" height="7"></rect>
 					</svg>
-					<br>Добавленные</button>
-				<button class="tablinks" id="settingsTab">
+					<br></button>
+				<button data-resource="optionsButton" class="tablinks" id="settingsTab">
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 						<line x1="4" y1="21" x2="4" y2="14"></line>
 						<line x1="4" y1="10" x2="4" y2="3"></line>
@@ -82,31 +82,31 @@
 						<line x1="9" y1="8" x2="15" y2="8"></line>
 						<line x1="17" y1="16" x2="23" y2="16"></line>
 					</svg>
-					<br>Опции</button>
-				<button class="tablinks" id="helpTab">
+					<br></button>
+				<button data-resource="help" class="tablinks" id="helpTab">
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 						<circle cx="12" cy="12" r="10"></circle>
 						<path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
 						<line x1="12" y1="17" x2="12.01" y2="17"></line>
 					</svg>
-					<br>Справка</button>
+					<br></button>
 			</div>
 			<div id="add" class="tabcontent" style="display: block;">
-				<h4 align="center">Добавление нового проекта</h4>
+				<h4 data-resource="addTitle" align="center"></h4>
 				<hr color="#5A5A5C">
 				<div class="row">
 					<form id="addProject">
 						<div class="col-xl-4 col-lg-4 col-md-12 mb-3"> </div>
 						<div class="col-xl-4 col-lg-4 col-md-12 mb-3">
 							<div class="form-group mb-1">
-								<label for="nick">Ваш никнейм</label>
+								<label data-resource="yourNick" for="nick"></label>
 							</div>
 							<input name="nick" id="nick" required placeholder="Введите никнейм" type="text" class="mb-2">
 							<div class="form-group mb-1">
-								<label for="project">Сайт рейтинга</label>
+								<label data-resource="siteTop" for="project"></label>
 							</div>
 							<select required id="project" class="mb-2">
-								<option value="" selected disabled>Выберите сайт</option>
+								<option data-resource="selectTop" value="" selected disabled></option>
 								<option value="TopCraft">TopCraft</option>
 								<option value="McTOP">McTOP</option>
 								<option value="MCRate">MCRate</option>
@@ -119,11 +119,11 @@
 								<option value="MinecraftServerList">MinecraftServerList</option>
 								<option value="ServerPact">ServerPact</option>
 								<option value="MinecraftIpList">MinecraftIpList</option>
-								<option value="Custom">Кастомное</option>
+								<option data-resource="custom" value="Custom"></option>
 							</select>
 							<div id="idSelector"></div>
 							<div id="submit" class="mt-3">
-								<button id="submitAddProject" type="submit">Добавить</button>
+								<button data-resource="addButton" id="submitAddProject" type="submit"></button>
 							</div>
 						</div>
 						<div class="col-xl-4 col-lg-4 col-md-12 mb-3"> </div>
@@ -134,70 +134,70 @@
 				</div>
 			</div>
 			<div id="settings" class="tabcontent" style="display: none;">
-				<h4 align="center">Опции расширения</h4>
+				<h4 data-resource="optionsExtension" align="center"></h4>
 				<hr color="#5A5A5C">
 				<div class="row">
 					<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
 						<div class="form-group mb-1">
-							<label>Настройки</label>
+							<label data-resource="settings"></label>
 						</div>
 						<input class="checkbox" id="disabledNotifStart" type="checkbox" name="checkbox" />
-						<label for="disabledNotifStart">Отключить уведомления о начале голосовании</label>
+						<label data-resource="disabledNotifStart" for="disabledNotifStart"></label>
 						<br>
 						<input class="checkbox" id="disabledNotifInfo" type="checkbox" name="checkbox" />
-						<label for="disabledNotifInfo">Отключить уведомления об успешном голосовании</label>
+						<label data-resource="disabledNotifInfo" for="disabledNotifInfo"></label>
 						<br>
 						<input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox" />
-						<label for="disabledNotifWarn">Отключить уведомления о предупреждениях</label> <span class="tooltip1 ml-1"><span class="tooltip1text">Например уведомление о том что вы уже голосовали (Это когда расширение попыталось проголосовать за проект но вы уже сами проголосовали)</span></span>
+						<label data-resource="disabledNotifWarn" for="disabledNotifWarn"></label> <span class="tooltip1 ml-1"><span data-resource="disabledNotifWarnTooltip" class="tooltip1text"></span></span>
 						<br>
 						<input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox" />
-						<label for="disabledNotifError">Отключить уведомления об ошибках</label>
+						<label data-resource="disabledNotifError" for="disabledNotifError"></label>
 						<br>
 						<input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox" />
-						<label for="enableSyncStorage">Сохранять настройки расширения в облаке</label> <span class="tooltip1 ml-1"><span class="tooltip1text">Не рекомендуется включать данную настройку если у вас очень много проектов в списке добавленных проектов. У облака есть ограниченный трафик и место хранения. Для работы этой функции требуется что бы в вашем браузере был подключён аккаунт и была включена синхронизация, иначе настройки всё равно будут сохраняться локально Позволяет синхронизировать настройки расширения с несколькоими компьютерами, не рекомендуется держать расширение включённым с этой включённой настройкой сразу на нескольких компьютерах</span></span>
+						<label data-resource="enableSyncStorage" for="enableSyncStorage"></label> <span class="tooltip1 ml-1"><span data-resource="enableSyncStorageTooltip" class="tooltip1text"></span></span>
 						<br>
 						<input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox" />
-						<label for="disabledCheckTime">Отключить проверку времени при старте расширения</label>
+						<label data-resource="disabledCheckTime" for="disabledCheckTime"></label>
 						<br>
 						<input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox" />
-						<label for="disableCheckProjects">Отключить проверку при добавлении проекта</label> <span class="tooltip1 ml-1"><span class="tooltip1text">Крайне не рекомендуется отключать эту проверку, это может вызвать ошибки в расширении и может сломать механизм авто-голосования, эта настройка отключает проверку при добавлении проекта, это отключает проверку для MCRate (Как известно там можно голосовать в день только за один проект) Также он отключает проверку на авторизацию вк Данный параметр не сохраняется при сохранении настроек</span></span>
+						<label data-resource="disableCheckProjects" for="disableCheckProjects"></label> <span class="tooltip1 ml-1"><span data-resource="disableCheckProjectsTooltip" class="tooltip1text"></span></span>
 						<br>
 						<input class="checkbox" id="priority" type="checkbox" name="checkbox" />
-						<label for="priority">Добавлять проект в приоритете при добавлении проекта</label> <span class="tooltip1 ml-1"><span class="tooltip1text">При включении данной опции и после при добавлении проекта, проект будет в приоритете, будет всегда самым первым голосовать и без задержеки в 10 минут</span></span>
+						<label data-resource="priority" for="priority"></label> <span class="tooltip1 ml-1"><span data-resource="priorityTooltip" class="tooltip1text"></span></span>
 					</div>
 					<div class="col-xl-4 col-lg-6 col-md-12 mb-3">
 						<div class="form-group mb-1">
-							<label for="enabledSilentVote">Режим голосования</label> <span class="tooltip2"><span class="tooltip2text">Тихий режим (Рекомендуется) — голосует за проекты полностью в фоновом режиме не открывая вкладки. Режим эмуляции — эмулирует реального пользователя, открывает вкладку и нажимает на кнопку голосования, лучше всего в данном режиме оставлять хотя бы одну открытую вкладку в браузере, иначе окно браузера будет открыто поверх остальных окон и может вызвать неудобства.</span></span>
+							<label data-resource="enabledSilentVote" for="enabledSilentVote"></label> <span class="tooltip2"><span data-resource="enabledSilentVoteTooltip" class="tooltip2text"></span></span>
 						</div>
 						<select required id="enabledSilentVote" class="mb-2">
-							<option value="enabled">Тихий режим</option>
-							<option value="disabled">Режим эмуляции</option>
+							<option data-resource="enabledSilentVoteSilent" value="enabled"></option>
+							<option data-resource="enabledSilentVoteNoSilent" value="disabled"></option>
 						</select>
 						<div class="form-group mb-1">
-							<label for="cooldown">Время между проверками в ms.</label>
+							<label data-resource="cooldown" for="cooldown"></label>
 						</div>
 						<form id="timeout">
 							<input name="cooldown" id="cooldown" required type="number" min="1000" class="mb-2">
 							<div id="submit2" class="mt-3 mb-2">
-								<button type="submit" class="w-50" style="display: inline;">Установить</button>
+								<button data-resource="setCooldown" type="submit" class="w-50" style="display: inline;"></button>
 							</div>
 						</form>
 						<div class="form-group mb-1">
-							<label for="enabledSilentVote">Экспорт/Импорт</label>
+							<label data-resource="settingsFile"></label>
 						</div>
-						<label for="file-upload" class="custom-file-upload mb-2">
+						<label data-resource="importSettings" for="file-upload" class="custom-file-upload mb-2">
 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /> </svg>Импортировать настройки</label>
+								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /> </svg></label>
 						<input id="file-upload" type="file" accept="application/json" />
-						<label id="file-download" class="custom-file-upload">
+						<label data-resource="exportSettings" id="file-download" class="custom-file-upload">
 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" /> </svg>Экспортировать настройки</label>
+								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" /> </svg></label>
 						<div id="file">&nbsp;</div>
 					</div>
 				</div>
 			</div>
 			<div id="added" class="tabcontent" style="display: none;">
-				<h4 align="center">Список уже добавленных вами проектов</h4>
+				<h4 data-resource="addedProjects" align="center"></h4>
 				<hr color="#5A5A5C">
 				<div class="row">
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
@@ -219,58 +219,58 @@
 						<button class="selectsite" id="MinecraftServerListButton">Minecraft-Server-List.com</button>
 						<button class="selectsite" id="TopGButton">TopG.org</button>
 						<button class="selectsite" id="MinecraftMpButton">Minecraft-Mp.com</button>
-						<button class="selectsite" id="CustomButton">Кастомное</button>
+						<button data-resource="custom" class="selectsite" id="CustomButton"></button>
 					</div>
 					<div class="col-xl-12 mb-3">
 						<div class="listcontent" id="TopCraftTab" style="display: none;">
-							<div id="TopCraftList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<div data-resource="notAdded" id="TopCraftList"></div>
 						</div>
 						<div class="listcontent" id="McTOPTab" style="display: none;">
-							<div id="McTOPList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<div data-resource="notAdded" id="McTOPList"></div>
 						</div>
 						<div class="listcontent" id="MCRateTab" style="display: none;">
-							<div id="MCRateList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<div data-resource="notAdded" id="MCRateList"></div>
 						</div>
 						<div class="listcontent" id="MinecraftRatingTab" style="display: none;">
-							<div id="MinecraftRatingList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<div data-resource="notAdded" id="MinecraftRatingList"></div>
 						</div>
 						<div class="listcontent" id="MonitoringMinecraftTab" style="display: none;">
-							<div id="MonitoringMinecraftList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<div data-resource="notAdded" id="MonitoringMinecraftList"></div>
 						</div>
 						<div class="listcontent" id="FairTopTab" style="display: none;">
-							<p>По умолчанию не доступен в тихом режиме голосования!</p>
-							<div id="FairTopList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<p data-resource="notAvaibledInSilent"></p>
+							<div data-resource="notAdded" id="FairTopList"></div>
 						</div>
 						<div class="listcontent" id="PlanetMinecraftTab" style="display: none;">
-							<p>По умолчанию не доступен в тихом режиме голосования!</p>
-							<div id="PlanetMinecraftList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<p data-resource="notAvaibledInSilent"></p>
+							<div data-resource="notAdded" id="PlanetMinecraftList"></div>
 						</div>
 						<div class="listcontent" id="TopGTab" style="display: none;">
-							<p>По умолчанию не доступен в тихом режиме голосования!</p>
-							<div id="TopGList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<p data-resource="notAvaibledInSilent"></p>
+							<div data-resource="notAdded" id="TopGList"></div>
 						</div>
 						<div class="listcontent" id="MinecraftMpTab" style="display: none;">
-							<p>По умолчанию не доступен в тихом режиме голосования!</p>
-							<div id="MinecraftMpList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<p data-resource="notAvaibledInSilent"></p>
+							<div data-resource="notAdded" id="MinecraftMpList"></div>
 						</div>
 						<div class="listcontent" id="MinecraftServerListTab" style="display: none;">
-							<p>По умолчанию не доступен в тихом режиме голосования!</p>
-							<div id="MinecraftServerListList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<p data-resource="notAvaibledInSilent"></p>
+							<div data-resource="notAdded" id="MinecraftServerListList"></div>
 						</div>
 						<div class="listcontent" id="ServerPactTab" style="display: none;">
-							<div id="ServerPactList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<div data-resource="notAdded" id="ServerPactList"></div>
 						</div>
 						<div class="listcontent" id="MinecraftIpListTab" style="display: none;">
-							<div id="MinecraftIpListList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<div data-resource="notAdded" id="MinecraftIpListList"></div>
 						</div>
 						<div class="listcontent" id="CustomTab" style="display: none;">
-							<div id="CustomList"> Вы ещё не добавили ни одного проекта на этот топ! </div>
+							<div data-resource="notAdded" id="CustomList"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div id="help" class="tabcontent" style="display: none;">
-				<h4 align="center">Справка</h4>
+				<h4 data-resource="help" align="center"></h4>
 				<hr color="#5A5A5C">
 				<div class="row">
 					<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
@@ -281,7 +281,7 @@
 					</div>
 					<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
 				</div>	
-			</div> <a target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH">Поддержать разработчика</a>
+			</div> <a data-resource="supportDev" target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
 			<div id="save">&nbsp;</div>
 			<script src="options.js"></script>
 		</div>

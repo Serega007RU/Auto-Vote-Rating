@@ -5,9 +5,9 @@
    "background": {
       "scripts": [ "background.js" ]
    },
-   "description": "Автоматическое голосование на майнкрафт рейтингах за проекты",
+   "description": "__MSG_appDesc__",
    "manifest_version": 2,
-   "name": "Auto Vote Minecraft Rating",
+   "name": "__MSG_appName__",
    "options_ui": {
       "open_in_tab": true,
       "page": "options.html"
@@ -21,5 +21,6 @@
    },
    "permissions": [ "cookies", "storage", "notifications", "background", "\u003Call_urls>", "tabs"],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "3.0.0"
+   "version": "3.0.0",
+   "default_locale": "ru"
 }

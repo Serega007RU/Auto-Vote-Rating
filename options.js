@@ -1492,17 +1492,6 @@ document.getElementById('CustomButton').addEventListener('click', function() {
     listSelect(event, 'CustomTab');
 });
 
-//Тут насрал Серега, не знаю, что это  -\_(O_o)_/-
-var buttons = document.querySelectorAll(".toggle-button");
-var modal = document.querySelector("#modal");
-
-[].forEach.call(buttons, function(button) {
-  button.addEventListener("click", function() {
-    modal.classList.toggle("off");
-  })
-});
-
-
 //Генерация поля ввода ID
 var selectedTop = document.getElementById("project");
 
@@ -1544,3 +1533,10 @@ selectedTop.addEventListener("change", function() {
        idSelector.innerHTML = label + input;
     }
 });
+
+//Локализация
+var elements = document.querySelectorAll('[data-resource]');
+elements.forEach(function(el) {
+    console.log('Переведено ' + chrome.i18n.getMessage(el.getAttribute('data-resource')));
+    el.innerHTML = el.innerHTML + chrome.i18n.getMessage(el.getAttribute('data-resource'))
+})

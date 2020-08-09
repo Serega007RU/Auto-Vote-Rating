@@ -1,0 +1,31 @@
+{
+  "appName": {
+    "message": "Auto Vote Minecraft Rating",
+    "description": "The title of the application, displayed in the web store."
+  },
+  "appDesc": {
+    "message": "Automatic voting on minecraft ratings for projects", 
+    "description":"The description of the application, displayed in the web store."
+  },
+  "addButton": {
+    "message": "Add"
+  },
+  "help": {
+    "message": "Help"
+  },
+  "fastAdd": {
+    "message": "Quickly add"
+  },
+  "load": {
+    "message": "Loading..."
+  },
+  "tabsButton": {
+    "message": "Tabs"
+  },
+  "addedButton": {
+    "message": "Added"
+  },
+  "optionsButton": {
+    "message": "Options"
+  }
+}
