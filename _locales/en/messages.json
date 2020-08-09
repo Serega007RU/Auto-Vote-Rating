@@ -23,7 +23,7 @@
     "message": "Loading...",
     "description": "Notification. Loading message"
   },
-  "tabsButton": {
+  "tabs": {
     "message": "Tabs",
     "description": "Label. Tabs"
   },

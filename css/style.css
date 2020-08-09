@@ -29,7 +29,7 @@ h1 {
   margin-right: 10px;
 }
 
-select:focus, input:focus {
+select:focus, input:focus, textarea:focus {
   border-bottom: solid 2px #1A7BEE;
   outline: 0;
 }
@@ -79,7 +79,7 @@ select {
   cursor: pointer;
 }
 
-select, input {
+select, input, textarea {
   width: 100%;
   display: block;
   background-color: #2A2A2F;
@@ -673,4 +673,8 @@ figure hr {
 
 #idSelector {
   height: 83px;
+}
+
+textarea {
+  height: 250px;
 }

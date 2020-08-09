@@ -943,7 +943,6 @@ document.querySelector('form').addEventListener('change', () => {
         customBody.setAttribute("id", 'id');
         customBody.setAttribute("name", 'customBody');
         customBody.setAttribute('placeholder', chrome.i18n.getMessage('bodyFetch'));
-        customBody.setAttribute('style', 'width: 250px;');
         elementProject.after(customBody);
 
         let labelBody = document.createElement('div');
@@ -957,7 +956,7 @@ document.querySelector('form').addEventListener('change', () => {
         customURL.setAttribute("name", 'customURL');
         customURL.setAttribute('placeholder', chrome.i18n.getMessage('urlFetch'));
         customURL.setAttribute('type', 'text');
-        customURL.setAttribute('style', 'width: 180;');
+        customURL.setAttribute('class', 'mb-2');
         elementProject.after(customURL);
 
         let labelURL = document.createElement('div');
@@ -971,8 +970,8 @@ document.querySelector('form').addEventListener('change', () => {
         customTime.setAttribute("name", 'customTime');
         customTime.setAttribute('placeholder', chrome.i18n.getMessage('delayFetch'));
         customTime.setAttribute('type', 'number');
-        customTime.setAttribute('style', 'width: 180;');
         customTime.setAttribute('min', '10000');
+        customTime.setAttribute('class', 'mb-2');
         elementProject.after(customTime);
 
         let labelTime = document.createElement('div');

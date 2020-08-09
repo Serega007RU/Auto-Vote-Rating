@@ -17,7 +17,7 @@
   "load": {
     "message": "Загрузка..."
   },
-  "tabsButton": {
+  "tabs": {
     "message": "Вкладки"
   },
   "addedButton": {
