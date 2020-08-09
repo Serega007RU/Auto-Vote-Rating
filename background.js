@@ -340,28 +340,28 @@ async function silentVote(project) {
 			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id)
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
 				return;
 			}
 			if (!host.includes('topcraft.')) {
-                endVote('Ошибка голосования! Произошла переадресация на неизвестный сайт: ' + response.url + ' Проверьте данный URL', null, project);
+                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
 			chrome.cookies.get({"url": 'https://topcraft.ru/', "name": 'csrftoken'}, async function(cookie) {
 				response = await fetch("https://topcraft.ru/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 				if (!extractHostname(response.url).includes('topcraft.')) {
-					endVote('Ошибка голосования! Произошла переадресация на неизвестный сайт: ' + response.url + ' Проверьте данный URL', null, project);
+					endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
 					return;
 				}
 				if (response.status == 400) {
 					endVote('later', null, project);
 					return;
 				} else if (!response.ok) {
-					endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+					endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
 					return;
 				}
 				endVote('successfully', null, project);
@@ -371,28 +371,28 @@ async function silentVote(project) {
 			let response = await fetch("https://mctop.su/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id)
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
 				return;
 			}
 			if (!host.includes('mctop.')) {
-                endVote('Ошибка голосования! Произошла переадресация на неизвестный сайт: ' + response.url + ' Проверьте данный URL', null, project);
+                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
 			chrome.cookies.get({"url": 'https://mctop.su/', "name": 'csrftoken'}, async function(cookie) {
 				response = await fetch("https://mctop.su/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 				if (!extractHostname(response.url).includes('mctop.')) {
-					endVote('Ошибка голосования! Произошла переадресация на неизвестный сайт: ' + response.url + ' Проверьте данный URL', null, project);
+					endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
 					return;
 				}
 				if (response.status == 400) {
 					endVote('later', null, project);
 					return;
 				} else if (!response.ok) {
-					endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+					endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
 					return;
 				}
 				endVote('successfully', null, project);
@@ -402,15 +402,15 @@ async function silentVote(project) {
 			let response = await fetch("https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=" + project.id + "&response_type=code");
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
 				return;
 			}
 			if (!host.includes('mcrate.')) {
-                endVote('Ошибка голосования! Произошла переадресация на неизвестный сайт: ' + response.url + ' Проверьте данный URL', null, project);
+                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
             let html = await response.text()
@@ -424,11 +424,11 @@ async function silentVote(project) {
                 }));
 			    host = extractHostname(response.url);
 			    if (!host.includes('mcrate.')) {
-                    endVote('Ошибка голосования! Произошла переадресация на неизвестный сайт: ' + response.url + ' Проверьте данный URL', null, project);
+                    endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
                     return;
 			    }
 			    if (!response.ok) {
-                    endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+                    endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                     return;
 			    }
             }
@@ -452,22 +452,22 @@ async function silentVote(project) {
 //				let later = Date.now() - (86400000 - milliseconds);
 				endVote('later', null, project);
 			} else {
-			    endVote('Ошибка голосования, кажется какой-то нужные элемент/кнопка отсутствует', null, project);
+			    endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project);
 			}
 	    }
 	    if (project.MinecraftRating) {
 			let response = await fetch("https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/" + project.id + "/&state=" + project.nick + "&response_type=code&v=5.45");
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
 				return;
 			}
 			if (!host.includes('minecraftrating.')) {
-                endVote('Ошибка голосования! Произошла переадресация на неизвестный сайт: ' + response.url + ' Проверьте данный URL', null, project);
+                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
 			let html = await response.text();
@@ -517,15 +517,15 @@ async function silentVote(project) {
 			let response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote('Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК', null, project);
+				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
 				return;
 			}
 			if (!host.includes('monitoringminecraft.')) {
-                endVote('Ошибка голосования! Произошла переадресация на неизвестный сайт: ' + response.url + ' Проверьте данный URL', null, project);
+                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
             let html = await response.text();
@@ -538,11 +538,11 @@ async function silentVote(project) {
                 }));
 			    host = extractHostname(response.url);
 			    if (!host.includes('monitoringminecraft.')) {
-                    endVote('Ошибка голосования! Произошла переадресация на неизвестный сайт: ' + response.url + ' Проверьте данный URL', null, project);
+                    endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
                     return;
 			    }
 			    if (!response.ok) {
-                    endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+                    endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                     return;
 			    }
 			}
@@ -570,7 +570,7 @@ async function silentVote(project) {
 			} else if (doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
 				endVote('successfully', null, project);
 			} else {
-				endVote('Ошибка голосования, кажется какой-то нужный элемент отсутствует', null, project);
+				endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project);
 			}
 	    }
 	    if (project.Custom) {
@@ -578,15 +578,15 @@ async function silentVote(project) {
 	    	if (response.ok) {
 	    		endVote('successfully', null, project);
 	    	} else {
-	    		endVote('Ошибка голосования! Код состояния HTTP: ' + response.status, null, project);
+	    		endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
 	    	}
 	    }
     } catch (e) {
         if (e == 'TypeError: Failed to fetch') {
-          	endVote('Кажется у вас нет подключения к интернету, смотрите подробности в консоле', null, project);
+          	endVote(chrome.i18n.getMessage('notConnectInternet'), null, project);
         } else {
         	console.error(e);
-           	endVote('Ошибка при голосовании! Вот что известно: ' + e, null, project);
+           	endVote(chrome.i18n.getMessage('errorVoteUnknown') + e, null, project);
         }
     }
 }
@@ -696,10 +696,10 @@ async function endVote(message, sender, project) {
             if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), sendMessage);
         }
         await setValue('AVMRprojects' + getProjectName(project), getProjectList(project));
-        console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + ' ' + sendMessage + ', метка времени установлена на ' + time);
+        console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + time);
 	//Если ошибка
 	} else {
-		let sendMessage = message + '. Следующая попытка голосования будет сделана через 5 минут';
+		let sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote');
         console.error('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + ' ' + sendMessage);
 	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), sendMessage);
 	}
@@ -760,7 +760,7 @@ async function checkTime () {
 	try {
         response = await fetch(`http://worldclockapi.com/api/json/utc/now`);
 	} catch (e) {
-        console.error("Не удалось связаться с сервером worldclockapi.com, " + e + ' Если у вас неверно установлено время на компьютере - расширение будет не корректно работать');
+        console.error(chrome.i18n.getMessage('errorClock', e));
 	}
     if (response.ok) { // если HTTP-статус в диапазоне 200-299
         // получаем тело ответа и сравниваем время
@@ -770,23 +770,26 @@ async function checkTime () {
         let timeDifference = (timeUTC - serverTimeUTC);
         if (Math.abs(timeDifference) > 300) {
         	let text;
+        	let time;
+        	let unit;
         	if (timeDifference > 0) {
-                text = 'спешат'
+                text = chrome.i18n.getMessage('clockHurry');
         	} else {
-        		text = 'отстают'
+        		text = chrome.i18n.getMessage('clockLagging');
         	}
         	if (timeDifference > 3600 || timeDifference < -3600) {
-        		let text2 = 'Кажется ваши часы ' + text + ' на ' + (Math.abs(timeDifference) / 60 / 60).toFixed(1) + ' часов. Расширение будет некорректно работать, пожалуйста настройте время правильно на своём компудахтере/калькуляторе';
-        		console.error(text2);
-        		sendNotification('Ваши часы ' + text + '!', text2);
+        		time = (Math.abs(timeDifference) / 60 / 60).toFixed(1);
+        		unit = chrome.i18n.getMessage('clockHourns');
         	} else {
-        		let text2 = 'Кажется ваши часы ' + text + ' на ' + (Math.abs(timeDifference) / 60).toFixed(1) + ' минут. Расширение будет некорректно работать, пожалуйста настройте время правильно на своём компудахтере/калькуляторе';
-                console.error(text2);
-                sendNotification('Ваши часы ' + text + '!', text2);
+        		time = (Math.abs(timeDifference) / 60).toFixed(1);
+        		unit = chrome.i18n.getMessage('clockMinutes');
         	}
+        	let text2 = chrome.i18n.getMessage('clockInaccurate', [text, time, unit]);
+            console.warn(text2);
+            sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2);
         }
     } else {
-        console.error("Не удалось связаться с сервером worldclockapi.com, Код состояния HTTP: " + response.status + '. Если у вас неверно установлено время на компьютере - расширение будет не корректно работать');
+        console.error(chrome.i18n.getMessage('errorClock2', response.status));
     }
 }
 var filetime_to_unixtime = function(ft) {

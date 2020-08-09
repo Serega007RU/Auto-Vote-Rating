@@ -341,7 +341,13 @@
     "message": "Введите ID или выберите из списка"
   },
   "developers": {
-    "message": "Разработчики"
+    "message": "Разработчики:"
+  },
+  "developer": {
+    "message": "Разработчик:"
+  },
+  "designer": {
+    "message": "Дизайнер:"
   },
   "itsFree": {
     "message": "Расширение распространяется абсолютно бесплатно!"
@@ -367,46 +373,80 @@
   "errorOpenTab": {
     "message": "Ошибка при открытии вкладки: "
   },
-  "test": {
-    "message": "test"
+  "errorAuthVK": {
+    "message": "Ошибка авторизации ВК! Проголосуйте вручную за данный проект чтобы в следующий раз не было ошибки с авторизацией ВК"
   },
-  "test": {
-    "message": "test"
+  "errorRedirected": {
+    "message": "Ошибка голосования! Произошла переадресация на неизвестный сайт: $url$ Проверьте данный URL",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
-  "test": {
-    "message": "test"
+  "errorVote": {
+    "message": "Ошибка голосования! Код состояния HTTP: "
   },
-  "test": {
-    "message": "test"
+  "errorVoteNoElement": {
+    "message": "Ошибка голосования, кажется какой-то нужные элемент/кнопка отсутствует"
   },
-  "test": {
-    "message": "test"
+  "errorVoteUnknown": {
+    "message": "Ошибка при голосовании! Вот что известно: "
   },
-  "test": {
-    "message": "test"
+  "errorNextVote": {
+    "message": "Следующая попытка голосования будет сделана через 5 минут"
   },
-  "test": {
-    "message": "test"
+  "timeStamp": {
+    "message": "метка времени установлена на"
   },
-  "test": {
-    "message": "test"
+  "errorClock": {
+    "message": "Не удалось связаться с сервером worldclockapi.com, $error$ Если у вас неверно установлено время на компьютере - расширение будет не корректно работать",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   },
-  "test": {
-    "message": "test"
+  "errorClock2": {
+    "message": "Не удалось связаться с сервером worldclockapi.com, Код состояния HTTP: $httpCode$. Если у вас неверно установлено время на компьютере - расширение будет не корректно работать",
+    "placeholders": {
+      "httpCode": {
+        "content": "$1"
+      }
+    }
   },
-  "test": {
-    "message": "test"
+  "clockHurry": {
+    "message": "спешат"
   },
-  "test": {
-    "message": "test"
+  "clockLagging": {
+    "message": "отстают"
   },
-  "test": {
-    "message": "test"
+  "clockHourns": {
+    "message": "часов"
   },
-  "test": {
-    "message": "test"
+  "clockMinutes": {
+    "message": "минут"
   },
-  "test": {
-    "message": "test"
+  "clockInaccurate": {
+    "message": "Кажется ваши часы $inaccurate$ на $count$ $unit$. Расширение будет некорректно работать, пожалуйста настройте время правильно",
+    "placeholders": {
+      "inaccurate": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      },
+      "unit": {
+        "content": "$3"
+      }
+    }
+  },
+  "clockInaccurateLog": {
+    "message": "Ваши часы $text$!",
+    "placeholders": {
+      "text": {
+        "content": "$1"
+      }
+    }
   }
 }
