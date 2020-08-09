@@ -4,28 +4,167 @@
     "description": "The title of the application, displayed in the web store."
   },
   "appDesc": {
-    "message": "Automatic voting on minecraft ratings for projects", 
-    "description":"The description of the application, displayed in the web store."
+    "message": "Automatic voting on minecraft ratings for projects",
+    "description": "The description of the application, displayed in the web store."
   },
   "addButton": {
-    "message": "Add"
+    "message": "Add",
+    "description": "Button. Add"
   },
   "help": {
-    "message": "Help"
+    "message": "Help",
+    "description": "Button. Help"
   },
   "fastAdd": {
-    "message": "Quickly add"
+    "message": "Fast add",
+    "description": "Notification. Fast add"
   },
   "load": {
-    "message": "Loading..."
+    "message": "Loading...",
+    "description": "Notification. Loading message"
   },
   "tabsButton": {
-    "message": "Tabs"
+    "message": "Tabs",
+    "description": "Label. Tabs"
   },
   "addedButton": {
-    "message": "Added"
+    "message": "Added",
+    "description": "Button. Added"
   },
   "optionsButton": {
-    "message": "Options"
+    "message": "Options",
+    "description": "Button. Options"
+  },
+  "addTitle": {
+    "message": "Adding a new project",
+    "description": "Header. Add"
+  },
+  "yourNick": {
+    "message": "Your nickname",
+    "description": "Label. Nickname"
+  },
+  "enterNick": {
+    "message": "Enter your nickname",
+    "description": "Input. Enter your nick"
+  },
+  "siteTop": {
+    "message": "Ranking site",
+    "description": "Label. Ranking site"
+  },
+  "selectTop": {
+    "message": "Select site",
+    "description": "Input. Select site"
+  },
+  "custom": {
+    "message": "Custom",
+    "description": "Input. Custom"
+  },
+  "optionsExtension": {
+    "message": "Expansion options",
+    "description": "Header. Options"
+  },
+  "settings": {
+    "message": "Settings",
+    "description": "Label. Settings"
+  },
+  "disabledNotifStart": {
+    "message": "Disable voting start notifications",
+    "description": "Checkbox. Voting start notifications"
+  },
+  "disabledNotifInfo": {
+    "message": "Disable notifications about successful voting",
+    "description": "Checkbox. Successful notifications"
+  },
+  "disabledNotifWarn": {
+    "message": "Disable alert notifications",
+    "description": "Checkbox. Alert notifications"
+  },
+  "disabledNotifWarnTooltip": {
+    "message": "For example, a notification that you have already voted (This is when the extension tried to vote for the project but you yourself have already voted)",
+    "description": "1234"
+  },
+  "disabledNotifError": {
+    "message": "Disable error notifications",
+    "description": "Checkbox. Error notifications"
+  },
+  "enableSyncStorage": {
+    "message": "Save extension settings in the cloud",
+    "description": "Checkbox. Cloud save extension settings"
+  },
+  "enableSyncStorageTooltip": {
+    "message": "It is not recommended to enable this setting if you have a lot of projects in the list of added projects. The cloud has limited traffic and storage space. For this function to work, your account must be connected and synchronization enabled, otherwise the settings will still be saved locally Allows you to synchronize extension settings with multiple computers, it is not recommended to keep the extension enabled with this setting enabled on several computers at once",
+    "description": "Tooltip. Cloud save extension settings"
+  },
+  "disabledCheckTime": {
+    "message": "Disable time checking at extension start",
+    "description": "Checkbox. Disable time checking"
+  },
+  "disableCheckProjects": {
+    "message": "Disable check when adding a project",
+    "description": "Checkbox. Disable check when adding a project"
+  },
+  "disableCheckProjectsTooltip": {
+    "message": "It is highly discouraged to disable this check, it can cause errors in the extension and can break the auto-voting mechanism, this setting disables checking when adding a project, this disables checking for MCRate (As you know, you can vote there only for one project per day) It also disables check for VK authorization This parameter is not saved when saving the settings",
+    "description": "Tooltip. Disable check when adding a project"
+  },
+  "priority": {
+    "message": "Prioritize project when adding project",
+    "description": "Checkbox. Priority"
+  },
+  "priorityTooltip": {
+    "message": "When this option is enabled and after when adding a project, the project will be in priority, it will always be the very first to vote and without a delay of 10 minutes",
+    "description": "Tooltip. Priority"
+  },
+  "enabledSilentVote": {
+    "message": "Voting mode",
+    "description": "Label. Voting mode"
+  },
+  "enabledSilentVoteTooltip": {
+    "message": "Quiet Mode (Recommended) - Vote for projects entirely in the background without opening any tabs. Emulation mode - emulates a real user, opens a tab and clicks on the voting button, it is best to leave at least one open tab in the browser in this mode, otherwise the browser window will be open on top of other windows and may cause inconvenience.",
+    "description": "Tooltip. Silent vote"
+  },
+  "enabledSilentVoteSilent": {
+    "message": "Silent mode",
+    "description": "Input. Mode."
+  },
+  "enabledSilentVoteNoSilent": {
+    "message": "Emulation mode",
+    "description": "Input. Mode."
+  },
+  "cooldown": {
+    "message": "Time between checks in ms.",
+    "description": "Label. Cooldown input"
+  },
+  "setCooldown": {
+    "message": "Set",
+    "description": "Button. Set cooldown"
+  },
+  "settingsFile": {
+    "message": "Export/Import",
+    "description": "Label. Export/Import"
+  },
+  "importSettings": {
+    "message": "Import settings",
+    "description": "Button. Import"
+  },
+  "exportSettings": {
+    "message": "Export settings",
+    "description": "Button. Export"
+  },
+  "addedProjects": {
+    "message": "List of projects you have already added",
+    "description": "Header. Added projects"
+  },
+  "notAdded": {
+    "message": "You haven't added any projects to this top yet!",
+    "description": "Notification. You haven't added any projects"
+  },
+  "notAvaibledInSilent": {
+    "message": "By default, it is not available in silent voting mode!",
+    "description": "Notification. available in silent voting mode"
+  },
+  "supportDev": {
+    "message": "Support the developer",
+    "description": "Link (Express gratitude)"
   }
 }
