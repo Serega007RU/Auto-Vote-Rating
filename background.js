@@ -110,7 +110,7 @@ function checkVote() {
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
     if (!online) {
     	if (navigator.onLine) {
-    		console.log('Подключение к интернету восстановлено');
+    		console.log(chrome.i18n.getMessage('internetRestored'));
     		online = true;
     	} else {
     		return;
@@ -215,8 +215,8 @@ async function checkOpen(project) {
         }
     }
 	
-	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + ' Начинает авто-голосовать');
-    if (!settings.disabledNotifStart) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), 'Начинает авто-голосовать');
+	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + ' ' + chrome.i18n.getMessage('startedAutoVote'));
+    if (!settings.disabledNotifStart) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), chrome.i18n.getMessage('startedAutoVote'));
 
     //Не позволяет голосовать за MonitoringMinecraft больше чем 1-го раза за 10 мигут (это ограничение самого MonMc)
 //    if (project.MonitoringMinecraft) {
@@ -264,7 +264,7 @@ async function newWindow(project) {
         silentVote(project);
 	} else {
 		chrome.windows.getCurrent(function(win) {
-			if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {console.error('Ошибка при открытии вкладки: ' + chrome.runtime.lastError);}
+			if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError);}
 			if (win == null) {
 				chrome.windows.create({},function(win){
 					chrome.windows.update(win.id, {focused: false})
@@ -689,10 +689,10 @@ async function endVote(message, sender, project) {
 	    }
         let sendMessage = '';
         if (message == "successfully") {
-            sendMessage = 'Успешное авто-голосование'
+            sendMessage = chrome.i18n.getMessage('successAutoVote');
             if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), sendMessage);
         } else {
-            sendMessage = 'Вы уже голосовали';
+            sendMessage = chrome.i18n.getMessage('alreadyVoted');
             if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), sendMessage);
         }
         await setValue('AVMRprojects' + getProjectName(project), getProjectList(project));
