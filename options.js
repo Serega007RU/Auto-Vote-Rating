@@ -935,9 +935,8 @@ let laterChoose;
 document.querySelector('form').addEventListener('change', () => {
     let elementProject = document.getElementById('project');
     if (elementProject.value == 'Custom' && laterChoose != 'Custom') {
-        elementProject.nextElementSibling.remove();
-        elementProject.nextElementSibling.remove();
-        elementProject.nextElementSibling.remove();
+        idSelector.innerHTML = '';
+        idSelector.setAttribute('style', 'height: 0px;')
 
         let customBody = document.createElement('textarea');
         customBody.required = true;
@@ -946,9 +945,12 @@ document.querySelector('form').addEventListener('change', () => {
         customBody.setAttribute('placeholder', 'Тело запроса');
         customBody.setAttribute('style', 'width: 250px;');
         elementProject.after(customBody);
-        
-        elementProject.after(document.createElement('p'));
 
+        let labelBody = document.createElement('div');
+        labelBody.setAttribute('class', 'form-group mb-1');
+        labelBody.innerHTML = '<label for="nick">Тело запроса</label>'
+        elementProject.after(labelBody);
+        
         let customURL = document.createElement('input');
         customURL.required = true;
         customURL.setAttribute("id", 'responseURL');
@@ -957,8 +959,11 @@ document.querySelector('form').addEventListener('change', () => {
         customURL.setAttribute('type', 'text');
         customURL.setAttribute('style', 'width: 180;');
         elementProject.after(customURL);
-        
-        elementProject.after(document.createElement('p'));
+
+        let labelURL = document.createElement('div');
+        labelURL.setAttribute('class', 'form-group mb-1');
+        labelURL.innerHTML = '<label for="nick">URL запроса</label>'
+        elementProject.after(labelURL);
 
         let customTime = document.createElement('input');
         customTime.required = true;
@@ -970,16 +975,13 @@ document.querySelector('form').addEventListener('change', () => {
         customTime.setAttribute('min', '10000');
         elementProject.after(customTime);
 
-        elementProject.after(' ');
+        let labelTime = document.createElement('div');
+        labelTime.setAttribute('class', 'form-group mb-1');
+        labelTime.innerHTML = '<label for="nick">Задерка</label>'
+        elementProject.after(labelTime);
 
-        let customName = document.createElement('input');
-        customName.required = true;
-        customName.setAttribute("id", 'nick');
-        customName.setAttribute("name", 'customName');
-        customName.setAttribute('placeholder', 'Придумайте название');
-        customName.setAttribute('type', 'text');
-        customName.setAttribute('style', 'width: 180;');
-        elementProject.after(customName);
+        document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = "Название";
+        document.querySelector("#nick").placeholder = "Придумайте название";
 
         elementProject.after(' ');
     } else if (laterChoose == 'Custom' && elementProject.value != 'Custom') {
@@ -989,34 +991,11 @@ document.querySelector('form').addEventListener('change', () => {
         elementProject.nextElementSibling.remove();
         elementProject.nextElementSibling.remove();
         elementProject.nextElementSibling.remove();
+        
+        document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = "Ваш никнейм";
+        document.querySelector("#nick").placeholder = "Введите никнейм";
 
-        let addId = document.createElement('input');
-        addId.required = true;
-        addId.setAttribute("id", 'id');
-        addId.setAttribute("name", 'id');
-        addId.setAttribute('placeholder', 'ID проекта');
-        addId.setAttribute('type', 'text');
-        addId.setAttribute('style', 'width: 180;');
-        elementProject.after(addId);
-
-        elementProject.after(' ');
-
-        let addNick = document.createElement('input');
-        addNick.required = true;
-        addNick.setAttribute("id", 'nick');
-        addNick.setAttribute("name", 'nick');
-        addNick.setAttribute('placeholder', 'Ваш никнейм');
-        addNick.setAttribute('type', 'text');
-        addNick.setAttribute('style', 'width: 180;');
-        elementProject.after(addNick);
-
-        elementProject.after(' ');
-
-        let addInfo = document.createElement('span');
-        addInfo.setAttribute('style', 'cursor: help;');
-        elementProject.after(addInfo);
-
-        elementProject.after(' ');
+        idSelector.removeAttribute('style');
     }
     laterChoose = elementProject.value;
 });
@@ -1530,8 +1509,7 @@ var selectedTop = document.getElementById("project");
 selectedTop.addEventListener("click", function() {
     var options = selectedTop.querySelectorAll("option");
     var count = options.length;
-    if(typeof(count) === "undefined" || count < 2)
-    {
+    if(typeof(count) === "undefined" || count < 2) {
         addActivityItem();
     }
 });
@@ -1539,7 +1517,7 @@ selectedTop.addEventListener("click", function() {
 selectedTop.addEventListener("change", function() {
     var label = '<div class="form-group mb-1"><label for="id">ID проекта</label> <span class="tooltip1"><span class="tooltip1text">ID проекта можно получить из адресной строки находясь на странице проекта, например: На TopCraft для StarWay ID: 10496</span></span></div>';
     var input = '<input name="id" id="id" required placeholder="Введите ID" type="text">';
-    var dataInput = '<input name="id" id="id" placeholder="Введите ID или выберите из списка" list="idlist"><datalist id="idlist">';
+    var dataInput = '<input name="id" id="id" required placeholder="Введите ID или выберите из списка" list="idlist"><datalist id="idlist">';
     if(selectedTop.value == "TopCraft") {
        idSelector.innerHTML = label + dataInput + '<option value="10496">StarWay</option><option value="7666">Arago.Games</option><option value="7126">Borealis</option><option value="7411">CenturyMine</option><option value="6482">CubixWorld</option><option value="8732">DiverseMine</option><option value="308">Excalibur-Craft</option><option value="3254">FineMine</option><option value="7125">FrostLand</option><option value="628">Gamai</option><option value="7863">GamePoint</option><option value="9536">GrandGear</option><option value="1041">Grand-Mine</option><option value="5966">HunterCraft</option><option value="216">IPlayCraft</option><option value="2762">LavaCraft</option><option value="5835">Letragon</option><option value="218">McSKill</option><option value="304">MinecraftOnly</option><option value="6287">MythicalPlanet</option><option value="5323">MythicalWorld</option><option value="9598">OneLand</option><option value="9311">OrangeCraft</option><option value="5451">PentaCraft</option><option value="6031">Pixelmon.PRO</option><option value="318">qoobworld</option><option value="9597">ShadowCraft</option><option value="9867">SideMC</option><option value="1283">SimpleMinecraft</option><option value="9584">skolot.fun</option><option value="600">SMARTYcraft</option><option value="8179">VictoryCraft</option><option value="6711">WarMine</option></datalist>';
     } else if(selectedTop.value == "McTOP") {
