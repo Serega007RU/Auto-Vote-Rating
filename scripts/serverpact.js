@@ -16,33 +16,44 @@ function vote () {
 		} else {
 			settingsStorage = chrome.storage.local;
 		}
-		settingsStorage.get('AVMRprojectsServerPact', function(result) {
+		settingsStorage.get('AVMRprojectsServerPact', async function(result) {
 			try {
-				if (document.querySelector("body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong") != null && document.querySelector("body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong").textContent.includes('You have voted successfully!')) {
+				if (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {
 					sendMessage('successfully');
-				} else if (document.querySelector("#voting > div > div > div:nth-child(3) > p") != null && document.querySelector("#voting > div > div > div:nth-child(3) > p").textContent.includes('You have already voted!')) {
-                    let numbers = document.querySelector("#voting > div > div > div:nth-child(3) > p").textContent.match(/\d+/g).map(Number);
-					let count = 0;
-					let hour = 0;
-					let min = 0;
-					let sec = 0;
-					for (var i in numbers) {
-						if (count == 0) {
-							hour = numbers[i];
-						} else if (count == 1) {
-							min = numbers[i];
-						}
-						count++;
-					}
-					var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-					var later = Date.now() - (43200000 - milliseconds);
-					sendMessage('later ' + later);
+				} else if (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {
+					sendMessage('later ' + Date.now());//ToDo <Serega007> а зачем нам говорить сколько осталось до следующего голосования? Нееет, мы по тупому просто напишем 12 часов и пошлём нафиг, зачем это нужно ServerPact'у?
+				} else if (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null) {
+					sendMessage(document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent);
 				} else {
-	                clearInterval(this.check);
 	                let nick = getNickName(result.AVMRprojectsServerPact);
 		            if (nick == null || nick == "") return;
-                    document.querySelector("#username").value = nick;
-                    document.querySelector("#v").click();
+		            //Отправка запроса на прохождение капчи (мы типо прошли капчу)
+					await fetch("https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php", {
+					  "headers": {
+						"accept": "application/json, text/javascript, */*; q=0.01",
+						"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
+						"cache-control": "no-cache",
+						"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+						"pragma": "no-cache",
+						"sec-fetch-dest": "empty",
+						"sec-fetch-mode": "cors",
+						"sec-fetch-site": "same-origin",
+						"x-requested-with": "XMLHttpRequest"
+					  },
+					  "referrerPolicy": "no-referrer-when-downgrade",
+					  "body": "action=qaptcha&qaptcha_key=" + document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(6)").name,
+					  "method": "POST",
+					  "mode": "cors",
+					  "credentials": "include"
+					});
+					//Убираем здесь value иначе капча не будет пройдена
+					document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(6)").value = "";
+					//Включаем кнопку отправки голоса
+					document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > span > input").removeAttribute('disabled');
+					//Вписываем ник в поле ввода
+					document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > input").value = nick;
+					//Жмём кнопку отправки голоса
+					document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > span > input").click();
 				}
 			} catch (e) {
 				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
@@ -57,7 +68,7 @@ function vote () {
 
 function getNickName(projects) {
     for (project of projects) {
-        if (project.TopG && (document.URL.startsWith('https://www.serverpact.com/vote-' + project.id))) {
+        if (project.ServerPact && (document.URL.startsWith('https://www.serverpact.com/vote-' + project.id))) {
             return project.nick;
         }
     }

@@ -490,5 +490,8 @@
         "content": "$1"
       }
     }
+  },
+  "errorVoteUnknown2": {
+    "message": "Unexpected error! No error message"
   }
 }

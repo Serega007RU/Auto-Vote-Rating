@@ -290,6 +290,8 @@ async function addProjectList(project, visually) {
             let date = new Date(new Date(project.time).getTime() - 18000000/*-5 часов*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
             let userTimezoneOffset = date.getTimezoneOffset() * 60000;
             timeNew = new Date(date.getTime() - userTimezoneOffset);
+        } else if (project.ServerPact) {
+            timeNew = new Date(project.time + (43200000/*+12 часов*/));
         } else {
             timeNew = new Date(project.time + (project.Custom ? project.timeout : 86400000/*+24 часа*/));
         }
