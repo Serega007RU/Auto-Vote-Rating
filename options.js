@@ -629,16 +629,16 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                 if (error) return;
                 if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).text);
-//                     project.name = projectURL;
+                    project.name = projectURL;
                 } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).textContent);
-//                     project.name = projectURL;
+                    project.name = projectURL;
                 } else if (doc.querySelector(jsPath).value != null && doc.querySelector(jsPath).value != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).value);
-//                     project.name = projectURL;
+                    project.name = projectURL;
                 } else if (doc.querySelector(jsPath).href != null && doc.querySelector(jsPath).href != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).href);
-//                     project.name = projectURL;
+                    project.name = projectURL;
                 } else {
                     projectURL = "";
                 }

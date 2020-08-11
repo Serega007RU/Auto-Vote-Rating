@@ -16,7 +16,7 @@ function vote () {
 		} else {
 			settingsStorage = chrome.storage.local;
 		}
-		settingsStorage.get('AVMRprojectsTopG', function(result) {
+		settingsStorage.get('AVMRprojectsServerPact', function(result) {
 			try {
 				if (document.querySelector("body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong") != null && document.querySelector("body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong").textContent.includes('You have voted successfully!')) {
 					sendMessage('successfully');
@@ -37,9 +37,9 @@ function vote () {
 					var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
 					var later = Date.now() - (43200000 - milliseconds);
 					sendMessage('later ' + later);
-				} else if (document.querySelector("#v") != null && document.querySelector("#v").textContent.includes('Submit your vote') && document.querySelector("#username").value.length == 0) {
+				} else {
 	                clearInterval(this.check);
-	                let nick = getNickName(result.AVMRprojectsTopG);
+	                let nick = getNickName(result.AVMRprojectsServerPact);
 		            if (nick == null || nick == "") return;
                     document.querySelector("#username").value = nick;
                     document.querySelector("#v").click();
