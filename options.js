@@ -295,7 +295,7 @@ async function addProjectList(project, visually) {
         }
         if (Date.now() < timeNew.getTime()) text = ('0' + timeNew.getDate()).slice(-2) + '.' + ('0' + (timeNew.getMonth()+1)).slice(-2) + '.' + timeNew.getFullYear() + ' ' + ('0' + timeNew.getHours()).slice(-2) + ':' + ('0' + timeNew.getMinutes()).slice(-2) + ':' + ('0' + timeNew.getSeconds()).slice(-2);
     }
-    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + chrome.i18n.getMessage('nextVote') + ' ' + text;
+    html.innerHTML = project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id) + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + chrome.i18n.getMessage('nextVote') + ' ' + text;
     listProject.after(html)
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).addEventListener('click', function() {
         removeProjectList(project, false);
@@ -629,12 +629,16 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                 if (error) return;
                 if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).text);
+//                     project.name = projectURL;
                 } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).textContent);
+//                     project.name = projectURL;
                 } else if (doc.querySelector(jsPath).value != null && doc.querySelector(jsPath).value != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).value);
+//                     project.name = projectURL;
                 } else if (doc.querySelector(jsPath).href != null && doc.querySelector(jsPath).href != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).href);
+//                     project.name = projectURL;
                 } else {
                     projectURL = "";
                 }

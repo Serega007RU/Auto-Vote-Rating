@@ -215,8 +215,8 @@ async function checkOpen(project) {
         }
     }
 	
-	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + ' ' + chrome.i18n.getMessage('startedAutoVote'));
-    if (!settings.disabledNotifStart) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), chrome.i18n.getMessage('startedAutoVote'));
+	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' - ' + project.name : '') + ' ' + chrome.i18n.getMessage('startedAutoVote'));
+    if (!settings.disabledNotifStart) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('startedAutoVote'));
 
     //Не позволяет голосовать за MonitoringMinecraft больше чем 1-го раза за 10 мигут (это ограничение самого MonMc)
 //    if (project.MonitoringMinecraft) {
@@ -690,18 +690,18 @@ async function endVote(message, sender, project) {
         let sendMessage = '';
         if (message == "successfully") {
             sendMessage = chrome.i18n.getMessage('successAutoVote');
-            if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), sendMessage);
+            if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         } else {
             sendMessage = chrome.i18n.getMessage('alreadyVoted');
-            if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), sendMessage);
+            if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         }
         await setValue('AVMRprojects' + getProjectName(project), getProjectList(project));
-        console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + time);
+        console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' - ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + time);
 	//Если ошибка
 	} else {
 		let sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote');
-        console.error('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + ' ' + sendMessage);
-	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id), sendMessage);
+        console.error('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' - ' + project.name : '') + ' ' + sendMessage);
+	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
 	}
 	// else {
 	//	//Если прям совсем всё плохо
@@ -1060,8 +1060,12 @@ v2.2.0
 
 v3.0.0
 Обновлён дизайн настроек - спасибо огромное за проделанную работу Qworte
+Изменения в настройках:
+- В списке добавленных топов написано теперь "Следующее голосование после" а не "Следующее голосование в", народ немного тупит на этом (спасибо YaMotλaV)
+- Настройки разнесены по вкладкам (также и сами топы разнесены по вкладкам)
+- В поле выбора ID теперь предлагается список проектов наиболее популярных на выбранном топе
+Теперь если у проекта есть name то пишется его имя (ссылка) вместо id
 Мелкие исправления с MultiVote
-В настройках в списке добавленных топов написано теперь "Следующее голосование после" а не "Следующее голосование в", народ немного тупит на этом (спасибо YaMotλaV)
 Чтобы пишется слитно а не раздельно (спасибо ребятам из 300iq Squad)
 Новые топы (пока в разработке):
 - PlanetMinecraft
