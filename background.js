@@ -608,48 +608,72 @@ async function silentVote(project) {
 			}
             let html = await response.text();
             let doc = new DOMParser().parseFromString(html, "text/html");
-			if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(6)") != null) {
-                	let captcha = await fetch("https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php", {
-					  "headers": {
-						"accept": "application/json, text/javascript, */*; q=0.01",
-						"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
-						"cache-control": "no-cache",
-						"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-						"pragma": "no-cache",
-						"sec-fetch-dest": "empty",
-						"sec-fetch-mode": "cors",
-						"sec-fetch-site": "same-origin",
-						"x-requested-with": "XMLHttpRequest"
-					  },
-					  "referrerPolicy": "no-referrer-when-downgrade",
-					  "body": "action=qaptcha&qaptcha_key=" + doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(6)").name,
-					  "method": "POST",
-					  "mode": "cors",
-					  "credentials": "include"
-					});
-					let json = captcha.json();
-					if (json.error) {
-						endVote('Error in captcha', null, project);
-						return;
-					}
-					let response2 = await fetch("https://www.serverpact.com/vote-" + project.id ,{"body": doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(2)").name + "=" + doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(2)").value + "&" + doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(6)").name + "=&minecraftusername=" + project.nick +"&voten=Send+your+vote","method": "POST",});
-			        if (!response2.ok) {
-                        endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
-                        return;
-			        }
-                    html = await response2.text();
-                    doc = new DOMParser().parseFromString(html, "text/html");
-				    if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {
-					    endVote('successfully', null, project);
-				    } else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {
-					    endVote('later ' + Date.now(), null, project);//ToDo <Serega007> а зачем нам говорить сколько осталось до следующего голосования? Нееет, мы по тупому просто напишем 12 часов и пошлём нафиг, зачем это нужно ServerPact'у?
-				    } else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null) {
-					    endVote(doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent, null, project);
-				    } else {
-				    	endVote(chrome.i18n.getMessage('errorVoteUnknown2'), null, project)
-				    }
+            function generatePass(nb) {
+                var chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@';
+                var pass = '';
+                for (i = 0; i < nb; i++) {
+                    var wpos = Math.round(Math.random() * chars.length);
+                    pass += chars.substring(wpos, wpos + 1);
+                }
+                return pass;
+            }
+            let captchaPass = generatePass(32);
+              let captcha = await fetch("https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php", {
+			    "headers": {
+			 	"accept": "application/json, text/javascript, */*; q=0.01",
+				"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
+				"cache-control": "no-cache",
+				"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+				"pragma": "no-cache",
+				"sec-fetch-dest": "empty",
+				"sec-fetch-mode": "cors",
+				"sec-fetch-site": "same-origin",
+				"x-requested-with": "XMLHttpRequest"
+			  },
+			  "referrerPolicy": "no-referrer-when-downgrade",
+			  "body": "action=qaptcha&qaptcha_key=" + captchaPass,
+			  "method": "POST",
+			  "mode": "cors",
+			  "credentials": "include"
+			});
+			let json = captcha.json();
+			if (json.error) {
+				endVote('Error in captcha', null, project);
+				return;
+			}
+			let response2 = await fetch("https://www.serverpact.com/vote-" + project.id, {
+			    "headers": {
+			        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+			        "accept-language": "ru,en;q=0.9,en-US;q=0.8",
+				    "cache-control": "no-cache",
+				    "content-type": "application/x-www-form-urlencoded",
+				    "pragma": "no-cache",
+				    "sec-fetch-dest": "document",
+				    "sec-fetch-mode": "navigate",
+				    "sec-fetch-site": "same-origin",
+				    "sec-fetch-user": "?1",
+				    "upgrade-insecure-requests": "1"
+			    },
+			    "referrerPolicy": "no-referrer-when-downgrade",
+			    "body": doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(2)").name + "=" + doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(2)").value + "&" + captchaPass + "=&minecraftusername=" + project.nick + "&voten=Send+your+vote",
+			    "method": "POST",
+			    "mode": "cors",
+			    "credentials": "include"
+			});
+			if (!response2.ok) {
+                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                return;
+			}
+            html = await response2.text();
+            doc = new DOMParser().parseFromString(html, "text/html");
+			if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {
+			    endVote('successfully', null, project);
+			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {
+			    endVote('later ' + Date.now(), null, project);
+			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null) {
+			    endVote(doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent, null, project);
 			} else {
-				endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project);
+			   	endVote(chrome.i18n.getMessage('errorVoteUnknown2'), null, project)
 			}
 	    }
 	    if (project.Custom) {
