@@ -297,7 +297,7 @@ async function addProjectList(project, visually) {
         }
         if (Date.now() < timeNew.getTime()) text = ('0' + timeNew.getDate()).slice(-2) + '.' + ('0' + (timeNew.getMonth()+1)).slice(-2) + '.' + timeNew.getFullYear() + ' ' + ('0' + timeNew.getHours()).slice(-2) + ':' + ('0' + timeNew.getMinutes()).slice(-2) + ':' + ('0' + timeNew.getSeconds()).slice(-2);
     }
-    html.innerHTML = project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id) + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + chrome.i18n.getMessage('nextVote') + ' ' + text;
+    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + chrome.i18n.getMessage('nextVote') + ' ' + text;
     listProject.after(html)
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).addEventListener('click', function() {
         removeProjectList(project, false);
@@ -836,6 +836,9 @@ function extractHostname(url) {
     //find & remove "?"
     hostname = hostname.split('?')[0];
 
+    hostname = hostname.replace(/\r?\n/g, "");
+    hostname = hostname.replace(/\s+/g, '');
+
     return hostname;
 }
 
@@ -1254,7 +1257,7 @@ async function fastAdd() {
         for (fastProj of getUrlProjects()) {
             let html = document.createElement('div');
             html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id);
-            html.innerHTML = '<span style="color:#f44336;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>'+getProjectName(fastProj) + " - " + fastProj.nick + " - " + fastProj.id;
+            html.innerHTML = '<span style="color:#f44336;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>'+getProjectName(fastProj) + " – " + fastProj.nick + " – " + fastProj.id;
             listFastAdd.before(html);
             await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, false, html);
         }
