@@ -60,7 +60,7 @@ function craft() {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это дубовая доска
-            if (getBase64Image(element) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEcElEQVRYR8WWwW9UVRTGL3RmmEIRKG0ppNVqigZJLCQSJcSEgDHEGBeauHBjDKzc4YIlC/8AEzfujAsT2cFCY4zRaEwIJpoQaiyQjrTSQjttZ2ppoUM7MOZ3Zr6XM2/e0CksvJt377v33e873/nOmdkQ/uex4XHxf/j8w4q+nZibDSfPfvtYd637I4ABZPR3ddvz+0tX7Xni8L7wxkdfruvOlg/HgUulUvju4nUDfvPIC2F2abGOVKtE1iTggf8anbMoifjevZVwaGhP6O7YauBS4/xPV8LmzRk710pqmhL44pO3Klzuxy+XxyKpUYChdxBivHN8yIAZ+p4zn371WyJWw0uAiZSxf2+XPbUmKoYA/N7Rg8+aEpxlzlCKIMWA9Nsfn6vDjBbe1QLxRBRNNpu1y+JSSynOSRURSUqRFIkInPngtUpxaTG8d/ygXc4gxz4iwLVHnj2AV0PqedKffX0x9O/qCPliKSyWlsOPl8YMu44ALyDBODzUZ09vrniO43sQ9t8wV4mOTd6RSI8msLq6agfT6bQ9yw+ra7mauSJTjuPAeETpE3D5wQO7J9XWlkzg2KEB62zPPb3dDm7dlA2L90vRE0WIWPWvUlNYgLJPinY+tSUM/z0TllerlcFoT2cMfHyqaOvL16YbU4D8N27+GzKZVOjr7YjA+aCzVpIoklQNN8YWQuHOXcsxgzxbINl2e+YmqpU1sGeHEbnw80g9gVPvHoh6Owcnp5fsg33PdIWr/8wZIU/k9VcGba0cD+fyUaRETsSTMwv2rlx+GFKpjaGvZ5ut2U80IQoADJgiHs5N2UcvDe62J2dIDx5hXiiuWLQC3LmjvQ6cNaMwvxw0R5UGBU4cGawIxBsREMhAZGWlHF5+sb+a1BoZCHjJAWIABpDI8Q7pGfgg0QPNQCCg8sQjDIhIAdbkGJkHdndGhFCFQSp4rzOQa0gBHpDsf4xM1IEguUVZqwrm+IJxK1+t713dW+wp08mEvMvP3rW9wf5qa2/aiBSll1wVYZe70mSND0ZvFiLHK2LVutLhzWcMQkg2oXJPpJJdZPQhPvFERQAwgAD36aAB4Xrtc09iFWBCTDa0tzfqgt6MzK+MTkepYQKR8dsLDbVOOmRAzkkZ5uO3580riSbkgDeiIlX0Kj88QmpQAwVwNbVOjpnHJVeJ6gz3NZTh6fdfrUh6DsiIas0iIaOKbL6wVOd8HzlnmpXlN79eT/41RAHl2edfrdlcfL/abg2g1ogkddyAvFcDMiPXWnNiI+JAvOUqDb41CxwieCCeY/ZVln7PG7TBA7pUZlTH850QcmpEmBUCKIDT1fd9B/Q9Qb3gz9xM8l+ySNPahJ/njuym0NPTbiWpimCb+pcR8YA3V6ROadnkjv/8xnHW/FsOETneV4XMSBVYeU0VIzOyVi+Q1HFgrdck4FPDPP6rmJucr/vjgdTZTDr8PnKrpbtbOuTZH3i+t9K5LRv9KnoFUhvbWgZetwJJHiE1eICxltRPnIJmFzzp+/8AoVgGTlFuFt4AAAAASUVORK5CYII=") {
+            if (getBase64Image(element) === "") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[0] = inventoryCount;
@@ -240,6 +240,7 @@ function getBase64Image(img) {
     var ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
 
+
     // Get the data-URL formatted image
     // Firefox supports PNG and JPEG. You could check img.src to
     // guess the original format, but be aware the using "image/jpg"
@@ -249,7 +250,7 @@ function getBase64Image(img) {
     return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 }
 
-// function addImageProcess(src){
+// function addImageProcess(src) {
 //   return new Promise((resolve, reject) => {
 // 	let img = new Image()
 // 	img.onload = () => resolve(img)

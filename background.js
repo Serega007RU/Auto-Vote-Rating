@@ -138,7 +138,7 @@ function checkVote() {
                 checkOpen(proj);
 			}
 	    } else if (proj.MinecraftMp) {
-            let timeEST = new Date(Date.now() - 18000000/*+ 5 часов*/);
+            let timeEST = new Date(Date.now() - 18000000/*- 5 часов*/);
             let date = (timeEST.getUTCMonth() + 1) + '/' + timeEST.getUTCDate() + '/' + timeEST.getUTCFullYear();
             let hourse = timeEST.getUTCHours();
 	        let minutes = timeEST.getUTCMinutes();
@@ -146,7 +146,7 @@ function checkVote() {
                 checkOpen(proj);
 			}
 	    } else if (proj.MinecraftServerList) {
-            let time5 = new Date(Date.now() + 18000000/*- 5 часов*/);
+            let time5 = new Date(Date.now() + 7200000/*+ 2 часа*/);
             let date = (time5.getUTCMonth() + 1) + '/' + time5.getUTCDate() + '/' + time5.getUTCFullYear();
             let hourse = time5.getUTCHours();
 	        let minutes = time5.getUTCMinutes();
@@ -1198,7 +1198,7 @@ https://minecraft-mp.com/
 
 https://minecraft-server-list.com/
 фоновая капча
-время голосования походу сбрасывается в 00:00 по UTC +5 тоесть от московского разница в +2 часов
+время голосования походу сбрасывается в 00:00 по UTC +2 тоесть от московского разница в +1 часов
 можно голосовать за все проекты разом
 
 https://www.serverpact.com/

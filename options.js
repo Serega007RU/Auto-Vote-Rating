@@ -287,7 +287,7 @@ async function addProjectList(project, visually) {
             let userTimezoneOffset = date.getTimezoneOffset() * 60000;
             timeNew = new Date(date.getTime() - userTimezoneOffset);
         } else if (project.MinecraftServerList) {
-            let date = new Date(new Date(project.time).getTime() - 18000000/*-5 часов*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
+            let date = new Date(new Date(project.time).getTime() - 7200000/*-2 часа*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
             let userTimezoneOffset = date.getTimezoneOffset() * 60000;
             timeNew = new Date(date.getTime() - userTimezoneOffset);
         } else if (project.ServerPact) {
