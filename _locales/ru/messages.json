@@ -451,5 +451,33 @@
   },
   "errorVoteUnknown2": {
     "message": "Непредвиденная ошибка! Нет сообщения об ошибки"
+  },
+  "tokenVK": {
+    "message": "Токен ВК:"
+  },
+  "projectID": {
+    "message": "ID проекта"
+  },
+  "firstAddSettings" {
+    "message": "Дополнительные настройки сгенерированы"
+  },
+  "secondBonus": {
+    "message": "На $project$ нужно ещё забирать награду за голосование, давай это тоже автоматизируем?",
+    "placeholders": {
+      "project": {
+        "content": "$1"
+      }
+    }
+  },
+  "redirectedSecondBonus" {
+    "message": "Произошла переадресация на $url$, похоже вы не авторизованы на данном сайте либо тут другая проблема. Проверьте данный URL",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "dailyBonus" {
+    "message": "Ежедневный бонус"
   }
 }

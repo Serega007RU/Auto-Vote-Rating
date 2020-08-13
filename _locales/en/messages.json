@@ -493,5 +493,33 @@
   },
   "errorVoteUnknown2": {
     "message": "Unexpected error! No error message"
+  },
+  "tokenVK": {
+    "message": "Token VK:"
+  },
+  "projectID": {
+    "message": "ID project"
+  },
+  "firstAddSettings" {
+    "message": "Additional settings are generated"
+  },
+  "secondBonus": {
+    "message": "On $project$ you still need to collect the reward for voting, let's automate this too?",
+    "placeholders": {
+      "project": {
+        "content": "$1"
+      }
+    }
+  },
+  "redirectedSecondBonus" {
+    "message": "There was a redirect to $url$, it looks like you are not logged in to this site, or there is another problem. Check this URL",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "dailyBonus" {
+    "message": "Daily bonus"
   }
 }

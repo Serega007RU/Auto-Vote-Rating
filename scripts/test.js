@@ -1,0 +1,1 @@
+console.log(chrome.i18n.getMessage('developers'));

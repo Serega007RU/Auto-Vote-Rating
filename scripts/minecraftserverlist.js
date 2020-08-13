@@ -66,4 +66,4 @@ this.check = setInterval(()=>{
         sendMessage(document.querySelector("#voteerror > font").textContent);
     }
     vote();
-}, 5000);
+}, 7000);

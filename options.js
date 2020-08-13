@@ -162,7 +162,7 @@ async function restoreOptions() {
         updateStatusSave('<div>' + chrome.i18n.getMessage('firstSettings') +'</div>', true);
         settings = new Settings(false, false, false, false, true, false, 1000, false);
         await setValue('AVMRsettings', settings, false);
-        console.log('Дополнительные настройки сгенерированы');
+        console.log(chrome.i18n.getMessage('firstAddSettings'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
     }
     //Поддержка новых настроек с версии 2.1.0 (или же с 2.1.1 для Opera)
@@ -490,9 +490,9 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
     let secondBonus = "";
         if (project.id == 'mythicalworld' || project.id == 5323 || project.id == 1654 || project.id == 6099) {
-        secondBonus = "На MythicalWorld нужно ещё забирать награду за голосование, давай это тоже автоматизируем? <button type='button' id='secondBonusMythicalWorld'>" + chrome.i18n.getMessage('lets') + "</button>"
+        secondBonus = chrome.i18n.getMessage('secondBonus', "MythicalWorld") + " <button type='button' id='secondBonusMythicalWorld'>" + chrome.i18n.getMessage('lets') + "</button>"
     } else if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
-        secondBonus = "На VictoryCraft нужно ещё забирать награду за голосование, давай это тоже автоматизируем? <button type='button' id='secondBonusVictoryCraft'>" + chrome.i18n.getMessage('lets') + "</button>"
+        secondBonus = chrome.i18n.getMessage('secondBonus', "VictoryCraft") + " <button type='button' id='secondBonusVictoryCraft'>" + chrome.i18n.getMessage('lets') + "</button>"
     }
 
     forLoopAllProjects(function () {
@@ -605,7 +605,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProjectRedirect') + response.url + '</div>', true, element);
             return;
         } else if (!response.ok) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">Не удалось соединиться с ' + getProjectName(project) + ', код состояния HTTP: ' + response.status + '</div>', true, element);
+            updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status + '</div>', true, element);
             return;
         }
         try {
@@ -722,10 +722,10 @@ function addProjectsBonus(project) {
         document.getElementById('secondBonusMythicalWorld').addEventListener('click', async () => {
             let response = await fetch('https://mythicalworld.su/bonus');
             if (!response.ok) {
-                updateStatusAdd('<div align="center" style="color:#f44336;">Не удалось соединиться с https://mythicalworld.su/bonus, код состояния HTTP: ' + response.status + '</div>', true, element);
+                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', response.url) + response.status + '</div>', true, element);
                 return;
             } else if (response.redirected) {
-                updateStatusAdd('<div align="center" style="color:#f44336;">Произошла переадресация на ' + response.url + ', похоже вы не авторизованы на данном сайте либо тут другая проблема. Проверьте данный URL</div>', true, element);
+                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('redirectedSecondBonus', response.url) +'</div>', true, element);
                 return;
             }
             await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
@@ -738,7 +738,7 @@ function addProjectsBonus(project) {
         });
     } else if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async () => {
-            await addProject('Custom', 'VictoryCraft Ежедневный бонус', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/","referrerPolicy":"no-referrer-when-downgrade","body":"give_daily_posted=1&token=%7Btoken%7D&return=%252F","method":"POST","mode":"cors"}', 86400000, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', priorityOption, null);
+            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/","referrerPolicy":"no-referrer-when-downgrade","body":"give_daily_posted=1&token=%7Btoken%7D&return=%252F","method":"POST","mode":"cors"}', 86400000, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', priorityOption, null);
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', 604800000, 'https://victorycraft.ru/?do=cabinet&loc=vote', priorityOption, null);
         });
     }
@@ -1366,7 +1366,7 @@ function addMultiVote() {
 
     let div = document.createElement('div');
     div.setAttribute('class', 'form-group mb-1');
-    div.innerHTML = '<label data-resource="cooldown" for="cooldown">Токен ВК:</label>'
+    div.innerHTML = '<label data-resource="cooldown" for="cooldown">' + chrome.i18n.getMessage('tokenVK') + '</label>'
 
     let inputToken = document.createElement('input');
     inputToken.setAttribute('name', 'tokenvk');
@@ -1530,7 +1530,7 @@ selectedTop.addEventListener("click", function() {
 });
 
 selectedTop.addEventListener("change", function() {
-    var label = '<div class="form-group mb-1"><label for="id">ID проекта</label> <span class="tooltip1"><span class="tooltip1text">' + chrome.i18n.getMessage('projectIDTooltip') + '</span></span></div>';
+    var label = '<div class="form-group mb-1"><label for="id">' + chrome.i18n.getMessage('projectID') + '</label> <span class="tooltip1"><span class="tooltip1text">' + chrome.i18n.getMessage('projectIDTooltip') + '</span></span></div>';
     var input = '<input name="id" id="id" required placeholder="' + chrome.i18n.getMessage('inputProjectID') + '" type="text">';
     var dataInput = '<input name="id" id="id" required placeholder="' + chrome.i18n.getMessage('inputProjectIDOrList') + '" list="idlist"><datalist id="idlist">';
     if(selectedTop.value == "TopCraft") {
