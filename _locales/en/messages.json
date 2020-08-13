@@ -12,8 +12,8 @@
     "description": "Button. Add"
   },
   "help": {
-    "message": "Help",
-    "description": "Button. Help"
+    "message": "About",
+    "description": "Button. About"
   },
   "fastAdd": {
     "message": "Fast add",
@@ -500,7 +500,7 @@
   "projectID": {
     "message": "ID project"
   },
-  "firstAddSettings" {
+  "firstAddSettings": {
     "message": "Additional settings are generated"
   },
   "secondBonus": {
@@ -511,7 +511,7 @@
       }
     }
   },
-  "redirectedSecondBonus" {
+  "redirectedSecondBonus": {
     "message": "There was a redirect to $url$, it looks like you are not logged in to this site, or there is another problem. Check this URL",
     "placeholders": {
       "url": {
@@ -519,7 +519,7 @@
       }
     }
   },
-  "dailyBonus" {
+  "dailyBonus": {
     "message": "Daily bonus"
   }
 }

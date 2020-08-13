@@ -9,7 +9,7 @@
     "message": "Добавить"
   },
   "help": {
-    "message": "Справка"
+    "message": "О расширении"
   },
   "fastAdd": {
     "message": "Быстрое добавление"
@@ -458,7 +458,7 @@
   "projectID": {
     "message": "ID проекта"
   },
-  "firstAddSettings" {
+  "firstAddSettings": {
     "message": "Дополнительные настройки сгенерированы"
   },
   "secondBonus": {
@@ -469,7 +469,7 @@
       }
     }
   },
-  "redirectedSecondBonus" {
+  "redirectedSecondBonus": {
     "message": "Произошла переадресация на $url$, похоже вы не авторизованы на данном сайте либо тут другая проблема. Проверьте данный URL",
     "placeholders": {
       "url": {
@@ -477,7 +477,7 @@
       }
     }
   },
-  "dailyBonus" {
+  "dailyBonus": {
     "message": "Ежедневный бонус"
   }
 }

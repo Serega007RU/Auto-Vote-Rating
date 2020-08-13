@@ -697,10 +697,6 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     }
 
     await addProjectList(project, false);
-    //Отключено для тестирования
-    //document.getElementById('project').value = '';
-    //document.getElementById('nick').value = '';
-    //document.getElementById('id').value = '';
 
     if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList) && settings.enabledSilentVote) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div>', true, element);

@@ -253,7 +253,7 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
-	if (project.vk != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+	if (project.vk != null && project.vk != '' && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
         chrome.cookies.set({"url": 'https://oauth.vk.com/', "name": 'remixsid', "value": project.vk}, function(cookie) {});
     }
     let silentVoteMode = false;
