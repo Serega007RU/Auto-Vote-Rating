@@ -1,4 +1,4 @@
-//vote();
+vote();
 function vote () {
 	if (document.readyState != 'complete') {
 		document.onreadystatechange = function () {
@@ -18,8 +18,45 @@ function vote () {
 		}
 		settingsStorage.get('AVMRprojectsMinecraftIpList', async function(result) {
 			try {
-                await getRecept();
-                
+				if (document.querySelector("#Content > div.Error") != null) {
+                    if (document.querySelector("#Content > div.Error").textContent.includes('You did not complete the crafting table correctly')) {
+					    sendMessage('Не удалось пройти капчу');
+					    return;
+				    }
+				    if (document.querySelector("#Content > div.Error").textContent.includes('last voted for this server')) {
+                        let numbers = document.querySelector("#Content > div.Error").textContent.match(/\d+/g).map(Number);
+						let count = 0;
+						let hour = 0;
+						let min = 0;
+						let sec = 0;
+						for (var i in numbers) {
+							if (count == 0) {
+								hour = numbers[i];
+							} else if (count == 1) {
+								min = numbers[i];
+							}
+							count++;
+						}
+						var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
+                        sendMessage('later ' + (Date.now() - milliseconds));
+                        return;
+				    }
+				    sendMessage(document.querySelector("#Content > div.Error").textContent);
+				    return;
+				}
+				if (document.querySelector("#Content > div.Good") != null && document.querySelector("#Content > div.Good").textContent.includes('You voted for this server!')) {
+                    sendMessage('successfully');
+                    return;
+				}
+                if (!await getRecept()) {
+                	sendMessage('Не удалось найти рецепт: ' + document.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src);
+                	return;
+                }
+                await craft();
+                let nick = getNickName(result.AVMRprojectsMinecraftIpList);
+		        if (nick == null || nick == "") return;
+		        document.querySelector("#Content > form > input[type=text]").value = nick;
+                document.querySelector("#votebutton").click();
 			} catch (e) {
 				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
 					sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
@@ -50,8 +87,27 @@ function sendMessage(message) {
     }, function(response) {});
 }
 
+var content = [0,0,0,0,0,0,0,0,0];
+
+function recalculate()
+{
+	code = 0;
+	code2 = 0;
+
+	for (i=0; i < 6; i ++)
+   	{
+   		code += content[i] << (i*5);
+	}
+	for (i=6; i < 9; i ++)
+	{
+   		code2 += content[i] << ((i-6)*5);
+	}
+	document.forms['main'].elements['captchacode1'].value = code;
+	document.forms['main'].elements['captchacode2'].value = code2;
+}
+
 //Собсна сам процесс крафта
-function craft() {
+async function craft() {
     let inventoryCount = 0;
     let inventory = document.querySelector("#Content > form > table > tbody > tr:nth-child(2) > td > table").getElementsByTagName('img');
     if (currentRecept.sign) {
@@ -60,7 +116,7 @@ function craft() {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это дубовая доска
-            if (getBase64Image(element) === "") {
+            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[0] = inventoryCount;
@@ -81,7 +137,7 @@ function craft() {
                 	content[5] = inventoryCount;
                 }
             //Если это палка
-            } else if (getBase64Image(element) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAvklEQVRYR2NkGGDAOMD2M4w6gG4h4Gkm+h8U3fdffAPH+o1HX8F2D38HwHzuYCgE9vn87U/oGwID5gBCFsOyP83SwIA5AGaxvAQn2JMHLrxFiXP0go/qITBgDiA2yGkWAgPmAFKDnOohMGAOIDfIqRYCA+YASoOc4hAYMAdQK8jJDoEBcwC1g5zkEBgwB9AqyIkOgQFzAL0sxtkiGnAHaMhxg9vvMABrv9OqC4fRIhpwB9DKp7jMpXqbkFQPAAAIj7AhtyvgaAAAAABJRU5ErkJggg==") {
+            } else if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
                 countRecept2++;
                 if (countRecept2 == 1) {
                 	content[7] = inventoryCount;
@@ -97,7 +153,7 @@ function craft() {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это железный слиток
-            if (getBase64Image(element) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABTElEQVRYR+2WMQqDMBSG6ym8gaNHcBBP4OIFXLyNg+AieBDFxVEENxG8hAhu0sKDV5rUl6QixoJdijbp+/4vyVPjofljaK7/uAEON+B53vNzWcuyFNb4XwA+KaYOw5DZ11mWwTVlYreB0wBkhYIggITDMGye6K7r4D5lQmrgNADVQhiTSkw1NsrE24A2ACzs+z7AR1G0GeLXxHEcC7t827bwu3EZgKIogChNU/h2XVfpOUUltW1bOD/Pc9bAZQBwrauqYkzsTYoaxnFkjNR1vW1AG0CSJAwhntu+7+G+aZpKe4JPSk36MqAdwHEcBtayLLiWGaASL8sC8/G88yaapoEm+O4D2gCQDBsSD7KuKwyZ51m4B3BNqaTU5K9ngTYAygRvYG9SqYHLAPAg0zQx8Lh7lZqCwiDyjQg3pTYABfhDhkjfCQ+pIviTG+AFAM4TIKlzVdgAAAAASUVORK5CYII=") {
+            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAIVBMVEUAAADY2NhERESWlpY1NTVycnJoaGioqKj///+CgoJ/f3/RLsQ9AAAAAXRSTlMAQObYZgAAAGRJREFUeF6tyjERADEIRNFYwAIWsICFWIgFLGAhFlB5yXAMBZTZ7r/Z8XaILWShCDaQpQAgWCHqpksFJI1cZ9yAUhSdtQAURXN2ACD21+xhbzHPxcyjwhW7Z68CLhZVICQr4ek+KDhG7bVD+wwAAAAASUVORK5CYII=") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[1] = inventoryCount;
@@ -106,7 +162,7 @@ function craft() {
                 	content[4] = inventoryCount;
                 }
             //Если это палка
-            } else if (getBase64Image(element) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAvklEQVRYR2NkGGDAOMD2M4w6gG4h4Gkm+h8U3fdffAPH+o1HX8F2D38HwHzuYCgE9vn87U/oGwID5gBCFsOyP83SwIA5AGaxvAQn2JMHLrxFiXP0go/qITBgDiA2yGkWAgPmAFKDnOohMGAOIDfIqRYCA+YASoOc4hAYMAdQK8jJDoEBcwC1g5zkEBgwB9AqyIkOgQFzAL0sxtkiGnAHaMhxg9vvMABrv9OqC4fRIhpwB9DKp7jMpXqbkFQPAAAIj7AhtyvgaAAAAABJRU5ErkJggg==") {
+            } else if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
                 countRecept2++;
                 if (countRecept2 == 1) {
                 	content[7] = inventoryCount;
@@ -122,7 +178,7 @@ function craft() {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это палка
-            if (getBase64Image(element) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAvklEQVRYR2NkGGDAOMD2M4w6gG4h4Gkm+h8U3fdffAPH+o1HX8F2D38HwHzuYCgE9vn87U/oGwID5gBCFsOyP83SwIA5AGaxvAQn2JMHLrxFiXP0go/qITBgDiA2yGkWAgPmAFKDnOohMGAOIDfIqRYCA+YASoOc4hAYMAdQK8jJDoEBcwC1g5zkEBgwB9AqyIkOgQFzAL0sxtkiGnAHaMhxg9vvMABrv9OqC4fRIhpwB9DKp7jMpXqbkFQPAAAIj7AhtyvgaAAAAABJRU5ErkJggg==") {
+            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[4] = inventoryCount;
@@ -131,7 +187,7 @@ function craft() {
                 	content[7] = inventoryCount;
                 }
             //Если это алмаз
-            } else if (getBase64Image(element) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABc0lEQVRYR2NkGGDAOMD2M4w6gOQQ4DE3+I8v2r6cvECSmSQpBlk8YA6AWfz5xHm86ZbXwhAsT2xIEB0CA+YAdIsXf3+BNQT0WXjA4vEPT4HpOzHFRIUEwRAYMAegW3zp9xewjy7+gdAwEMspAWZ6v7uEIn7IK56yEBh0DoDFPczHsBBBTxCVn++BhZ69e0NUWsCZBnDFPc0dQMji3q+P8ZYDUxbOB8trRQSAaUJpASMEBq0DYPl896/3JIUAobRAdAgMmANgqT368j6wzxPUIWU9LgBLA7+fvUJR8nHPUazlAsEQGHAHoJdw11ZswBsCPBYGKPJfTlwA898sWk9eCNDdATDnw7Kj3baFYKGLfbPAtGCQG94QeL9uF4q6B1n1WH0OM4RgSTjgDlBZ0gt27OsF60gKAVYpMbxxT3QIDJgD0NOCSFwgWAg9laMnCEKpHl090S2iAXMAekjgzQJIkjRrFQ+YA4i1mFR1BNMAqQaSqh4AYA1SMLuYz5cAAAAASUVORK5CYII=") {
+            } else if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIVBMVEUAAAAw270be2vR+vOi9udK7dEglYGM9OL///8szbEMNzBqdBtcAAAAAXRSTlMAQObYZgAAAHJJREFUeNrNzUEOAjEMQ1FaE0/D/Q9MM4pkduCu+KtIflIe/9arc4Hm1RVxgObnHTCGyHegGah5rdidgRpxF6EnvwDNV0dGnABAoJ9YAMgUmDsXxI5d7kgHFImYM7u6avbAGJ+AtEATMjvNBiiiNBvguDejWQ0NckD8GAAAAABJRU5ErkJggg==") {
                 countRecept2++;
                 if (countRecept2 == 1) {
                 	content[0] = inventoryCount;
@@ -152,7 +208,7 @@ function craft() {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это дубовая доска
-            if (getBase64Image(element) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEcElEQVRYR8WWwW9UVRTGL3RmmEIRKG0ppNVqigZJLCQSJcSEgDHEGBeauHBjDKzc4YIlC/8AEzfujAsT2cFCY4zRaEwIJpoQaiyQjrTSQjttZ2ppoUM7MOZ3Zr6XM2/e0CksvJt377v33e873/nOmdkQ/uex4XHxf/j8w4q+nZibDSfPfvtYd637I4ABZPR3ddvz+0tX7Xni8L7wxkdfruvOlg/HgUulUvju4nUDfvPIC2F2abGOVKtE1iTggf8anbMoifjevZVwaGhP6O7YauBS4/xPV8LmzRk710pqmhL44pO3Klzuxy+XxyKpUYChdxBivHN8yIAZ+p4zn371WyJWw0uAiZSxf2+XPbUmKoYA/N7Rg8+aEpxlzlCKIMWA9Nsfn6vDjBbe1QLxRBRNNpu1y+JSSynOSRURSUqRFIkInPngtUpxaTG8d/ygXc4gxz4iwLVHnj2AV0PqedKffX0x9O/qCPliKSyWlsOPl8YMu44ALyDBODzUZ09vrniO43sQ9t8wV4mOTd6RSI8msLq6agfT6bQ9yw+ra7mauSJTjuPAeETpE3D5wQO7J9XWlkzg2KEB62zPPb3dDm7dlA2L90vRE0WIWPWvUlNYgLJPinY+tSUM/z0TllerlcFoT2cMfHyqaOvL16YbU4D8N27+GzKZVOjr7YjA+aCzVpIoklQNN8YWQuHOXcsxgzxbINl2e+YmqpU1sGeHEbnw80g9gVPvHoh6Owcnp5fsg33PdIWr/8wZIU/k9VcGba0cD+fyUaRETsSTMwv2rlx+GFKpjaGvZ5ut2U80IQoADJgiHs5N2UcvDe62J2dIDx5hXiiuWLQC3LmjvQ6cNaMwvxw0R5UGBU4cGawIxBsREMhAZGWlHF5+sb+a1BoZCHjJAWIABpDI8Q7pGfgg0QPNQCCg8sQjDIhIAdbkGJkHdndGhFCFQSp4rzOQa0gBHpDsf4xM1IEguUVZqwrm+IJxK1+t713dW+wp08mEvMvP3rW9wf5qa2/aiBSll1wVYZe70mSND0ZvFiLHK2LVutLhzWcMQkg2oXJPpJJdZPQhPvFERQAwgAD36aAB4Xrtc09iFWBCTDa0tzfqgt6MzK+MTkepYQKR8dsLDbVOOmRAzkkZ5uO3580riSbkgDeiIlX0Kj88QmpQAwVwNbVOjpnHJVeJ6gz3NZTh6fdfrUh6DsiIas0iIaOKbL6wVOd8HzlnmpXlN79eT/41RAHl2edfrdlcfL/abg2g1ogkddyAvFcDMiPXWnNiI+JAvOUqDb41CxwieCCeY/ZVln7PG7TBA7pUZlTH850QcmpEmBUCKIDT1fd9B/Q9Qb3gz9xM8l+ySNPahJ/njuym0NPTbiWpimCb+pcR8YA3V6ROadnkjv/8xnHW/FsOETneV4XMSBVYeU0VIzOyVi+Q1HFgrdck4FPDPP6rmJucr/vjgdTZTDr8PnKrpbtbOuTZH3i+t9K5LRv9KnoFUhvbWgZetwJJHiE1eICxltRPnIJmFzzp+/8AoVgGTlFuFt4AAAAASUVORK5CYII=") {
+            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[0] = inventoryCount;
@@ -189,13 +245,13 @@ function craft() {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это золотой слиток
-            if (getBase64Image(element) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABVElEQVRYR+2WPQrCQBBGN6VoIXiCgLXkKMbKRvES9jaSQrH2FisInkDE3jJFDqCChYKNP5BxJDs62VWCGyF2xsR935vZyTrC8sexvL4oADI30GyKW7Kss1m65f8FoEkxtZRlpa99/xR/50x8beBnAPqFjo/EY2ZHD+LrnAmtgZ8BmC+EQbnE3Gh7b+JpwBoALjyZALnrKts4EeezxEHQT53yiwX87OQGQEpIHkVQFdcdGb2nuKTtdvrj3S4xkBsAIaDWUQQ1RBPfJkUP12lNUdJb7dUeQAMWAWjNYd9KCbPc84xaQtCk9Klwe4kvDcMDNWAZYNRSa1TvnI0McIlpUmpiuYRzwnMOWANAMhxIFGRTgW5trFVDNBF2NZeU66CXd4E1AM4EGijNq0r3fppUayA3ABRkt1PZsXvNpoL+LvZEhE1pDUDPns0d2jNhNsvw/1IA3AH2jNXZ87pgMwAAAABJRU5ErkJggg==") {
+            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAJFBMVEUAAAD//4tQUADe3gA8PADcdhOGhgD//wv////bohOurgC3YRCwQZoNAAAAAXRSTlMAQObYZgAAAGdJREFUeF6tykERwDAIRNFYwAIWsICFWKgFLMRCLMRCzZVCGQ5w7N7+mx3/DrGFLBTBBrIWAAhWiHrTpQLSirx03MCiKNK1ABRFc3YAIMdLd3ewt4EV8yhgcqbOq4DL+c4VQrISft0DreJJLwFPy8oAAAAASUVORK5CYII=") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[1] = inventoryCount;
                 }
             //Если это палка
-            } else if (getBase64Image(element) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAvklEQVRYR2NkGGDAOMD2M4w6gG4h4Gkm+h8U3fdffAPH+o1HX8F2D38HwHzuYCgE9vn87U/oGwID5gBCFsOyP83SwIA5AGaxvAQn2JMHLrxFiXP0go/qITBgDiA2yGkWAgPmAFKDnOohMGAOIDfIqRYCA+YASoOc4hAYMAdQK8jJDoEBcwC1g5zkEBgwB9AqyIkOgQFzAL0sxtkiGnAHaMhxg9vvMABrv9OqC4fRIhpwB9DKp7jMpXqbkFQPAAAIj7AhtyvgaAAAAABJRU5ErkJggg==") {
+            } else if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
                 countRecept2++;
                 if (countRecept2 == 1) {
                 	content[4] = inventoryCount;
@@ -214,47 +270,34 @@ function craft() {
 var currentRecept = {};
 
 //Узнаёт какой щас рецепт
-function getRecept() {
-    let image_base64 = getBase64Image(document.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img"));
-    if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA+UlEQVRYR2NkGGDAOMD2M4w6ACME5rf4/qdltJy68Axs/PQ1Z8F2D14HLFh5EOzShHB7ogKkaeo+sDo5EWYUfejmEB0CA+4AmI9g3q/LdgIzcfkUXT0sJB69+QvWB9NPdAgMuAOIingyFBEdAmSYTZQWkh2AnhhhfJht6LkEl3qYuqHjAEKJEBYC6KkdV66hei6guQOISlFkKCI5DZBhB14tBB2QGWJM09oQ5jqcteGAO8DRRJEuIbD/zH3s7YEBdwCxiS7JVwclpO4//wrWCvMZseaQ3SgdcAfUJNmBQ+DZ63dgz9I9BEYdMBoCAx4CuAosupUD1HIAANcWHjDlMO3DAAAAAElFTkSuQmCC") {
+async function getRecept() {
+    let image_base64 = await toDataURL(document.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src);
+    if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAGFBMVEUAAACfhE1BNCFpVDMhGQs/LQ5iTSx8Yj6Dkc6FAAAAAXRSTlMAQObYZgAAAE9JREFUeF69yDERgEAMRFEsxEIsnIVvYS2cBewzhIIU2Y7hF5nNO74pWmsGFaCQA7g/EA5aDhRSXQcQIAgcvBlYrRmyN0K197M9nL9ApoMLLkoqo8izD4QAAAAASUVORK5CYII=") {
         currentRecept.sign = true;
-    } else if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABMklEQVRYR+WVMQ6CQBBFodTSxMTOTmhtrEmAwrsQDsMFvAKdBZB4BBsCWBpbS201GTIFK5NdZdkh0WYSjfnv/539a1uGPkEQvPqkbEP6FhsACmdZBl6bpoEZRRHM0RNgA6CEHccB52EYjpsAG4CqcJ7ncPzad4AN4FthvP7aEmAD+FVYWwLaAVzX7XR2Xde9xzRUmExgMgC+7wNkURQwMQldzqUJsAEgGR5FHMfwVZIkMKuq6rxqYrdjw6k+82QPTBYgTVMwN9S5tAeoBIwByHYBf6d6YvAOsAPsd0toxPVqBiynyxwm3oqyLHt7QtW5dAfYAFDY2y4A8nC8tU14fcCVFauaKizVJD56wDiA6MjbPNszP987zilHqo8X9X97MgBi5w+938o7QDWecQCR+G8A3m2QOvKmXFx+AAAAAElFTkSuQmCC") {
+        return true;
+    } else if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAIVBMVEUAAAAoKChERET////Y2NiWlpZra2soHgtJNhVoTh6JZyfBS+igAAAAAXRSTlMAQObYZgAAAFlJREFUeF69ylENgDAMBuFaOAu1MAtYqIVamIVZmAVUkhBoQsg/3uhLe19qj3H3NXjbFFQ3AX88QLWC5GoFRlAtofoFJdgKxiSSBYy9GyQKYPZza4j7ksAHHA9JIPGh7/5zAAAAAElFTkSuQmCC") {
         currentRecept.ironSword = true;
-    } else if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABQ0lEQVRYR2NkGGDAOMD2M4w6gOQQ4LM3+09MtH06eIoos4lShGzhgDkAZrHqmqlg9/y48xBM/3n9DiVAWESFwPzHFV1g2vr7fTAtL8EJpmdseoTiaaJDYMAdAPMmoSiQLE5BCZGkrb1g/vztT8D0jUdfyQuBQeMAQjnA00wUnEseTZyOkkae984B89FzB9FpgJDFMPkBcwDMYlhqP3DhLdhN/6f0g2n03AELCaqFwIA5AGaxgyEk/6OndliugeUO9LRAcQgMmANwBTl6PqdZCAyYAwgFOXp2hYWAbEcZSh1Bdi4YMAcQG+S4QgBWi94OyUYpEYnOBQPmAFKDHFeRDUsLJNcFA+YAcoOc2EoLpg5nGhgwB1AryIkNCYwQGHAHZPjJgVs0sPocvWwn1mfEqsMIgQF3ALEup5Y6oktCalmIbg4A+foUMN2VCYUAAAAASUVORK5CYII=") {
+        return true;
+    } else if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAG1BMVEUAAAAOPzYoHgtJNhUnsppoTh6JZycrx6wz68uqoKj7AAAAAXRSTlMAQObYZgAAAF5JREFUeF6tz1EJwDAMhOFYiIVaiIWzUAuzEAuTvW57uMCxwKD3+MEfiO2b3+vAzwTSYyrUBDiGQl0kvIWYA+kNxLroUKiBfQCDBanA4P1RoQSPmAIDjlCCHhgQfu0Cin4cjxIk8BAAAAAASUVORK5CYII=") {
         currentRecept.diamondPickaxe = true;
-    } else if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAFVklEQVRYR+1WW29UVRT+zm3uvTAttEAHymWgAoVixKBIDMGEGH02POAb/4J/4+XFJ40hvhiVGBUKxUIFwZoOTOTSdjqXzsy5zDn7bLPW7hkLhZ6CJry4XvY+Z+991re+9a21j4ZXbNor9o//Abw0A29O7JcfHk1yBr+ecnD15uxLfeuFD5Hjs8d0dpy3OjxW/QSPn10OcH3mxYBsGMDr40X5wVHBjsb6BHxhwjICfn7shxjp78NCU4NwbHx+Td8wI7EAKOIzh/2uY5qY2R78VW9gczoDI3D52Vl2eE+6N81AFpptXPzViGXkuQAo4nPHTf7oUMrmMXK8unSHLZUOYaZ4jAB5no+FmuR3X0xrmJy++0xfa14e2LdTnj3Rxwf35BpdimlCESeTFr8L2s0uKJoQI9EeArEa1L26EuuX15w1jKwBcGj/TinCENl0Gu9PqBwXB5RTch5RvRQqARIoskXHRsQGaYJMEzkeP/1FYKlag9vxsVCpP+HzuQCYTl1HJp3CxycSLK7+lMpxFDEJjyIf0BMsyMhxwujnPZ/86GK+Uuc5WbPtoNZorQ/gQHGHPFJo8YGZBz08SglkMwoIias/43PkoacYIjaiKqD1b6ZNPF6sQteUr7GhAFoY4Op9iWo9BgCl4J0dCkBDSPRYCfxUSiKUYZeRjyaUuArDqv5/e6hESo4XKjXQqpQS49vVvqCjgE6VQ1TrzfUZeK1YkPu2KBFtzahchroFyzJxadbo0kmpiTrhxSkHDxZrvEZRb+9xoRs6ZBAgmzJBREnNwPR9F82WHa8B2/H4YyeKSnxZXUVoJNPw/QA/31OqbtkuQhEipBwB2DXoIm1amJtXAZDley3cr+jMShCIeAYOFguysAnQdQ13HnZA9+X4iEBvKsVARGjA0AWDuXjDZwAHt4VoeR4yuoamE2L81DmcP38eFy5cwI3rkxjJq35SWnDjNUAADg+rztdY6fG3H3hM7XhBIGdoyFhUIQJf3ZCwTAP7BzvQtRA1T0ModIweeQ+GYaBcLsNbvIOspRi69SiIB0AifLcoUG0o4ZDN26rb3VtUmji+Wz3/8LsLw9CxtVf1BKI6EAKnTp9hEZZKJWSdOV7LZQ1cnvXiy5BEOFFoI5/JQHgOGq7F0ZE9aptIWSaIETLSA/UKajCkLKLa9gR2HXwLQRCgUqlgUJZ4LwHdEABi4O1RD02/wyCqts1jfVlFGUq9m5ord+tIpxIY6qH3QM4M0PIEto6dRKvVQqo5AyfwWRtSN3F1zo9ngDRwctRmkUVR0khlSBE3VUHADYDJks8MjPZ3IOVKdZkBcskki5KMqoJMihBTZaqCDTQi0kDHURG35D9aoGdqTATm4VKAK3MdpnZXv49sRildCJUuipyMomcAuolrJRJhTCOiFOwZtDGyKcn05zSTFU9dkazP0JidZUfDtzNtroKoDBU3yiLHNuWGNKClcLPsxQPYNpSXx/aqjke135uWDIQck1FXJJtvCUzOCsXASgOiObVdEm3k2PN1JA2T912fs7Ec1wnp49uH8lJCw+lD6qpddl1kkup3jIBQM2oLE9/fdpmB6LIhgZoJk/NPEZPZnQ7+fCz5Qqs1nqSf1tf9Jds2NCA1SLyx12A2yALZZh2QGC/9oTQwNuizYzKno7HTTCKBm2XVkp8W3upUxf4T0mYCAkicPpSFEES7StF3t2yuAtLAUmtFdOyYKmDt1bvacTTfEIBoM+mDSKPUtDvAlVkFYPeg7FJNjC09VWrPcvxSAKJDw1sGJFUX/W8QgJbtcC5fxPG/AhAd3pzv5f/H9XK8XvSxIow7/F+s/w3q6KE/0+QK8AAAAABJRU5ErkJggg==") {
+        return true;
+    } else if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABGlBMVEX///8eGhU9LQxZQhJoRRNrTBxJNBNGMRFdQx0sJx+NaB2peCylbR+icSdmRxh9XiKgaiM2KA5HLw1POxVZPRgcGRRALhRFLg+CYS6OZSk9KRCTay0iHhhlQxYaFxI2MCcSEA0pJR1KOB4SEAwaFxMbGBMgHRcyLSVbPhYXFBAZFhIzJhRaQBqMYCYWFBAkGgkdGhQ+Kg80LiZCMxo1LiUbFxIrJR06JgsrJh89KxIyMjJRORhGRkZKSkpUVFSQYiMRDwwTEAwNDAoODAoRDw0TEQ0TEQ4VEg4YFhMdGhUiHxgpHxExIg0yJBE0JRAxJRQqJR45Jw0qJh87Kg8xLCY3LiVINh05OTlSPR0+Pj5TU1NXV1dnZ2fLy8skqgJzAAAAAXRSTlMAQObYZgAAActJREFUeF7NkEWOHEEQRTs5i5mhkRmG2czMdP9rOHrTVbI8I3nnv/0vXkZG4/9LM44P7qqTxLaTZHhLPbQs3dZ1Vcuu/2ZpQq1rqqFrtq1l1p+WYZLsaoiuGwAZ83mzVr+PY1CrhqYBBZixo+K4sijtjWUZBsihNNQdnCQf0aIGtJVmdm3DtKbaUGfZAULoZg+8JURRTpqZpRoggRU3AULC7VYGSol5Apb5XNMsa4OeBZxHUWsPtD2PUpMpigKX/BQE6N2H42h9er8y5LmUlDJTUQYoCLBYLpfOeFEZjj538ueepAVlA8Sxe/zz18V4Ou1WgO93OoPcGxV0giLXeX3148urNK0tyXzf327zfDYrV44zfnT1/SxNefXNNmHUH422ncGgjxbj6YvLizMhaoBiEkbYaAQPPQ6mb9KXl98EdkUFHFHGTJOZvn/eR+s0xRxjIaL6DkVBICY7L1drzoXA2HVFqwI8RgpKCGVygmB6V2McVkDpeZIROKbpTeBMPILaOQ0fNPY57EnpgaGYTZBwI47D0Gk9bNTTO/SkJKZfriLOQyfs7jeskFLOpOwj7jhhq6rrKXvyax+B/F7jtjzt9VEX6jvyBOT/lt87NjDVK2XlDAAAAABJRU5ErkJggg==") {
         currentRecept.chest = true;
-    } else if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABG0lEQVRYR2NkGGDAOMD2M4w6gGYhYGur8h9b9B4+fAfFzuHnAJjP1240RgmASxe/gfmNddfBNCwkqB4CA+YAdIsfP/oJ9un793/BtJ4+F5gO9j9LmxAYMAcQslhQkBnsY1k5dtqEwIA7AJbUPc1Ewfm+uNMCLETI5zB9VMsFA+YAmMUOhkJgT83f/gRMH7rggzXO0UtHikNgwByAy+Ibj76CPQVLnOhlP9VCYMAcALNYXoIT7JkDF96CaZjP0X1IiE9yGhgwBxAKckI+xSVPdAgMmAOoHeQk5wK6O0BDjhtcpitKQOpv9BKO3NROdBoYcAfQKrERHQID7gD0+v3+C0hrltpxT7A9AAuJAXMAuSUbqfqILglJNZhY9QAUhdwhLzndMwAAAABJRU5ErkJggg==") {
+        return true;
+    } else if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAG1BMVEUAAAA9PSQoHgtJNhXq7leJZye8v03N0FBoTh6Jp74IAAAAAXRSTlMAQObYZgAAAFBJREFUeF6tzUENwEAIRNGxMBawgAUs1MJaWAuV3eOEkAyXcvsvAfDzkPTAqkMHrHtqQu9rAdl7Qj6hFrQGYSDfUAj6goH9QmhhwPZCYmGfD2TEGC3TC/o7AAAAAElFTkSuQmCC") {
         currentRecept.goldShover = true;
+        return true;
+    } else {
+        return false;
     }
 }
 
 //Преобразует изображение в String
-function getBase64Image(img) {
-    // Create an empty canvas element
-    var canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-
-    // Copy the image contents to the canvas
-    var ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-
-
-    // Get the data-URL formatted image
-    // Firefox supports PNG and JPEG. You could check img.src to
-    // guess the original format, but be aware the using "image/jpg"
-    // will re-encode the image.
-    var dataURL = canvas.toDataURL("image/png");
-
-    return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-}
-
-// function addImageProcess(src) {
-//   return new Promise((resolve, reject) => {
-// 	let img = new Image()
-// 	img.onload = () => resolve(img)
-// 	img.onerror = reject
-// 	img.src = src
-//   })
-// }
+const toDataURL = url => fetch(url)
+  .then(response => response.blob())
+  .then(blob => new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result.replace(/^data:image\/(png|jpg);base64,/, ""))
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+}))

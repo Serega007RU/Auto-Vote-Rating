@@ -579,7 +579,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             jsPath = "body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(2) > div > div.panel-body > table > tbody > tr:nth-child(6) > td:nth-child(2) > a"
         }
         if (project.MinecraftIpList) {
-            url = 'https://www.minecraftiplist.com/server/' + project.id + '/';
+            url = 'https://www.minecraftiplist.com/server/-' + project.id + '/';
             jsPath = "#addr > span:nth-child(3)"
         }
         let response;
