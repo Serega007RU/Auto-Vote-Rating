@@ -1347,30 +1347,48 @@ function addMultiVote() {
         confirmWarn = true;
         return;
     }
-    let el = document.querySelector("#centerLayer > p:nth-child(31)");
+    let el = document.querySelector("#settings > div > div.col-xl-6.col-lg-6.col-md-12.mb-3 > span:nth-child(28)");
     if (el == null) return;
+
+    let input = document.createElement('input');
+    input.setAttribute('class', 'checkbox');
+    input.setAttribute('type', 'checkbox');
+    input.setAttribute('name', 'checkbox');
+    input.setAttribute('id', 'enableMulteVote');
+    
     let label = document.createElement('label');
-    label.innerHTML = '<input id="enableMulteVote" type="checkbox" name="checkbox">' + chrome.i18n.getMessage('enableMultiVote');
+    label.setAttribute('for', 'enableMulteVote');
+    label.setAttribute('id', 'enableMultiVote');
+    label.innerHTML = chrome.i18n.getMessage('enableMultiVote');
+    
     let br = document.createElement('br');
-    el.before(br);
-    el.before(label);
-    let br2 = document.createElement('br');
-    el.before(br2);
-    el.before("Токен ВК: ");
+    
+
+    let div = document.createElement('div');
+    div.setAttribute('class', 'form-group mb-1');
+    div.innerHTML = '<label data-resource="cooldown" for="cooldown">Токен ВК:</label>'
+
     let inputToken = document.createElement('input');
     inputToken.setAttribute('name', 'tokenvk');
     inputToken.setAttribute('id', 'tokenvk');
+    inputToken.setAttribute('class', 'mb-2');
+
+
     chrome.cookies.get({"url": 'https:/vk.com/', "name": 'remixsid'}, async function(cookie) {
         if (cookie != null) {
             inputToken.value = cookie.value;
         }
-        el.before(inputToken);
-    });
+        el.after(inputToken);
+        el.after(div);
+        el.after(label);
+        el.after(input);
+        el.after(br);
 
-    document.getElementById('enableMulteVote').checked = settings.multivote;
-    document.getElementById('enableMulteVote').addEventListener('change', async function() {
-        settings.multivote = this.checked;
-        await setValue('AVMRsettings', settings, true);
+        document.getElementById('enableMulteVote').checked = settings.multivote;
+        document.getElementById('enableMulteVote').addEventListener('change', async function() {
+            settings.multivote = this.checked;
+            await setValue('AVMRsettings', settings, true);
+        });
     });
 }
 
