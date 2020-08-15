@@ -48,8 +48,8 @@ function vote () {
                     sendMessage('successfully');
                     return;
 				}
-                if (!await getRecept()) {
-                	sendMessage('Не удалось найти рецепт: ' + document.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src);
+                if (!await getRecipe()) {
+                	sendMessage('Не удалось найти рецепт: ' + document.querySelector("table[class='CraftingTarget']").firstElementChild.firstElementChild.firstElementChild.firstElementChild.src);
                 	return;
                 }
                 await craft();
@@ -270,8 +270,8 @@ async function craft() {
 var currentRecept = {};
 
 //Узнаёт какой щас рецепт
-async function getRecept() {
-    let image_base64 = await toDataURL(document.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src);
+async function getRecipe() {
+    let image_base64 = await toDataURL(document.querySelector("table[class='CraftingTarget']").firstElementChild.firstElementChild.firstElementChild.firstElementChild.src);
     if (image_base64 === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAGFBMVEUAAACfhE1BNCFpVDMhGQs/LQ5iTSx8Yj6Dkc6FAAAAAXRSTlMAQObYZgAAAE9JREFUeF69yDERgEAMRFEsxEIsnIVvYS2cBewzhIIU2Y7hF5nNO74pWmsGFaCQA7g/EA5aDhRSXQcQIAgcvBlYrRmyN0K197M9nL9ApoMLLkoqo8izD4QAAAAASUVORK5CYII=") {
         currentRecept.sign = true;
         return true;

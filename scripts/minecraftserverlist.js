@@ -27,7 +27,9 @@ function vote () {
 				}
 				let nick = getNickName(result.AVMRprojectsMinecraftServerList);
 		        if (nick == null || nick == "") return;
+		        document.querySelector("#ignn").click();
                 document.querySelector("#ignn").value = nick;
+                document.querySelector("#ignn").click();
                 setTimeout(() => document.querySelector("#voteform > input.buttonsmall.pointer.green.size10").click(), 3000);
 			} catch (e) {
 				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
