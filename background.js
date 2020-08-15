@@ -740,10 +740,8 @@ async function silentVote(project) {
 				endVote(doc.querySelector("#Content > div.Error").textContent, null, project);
 				return;
 			}
-
-			let test = doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img");
             
-            if (!await getRecept(doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com'))) {
+            if (!await getRecept(doc.querySelector("table[class='CraftingTarget']").firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com'))) {
                	endVote('Не удалось найти рецепт: ' + doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com'), null, project);
                	return;
             }
