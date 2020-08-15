@@ -18,10 +18,10 @@ function vote () {
 		}
 		settingsStorage.get('AVMRprojectsPlanetMinecraft', function(result) {
 			try {
-				if (document.querySelector("#center > div > h1").textContent.includes('Successfully voted')) {
+				if (document.querySelector("#center > div > h1") != null && document.querySelector("#center > div > h1").textContent.includes('Successfully voted')) {
 					sendMessage('successfully');
 					return;
-				} else if (document.querySelector("#center > div > h1").includes('You already voted')) {
+				} else if (document.querySelector("#center > div > h1") != null && document.querySelector("#center > div > h1").textContent.includes('You already voted')) {
                     sendMessage('later');
                     return;
 				}
@@ -42,7 +42,7 @@ function vote () {
 
 function getNickName(projects) {
     for (project of projects) {
-        if (project.FairTop && (document.URL.startsWith('https://www.planetminecraft.com/server/' + project.id))) {
+        if (project.PlanetMinecraft && (document.URL.startsWith('https://www.planetminecraft.com/server/' + project.id))) {
             return project.nick;
         }
     }

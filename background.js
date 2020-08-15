@@ -137,7 +137,7 @@ function checkVote() {
 			if (proj.time == null || proj.time < (Date.now() - (43200000/*+12 часов*/))) {
                 checkOpen(proj);
 			}
-	    } else if (proj.MinecraftMp) {
+	    } else if (proj.MinecraftMp || proj.PlanetMinecraft) {
             let timeEST = new Date(Date.now() - 18000000/*- 5 часов*/);
             let date = (timeEST.getUTCMonth() + 1) + '/' + timeEST.getUTCDate() + '/' + timeEST.getUTCFullYear();
             let hourse = timeEST.getUTCHours();
@@ -712,6 +712,8 @@ async function silentVote(project) {
             let html = await response.text();
             let doc = new DOMParser().parseFromString(html, "text/html");
 
+            doc.baseURI = 'https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id;
+
             if (doc.querySelector("#Content > div.Error") != null) {
 				if (doc.querySelector("#Content > div.Error").textContent.includes('You did not complete the crafting table correctly')) {
 					endVote('Не удалось пройти капчу', null, project);
@@ -738,9 +740,11 @@ async function silentVote(project) {
 				endVote(doc.querySelector("#Content > div.Error").textContent, null, project);
 				return;
 			}
+
+			let test = doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img");
             
-            if (!await getRecept(doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src)) {
-               	endVote('Не удалось найти рецепт: ' + doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src, null, project);
+            if (!await getRecept(doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com'))) {
+               	endVote('Не удалось найти рецепт: ' + doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com'), null, project);
                	return;
             }
             await craft(doc.querySelector("#Content > form > table > tbody > tr:nth-child(2) > td > table").getElementsByTagName('img'));
@@ -912,7 +916,7 @@ async function endVote(message, sender, project) {
             let timeMoscow = new Date(Date.now() + 10800000/*+3 часа*/);
             time = (timeMoscow.getUTCMonth() + 1) + '/' + timeMoscow.getUTCDate() + '/' + timeMoscow.getUTCFullYear();
             project.time = time;
-        } else if (project.MinecraftMp) {
+        } else if (project.MinecraftMp || project.PlanetMinecraft) {
             let timeEST = new Date(Date.now() - 18000000/*-5 часов*/);
             time = (timeEST.getUTCMonth() + 1) + '/' + timeEST.getUTCDate() + '/' + timeEST.getUTCFullYear();
             project.time = time;
@@ -1167,7 +1171,7 @@ async function craft(inv) {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это дубовая доска
-            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==") {
+            if (await toDataURL(element.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[0] = inventoryCount;
@@ -1188,14 +1192,13 @@ async function craft(inv) {
                 	content[5] = inventoryCount;
                 }
             //Если это палка
-            } else if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
+            } else if (await toDataURL(element.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
                 countRecept2++;
                 if (countRecept2 == 1) {
                 	content[7] = inventoryCount;
                 }
             }
     	}
-    	recalculate();
     	return;
     }
     if (currentRecept.ironSword) {
@@ -1204,7 +1207,7 @@ async function craft(inv) {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это железный слиток
-            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAIVBMVEUAAADY2NhERESWlpY1NTVycnJoaGioqKj///+CgoJ/f3/RLsQ9AAAAAXRSTlMAQObYZgAAAGRJREFUeF6tyjERADEIRNFYwAIWsICFWIgFLGAhFlB5yXAMBZTZ7r/Z8XaILWShCDaQpQAgWCHqpksFJI1cZ9yAUhSdtQAURXN2ACD21+xhbzHPxcyjwhW7Z68CLhZVICQr4ek+KDhG7bVD+wwAAAAASUVORK5CYII=") {
+            if (await toDataURL(element.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAIVBMVEUAAADY2NhERESWlpY1NTVycnJoaGioqKj///+CgoJ/f3/RLsQ9AAAAAXRSTlMAQObYZgAAAGRJREFUeF6tyjERADEIRNFYwAIWsICFWIgFLGAhFlB5yXAMBZTZ7r/Z8XaILWShCDaQpQAgWCHqpksFJI1cZ9yAUhSdtQAURXN2ACD21+xhbzHPxcyjwhW7Z68CLhZVICQr4ek+KDhG7bVD+wwAAAAASUVORK5CYII=") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[1] = inventoryCount;
@@ -1213,14 +1216,13 @@ async function craft(inv) {
                 	content[4] = inventoryCount;
                 }
             //Если это палка
-            } else if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
+            } else if (await toDataURL(element.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
                 countRecept2++;
                 if (countRecept2 == 1) {
                 	content[7] = inventoryCount;
                 }
             }
     	}
-    	recalculate();
     	return;
     }
     if (currentRecept.diamondPickaxe) {
@@ -1229,7 +1231,7 @@ async function craft(inv) {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это палка
-            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
+            if (await toDataURL(element.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[4] = inventoryCount;
@@ -1238,7 +1240,7 @@ async function craft(inv) {
                 	content[7] = inventoryCount;
                 }
             //Если это алмаз
-            } else if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIVBMVEUAAAAw270be2vR+vOi9udK7dEglYGM9OL///8szbEMNzBqdBtcAAAAAXRSTlMAQObYZgAAAHJJREFUeNrNzUEOAjEMQ1FaE0/D/Q9MM4pkduCu+KtIflIe/9arc4Hm1RVxgObnHTCGyHegGah5rdidgRpxF6EnvwDNV0dGnABAoJ9YAMgUmDsXxI5d7kgHFImYM7u6avbAGJ+AtEATMjvNBiiiNBvguDejWQ0NckD8GAAAAABJRU5ErkJggg==") {
+            } else if (await toDataURL(element.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIVBMVEUAAAAw270be2vR+vOi9udK7dEglYGM9OL///8szbEMNzBqdBtcAAAAAXRSTlMAQObYZgAAAHJJREFUeNrNzUEOAjEMQ1FaE0/D/Q9MM4pkduCu+KtIflIe/9arc4Hm1RVxgObnHTCGyHegGah5rdidgRpxF6EnvwDNV0dGnABAoJ9YAMgUmDsXxI5d7kgHFImYM7u6avbAGJ+AtEATMjvNBiiiNBvguDejWQ0NckD8GAAAAABJRU5ErkJggg==") {
                 countRecept2++;
                 if (countRecept2 == 1) {
                 	content[0] = inventoryCount;
@@ -1251,7 +1253,6 @@ async function craft(inv) {
                 }
             }
     	}
-    	recalculate();
     	return;
     }
     if (currentRecept.chest) {
@@ -1259,7 +1260,7 @@ async function craft(inv) {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это дубовая доска
-            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==") {
+            if (await toDataURL(element.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[0] = inventoryCount;
@@ -1284,7 +1285,6 @@ async function craft(inv) {
                 }
                 if (countRecept == 8) {
                 	content[8] = inventoryCount;
-                	recalculate();
                 	return;
                 }
             }
@@ -1296,13 +1296,13 @@ async function craft(inv) {
     	for (let element of inventory) {
     		inventoryCount++;
     		//Если это золотой слиток
-            if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAJFBMVEUAAAD//4tQUADe3gA8PADcdhOGhgD//wv////bohOurgC3YRCwQZoNAAAAAXRSTlMAQObYZgAAAGdJREFUeF6tykERwDAIRNFYwAIWsICFWKgFLMRCLMRCzZVCGQ5w7N7+mx3/DrGFLBTBBrIWAAhWiHrTpQLSirx03MCiKNK1ABRFc3YAIMdLd3ewt4EV8yhgcqbOq4DL+c4VQrISft0DreJJLwFPy8oAAAAASUVORK5CYII=") {
+            if (await toDataURL(element.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAJFBMVEUAAAD//4tQUADe3gA8PADcdhOGhgD//wv////bohOurgC3YRCwQZoNAAAAAXRSTlMAQObYZgAAAGdJREFUeF6tykERwDAIRNFYwAIWsICFWKgFLMRCLMRCzZVCGQ5w7N7+mx3/DrGFLBTBBrIWAAhWiHrTpQLSirx03MCiKNK1ABRFc3YAIMdLd3ewt4EV8yhgcqbOq4DL+c4VQrISft0DreJJLwFPy8oAAAAASUVORK5CYII=") {
                 countRecept++;
                 if (countRecept == 1) {
                 	content[1] = inventoryCount;
                 }
             //Если это палка
-            } else if (await toDataURL(element.src) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
+            } else if (await toDataURL(element.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')) === "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=") {
                 countRecept2++;
                 if (countRecept2 == 1) {
                 	content[4] = inventoryCount;
@@ -1312,7 +1312,6 @@ async function craft(inv) {
                 }
             }
     	}
-    	recalculate();
     	return;
     }
 }
@@ -1519,44 +1518,6 @@ v3.0.0
 - MinecraftIpList
 
 Планируется:
-Локализация под разные языки, первый язык: English
-Добавить следующие топы:
-https://www.planetminecraft.com/
-фоновая капча
-раз в день
-можно голосовать за все проекты разом
-
-https://topg.org/
-фоновая капча
-раз в 12 часов, время сбрасывается через 12 часов с момента голосования
-можно голосовать за все проекты разом
-
-https://minecraft-mp.com/
-фоновая капча
-время голосования сбрасывается в 00:00 по Северноамериканскому Восточному времени (UTC -5) тоесть от московского разница в -8 часов
-можно голосовать за все проекты разом
-
-https://minecraft-server-list.com/
-фоновая капча
-время голосования походу сбрасывается в 00:00 по UTC +2 тоесть от московского разница в +1 часов
-можно голосовать за все проекты разом
-
-https://www.serverpact.com/
-непонятная капча но стоит попробовать
-раз в 12 часов, время сбрасывается через 12 часов с момента голосования
-можно голосовать только за 1 проект раз в 12 часов
-
-https://www.minecraftiplist.com/
-прикольная капча но стоит попробовать (чуть посложнее чем предыдущая)
-раз в 24 часов, время сбрасывается через 24 часов с момента голосования
-можно голосовать только за 5 проектов раз в 24 часа
-попавшиеся рецепты:
-золотая лопата
-сундук (дубовый)
-алмазная кирка
-железный меч
-табличка (дубовая)
-
 https://ionmc.top/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)
 https://serveur-prive.net/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)
 https://minecraftservers.org/ не возможно обойти капчу

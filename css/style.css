@@ -256,7 +256,7 @@ p, form, label, details {
   position: fixed;
   left: 0;
   height: 100%;
-  width: 100px;
+  width: 101px;
   transition: 0.5s;
 }
 

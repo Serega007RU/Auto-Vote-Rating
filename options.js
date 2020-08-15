@@ -282,7 +282,7 @@ async function addProjectList(project, visually) {
             timeNew = new Date(date.getTime() - userTimezoneOffset);
         } else if (project.TopG) {
             timeNew = new Date(project.time + (43200000/*+12 часов*/));
-        } else if (project.MinecraftMp) {
+        } else if (project.MinecraftMp || project.PlanetMinecraft) {
             let date = new Date(new Date(project.time).getTime() + 18000000/*+5 часов*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
             let userTimezoneOffset = date.getTimezoneOffset() * 60000;
             timeNew = new Date(date.getTime() - userTimezoneOffset);
@@ -1542,17 +1542,17 @@ selectedTop.addEventListener("change", function() {
     } else if(selectedTop.value == "FairTop") {
        idSelector.innerHTML = label + dataInput + '<option value="354">FineMine</option><option value="1356">GrandGear</option><option value="731">PentaCraft</option><option value="1404">Pixelmon.PRO</option><option value="797">qoobworld</option><option value="6">SMARTYcraft</option></datalist>';
     } else if(selectedTop.value == "PlanetMinecraft") {
-       idSelector.innerHTML = label + input;
+       idSelector.innerHTML = label + dataInput + '<option value="legends-evolved">Legends Evolved</option></datalist>';
     } else if(selectedTop.value == "TopG") {
-       idSelector.innerHTML = label + input;
+       idSelector.innerHTML = label + dataInput + '<option value="405637">Hypixel</option><option value="414300">Mineplex</option><option value="512397">Legends Evolved</option></datalist>';
     } else if(selectedTop.value == "MinecraftMp") {
-       idSelector.innerHTML = label + input;
+       idSelector.innerHTML = label + dataInput + '<option value="81821">Hypixel</option><option value="234147">Legends Evolved</option></datalist>';
     } else if(selectedTop.value == "MinecraftServerList") {
-       idSelector.innerHTML = label + input;
+       idSelector.innerHTML = label + dataInput + '<option value="292028">Hypixel</option><option value="218820">Mineplex</option></datalist>';
     } else if(selectedTop.value == "ServerPact") {
-       idSelector.innerHTML = label + input;
+       idSelector.innerHTML = label + dataInput + '<option value="24604">Hypixel</option></datalist>';
     } else if(selectedTop.value == "MinecraftIpList") {
-       idSelector.innerHTML = label + input;
+       idSelector.innerHTML = label + dataInput + '<option value="2576">Hypixel</option></datalist>';
     }
 });
 
