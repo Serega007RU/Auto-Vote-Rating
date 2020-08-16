@@ -395,10 +395,16 @@
     "message": "The Extension is absolutely free!"
   },
   "feedback": {
-    "message": "To get into the list of projects for voting, report an error, or suggest the introduction of new functionality, write to "
+    "message": "If you have any questions or concerns, feel free to contact us at "
+  },
+  "feedback2": {
+    "message": "or support in "
   },
   "dmDiscord": {
-    "message": "Diskord DM"
+    "message": "discord"
+  },
+  "dmChromeWebStore": {
+    "message": "Chrome Web Store"
   },
   "internetRestored": {
     "message": "Internet Connection restored"
