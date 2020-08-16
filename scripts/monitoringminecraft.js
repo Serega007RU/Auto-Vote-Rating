@@ -22,6 +22,10 @@ function vote() {
 				return;
 			}
 			try {
+				if (document.querySelector("body") != null && document.querySelector("body").textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
+					sendMessage(document.querySelector("body").textContent);
+					return;
+				}
 				//Чистит куки
 				//document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/,"").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");});
 				//Проверяет есть ли кнопка "голосовать", если есть то голосует, если нет, ждёт когда страница полностью загрузица иначе отправляет ошибку

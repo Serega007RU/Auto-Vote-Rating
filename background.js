@@ -34,6 +34,8 @@ var cooldown = 1000;
 //Таймаут 5 минут на повторное голосование после ошибки (вычисляется из таймаунт проверки голосования (cooldown))
 var retryCoolDown = 300
 
+var clearCookieMonitoringMinecraft = true;
+
 //var countMonMc = 0;
 //var accessMonMc = true;
 //var timerMonMc;
@@ -245,7 +247,11 @@ async function checkOpen(project) {
 //	    }
 //    }
     if (project.MonitoringMinecraft) {
-    	await chrome.cookies.remove({"url": 'http://monitoringminecraft.ru/', "name": 'session'}, function(details) {});
+    	if (clearCookieMonitoringMinecraft) {
+    		await chrome.cookies.remove({"url": 'http://monitoringminecraft.ru/', "name": 'session'}, function(details) {});
+    	} else {
+    		clearCookieMonitoringMinecraft = true;
+    	}
     }
 
 	newWindow(project);
@@ -538,6 +544,10 @@ async function silentVote(project) {
 			}
             let html = await response.text();
             let doc = new DOMParser().parseFromString(html, "text/html");
+			if (doc.querySelector("body") != null && doc.querySelector("body").textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
+				sendMessage(doc.querySelector("body").textContent);
+				return;
+			}
 			if (doc.querySelector("input[name=player]") != null) {
                 await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
                 .then(response => response.text().then((html) => {
@@ -948,6 +958,9 @@ async function endVote(message, sender, project) {
         console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + time);
 	//Если ошибка
 	} else {
+		if (project.MonitoringMinecraft && message.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
+			clearCookieMonitoringMinecraft = false;
+		}
 		let sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote');
         console.error('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage);
 	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
