@@ -1563,6 +1563,7 @@ selectedTop.addEventListener("change", function() {
 //Локализация
 var elements = document.querySelectorAll('[data-resource]');
 elements.forEach(function(el) {
-    el.innerHTML = el.innerHTML + chrome.i18n.getMessage(el.getAttribute('data-resource'))
-})
-document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
+    el.innerHTML = el.innerHTML + chrome.i18n.getMessage(el.getAttribute('data-resource'));
+});
+document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'));
+document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'));

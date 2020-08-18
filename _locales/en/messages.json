@@ -527,5 +527,8 @@
   },
   "dailyBonus": {
     "message": "Daily bonus"
+  },
+  "donate": {
+    "message": "https://paypal.me/serega007ru"
   }
 }

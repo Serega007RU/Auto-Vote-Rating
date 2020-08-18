@@ -485,5 +485,8 @@
   },
   "dailyBonus": {
     "message": "Ежедневный бонус"
+  },
+  "donate": {
+    "message": "https://my.qiwi.com/Sergei-EV-7E02hYH"
   }
 }
