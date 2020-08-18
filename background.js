@@ -248,7 +248,7 @@ async function checkOpen(project) {
 //    }
     if (project.MonitoringMinecraft) {
     	if (clearCookieMonitoringMinecraft) {
-    		await chrome.cookies.remove({"url": 'http://monitoringminecraft.ru/', "name": 'session'}, function(details) {});
+    		await removeCookie('http://monitoringminecraft.ru/', 'session');
     	} else {
     		clearCookieMonitoringMinecraft = true;
     	}
@@ -260,7 +260,7 @@ async function checkOpen(project) {
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
 	if (project.vk != null && project.vk != '' && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-        chrome.cookies.set({"url": 'https://oauth.vk.com/', "name": 'remixsid', "value": project.vk}, function(cookie) {});
+        await setCookie('https://oauth.vk.com/', 'remixsid', project.vk);
     }
     let silentVoteMode = false;
     if (project.Custom) {
@@ -361,21 +361,20 @@ async function silentVote(project) {
                 endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
-			chrome.cookies.get({"url": 'https://topcraft.ru/', "name": 'csrftoken'}, async function(cookie) {
-				response = await fetch("https://topcraft.ru/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
-				if (!extractHostname(response.url).includes('topcraft.')) {
-					endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
-					return;
-				}
-				if (response.status == 400) {
-					endVote('later', null, project);
-					return;
-				} else if (!response.ok) {
-					endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
-					return;
-				}
-				endVote('successfully', null, project);
-			});
+			let cookie = await getCookie('https://topcraft.ru/', 'csrftoken');
+			response = await fetch("https://topcraft.ru/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
+			if (!extractHostname(response.url).includes('topcraft.')) {
+				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+				return;
+			}
+			if (response.status == 400) {
+				endVote('later', null, project);
+				return;
+			} else if (!response.ok) {
+				endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+				return;
+			}
+			endVote('successfully', null, project);
 	    }
 
 	    if (project.McTOP) {
@@ -393,21 +392,20 @@ async function silentVote(project) {
                 endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
-			chrome.cookies.get({"url": 'https://mctop.su/', "name": 'csrftoken'}, async function(cookie) {
-				response = await fetch("https://mctop.su/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
-				if (!extractHostname(response.url).includes('mctop.')) {
-					endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
-					return;
-				}
-				if (response.status == 400) {
-					endVote('later', null, project);
-					return;
-				} else if (!response.ok) {
-					endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
-					return;
-				}
-				endVote('successfully', null, project);
-			});
+			let cookie = await getCookie('https://mctop.su/', 'csrftoken');
+			response = await fetch("https://mctop.su/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
+			if (!extractHostname(response.url).includes('mctop.')) {
+				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+				return;
+			}
+			if (response.status == 400) {
+				endVote('later', null, project);
+				return;
+			} else if (!response.ok) {
+				endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+				return;
+			}
+			endVote('successfully', null, project);
 	    }
 
 	    if (project.MCRate) {
@@ -692,6 +690,28 @@ async function silentVote(project) {
 	    }
 
 	    if (project.MinecraftIpList) {
+            let cookie = await getCookie('https://www.minecraftiplist.com/', 'PHPSESSID');
+            if (cookie == null) {
+            	console.log('Нет куки PHPSESSID на MinecraftIpList, пытаюсь заставить его установить...');
+				await fetch("https://www.minecraftiplist.com/timezone.php?timezone=Europe/Moscow", {
+				  "headers": {
+					"accept": "*/*",
+					"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
+					"cache-control": "no-cache",
+					"pragma": "no-cache",
+					"sec-fetch-dest": "empty",
+					"sec-fetch-mode": "cors",
+					"sec-fetch-site": "same-origin",
+					"x-requested-with": "XMLHttpRequest"
+				  },
+				  "referrerPolicy": "no-referrer-when-downgrade",
+				  "body": null,
+				  "method": "GET",
+				  "mode": "cors",
+				  "credentials": "include"
+				});
+            }
+
 			let response = await fetch("https://www.minecraftiplist.com/index.php?action=vote&listingID=" + project.id, {
 			  "headers": {
 				"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -1023,6 +1043,7 @@ async function checkTime () {
         response = await fetch(`http://worldclockapi.com/api/json/utc/now`);
 	} catch (e) {
         console.error(chrome.i18n.getMessage('errorClock', e));
+        return;
 	}
     if (response.ok) { // если HTTP-статус в диапазоне 200-299
         // получаем тело ответа и сравниваем время
@@ -1058,6 +1079,30 @@ var filetime_to_unixtime = function(ft) {
     epoch_diff = 116444736000000000;
     rate_diff = 10000000;
     return parseInt((ft - epoch_diff)/rate_diff);
+}
+
+async function setCookie(url, name, value) {
+	return new Promise(resolve => {
+		chrome.cookies.set({'url': url, 'name': name, 'value': value}, function(details) {
+			resolve(details);
+		})
+	})
+}
+
+async function getCookie(url, name) {
+	return new Promise(resolve => {
+		chrome.cookies.get({'url': url, 'name': name}, function(cookie) {
+			resolve(cookie);
+		})
+	})
+}
+
+async function removeCookie(url, name) {
+	return new Promise(resolve => {
+		chrome.cookies.remove({'url': url, 'name': name}, function(details) {
+			resolve(details);
+		})
+	})
 }
 
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
@@ -1528,6 +1573,11 @@ v3.0.0
 - MinecraftServerList
 - ServerPact
 - MinecraftIpList
+
+v3.0.1
+Если выдало ошибку в проверке времени то дальше код не должен выполняться
+Исправление критической ошибки с MinecraftIpList, если нет куки PHPSESSID то голосование не происходило
+Оптимизация кода работы с куки
 
 Планируется:
 https://ionmc.top/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)

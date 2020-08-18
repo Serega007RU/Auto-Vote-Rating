@@ -48,6 +48,7 @@ function vote () {
                     sendMessage('successfully');
                     return;
 				}
+				if (document.querySelector("#InnerWrapper").innerText.includes('";')) return;
                 if (!await getRecipe()) {
                 	sendMessage('Не удалось найти рецепт: ' + document.querySelector("table[class='CraftingTarget']").firstElementChild.firstElementChild.firstElementChild.firstElementChild.src);
                 	return;

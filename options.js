@@ -584,7 +584,11 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         }
         let response;
         try {
-            response = await fetch(url);
+            if (project.MinecraftIpList) {
+                response = await fetch(url, {"credentials": "omit"});
+            } else {
+                response = await fetch(url);
+            }
         } catch (e) {
            if (e == 'TypeError: Failed to fetch') {
                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnectInternet') + '</div>', true, element);
