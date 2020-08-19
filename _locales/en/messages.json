@@ -4,7 +4,7 @@
     "description": "The title of the application, displayed in the web store."
   },
   "appDesc": {
-    "message": "Automatic voting on minecraft ratings for projects",
+    "message": "Automatic voting on minecraft ratings for projects or servers",
     "description": "The description of the application, displayed in the web store."
   },
   "addButton": {
