@@ -1,6 +1,6 @@
 Auto Vote Minecraft Rating - Chrome Extension
 
-Автоматическое голосование на топах таких как TopCraft, McTOP, MCRate, MinecraftRating, MonitoringMinecraft, FairTop, PlanetMinecraft, TopG, Minecraft-Mp, Minecraft-Server-List, ServerPact и MinecraftIpList для Minecraft проектов
+Автоматическое голосование на топах таких как TopCraft, McTOP, MCRate, MinecraftRating, MonitoringMinecraft, FairTop, PlanetMinecraft, TopG, Minecraft-Mp, Minecraft-Server-List, ServerPact и MinecraftIpList для Minecraft проектов или серверов
 
 Ссылка на рассширение от куда его можно поставить https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd
 

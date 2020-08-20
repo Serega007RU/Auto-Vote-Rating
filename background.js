@@ -35,6 +35,7 @@ var cooldown = 1000;
 var retryCoolDown = 300
 
 var clearCookieMonitoringMinecraft = true;
+var secondVoteMinecraftIpList = false;
 
 //var countMonMc = 0;
 //var accessMonMc = true;
@@ -200,13 +201,13 @@ async function checkOpen(project) {
     
     //Не позволяет открыть больше одной вкладки для одного топа
 	for (let value of queueProjects) {
-		//Не позволяет открыть больше одной вкладки для всех топов если включён режим голосования с нескольких аккаунтов вк для топов где используется вк
-		if (settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-            if (queueProjects.size > 0) return;
-        //Не позволяет открыть более одной вкладки для одного топа
-		} else {
+// 		//Не позволяет открыть больше одной вкладки для всех топов если включён режим голосования с нескольких аккаунтов вк для топов где используется вк
+// 		if (settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+//             if (queueProjects.size > 0) return;
+//         //Не позволяет открыть более одной вкладки для одного топа
+// 		} else {
 			if (getProjectName(value) == getProjectName(project)) return;
-		}
+// 		}
 	}
 
 	queueProjects.add(project);
@@ -259,9 +260,9 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
-	if (project.vk != null && project.vk != '' && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-        await setCookie('https://oauth.vk.com/', 'remixsid', project.vk);
-    }
+// 	if (project.vk != null && project.vk != '' && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+//         await setCookie('https://oauth.vk.com/', 'remixsid', project.vk);
+//     }
     let silentVoteMode = false;
     if (project.Custom) {
     	silentVoteMode = true;
@@ -690,27 +691,27 @@ async function silentVote(project) {
 	    }
 
 	    if (project.MinecraftIpList) {
-            let cookie = await getCookie('https://www.minecraftiplist.com/', 'PHPSESSID');
-            if (cookie == null) {
-            	console.log('Нет куки PHPSESSID на MinecraftIpList, пытаюсь заставить его установить...');
-				await fetch("https://www.minecraftiplist.com/timezone.php?timezone=Europe/Moscow", {
-				  "headers": {
-					"accept": "*/*",
-					"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
-					"cache-control": "no-cache",
-					"pragma": "no-cache",
-					"sec-fetch-dest": "empty",
-					"sec-fetch-mode": "cors",
-					"sec-fetch-site": "same-origin",
-					"x-requested-with": "XMLHttpRequest"
-				  },
-				  "referrerPolicy": "no-referrer-when-downgrade",
-				  "body": null,
-				  "method": "GET",
-				  "mode": "cors",
-				  "credentials": "include"
-				});
-            }
+//             let cookie = await getCookie('https://www.minecraftiplist.com/', 'PHPSESSID');
+//             if (cookie == null) {
+//             	console.log('Нет куки PHPSESSID на MinecraftIpList, пытаюсь заставить его установить...');
+// 				await fetch("https://www.minecraftiplist.com/timezone.php?timezone=Europe/Moscow", {
+// 				  "headers": {
+// 					"accept": "*/*",
+// 					"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
+// 					"cache-control": "no-cache",
+// 					"pragma": "no-cache",
+// 					"sec-fetch-dest": "empty",
+// 					"sec-fetch-mode": "cors",
+// 					"sec-fetch-site": "same-origin",
+// 					"x-requested-with": "XMLHttpRequest"
+// 				  },
+// 				  "referrerPolicy": "no-referrer-when-downgrade",
+// 				  "body": null,
+// 				  "method": "GET",
+// 				  "mode": "cors",
+// 				  "credentials": "include"
+// 				});
+//             }
 
 			let response = await fetch("https://www.minecraftiplist.com/index.php?action=vote&listingID=" + project.id, {
 			  "headers": {
@@ -742,7 +743,34 @@ async function silentVote(project) {
             let html = await response.text();
             let doc = new DOMParser().parseFromString(html, "text/html");
 
-            doc.baseURI = 'https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id;
+            if (doc.querySelector("#InnerWrapper > script:nth-child(10)") != null && doc.querySelector("table[class='CraftingTarget']") == null) {
+            	if (secondVoteMinecraftIpList) {
+            		secondVoteMinecraftIpList = false;
+            		endVote('Error time zone', null, project);
+            		return;
+            	}
+				await fetch("https://www.minecraftiplist.com/timezone.php?timezone=Europe/Moscow", {
+				  "headers": {
+					"accept": "*/*",
+					"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
+					"cache-control": "no-cache",
+					"pragma": "no-cache",
+					"sec-fetch-dest": "empty",
+					"sec-fetch-mode": "cors",
+					"sec-fetch-site": "same-origin",
+					"x-requested-with": "XMLHttpRequest"
+				  },
+				  "referrerPolicy": "no-referrer-when-downgrade",
+				  "body": null,
+				  "method": "GET",
+				  "mode": "cors",
+				  "credentials": "include"
+				});
+				secondVoteMinecraftIpList = true;
+				silentVote(project);
+				return;
+            }
+            if (secondVoteMinecraftIpList) secondVoteMinecraftIpList = false;
 
             if (doc.querySelector("#Content > div.Error") != null) {
 				if (doc.querySelector("#Content > div.Error").textContent.includes('You did not complete the crafting table correctly')) {
@@ -1407,7 +1435,7 @@ const toDataURL = url => fetch(url)
 
 /*
 История настроек:
-v1 
+v1 http://ipic.su/img/img7/fs/options1.1597930655.png
 v2 http://ipic.su/img/img7/fs/options2.1597852890.png
 v3 http://ipic.su/img/img7/fs/options3.1597852881.png
 v4 http://ipic.su/img/img7/fs/options4.1597852840.png
@@ -1587,6 +1615,9 @@ v3.0.1
 Исправление критической ошибки с MinecraftIpList, если нет куки PHPSESSID то голосование не происходило
 Оптимизация кода работы с куки
 Изменено описание расширения
+После rejected:
+Попытка заставить нормально работать MinecraftIpList в фоновом режиме (конфликт с timezone)
+Попытка отказаться от написания политики конфиденциальности: вырезан функционал MultiVote, теперь это будет доступно только в неофициальной версии разработчика
 
 Планируется:
 https://ionmc.top/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)

@@ -62,7 +62,7 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
     this.enabledSilentVote = enabledSilentVote;
     this.disabledCheckTime = disabledCheckTime;
     this.cooldown = cooldown;
-    this.multivote = multivote;
+//     this.multivote = multivote;
 };
 
 // Restores select box and checkbox state using the preferences
@@ -165,11 +165,11 @@ async function restoreOptions() {
         console.log(chrome.i18n.getMessage('firstAddSettings'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
     }
-    //Поддержка новых настроек с версии 2.1.0 (или же с 2.1.1 для Opera)
-    if (settings.multivote == null) {
-        settings.multivote = false;
-        await setValue('AVMRsettings', settings, false);
-    }
+//     //Поддержка новых настроек с версии 2.1.0 (или же с 2.1.1 для Opera)
+//     if (settings.multivote == null) {
+//         settings.multivote = false;
+//         await setValue('AVMRsettings', settings, false);
+//     }
 
     updateProjectList();
 
@@ -259,7 +259,7 @@ async function restoreOptions() {
     document.getElementById("enableSyncStorage").checked = settingsSync;
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
-    if (settings.multivote) addMultiVote();
+//     if (settings.multivote) addMultiVote();
 };
 
 //Добавить проект в список проекта
@@ -308,9 +308,9 @@ async function addProjectList(project, visually) {
     } else {
         getProjectList(project).push(project);
     }
-    if (settings.multivote && document.getElementById('tokenvk') != null && document.getElementById('tokenvk').value != null && document.getElementById('tokenvk').value != '') {
-        project.vk = document.getElementById('tokenvk').value;
-    }
+//     if (settings.multivote && document.getElementById('tokenvk') != null && document.getElementById('tokenvk').value != null && document.getElementById('tokenvk').value != '') {
+//         project.vk = document.getElementById('tokenvk').value;
+//     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
     //projects.push(project);
     //await setValue('AVMRprojects', projects, true);
@@ -496,7 +496,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     }
 
     forLoopAllProjects(function () {
-        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom && !settings.multivote) {
+        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom/* && !settings.multivote*/) {
             if (secondBonus === "") {
                 updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
             } else if (element != null) {
@@ -1172,11 +1172,11 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     } else {
                         document.getElementById("enabledSilentVote").value = 'disabled';
                     }
-                    if (document.getElementById("enableMulteVote") != null) {
-                        document.getElementById("enableMulteVote").checked = settings.multivote;
-                    } else if (settings.multivote) {
-                        addMultiVote();
-                    }
+//                     if (document.getElementById("enableMulteVote") != null) {
+//                         document.getElementById("enableMulteVote").checked = settings.multivote;
+//                     } else if (settings.multivote) {
+//                         addMultiVote();
+//                     }
 
                     await updateProjectList();
 
@@ -1320,6 +1320,7 @@ async function fastAdd() {
 }
 
 /*
+Данный функционал не доступен из-за отсутвия политики конфиденциальности и доступ только в версии разработчки
 Пока что в бета тестировании
 Документация по использованию режима MultiVote
 Что б работал этот режим должны быть удалены и очищены все куки с домена vk.com иначе будет выдавать ошибку авторизации,
@@ -1338,59 +1339,59 @@ async function fastAdd() {
 после голосования привязанный токен остаётся и не сбрасывается если к добавленному топу не было привязки токена
 */
 //Пока что данная настройка скрыта из-за нарушений правил топов
-var confirmWarn = false;
-function addMultiVote() {
-    if (!confirmWarn && !settings.multivote) {
-        console.warn(chrome.i18n.getMessage('warnMultiVote1'));
-        console.warn(chrome.i18n.getMessage('warnMultiVote2'));
-        console.log(chrome.i18n.getMessage('warnMultiVote3'));
-        confirmWarn = true;
-        return;
-    }
-    let el = document.querySelector("#settings > div > div.col-xl-6.col-lg-6.col-md-12.mb-3 > span:nth-child(28)");
-    if (el == null) return;
+// var confirmWarn = false;
+// function addMultiVote() {
+//     if (!confirmWarn && !settings.multivote) {
+//         console.warn(chrome.i18n.getMessage('warnMultiVote1'));
+//         console.warn(chrome.i18n.getMessage('warnMultiVote2'));
+//         console.log(chrome.i18n.getMessage('warnMultiVote3'));
+//         confirmWarn = true;
+//         return;
+//     }
+//     let el = document.querySelector("#settings > div > div.col-xl-6.col-lg-6.col-md-12.mb-3 > span:nth-child(28)");
+//     if (el == null) return;
 
-    let input = document.createElement('input');
-    input.setAttribute('class', 'checkbox');
-    input.setAttribute('type', 'checkbox');
-    input.setAttribute('name', 'checkbox');
-    input.setAttribute('id', 'enableMulteVote');
+//     let input = document.createElement('input');
+//     input.setAttribute('class', 'checkbox');
+//     input.setAttribute('type', 'checkbox');
+//     input.setAttribute('name', 'checkbox');
+//     input.setAttribute('id', 'enableMulteVote');
     
-    let label = document.createElement('label');
-    label.setAttribute('for', 'enableMulteVote');
-    label.setAttribute('id', 'enableMultiVote');
-    label.innerHTML = chrome.i18n.getMessage('enableMultiVote');
+//     let label = document.createElement('label');
+//     label.setAttribute('for', 'enableMulteVote');
+//     label.setAttribute('id', 'enableMultiVote');
+//     label.innerHTML = chrome.i18n.getMessage('enableMultiVote');
     
-    let br = document.createElement('br');
+//     let br = document.createElement('br');
     
 
-    let div = document.createElement('div');
-    div.setAttribute('class', 'form-group mb-1');
-    div.innerHTML = '<label data-resource="cooldown" for="cooldown">' + chrome.i18n.getMessage('tokenVK') + '</label>'
+//     let div = document.createElement('div');
+//     div.setAttribute('class', 'form-group mb-1');
+//     div.innerHTML = '<label data-resource="cooldown" for="cooldown">' + chrome.i18n.getMessage('tokenVK') + '</label>'
 
-    let inputToken = document.createElement('input');
-    inputToken.setAttribute('name', 'tokenvk');
-    inputToken.setAttribute('id', 'tokenvk');
-    inputToken.setAttribute('class', 'mb-2');
+//     let inputToken = document.createElement('input');
+//     inputToken.setAttribute('name', 'tokenvk');
+//     inputToken.setAttribute('id', 'tokenvk');
+//     inputToken.setAttribute('class', 'mb-2');
 
 
-    chrome.cookies.get({"url": 'https:/vk.com/', "name": 'remixsid'}, async function(cookie) {
-        if (cookie != null) {
-            inputToken.value = cookie.value;
-        }
-        el.after(inputToken);
-        el.after(div);
-        el.after(label);
-        el.after(input);
-        el.after(br);
+//     chrome.cookies.get({"url": 'https:/vk.com/', "name": 'remixsid'}, async function(cookie) {
+//         if (cookie != null) {
+//             inputToken.value = cookie.value;
+//         }
+//         el.after(inputToken);
+//         el.after(div);
+//         el.after(label);
+//         el.after(input);
+//         el.after(br);
 
-        document.getElementById('enableMulteVote').checked = settings.multivote;
-        document.getElementById('enableMulteVote').addEventListener('change', async function() {
-            settings.multivote = this.checked;
-            await setValue('AVMRsettings', settings, true);
-        });
-    });
-}
+//         document.getElementById('enableMulteVote').checked = settings.multivote;
+//         document.getElementById('enableMulteVote').addEventListener('change', async function() {
+//             settings.multivote = this.checked;
+//             await setValue('AVMRsettings', settings, true);
+//         });
+//     });
+// }
 
 var poput;
 function openPoput(url, reload) {
