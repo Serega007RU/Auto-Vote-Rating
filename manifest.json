@@ -22,5 +22,8 @@
    "permissions": [ "cookies", "storage", "notifications", "background", "\u003Call_urls>", "tabs"],
    "update_url": "https://clients2.google.com/service/update2/crx",
    "version": "3.0.1",
-   "default_locale": "ru"
+   "default_locale": "ru",
+   "web_accessible_resources": [
+      "options.html"
+   ]
 }
