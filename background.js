@@ -5,6 +5,9 @@ var projectsMCRate = [];
 var projectsMinecraftRating = [];
 var projectsMonitoringMinecraft = [];
 var projectsFairTop = [];
+var projectsIonMc = [];
+var projectsMinecraftServers = [];
+var projectsServeurPrive = [];
 var projectsPlanetMinecraft = [];
 var projectsTopG = [];
 var projectsMinecraftMp = [];
@@ -64,6 +67,12 @@ async function initializeConfig() {
     projectsMonitoringMinecraft = projectsMonitoringMinecraft.AVMRprojectsMonitoringMinecraft;
     projectsFairTop = await getValue('AVMRprojectsFairTop');
     projectsFairTop = projectsFairTop.AVMRprojectsFairTop;
+    projectsIonMc = await getValue('AVMRprojectsIonMc');
+    projectsIonMc = projectsIonMc.AVMRprojectsIonMc;
+    projectsMinecraftServers = await getValue('AVMRprojectsMinecraftServers');
+    projectsMinecraftServers = projectsMinecraftServers.AVMRprojectsMinecraftServers;
+    projectsServeurPrive = await getValue('AVMRprojectsServeurPrive');
+    projectsServeurPrive = projectsServeurPrive.AVMRprojectsServeurPrive;
     projectsPlanetMinecraft = await getValue('AVMRprojectsPlanetMinecraft');
     projectsPlanetMinecraft = projectsPlanetMinecraft.AVMRprojectsPlanetMinecraft;
     projectsTopG = await getValue('AVMRprojectsTopG');
@@ -89,6 +98,13 @@ async function initializeConfig() {
         projectsMinecraftServerList = [];
         projectsServerPact = [];
         projectsMinecraftIpList = [];
+    }
+
+    //Если пользователь обновился с версии 3.0.1
+    if (projectsIonMc == null || !(typeof projectsIonMc[Symbol.iterator] === 'function')) {
+        projectsIonMc = [];
+        projectsMinecraftServers = [];
+        projectsServeurPrive = [];
     }
 
     if (settings && settings.cooldown && Number.isInteger(settings.cooldown)) cooldown = settings.cooldown;
@@ -278,6 +294,21 @@ async function newWindow(project) {
 			}
 			if (project.FairTop) {
 				chrome.tabs.create({"url":"https://fairtop.in/project/" + project.id + "/", "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.IonMc) {
+				chrome.tabs.create({"url":"https://ionmc.top/vote/" + project.id, "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.MinecraftServers) {
+				chrome.tabs.create({"url":"https://minecraftservers.org/vote/" + project.id, "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.ServeurPrive) {
+				chrome.tabs.create({"url":"https://serveur-prive.net/minecraft/" + project.id + "/vote", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
@@ -856,6 +887,9 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 		if (openedProjects.get(tab.id).MinecraftRating) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftrating.js"});
 		if (openedProjects.get(tab.id).MonitoringMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/monitoringminecraft.js"});
 		if (openedProjects.get(tab.id).FairTop) chrome.tabs.executeScript(tabid, {file: "scripts/fairtop.js"});
+		if (openedProjects.get(tab.id).IonMc) chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js"});
+		if (openedProjects.get(tab.id).MinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js"});
+		if (openedProjects.get(tab.id).ServeurPrive) chrome.tabs.executeScript(tabid, {file: "scripts/serveurprive.js"});
 		if (openedProjects.get(tab.id).PlanetMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/planetminecraft.js"});
 		if (openedProjects.get(tab.id).TopG) chrome.tabs.executeScript(tabid, {file: "scripts/topg.js"});
 		if (openedProjects.get(tab.id).MinecraftMp) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftmp.js"});
@@ -984,6 +1018,9 @@ function getProjectName(project) {
 	if (project.MinecraftRating) return "MinecraftRating";
 	if (project.MonitoringMinecraft) return "MonitoringMinecraft";
 	if (project.FairTop) return "FairTop";
+	if (project.IonMc) return "IonMc";
+	if (project.MinecraftServers) return "MinecraftServers";
+	if (project.ServeurPrive) return "ServeurPrive";
 	if (project.PlanetMinecraft) return "PlanetMinecraft";
 	if (project.TopG) return "TopG";
 	if (project.MinecraftMp) return "MinecraftMp";
@@ -1000,6 +1037,9 @@ function getProjectList(project) {
     if (project.MinecraftRating) return projectsMinecraftRating;
     if (project.MonitoringMinecraft) return projectsMonitoringMinecraft;
     if (project.FairTop) return projectsFairTop;
+    if (project.IonMc) return projectsIonMc;
+    if (project.MinecraftServers) return projectsMinecraftServers;
+    if (project.ServeurPrive) return projectsServeurPrive;
     if (project.PlanetMinecraft) return projectsPlanetMinecraft;
     if (project.TopG) return projectsTopG;
     if (project.MinecraftMp) return projectsMinecraftMp;
@@ -1120,6 +1160,15 @@ function forLoopAllProjects (fuc) {
     for (proj of projectsFairTop) {
         fuc();
     }
+    for (proj of projectsIonMc) {
+        fuc();
+    }
+    for (proj of projectsMinecraftServers) {
+        fuc();
+    }
+    for (proj of projectsServeurPrive) {
+        fuc();
+    }
     for (proj of projectsPlanetMinecraft) {
         fuc();
     }
@@ -1172,6 +1221,9 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         if (key == 'AVMRprojectsMinecraftRating') projectsMinecraftRating = storageChange.newValue;
         if (key == 'AVMRprojectsMonitoringMinecraft') projectsMonitoringMinecraft = storageChange.newValue;
         if (key == 'AVMRprojectsFairTop') projectsFairTop = storageChange.newValue;
+        if (key == 'AVMRprojectsIonMc') projectsIonMc = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftServers') projectsMinecraftServers = storageChange.newValue;
+        if (key == 'AVMRprojectsServeurPrive') projectsServeurPrive = storageChange.newValue;
         if (key == 'AVMRprojectsPlanetMinecraft') projectsPlanetMinecraft = storageChange.newValue;
         if (key == 'AVMRprojectsTopG') projectsTopG = storageChange.newValue;
         if (key == 'AVMRprojectsMinecraftMp') projectsMinecraftMp = storageChange.newValue;
@@ -1581,9 +1633,16 @@ v3.1.0
 Возвращение MultiVote но теперь пользователя предупреждает что токен ВКонтакте хранится в НЕзашифрованном виде и в настройках больше не читает куки токена ВКонтакте
 
 Планируется:
-https://ionmc.top/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)
-https://serveur-prive.net/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)
+https://ionmc.top/
+можно голосовать за все проекты разом
+
+https://serveur-prive.net/
+можно голосовать за все проекты разом
+время голосования сбрасывается в 00:00 по МСК (учитывается часовой пояс?)
+
 https://minecraftservers.org/ не возможно обойти капчу
+можно голосовать только за 1 проект
+
 https://www.minetrack.net/ на момент проверки сайт лежал
 https://www.minestatus.net/ фоновая капча и потом этот сайт лёг
 

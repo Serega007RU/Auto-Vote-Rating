@@ -228,13 +228,13 @@
     "message": "You have already added this project"
   },
   "oneProjectFairTop": {
-    "message": "You can only vote for 1 project on FairTop. to vote for multiple projects, prohibit the site FairTop.in save cookies, if you don't know how to do it - Google it) If you do not allow saving cookies, disable verification when adding a project in the advanced settings and try adding this project again. Be careful with the project ID when adding a project with verification disabled, the extension may accept a project with a non-existent ID."
+    "message": "You can only vote for 1 project on FairTop at a time. to vote for multiple projects, prohibit the site FairTop.in save cookies, if you don't know how to do it - Google it If you do not allow saving cookies, disable verification when adding a project in the advanced settings and try adding this project again. Be careful with the project ID when adding a project with verification disabled, the extension may accept a project with a non-existent ID."
   },
   "oneProjectMinecraftIpList": {
     "message": "On MinecraftIpList, you can only vote for 5 projects at a time."
   },
   "oneProject": {
-    "message": "On $project$, you can only vote for 1 project< / div>",
+    "message": "On $project$, you can only vote for 1 project at a time</div>",
     "placeholders": {
       "project": {
         "content": "$1"
