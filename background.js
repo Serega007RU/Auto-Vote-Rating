@@ -1,5 +1,4 @@
 //Список проектов
-//var projects = [];
 var projectsTopCraft = [];
 var projectsMcTOP = [];
 var projectsMCRate = [];
@@ -36,10 +35,6 @@ var retryCoolDown = 300
 
 var clearCookieMonitoringMinecraft = true;
 var secondVoteMinecraftIpList = false;
-
-//var countMonMc = 0;
-//var accessMonMc = true;
-//var timerMonMc;
 
 //Инициализация настроек расширения
 initializeConfig();
@@ -171,10 +166,7 @@ function checkVote() {
 async function checkOpen(project) {
 	//Если нет подключения к интернету
 	if (!navigator.onLine && online) {
-		//console.warn('Где мой интернет?', 'Мне нужно проголосовать но у тебя нет подключения к интернету! Жду когда он появится...');
-        //sendNotification('Где мой интернет?', 'Мне нужно проголосовать но у тебя нет подключения к интернету! Жду когда он появится...');
         online = true;
-        //return;
     } else if (!online) {
     	return;
     }
@@ -201,13 +193,13 @@ async function checkOpen(project) {
     
     //Не позволяет открыть больше одной вкладки для одного топа
 	for (let value of queueProjects) {
-// 		//Не позволяет открыть больше одной вкладки для всех топов если включён режим голосования с нескольких аккаунтов вк для топов где используется вк
-// 		if (settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-//             if (queueProjects.size > 0) return;
-//         //Не позволяет открыть более одной вкладки для одного топа
-// 		} else {
+		//Не позволяет открыть больше одной вкладки для всех топов если включён режим голосования с нескольких аккаунтов вк для топов где используется вк
+		if (settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+            if (queueProjects.size > 0) return;
+        //Не позволяет открыть более одной вкладки для одного топа
+		} else {
 			if (getProjectName(value) == getProjectName(project)) return;
-// 		}
+		}
 	}
 
 	queueProjects.add(project);
@@ -225,28 +217,6 @@ async function checkOpen(project) {
 	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('startedAutoVote'));
     if (!settings.disabledNotifStart) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('startedAutoVote'));
 
-    //Не позволяет голосовать за MonitoringMinecraft больше чем 1-го раза за 10 мигут (это ограничение самого MonMc)
-//    if (project.MonitoringMinecraft) {
-//    	if (countMonMc == 1) {
-//    		console.log('[MonitoringMinecraft] Достигнуто ограничение голосований за 10 минут, расширение продолжит голосовать на этом топе по истечении этого времени');
-//    		clearTimeout(timerMonMc);
-//    		timerMonMc = setTimeout(() => {
-//                countMonMc = 0;
-//                console.log('[MonitoringMinecraft] Ограничение голосования за 10 минут сброшено');
-//    		}, 970000);
-//            countMonMc++;
-//            return;
-//	    } else if (countMonMc == 2) {
-//	    	return;
-//	    } else {
-//	    	clearTimeout(timerMonMc);
-//    		timerMonMc = setTimeout(() => {
-//                countMonMc = 0;
-//                console.log('[MonitoringMinecraft] Ограничение голосования за 10 минут сброшено');
-//    		}, 610000);
-//	    	countMonMc++;
-//	    }
-//    }
     if (project.MonitoringMinecraft) {
     	if (clearCookieMonitoringMinecraft) {
     		await removeCookie('http://monitoringminecraft.ru/', 'session');
@@ -260,9 +230,9 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
-// 	if (project.vk != null && project.vk != '' && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-//         await setCookie('https://oauth.vk.com/', 'remixsid', project.vk);
-//     }
+	if (settings.multivote && project.vk != null && project.vk != '' && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+        await setCookie('https://oauth.vk.com/', 'remixsid', project.vk);
+    }
     let silentVoteMode = false;
     if (project.Custom) {
     	silentVoteMode = true;
@@ -631,8 +601,8 @@ async function silentVote(project) {
                 return pass;
             }
             let captchaPass = generatePass(32);
-              let captcha = await fetch("https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php", {
-			    "headers": {
+            let captcha = await fetch("https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php", {
+			  "headers": {
 			 	"accept": "application/json, text/javascript, */*; q=0.01",
 				"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
 				"cache-control": "no-cache",
@@ -654,19 +624,20 @@ async function silentVote(project) {
 				endVote('Error in captcha', null, project);
 				return;
 			}
+
 			let response2 = await fetch("https://www.serverpact.com/vote-" + project.id, {
-			    "headers": {
-			        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-			        "accept-language": "ru,en;q=0.9,en-US;q=0.8",
-				    "cache-control": "no-cache",
-				    "content-type": "application/x-www-form-urlencoded",
-				    "pragma": "no-cache",
-				    "sec-fetch-dest": "document",
-				    "sec-fetch-mode": "navigate",
-				    "sec-fetch-site": "same-origin",
-				    "sec-fetch-user": "?1",
-				    "upgrade-insecure-requests": "1"
-			    },
+				"headers": {
+					"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+					"accept-language": "ru,en;q=0.9,en-US;q=0.8",
+					"cache-control": "no-cache",
+					"content-type": "application/x-www-form-urlencoded",
+					"pragma": "no-cache",
+					"sec-fetch-dest": "document",
+					"sec-fetch-mode": "navigate",
+					"sec-fetch-site": "same-origin",
+					"sec-fetch-user": "?1",
+					"upgrade-insecure-requests": "1"
+				},
 			    "referrerPolicy": "no-referrer-when-downgrade",
 			    "body": doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(2)").name + "=" + doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(2)").value + "&" + captchaPass + "=&minecraftusername=" + project.nick + "&voten=Send+your+vote",
 			    "method": "POST",
@@ -691,28 +662,6 @@ async function silentVote(project) {
 	    }
 
 	    if (project.MinecraftIpList) {
-//             let cookie = await getCookie('https://www.minecraftiplist.com/', 'PHPSESSID');
-//             if (cookie == null) {
-//             	console.log('Нет куки PHPSESSID на MinecraftIpList, пытаюсь заставить его установить...');
-// 				await fetch("https://www.minecraftiplist.com/timezone.php?timezone=Europe/Moscow", {
-// 				  "headers": {
-// 					"accept": "*/*",
-// 					"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
-// 					"cache-control": "no-cache",
-// 					"pragma": "no-cache",
-// 					"sec-fetch-dest": "empty",
-// 					"sec-fetch-mode": "cors",
-// 					"sec-fetch-site": "same-origin",
-// 					"x-requested-with": "XMLHttpRequest"
-// 				  },
-// 				  "referrerPolicy": "no-referrer-when-downgrade",
-// 				  "body": null,
-// 				  "method": "GET",
-// 				  "mode": "cors",
-// 				  "credentials": "include"
-// 				});
-//             }
-
 			let response = await fetch("https://www.minecraftiplist.com/index.php?action=vote&listingID=" + project.id, {
 			  "headers": {
 				"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -1429,6 +1378,18 @@ const toDataURL = url => fetch(url)
     reader.readAsDataURL(blob)
 }))
 
+//Поддержка для мобильных устройсв, заставляем думать ServerPact и MinecraftIpList что мы с компьютера а не с телефона
+handler = function(n) {
+    for (var t = 0, i = n.requestHeaders.length; t < i; ++t) {
+       	if (n.requestHeaders[t].name === "User-Agent" && (n.requestHeaders[t].value.includes('Mobile') || n.requestHeaders[t].value.includes('Android') || n.requestHeaders[t].value.includes('iPhone'))) {
+            n.requestHeaders[t].value = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36";
+            break;
+        }
+    }
+    return {requestHeaders: n.requestHeaders}
+};
+chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serverpact.com/*", "*://www.minecraftiplist.com/*"]}, ["blocking", "requestHeaders"]);
+
 /*
 История настроек:
 v1 http://ipic.su/img/img7/fs/options1.1597930655.png
@@ -1614,6 +1575,10 @@ v3.0.1
 После rejected:
 Попытка заставить нормально работать MinecraftIpList в фоновом режиме (конфликт с timezone)
 Попытка отказаться от написания политики конфиденциальности: вырезан функционал MultiVote, теперь это будет доступно только в неофициальной версии разработчика
+
+v3.1.0
+Теперь нет ошибок если автоголосовать с телефона на ServerPact и MinecraftIpList
+Возвращение MultiVote но теперь пользователя предупреждает что токен ВКонтакте хранится в НЕзашифрованном виде и в настройках больше не читает куки токена ВКонтакте
 
 Планируется:
 https://ionmc.top/ под вопросом насчёт капчи (нужно браузер будет запускать с отключённой сетевой защитой)

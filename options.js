@@ -62,7 +62,7 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
     this.enabledSilentVote = enabledSilentVote;
     this.disabledCheckTime = disabledCheckTime;
     this.cooldown = cooldown;
-//     this.multivote = multivote;
+    this.multivote = multivote;
 };
 
 // Restores select box and checkbox state using the preferences
@@ -165,11 +165,11 @@ async function restoreOptions() {
         console.log(chrome.i18n.getMessage('firstAddSettings'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
     }
-//     //Поддержка новых настроек с версии 2.1.0 (или же с 2.1.1 для Opera)
-//     if (settings.multivote == null) {
-//         settings.multivote = false;
-//         await setValue('AVMRsettings', settings, false);
-//     }
+    //Поддержка новых настроек с версии 2.1.0 (или же с 2.1.1 для Opera)
+    if (settings.multivote == null) {
+        settings.multivote = false;
+        await setValue('AVMRsettings', settings, false);
+    }
 
     updateProjectList();
 
@@ -259,7 +259,7 @@ async function restoreOptions() {
     document.getElementById("enableSyncStorage").checked = settingsSync;
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
-//     if (settings.multivote) addMultiVote();
+    if (settings.multivote) addMultiVote();
 };
 
 //Добавить проект в список проекта
@@ -308,9 +308,9 @@ async function addProjectList(project, visually) {
     } else {
         getProjectList(project).push(project);
     }
-//     if (settings.multivote && document.getElementById('tokenvk') != null && document.getElementById('tokenvk').value != null && document.getElementById('tokenvk').value != '') {
-//         project.vk = document.getElementById('tokenvk').value;
-//     }
+    if (settings.multivote && document.getElementById('tokenvk') != null && document.getElementById('tokenvk').value != null && document.getElementById('tokenvk').value != '') {
+        project.vk = document.getElementById('tokenvk').value;
+    }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
     //projects.push(project);
     //await setValue('AVMRprojects', projects, true);
@@ -450,9 +450,6 @@ function updateProjectList() {
         document.getElementById("CustomList").nextElementSibling.remove();
     }
     forLoopAllProjects(function () {addProjectList(proj, true);}, true);
-    //for (project of projects) {
-    //    addProjectList(project, true);
-    //}
 }
 
 //Слушатель кнопки "Добавить"
@@ -496,7 +493,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     }
 
     forLoopAllProjects(function () {
-        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom/* && !settings.multivote*/) {
+        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom && !settings.multivote) {
             if (secondBonus === "") {
                 updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
             } else if (element != null) {
@@ -676,9 +673,6 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             }
 
             if (response2.ok) {
-//                 if (project.TopCraft) url2 = "https://topcraft.ru/accounts/vk/login/";
-//                 if (project.McTOP) url2 = "https://mctop.su/accounts/vk/login/";
-//                 if (project.MonitoringMinecraft) url2 = "http://monitoringminecraft.ru/top/" + project.id + "/vote"
                 updateStatusAdd('<div style="color:#f44336;">' + chrome.i18n.getMessage('authVK', getProjectName(project)) + '</div> <button id="authvk"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><path d="M5 12h13M12 5l7 7-7 7"/></svg>' + chrome.i18n.getMessage('authButton') + '</button>', true, element);
                 document.getElementById('authvk').addEventListener('click', function() {
                     if (element != null) {
@@ -1172,11 +1166,11 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     } else {
                         document.getElementById("enabledSilentVote").value = 'disabled';
                     }
-//                     if (document.getElementById("enableMulteVote") != null) {
-//                         document.getElementById("enableMulteVote").checked = settings.multivote;
-//                     } else if (settings.multivote) {
-//                         addMultiVote();
-//                     }
+                    if (document.getElementById("enableMulteVote") != null) {
+                        document.getElementById("enableMulteVote").checked = settings.multivote;
+                    } else if (settings.multivote) {
+                        addMultiVote();
+                    }
 
                     await updateProjectList();
 
@@ -1320,8 +1314,8 @@ async function fastAdd() {
 }
 
 /*
-Данный функционал не доступен из-за отсутвия политики конфиденциальности и доступ только в версии разработчки
 Пока что в бета тестировании
+Данная настройка скрыта из-за нарушений правил топов
 Документация по использованию режима MultiVote
 Что б работал этот режим должны быть удалены и очищены все куки с домена vk.com иначе будет выдавать ошибку авторизации,
 нет не получиться одновременно сидеть в вконтакте и голосовать с нескольких аккаунтов,
@@ -1338,9 +1332,8 @@ async function fastAdd() {
 Неисправленная проблема:
 после голосования привязанный токен остаётся и не сбрасывается если к добавленному топу не было привязки токена
 */
-//Пока что данная настройка скрыта из-за нарушений правил топов
 // var confirmWarn = false;
-// function addMultiVote() {
+function addMultiVote() {
 //     if (!confirmWarn && !settings.multivote) {
 //         console.warn(chrome.i18n.getMessage('warnMultiVote1'));
 //         console.warn(chrome.i18n.getMessage('warnMultiVote2'));
@@ -1348,50 +1341,45 @@ async function fastAdd() {
 //         confirmWarn = true;
 //         return;
 //     }
-//     let el = document.querySelector("#settings > div > div.col-xl-6.col-lg-6.col-md-12.mb-3 > span:nth-child(28)");
-//     if (el == null) return;
+    let el = document.querySelector("#settings > div > div.col-xl-6.col-lg-6.col-md-12.mb-3 > span:nth-child(28)");
+    if (el == null) return;
 
-//     let input = document.createElement('input');
-//     input.setAttribute('class', 'checkbox');
-//     input.setAttribute('type', 'checkbox');
-//     input.setAttribute('name', 'checkbox');
-//     input.setAttribute('id', 'enableMulteVote');
+    let input = document.createElement('input');
+    input.setAttribute('class', 'checkbox');
+    input.setAttribute('type', 'checkbox');
+    input.setAttribute('name', 'checkbox');
+    input.setAttribute('id', 'enableMulteVote');
     
-//     let label = document.createElement('label');
-//     label.setAttribute('for', 'enableMulteVote');
-//     label.setAttribute('id', 'enableMultiVote');
-//     label.innerHTML = chrome.i18n.getMessage('enableMultiVote');
+    let label = document.createElement('label');
+    label.setAttribute('for', 'enableMulteVote');
+    label.setAttribute('id', 'enableMultiVote');
+    label.innerHTML = chrome.i18n.getMessage('enableMultiVote');
     
-//     let br = document.createElement('br');
+    let br = document.createElement('br');
+    let br2 = document.createElement('br');
     
+    let div = document.createElement('div');
+    div.setAttribute('class', 'form-group mb-1');
+    div.innerHTML = '<label data-resource="cooldown" for="cooldown">' + chrome.i18n.getMessage('tokenVK') + '</label>'
 
-//     let div = document.createElement('div');
-//     div.setAttribute('class', 'form-group mb-1');
-//     div.innerHTML = '<label data-resource="cooldown" for="cooldown">' + chrome.i18n.getMessage('tokenVK') + '</label>'
+    let inputToken = document.createElement('input');
+    inputToken.setAttribute('name', 'tokenvk');
+    inputToken.setAttribute('id', 'tokenvk');
+    inputToken.setAttribute('class', 'mb-2');
+    
+    el.after(chrome.i18n.getMessage('unecryptedTokenVK'));
+    el.after(inputToken);
+    el.after(div);
+    el.after(label);
+    el.after(input);
+    el.after(br);
 
-//     let inputToken = document.createElement('input');
-//     inputToken.setAttribute('name', 'tokenvk');
-//     inputToken.setAttribute('id', 'tokenvk');
-//     inputToken.setAttribute('class', 'mb-2');
-
-
-//     chrome.cookies.get({"url": 'https:/vk.com/', "name": 'remixsid'}, async function(cookie) {
-//         if (cookie != null) {
-//             inputToken.value = cookie.value;
-//         }
-//         el.after(inputToken);
-//         el.after(div);
-//         el.after(label);
-//         el.after(input);
-//         el.after(br);
-
-//         document.getElementById('enableMulteVote').checked = settings.multivote;
-//         document.getElementById('enableMulteVote').addEventListener('change', async function() {
-//             settings.multivote = this.checked;
-//             await setValue('AVMRsettings', settings, true);
-//         });
-//     });
-// }
+    document.getElementById('enableMulteVote').checked = settings.multivote;
+    document.getElementById('enableMulteVote').addEventListener('change', async function() {
+        settings.multivote = this.checked;
+        await setValue('AVMRsettings', settings, true);
+    });
+}
 
 var poput;
 function openPoput(url, reload) {

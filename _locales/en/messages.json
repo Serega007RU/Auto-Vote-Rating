@@ -501,7 +501,7 @@
     "message": "Unexpected error! No error message"
   },
   "tokenVK": {
-    "message": "Token VK:"
+    "message": "Token VKontakte:"
   },
   "projectID": {
     "message": "ID project"
@@ -530,5 +530,8 @@
   },
   "donate": {
     "message": "https://paypal.me/serega007ru"
+  },
+  "unecryptedTokenVK": {
+    "message": "Denial of responsibility: The VK token will be stored Unencrypted and can be hacked. You add a token here at your own risk!"
   }
 }
