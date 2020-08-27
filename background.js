@@ -686,7 +686,7 @@ async function silentVote(project) {
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {
 			    endVote('later ' + Date.now(), null, project);
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null) {
-			    endVote(doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent, null, project);
+			    endVote(doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.substring(0, doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.indexOf('\n')), null, project);
 			} else {
 			   	endVote(chrome.i18n.getMessage('errorVoteUnknown2'), null, project)
 			}
@@ -1631,6 +1631,7 @@ v3.0.1
 v3.1.0
 Теперь нет ошибок если автоголосовать с телефона на ServerPact и MinecraftIpList
 Возвращение MultiVote но теперь пользователя предупреждает что токен ВКонтакте хранится в НЕзашифрованном виде и в настройках больше не читает куки токена ВКонтакте
+Ошибка на ServerPact теперь адекватно показывается
 
 Планируется:
 https://ionmc.top/
@@ -1638,9 +1639,9 @@ https://ionmc.top/
 
 https://serveur-prive.net/
 можно голосовать за все проекты разом
-время голосования сбрасывается в 00:00 по МСК (учитывается часовой пояс?)
+время голосования сбрасывается через 1:30 с момента голосования
 
-https://minecraftservers.org/ не возможно обойти капчу
+https://minecraftservers.org/ под вопросом насчёт капчи
 можно голосовать только за 1 проект
 
 https://www.minetrack.net/ на момент проверки сайт лежал
