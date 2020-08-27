@@ -171,6 +171,10 @@ function checkVote() {
 			if (proj.time == null || proj.time < (Date.now() - 43200000/*12 часов*/)) {
                 checkOpen(proj);
 			}
+	    } else if (proj.ServeurPrive) {
+			if (proj.time == null || proj.time < (Date.now() - 5400000/*1.5 часов*/)) {
+                checkOpen(proj);
+			}
 		} else {
 			if (proj.time == null || proj.time < (Date.now() - (proj.Custom ? proj.timeout : 86400000/*+24 часа*/))) {
                 checkOpen(proj);
@@ -880,7 +884,7 @@ async function silentVote(project) {
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
 chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
-	if (openedProjects.has(tab.id) && info.status == 'loading') {//Временно изменён для поддержки браузера Kiwi
+	if (openedProjects.has(tab.id) && info.status == 'complete') {
 		if (openedProjects.get(tab.id).TopCraft) chrome.tabs.executeScript(tabid, {file: "scripts/topcraft.js"});
 		if (openedProjects.get(tab.id).McTOP) setTimeout(()=> chrome.tabs.executeScript(tabid, {file: "scripts/mctop.js"}), 3000);
 		if (openedProjects.get(tab.id).MCRate) chrome.tabs.executeScript(tabid, {file: "scripts/mcrate.js"});
@@ -889,7 +893,7 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 		if (openedProjects.get(tab.id).FairTop) chrome.tabs.executeScript(tabid, {file: "scripts/fairtop.js"});
 		if (openedProjects.get(tab.id).IonMc) chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js"});
 		if (openedProjects.get(tab.id).MinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js"});
-		if (openedProjects.get(tab.id).ServeurPrive) chrome.tabs.executeScript(tabid, {file: "scripts/serveurprive.js"});
+		if (openedProjects.get(tab.id).ServeurPrive) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/serveurprive.js", allFrames: true}), 4000);
 		if (openedProjects.get(tab.id).PlanetMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/planetminecraft.js"});
 		if (openedProjects.get(tab.id).TopG) chrome.tabs.executeScript(tabid, {file: "scripts/topg.js"});
 		if (openedProjects.get(tab.id).MinecraftMp) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftmp.js"});

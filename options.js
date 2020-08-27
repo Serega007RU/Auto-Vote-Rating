@@ -330,6 +330,8 @@ async function addProjectList(project, visually) {
             timeNew = new Date(date.getTime() - userTimezoneOffset);
         } else if (project.ServerPact) {
             timeNew = new Date(project.time + (43200000/*+12 часов*/));
+        } else if (project.ServeurPrive) {
+            timeNew = new Date(project.time + (5400000/*+1.5 часов*/));
         } else {
             timeNew = new Date(project.time + (project.Custom ? project.timeout : 86400000/*+24 часа*/));
         }
@@ -676,6 +678,8 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             }
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProjectRedirect') + response.url + '</div>', true, element);
             return;
+        } else if (project.ServeurPrive && response.status == 503) {
+            //None
         } else if (!response.ok) {
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status + '</div>', true, element);
             return;
