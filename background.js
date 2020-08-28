@@ -1066,47 +1066,41 @@ function getProjectList(project) {
 
 //Проверяет правильное ли у вас время
 async function checkTime () {
-	let response;
 	try {
-        response = await fetch(`http://worldclockapi.com/api/json/utc/now`);
+        let response = await fetch('https://api-testing.cifrazia.com/');
+		if (response.ok && !response.redirected) { // если HTTP-статус в диапазоне 200-299 и не было переадресаций
+			// получаем тело ответа и сравниваем время
+			let json = await response.json();
+			let serverTimeUTC = Number(json.timestamp.toString().replace(".", "").substring(0, 13));
+			let timeUTC = Date.now();
+			let timeDifference = (timeUTC - serverTimeUTC);
+			if (Math.abs(timeDifference) > 300000) {
+				let text;
+				let time;
+				let unit;
+				if (timeDifference > 0) {
+					text = chrome.i18n.getMessage('clockHurry');
+				} else {
+					text = chrome.i18n.getMessage('clockLagging');
+				}
+				if (timeDifference > 3600000 || timeDifference < -3600000) {
+					time = (Math.abs(timeDifference) / 1000 / 60 / 60).toFixed(1);
+					unit = chrome.i18n.getMessage('clockHourns');
+				} else {
+					time = (Math.abs(timeDifference) / 1000 / 60).toFixed(1);
+					unit = chrome.i18n.getMessage('clockMinutes');
+				}
+				let text2 = chrome.i18n.getMessage('clockInaccurate', [text, time, unit]);
+				console.warn(text2);
+				sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2);
+			}
+		} else {
+			console.error(chrome.i18n.getMessage('errorClock2', response.status));
+		}
 	} catch (e) {
         console.error(chrome.i18n.getMessage('errorClock', e));
         return;
 	}
-    if (response.ok) { // если HTTP-статус в диапазоне 200-299
-        // получаем тело ответа и сравниваем время
-        let json = await response.json();
-        let serverTimeUTC = filetime_to_unixtime(json.currentFileTime);
-        let timeUTC = Date.now() / 1000;
-        let timeDifference = (timeUTC - serverTimeUTC);
-        if (Math.abs(timeDifference) > 300) {
-        	let text;
-        	let time;
-        	let unit;
-        	if (timeDifference > 0) {
-                text = chrome.i18n.getMessage('clockHurry');
-        	} else {
-        		text = chrome.i18n.getMessage('clockLagging');
-        	}
-        	if (timeDifference > 3600 || timeDifference < -3600) {
-        		time = (Math.abs(timeDifference) / 60 / 60).toFixed(1);
-        		unit = chrome.i18n.getMessage('clockHourns');
-        	} else {
-        		time = (Math.abs(timeDifference) / 60).toFixed(1);
-        		unit = chrome.i18n.getMessage('clockMinutes');
-        	}
-        	let text2 = chrome.i18n.getMessage('clockInaccurate', [text, time, unit]);
-            console.warn(text2);
-            sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2);
-        }
-    } else {
-        console.error(chrome.i18n.getMessage('errorClock2', response.status));
-    }
-}
-var filetime_to_unixtime = function(ft) {
-    epoch_diff = 116444736000000000;
-    rate_diff = 10000000;
-    return parseInt((ft - epoch_diff)/rate_diff);
 }
 
 async function setCookie(url, name, value) {
@@ -1647,6 +1641,7 @@ v3.1.0
 Теперь нет ошибок если автоголосовать с телефона на ServerPact и MinecraftIpList
 Возвращение MultiVote но теперь пользователя предупреждает что токен ВКонтакте хранится в НЕзашифрованном виде и в настройках больше не читает куки токена ВКонтакте
 Ошибка на ServerPact теперь адекватно показывается
+worldclockapi успешно сдох и поэтому мы перешли на своё API: https://api-testing.cifrazia.com/
 
 Планируется:
 https://ionmc.top/
