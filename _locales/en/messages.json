@@ -533,5 +533,8 @@
   },
   "unecryptedTokenVK": {
     "message": "Denial of responsibility: The VK token will be stored Unencrypted and can be hacked. You add a token here at your own risk!"
+  },
+  "countVote": {
+    "message": "How many votes make per day"
   }
 }

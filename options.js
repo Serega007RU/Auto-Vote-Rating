@@ -1021,75 +1021,6 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
     }
 });
 
-//Слушатель изменения выбора топов, если пользователь выбирает "Кастомное", то изменяется форма
-let laterChoose;
-document.querySelector('form').addEventListener('change', () => {
-    let elementProject = document.getElementById('project');
-    if (elementProject.value == 'Custom' && laterChoose != 'Custom') {
-        idSelector.innerHTML = '';
-        idSelector.setAttribute('style', 'height: 0px;')
-
-        let customBody = document.createElement('textarea');
-        customBody.required = true;
-        customBody.setAttribute("id", 'id');
-        customBody.setAttribute("name", 'customBody');
-        customBody.setAttribute('placeholder', chrome.i18n.getMessage('bodyFetch'));
-        elementProject.after(customBody);
-
-        let labelBody = document.createElement('div');
-        labelBody.setAttribute('class', 'form-group mb-1');
-        labelBody.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('bodyFetch') + '</label>'
-        elementProject.after(labelBody);
-        
-        let customURL = document.createElement('input');
-        customURL.required = true;
-        customURL.setAttribute("id", 'responseURL');
-        customURL.setAttribute("name", 'customURL');
-        customURL.setAttribute('placeholder', chrome.i18n.getMessage('urlFetch'));
-        customURL.setAttribute('type', 'text');
-        customURL.setAttribute('class', 'mb-2');
-        elementProject.after(customURL);
-
-        let labelURL = document.createElement('div');
-        labelURL.setAttribute('class', 'form-group mb-1');
-        labelURL.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('urlFetch') + '</label>'
-        elementProject.after(labelURL);
-
-        let customTime = document.createElement('input');
-        customTime.required = true;
-        customTime.setAttribute("id", 'time');
-        customTime.setAttribute("name", 'customTime');
-        customTime.setAttribute('placeholder', chrome.i18n.getMessage('delayFetch'));
-        customTime.setAttribute('type', 'number');
-        customTime.setAttribute('min', '10000');
-        customTime.setAttribute('class', 'mb-2');
-        elementProject.after(customTime);
-
-        let labelTime = document.createElement('div');
-        labelTime.setAttribute('class', 'form-group mb-1');
-        labelTime.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('delayFetch') + '</label>'
-        elementProject.after(labelTime);
-
-        document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
-        document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterName');
-
-        elementProject.after(' ');
-    } else if (laterChoose == 'Custom' && elementProject.value != 'Custom') {
-        elementProject.nextElementSibling.remove();
-        elementProject.nextElementSibling.remove();
-        elementProject.nextElementSibling.remove();
-        elementProject.nextElementSibling.remove();
-        elementProject.nextElementSibling.remove();
-        elementProject.nextElementSibling.remove();
-        
-        document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('yourNick');
-        document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterNick');
-
-        idSelector.removeAttribute('style');
-    }
-    laterChoose = elementProject.value;
-});
-
 function forLoopAllProjects (fuc, reverse) {
     if (reverse) projectsTopCraft.reverse();
     for (proj of projectsTopCraft) {
@@ -1642,6 +1573,7 @@ selectedTop.addEventListener("click", function() {
     }
 });
 
+let laterChoose;
 selectedTop.addEventListener("change", function() {
     var label = '<div class="form-group mb-1"><label for="id">' + chrome.i18n.getMessage('projectID') + '</label> <span class="tooltip1"><span class="tooltip1text">' + chrome.i18n.getMessage('projectIDTooltip') + '</span></span></div>';
     var input = '<input name="id" id="id" required placeholder="' + chrome.i18n.getMessage('inputProjectID') + '" type="text">';
@@ -1673,6 +1605,91 @@ selectedTop.addEventListener("change", function() {
     } else {
        idSelector.innerHTML = label + input;
     }
+    
+    if(selectedTop.value == 'Custom' && laterChoose != 'Custom') {
+       idSelector.innerHTML = '';
+       idSelector.setAttribute('style', 'height: 0px;')
+
+       let customBody = document.createElement('textarea');
+       customBody.required = true;
+       customBody.setAttribute("id", 'id');
+       customBody.setAttribute("name", 'customBody');
+       customBody.setAttribute('placeholder', chrome.i18n.getMessage('bodyFetch'));
+       selectedTop.after(customBody);
+
+       let labelBody = document.createElement('div');
+       labelBody.setAttribute('class', 'form-group mb-1');
+       labelBody.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('bodyFetch') + '</label>'
+       selectedTop.after(labelBody);
+        
+       let customURL = document.createElement('input');
+       customURL.required = true;
+       customURL.setAttribute("id", 'responseURL');
+       customURL.setAttribute("name", 'customURL');
+       customURL.setAttribute('placeholder', chrome.i18n.getMessage('urlFetch'));
+       customURL.setAttribute('type', 'text');
+       customURL.setAttribute('class', 'mb-2');
+       selectedTop.after(customURL);
+
+       let labelURL = document.createElement('div');
+       labelURL.setAttribute('class', 'form-group mb-1');
+       labelURL.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('urlFetch') + '</label>'
+       selectedTop.after(labelURL);
+
+       let customTime = document.createElement('input');
+       customTime.required = true;
+       customTime.setAttribute("id", 'time');
+       customTime.setAttribute("name", 'customTime');
+       customTime.setAttribute('placeholder', chrome.i18n.getMessage('delayFetch'));
+       customTime.setAttribute('type', 'number');
+       customTime.setAttribute('min', '10000');
+       customTime.setAttribute('class', 'mb-2');
+       selectedTop.after(customTime);
+
+       let labelTime = document.createElement('div');
+       labelTime.setAttribute('class', 'form-group mb-1');
+       labelTime.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('delayFetch') + '</label>'
+       selectedTop.after(labelTime);
+
+       document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
+       document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterName');
+
+       selectedTop.after(' ');
+    } else if (laterChoose == 'Custom' && selectedTop.value != 'Custom') {
+       selectedTop.nextElementSibling.remove();
+       selectedTop.nextElementSibling.remove();
+       selectedTop.nextElementSibling.remove();
+       selectedTop.nextElementSibling.remove();
+       selectedTop.nextElementSibling.remove();
+       selectedTop.nextElementSibling.remove();
+        
+       document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('yourNick');
+       document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterNick');
+
+       idSelector.removeAttribute('style');
+    }
+
+    if (selectedTop.value == 'ServeurPrive' && laterChoose != 'ServeurPrive') {
+       let countVote = document.createElement('input');
+       countVote.required = true;
+       countVote.setAttribute("id", 'countVote');
+       countVote.setAttribute("name", 'countVote');
+       countVote.setAttribute('type', 'number');
+       countVote.setAttribute('min', '1');
+       countVote.setAttribute('max', '24');
+       countVote.setAttribute('placeholder', chrome.i18n.getMessage('countVote'));
+       selectedTop.nextElementSibling.after(countVote);
+
+       let labelCountVote = document.createElement('div');
+       labelCountVote.setAttribute('class', 'form-group mb-1');
+       labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
+       selectedTop.nextElementSibling.after(labelCountVote);
+    } else if (laterChoose == 'ServeurPrive' && selectedTop.value != 'ServeurPrive') {
+       selectedTop.nextElementSibling.nextElementSibling.remove();
+       selectedTop.nextElementSibling.nextElementSibling.remove();
+    }
+
+    laterChoose = selectedTop.value;
 });
 
 //Локализация
