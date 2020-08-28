@@ -52,7 +52,7 @@ function vote() {
 								count++;
 							}
 							var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-							var later = Date.now() - (86400000 - milliseconds);
+							var later = Date.now() - (5400000 - milliseconds);
 							sendMessage('later ' + later);
                 		//Что?
                 		} else {
