@@ -545,6 +545,11 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         project = new Project(choice, nick, id, null, null, priorityOpt);
     }
 
+    if (choice == 'ServeurPrive') {
+        project.maxCountVote = document.querySelector("#countVote").valueAsNumber;
+        project.countVote = 0;
+    }
+
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
     let secondBonus = "";
         if (project.id == 'mythicalworld' || project.id == 5323 || project.id == 1654 || project.id == 6099) {
@@ -1607,6 +1612,10 @@ selectedTop.addEventListener("change", function() {
     }
     
     if(selectedTop.value == 'Custom' && laterChoose != 'Custom') {
+       if (laterChoose == 'ServeurPrive' && selectedTop.value != 'ServeurPrive') {
+           selectedTop.nextElementSibling.nextElementSibling.remove();
+           selectedTop.nextElementSibling.nextElementSibling.remove();
+       }
        idSelector.innerHTML = '';
        idSelector.setAttribute('style', 'height: 0px;')
 
@@ -1676,15 +1685,16 @@ selectedTop.addEventListener("change", function() {
        countVote.setAttribute("name", 'countVote');
        countVote.setAttribute('type', 'number');
        countVote.setAttribute('min', '1');
-       countVote.setAttribute('max', '24');
+       countVote.setAttribute('max', '16');
        countVote.setAttribute('placeholder', chrome.i18n.getMessage('countVote'));
+       countVote.value = 5;
        selectedTop.nextElementSibling.after(countVote);
 
        let labelCountVote = document.createElement('div');
        labelCountVote.setAttribute('class', 'form-group mb-1');
        labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
        selectedTop.nextElementSibling.after(labelCountVote);
-    } else if (laterChoose == 'ServeurPrive' && selectedTop.value != 'ServeurPrive') {
+    } else if (laterChoose == 'ServeurPrive' && selectedTop.value != 'ServeurPrive' && selectedTop.value != 'Custom') {
        selectedTop.nextElementSibling.nextElementSibling.remove();
        selectedTop.nextElementSibling.nextElementSibling.remove();
     }

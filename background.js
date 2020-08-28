@@ -172,7 +172,14 @@ function checkVote() {
                 checkOpen(proj);
 			}
 	    } else if (proj.ServeurPrive) {
-			if (proj.time == null || proj.time < (Date.now() - 5400000/*1.5 часов*/)) {
+	    	if (proj.countVote > 0 && proj.time != null) {
+				let now = new Date();
+				let past = new Date(proj.time);
+				if (now.getDate() != past.getDate() || now.getMonth() != past.getMonth() || now.getFullYear != past.getFullYear) {
+					proj.countVote = 0;
+				}
+	    	}
+			if (proj.countVote < proj.maxCountVote && (proj.time == null || proj.time < (Date.now() - 5400000/*1.5 часов*/))) {
                 checkOpen(proj);
 			}
 		} else {
@@ -950,6 +957,7 @@ async function endVote(message, sender, project) {
         if (deleted) {
         	return;
         }
+
         let time;
         if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.MCRate) {//Топы на которых время сбрасывается в 00:00 по МСК
             let timeMoscow = new Date(Date.now() + 10800000/*+3 часа*/);
@@ -971,6 +979,9 @@ async function endVote(message, sender, project) {
 				time = parseInt(message.replace('later ', ''))
 				project.time = time;
 			}
+		}
+        if (project.ServeurPrive) {
+			project.countVote = project.countVote + 1;
 		}
 		if (project.priority) {
             getProjectList(project).unshift(project);
