@@ -310,7 +310,7 @@ async function addProjectList(project, visually) {
     let text = "скоро...";
     if (!(project.time == null || project.time == "")) {
         let timeNew;
-        if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating) {
+        if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.IonMc) {
             let date = new Date(new Date(project.time).getTime() - 10800000/*-3 часа*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
             let userTimezoneOffset = date.getTimezoneOffset() * 60000;
             timeNew = new Date(date.getTime() - userTimezoneOffset);
@@ -623,7 +623,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         }
         if (project.IonMc) {
             url = 'https://ionmc.top/vote/' + project.id;
-            jsPath = "#app > div.section > div.container.page-content > div.project > div.project__banner > div.project__banner-text";
+            jsPath = "#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.mx-2.-mt-1.mb-1.sm\\:mx-5.sm\\:my-2 > ul > li:nth-child(2) > a";
         }
         if (project.MinecraftServers) {
             url = 'https://minecraftservers.org/server/' + project.id;

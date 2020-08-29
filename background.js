@@ -132,7 +132,7 @@ function checkVote() {
     }
     
 	forLoopAllProjects(function () {
-		if (proj.TopCraft || proj.McTOP || proj.FairTop || proj.MinecraftRating || proj.MCRate) {
+		if (proj.TopCraft || proj.McTOP || proj.FairTop || proj.MinecraftRating || proj.MCRate || proj.IonMc) {
             let timeMoscow = new Date(Date.now() + 10800000);
             let date = (timeMoscow.getUTCMonth() + 1) + '/' + timeMoscow.getUTCDate() + '/' + timeMoscow.getUTCFullYear();
             let hourse = timeMoscow.getUTCHours();
@@ -237,7 +237,11 @@ async function checkOpen(project) {
 	for (let [key, value] of openedProjects.entries()) {
         if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
             openedProjects.delete(key);
-            chrome.tabs.remove(key);
+            chrome.tabs.remove(key, function() {
+            	if (chrome.runtime.lastError) {
+            		sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
+            	}
+            });
         }
     }
 	
@@ -906,7 +910,7 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 		if (openedProjects.get(tab.id).MinecraftRating) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftrating.js"});
 		if (openedProjects.get(tab.id).MonitoringMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/monitoringminecraft.js"});
 		if (openedProjects.get(tab.id).FairTop) chrome.tabs.executeScript(tabid, {file: "scripts/fairtop.js"});
-		if (openedProjects.get(tab.id).IonMc) chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js"});
+		if (openedProjects.get(tab.id).IonMc) chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js", allFrames: true});
 		if (openedProjects.get(tab.id).MinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js"});
 		if (openedProjects.get(tab.id).ServeurPrive) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/serveurprive.js", allFrames: true}), 4000);
 		if (openedProjects.get(tab.id).PlanetMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/planetminecraft.js"});
@@ -927,6 +931,11 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
 async function endVote(message, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         chrome.tabs.remove(sender.tab.id);
+        chrome.tabs.remove(sender.tab.id, function() {
+          	if (chrome.runtime.lastError) {
+           		sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
+           	}
+        });
         project = openedProjects.get(sender.tab.id);
         openedProjects.delete(sender.tab.id);
 	} else if (!project) return;//Если сообщение пришло от вкладки от другого расширения
@@ -967,7 +976,7 @@ async function endVote(message, sender, project) {
         }
 
         let time;
-        if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.MCRate) {//Топы на которых время сбрасывается в 00:00 по МСК
+        if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.MCRate || project.IonMc) {//Топы на которых время сбрасывается в 00:00 по МСК
             let timeMoscow = new Date(Date.now() + 10800000/*+3 часа*/);
             time = (timeMoscow.getUTCMonth() + 1) + '/' + timeMoscow.getUTCDate() + '/' + timeMoscow.getUTCFullYear();
             project.time = time;
@@ -1650,16 +1659,14 @@ v3.1.0
 Возвращение MultiVote но теперь пользователя предупреждает что токен ВКонтакте хранится в НЕзашифрованном виде и в настройках больше не читает куки токена ВКонтакте
 Ошибка на ServerPact теперь адекватно показывается
 worldclockapi успешно сдох и поэтому мы перешли на своё API: https://api-testing.cifrazia.com/
-Повторная попытка исправить ошибку на MonitoringMinecraft "Вы слишком часто обновляете страницу. Умерьте пыл."
+Повторная попытка исправить ошибку на MonitoringMinecraft "Вы слишком часто обновляете страницу. Умерьте пыл." (Ошибка 503)
+При закрытии вкладки теперь выводиться в уведомления ошибка chrome.runtime.lastError
+Новые топы:
+- IonMc
+- ServeurPrive
+- MinecraftServers (проблемы с капчей, не будет доступно по умолчанию)
 
 Планируется:
-https://ionmc.top/
-можно голосовать за все проекты разом
-
-https://serveur-prive.net/
-можно голосовать за все проекты разом
-время голосования сбрасывается через 1:30 с момента голосования
-
 https://minecraftservers.org/ под вопросом насчёт капчи
 можно голосовать только за 1 проект
 
