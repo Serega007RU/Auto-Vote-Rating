@@ -551,6 +551,9 @@ async function silentVote(project) {
 			}
 			if (!response.ok) {
                 endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+				if (response.status == 503) {
+					clearCookieMonitoringMinecraft = false;
+				}
                 return;
 			}
             let html = await response.text();
@@ -560,20 +563,25 @@ async function silentVote(project) {
 				return;
 			}
 			if (doc.querySelector("input[name=player]") != null) {
-                await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
-                .then(response => response.text().then((html) => {
-                	doc = new DOMParser().parseFromString(html, "text/html");
-                	response = response;
-                }));
+                response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
 			    host = extractHostname(response.url);
 			    if (!host.includes('monitoringminecraft.')) {
                     endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
                     return;
 			    }
-			    if (!response.ok) {
-                    endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
-                    return;
-			    }
+				if (!response.ok) {
+					endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+					if (response.status == 503) {
+						clearCookieMonitoringMinecraft = false;
+					}
+					return;
+				}
+				html = await response.text();
+                doc = new DOMParser().parseFromString(html, "text/html");
+				if (doc.querySelector("body") != null && doc.querySelector("body").textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
+					sendMessage(doc.querySelector("body").textContent);
+					return;
+				}
 			}
 			if (doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
 				//Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
@@ -1642,6 +1650,7 @@ v3.1.0
 Возвращение MultiVote но теперь пользователя предупреждает что токен ВКонтакте хранится в НЕзашифрованном виде и в настройках больше не читает куки токена ВКонтакте
 Ошибка на ServerPact теперь адекватно показывается
 worldclockapi успешно сдох и поэтому мы перешли на своё API: https://api-testing.cifrazia.com/
+Повторная попытка исправить ошибку на MonitoringMinecraft "Вы слишком часто обновляете страницу. Умерьте пыл."
 
 Планируется:
 https://ionmc.top/
