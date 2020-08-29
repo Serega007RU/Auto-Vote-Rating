@@ -332,6 +332,10 @@ async function addProjectList(project, visually) {
             timeNew = new Date(project.time + (43200000/*+12 часов*/));
         } else if (project.ServeurPrive) {
             timeNew = new Date(project.time + (5400000/*+1.5 часов*/));
+        } else if (project.MinecraftServers) {
+            let date = new Date(new Date(project.time).getTime() + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
+            let userTimezoneOffset = date.getTimezoneOffset() * 60000;
+            timeNew = new Date(date.getTime() - userTimezoneOffset);
         } else {
             timeNew = new Date(project.time + (project.Custom ? project.timeout : 86400000/*+24 часа*/));
         }
@@ -559,7 +563,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     }
 
     forLoopAllProjects(function () {
-        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom && !settings.multivote) {
+        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom) {
             if (secondBonus === "") {
                 updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
             } else if (element != null) {

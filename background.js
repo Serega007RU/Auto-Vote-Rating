@@ -182,6 +182,14 @@ function checkVote() {
 			if (proj.countVote < proj.maxCountVote && (proj.time == null || proj.time < (Date.now() - 5400000/*1.5 часов*/))) {
                 checkOpen(proj);
 			}
+	    } else if (proj.MinecraftServers) {
+            let timeUTC = new Date(Date.now());
+            let date = (timeUTC.getUTCMonth() + 1) + '/' + timeUTC.getUTCDate() + '/' + timeUTC.getUTCFullYear();
+            let hourse = timeUTC.getUTCHours();
+	        let minutes = timeUTC.getUTCMinutes();
+			if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
+                checkOpen(proj);
+			}
 		} else {
 			if (proj.time == null || proj.time < (Date.now() - (proj.Custom ? proj.timeout : 86400000/*+24 часа*/))) {
                 checkOpen(proj);
@@ -911,7 +919,7 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 		if (openedProjects.get(tab.id).MonitoringMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/monitoringminecraft.js"});
 		if (openedProjects.get(tab.id).FairTop) chrome.tabs.executeScript(tabid, {file: "scripts/fairtop.js"});
 		if (openedProjects.get(tab.id).IonMc) chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js", allFrames: true});
-		if (openedProjects.get(tab.id).MinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js"});
+		if (openedProjects.get(tab.id).MinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js", allFrames: true});
 		if (openedProjects.get(tab.id).ServeurPrive) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/serveurprive.js", allFrames: true}), 4000);
 		if (openedProjects.get(tab.id).PlanetMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/planetminecraft.js"});
 		if (openedProjects.get(tab.id).TopG) chrome.tabs.executeScript(tabid, {file: "scripts/topg.js"});
@@ -930,7 +938,6 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(message, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
-        chrome.tabs.remove(sender.tab.id);
         chrome.tabs.remove(sender.tab.id, function() {
           	if (chrome.runtime.lastError) {
            		sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
@@ -987,6 +994,10 @@ async function endVote(message, sender, project) {
         } else if (project.MinecraftServerList) {
             let time5 = new Date(Date.now() + 18000000/*+5 часов*/);
             time = (time5.getUTCMonth() + 1) + '/' + time5.getUTCDate() + '/' + time5.getUTCFullYear();
+            project.time = time;
+        } else if (project.MinecraftServers) {
+            let timeUTC = new Date(Date.now());
+            time = (timeUTC.getUTCMonth() + 1) + '/' + timeUTC.getUTCDate() + '/' + timeUTC.getUTCFullYear();
             project.time = time;
 	    } else {
 		    if (message == "successfully") {
