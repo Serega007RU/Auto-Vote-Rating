@@ -712,6 +712,11 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                         updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProject') + '</div>', true, element);
                         error = true;
                     }
+                } else if (project.IonMc) {
+                    if (doc.querySelector("#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div") != null) {
+                        updateStatusAdd('<div align="center" style="color:#f44336;">' + doc.querySelector("#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div").innerText + '</div>', true, element);
+                        error = true;
+                    }
                 }
                 if (error) return;
                 if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
@@ -1599,6 +1604,12 @@ selectedTop.addEventListener("change", function() {
        idSelector.innerHTML = label + dataInput + '<option value="cubixworld">CubixWorld</option><option value="gg">GrandGear</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mytdicalworld">MythicalWorld</option><option value="orangecraft">OrangeCraft</option><option value="pixelmonpro">Pixelmon.PRO</option><option value="skolotfun">skolot.fun</option></datalist>';
     } else if(selectedTop.value == "FairTop") {
        idSelector.innerHTML = label + dataInput + '<option value="354">FineMine</option><option value="1356">GrandGear</option><option value="731">PentaCraft</option><option value="1404">Pixelmon.PRO</option><option value="797">qoobworld</option><option value="6">SMARTYcraft</option><option value="224">HillMine</option></datalist>';
+    } else if(selectedTop.value == "IonMc") {
+       idSelector.innerHTML = label + dataInput + '<option value="80">Pixelmon.PRO 1.12.2</option><option value="83">FineMine.RU</option></datalist>';
+    } else if(selectedTop.value == "MinecraftServers") {
+       idSelector.innerHTML = label + dataInput + '<option value="25531">CubeCraft Games</option></datalist>';
+    } else if(selectedTop.value == "ServeurPrive") {
+       idSelector.innerHTML = label + dataInput + '<option value="gommehd-net-4932">GommeHD.net</option></datalist>';
     } else if(selectedTop.value == "PlanetMinecraft") {
        idSelector.innerHTML = label + dataInput + '<option value="legends-evolved">Legends Evolved</option></datalist>';
     } else if(selectedTop.value == "TopG") {

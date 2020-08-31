@@ -68,7 +68,7 @@ function vote() {
                 	let nick = getNickName(result.AVMRprojectsServeurPrive);
 					if (nick == null || nick == "") return;
 					document.querySelector("#c > div > div > div.bvt > form > input.pseudov").value = nick;
-					setTimeout(() => document.querySelector("#c > div > div > div.bvt > form > button").click(), 5000);
+					setTimeout(() => document.querySelector("#c > div > div > div.bvt > form > button").click(), 7000);
                 }
 			} catch (e) {
 				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {

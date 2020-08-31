@@ -34,7 +34,9 @@ var online = true;
 //Таймаут проверки голосования
 var cooldown = 1000;
 //Таймаут 5 минут на повторное голосование после ошибки (вычисляется из таймаунт проверки голосования (cooldown))
-var retryCoolDown = 300
+var retryCoolDown = 300;
+//Таймаут 15 минут
+var retryCoolDownEmulation = 900;
 
 var clearCookieMonitoringMinecraft = true;
 var secondVoteMinecraftIpList = false;
@@ -113,6 +115,7 @@ async function initializeConfig() {
     
     //Вычисляет сколько раз повторится проверка голосования в 5 минут
     retryCoolDown = 300 / (cooldown / 1000);
+    retryCoolDownEmulation = 900 / (cooldown / 1000);
     //Проверка на голосование
     setInterval(function() {checkVote()}, cooldown);
 }
@@ -205,12 +208,18 @@ async function checkOpen(project) {
     } else if (!online) {
     	return;
     }
-	//Таймаут для голосования, если попыток срабатывая превышает retryCoolDown (5 минут), разрешает снова попытаться проголосовать
+	//Таймаут для голосования, если попыток срабатывая превышает retryCoolDown (5 минут) или retryCoolDownEmulation (15 минут), разрешает снова попытаться проголосовать
 	let has = false;
+	let rcd;
+	if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
+        rcd = retryCoolDown;
+	} else {
+		rcd = retryCoolDownEmulation;
+	}
 	for (let [key, value] of retryProjects.entries()) {
         if (key.nick == project.nick && key.id == project.id && getProjectName(key) == getProjectName(project)) {
         	has = true;
-        	if (value >= retryCoolDown) {
+        	if (value >= rcd) {
         	    retryProjects.set(key, 1);
         	    for (let value2 of queueProjects) {
                     if (value2.nick == project.nick && value2.id == project.id && getProjectName(value2) == getProjectName(project)) {
@@ -229,7 +238,7 @@ async function checkOpen(project) {
     //Не позволяет открыть больше одной вкладки для одного топа
 	for (let value of queueProjects) {
 		//Не позволяет открыть больше одной вкладки для всех топов если включён режим голосования с нескольких аккаунтов вк для топов где используется вк
-		if (settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+		if (settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (value.TopCraft || value.McTOP || value.MCRate || value.MinecraftRating || value.MonitoringMinecraft)) {
             if (queueProjects.size > 0) return;
         //Не позволяет открыть более одной вкладки для одного топа
 		} else {
@@ -913,13 +922,13 @@ async function silentVote(project) {
 chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 	if (openedProjects.has(tab.id) && info.status == 'complete') {
 		if (openedProjects.get(tab.id).TopCraft) chrome.tabs.executeScript(tabid, {file: "scripts/topcraft.js"});
-		if (openedProjects.get(tab.id).McTOP) setTimeout(()=> chrome.tabs.executeScript(tabid, {file: "scripts/mctop.js"}), 3000);
+		if (openedProjects.get(tab.id).McTOP) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/mctop.js"}), 3000);
 		if (openedProjects.get(tab.id).MCRate) chrome.tabs.executeScript(tabid, {file: "scripts/mcrate.js"});
 		if (openedProjects.get(tab.id).MinecraftRating) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftrating.js"});
 		if (openedProjects.get(tab.id).MonitoringMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/monitoringminecraft.js"});
 		if (openedProjects.get(tab.id).FairTop) chrome.tabs.executeScript(tabid, {file: "scripts/fairtop.js"});
-		if (openedProjects.get(tab.id).IonMc) chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js", allFrames: true});
-		if (openedProjects.get(tab.id).MinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js", allFrames: true});
+		if (openedProjects.get(tab.id).IonMc) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js", allFrames: true}), 4000);
+		if (openedProjects.get(tab.id).MinecraftServers) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js", allFrames: true}), 4000);
 		if (openedProjects.get(tab.id).ServeurPrive) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/serveurprive.js", allFrames: true}), 4000);
 		if (openedProjects.get(tab.id).PlanetMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/planetminecraft.js"});
 		if (openedProjects.get(tab.id).TopG) chrome.tabs.executeScript(tabid, {file: "scripts/topg.js"});
@@ -1676,6 +1685,7 @@ worldclockapi успешно сдох и поэтому мы перешли на
 - IonMc
 - ServeurPrive
 - MinecraftServers (проблемы с капчей, не будет доступно по умолчанию)
+Для топов где недоступен режим тихого голосования увеличено таймаут на повторное голосование после ошибки до 15 минут (это сделано для того что б потом капча не подозревала нас во флуде)
 
 Планируется:
 https://minecraftservers.org/ под вопросом насчёт капчи

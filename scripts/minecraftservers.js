@@ -43,7 +43,7 @@ function vote() {
                 	let nick = getNickName(result.AVMRprojectsMinecraftServers);
 					if (nick == null || nick == "") return;
 					document.querySelector("#field-container > form > ul > li > input").value = nick;
-					setTimeout(() => document.querySelector("#field-container > form > button").click(), 5000);
+					setTimeout(() => document.querySelector("#field-container > form > button").click(), 7000);
                 }
 			} catch (e) {
 				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {

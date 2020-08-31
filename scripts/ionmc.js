@@ -54,7 +54,7 @@ function vote() {
                 	let nick = getNickName(result.AVMRprojectsIonMc);
 					if (nick == null || nick == "") return;
 					document.querySelector('input[name=nickname]').value = nick;
-					setTimeout(() => document.querySelector("#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div > form > div.flex.my-1 > div.w-2\\/5 > button").click(), 5000);
+					setTimeout(() => document.querySelector("#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div > form > div.flex.my-1 > div.w-2\\/5 > button").click(), 7000);
                 }
 			} catch (e) {
 				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
