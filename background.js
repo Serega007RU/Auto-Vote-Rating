@@ -14,6 +14,7 @@ var projectsMinecraftMp = [];
 var projectsMinecraftServerList = [];
 var projectsServerPact = [];
 var projectsMinecraftIpList = [];
+var projectsTopMinecraftServers = [];
 var projectsCustom = [];
 
 //Настройки
@@ -87,6 +88,8 @@ async function initializeConfig() {
     projectsServerPact = projectsServerPact.AVMRprojectsServerPact;
     projectsMinecraftIpList = await getValue('AVMRprojectsMinecraftIpList');
     projectsMinecraftIpList = projectsMinecraftIpList.AVMRprojectsMinecraftIpList;
+    projectsTopMinecraftServers = await getValue('AVMRprojectsTopMinecraftServers');
+    projectsTopMinecraftServers = projectsTopMinecraftServers.AVMRprojectsTopMinecraftServers;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
     settings = await getValue('AVMRsettings');
@@ -103,10 +106,11 @@ async function initializeConfig() {
     }
 
     //Если пользователь обновился с версии 3.0.1
-    if (projectsIonMc == null || !(typeof projectsIonMc[Symbol.iterator] === 'function')) {
+    if (projectsTopMinecraftServers == null || !(typeof projectsTopMinecraftServers[Symbol.iterator] === 'function')) {
         projectsIonMc = [];
         projectsMinecraftServers = [];
         projectsServeurPrive = [];
+        projectsTopMinecraftServers = [];
     }
 
     if (settings && settings.cooldown && Number.isInteger(settings.cooldown)) cooldown = settings.cooldown;
@@ -190,6 +194,14 @@ function checkVote() {
             let date = (timeUTC.getUTCMonth() + 1) + '/' + timeUTC.getUTCDate() + '/' + timeUTC.getUTCFullYear();
             let hourse = timeUTC.getUTCHours();
 	        let minutes = timeUTC.getUTCMinutes();
+			if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
+                checkOpen(proj);
+			}
+	    } else if (proj.TopMinecraftServers) {
+            let time4 = new Date(Date.now() - 14400000/*- 4 часа*/);
+            let date = (time4.getUTCMonth() + 1) + '/' + time4.getUTCDate() + '/' + time4.getUTCFullYear();
+            let hourse = time4.getUTCHours();
+	        let minutes = time4.getUTCMinutes();
 			if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
                 checkOpen(proj);
 			}
@@ -371,6 +383,11 @@ async function newWindow(project) {
 			}
 			if (project.MinecraftIpList) {
 				chrome.tabs.create({"url":"https://www.minecraftiplist.com/index.php?action=vote&listingID=" + project.id, "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.TopMinecraftServers) {
+				chrome.tabs.create({"url":"https://topminecraftservers.org/vote/" + project.id, "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
@@ -936,6 +953,7 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 		if (openedProjects.get(tab.id).MinecraftServerList) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftserverlist.js"});
 		if (openedProjects.get(tab.id).ServerPact) chrome.tabs.executeScript(tabid, {file: "scripts/serverpact.js"});
 		if (openedProjects.get(tab.id).MinecraftIpList) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftiplist.js"});
+		if (openedProjects.get(tab.id).TopMinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/topminecraftservers.js"});
 	}
 });
 
@@ -1007,6 +1025,10 @@ async function endVote(message, sender, project) {
         } else if (project.MinecraftServers) {
             let timeUTC = new Date(Date.now());
             time = (timeUTC.getUTCMonth() + 1) + '/' + timeUTC.getUTCDate() + '/' + timeUTC.getUTCFullYear();
+            project.time = time;
+        } else if (project.TopMinecraftServers) {
+            let time4 = new Date(Date.now() - 14400000/*-4 часа*/);
+            time = (time4.getUTCMonth() + 1) + '/' + time4.getUTCDate() + '/' + time4.getUTCFullYear();
             project.time = time;
 	    } else {
 		    if (message == "successfully") {
@@ -1084,6 +1106,7 @@ function getProjectName(project) {
 	if (project.MinecraftServerList) return "MinecraftServerList";
 	if (project.ServerPact) return "ServerPact";
 	if (project.MinecraftIpList) return "MinecraftIpList";
+	if (project.TopMinecraftServers) return "TopMinecraftServers";
 	if (project.Custom) return "Custom";
 }
 
@@ -1103,6 +1126,7 @@ function getProjectList(project) {
     if (project.MinecraftServerList) return projectsMinecraftServerList;
     if (project.ServerPact) return projectsServerPact;
     if (project.MinecraftIpList) return projectsMinecraftIpList;
+    if (project.TopMinecraftServers) return projectsTopMinecraftServers;
     if (project.Custom) return projectsCustom;
 }
 
@@ -1238,6 +1262,9 @@ function forLoopAllProjects (fuc) {
     for (proj of projectsMinecraftIpList) {
         fuc();
     }
+    for (proj of projectsTopMinecraftServers) {
+        fuc();
+    }
     for (proj of projectsCustom) {
         fuc();
     }
@@ -1281,6 +1308,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         if (key == 'AVMRprojectsMinecraftServerList') projectsMinecraftServerList = storageChange.newValue;
         if (key == 'AVMRprojectsServerPact') projectsServerPact = storageChange.newValue;
         if (key == 'AVMRprojectsMinecraftIpList') projectsMinecraftIpList = storageChange.newValue;
+        if (key == 'AVMRprojectsTopMinecraftServers') projectsTopMinecraftServers = storageChange.newValue;
         if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
         if (key == 'AVMRsettings') {
         	settings = storageChange.newValue;
@@ -1690,6 +1718,7 @@ worldclockapi успешно сдох и поэтому мы перешли на
 - IonMc
 - ServeurPrive
 - MinecraftServers (проблемы с капчей, не будет доступно по умолчанию, используйте Privacy Pass)
+- TopMinecraftServers
 Для топов где недоступен режим тихого голосования увеличено таймаут на повторное голосование после ошибки до 15 минут (это сделано для того что б потом капча не подозревала нас во флуде)
 Исправлена ошибка подключения к интернету если пропало подключение к интернету, расширение теперь верно детектит неподключение к интернету (Unchecked runtime.lastError: Cannot access contents of url "chrome-error://chromewebdata/". Extension manifest must request permission to access this host.)
 
