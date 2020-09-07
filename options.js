@@ -1233,6 +1233,40 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     projectsCustom = allSetting.projectsCustom;
                     settings = allSetting.settings;
 
+                    //Если пользователь обновился с версии 2.2.0
+                    if (projectsPlanetMinecraft == null || !(typeof projectsPlanetMinecraft[Symbol.iterator] === 'function')) {
+                        projectsPlanetMinecraft = [];
+                    }
+                    if (projectsTopG == null || !(typeof projectsTopG[Symbol.iterator] === 'function')) {
+                        projectsTopG = [];
+                    }
+                    if (projectsMinecraftMp == null || !(typeof projectsMinecraftMp[Symbol.iterator] === 'function')) {
+                        projectsMinecraftMp = [];
+                    }
+                    if (projectsMinecraftServerList == null || !(typeof projectsMinecraftServerList[Symbol.iterator] === 'function')) {
+                        projectsMinecraftServerList = [];
+                    }
+                    if (projectsServerPact == null || !(typeof projectsServerPact[Symbol.iterator] === 'function')) {
+                        projectsServerPact = [];
+                    }
+                    if (projectsMinecraftIpList == null || !(typeof projectsMinecraftIpList[Symbol.iterator] === 'function')) {
+                        projectsMinecraftIpList = [];
+                    }
+
+                    //Если пользователь обновился с версии 3.0.1
+                    if (projectsIonMc == null || !(typeof projectsIonMc[Symbol.iterator] === 'function')) {
+                        projectsIonMc = [];
+                    }
+                    if (projectsMinecraftServers == null || !(typeof projectsMinecraftServers[Symbol.iterator] === 'function')) {
+                        projectsMinecraftServers = [];
+                    }
+                    if (projectsServeurPrive == null || !(typeof projectsServeurPrive[Symbol.iterator] === 'function')) {
+                        projectsServeurPrive = [];
+                    }
+                    if (projectsTopMinecraftServers == null || !(typeof projectsTopMinecraftServers[Symbol.iterator] === 'function')) {
+                        projectsTopMinecraftServers = [];
+                    }
+
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);
                     await setValue('AVMRsettings', settings, false);
                     await setValue('AVMRprojectsTopCraft', projectsTopCraft, false);

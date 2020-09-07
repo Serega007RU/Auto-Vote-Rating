@@ -30,7 +30,7 @@ function vote () {
 	                let nick = getNickName(result.AVMRprojectsTopMinecraftServers);
 		            if (nick == null || nick == "") return;
 		            document.querySelector("#username").value = nick;
-		            setTimeout(() => document.querySelector("#voteButton").click(), 5000);
+		            setTimeout(() => document.querySelector("#voteButton").click(), 10000);
 			    }
 			} catch (e) {
 				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {

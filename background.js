@@ -937,16 +937,16 @@ async function silentVote(project) {
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
 chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
-	if (openedProjects.has(tab.id) && info.status == 'complete') {
+	if (openedProjects.has(tab.id) && info.status == 'loading') {//ToDo вместо complete используется loading так как на Kiwi Browser complete вообще не отрабатывает, следует изучить данную проблему
 		if (openedProjects.get(tab.id).TopCraft) chrome.tabs.executeScript(tabid, {file: "scripts/topcraft.js"});
-		if (openedProjects.get(tab.id).McTOP) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/mctop.js"}), 3000);
+		if (openedProjects.get(tab.id).McTOP) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/mctop.js"}), 5000);
 		if (openedProjects.get(tab.id).MCRate) chrome.tabs.executeScript(tabid, {file: "scripts/mcrate.js"});
 		if (openedProjects.get(tab.id).MinecraftRating) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftrating.js"});
 		if (openedProjects.get(tab.id).MonitoringMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/monitoringminecraft.js"});
 		if (openedProjects.get(tab.id).FairTop) chrome.tabs.executeScript(tabid, {file: "scripts/fairtop.js"});
-		if (openedProjects.get(tab.id).IonMc) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js", allFrames: true}), 4000);
-		if (openedProjects.get(tab.id).MinecraftServers) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js", allFrames: true}), 4000);
-		if (openedProjects.get(tab.id).ServeurPrive) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/serveurprive.js", allFrames: true}), 4000);
+		if (openedProjects.get(tab.id).IonMc) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js", allFrames: true}), 10000);
+		if (openedProjects.get(tab.id).MinecraftServers) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js", allFrames: true}), 10000);
+		if (openedProjects.get(tab.id).ServeurPrive) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/serveurprive.js", allFrames: true}), 10000);
 		if (openedProjects.get(tab.id).PlanetMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/planetminecraft.js"});
 		if (openedProjects.get(tab.id).TopG) chrome.tabs.executeScript(tabid, {file: "scripts/topg.js"});
 		if (openedProjects.get(tab.id).MinecraftMp) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftmp.js"});
@@ -1721,6 +1721,8 @@ worldclockapi успешно сдох и поэтому мы перешли на
 - TopMinecraftServers
 Для топов где недоступен режим тихого голосования увеличено таймаут на повторное голосование после ошибки до 15 минут (это сделано для того что б потом капча не подозревала нас во флуде)
 Исправлена ошибка подключения к интернету если пропало подключение к интернету, расширение теперь верно детектит неподключение к интернету (Unchecked runtime.lastError: Cannot access contents of url "chrome-error://chromewebdata/". Extension manifest must request permission to access this host.)
+В импорте настроек добавлена поддержка старый версий (2.2.0)
+В манифест возвращён в background persistent true
 
 Планируется:
 https://minecraftservers.org/ под вопросом насчёт капчи

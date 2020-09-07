@@ -3,7 +3,8 @@
    "short_name": "AVMR",
    "author": "Serega007",
    "background": {
-      "scripts": [ "background.js" ]
+      "scripts": [ "background.js" ],
+      "persistent": true
    },
    "description": "__MSG_appDesc__",
    "manifest_version": 2,
