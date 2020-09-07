@@ -298,6 +298,7 @@ async function restoreOptions() {
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
     if (settings.multivote) addMultiVote();
+    if (settings.enableMinecraftServers) addMinecraftServers();
 };
 
 //Добавить проект в список проекта
@@ -1441,6 +1442,31 @@ function addMultiVote() {
     });
 }
 
+function addMinecraftServers() {
+    if (document.querySelector('#project').children[8].text != "MinecraftServers") {
+        let option = document.createElement('option');
+        option.setAttribute('value', 'MinecraftServers');
+        option.innerHTML = "MinecraftServers";
+        document.querySelector('#project').insertBefore(option, document.querySelector('#project').children[8]);
+    }
+
+    if (document.querySelector('#MinecraftServersButton') == null) {
+        let buttonMS = document.createElement('button');
+        buttonMS.setAttribute('class', 'selectsite');
+        buttonMS.setAttribute('id', 'MinecraftServersButton');
+        buttonMS.innerHTML = "MinecraftServers.org";
+        document.querySelector("#added > div > div:nth-child(2)").insertBefore(buttonMS, document.querySelector("#added > div > div:nth-child(2)").children[3]);
+
+        document.getElementById('MinecraftServersButton').addEventListener('click', function() {
+            listSelect(event, 'MinecraftServersTab');
+        });
+    }
+    if (!settings.enableMinecraftServers) {
+        settings.enableMinecraftServers = true;
+        setValue('AVMRsettings', settings, false);
+    }
+}
+
 var poput;
 function openPoput(url, reload) {
     let popupBoxWidth = 655;
@@ -1548,9 +1574,11 @@ document.getElementById('FairTopButton').addEventListener('click', function() {
 document.getElementById('IonMcButton').addEventListener('click', function() {
     listSelect(event, 'IonMcTab');
 });
-document.getElementById('MinecraftServersButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftServersTab');
-});
+if (document.getElementById('MinecraftServersButton') != null) {
+    document.getElementById('MinecraftServersButton').addEventListener('click', function() {
+        listSelect(event, 'MinecraftServersTab');
+    });
+}
 document.getElementById('ServeurPriveButton').addEventListener('click', function() {
     listSelect(event, 'ServeurPriveTab');
 });

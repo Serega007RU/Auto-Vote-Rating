@@ -204,9 +204,9 @@ function checkVote() {
 async function checkOpen(project) {
 	//Если нет подключения к интернету
 	if (!navigator.onLine && online) {
-        online = true;
-    } else if (!online) {
-    	return;
+        online = false;
+        console.warn(chrome.i18n.getMessage('internetDisconected'));
+        return;
     }
 	//Таймаут для голосования, если попыток срабатывая превышает retryCoolDown (5 минут) или retryCoolDownEmulation (15 минут), разрешает снова попытаться проголосовать
 	let has = false;
@@ -1040,7 +1040,12 @@ async function endVote(message, sender, project) {
 		if (project.MonitoringMinecraft && message.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
 			clearCookieMonitoringMinecraft = false;
 		}
-		let sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote');
+		let sendMessage;
+		if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
+            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
+		} else {
+            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "15");
+		}
         console.error('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage);
 	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
 	}
@@ -1684,8 +1689,9 @@ worldclockapi успешно сдох и поэтому мы перешли на
 Новые топы:
 - IonMc
 - ServeurPrive
-- MinecraftServers (проблемы с капчей, не будет доступно по умолчанию)
+- MinecraftServers (проблемы с капчей, не будет доступно по умолчанию, используйте Privacy Pass)
 Для топов где недоступен режим тихого голосования увеличено таймаут на повторное голосование после ошибки до 15 минут (это сделано для того что б потом капча не подозревала нас во флуде)
+Исправлена ошибка подключения к интернету если пропало подключение к интернету, расширение теперь верно детектит неподключение к интернету (Unchecked runtime.lastError: Cannot access contents of url "chrome-error://chromewebdata/". Extension manifest must request permission to access this host.)
 
 Планируется:
 https://minecraftservers.org/ под вопросом насчёт капчи

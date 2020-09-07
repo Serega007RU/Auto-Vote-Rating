@@ -409,6 +409,9 @@
   "internetRestored": {
     "message": "Internet Connection restored"
   },
+  "internetDisconected": {
+    "message": "It's time to vote, but the Internet connection is lost, I'm waiting for the Internet connection to resume..."
+  },
   "startedAutoVote": {
     "message": "Starts auto-voting"
   },
@@ -442,7 +445,12 @@
     "message": "Error when voting! Here's what we know:"
   },
   "errorNextVote": {
-    "message": "The next voting attempt will be made in 5 minutes"
+    "message": "The next voting attempt will be made in $minutes$ minutes",
+    "placeholders": {
+      "minutes": {
+        "content": "$1"
+      }
+    }
   },
   "timeStamp": {
     "message": "the time stamp is set to"
