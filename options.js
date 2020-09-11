@@ -341,7 +341,13 @@ async function addProjectList(project, visually) {
         } else if (project.ServerPact) {
             timeNew = new Date(project.time + (43200000/*+12 часов*/));
         } else if (project.ServeurPrive) {
-            timeNew = new Date(project.time + (5400000/*+1.5 часов*/));
+            if (project.countVote >= project.maxCountVote) {
+                timeNew = new Date(project.time);
+                timeNew.setDate(timeNew.getDate() + 1);
+                timeNew.setHours(0, 0, 0, 0);
+            } else {
+                timeNew = new Date(project.time + (5400000/*+1.5 часов*/));
+            }
         } else if (project.MinecraftServers) {
             let date = new Date(new Date(project.time).getTime() + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
             let userTimezoneOffset = date.getTimezoneOffset() * 60000;
@@ -669,7 +675,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         }
         if (project.MinecraftMp) {
             url = 'https://minecraft-mp.com/server-s' + project.id;
-            jsPath = "body > div.content > div > div:nth-child(13) > div.col-xs-7 > table > tbody > tr:nth-child(7) > td:nth-child(2) > a"
+            jsPath = 'table[class="table table-bordered"] > tbody > tr:nth-child(7) > td:nth-child(2) > a'
         }
         if (project.MinecraftServerList) {
             url = 'https://minecraft-server-list.com/server/' + project.id + '/';
@@ -858,7 +864,9 @@ async function setCoolDown() {
     if (settings.cooldown && settings.cooldown == parseInt(document.getElementById('cooldown').value)) return;
     settings.cooldown = parseInt(document.getElementById('cooldown').value);
     await setValue('AVMRsettings', settings, true);
-    alert(chrome.i18n.getMessage('cooldownChanged'));
+    if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
+        chrome.runtime.reload();
+    }
 }
 
 //Статус сохранения настроек

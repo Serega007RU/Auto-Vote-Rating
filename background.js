@@ -307,7 +307,7 @@ async function newWindow(project) {
 		chrome.windows.getCurrent(function(win) {
 			if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError);}
 			if (win == null) {
-				chrome.windows.create({},function(win){
+				chrome.windows.create({focused: false}, function(win){
 					chrome.windows.update(win.id, {focused: false})
 				})
 			}
@@ -1723,10 +1723,10 @@ worldclockapi успешно сдох и поэтому мы перешли на
 Исправлена ошибка подключения к интернету если пропало подключение к интернету, расширение теперь верно детектит неподключение к интернету (Unchecked runtime.lastError: Cannot access contents of url "chrome-error://chromewebdata/". Extension manifest must request permission to access this host.)
 В импорте настроек добавлена поддержка старый версий (2.2.0)
 В манифест возвращён в background persistent true
+В настройках при изменении кулдауна расширение теперь может сам себя перезапускать
 
 Планируется:
 https://minecraftservers.org/ под вопросом насчёт капчи
-можно голосовать только за 1 проект
 
 https://www.minetrack.net/ на момент проверки сайт лежал
 https://www.minestatus.net/ фоновая капча и потом этот сайт лёг

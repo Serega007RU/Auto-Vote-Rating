@@ -299,7 +299,7 @@
     }
   },
   "cooldownChanged": {
-    "message": "Cooldown has been changed successfully. Restart the extension to make the changes take effect."
+    "message": "In order for the changes to take effect, the extension must be restarted. when you restart the settings, they will be closed, and you will need to manually reopen them. Restart the extension?"
   },
   "storageError": {
     "message": "An error occurred while reading the settings, see the details in the console"
