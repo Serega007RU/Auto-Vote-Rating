@@ -193,7 +193,7 @@ p, form, label, details {
   background-image:url('');
   background-repeat:no-repeat;
   width:5px;
-  height:0px
+  height:0px;
 }
 
 ::-webkit-scrollbar-track {
@@ -215,7 +215,7 @@ p, form, label, details {
   background-image:url('');
   background-repeat:no-repeat;
   width:4px;
-  height:0px
+  height:0px;
 }
 
 ::-webkit-scrollbar{
@@ -437,7 +437,7 @@ p, form, label, details {
   transform: rotate(45deg);
 }
 
-.listcontent > p {
+.listcontent > label {
   color: #f44336;
 }
 
