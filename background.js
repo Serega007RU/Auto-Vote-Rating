@@ -290,8 +290,12 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
-	if (settings.multivote && project.vk != null && project.vk != '' && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-        await setCookie('https://oauth.vk.com/', 'remixsid', project.vk);
+	if (settings.multivote && project.tokenvk != null && project.tokenvk != '' && project.idvk != null && project.idvk != '' && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+        await setCookie('https://login.vk.com/', 'p', project.tokenvk);
+        await setCookie('https://login.vk.com/', 'l', project.idvk);
+        await setCookie('https://login.vk.com/', 'h', "1");
+        await setCookie('https://login.vk.com/', 's', "1");
+        await fetch('https://login.vk.com/');
     }
     let silentVoteMode = false;
     if (project.Custom) {

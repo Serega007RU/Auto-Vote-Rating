@@ -469,6 +469,9 @@
   "tokenVK": {
     "message": "Токен ВКонтакте:"
   },
+  "IDVK": {
+    "message": "Айди ВКонтакте:"
+  },
   "projectID": {
     "message": "ID проекта"
   },

@@ -374,7 +374,8 @@ async function addProjectList(project, visually) {
         getProjectList(project).push(project);
     }
     if (settings.multivote && document.getElementById('tokenvk') != null && document.getElementById('tokenvk').value != null && document.getElementById('tokenvk').value != '') {
-        project.vk = document.getElementById('tokenvk').value;
+        project.tokenvk = document.getElementById('tokenvk').value;
+        project.idvk = document.getElementById('IDvk').value.toString();
     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
     //projects.push(project);
@@ -774,7 +775,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         updateStatusAdd('<div>' + chrome.i18n.getMessage('checkHasProjectSuccess') + '</div>', true, element);
 
         //Проверка авторизации ВКонтакте
-        if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
+        if (!settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
             updateStatusAdd('<div>' + chrome.i18n.getMessage('checkAuthVK') + '</div>', true, element);
             let url2;
             if (project.TopCraft) url2 = "https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email";
@@ -1459,14 +1460,14 @@ async function fastAdd() {
 Пока что в бета тестировании
 Данная настройка скрыта из-за нарушений правил топов
 Документация по использованию режима MultiVote
-Что б работал этот режим должны быть удалены и очищены все куки с домена vk.com иначе будет выдавать ошибку авторизации,
 нет не получиться одновременно сидеть в вконтакте и голосовать с нескольких аккаунтов,
 в обход данной проблемы создавайте второй профиль в браузере и с него сидите в вк или используйте расширение либо используйте другой браузер
 
 Для начала в консоле нужно ввести команду addMultiVote();
 Потом нужно поставить галочку напротив "Включить возможность голосования с нескольких аккаунтов вк".
-Если поле токен пустое то в него нужно ввести куки remixsid, который можно взять из куки домена vk.com (погуглите в интернете как смотреть куки браузера и управлять ими если не знаете как)
-Что б это поле было не пустым в вашем браузере должны быть этот куки.
+Зайдите на https://login.vk.com/ в куки домена login.vk.com найдите куки под название l и p
+В поле Токен ВКонтакте введите значение куки p
+В поле Айди ВКонтакте введите значение куки l (это ваш числовой айди аккаунта ВК)
 Потом можно будет добавлять топ (проект)
 
 При добавлении топа токен будет привязываться к добавленному топу и соответсвенно когда расширение будет голосовать он будет применять привязанный токен и соответсвенно голосовать с аккаунта этого токена
@@ -1502,14 +1503,26 @@ function addMultiVote() {
     
     let div = document.createElement('div');
     div.setAttribute('class', 'form-group mb-1');
-    div.innerHTML = '<label data-resource="cooldown" for="cooldown">' + chrome.i18n.getMessage('tokenVK') + '</label>'
+    div.innerHTML = '<label>' + chrome.i18n.getMessage('tokenVK') + '</label>'
+
+    let div2 = document.createElement('div');
+    div2.setAttribute('class', 'form-group mb-1');
+    div2.innerHTML = '<label>' + chrome.i18n.getMessage('IDVK') + '</label>'
 
     let inputToken = document.createElement('input');
     inputToken.setAttribute('name', 'tokenvk');
     inputToken.setAttribute('id', 'tokenvk');
     inputToken.setAttribute('class', 'mb-2');
+
+    let inputID = document.createElement('input');
+    inputID.setAttribute('name', 'IDvk');
+    inputID.setAttribute('id', 'IDvk');
+    inputID.setAttribute('class', 'mb-2');
+    inputID.setAttribute('type', 'number');
     
     el.after(chrome.i18n.getMessage('unecryptedTokenVK'));
+    el.after(inputID);
+    el.after(div2);
     el.after(inputToken);
     el.after(div);
     el.after(label);

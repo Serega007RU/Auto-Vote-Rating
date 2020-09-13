@@ -511,6 +511,9 @@
   "tokenVK": {
     "message": "Token VKontakte:"
   },
+  "IDVK": {
+    "message": "ID VKontakte:"
+  },
   "projectID": {
     "message": "ID project"
   },
