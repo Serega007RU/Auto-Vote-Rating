@@ -25,6 +25,8 @@ var settings;
 var disableCheckProjects = false;
 //Нужно ли добавлять проект с приоритетом
 var priorityOption = false;
+//Нужно ли привязывать куки ВК в добавленному проекту
+var saveVKCookies = false;
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd;
 
@@ -373,9 +375,14 @@ async function addProjectList(project, visually) {
     } else {
         getProjectList(project).push(project);
     }
-    if (settings.multivote && document.getElementById('tokenvk') != null && document.getElementById('tokenvk').value != null && document.getElementById('tokenvk').value != '') {
-        project.tokenvk = document.getElementById('tokenvk').value;
-        project.idvk = document.getElementById('IDvk').value.toString();
+    if (settings.multivote && saveVKCookies) {
+        let getVKCookies = new Promise(resolve => {
+            chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+                resolve(cookies);
+            });
+        });
+
+        project.vk = await getVKCookies;
     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
     //projects.push(project);
@@ -592,7 +599,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     }
 
     forLoopAllProjects(function () {
-        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom) {
+        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom && !(settings.multivote && proj.nick != project.nick && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft))) {
             if (secondBonus === "") {
                 updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
             } else if (element != null) {
@@ -1465,15 +1472,13 @@ async function fastAdd() {
 
 Для начала в консоле нужно ввести команду addMultiVote();
 Потом нужно поставить галочку напротив "Включить возможность голосования с нескольких аккаунтов вк".
-Зайдите на https://login.vk.com/ в куки домена login.vk.com найдите куки под название l и p
-В поле Токен ВКонтакте введите значение куки p
-В поле Айди ВКонтакте введите значение куки l (это ваш числовой айди аккаунта ВК)
+Затем поставить галочку напротив "Включить привязку куки ВК к добавленному проекту".
 Потом можно будет добавлять топ (проект)
 
-При добавлении топа токен будет привязываться к добавленному топу и соответсвенно когда расширение будет голосовать он будет применять привязанный токен и соответсвенно голосовать с аккаунта этого токена
+При добавлении топа куки ВК будут привязываться к добавленному проекту и соответсвенно когда расширение будет голосовать он будет применять привязанные куки и соответсвенно голосовать с аккаунта вк который был авторизован в момент добавления проекта
 
 Неисправленная проблема:
-после голосования привязанный токен остаётся и не сбрасывается если к добавленному топу не было привязки токена
+необходимо реализовать смену айпи через прокси, впн или что-то другое
 */
 // var confirmWarn = false;
 function addMultiVote() {
@@ -1499,40 +1504,33 @@ function addMultiVote() {
     label.innerHTML = chrome.i18n.getMessage('enableMultiVote');
     
     let br = document.createElement('br');
-    let br2 = document.createElement('br');
     
-    let div = document.createElement('div');
-    div.setAttribute('class', 'form-group mb-1');
-    div.innerHTML = '<label>' + chrome.i18n.getMessage('tokenVK') + '</label>'
+    let input2 = document.createElement('input');
+    input2.setAttribute('class', 'checkbox');
+    input2.setAttribute('type', 'checkbox');
+    input2.setAttribute('name', 'checkbox');
+    input2.setAttribute('id', 'enableSaveVKCookies');
 
-    let div2 = document.createElement('div');
-    div2.setAttribute('class', 'form-group mb-1');
-    div2.innerHTML = '<label>' + chrome.i18n.getMessage('IDVK') + '</label>'
-
-    let inputToken = document.createElement('input');
-    inputToken.setAttribute('name', 'tokenvk');
-    inputToken.setAttribute('id', 'tokenvk');
-    inputToken.setAttribute('class', 'mb-2');
-
-    let inputID = document.createElement('input');
-    inputID.setAttribute('name', 'IDvk');
-    inputID.setAttribute('id', 'IDvk');
-    inputID.setAttribute('class', 'mb-2');
-    inputID.setAttribute('type', 'number');
+    let label2 = document.createElement('label');
+    label2.setAttribute('for', 'enableSaveVKCookies');
+    label2.setAttribute('id', 'enableSaveVKCookies');
+    label2.innerHTML = chrome.i18n.getMessage('enableSaveVKCookies');
     
     el.after(chrome.i18n.getMessage('unecryptedTokenVK'));
-    el.after(inputID);
-    el.after(div2);
-    el.after(inputToken);
-    el.after(div);
+    el.after(br);
+    el.after(label2);
+    el.after(input2);
     el.after(label);
     el.after(input);
-    el.after(br);
 
     document.getElementById('enableMulteVote').checked = settings.multivote;
     document.getElementById('enableMulteVote').addEventListener('change', async function() {
         settings.multivote = this.checked;
         await setValue('AVMRsettings', settings, true);
+    });
+
+    document.getElementById('enableSaveVKCookies').addEventListener('change', function() {
+        saveVKCookies = this.checked;
     });
 }
 

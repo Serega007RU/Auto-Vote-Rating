@@ -373,6 +373,9 @@
   "enableMultiVote": {
     "message": "Include the possibility of voting with multiple accounts VK"
   },
+  "enableSaveVKCookies": {
+    "message": "Enable the binding from the cookie added to the VK project"
+  },
   "projectIDTooltip": {
     "message": "Project ID can be obtained from the address bar while on the project page, for example: on TopCraft for StarWay ID: 10496"
   },

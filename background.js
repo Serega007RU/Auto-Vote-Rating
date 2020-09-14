@@ -290,12 +290,23 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
-	if (settings.multivote && project.tokenvk != null && project.tokenvk != '' && project.idvk != null && project.idvk != '' && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-        await setCookie('https://login.vk.com/', 'p', project.tokenvk);
-        await setCookie('https://login.vk.com/', 'l', project.idvk);
-        await setCookie('https://login.vk.com/', 'h', "1");
-        await setCookie('https://login.vk.com/', 's', "1");
-        await fetch('https://login.vk.com/');
+	if (settings.multivote && project.vk != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+        console.log('Изменяю авторизацю вк...');
+
+        let getVKCookies = new Promise(resolve => {
+            chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+                resolve(cookies);
+            });
+        });
+        let cookies = await getVKCookies;
+		for(var i=0; i<cookies.length;i++) {
+			await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+		}
+
+		for(var i = 0; i < project.vk.length; i++) {
+			let cookie = project.vk[i];
+            await setCookieDetails({url: "https://" + cookie.domain.substring(1, cookie.domain.length) + cookie.path, name: cookie.name, value: cookie.value, domain: cookie.domain, path: cookie.path, secure: cookie.secure, httpOnly: cookie.httpOnly, sameSite: cookie.sameSite, expirationDate: cookie.expirationDate, storeId: cookie.storeId});
+		}
     }
     let silentVoteMode = false;
     if (project.Custom) {
@@ -1177,6 +1188,14 @@ async function setCookie(url, name, value) {
 	return new Promise(resolve => {
 		chrome.cookies.set({'url': url, 'name': name, 'value': value}, function(details) {
 			resolve(details);
+		})
+	})
+}
+
+async function setCookieDetails(details) {
+	return new Promise(resolve => {
+		chrome.cookies.set(details, function(det) {
+			resolve(det);
 		})
 	})
 }
