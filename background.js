@@ -1542,7 +1542,18 @@ handler = function(n) {
     }
     return {requestHeaders: n.requestHeaders}
 };
-chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serverpact.com/*", "*://www.minecraftiplist.com/*"]}, ["blocking", "requestHeaders"]);
+
+chrome.permissions.contains({
+    permissions: [ "webRequest", "webRequestBlocking" ]
+}, function(result) {
+    if (result) {
+    	addListenerWebRequest();
+    }
+});
+
+function addListenerWebRequest() {
+    chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serverpact.com/*", "*://www.minecraftiplist.com/*"]}, ["blocking", "requestHeaders"]);
+}
 
 /*
 История настроек:

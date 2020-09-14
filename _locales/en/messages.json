@@ -546,9 +546,12 @@
     "message": "https://paypal.me/serega007ru"
   },
   "unecryptedTokenVK": {
-    "message": "Denial of responsibility: The VK token will be stored Unencrypted and can be hacked. You add a token here at your own risk!"
+    "message": "Disclaimer: VK cookies will be stored Unencrypted and can be hacked. You use VK cookies at your own risk!"
   },
   "countVote": {
     "message": "How many votes make per day"
+  },
+  "userAgent": {
+    "message": "If you are using a mobile device, you need additional permission to vote on ServerPact or MinecraftIpList, please provide it. If you are using a computer you may not grant this permission"
   }
 }
