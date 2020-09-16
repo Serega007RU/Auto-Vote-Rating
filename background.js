@@ -1542,18 +1542,7 @@ handler = function(n) {
     }
     return {requestHeaders: n.requestHeaders}
 };
-
-chrome.permissions.contains({
-    permissions: [ "webRequest", "webRequestBlocking" ]
-}, function(result) {
-    if (result) {
-    	addListenerWebRequest();
-    }
-});
-
-function addListenerWebRequest() {
-    chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serverpact.com/*", "*://www.minecraftiplist.com/*"]}, ["blocking", "requestHeaders"]);
-}
+chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serverpact.com/*", "*://www.minecraftiplist.com/*"]}, ["blocking", "requestHeaders"]);
 
 /*
 История настроек:
@@ -1758,6 +1747,9 @@ worldclockapi успешно сдох и поэтому мы перешли на
 В импорте настроек добавлена поддержка старых версий (2.2.0)
 В манифест возвращён в background persistent true
 В настройках при изменении кулдауна расширение теперь может сам себя перезапускать
+
+v3.1.1
+Как выяснилось Kiwi Browser не способен работать в необязательными разрешениями что теперь разрешениями webRequest и webRequestBlocking теперь являются обязательными (в частности с методами chrome.permissions.request, alert, confirm или с любыми другими всплывающими окнами chrome (также выдавало ошибку при использвании chrome.runtime.getPlatformInfo что и так осложняло поддержку необязаных разрешений для мобильных устройств))
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)

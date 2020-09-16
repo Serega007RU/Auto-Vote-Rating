@@ -824,24 +824,6 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         }
     }
 
-    if (project.ServerPact || project.MinecraftIpList) {
-        chrome.permissions.contains({
-            permissions: [ "webRequest", "webRequestBlocking" ]
-        }, function(result) {
-            if (!result) {
-                updateStatusAdd('<div align="center" style="color:#FF9333;">' + chrome.i18n.getMessage('userAgent') + '</div>', true, element);
-                chrome.permissions.request({
-                    permissions: [ "webRequest", "webRequestBlocking" ]
-                }, function(granted) {
-                    // The callback argument will be true if the user granted the permissions.
-                    if (granted) {
-                        chrome.extension.getBackgroundPage().addListenerWebRequest();
-                    }
-                });
-            }
-        });
-    }
-
     await addProjectList(project, false);
 
     if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.MinecraftServers || project.ServeurPrive) && settings.enabledSilentVote) {

@@ -550,8 +550,5 @@
   },
   "countVote": {
     "message": "How many votes make per day"
-  },
-  "userAgent": {
-    "message": "If you are using a mobile device, you need additional permission to vote on ServerPact or MinecraftIpList, please provide it. If you are using a computer you may not grant this permission"
   }
 }
