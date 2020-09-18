@@ -1,6 +1,3 @@
-//Где сохранять настройки
-var settingsStorage;
-
 //var projects = [];
 var projectsTopCraft = [];
 var projectsMcTOP = [];
@@ -78,18 +75,6 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 async function restoreOptions() {
-    let settingsSync = await getSyncValue('AVMRenableSyncStorage');
-    settingsSync = settingsSync.AVMRenableSyncStorage;
-    if (settingsSync) {
-        settingsStorage = chrome.storage.sync;
-    } else {
-        settingsStorage = chrome.storage.local;
-    }
-    if (settingsSync == undefined) {
-        alert(chrome.i18n.getMessage('firstInstall'));
-        await setSyncValue('AVMRenableSyncStorage', false);
-    }
-    
     projectsTopCraft = await getValue('AVMRprojectsTopCraft');
     projectsTopCraft = projectsTopCraft.AVMRprojectsTopCraft;
     projectsMcTOP = await getValue('AVMRprojectsMcTOP');
@@ -236,42 +221,6 @@ async function restoreOptions() {
                 }
             }
             if (this.id == "disabledCheckTime") settings.disabledCheckTime = this.checked;
-            if (this.id == "enableSyncStorage") {
-                if (this.checked) {
-                    settingsStorage = chrome.storage.sync;
-                    updateStatusSave('<div>' + chrome.i18n.getMessage('settingsSyncCopy') + '</div>', false);
-                } else {
-                   settingsStorage = chrome.storage.local;
-                   updateStatusSave('<div>' + chrome.i18n.getMessage('settingsSyncCopyLocal') + '</div>', true);
-                }
-                await setSyncValue('AVMRenableSyncStorage', this.checked);
-                await setValue('AVMRsettings', settings, false);
-                await setValue('AVMRprojectsTopCraft', projectsTopCraft, false);
-                await setValue('AVMRprojectsMcTOP', projectsMcTOP, false);
-                await setValue('AVMRprojectsMCRate', projectsMCRate, false);
-                await setValue('AVMRprojectsMinecraftRating', projectsMinecraftRating, false);
-                await setValue('AVMRprojectsMonitoringMinecraft', projectsMonitoringMinecraft, false);
-                await setValue('AVMRprojectsFairTop', projectsFairTop, false);
-                await setValue('AVMRprojectsIonMc', projectsIonMc, false);
-                await setValue('AVMRprojectsMinecraftServers', projectsMinecraftServers, false);
-                await setValue('AVMRprojectsServeurPrive', projectsServeurPrive, false);
-                await setValue('AVMRprojectsPlanetMinecraft', projectsPlanetMinecraft, false);
-                await setValue('AVMRprojectsTopG', projectsTopG, false);
-                await setValue('AVMRprojectsMinecraftMp', projectsMinecraftMp, false);
-                await setValue('AVMRprojectsMinecraftServerList', projectsMinecraftServerList, false);
-                await setValue('AVMRprojectsServerPact', projectsServerPact, false);
-                await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
-                await setValue('AVMRprojectsTopMinecraftServers', projectsTopMinecraftServers, false);
-                await setValue('AVMRprojectsCustom', projectsCustom, false);
-                //await setValue('AVMRprojects', projects, false);
-                await chrome.extension.getBackgroundPage().initializeConfig();
-                if (this.checked) {
-                    updateStatusSave('<div>' + chrome.i18n.getMessage('settingsSyncCopySuccess') + '</div>', false);
-                } else {
-                    updateStatusSave('<div>' + chrome.i18n.getMessage('settingsSyncCopyLocalSuccess') + '</div>', false);
-                }
-                return;
-            }
             if (this.id == "disableCheckProjects") {
                 if (this.checked && confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                     disableCheckProjects = this.checked;
@@ -305,7 +254,6 @@ async function restoreOptions() {
     } else {
         document.getElementById("enabledSilentVote").value = 'disabled';
     }
-    document.getElementById("enableSyncStorage").checked = settingsSync;
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
     if (settings.multivote) addMultiVote();
@@ -986,7 +934,7 @@ function extractHostname(url) {
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
 async function getValue(name) {
     return new Promise(resolve => {
-        settingsStorage.get(name, data => {
+        chrome.storage.local.get(name, data => {
             if (chrome.runtime.lastError) {
                 updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('storageError') + '</div>', false);
                 reject(chrome.runtime.lastError);
@@ -999,7 +947,7 @@ async function getValue(name) {
 async function setValue(key, value, updateStatus) {
     if (updateStatus) updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);
     return new Promise(resolve => {
-        settingsStorage.set({[key]: value}, data => {
+        chrome.storage.local.set({[key]: value}, data => {
             if (chrome.runtime.lastError) {
                 updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('storageErrorSave') + '</div>', false);
                 reject(chrome.runtime.lastError);

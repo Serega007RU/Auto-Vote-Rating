@@ -87,14 +87,6 @@
     "message": "Disable error notifications",
     "description": "Checkbox. Error notifications"
   },
-  "enableSyncStorage": {
-    "message": "Save extension settings in the cloud",
-    "description": "Checkbox. Cloud save extension settings"
-  },
-  "enableSyncStorageTooltip": {
-    "message": "It is not recommended to enable this setting if you have a lot of projects in the list of added projects. The cloud has limited traffic and storage space. For this function to work, your account must be connected and synchronization enabled, otherwise the settings will still be saved locally Allows you to synchronize extension settings with multiple computers, it is not recommended to keep the extension enabled with this setting enabled on several computers at once",
-    "description": "Tooltip. Cloud save extension settings"
-  },
   "disabledCheckTime": {
     "message": "Disable time checking at extension start",
     "description": "Checkbox. Disable time checking"
@@ -190,18 +182,6 @@
   },
   "confirmDisableErrors": {
     "message": "Do You really want to disable error notifications? If there is any problem when voting, the extension will try to vote again every 5 minutes. If you don't get errors and don't keep track of them, the extension will endlessly try to vote. be careful with this, you may be blocked for trying to vote so often"
-  },
-  "settingsSyncCopy": {
-    "message": "Copying settings to the cloud..."
-  },
-  "settingsSyncCopyLocal": {
-    "message": "Copying settings to local storage..."
-  },
-  "settingsSyncCopySuccess": {
-    "message": "Settings were successfully copied to the cloud"
-  },
-  "settingsSyncCopyLocalSuccess": {
-    "message": "Settings were successfully copied to local storage"
   },
   "confirmDisableCheckProjects": {
     "message": "Do You really want to disable verification when adding a project? If you make an error when adding a project it may lead to errors"

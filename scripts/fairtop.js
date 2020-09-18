@@ -8,36 +8,27 @@ function vote () {
         }
 		return;
 	}
-	chrome.storage.sync.get('AVMRenableSyncStorage', function(result) {
-		var settingsStorage;
-		let settingsSync = result.AVMRenableSyncStorage;
-		if (settingsSync) {
-			settingsStorage = chrome.storage.sync;
-		} else {
-			settingsStorage = chrome.storage.local;
-		}
-		settingsStorage.get('AVMRprojectsFairTop', function(result) {
-			try {
-				//Если есть поле ввода для никнейма, значит мы на первой странице
-				if (document.querySelector("body > div.container > div > div > div > div.page-data-units > div.page-unit > div.vote-form > form > input.form-control.input-vote.col-sm-60") != null) {
-					//Достаёт никнейм для голосования
-					let nick = getNickName(result.AVMRprojectsFairTop);
-					if (nick == null || nick == "") return;
-					document.querySelector("body > div.container > div > div > div > div.page-data-units > div.page-unit > div.vote-form > form > input.form-control.input-vote.col-sm-60").value = nick;
-					//Кликает на "Проголосовать"
-					document.querySelector("body > div.container > div > div > div > div.page-data-units > div.page-unit > div.vote-form > form > button").click();
-				} else if (document.querySelector("#submit-form") != null) {//Если мы на второй странице и есть опять же кнопка "Проголосовать"
-					//Кликает на кнопку "Проголосовать"
-					document.querySelector("#submit-form").click();
-				}
-			} catch (e) {
-				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
-					sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
-				} else {
-					sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
-				}
+	chrome.storage.local.get('AVMRprojectsFairTop', function(result) {
+		try {
+			//Если есть поле ввода для никнейма, значит мы на первой странице
+			if (document.querySelector("body > div.container > div > div > div > div.page-data-units > div.page-unit > div.vote-form > form > input.form-control.input-vote.col-sm-60") != null) {
+				//Достаёт никнейм для голосования
+				let nick = getNickName(result.AVMRprojectsFairTop);
+				if (nick == null || nick == "") return;
+				document.querySelector("body > div.container > div > div > div > div.page-data-units > div.page-unit > div.vote-form > form > input.form-control.input-vote.col-sm-60").value = nick;
+				//Кликает на "Проголосовать"
+				document.querySelector("body > div.container > div > div > div > div.page-data-units > div.page-unit > div.vote-form > form > button").click();
+			} else if (document.querySelector("#submit-form") != null) {//Если мы на второй странице и есть опять же кнопка "Проголосовать"
+				//Кликает на кнопку "Проголосовать"
+				document.querySelector("#submit-form").click();
 			}
-		});
+		} catch (e) {
+			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
+				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
+			} else {
+				sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
+			}
+		}
 	});
 }
 

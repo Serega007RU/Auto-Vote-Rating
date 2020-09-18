@@ -8,38 +8,29 @@ function vote () {
         }
 		return;
 	}
-	chrome.storage.sync.get('AVMRenableSyncStorage', function(result) {
-		var settingsStorage;
-		let settingsSync = result.AVMRenableSyncStorage;
-		if (settingsSync) {
-			settingsStorage = chrome.storage.sync;
-		} else {
-			settingsStorage = chrome.storage.local;
-		}
-		settingsStorage.get('AVMRprojectsTopMinecraftServers', function(result) {
-			try {
-				if (document.querySelector("body > div.container > div > div > div.alert.alert-danger") != null) {
-					sendMessage(document.querySelector("body > div.container > div > div > div.alert.alert-danger").textContent);
-				} else if (document.querySelector("body > div.container > div > div > div > div.col-md-4 > button") != null) {
-			        if (document.querySelector("body > div.container > div > div > div > div.col-md-4 > button").textContent.includes('already voted')) {
-                        sendMessage('successfully');
-			        } else {
-			            sendMessage(document.querySelector("body > div.container > div > div > div > div.col-md-4 > button").textContent);
-			        }
-			    } else {
-	                let nick = getNickName(result.AVMRprojectsTopMinecraftServers);
-		            if (nick == null || nick == "") return;
-		            document.querySelector("#username").value = nick;
-		            setTimeout(() => document.querySelector("#voteButton").click(), 10000);
-			    }
-			} catch (e) {
-				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
-					sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
-				} else {
-					sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
-				}
+	chrome.storage.local.get('AVMRprojectsTopMinecraftServers', function(result) {
+		try {
+			if (document.querySelector("body > div.container > div > div > div.alert.alert-danger") != null) {
+				sendMessage(document.querySelector("body > div.container > div > div > div.alert.alert-danger").textContent);
+			} else if (document.querySelector("body > div.container > div > div > div > div.col-md-4 > button") != null) {
+		        if (document.querySelector("body > div.container > div > div > div > div.col-md-4 > button").textContent.includes('already voted')) {
+                    sendMessage('successfully');
+		        } else {
+		            sendMessage(document.querySelector("body > div.container > div > div > div > div.col-md-4 > button").textContent);
+		        }
+		    } else {
+	            let nick = getNickName(result.AVMRprojectsTopMinecraftServers);
+	            if (nick == null || nick == "") return;
+	            document.querySelector("#username").value = nick;
+	            setTimeout(() => document.querySelector("#voteButton").click(), 10000);
+		    }
+		} catch (e) {
+			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
+				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
+			} else {
+				sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
 			}
-		});
+		}
 	});
 }
 

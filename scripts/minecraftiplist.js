@@ -8,64 +8,55 @@ function vote () {
         }
 		return;
 	}
-	chrome.storage.sync.get('AVMRenableSyncStorage', function(result) {
-		var settingsStorage;
-		let settingsSync = result.AVMRenableSyncStorage;
-		if (settingsSync) {
-			settingsStorage = chrome.storage.sync;
-		} else {
-			settingsStorage = chrome.storage.local;
-		}
-		settingsStorage.get('AVMRprojectsMinecraftIpList', async function(result) {
-			try {
-				if (document.querySelector("#Content > div.Error") != null) {
-                    if (document.querySelector("#Content > div.Error").textContent.includes('You did not complete the crafting table correctly')) {
-					    sendMessage('Не удалось пройти капчу');
-					    return;
-				    }
-				    if (document.querySelector("#Content > div.Error").textContent.includes('last voted for this server')) {
-                        let numbers = document.querySelector("#Content > div.Error").textContent.match(/\d+/g).map(Number);
-						let count = 0;
-						let hour = 0;
-						let min = 0;
-						let sec = 0;
-						for (var i in numbers) {
-							if (count == 0) {
-								hour = numbers[i];
-							} else if (count == 1) {
-								min = numbers[i];
-							}
-							count++;
-						}
-						var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-                        sendMessage('later ' + (Date.now() - milliseconds));
-                        return;
-				    }
-				    sendMessage(document.querySelector("#Content > div.Error").textContent);
+	chrome.storage.local.get('AVMRprojectsMinecraftIpList', async function(result) {
+		try {
+			if (document.querySelector("#Content > div.Error") != null) {
+                if (document.querySelector("#Content > div.Error").textContent.includes('You did not complete the crafting table correctly')) {
+				    sendMessage('Не удалось пройти капчу');
 				    return;
-				}
-				if (document.querySelector("#Content > div.Good") != null && document.querySelector("#Content > div.Good").textContent.includes('You voted for this server!')) {
-                    sendMessage('successfully');
+			    }
+			    if (document.querySelector("#Content > div.Error").textContent.includes('last voted for this server')) {
+                    let numbers = document.querySelector("#Content > div.Error").textContent.match(/\d+/g).map(Number);
+					let count = 0;
+					let hour = 0;
+					let min = 0;
+					let sec = 0;
+					for (var i in numbers) {
+						if (count == 0) {
+							hour = numbers[i];
+						} else if (count == 1) {
+							min = numbers[i];
+						}
+						count++;
+					}
+					var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
+                    sendMessage('later ' + (Date.now() - milliseconds));
                     return;
-				}
-				if (document.querySelector("#InnerWrapper").innerText.includes('";')) return;
-                if (!await getRecipe()) {
-                	sendMessage('Не удалось найти рецепт: ' + document.querySelector("table[class='CraftingTarget']").firstElementChild.firstElementChild.firstElementChild.firstElementChild.src);
-                	return;
-                }
-                await craft();
-                let nick = getNickName(result.AVMRprojectsMinecraftIpList);
-		        if (nick == null || nick == "") return;
-		        document.querySelector("#Content > form > input[type=text]").value = nick;
-                document.querySelector("#votebutton").click();
-			} catch (e) {
-				if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
-					sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
-				} else {
-					sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
-				}
+			    }
+			    sendMessage(document.querySelector("#Content > div.Error").textContent);
+			    return;
 			}
-		});
+			if (document.querySelector("#Content > div.Good") != null && document.querySelector("#Content > div.Good").textContent.includes('You voted for this server!')) {
+                sendMessage('successfully');
+                return;
+			}
+			if (document.querySelector("#InnerWrapper").innerText.includes('";')) return;
+            if (!await getRecipe()) {
+               	sendMessage('Не удалось найти рецепт: ' + document.querySelector("table[class='CraftingTarget']").firstElementChild.firstElementChild.firstElementChild.firstElementChild.src);
+               	return;
+            }
+            await craft();
+            let nick = getNickName(result.AVMRprojectsMinecraftIpList);
+	        if (nick == null || nick == "") return;
+	        document.querySelector("#Content > form > input[type=text]").value = nick;
+            document.querySelector("#votebutton").click();
+		} catch (e) {
+			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
+				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
+			} else {
+				sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
+			}
+		}
 	});
 }
 

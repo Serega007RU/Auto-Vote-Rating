@@ -19,8 +19,6 @@ var projectsCustom = [];
 
 //Настройки
 var settings;
-//Где сохранять настройки
-var settingsStorage;
 
 //Текущие открытые вкладки расширением
 var openedProjects = new Map();
@@ -45,19 +43,6 @@ var secondVoteMinecraftIpList = false;
 //Инициализация настроек расширения
 initializeConfig();
 async function initializeConfig() {
-    let settingsSync = await getSyncValue('AVMRenableSyncStorage');
-    settingsSync = settingsSync.AVMRenableSyncStorage;
-    if (settingsSync == undefined) {
-    	setTimeout(() => {
-    		chrome.runtime.openOptionsPage();
-    	}, 1500);
-    }
-    if (settingsSync) {
-        settingsStorage = chrome.storage.sync;
-    } else {
-    	settingsStorage = chrome.storage.local;
-    }
-    
     projectsTopCraft = await getValue('AVMRprojectsTopCraft');
     projectsTopCraft = projectsTopCraft.AVMRprojectsTopCraft;
     projectsMcTOP = await getValue('AVMRprojectsMcTOP');
@@ -1219,7 +1204,7 @@ async function removeCookie(url, name) {
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
 async function getValue(name) {
     return new Promise(resolve => {
-        settingsStorage.get(name, data => {
+        chrome.storage.local.get(name, data => {
             resolve(data);
         });
     });
@@ -1233,7 +1218,7 @@ async function getSyncValue(name) {
 }
 async function setValue(key, value) {
     return new Promise(resolve => {
-        settingsStorage.set({[key]: value}, data => {
+        chrome.storage.local.set({[key]: value}, data => {
             resolve(data);
         });
     });
@@ -1750,6 +1735,7 @@ worldclockapi успешно сдох и поэтому мы перешли на
 
 v3.1.1
 Как выяснилось Kiwi Browser не способен работать в необязательными разрешениями что теперь разрешениями webRequest и webRequestBlocking теперь являются обязательными (в частности с методами chrome.permissions.request, alert, confirm или с любыми другими всплывающими окнами chrome (также выдавало ошибку при использвании chrome.runtime.getPlatformInfo что и так осложняло поддержку необязаных разрешений для мобильных устройств))
+Избавились от функционала синхронизации настроек между браузерами, ненужный функционал от которого много проблем. Используйте вместо него импорт/экспорт настроек
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
