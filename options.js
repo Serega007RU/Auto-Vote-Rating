@@ -150,6 +150,7 @@ async function restoreOptions() {
         await setValue('AVMRprojectsCustom', projectsCustom, false);
         console.log(chrome.i18n.getMessage('settingsGen'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
+        alert(chrome.i18n.getMessage('firstInstall'));
     }
 
     //Если пользователь обновился с версии 2.2.0

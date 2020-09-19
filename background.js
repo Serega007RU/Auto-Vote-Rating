@@ -1529,6 +1529,12 @@ handler = function(n) {
 };
 chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serverpact.com/*", "*://www.minecraftiplist.com/*"]}, ["blocking", "requestHeaders"]);
 
+chrome.runtime.onInstalled.addListener(function (details) {
+	if (details.reason == "install") {
+		chrome.runtime.openOptionsPage();
+	}
+})
+
 /*
 История настроек:
 v1 http://ipic.su/img/img7/fs/options1.1597930655.png
