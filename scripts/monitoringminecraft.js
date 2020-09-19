@@ -45,7 +45,7 @@ function vote() {
 					count++;
 				}
 				var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-				var later = Date.now() - (86400000 - milliseconds);
+				var later = Date.now() + milliseconds;
 				sendMessage('later ' + later);
 			} else if (document.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
 				sendMessage('successfully');

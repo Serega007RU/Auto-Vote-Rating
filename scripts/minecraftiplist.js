@@ -30,7 +30,7 @@ function vote () {
 						count++;
 					}
 					var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-                    sendMessage('later ' + (Date.now() - milliseconds));
+                    sendMessage('later ' + (Date.now() + (86400000 - milliseconds)));
                     return;
 			    }
 			    sendMessage(document.querySelector("#Content > div.Error").textContent);

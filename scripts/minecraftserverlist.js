@@ -54,7 +54,7 @@ function sendMessage(message) {
 
 //Ждёт готовности recaptcha (Anti Spam check) и проверяет что с голосованием и пытается вновь нажать vote();
 this.check = setInterval(()=>{
-    if (document.querySelector("#voteerror > font") != null && (!document.querySelector("#voteerror > font").textContent.includes('Error with the Anti Spam check')) && !document.querySelector("#voteerror > font").textContent.includes('Thanks, Vote Registered') && !document.querySelector("#voteerror > font").textContent.includes('Username already voted today!')) {
+    if (document.querySelector("#voteerror > font") != null && (!document.querySelector("#voteerror > font").textContent.includes('Error with the Anti Spam check')) && !document.querySelector("#voteerror > font").textContent.includes('Thanks, Vote Registered') && !document.querySelector("#voteerror > font").textContent.includes('Username already voted today!') && !document.querySelector("#voteerror > font").textContent.includes('Please Wait...')) {
         clearInterval(this.check);
         sendMessage(document.querySelector("#voteerror > font").textContent);
     }

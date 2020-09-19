@@ -13,7 +13,7 @@ function vote () {
 			if (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {
 				sendMessage('successfully');
 			} else if (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {
-				sendMessage('later ' + Date.now());//ToDo <Serega007> а зачем нам говорить сколько осталось до следующего голосования? Нееет, мы по тупому просто напишем 12 часов и пошлём нафиг, зачем это нужно ServerPact'у?
+				sendMessage('later ' + (Date.now() + 43200000));//ToDo <Serega007> а зачем нам говорить сколько осталось до следующего голосования? Нееет, мы по тупому просто напишем 12 часов и пошлём нафиг, зачем это нужно ServerPact'у?
 			} else if (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null) {
 				sendMessage(document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent);
 			} else {

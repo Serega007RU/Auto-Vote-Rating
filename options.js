@@ -270,48 +270,16 @@ async function addProjectList(project, visually) {
     //Расчёт времени
     let text = "скоро...";
     if (!(project.time == null || project.time == "")) {
-        let timeNew;
-        if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.IonMc) {
-            let date = new Date(new Date(project.time).getTime() - 10800000/*-3 часа*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
-            let userTimezoneOffset = date.getTimezoneOffset() * 60000;
-            timeNew = new Date(date.getTime() - userTimezoneOffset);
-        } else if (project.MCRate) {
-            let date = new Date(new Date(project.time).getTime() - 10800000/*-3 часа*/ + 86400000/*+24 часа*/ + 3600000/*+ 1 час*/ + (project.priority ? 0 : 600000/*+10 минут*/));
-            let userTimezoneOffset = date.getTimezoneOffset() * 60000;
-            timeNew = new Date(date.getTime() - userTimezoneOffset);
-        } else if (project.TopG) {
-            timeNew = new Date(project.time + (43200000/*+12 часов*/));
-        } else if (project.MinecraftMp || project.PlanetMinecraft) {
-            let date = new Date(new Date(project.time).getTime() + 18000000/*+5 часов*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
-            let userTimezoneOffset = date.getTimezoneOffset() * 60000;
-            timeNew = new Date(date.getTime() - userTimezoneOffset);
-        } else if (project.MinecraftServerList) {
-            let date = new Date(new Date(project.time).getTime() - 7200000/*-2 часа*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
-            let userTimezoneOffset = date.getTimezoneOffset() * 60000;
-            timeNew = new Date(date.getTime() - userTimezoneOffset);
-        } else if (project.ServerPact) {
-            timeNew = new Date(project.time + (43200000/*+12 часов*/));
-        } else if (project.ServeurPrive) {
-            if (project.countVote >= project.maxCountVote) {
-                timeNew = new Date(project.time);
-                timeNew.setDate(timeNew.getDate() + 1);
-                timeNew.setHours(0, 0, 0, 0);
-            } else {
-                timeNew = new Date(project.time + (5400000/*+1.5 часов*/));
+        let time = new Date(project.time);
+        let next = false;
+        if (project.ServeurPrive) {
+            if (project.countVote >= project.maxCountVote && Date.now() > project.time) {
+                time.setDate(time.getDate() + 1);
+                time.setHours(0, 0, 0, 0);
+                next = true;
             }
-        } else if (project.MinecraftServers) {
-            let date = new Date(new Date(project.time).getTime() + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
-            let userTimezoneOffset = date.getTimezoneOffset() * 60000;
-            timeNew = new Date(date.getTime() - userTimezoneOffset);
-        } else if (project.TopMinecraftServers) {
-            //ToDo следует проверить корректность работы с разными часовыми поясами
-            let date = new Date(new Date(project.time).getTime() + 14400000/*+4 часа*/ + 86400000/*+24 часа*/ + (project.priority ? 0 : 600000/*+10 минут*/));
-            let userTimezoneOffset = date.getTimezoneOffset() * 60000;
-            timeNew = new Date(date.getTime() - userTimezoneOffset);
-        } else {
-            timeNew = new Date(project.time + (project.Custom ? project.timeout : 86400000/*+24 часа*/));
         }
-        if (Date.now() < timeNew.getTime()) text = ('0' + timeNew.getDate()).slice(-2) + '.' + ('0' + (timeNew.getMonth()+1)).slice(-2) + '.' + timeNew.getFullYear() + ' ' + ('0' + timeNew.getHours()).slice(-2) + ':' + ('0' + timeNew.getMinutes()).slice(-2) + ':' + ('0' + timeNew.getSeconds()).slice(-2);
+        if (Date.now() < project.time || next) text = ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth()+1)).slice(-2) + '.' + time.getFullYear() + ' ' + ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2) + ':' + ('0' + time.getSeconds()).slice(-2);
     }
     html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + chrome.i18n.getMessage('nextVote') + ' ' + text;
     listProject.after(html)
@@ -600,7 +568,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         }
         if (project.MinecraftRating) {
             url = 'http://minecraftrating.ru/projects/' + project.id + '/';
-            jsPath = "#tab-about > div.table-wrap > div > table > tbody > tr:nth-child(2) > td:nth-child(2) > a";
+            jsPath = "table[class='table server-table'] > tbody > tr:nth-child(2) > td:nth-child(2) > a";
         }
         if (project.MonitoringMinecraft) {
             url = 'http://monitoringminecraft.ru/top/' + project.id + '/';

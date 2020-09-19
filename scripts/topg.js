@@ -27,7 +27,7 @@ function vote () {
 					count++;
 				}
 				var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-				var later = Date.now() - (43200000 - milliseconds);
+				var later = Date.now() + milliseconds;
 				sendMessage('later ' + later);
 			} else if (document.querySelector("#v") != null && document.querySelector("#v").textContent.includes('Submit your vote') && document.querySelector("#username").value.length == 0) {
 	            clearInterval(this.check);

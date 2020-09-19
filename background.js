@@ -124,76 +124,19 @@ function checkVote() {
     }
     
 	forLoopAllProjects(function () {
-		if (proj.TopCraft || proj.McTOP || proj.FairTop || proj.MinecraftRating || proj.MCRate || proj.IonMc) {
-            let timeMoscow = new Date(Date.now() + 10800000);
-            let date = (timeMoscow.getUTCMonth() + 1) + '/' + timeMoscow.getUTCDate() + '/' + timeMoscow.getUTCFullYear();
-            let hourse = timeMoscow.getUTCHours();
-	        let minutes = timeMoscow.getUTCMinutes();
-			//Должно соблюсти след условия: должно быть дата не равна, если сейчас 0 часов (1 на MCRate) — должно быть больше 10-ти минут (или должен быть приоритет), если 1 (2 на MCRate) или больше часов то пропускает
-		    if (proj.MCRate) {
-				if (proj.time == null || ((proj.time != date && hourse >= 2) || (proj.time != date && hourse == 1 && (proj.priority || minutes >= 10)))) {
-					checkOpen(proj);
-				}
-		    } else {
-				if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
-					checkOpen(proj);
-				}
-		    }
-	    } else if (proj.TopG) {
-			if (proj.time == null || proj.time < (Date.now() - (43200000/*+12 часов*/))) {
-                checkOpen(proj);
-			}
-	    } else if (proj.MinecraftMp || proj.PlanetMinecraft) {
-            let timeEST = new Date(Date.now() - 18000000/*- 5 часов*/);
-            let date = (timeEST.getUTCMonth() + 1) + '/' + timeEST.getUTCDate() + '/' + timeEST.getUTCFullYear();
-            let hourse = timeEST.getUTCHours();
-	        let minutes = timeEST.getUTCMinutes();
-			if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
-                checkOpen(proj);
-			}
-	    } else if (proj.MinecraftServerList) {
-            let time5 = new Date(Date.now() + 7200000/*+ 2 часа*/);
-            let date = (time5.getUTCMonth() + 1) + '/' + time5.getUTCDate() + '/' + time5.getUTCFullYear();
-            let hourse = time5.getUTCHours();
-	        let minutes = time5.getUTCMinutes();
-			if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
-                checkOpen(proj);
-			}
-	    } else if (proj.ServerPact) {
-			if (proj.time == null || proj.time < (Date.now() - 43200000/*12 часов*/)) {
-                checkOpen(proj);
-			}
-	    } else if (proj.ServeurPrive) {
+		if (proj.ServeurPrive) {
 	    	if (proj.countVote > 0 && proj.time != null) {
 				let now = new Date();
-				let past = new Date(proj.time);
-				if (now.getDate() != past.getDate() || now.getMonth() != past.getMonth() || now.getFullYear != past.getFullYear) {
+				let next = new Date(proj.time);
+				if (now.getDate() > next.getDate() || now.getMonth() > next.getMonth() || now.getFullYear > next.getFullYear) {
 					proj.countVote = 0;
 				}
 	    	}
-			if (proj.countVote < proj.maxCountVote && (proj.time == null || proj.time < (Date.now() - 5400000/*1.5 часов*/))) {
+			if (proj.countVote < proj.maxCountVote && (proj.time == null || proj.time < Date.now())) {
                 checkOpen(proj);
 			}
-	    } else if (proj.MinecraftServers) {
-            let timeUTC = new Date(Date.now());
-            let date = (timeUTC.getUTCMonth() + 1) + '/' + timeUTC.getUTCDate() + '/' + timeUTC.getUTCFullYear();
-            let hourse = timeUTC.getUTCHours();
-	        let minutes = timeUTC.getUTCMinutes();
-			if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
-                checkOpen(proj);
-			}
-	    } else if (proj.TopMinecraftServers) {
-            let time4 = new Date(Date.now() - 14400000/*- 4 часа*/);
-            let date = (time4.getUTCMonth() + 1) + '/' + time4.getUTCDate() + '/' + time4.getUTCFullYear();
-            let hourse = time4.getUTCHours();
-	        let minutes = time4.getUTCMinutes();
-			if (proj.time == null || ((proj.time != date && hourse >= 1) || (proj.time != date && hourse == 0 && (proj.priority || minutes >= 10)))) {
-                checkOpen(proj);
-			}
-		} else {
-			if (proj.time == null || proj.time < (Date.now() - (proj.Custom ? proj.timeout : 86400000/*+24 часа*/))) {
-                checkOpen(proj);
-			}
+		} else if (proj.time == null || proj.time < Date.now()) {
+            checkOpen(proj);
 		}
 	});
 }
@@ -631,7 +574,7 @@ async function silentVote(project) {
 				let hour = 0;
 				let min = 0;
 				let sec = 0;
-				for (var i in numbers) {
+				for (let i in numbers) {
 					if (count == 0) {
 						hour = numbers[i];
 					} else if (count == 1) {
@@ -639,8 +582,8 @@ async function silentVote(project) {
 					}
 					count++;
 				}
-				var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-				var later = Date.now() - (86400000 - milliseconds);
+				let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
+				let later = Date.now() + milliseconds;
 				endVote('later ' + later, null, project);
 			} else if (doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
 				endVote('successfully', null, project);
@@ -741,7 +684,7 @@ async function silentVote(project) {
 			if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {
 			    endVote('successfully', null, project);
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {
-			    endVote('later ' + Date.now(), null, project);
+			    endVote('later ' + (Date.now() + 43200000), null, project);
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null) {
 			    endVote(doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.substring(0, doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.indexOf('\n')), null, project);
 			} else {
@@ -829,7 +772,7 @@ async function silentVote(project) {
 						count++;
 					}
 					var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-					endVote('later ' + (Date.now() - milliseconds), null, project);
+					endVote('later ' + (Date.now() + (86400000 - milliseconds)), null, project);
 					return;
 			    }
 				endVote(doc.querySelector("#Content > div.Error").textContent, null, project);
@@ -1009,39 +952,47 @@ async function endVote(message, sender, project) {
         	return;
         }
 
-        let time;
-        if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.MCRate || project.IonMc) {//Топы на которых время сбрасывается в 00:00 по МСК
-            let timeMoscow = new Date(Date.now() + 10800000/*+3 часа*/);
-            time = (timeMoscow.getUTCMonth() + 1) + '/' + timeMoscow.getUTCDate() + '/' + timeMoscow.getUTCFullYear();
-            project.time = time;
+        let time = new Date();
+        if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.IonMc) {//Топы на которых время сбрасывается в 00:00 по МСК
+            time.setUTCDate(time.getUTCDate() + 1);
+            time.setUTCHours(-3, (project.priority ? 0 : 10), 0, 0);
+        } else if (project.MCRate) {
+            time.setUTCDate(time.getUTCDate() + 1);
+            time.setUTCHours(-2, (project.priority ? 0 : 10), 0, 0);
         } else if (project.MinecraftMp || project.PlanetMinecraft) {
-            let timeEST = new Date(Date.now() - 18000000/*-5 часов*/);
-            time = (timeEST.getUTCMonth() + 1) + '/' + timeEST.getUTCDate() + '/' + timeEST.getUTCFullYear();
-            project.time = time;
+            time.setUTCDate(time.getUTCDate() + 1);
+            time.setUTCHours(-5, (project.priority ? 0 : 10), 0, 0);
         } else if (project.MinecraftServerList) {
-            let time5 = new Date(Date.now() + 18000000/*+5 часов*/);
-            time = (time5.getUTCMonth() + 1) + '/' + time5.getUTCDate() + '/' + time5.getUTCFullYear();
-            project.time = time;
+            time.setUTCDate(time.getUTCDate() + 1);
+            time.setUTCHours(-2, (project.priority ? 0 : 10), 0, 0);
         } else if (project.MinecraftServers) {
-            let timeUTC = new Date(Date.now());
-            time = (timeUTC.getUTCMonth() + 1) + '/' + timeUTC.getUTCDate() + '/' + timeUTC.getUTCFullYear();
-            project.time = time;
+            time.setUTCDate(time.getUTCDate() + 1);
+            time.setUTCHours(0, (project.priority ? 0 : 10), 0, 0);
         } else if (project.TopMinecraftServers) {
-            let time4 = new Date(Date.now() - 14400000/*-4 часа*/);
-            time = (time4.getUTCMonth() + 1) + '/' + time4.getUTCDate() + '/' + time4.getUTCFullYear();
-            project.time = time;
-	    } else {
-		    if (message == "successfully") {
-			    time = Date.now();
-                project.time = time;
-			} else {
-				time = parseInt(message.replace('later ', ''))
-				project.time = time;
+            time.setUTCDate(time.getUTCDate() + 1);
+            time.setUTCHours(-4, (project.priority ? 0 : 10), 0, 0);
+        }
+		if (message.startsWith('later ')) {
+			time = parseInt(message.replace('later ', ''));
+			project.time = time;
+			if (project.ServeurPrive) {
+				project.countVote = project.countVote + 1;
 			}
+		} else {
+			if (project.TopG || project.ServerPact) {
+				time.setUTCHours(time.getUTCHours() + 12);
+			} else if (project.MinecraftIpList || project.MonitoringMinecraft) {
+				time.setUTCDate(time.getUTCDate() + 1);
+			} else if (project.ServeurPrive) {
+				time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30);
+				project.countVote = project.countVote + 1;
+			} else if (project.Custom) {
+				time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout);
+			}
+			project.time = time.getTime();
+			time = time.getTime();
 		}
-        if (project.ServeurPrive) {
-			project.countVote = project.countVote + 1;
-		}
+
 		if (project.priority) {
             getProjectList(project).unshift(project);
 	    } else {
@@ -1742,12 +1693,14 @@ worldclockapi успешно сдох и поэтому мы перешли на
 v3.1.1
 Как выяснилось Kiwi Browser не способен работать в необязательными разрешениями что теперь разрешениями webRequest и webRequestBlocking теперь являются обязательными (в частности с методами chrome.permissions.request, alert, confirm или с любыми другими всплывающими окнами chrome (также выдавало ошибку при использвании chrome.runtime.getPlatformInfo что и так осложняло поддержку необязаных разрешений для мобильных устройств))
 Избавились от функционала синхронизации настроек между браузерами, ненужный функционал от которого много проблем. Используйте вместо него импорт/экспорт настроек
+Оптимизация работы с проверкой на следующее голосование, должно меньше жрать ЦП при расчёте след голосования (я ваще не заметил нагрузки, скорее эта оптимизация будет полезна если кто-то голосует за больше 1000 проектов)
+Мелкие исправления ошибок
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
+https://minecraftservers.biz/ очень странное у него голосование но мы попробуем (по просьбе Zeudon#5060)
 
 https://minecraftservers.org/ под вопросом насчёт капчи
-
 https://www.minetrack.net/ на момент проверки сайт лежал
 https://www.minestatus.net/ фоновая капча и потом этот сайт лёг
 
