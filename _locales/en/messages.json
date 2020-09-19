@@ -228,7 +228,7 @@
     "message": "it Seems you don't have an Internet connection, see the details in the console"
   },
   "notFoundProjectCode": {
-    "message": "There is no such project! HTTP status code:"
+    "message": "There is no such project! HTTP status code: "
   },
   "notFoundProject": {
     "message": "There is no such project!"
@@ -419,7 +419,7 @@
     }
   },
   "errorVote": {
-    "message": "Voting error! HTTP status code:"
+    "message": "Voting error! HTTP status code: "
   },
   "errorVoteNoElement": {
     "message": "Voting error, it seems some necessary element/button is missing"
@@ -439,7 +439,7 @@
     "message": "the time stamp is set to"
   },
   "errorblock": {
-    "message": "Failed to contact the server worldclockapi.com, $error$ If you have incorrectly set the time on your computer, the extension will not work correctly",
+    "message": "Failed to contact the server api-testing.cifrazia.com, $error$ If you have incorrectly set the time on your computer, the extension will not work correctly",
     "placeholders": {
       "error": {
         "content": "$1"
@@ -447,7 +447,7 @@
     }
   },
   "errorClock2": {
-    "message": "Failed to contact the server worldclockapi.com, HTTP status Code: $httpCode$. If you have incorrectly set the time on your computer, the extension will not work correctly",
+    "message": "Failed to contact the server api-testing.cifrazia.com, HTTP status Code: $httpCode$. If you have incorrectly set the time on your computer, the extension will not work correctly",
     "placeholders": {
       "httpCode": {
         "content": "$1"

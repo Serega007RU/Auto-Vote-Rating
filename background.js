@@ -342,8 +342,8 @@ async function newWindow(project) {
 					openedProjects.set(tab.id, project);
 				});
 			}
-			if (project.projectsMinecraftServersBiz) {
-				chrome.tabs.create({"url":"https://minecraftservers.biz/servers/" + project.id + "/", "selected":false}, function(tab) {
+			if (project.MinecraftServersBiz) {
+				chrome.tabs.create({"url":"https://minecraftservers.biz/" + project.id + "/", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
@@ -910,7 +910,7 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 		if (openedProjects.get(tab.id).ServerPact) chrome.tabs.executeScript(tabid, {file: "scripts/serverpact.js"});
 		if (openedProjects.get(tab.id).MinecraftIpList) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftiplist.js"});
 		if (openedProjects.get(tab.id).TopMinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/topminecraftservers.js"});
-		if (openedProjects.get(tab.id).MinecraftServersBiz) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftserversbiz.js"});
+		if (openedProjects.get(tab.id).MinecraftServersBiz) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/minecraftserversbiz.js", allFrames: true}), 10000);
 	}
 });
 
@@ -1710,15 +1710,16 @@ worldclockapi успешно сдох и поэтому мы перешли на
 В манифест возвращён в background persistent true
 В настройках при изменении кулдауна расширение теперь может сам себя перезапускать
 
-v3.1.1
+v3.2.0
 Как выяснилось Kiwi Browser не способен работать в необязательными разрешениями что теперь разрешениями webRequest и webRequestBlocking теперь являются обязательными (в частности с методами chrome.permissions.request, alert, confirm или с любыми другими всплывающими окнами chrome (также выдавало ошибку при использвании chrome.runtime.getPlatformInfo что и так осложняло поддержку необязаных разрешений для мобильных устройств))
 Избавились от функционала синхронизации настроек между браузерами, ненужный функционал от которого много проблем. Используйте вместо него импорт/экспорт настроек
 Оптимизация работы с проверкой на следующее голосование, должно меньше жрать ЦП при расчёте след голосования (я ваще не заметил нагрузки, скорее эта оптимизация будет полезна если кто-то голосует за больше 1000 проектов)
 Мелкие исправления ошибок
+Новый топ - MinecraftServersBiz (добавлен по просьбе Zeudon#5060)
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
-https://minecraftservers.biz/ очень странное у него голосование но мы попробуем (по просьбе Zeudon#5060)
+Добавить поддержку расширения Buster https://chrome.google.com/webstore/detail/buster-captcha-solver-for/mpbjkejclgfgadiemmefgebjfooflfhl
 
 https://minecraftservers.org/ под вопросом насчёт капчи
 https://www.minetrack.net/ на момент проверки сайт лежал

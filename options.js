@@ -641,8 +641,8 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             jsPath = "body > div.container > div > div > div > div.col-md-8 > h1"
         }
         if (project.MinecraftServersBiz) {
-            url = 'https://minecraftservers.biz/servers/' + project.id + "/";
-            jsPath = ""
+            url = 'https://minecraftservers.biz/' + project.id + "/";
+            jsPath = "table[class='table table-hover table-striped'] > tbody > tr:nth-child(4) > td:nth-child(2)"
         }
         let response;
         try {
