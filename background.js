@@ -204,6 +204,7 @@ async function checkOpen(project) {
             openedProjects.delete(key);
             chrome.tabs.remove(key, function() {
             	if (chrome.runtime.lastError) {
+            		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
             		if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
             	}
             });
@@ -978,6 +979,7 @@ async function endVote(message, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         chrome.tabs.remove(sender.tab.id, function() {
           	if (chrome.runtime.lastError) {
+          		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
            		if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
            	}
         });
@@ -1022,23 +1024,30 @@ async function endVote(message, sender, project) {
 
         let time = new Date();
         if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.IonMc) {//Топы на которых время сбрасывается в 00:00 по МСК
-            time.setUTCDate(time.getUTCDate() + 1);
-            time.setUTCHours(-3, (project.priority ? 0 : 10), 0, 0);
-        } else if (project.MCRate) {
-            time.setUTCDate(time.getUTCDate() + 1);
-            time.setUTCHours(-2, (project.priority ? 0 : 10), 0, 0);
+            if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+            	time.setUTCDate(time.getUTCDate() + 1);
+            }
+            time.setUTCHours(21, (project.priority ? 0 : 10), 0, 0);
+        } else if (project.MCRate || project.MinecraftServerList) {
+            if (time.getUTCHours() > 22 || (time.getUTCHours() == 22 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+            	time.setUTCDate(time.getUTCDate() + 1);
+            }
+            time.setUTCHours(22, (project.priority ? 0 : 10), 0, 0);
         } else if (project.MinecraftMp || project.PlanetMinecraft) {
-            time.setUTCDate(time.getUTCDate() + 1);
-            time.setUTCHours(-5, (project.priority ? 0 : 10), 0, 0);
-        } else if (project.MinecraftServerList) {
-            time.setUTCDate(time.getUTCDate() + 1);
-            time.setUTCHours(-2, (project.priority ? 0 : 10), 0, 0);
+            if (time.getUTCHours() > 5 || (time.getUTCHours() == 5 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+            	time.setUTCDate(time.getUTCDate() + 1);
+            }
+            time.setUTCHours(5, (project.priority ? 0 : 10), 0, 0);
         } else if (project.MinecraftServers) {
-            time.setUTCDate(time.getUTCDate() + 1);
+            if (time.getUTCHours() > 0 || (time.getUTCHours() == 0 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+            	time.setUTCDate(time.getUTCDate() + 1);
+            }
             time.setUTCHours(0, (project.priority ? 0 : 10), 0, 0);
         } else if (project.TopMinecraftServers) {
-            time.setUTCDate(time.getUTCDate() + 1);
-            time.setUTCHours(-4, (project.priority ? 0 : 10), 0, 0);
+            if (time.getUTCHours() > 4 || (time.getUTCHours() == 4 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+            	time.setUTCDate(time.getUTCDate() + 1);
+            }
+            time.setUTCHours(4, (project.priority ? 0 : 10), 0, 0);
         }
 		if (message.startsWith('later ')) {
 			time = parseInt(message.replace('later ', ''));

@@ -3,7 +3,11 @@ function vote () {
 	chrome.storage.local.get('AVMRprojectsTopMinecraftServers', function(result) {
 		try {
 			if (document.querySelector("body > div.container > div > div > div.alert.alert-danger") != null) {
-				sendMessage(document.querySelector("body > div.container > div > div > div.alert.alert-danger").textContent);
+				if (document.querySelector("body > div.container > div > div > div.alert.alert-danger").textContent.includes('already voted')) {
+                    sendMessage('later');
+				} else {
+					sendMessage(document.querySelector("body > div.container > div > div > div.alert.alert-danger").textContent);
+				}
 			} else if (document.querySelector("body > div.container > div > div > div > div.col-md-4 > button") != null) {
 		        if (document.querySelector("body > div.container > div > div > div > div.col-md-4 > button").textContent.includes('already voted')) {
                     sendMessage('successfully');
