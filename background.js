@@ -83,27 +83,36 @@ async function initializeConfig() {
     settings = await getValue('AVMRsettings');
     settings = settings.AVMRsettings;
 
-    //Если пользователь обновился с версии 2.2.0
-    if (projectsPlanetMinecraft == null || !(typeof projectsPlanetMinecraft[Symbol.iterator] === 'function')) {
-        projectsPlanetMinecraft = [];
-        projectsTopG = [];
-        projectsMinecraftMp = [];
-        projectsMinecraftServerList = [];
-        projectsServerPact = [];
-        projectsMinecraftIpList = [];
-    }
+    if (!(projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function'))) {
+		//Если пользователь обновился с версии 2.2.0
+		if (projectsPlanetMinecraft == null || !(typeof projectsPlanetMinecraft[Symbol.iterator] === 'function')) {
+			projectsPlanetMinecraft = [];
+			projectsTopG = [];
+			projectsMinecraftMp = [];
+			projectsMinecraftServerList = [];
+			projectsServerPact = [];
+			projectsMinecraftIpList = [];
+		}
 
-    //Если пользователь обновился с версии 3.0.1
-    if (projectsTopMinecraftServers == null || !(typeof projectsTopMinecraftServers[Symbol.iterator] === 'function')) {
-        projectsIonMc = [];
-        projectsMinecraftServers = [];
-        projectsServeurPrive = [];
-        projectsTopMinecraftServers = [];
-    }
+		//Если пользователь обновился с версии 3.0.1
+		if (projectsTopMinecraftServers == null || !(typeof projectsTopMinecraftServers[Symbol.iterator] === 'function')) {
+			projectsIonMc = [];
+			projectsMinecraftServers = [];
+			projectsServeurPrive = [];
+			projectsTopMinecraftServers = [];
+		}
 
-    //Если пользователь обновился с версии 3.1.0
-    if (projectsMinecraftServersBiz == null || !(typeof projectsMinecraftServersBiz[Symbol.iterator] === 'function')) {
-    	projectsMinecraftServersBiz = [];
+		//Если пользователь обновился с версии 3.1.0
+		if (projectsMinecraftServersBiz == null || !(typeof projectsMinecraftServersBiz[Symbol.iterator] === 'function')) {
+			projectsMinecraftServersBiz = [];
+			//Сброс time для проектов где использовался String
+            forLoopAllProjects(async function () {
+            	if (proj.TopCraft || proj.McTOP || proj.FairTop || proj.MinecraftRating || proj.MCRate || proj.IonMc || proj.MinecraftMp || proj.PlanetMinecraft || proj.MinecraftServerList || proj.MinecraftServers || proj.TopMinecraftServers) {
+            		proj.time = null;
+            		await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj));
+            	}
+            });
+		}
     }
 
     if (settings && settings.cooldown && Number.isInteger(settings.cooldown)) cooldown = settings.cooldown;
@@ -1785,8 +1794,8 @@ v3.2.0
 Теперь выводиться уведомление если требуется пройти капчу вручную
 
 Планируется:
+Выявлен баг на MinecraftIpList, если проголосовать повторно в конце дня (по МСК) то будет бесконечное голосование
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
-Добавить поддержку расширения Buster https://chrome.google.com/webstore/detail/buster-captcha-solver-for/mpbjkejclgfgadiemmefgebjfooflfhl
 
 https://minecraftservers.org/ под вопросом насчёт капчи
 https://www.minetrack.net/ на момент проверки сайт лежал
