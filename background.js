@@ -892,27 +892,74 @@ async function silentVote(project) {
 }
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
-chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
-	if (openedProjects.has(tab.id) && info.status == 'loading') {//ToDo вместо complete используется loading так как на Kiwi Browser complete вообще не отрабатывает, следует изучить данную проблему
-		if (openedProjects.get(tab.id).TopCraft) chrome.tabs.executeScript(tabid, {file: "scripts/topcraft.js"});
-		if (openedProjects.get(tab.id).McTOP) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/mctop.js"}), 5000);
-		if (openedProjects.get(tab.id).MCRate) chrome.tabs.executeScript(tabid, {file: "scripts/mcrate.js"});
-		if (openedProjects.get(tab.id).MinecraftRating) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftrating.js"});
-		if (openedProjects.get(tab.id).MonitoringMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/monitoringminecraft.js"});
-		if (openedProjects.get(tab.id).FairTop) chrome.tabs.executeScript(tabid, {file: "scripts/fairtop.js"});
-		if (openedProjects.get(tab.id).IonMc) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/ionmc.js", allFrames: true}), 10000);
-		if (openedProjects.get(tab.id).MinecraftServers) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/minecraftservers.js", allFrames: true}), 10000);
-		if (openedProjects.get(tab.id).ServeurPrive) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/serveurprive.js", allFrames: true}), 10000);
-		if (openedProjects.get(tab.id).PlanetMinecraft) chrome.tabs.executeScript(tabid, {file: "scripts/planetminecraft.js"});
-		if (openedProjects.get(tab.id).TopG) chrome.tabs.executeScript(tabid, {file: "scripts/topg.js"});
-		if (openedProjects.get(tab.id).MinecraftMp) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftmp.js"});
-		if (openedProjects.get(tab.id).MinecraftServerList) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftserverlist.js"});
-		if (openedProjects.get(tab.id).ServerPact) chrome.tabs.executeScript(tabid, {file: "scripts/serverpact.js"});
-		if (openedProjects.get(tab.id).MinecraftIpList) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftiplist.js"});
-		if (openedProjects.get(tab.id).TopMinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/topminecraftservers.js"});
-		if (openedProjects.get(tab.id).MinecraftServersBiz) setTimeout(() => chrome.tabs.executeScript(tabid, {file: "scripts/minecraftserversbiz.js", allFrames: true}), 10000);
+chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
+	let project = openedProjects.get(details.tabId);
+	if (project == null) return;
+	if (project.TopCraft) {
+        chrome.tabs.executeScript(details.tabId, {file: "scripts/topcraft.js"});
+	} else if (project.McTOP) {
+        setTimeout(() => chrome.tabs.executeScript(details.tabId, {file: "scripts/mctop.js"}), 5000);
+	} else if (project.MCRate) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/mcrate.js"});
+	} else if (project.MinecraftRating) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftrating.js"});
+	} else if (project.MonitoringMinecraft) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/monitoringminecraft.js"});
+	} else if (project.FairTop) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/fairtop.js"});
+	} else if (project.IonMc) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/ionmc.js"});
+	} else if (project.MinecraftServers) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftservers.js"});
+	} else if (project.ServeurPrive) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/serveurprive.js"});
+	} else if (project.PlanetMinecraft) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/planetminecraft.js"});
+	} else if (project.TopG) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/topg.js"});
+	} else if (project.MinecraftMp) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftmp.js"});
+	} else if (project.MinecraftServerList) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftserverlist.js"});
+	} else if (project.ServerPact) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/serverpact.js"});
+	} else if (project.MinecraftIpList) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftiplist.js"});
+	} else if (project.TopMinecraftServers) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/topminecraftservers.js"});
+	} else if (project.MinecraftServersBiz) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftserversbiz.js"});
 	}
-});
+}, {url: [{hostSuffix: 'topcraft.ru'},
+          {hostSuffix: 'mctop.su'},
+          {hostSuffix: 'mcrate.su'},
+          {hostSuffix: 'minecraftrating.ru'},
+          {hostSuffix: 'monitoringminecraft.ru'},
+          {hostSuffix: 'fairtop.in'},
+          {hostSuffix: 'ionmc.top'},
+          {hostSuffix: 'minecraftservers.org'},
+          {hostSuffix: 'serveur-prive.net'},
+          {hostSuffix: 'planetminecraft.com'},
+          {hostSuffix: 'topg.org'},
+          {hostSuffix: 'minecraft-mp.com'},
+          {hostSuffix: 'minecraft-server-list.com'},
+          {hostSuffix: 'serverpact.com'},
+          {hostSuffix: 'minecraftiplist.com'},
+          {hostSuffix: 'topminecraftservers.org'},
+          {hostSuffix: 'minecraftservers.biz'}
+          ]});
+
+chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
+	if (details.frameId != 0) {
+		let project = openedProjects.get(details.tabId);
+		if (project == null) return;
+		if (project.ServeurPrive || project.IonMc || project.MinecraftServersBiz || project.MinecraftServersBiz || project.MinecraftServers) {
+			chrome.tabs.executeScript(details.tabId, {file: "scripts/captchaclicker.js", frameId: details.frameId});
+		}
+	}
+}, {url: [{hostSuffix: 'recaptcha.net'},
+          {urlContains: '://www.google.com/recaptcha/'}
+          ]});
 
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
@@ -1716,6 +1763,8 @@ v3.2.0
 Оптимизация работы с проверкой на следующее голосование, должно меньше жрать ЦП при расчёте след голосования (я ваще не заметил нагрузки, скорее эта оптимизация будет полезна если кто-то голосует за больше 1000 проектов)
 Мелкие исправления ошибок
 Новый топ - MinecraftServersBiz (добавлен по просьбе Zeudon#5060)
+Оптимизирована работа с executeScript и теперь executeScript выполняется только тогда когда страница полностью загрузилась
+Теперь адекватнее капча проходится (а не то что было костылями с задержакми), теперь расширение ждёт когда капча будет пройдена
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)

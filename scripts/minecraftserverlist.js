@@ -1,13 +1,5 @@
 //vote();
 function vote () {
-	if (document.readyState != 'complete') {
-		document.onreadystatechange = function () {
-            if (document.readyState == "complete") {
-                vote();
-            }
-        }
-		return;
-	}
 	chrome.storage.local.get('AVMRprojectsMinecraftServerList', function(result) {
 		try {
 			if (document.querySelector("#voteerror > font") != null && document.querySelector("#voteerror > font").textContent.includes('Thanks, Vote Registered')) {

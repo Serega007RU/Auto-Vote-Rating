@@ -1,13 +1,5 @@
 vote();
 function vote () {
-	if (document.readyState != 'complete') {
-		document.onreadystatechange = function () {
-            if (document.readyState == "complete") {
-                vote();
-            }
-        }
-		return;
-	}
 	chrome.storage.local.get('AVMRprojectsServerPact', async function(result) {
 		try {
 			if (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {

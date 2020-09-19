@@ -1,53 +1,46 @@
-vote();
-function vote() {
-	if (document.readyState != 'complete') {
-		document.onreadystatechange = function () {
-            if (document.readyState == "complete") {
-                vote();
-            }
-        }
-		return;
-	}
+window.onmessage = function(e){
+    if (e.data == 'vote') {
+        vote(false);
+    }
+};
+vote(true);
+
+function vote(first) {
 	chrome.storage.local.get('AVMRprojectsIonMc', function(result) {
 		try {
-			//Если мы находимся во frame'е
-            if (window.location.href.includes('://www.google.com/')) {
-          	if (document.querySelector("#recaptcha-anchor > div.recaptcha-checkbox-border") != null) {
-               	    //Я человек!!!
-               	    document.querySelector("#recaptcha-anchor > div.recaptcha-checkbox-border").click();
-               	}
-            } else {
-                //Если пользователь не авторизован
-                if (document.querySelector('div[class="notification is-primary text-center"]') != null) {
-                    sendMessage(document.querySelector('div[class="notification is-primary text-center"]').innerText);
-                    return;
-                }
-              	//Если есть ошибка
-               	if (document.querySelector('div[class="notification is-danger"]') != null) {
-               		//Если не удалось пройти капчу
-               		if (document.querySelector('div[class="notification is-danger"]').textContent.includes('Пожалуйста, подтвердите что вы не робот')) {
-               			sendMessage('Не удалось пройти капчу, попробуйте пройти её вручную');
-               		} else {
-               		    sendMessage(document.querySelector('div[class="notification is-danger"]').textContent);
-               		}
-               		return;
-               	}
-               	//Если успешное автоголосование
-               	if (document.querySelector('div[class="notification is-success has-text-centered"]') != null) {
-               	    if (document.querySelector('div[class="notification is-success has-text-centered"]').textContent.includes('Голос засчитан')) {
-               	       sendMessage('successfully');
-               	    } else if (document.querySelector('div[class="notification is-success has-text-centered"]').textContent.includes('Вы уже голосовали')) {
-               	       sendMessage('later');
-                    } else {
-                       sendMessage(document.querySelector('div[class="notification is-success has-text-centered"]').textContent);
-                    }
-                    return;
-               	}
-               	let nick = getNickName(result.AVMRprojectsIonMc);
-				if (nick == null || nick == "") return;
-				document.querySelector('input[name=nickname]').value = nick;
-				setTimeout(() => document.querySelector("#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div > form > div.flex.my-1 > div.w-2\\/5 > button").click(), 7000);
+            //Если пользователь не авторизован
+            if (document.querySelector('div[class="notification is-primary text-center"]') != null) {
+                sendMessage(document.querySelector('div[class="notification is-primary text-center"]').innerText);
+                return;
             }
+           	//Если есть ошибка
+           	if (document.querySelector('div[class="notification is-danger"]') != null) {
+           		//Если не удалось пройти капчу
+           		if (document.querySelector('div[class="notification is-danger"]').textContent.includes('Пожалуйста, подтвердите что вы не робот')) {
+           			sendMessage('Не удалось пройти капчу, попробуйте пройти её вручную');
+           		} else {
+           		    sendMessage(document.querySelector('div[class="notification is-danger"]').textContent);
+           		}
+           		return;
+           	}
+           	//Если успешное автоголосование
+           	if (document.querySelector('div[class="notification is-success has-text-centered"]') != null) {
+           	    if (document.querySelector('div[class="notification is-success has-text-centered"]').textContent.includes('Голос засчитан')) {
+           	       sendMessage('successfully');
+           	    } else if (document.querySelector('div[class="notification is-success has-text-centered"]').textContent.includes('Вы уже голосовали')) {
+           	       sendMessage('later');
+                } else {
+                   sendMessage(document.querySelector('div[class="notification is-success has-text-centered"]').textContent);
+                }
+                return;
+           	}
+           	if (first) {
+           		return;
+           	}
+           	let nick = getNickName(result.AVMRprojectsIonMc);
+			if (nick == null || nick == "") return;
+			document.querySelector('input[name=nickname]').value = nick;
+			document.querySelector("#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div > form > div.flex.my-1 > div.w-2\\/5 > button").click();
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
 				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)

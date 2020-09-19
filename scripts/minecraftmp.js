@@ -1,13 +1,5 @@
 vote();
 function vote () {
-	if (document.readyState != 'complete') {
-		document.onreadystatechange = function () {
-            if (document.readyState == "complete") {
-                vote();
-            }
-        }
-		return;
-	}
 	chrome.storage.local.get('AVMRprojectsMinecraftMp', function(result) {
 		try {
 			if (document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong") != null && document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong").textContent.includes('Thank you for your vote!')) {

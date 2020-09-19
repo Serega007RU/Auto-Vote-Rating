@@ -1,42 +1,35 @@
-vote();
-function vote() {
-	if (document.readyState != 'complete') {
-		document.onreadystatechange = function () {
-            if (document.readyState == "complete") {
-                vote();
-            }
-        }
-		return;
-	}
+window.onmessage = function(e){
+    if (e.data == 'vote') {
+        vote(false);
+    }
+};
+vote(true);
+
+function vote(first) {
 	chrome.storage.local.get('AVMRprojectsMinecraftServersBiz', function(result) {
 		try {
-			//Если мы находимся во frame'е
-            if (window.location.href.includes('://www.google.com/')) {
-               	if (document.querySelector("#recaptcha-anchor > div.recaptcha-checkbox-border") != null) {
-               	    //Я человек!!!
-               	    document.querySelector("#recaptcha-anchor > div.recaptcha-checkbox-border").click();
-               	}
-            } else {
-                //Если есть ошибка
-                if (document.querySelector("#cookies-message > div") != null) {
-                    //Если вы уже голосовали
-                    if (document.querySelector("#cookies-message > div").textContent.includes('already voted')) {
-                        sendMessage('later');
-                        return;
-                    //Если успешное автоголосование
-                    } else if (document.querySelector("#cookies-message > div").textContent.includes('successfully voted')) {
-                        sendMessage('successfully');
-                        return;
-                    } else {
-                        sendMessage(document.querySelector("#cookies-message > div").textContent);
-                        return;
-                    }
+            //Если есть ошибка
+            if (document.querySelector("#cookies-message > div") != null) {
+                //Если вы уже голосовали
+                if (document.querySelector("#cookies-message > div").textContent.includes('already voted')) {
+                    sendMessage('later');
+                    return;
+                //Если успешное автоголосование
+                } else if (document.querySelector("#cookies-message > div").textContent.includes('successfully voted')) {
+                    sendMessage('successfully');
+                    return;
+                } else {
+                    sendMessage(document.querySelector("#cookies-message > div").textContent);
+                    return;
                 }
-               	let nick = getNickName(result.AVMRprojectsMinecraftServersBiz);
-				if (nick == null || nick == "") return;
-				document.querySelector("#vote_username").value = nick;
-				setTimeout(() => document.querySelector("input[name='commit'").click(), 7000);
             }
+            if (first) {
+               	return;
+            }
+           	let nick = getNickName(result.AVMRprojectsMinecraftServersBiz);
+			if (nick == null || nick == "") return;
+			document.querySelector("#vote_username").value = nick;
+			document.querySelector("input[name='commit'").click();
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
 				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)

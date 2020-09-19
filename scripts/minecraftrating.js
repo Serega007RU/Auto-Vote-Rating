@@ -1,13 +1,5 @@
 vote();
 function vote () {
-	if (document.readyState != 'complete') {
-		document.onreadystatechange = function () {
-            if (document.readyState == "complete") {
-                vote();
-            }
-        }
-		return;
-	}
 	chrome.storage.local.get('AVMRprojectsMinecraftRating', function(result) {
 		if (document.URL.includes('.vk')) {
 			sendMessage('Требуется авторизация вк! Авторизуйтесь в вк для того что б расширение могло авто-голосовать');

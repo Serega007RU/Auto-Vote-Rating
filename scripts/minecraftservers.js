@@ -1,13 +1,5 @@
 vote();
 function vote() {
-	if (document.readyState != 'complete') {
-		document.onreadystatechange = function () {
-            if (document.readyState == "complete") {
-                vote();
-            }
-        }
-		return;
-	}
 	chrome.storage.local.get('AVMRprojectsMinecraftServers', function(result) {
 		try {
 			//Если мы находимся во frame'е
