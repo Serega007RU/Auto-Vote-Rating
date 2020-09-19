@@ -530,5 +530,8 @@
   },
   "countVote": {
     "message": "How many votes make per day"
+  },
+  "requiresCaptcha": {
+    "message": "Requires manually passing the captcha"
   }
 }

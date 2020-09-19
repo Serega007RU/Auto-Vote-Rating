@@ -204,7 +204,7 @@ async function checkOpen(project) {
             openedProjects.delete(key);
             chrome.tabs.remove(key, function() {
             	if (chrome.runtime.lastError) {
-            		sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
+            		if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
             	}
             });
         }
@@ -963,7 +963,14 @@ chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
 
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
-    endVote(request.message, sender, null);
+	//Если требует ручное прохождение капчи
+	if (request.message == "Requires manually passing the captcha" && sender && openedProjects.has(sender.tab.id)) {
+		let project = openedProjects.get(sender.tab.id);
+		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('requiresCaptcha'));
+        if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('requiresCaptcha'));
+	} else {
+		endVote(request.message, sender, null);
+	}
 });
 
 //Завершает голосование, если есть ошибка то обрабатывает её
@@ -971,7 +978,7 @@ async function endVote(message, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         chrome.tabs.remove(sender.tab.id, function() {
           	if (chrome.runtime.lastError) {
-           		sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
+           		if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
            	}
         });
         project = openedProjects.get(sender.tab.id);
@@ -1172,7 +1179,7 @@ async function checkTime () {
 				}
 				let text2 = chrome.i18n.getMessage('clockInaccurate', [text, time, unit]);
 				console.warn(text2);
-				sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2);
+				if (!settings.disabledNotifWarn) sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2);
 			}
 		} else {
 			console.error(chrome.i18n.getMessage('errorClock2', response.status));
@@ -1765,6 +1772,8 @@ v3.2.0
 Новый топ - MinecraftServersBiz (добавлен по просьбе Zeudon#5060)
 Оптимизирована работа с executeScript и теперь executeScript выполняется только тогда когда страница полностью загрузилась
 Теперь адекватнее капча проходится (а не то что было костылями с задержакми), теперь расширение ждёт когда капча будет пройдена
+Добавлена небольшая интеграция с расширением Buster: Captcha Solver for Humans (требуется редактирование расширения, нужно убрать проверку isTrusted у слушателя кнопки solver-button)
+Теперь выводиться уведомление если требуется пройти капчу вручную
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
