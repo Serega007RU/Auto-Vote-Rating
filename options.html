@@ -122,6 +122,7 @@
 								<option value="ServerPact">ServerPact</option>
 								<option value="MinecraftIpList">MinecraftIpList</option>
 								<option value="TopMinecraftServers">TopMinecraftServers</option>
+								<option value="MinecraftServersBiz">MinecraftServersBiz</option>
 								<option data-resource="custom" value="Custom"></option>
 							</select>
 							<div id="idSelector"></div>
@@ -205,9 +206,10 @@
 						<button class="selectsite" id="McTOPButton">MCTop.ru</button>
 						<button class="selectsite" id="MCRateButton">MCRate.su</button>
 						<button class="selectsite" id="MinecraftRatingButton">MinecraftRating.ru</button>
+						<button class="selectsite" id="MinecraftServersBizButton">MinecraftServers.biz</button>
 					</div>
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
-					<button class="selectsite" id="MonitoringMinecraftButton">MonitoringMinecraft.ru</button>
+					    <button class="selectsite" id="MonitoringMinecraftButton">MonitoringMinecraft.ru</button>
 						<button class="selectsite" id="FairTopButton">FairTop.in</button>
 						<button class="selectsite" id="IonMcButton">IonMc.top</button>
 						<button class="selectsite" id="ServeurPriveButton">Serveur-Prive.net</button>
@@ -279,7 +281,12 @@
 							<div data-resource="notAdded" id="MinecraftIpListList"></div>
 						</div>
 						<div class="listcontent" id="TopMinecraftServersTab" style="display: none;">
+						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
 							<div data-resource="notAdded" id="TopMinecraftServersList"></div>
+						</div>
+						<div class="listcontent" id="MinecraftServersBizTab" style="display: none;">
+						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+							<div data-resource="notAdded" id="MinecraftServersBizList"></div>
 						</div>
 						<div class="listcontent" id="CustomTab" style="display: none;">
 							<div data-resource="notAdded" id="CustomList"></div>

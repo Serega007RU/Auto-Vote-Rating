@@ -15,6 +15,7 @@ var projectsMinecraftServerList = [];
 var projectsServerPact = [];
 var projectsMinecraftIpList = [];
 var projectsTopMinecraftServers = [];
+var projectsMinecraftServersBiz = [];
 var projectsCustom = [];
 
 //Настройки
@@ -75,6 +76,8 @@ async function initializeConfig() {
     projectsMinecraftIpList = projectsMinecraftIpList.AVMRprojectsMinecraftIpList;
     projectsTopMinecraftServers = await getValue('AVMRprojectsTopMinecraftServers');
     projectsTopMinecraftServers = projectsTopMinecraftServers.AVMRprojectsTopMinecraftServers;
+    projectsMinecraftServersBiz = await getValue('AVMRprojectsMinecraftServersBiz');
+    projectsMinecraftServersBiz = projectsMinecraftServersBiz.AVMRprojectsMinecraftServersBiz;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
     settings = await getValue('AVMRsettings');
@@ -96,6 +99,11 @@ async function initializeConfig() {
         projectsMinecraftServers = [];
         projectsServeurPrive = [];
         projectsTopMinecraftServers = [];
+    }
+
+    //Если пользователь обновился с версии 3.1.0
+    if (projectsMinecraftServersBiz == null || !(typeof projectsMinecraftServersBiz[Symbol.iterator] === 'function')) {
+    	projectsMinecraftServersBiz = [];
     }
 
     if (settings && settings.cooldown && Number.isInteger(settings.cooldown)) cooldown = settings.cooldown;
@@ -331,6 +339,11 @@ async function newWindow(project) {
 			}
 			if (project.TopMinecraftServers) {
 				chrome.tabs.create({"url":"https://topminecraftservers.org/vote/" + project.id, "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.projectsMinecraftServersBiz) {
+				chrome.tabs.create({"url":"https://minecraftservers.biz/servers/" + project.id + "/", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
@@ -897,6 +910,7 @@ chrome.tabs.onUpdated.addListener(function(tabid, info, tab) {
 		if (openedProjects.get(tab.id).ServerPact) chrome.tabs.executeScript(tabid, {file: "scripts/serverpact.js"});
 		if (openedProjects.get(tab.id).MinecraftIpList) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftiplist.js"});
 		if (openedProjects.get(tab.id).TopMinecraftServers) chrome.tabs.executeScript(tabid, {file: "scripts/topminecraftservers.js"});
+		if (openedProjects.get(tab.id).MinecraftServersBiz) chrome.tabs.executeScript(tabid, {file: "scripts/minecraftserversbiz.js"});
 	}
 });
 
@@ -979,7 +993,7 @@ async function endVote(message, sender, project) {
 				project.countVote = project.countVote + 1;
 			}
 		} else {
-			if (project.TopG || project.ServerPact) {
+			if (project.TopG || project.ServerPact || project.MinecraftServersBiz) {
 				time.setUTCHours(time.getUTCHours() + 12);
 			} else if (project.MinecraftIpList || project.MonitoringMinecraft) {
 				time.setUTCDate(time.getUTCDate() + 1);
@@ -1058,6 +1072,7 @@ function getProjectName(project) {
 	if (project.ServerPact) return "ServerPact";
 	if (project.MinecraftIpList) return "MinecraftIpList";
 	if (project.TopMinecraftServers) return "TopMinecraftServers";
+	if (project.MinecraftServersBiz) return "MinecraftServersBiz";
 	if (project.Custom) return "Custom";
 }
 
@@ -1078,6 +1093,7 @@ function getProjectList(project) {
     if (project.ServerPact) return projectsServerPact;
     if (project.MinecraftIpList) return projectsMinecraftIpList;
     if (project.TopMinecraftServers) return projectsTopMinecraftServers;
+    if (project.MinecraftServersBiz) return projectsMinecraftServersBiz;
     if (project.Custom) return projectsCustom;
 }
 
@@ -1224,6 +1240,9 @@ function forLoopAllProjects (fuc) {
     for (proj of projectsTopMinecraftServers) {
         fuc();
     }
+    for (proj of projectsMinecraftServersBiz) {
+        fuc();
+    }
     for (proj of projectsCustom) {
         fuc();
     }
@@ -1268,6 +1287,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         if (key == 'AVMRprojectsServerPact') projectsServerPact = storageChange.newValue;
         if (key == 'AVMRprojectsMinecraftIpList') projectsMinecraftIpList = storageChange.newValue;
         if (key == 'AVMRprojectsTopMinecraftServers') projectsTopMinecraftServers = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftServersBiz') projectsMinecraftServersBiz = storageChange.newValue;
         if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
         if (key == 'AVMRsettings') {
         	settings = storageChange.newValue;
