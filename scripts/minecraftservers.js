@@ -1,34 +1,47 @@
-vote();
-function vote() {
+window.onmessage = function(e){
+    if (e.data == 'vote') {
+        vote(false);
+    }
+};
+vote(true);
+
+function vote(first) {
 	chrome.storage.local.get('AVMRprojectsMinecraftServers', function(result) {
 		try {
-			//Если мы находимся во frame'е
-            if (window.location.href.includes('.hcaptcha.com/')) {
-            if (document.querySelector("#checkbox") != null) {
-           	    //Я человек!!!
-           	    document.querySelector("#checkbox").click();
-           	    }
-            } else {
-               	//Если вы уже голосовали
-               	if (document.querySelector("#error-message") != null && document.querySelector("#error-message").textContent.includes('You already voted today')) {
-               		sendMessage('later');
-               		return;
-               	}
-               	//Если не удалось пройти капчу
-               	if (document.querySelector("#field-container > form > span") != null) {
-               	    sendMessage(document.querySelector("#field-container > form > span").textContent);
-               	    return;
-               	}
-               	//Если успешное автоголосование
-               	if (document.querySelector("#single > div.flash") != null && document.querySelector("#single > div.flash").textContent.includes('Thanks for voting')) {
-               	    sendMessage('successfully');
-                    return;
-               	}
-               	let nick = getNickName(result.AVMRprojectsMinecraftServers);
-				if (nick == null || nick == "") return;
-				document.querySelector("#field-container > form > ul > li > input").value = nick;
-				setTimeout(() => document.querySelector("#field-container > form > button").click(), 7000);
-            }
+           	//Если вы уже голосовали
+           	if (document.querySelector("#error-message") != null) {
+           		if (document.querySelector("#error-message").textContent.includes('You already voted today')) {
+					sendMessage('later');
+					return;
+           		}
+                sendMessage(document.querySelector("#error-message").textContent);
+                return;
+           	}
+           	if (document.querySelector("#single > div.flash") != null) {
+           		if (document.querySelector("#single > div.flash").textContent.includes('You must wait until tomorrow before voting again')) {
+           			sendMessage('later');
+           			return;
+           		}
+           		//Если успешное автоголосование
+           		if (document.querySelector("#single > div.flash").textContent.includes('Thanks for voting')) {
+					sendMessage('successfully');
+					return;
+           		}
+           		sendMessage(document.querySelector("#single > div.flash").textContent);
+           		return;
+           	}
+           	//Если не удалось пройти капчу
+           	if (document.querySelector("#field-container > form > span") != null) {
+           	    sendMessage(document.querySelector("#field-container > form > span").textContent);
+           	    return;
+           	}
+           	if (first) {
+           		return;
+           	}
+           	let nick = getNickName(result.AVMRprojectsMinecraftServers);
+			if (nick == null || nick == "") return;
+			document.querySelector("#field-container > form > ul > li > input").value = nick;
+			document.querySelector("#field-container > form > button").click();
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
 				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)

@@ -967,7 +967,8 @@ chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
 			chrome.tabs.executeScript(details.tabId, {file: "scripts/captchaclicker.js", frameId: details.frameId});
 		}
 	}
-}, {url: [{hostSuffix: 'recaptcha.net'},
+}, {url: [{hostSuffix: 'hcaptcha.com'},
+          {hostSuffix: 'recaptcha.net'},
           {urlContains: '://www.google.com/recaptcha/'}
           ]});
 
