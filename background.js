@@ -771,7 +771,7 @@ async function silentVote(project) {
 					return;
 				}
 			    if (doc.querySelector("#Content > div.Error").textContent.includes('last voted for this server') || doc.querySelector("#Content > div.Error").textContent.includes('has no votes')) {
-					let numbers = doc.querySelector("#Content > div.Error").textContent.match(/\d+/g).map(Number);
+					let numbers = doc.querySelector("#Content > div.Error").textContent.substring(doc.querySelector("#Content > div.Error").textContent.length - 30).match(/\d+/g).map(Number);
 					let count = 0;
 					let hour = 0;
 					let min = 0;
@@ -847,7 +847,7 @@ async function silentVote(project) {
 					return;
 				}
 			    if (doc.querySelector("#Content > div.Error").textContent.includes('last voted for this server')) {
-					let numbers = doc.querySelector("#Content > div.Error").textContent.match(/\d+/g).map(Number);
+					let numbers = doc.querySelector("#Content > div.Error").textContent.substring(doc.querySelector("#Content > div.Error").textContent.length - 30).match(/\d+/g).map(Number);
 					let count = 0;
 					let hour = 0;
 					let min = 0;
@@ -861,7 +861,7 @@ async function silentVote(project) {
 						count++;
 					}
 					let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-					endVote('later ' + (Date.now() - milliseconds), null, project);
+					endVote('later ' + (Date.now() + (86400000 - milliseconds)), null, project);
 					return;
 			    }
 				endVote(doc.querySelector("#Content > div.Error").textContent, null, project);
