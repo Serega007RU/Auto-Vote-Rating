@@ -6,7 +6,7 @@ var projectsMinecraftRating = [];
 var projectsMonitoringMinecraft = [];
 var projectsFairTop = [];
 var projectsIonMc = [];
-var projectsMinecraftServers = [];
+var projectsMinecraftServersOrg = [];
 var projectsServeurPrive = [];
 var projectsPlanetMinecraft = [];
 var projectsTopG = [];
@@ -37,7 +37,7 @@ function Project(top, nick, id, time, responseURL, priority) {
     if (top == "MonitoringMinecraft") this.MonitoringMinecraft = true;
     if (top == "FairTop") this.FairTop = true;
     if (top == "IonMc") this.IonMc = true;
-    if (top == "MinecraftServers") this.MinecraftServers = true;
+    if (top == "MinecraftServersOrg") this.MinecraftServersOrg = true;
     if (top == "ServeurPrive") this.ServeurPrive = true;
     if (top == "PlanetMinecraft") this.PlanetMinecraft = true;
     if (top == "TopG") this.TopG = true;
@@ -91,8 +91,8 @@ async function restoreOptions() {
     projectsFairTop = projectsFairTop.AVMRprojectsFairTop;
     projectsIonMc = await getValue('AVMRprojectsIonMc');
     projectsIonMc = projectsIonMc.AVMRprojectsIonMc;
-    projectsMinecraftServers = await getValue('AVMRprojectsMinecraftServers');
-    projectsMinecraftServers = projectsMinecraftServers.AVMRprojectsMinecraftServers;
+    projectsMinecraftServersOrg = await getValue('AVMRprojectsMinecraftServersOrg');
+    projectsMinecraftServersOrg = projectsMinecraftServersOrg.AVMRprojectsMinecraftServersOrg;
     projectsServeurPrive = await getValue('AVMRprojectsServeurPrive');
     projectsServeurPrive = projectsServeurPrive.AVMRprojectsServeurPrive;
     projectsPlanetMinecraft = await getValue('AVMRprojectsPlanetMinecraft');
@@ -124,7 +124,7 @@ async function restoreOptions() {
         projectsMonitoringMinecraft = [];
         projectsFairTop = [];
         projectsIonMc = [];
-        projectsMinecraftServers = [];
+        projectsMinecraftServersOrg = [];
         projectsServeurPrive = [];
         projectsPlanetMinecraft = [];
         projectsTopG = [];
@@ -143,7 +143,7 @@ async function restoreOptions() {
         await setValue('AVMRprojectsMonitoringMinecraft', projectsMonitoringMinecraft, false);
         await setValue('AVMRprojectsFairTop', projectsFairTop, false);
         await setValue('AVMRprojectsIonMc', projectsIonMc, false);
-        await setValue('AVMRprojectsMinecraftServers', projectsMinecraftServers, false);
+        await setValue('AVMRprojectsMinecraftServersOrg', projectsMinecraftServersOrg, false);
         await setValue('AVMRprojectsServeurPrive', projectsServeurPrive, false);
         await setValue('AVMRprojectsPlanetMinecraft', projectsPlanetMinecraft, false);
         await setValue('AVMRprojectsTopG', projectsTopG, false);
@@ -183,12 +183,12 @@ async function restoreOptions() {
     if (projectsTopMinecraftServers == null || !(typeof projectsTopMinecraftServers[Symbol.iterator] === 'function')) {
         updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true);
         projectsIonMc = [];
-        projectsMinecraftServers = [];
+        projectsMinecraftServersOrg = [];
         projectsServeurPrive = [];
         projectsTopMinecraftServers = [];
 
         await setValue('AVMRprojectsIonMc', projectsIonMc, false);
-        await setValue('AVMRprojectsMinecraftServers', projectsMinecraftServers, false);
+        await setValue('AVMRprojectsMinecraftServersOrg', projectsMinecraftServersOrg, false);
         await setValue('AVMRprojectsServeurPrive', projectsServeurPrive, false);
         await setValue('AVMRprojectsTopMinecraftServers', projectsTopMinecraftServers, false);
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'));
@@ -200,6 +200,8 @@ async function restoreOptions() {
         updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true);
         projectsMinecraftServersBiz = [];
         await setValue('AVMRprojectsMinecraftServersBiz', projectsMinecraftServersBiz, false);
+        projectsMinecraftServersOrg = [];
+        await setValue('AVMRprojectsMinecraftServersOrg', projectsMinecraftServersOrg, false);
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false);
     }
@@ -273,7 +275,7 @@ async function restoreOptions() {
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
     if (settings.multivote) addMultiVote();
-    if (settings.enableMinecraftServers) addMinecraftServers();
+    if (settings.enableMinecraftServersOrg) addMinecraftServersOrg();
 };
 
 //Добавить проект в список проекта
@@ -335,7 +337,7 @@ async function removeProjectList(project, visually) {
     let countMonitoringMinecraft = 0;
     let countFairTop = 0;
     let countIonMc = 0;
-    let countMinecraftServers = 0;
+    let countMinecraftServersOrg = 0;
     let countServeurPrive = 0;
     let countPlanetMinecraft = 0;
     let countTopG = 0;
@@ -354,7 +356,7 @@ async function removeProjectList(project, visually) {
         if (proj.MonitoringMinecraft) countMonitoringMinecraft++;
         if (proj.FairTop) countFairTop++;
         if (proj.IonMc) countIonMc++;
-        if (proj.MinecraftServers) countMinecraftServers++;
+        if (proj.MinecraftServersOrg) countMinecraftServersOrg++;
         if (proj.ServeurPrive) countServeurPrive++;
         if (proj.PlanetMinecraft) countPlanetMinecraft++;
         if (proj.TopG) countTopG++;
@@ -374,7 +376,7 @@ async function removeProjectList(project, visually) {
             if (proj.MonitoringMinecraft) countMonitoringMinecraft--;
             if (proj.FairTop) countFairTop--;
             if (proj.IonMc) countIonMc--;
-            if (proj.MinecraftServers) countMinecraftServers--;
+            if (proj.MinecraftServersOrg) countMinecraftServersOrg--;
             if (proj.ServeurPrive) countServeurPrive--;
             if (proj.PlanetMinecraft) countPlanetMinecraft--;
             if (proj.TopG) countTopG--;
@@ -394,7 +396,7 @@ async function removeProjectList(project, visually) {
     if (countMonitoringMinecraft == 0) document.getElementById("MonitoringMinecraftList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countFairTop == 0) document.getElementById("FairTopList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countIonMc == 0) document.getElementById("IonMcList").innerHTML = (chrome.i18n.getMessage('notAdded'));
-    if (countMinecraftServers == 0) document.getElementById("MinecraftServersList").innerHTML = (chrome.i18n.getMessage('notAdded'));
+    if (countMinecraftServersOrg == 0) document.getElementById("MinecraftServersOrgList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countServeurPrive == 0) document.getElementById("ServeurPriveList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countPlanetMinecraft == 0) document.getElementById("PlanetMinecraftList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countTopG == 0) document.getElementById("TopGList").innerHTML = (chrome.i18n.getMessage('notAdded'));
@@ -456,8 +458,8 @@ function updateProjectList() {
     while (document.getElementById("IonMcList").nextElementSibling != null) {
         document.getElementById("IonMcList").nextElementSibling.remove();
     }
-    while (document.getElementById("MinecraftServersList").nextElementSibling != null) {
-        document.getElementById("MinecraftServersList").nextElementSibling.remove();
+    while (document.getElementById("MinecraftServersOrgList").nextElementSibling != null) {
+        document.getElementById("MinecraftServersOrgList").nextElementSibling.remove();
     }
     while (document.getElementById("ServeurPriveList").nextElementSibling != null) {
         document.getElementById("ServeurPriveList").nextElementSibling.remove();
@@ -548,7 +550,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             }
             returnAdd = true;
             return;
-        } else if (((proj.MCRate && choice == "MCRate") || (proj.ServerPact && choice == "ServerPact") || (proj.MinecraftServers && choice == "MinecraftServers")) && proj.nick && project.nick && !disableCheckProjects) {
+        } else if (((proj.MCRate && choice == "MCRate") || (proj.ServerPact && choice == "ServerPact") || (proj.MinecraftServersOrg && choice == "MinecraftServersOrg")) && proj.nick && project.nick && !disableCheckProjects) {
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProject', getProjectName(proj)) + '</div>', false, element);
             returnAdd = true;
             return;
@@ -604,7 +606,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             url = 'https://ionmc.top/vote/' + project.id;
             jsPath = "#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.mx-2.-mt-1.mb-1.sm\\:mx-5.sm\\:my-2 > ul > li:nth-child(2) > a";
         }
-        if (project.MinecraftServers) {
+        if (project.MinecraftServersOrg) {
             url = 'https://minecraftservers.org/server/' + project.id;
             jsPath = "#left > div > h1";
         }
@@ -769,7 +771,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
 
     await addProjectList(project, false);
 
-    if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.MinecraftServers || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz) && settings.enabledSilentVote) {
+    if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz) && settings.enabledSilentVote) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span>', true, element);
     } else {
         if (secondBonus === "") {
@@ -865,7 +867,7 @@ function getProjectName(project) {
     if (project.MinecraftRating) return "MinecraftRating";
     if (project.FairTop) return "FairTop";
     if (project.IonMc) return "IonMc";
-    if (project.MinecraftServers) return "MinecraftServers";
+    if (project.MinecraftServersOrg) return "MinecraftServersOrg";
     if (project.ServeurPrive) return "ServeurPrive";
     if (project.PlanetMinecraft) return "PlanetMinecraft";
     if (project.TopG) return "TopG";
@@ -886,7 +888,7 @@ function getProjectList(project) {
     if (project.MonitoringMinecraft) return projectsMonitoringMinecraft;
     if (project.FairTop) return projectsFairTop;
     if (project.IonMc) return projectsIonMc;
-    if (project.MinecraftServers) return projectsMinecraftServers;
+    if (project.MinecraftServersOrg) return projectsMinecraftServersOrg;
     if (project.ServeurPrive) return projectsServeurPrive;
     if (project.PlanetMinecraft) return projectsPlanetMinecraft;
     if (project.TopG) return projectsTopG;
@@ -991,7 +993,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         || key == 'AVMRprojectsMonitoringMinecraft'
         || key == 'AVMRprojectsFairTop'
         || key == 'AVMRprojectsIonMc'
-        || key == 'AVMRprojectsMinecraftServers'
+        || key == 'AVMRprojectsMinecraftServersOrg'
         || key == 'AVMRprojectsServeurPrive'
         || key == 'AVMRprojectsPlanetMinecraft'
         || key == 'AVMRprojectsTopG'
@@ -1009,7 +1011,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             if (key == 'AVMRprojectsMonitoringMinecraft') projectsMonitoringMinecraft = storageChange.newValue;
             if (key == 'AVMRprojectsFairTop') projectsFairTop = storageChange.newValue;
             if (key == 'AVMRprojectsIonMc') projectsIonMc = storageChange.newValue;
-            if (key == 'AVMRprojectsMinecraftServers') projectsMinecraftServers = storageChange.newValue;
+            if (key == 'AVMRprojectsMinecraftServersOrg') projectsMinecraftServersOrg = storageChange.newValue;
             if (key == 'AVMRprojectsServeurPrive') projectsServeurPrive = storageChange.newValue;
             if (key == 'AVMRprojectsPlanetMinecraft') projectsPlanetMinecraft = storageChange.newValue;
             if (key == 'AVMRprojectsTopG') projectsTopG = storageChange.newValue;
@@ -1071,11 +1073,11 @@ function forLoopAllProjects (fuc, reverse) {
     }
     if (reverse) projectsIonMc.reverse();
 
-    if (reverse) projectsMinecraftServers.reverse();
-    for (proj of projectsMinecraftServers) {
+    if (reverse) projectsMinecraftServersOrg.reverse();
+    for (proj of projectsMinecraftServersOrg) {
         fuc();
     }
-    if (reverse) projectsMinecraftServers.reverse();
+    if (reverse) projectsMinecraftServersOrg.reverse();
 
     if (reverse) projectsServeurPrive.reverse();
     for (proj of projectsServeurPrive) {
@@ -1149,7 +1151,7 @@ document.getElementById('file-download').addEventListener('click', () => {
         projectsMonitoringMinecraft,
         projectsFairTop,
         projectsIonMc,
-        projectsMinecraftServers,
+        projectsMinecraftServersOrg,
         projectsServeurPrive,
         projectsPlanetMinecraft,
         projectsTopG,
@@ -1191,7 +1193,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     projectsMonitoringMinecraft = allSetting.projectsMonitoringMinecraft;
                     projectsFairTop = allSetting.projectsFairTop;
                     projectsIonMc = allSetting.projectsIonMc;
-                    projectsMinecraftServers = allSetting.projectsMinecraftServers;
+                    projectsMinecraftServersOrg = allSetting.projectsMinecraftServersOrg;
                     projectsServeurPrive = allSetting.projectsServeurPrive;
                     projectsPlanetMinecraft = allSetting.projectsPlanetMinecraft;
                     projectsTopG = allSetting.projectsTopG;
@@ -1241,6 +1243,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     //Если пользователь обновился с версии 3.1.0
                     if (projectsMinecraftServersBiz == null || !(typeof projectsMinecraftServersBiz[Symbol.iterator] === 'function')) {
                         projectsMinecraftServersBiz = [];
+                        projectsMinecraftServersOrg = [];
                     }
 
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);
@@ -1252,7 +1255,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     await setValue('AVMRprojectsMonitoringMinecraft', projectsMonitoringMinecraft, false);
                     await setValue('AVMRprojectsFairTop', projectsFairTop, false);
                     await setValue('AVMRprojectsIonMc', projectsIonMc, false);
-                    await setValue('AVMRprojectsMinecraftServers', projectsMinecraftServers, false);
+                    await setValue('AVMRprojectsMinecraftServersOrg', projectsMinecraftServersOrg, false);
                     await setValue('AVMRprojectsServeurPrive', projectsServeurPrive, false);
                     await setValue('AVMRprojectsPlanetMinecraft', projectsPlanetMinecraft, false);
                     await setValue('AVMRprojectsTopG', projectsTopG, false);
@@ -1281,7 +1284,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     } else if (settings.multivote) {
                         addMultiVote();
                     }
-                    if (settings.enableMinecraftServers) addMinecraftServers();
+                    if (settings.enableMinecraftServersOrg) addMinecraftServersOrg();
 
                     await updateProjectList();
 
@@ -1495,27 +1498,27 @@ function addMultiVote() {
     });
 }
 
-function addMinecraftServers() {
-    if (document.querySelector('#project').children[8].text != "MinecraftServers") {
+function addMinecraftServersOrg() {
+    if (document.querySelector('#project').children[8].text != "MinecraftServersOrg") {
         let option = document.createElement('option');
-        option.setAttribute('value', 'MinecraftServers');
-        option.innerHTML = "MinecraftServers";
+        option.setAttribute('value', 'MinecraftServersOrg');
+        option.innerHTML = "MinecraftServersOrg";
         document.querySelector('#project').insertBefore(option, document.querySelector('#project').children[8]);
     }
 
-    if (document.querySelector('#MinecraftServersButton') == null) {
+    if (document.querySelector('#MinecraftServersOrgButton') == null) {
         let buttonMS = document.createElement('button');
         buttonMS.setAttribute('class', 'selectsite');
-        buttonMS.setAttribute('id', 'MinecraftServersButton');
+        buttonMS.setAttribute('id', 'MinecraftServersOrgButton');
         buttonMS.innerHTML = "MinecraftServers.org";
         document.querySelector("#added > div > div:nth-child(2)").insertBefore(buttonMS, document.querySelector("#added > div > div:nth-child(2)").children[4]);
 
-        document.getElementById('MinecraftServersButton').addEventListener('click', function() {
-            listSelect(event, 'MinecraftServersTab');
+        document.getElementById('MinecraftServersOrgButton').addEventListener('click', function() {
+            listSelect(event, 'MinecraftServersOrgTab');
         });
     }
-    if (!settings.enableMinecraftServers) {
-        settings.enableMinecraftServers = true;
+    if (!settings.enableMinecraftServersOrg) {
+        settings.enableMinecraftServersOrg = true;
         setValue('AVMRsettings', settings, false);
     }
 }
@@ -1627,9 +1630,9 @@ document.getElementById('FairTopButton').addEventListener('click', function() {
 document.getElementById('IonMcButton').addEventListener('click', function() {
     listSelect(event, 'IonMcTab');
 });
-if (document.getElementById('MinecraftServersButton') != null) {
-    document.getElementById('MinecraftServersButton').addEventListener('click', function() {
-        listSelect(event, 'MinecraftServersTab');
+if (document.getElementById('MinecraftServersOrgButton') != null) {
+    document.getElementById('MinecraftServersOrgButton').addEventListener('click', function() {
+        listSelect(event, 'MinecraftServersOrgTab');
     });
 }
 document.getElementById('ServeurPriveButton').addEventListener('click', function() {
@@ -1693,7 +1696,7 @@ selectedTop.addEventListener("change", function() {
        idSelector.innerHTML = label + dataInput + '<option value="354">FineMine</option><option value="1356">GrandGear</option><option value="731">PentaCraft</option><option value="1404">Pixelmon.PRO</option><option value="797">qoobworld</option><option value="6">SMARTYcraft</option><option value="224">HillMine</option></datalist>';
     } else if(selectedTop.value == "IonMc") {
        idSelector.innerHTML = label + dataInput + '<option value="80">Pixelmon.PRO 1.12.2</option><option value="83">FineMine.RU</option></datalist>';
-    } else if(selectedTop.value == "MinecraftServers") {
+    } else if(selectedTop.value == "MinecraftServersOrg") {
        idSelector.innerHTML = label + dataInput + '<option value="25531">CubeCraft Games</option></datalist>';
     } else if(selectedTop.value == "ServeurPrive") {
        idSelector.innerHTML = label + dataInput + '<option value="gommehd-net-4932">GommeHD.net</option></datalist>';
