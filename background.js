@@ -140,7 +140,7 @@ function checkVote() {
     	}
     }
     
-	forLoopAllProjects(function () {
+	forLoopAllProjects(function (proj) {
 		if (proj.ServeurPrive) {
 	    	if (proj.countVote > 0 && proj.time != null) {
 				let now = new Date();
@@ -245,11 +245,11 @@ async function newWindow(project) {
             });
         });
         let cookies = await getVKCookies;
-		for(var i=0; i<cookies.length;i++) {
+		for(let i=0; i<cookies.length;i++) {
 			await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
 		}
 
-		for(var i = 0; i < project.vk.length; i++) {
+		for(let i = 0; i < project.vk.length; i++) {
 			let cookie = project.vk[i];
             await setCookieDetails({url: "https://" + cookie.domain.substring(1, cookie.domain.length) + cookie.path, name: cookie.name, value: cookie.value, domain: cookie.domain, path: cookie.path, secure: cookie.secure, httpOnly: cookie.httpOnly, sameSite: cookie.sameSite, expirationDate: cookie.expirationDate, storeId: cookie.storeId});
 		}
@@ -460,7 +460,7 @@ async function silentVote(project) {
 			    }
             }
             if (doc.querySelector('div[class=report]') != null) {
-				var message;
+				let message;
 				if (doc.querySelector('div[class=report]').textContent.includes('Ваш голос засчитан')) {
 				    message = 'successfully';
 				} else {
@@ -502,15 +502,15 @@ async function silentVote(project) {
             let doc = new DOMParser().parseFromString(html, "text/html");
 			if (doc.querySelector('div.alert.alert-danger') != null) {
 				if (doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
-//					var numbers = doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number);
-//					var count = 0;
-//					var year = 0;
-//					var month = 0;
-//					var day = 0;
-//					var hour = 0;
-//					var min = 0;
-//					var sec = 0;
-//					for (var i in numbers) {
+//					let numbers = doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number);
+//					let count = 0;
+//					let year = 0;
+//					let month = 0;
+//					let day = 0;
+//					let hour = 0;
+//					let min = 0;
+//					let sec = 0;
+//					for (let i in numbers) {
 //						if (count == 0) {
 //							hour = numbers[i];
 //						} else if (count == 1) {
@@ -526,7 +526,7 @@ async function silentVote(project) {
 //						}
 //						count++;
 //					}
-//					var later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000;
+//					let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000;
 					endVote('later', null, project);
 				} else {
 					endVote(doc.querySelector('div.alert.alert-danger').textContent, null, project);
@@ -646,10 +646,10 @@ async function silentVote(project) {
             let html = await response.text();
             let doc = new DOMParser().parseFromString(html, "text/html");
             function generatePass(nb) {
-                var chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@';
-                var pass = '';
+                let chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@';
+                let pass = '';
                 for (i = 0; i < nb; i++) {
-                    var wpos = Math.round(Math.random() * chars.length);
+                    let wpos = Math.round(Math.random() * chars.length);
                     pass += chars.substring(wpos, wpos + 1);
                 }
                 return pass;
@@ -786,7 +786,7 @@ async function silentVote(project) {
 					let hour = 0;
 					let min = 0;
 					let sec = 0;
-					for (var i in numbers) {
+					for (let i in numbers) {
 						if (count == 0) {
 							hour = numbers[i];
 						} else if (count == 1) {
@@ -794,7 +794,7 @@ async function silentVote(project) {
 						}
 						count++;
 					}
-					var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
+					let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
 					endVote('later ' + (Date.now() + (86400000 - milliseconds)), null, project);
 					return;
 			    }
@@ -862,7 +862,7 @@ async function silentVote(project) {
 					let hour = 0;
 					let min = 0;
 					let sec = 0;
-					for (var i in numbers) {
+					for (let i in numbers) {
 						if (count == 0) {
 							hour = numbers[i];
 						} else if (count == 1) {
@@ -870,7 +870,7 @@ async function silentVote(project) {
 						}
 						count++;
 					}
-					var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
+					let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
 					endVote('later ' + (Date.now() - milliseconds), null, project);
 					return;
 			    }
@@ -1020,7 +1020,7 @@ async function endVote(message, sender, project) {
 		let count = 0;
 		let deleteCount = 0;
 		let deleted = true;
-        for (var i = getProjectList(project).length; i--;) {
+        for (let i = getProjectList(project).length; i--;) {
         	let temp = getProjectList(project)[i];
             if (temp.nick == project.nick && temp.id == project.id && getProjectName(temp) == getProjectName(project)) {
             	getProjectList(project).splice(i, 1);
@@ -1264,64 +1264,64 @@ async function setValue(key, value) {
 }
 
 function forLoopAllProjects (fuc) {
-    for (proj of projectsTopCraft) {
-        fuc();
+    for (let proj of projectsTopCraft) {
+        fuc(proj);
     }
-    for (proj of projectsMcTOP) {
-        fuc();
+    for (let proj of projectsMcTOP) {
+        fuc(proj);
     }
-    for (proj of projectsMCRate) {
-        fuc();
+    for (let proj of projectsMCRate) {
+        fuc(proj);
     }
-    for (proj of projectsMinecraftRating) {
-        fuc();
+    for (let proj of projectsMinecraftRating) {
+        fuc(proj);
     }
-    for (proj of projectsMonitoringMinecraft) {
-        fuc();
+    for (let proj of projectsMonitoringMinecraft) {
+        fuc(proj);
     }
-    for (proj of projectsFairTop) {
-        fuc();
+    for (let proj of projectsFairTop) {
+        fuc(proj);
     }
-    for (proj of projectsIonMc) {
-        fuc();
+    for (let proj of projectsIonMc) {
+        fuc(proj);
     }
-    for (proj of projectsMinecraftServers) {
-        fuc();
+    for (let proj of projectsMinecraftServers) {
+        fuc(proj);
     }
-    for (proj of projectsServeurPrive) {
-        fuc();
+    for (let proj of projectsServeurPrive) {
+        fuc(proj);
     }
-    for (proj of projectsPlanetMinecraft) {
-        fuc();
+    for (let proj of projectsPlanetMinecraft) {
+        fuc(proj);
     }
-    for (proj of projectsTopG) {
-        fuc();
+    for (let proj of projectsTopG) {
+        fuc(proj);
     }
-    for (proj of projectsMinecraftMp) {
-        fuc();
+    for (let proj of projectsMinecraftMp) {
+        fuc(proj);
     }
-    for (proj of projectsMinecraftServerList) {
-        fuc();
+    for (let proj of projectsMinecraftServerList) {
+        fuc(proj);
     }
-    for (proj of projectsServerPact) {
-        fuc();
+    for (let proj of projectsServerPact) {
+        fuc(proj);
     }
-    for (proj of projectsMinecraftIpList) {
-        fuc();
+    for (let proj of projectsMinecraftIpList) {
+        fuc(proj);
     }
-    for (proj of projectsTopMinecraftServers) {
-        fuc();
+    for (let proj of projectsTopMinecraftServers) {
+        fuc(proj);
     }
-    for (proj of projectsMinecraftServersBiz) {
-        fuc();
+    for (let proj of projectsMinecraftServersBiz) {
+        fuc(proj);
     }
-    for (proj of projectsCustom) {
-        fuc();
+    for (let proj of projectsCustom) {
+        fuc(proj);
     }
 }
 
 function extractHostname(url) {
-    var hostname;
+    let hostname;
     //find & remove protocol (http, ftp, etc.) and get hostname
 
     if (url.indexOf("//") > -1) {
@@ -1341,8 +1341,8 @@ function extractHostname(url) {
 
 //Слушатель на изменение настроек
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-    for (var key in changes) {
-        var storageChange = changes[key];
+    for (let key in changes) {
+        let storageChange = changes[key];
         if (key == 'AVMRprojectsTopCraft') projectsTopCraft = storageChange.newValue;
         if (key == 'AVMRprojectsMcTOP') projectsMcTOP = storageChange.newValue;
         if (key == 'AVMRprojectsMCRate') projectsMCRate = storageChange.newValue;
@@ -1562,7 +1562,7 @@ const toDataURL = url => fetch(url)
 
 //Поддержка для мобильных устройсв, заставляем думать ServerPact и MinecraftIpList что мы с компьютера а не с телефона
 handler = function(n) {
-    for (var t = 0, i = n.requestHeaders.length; t < i; ++t) {
+    for (let t = 0, i = n.requestHeaders.length; t < i; ++t) {
        	if (n.requestHeaders[t].name === "User-Agent" && (n.requestHeaders[t].value.includes('Mobile') || n.requestHeaders[t].value.includes('Android') || n.requestHeaders[t].value.includes('iPhone'))) {
             n.requestHeaders[t].value = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36";
             break;

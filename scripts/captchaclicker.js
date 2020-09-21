@@ -11,6 +11,7 @@ this.check = setInterval(()=>{
 this.check2 = setInterval(()=>{
    	if (document.querySelector("#solver-button") != null && !document.querySelector("#solver-button").className.includes('working')) {
    		document.querySelector("#solver-button").click();
+   		clearInterval(this.check2);
    	}
 }, 1000);
 
@@ -22,7 +23,19 @@ this.check3 = setInterval(()=>{
    	}
 }, 1000);
 
-//Проверяет прошла ли проверка капчи
+//Проверяет прошла ли проверка hCaptcha
+this.check5 = setInterval(()=>{
+   	if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1) {
+   		window.top.postMessage('vote', '*');
+   		clearInterval(this.check);
+   		clearInterval(this.check2);
+   		clearInterval(this.check3);
+   		clearInterval(this.check4);
+   		clearInterval(this.check5);
+   	}
+}, 1000);
+
+//Проверяет прошла ли проверка ReCaptcha
 let notified = false;
 this.check4 = setInterval(()=>{
    	if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1) {
@@ -31,6 +44,7 @@ this.check4 = setInterval(()=>{
    		clearInterval(this.check2);
    		clearInterval(this.check3);
    		clearInterval(this.check4);
+   		clearInterval(this.check5);
    	}
    	if (document.querySelector("#solver-button") == null && !notified && document.querySelector("#recaptcha-verify-button") != null) {
    	    notified = true;
