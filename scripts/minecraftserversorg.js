@@ -6,7 +6,7 @@ window.onmessage = function(e){
 vote(true);
 
 function vote(first) {
-	chrome.storage.local.get('AVMRprojectsMinecraftServers', function(result) {
+	chrome.storage.local.get('AVMRprojectsMinecraftServersOrg', function(result) {
 		try {
            	//Если вы уже голосовали
            	if (document.querySelector("#error-message") != null) {
@@ -38,7 +38,7 @@ function vote(first) {
            	if (first) {
            		return;
            	}
-           	let nick = getNickName(result.AVMRprojectsMinecraftServers);
+           	let nick = getNickName(result.AVMRprojectsMinecraftServersOrg);
 			if (nick == null || nick == "") return;
 			document.querySelector("#field-container > form > ul > li > input").value = nick;
 			document.querySelector("#field-container > form > button").click();
@@ -54,7 +54,7 @@ function vote(first) {
 
 function getNickName(projects) {
     for (project of projects) {
-        if (project.MinecraftServers && document.URL.startsWith('https://minecraftservers.org/vote/' + project.id)) {
+        if (project.MinecraftServersOrg && document.URL.startsWith('https://minecraftservers.org/vote/' + project.id)) {
             return project.nick;
         }
     }

@@ -921,7 +921,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
 	} else if (project.IonMc) {
 		chrome.tabs.executeScript(details.tabId, {file: "scripts/ionmc.js"});
 	} else if (project.MinecraftServersOrg) {
-		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftservers.js"});
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftserversorg.js"});
 	} else if (project.ServeurPrive) {
 		chrome.tabs.executeScript(details.tabId, {file: "scripts/serveurprive.js"});
 	} else if (project.PlanetMinecraft) {
