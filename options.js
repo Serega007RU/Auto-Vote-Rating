@@ -1222,8 +1222,8 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     if (projectsIonMc == null || !(typeof projectsIonMc[Symbol.iterator] === 'function')) {
                         projectsIonMc = [];
                     }
-                    if (projectsMinecraftServers == null || !(typeof projectsMinecraftServers[Symbol.iterator] === 'function')) {
-                        projectsMinecraftServers = [];
+                    if (projectsMinecraftServersOrg == null || !(typeof projectsMinecraftServersOrg[Symbol.iterator] === 'function')) {
+                        projectsMinecraftServersOrg = [];
                     }
                     if (projectsServeurPrive == null || !(typeof projectsServeurPrive[Symbol.iterator] === 'function')) {
                         projectsServeurPrive = [];
