@@ -290,7 +290,7 @@ async function addProjectList(project, visually) {
         let time = new Date(project.time);
         let next = false;
         if (project.ServeurPrive) {
-            if (project.countVote >= project.maxCountVote && Date.now() > project.time) {
+            if (project.countVote >= project.maxCountVote) {
                 time.setDate(time.getDate() + 1);
                 time.setHours(0, 0, 0, 0);
                 next = true;
@@ -1243,6 +1243,8 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     //Если пользователь обновился с версии 3.1.0
                     if (projectsMinecraftServersBiz == null || !(typeof projectsMinecraftServersBiz[Symbol.iterator] === 'function')) {
                         projectsMinecraftServersBiz = [];
+                    }
+                    if (projectsMinecraftServersOrg == null || !(typeof projectsMinecraftServersOrg[Symbol.iterator] === 'function')) {
                         projectsMinecraftServersOrg = [];
                     }
 

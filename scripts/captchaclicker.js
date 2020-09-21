@@ -1,7 +1,11 @@
-//Клик "Я не робот" для ReCaptcha
+//Клик "Я не робот" для ReCaptcha или hCaptcha
 this.check = setInterval(()=>{
    	if (document.querySelector("#recaptcha-anchor > div.recaptcha-checkbox-border") != null) {
    		document.querySelector("#recaptcha-anchor > div.recaptcha-checkbox-border").click();
+   		clearInterval(this.check);
+   	}
+   	if (document.querySelector("#checkbox") != null) {
+   		document.querySelector("#checkbox").click();
    		clearInterval(this.check);
    	}
 }, 1000);
@@ -12,14 +16,6 @@ this.check2 = setInterval(()=>{
    	if (document.querySelector("#solver-button") != null && !document.querySelector("#solver-button").className.includes('working')) {
    		document.querySelector("#solver-button").click();
    		clearInterval(this.check2);
-   	}
-}, 1000);
-
-//Клик "Я не робот" для hCaptcha //ToDo пока не работает из-за проверки isTrusted
-this.check3 = setInterval(()=>{
-   	if (document.querySelector("#checkbox") != null) {
-   		document.querySelector("#checkbox").click();
-   		clearInterval(this.check3);
    	}
 }, 1000);
 

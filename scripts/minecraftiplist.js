@@ -8,7 +8,7 @@ function vote () {
 				    return;
 			    }
 			    if (document.querySelector("#Content > div.Error").textContent.includes('last voted for this server')) {
-                    let numbers = document.querySelector("#Content > div.Error").textContent.match(/\d+/g).map(Number);
+                    let numbers = document.querySelector("#Content > div.Error").textContent.substring(document.querySelector("#Content > div.Error").textContent.length - 30).match(/\d+/g).map(Number);
 					let count = 0;
 					let hour = 0;
 					let min = 0;
