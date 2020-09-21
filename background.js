@@ -142,18 +142,7 @@ function checkVote() {
     }
     
 	forLoopAllProjects(function (proj) {
-		if (proj.ServeurPrive) {
-	    	if (proj.countVote > 0 && proj.time != null) {
-				let now = new Date();
-				let next = new Date(proj.time);
-				if (now.getDate() > next.getDate() || now.getMonth() > next.getMonth() || now.getFullYear > next.getFullYear) {
-					proj.countVote = 0;
-				}
-	    	}
-			if (proj.countVote < proj.maxCountVote && (proj.time == null || proj.time < Date.now())) {
-                checkOpen(proj);
-			}
-		} else if (proj.time == null || proj.time < Date.now()) {
+		if (proj.time == null || proj.time < Date.now()) {
             checkOpen(proj);
 		}
 	});
@@ -1062,18 +1051,29 @@ async function endVote(message, sender, project) {
         }
 		if (message.startsWith('later ')) {
 			time = parseInt(message.replace('later ', ''));
-			project.time = time;
 			if (project.ServeurPrive) {
 				project.countVote = project.countVote + 1;
+				if (project.countVote >= project.maxCountVote) {
+					time = new Date();
+					time.setDate(time.getDate() + 1);
+					time.setHours(0, (project.priority ? 0 : 10), 0, 0);
+					time = time.getTime();
+				}
 			}
+			project.time = time;
 		} else {
 			if (project.TopG || project.ServerPact || project.MinecraftServersBiz) {
 				time.setUTCHours(time.getUTCHours() + 12);
 			} else if (project.MinecraftIpList || project.MonitoringMinecraft) {
 				time.setUTCDate(time.getUTCDate() + 1);
 			} else if (project.ServeurPrive) {
-				time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30);
 				project.countVote = project.countVote + 1;
+				if (project.countVote >= project.maxCountVote) {
+					time.setDate(time.getDate() + 1);
+					time.setHours(0, (project.priority ? 0 : 10), 0, 0);
+				} else {
+					time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30);
+				}
 			} else if (project.Custom) {
 				time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout);
 			}
