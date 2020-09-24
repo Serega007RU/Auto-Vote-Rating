@@ -107,7 +107,7 @@ async function initializeConfig() {
 			projectsMinecraftServersBiz = [];
 			projectsMinecraftServersOrg = [];
 			//Сброс time для проектов где использовался String
-            forLoopAllProjects(async function () {
+            forLoopAllProjects(async function (proj) {
             	if (proj.TopCraft || proj.McTOP || proj.FairTop || proj.MinecraftRating || proj.MCRate || proj.IonMc || proj.MinecraftMp || proj.PlanetMinecraft || proj.MinecraftServerList || proj.MinecraftServersOrg || proj.TopMinecraftServers) {
             		proj.time = null;
             		await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj));
