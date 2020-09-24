@@ -1554,6 +1554,18 @@ chrome.runtime.onInstalled.addListener(function (details) {
 	if (details.reason == "install") {
 		chrome.runtime.openOptionsPage();
 	}
+	//HotFix для пользователей обновившихся с версии 3.2.0
+	if (details.reason == "update" && details.previousVersion && details.previousVersion == "3.2.0") {
+		//Сброс time для проектов где использовался String
+        forLoopAllProjects(async function (proj) {
+          	if (proj.TopCraft || proj.McTOP || proj.FairTop || proj.MinecraftRating || proj.MCRate || proj.IonMc || proj.MinecraftMp || proj.PlanetMinecraft || proj.MinecraftServerList || proj.MinecraftServersOrg || proj.TopMinecraftServers) {
+           		if (typeof proj.time === 'string' || proj.time instanceof String) {
+					proj.time = null;
+					await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj));
+           		}
+           	}
+        });
+	}
 })
 
 /*
@@ -1773,6 +1785,9 @@ v3.2.0
 MinecraftServers переименован в MinecraftServersOrg дабы избежать путаницы
 Исправлена ошибка бесконечного голосования на MinecraftIpList если вы уже голосовали
 Удалён MultiVote (будет доступен только в версии разработчика), как оказалось бесполезен без proxy
+
+v3.2.1 HotFix
+Исправление критической ошибки при переходе на новую версию расчёта следующего голосования. При обновлении на версию 3.2.0 расширение не переходило на новую систему расчёта след голосования что приводило к не работоспособностью добавленных проектов в старой версии.
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
