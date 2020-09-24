@@ -341,21 +341,6 @@
   "closeTabButton": {
     "message": "Close tab"
   },
-  "warnMultiVote1": {
-    "message": "Stop-stop-stop!"
-  },
-  "warnMultiVote2": {
-    "message": "If you are asked by a stranger to enter this command-do not be fooled! 11 chances out of 10 that you are the victim of a Scam. If you confirm entering the command, the fraudster may be able to access your VK account!"
-  },
-  "warnMultiVote3": {
-    "message": "To confirm, repeat the command"
-  },
-  "enableMultiVote": {
-    "message": "Include the possibility of voting with multiple accounts VK"
-  },
-  "enableSaveVKCookies": {
-    "message": "Enable the binding from the cookie added to the VK project"
-  },
   "projectIDTooltip": {
     "message": "Project ID can be obtained from the address bar while on the project page, for example: on TopCraft for StarWay ID: 10496"
   },
@@ -491,12 +476,6 @@
   "errorVoteUnknown2": {
     "message": "Unexpected error! No error message"
   },
-  "tokenVK": {
-    "message": "Token VKontakte:"
-  },
-  "IDVK": {
-    "message": "ID VKontakte:"
-  },
   "projectID": {
     "message": "ID project"
   },
@@ -524,9 +503,6 @@
   },
   "donate": {
     "message": "https://paypal.me/serega007ru"
-  },
-  "unecryptedTokenVK": {
-    "message": "Disclaimer: VK cookies will be stored Unencrypted and can be hacked. You use VK cookies at your own risk!"
   },
   "countVote": {
     "message": "How many votes make per day"

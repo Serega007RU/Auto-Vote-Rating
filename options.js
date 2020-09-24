@@ -23,8 +23,6 @@ var settings;
 var disableCheckProjects = false;
 //Нужно ли добавлять проект с приоритетом
 var priorityOption = false;
-//Нужно ли привязывать куки ВК в добавленному проекту
-var saveVKCookies = false;
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd;
 
@@ -63,7 +61,7 @@ function Project(top, nick, id, time, responseURL, priority) {
 };
 
 //Конструктор настроек
-function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disabledNotifError, enabledSilentVote, disabledCheckTime, cooldown, multivote) {
+function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disabledNotifError, enabledSilentVote, disabledCheckTime, cooldown) {
     this.disabledNotifStart = disabledNotifStart;
     this.disabledNotifInfo = disabledNotifInfo;
     this.disabledNotifWarn = disabledNotifWarn;
@@ -71,7 +69,6 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
     this.enabledSilentVote = enabledSilentVote;
     this.disabledCheckTime = disabledCheckTime;
     this.cooldown = cooldown;
-    this.multivote = multivote;
 };
 
 // Restores select box and checkbox state using the preferences
@@ -213,11 +210,6 @@ async function restoreOptions() {
         console.log(chrome.i18n.getMessage('firstAddSettings'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
     }
-    //Поддержка новых настроек с версии 2.1.0 (или же с 2.1.1 для Opera)
-    if (settings.multivote == null) {
-        settings.multivote = false;
-        await setValue('AVMRsettings', settings, false);
-    }
 
     updateProjectList();
 
@@ -274,7 +266,6 @@ async function restoreOptions() {
     }
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
-    if (settings.multivote) addMultiVote();
     if (settings.enableMinecraftServersOrg) addMinecraftServersOrg();
 };
 
@@ -300,15 +291,6 @@ async function addProjectList(project, visually) {
         getProjectList(project).unshift(project);
     } else {
         getProjectList(project).push(project);
-    }
-    if (settings.multivote && saveVKCookies) {
-        let getVKCookies = new Promise(resolve => {
-            chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
-                resolve(cookies);
-            });
-        });
-
-        project.vk = await getVKCookies;
     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
     //projects.push(project);
@@ -532,7 +514,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     }
 
     forLoopAllProjects(function () {
-        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom && !(settings.multivote && proj.nick != project.nick && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft))) {
+        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom) {
             if (secondBonus === "") {
                 updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
             } else if (element != null) {
@@ -719,7 +701,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         updateStatusAdd('<div>' + chrome.i18n.getMessage('checkHasProjectSuccess') + '</div>', true, element);
 
         //Проверка авторизации ВКонтакте
-        if (!settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+        if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
             updateStatusAdd('<div>' + chrome.i18n.getMessage('checkAuthVK') + '</div>', true, element);
             let url2;
             if (project.TopCraft) url2 = "https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email";
@@ -1273,11 +1255,6 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     } else {
                         document.getElementById("enabledSilentVote").value = 'disabled';
                     }
-                    if (document.getElementById("enableMulteVote") != null) {
-                        document.getElementById("enableMulteVote").checked = settings.multivote;
-                    } else if (settings.multivote) {
-                        addMultiVote();
-                    }
                     if (settings.enableMinecraftServersOrg) addMinecraftServersOrg();
 
                     await updateProjectList();
@@ -1419,77 +1396,6 @@ async function fastAdd() {
             window.close();
         });
     }
-}
-
-/*
-Пока что в бета тестировании
-Данная настройка скрыта из-за нарушений правил топов
-Документация по использованию режима MultiVote
-нет не получиться одновременно сидеть в вконтакте и голосовать с нескольких аккаунтов,
-в обход данной проблемы создавайте второй профиль в браузере и с него сидите в вк или используйте расширение либо используйте другой браузер
-
-Для начала в консоле нужно ввести команду addMultiVote();
-Потом нужно поставить галочку напротив "Включить возможность голосования с нескольких аккаунтов вк".
-Затем поставить галочку напротив "Включить привязку куки ВК к добавленному проекту".
-Потом можно будет добавлять топ (проект)
-
-При добавлении топа куки ВК будут привязываться к добавленному проекту и соответсвенно когда расширение будет голосовать он будет применять привязанные куки и соответсвенно голосовать с аккаунта вк который был авторизован в момент добавления проекта
-
-Неисправленная проблема:
-необходимо реализовать смену айпи через прокси, впн или что-то другое
-*/
-// var confirmWarn = false;
-function addMultiVote() {
-//     if (!confirmWarn && !settings.multivote) {
-//         console.warn(chrome.i18n.getMessage('warnMultiVote1'));
-//         console.warn(chrome.i18n.getMessage('warnMultiVote2'));
-//         console.log(chrome.i18n.getMessage('warnMultiVote3'));
-//         confirmWarn = true;
-//         return;
-//     }
-    let el = document.querySelector("#settings > div > div.col-xl-6.col-lg-6.col-md-12.mb-3 > span:nth-child(28)");
-    if (el == null) return;
-
-    let input = document.createElement('input');
-    input.setAttribute('class', 'checkbox');
-    input.setAttribute('type', 'checkbox');
-    input.setAttribute('name', 'checkbox');
-    input.setAttribute('id', 'enableMulteVote');
-    
-    let label = document.createElement('label');
-    label.setAttribute('for', 'enableMulteVote');
-    label.setAttribute('id', 'enableMultiVote');
-    label.innerHTML = chrome.i18n.getMessage('enableMultiVote');
-    
-    let br = document.createElement('br');
-    
-    let input2 = document.createElement('input');
-    input2.setAttribute('class', 'checkbox');
-    input2.setAttribute('type', 'checkbox');
-    input2.setAttribute('name', 'checkbox');
-    input2.setAttribute('id', 'enableSaveVKCookies');
-
-    let label2 = document.createElement('label');
-    label2.setAttribute('for', 'enableSaveVKCookies');
-    label2.setAttribute('id', 'enableSaveVKCookies');
-    label2.innerHTML = chrome.i18n.getMessage('enableSaveVKCookies');
-    
-    el.after(chrome.i18n.getMessage('unecryptedTokenVK'));
-    el.after(br);
-    el.after(label2);
-    el.after(input2);
-    el.after(label);
-    el.after(input);
-
-    document.getElementById('enableMulteVote').checked = settings.multivote;
-    document.getElementById('enableMulteVote').addEventListener('change', async function() {
-        settings.multivote = this.checked;
-        await setValue('AVMRsettings', settings, true);
-    });
-
-    document.getElementById('enableSaveVKCookies').addEventListener('change', function() {
-        saveVKCookies = this.checked;
-    });
 }
 
 function addMinecraftServersOrg() {

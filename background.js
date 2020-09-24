@@ -184,13 +184,7 @@ async function checkOpen(project) {
     
     //Не позволяет открыть больше одной вкладки для одного топа
 	for (let value of queueProjects) {
-		//Не позволяет открыть больше одной вкладки для всех топов если включён режим голосования с нескольких аккаунтов вк для топов где используется вк
-		if (settings.multivote && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (value.TopCraft || value.McTOP || value.MCRate || value.MinecraftRating || value.MonitoringMinecraft)) {
-            if (queueProjects.size > 0) return;
-        //Не позволяет открыть более одной вкладки для одного топа
-		} else {
-			if (getProjectName(value) == getProjectName(project)) return;
-		}
+		if (getProjectName(value) == getProjectName(project)) return;
 	}
 
 	queueProjects.add(project);
@@ -226,24 +220,6 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
-	if (settings.multivote && project.vk != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-        console.log('Изменяю авторизацю вк...');
-
-        let getVKCookies = new Promise(resolve => {
-            chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
-                resolve(cookies);
-            });
-        });
-        let cookies = await getVKCookies;
-		for(let i=0; i<cookies.length;i++) {
-			await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
-		}
-
-		for(let i = 0; i < project.vk.length; i++) {
-			let cookie = project.vk[i];
-            await setCookieDetails({url: "https://" + cookie.domain.substring(1, cookie.domain.length) + cookie.path, name: cookie.name, value: cookie.value, domain: cookie.domain, path: cookie.path, secure: cookie.secure, httpOnly: cookie.httpOnly, sameSite: cookie.sameSite, expirationDate: cookie.expirationDate, storeId: cookie.storeId});
-		}
-    }
     let silentVoteMode = false;
     if (project.Custom) {
     	silentVoteMode = true;
@@ -1796,6 +1772,7 @@ v3.2.0
 Теперь выводиться уведомление если требуется пройти капчу вручную
 MinecraftServers переименован в MinecraftServersOrg дабы избежать путаницы
 Исправлена ошибка бесконечного голосования на MinecraftIpList если вы уже голосовали
+Удалён MultiVote (будет доступен только в версии разработчика), как оказалось бесполезен без proxy
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
