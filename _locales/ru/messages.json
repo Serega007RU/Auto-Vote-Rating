@@ -302,7 +302,12 @@
     "message": "Закрыть вкладку"
   },
   "projectIDTooltip": {
-    "message": "ID проекта можно получить из адресной строки находясь на странице проекта, например: На TopCraft для StarWay ID: 10496"
+    "message": "<span style='color:red;'>ID</span> проекта можно получить из адресной строки находясь на странице проекта, например: <br> $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
   "inputProjectID": {
     "message": "Введите ID"
