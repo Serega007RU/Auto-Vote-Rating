@@ -8,6 +8,8 @@ function vote () {
 			} else if (document.querySelector("#vote_form > div.alert.alert-danger") != null && document.querySelector("#vote_form > div.alert.alert-danger").textContent.includes('You have already voted for this server today.')) {
 				sendMessage('later');
 				return;
+			} else if (document.querySelector("body > iframe") != null) {
+				return;
 			}
 			let nick = getNickName(result.AVMRprojectsMinecraftMp);
 	        if (nick == null || nick == "") return;

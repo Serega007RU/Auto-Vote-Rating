@@ -929,7 +929,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
 	if (details.frameId != 0) {
 		let project = openedProjects.get(details.tabId);
 		if (project == null) return;
-		if (project.ServeurPrive || project.IonMc || project.MinecraftServersBiz || project.MinecraftServersBiz || project.MinecraftServersOrg) {
+		if (project.ServeurPrive || project.IonMc || project.MinecraftServersBiz || project.MinecraftServersBiz || project.MinecraftServersOrg || project.MinecraftMp) {
 			chrome.tabs.executeScript(details.tabId, {file: "scripts/captchaclicker.js", frameId: details.frameId});
 		}
 	}
@@ -1788,6 +1788,9 @@ MinecraftServers переименован в MinecraftServersOrg дабы изб
 
 v3.2.1 HotFix
 Исправление критической ошибки при переходе на новую версию расчёта следующего голосования. При обновлении на версию 3.2.0 расширение не переходило на новую систему расчёта след голосования что приводило к не работоспособностью добавленных проектов в старой версии.
+
+v3.2.2
+У MinecraftMp оказалась дополнительная провека капчи, исправлены некоторые ошибки с ним
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)

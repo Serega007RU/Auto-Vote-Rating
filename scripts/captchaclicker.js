@@ -29,7 +29,7 @@ this.check4 = setInterval(()=>{
    		clearInterval(this.check3);
    		clearInterval(this.check4);
    	}
-   	if (document.querySelector("#solver-button") == null && !notified && document.querySelector("#recaptcha-verify-button") != null) {
+   	if (document.querySelector("#solver-button") == null && !notified && document.querySelector("#recaptcha-verify-button") != null && !document.referrer.includes('minecraft-mp')) {
    	    notified = true;
         sendMessage("Requires manually passing the captcha");
    	}
