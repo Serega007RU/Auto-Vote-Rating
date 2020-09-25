@@ -868,7 +868,7 @@ async function silentVote(project) {
 }
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
-chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
+chrome.webNavigation.onCompleted.addListener(function(details) {
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
 	if (project.TopCraft) {
@@ -1792,6 +1792,7 @@ v3.2.1 HotFix
 v3.2.2
 У MinecraftMp оказалась дополнительная проверка капчи, исправлены некоторые ошибки с ним
 В Tooltip'е ID проекта теперь более адекватно и понятно показывается где и как достать ID проекта (было слишком много вопросов как его доставать)
+Исправлена ошибка когда скрипт загружался во вкладку раньше чем загрузилась вкладка
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
