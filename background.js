@@ -1047,6 +1047,7 @@ async function endVote(message, sender, project) {
 				if (project.countVote >= project.maxCountVote) {
 					time.setDate(time.getDate() + 1);
 					time.setHours(0, (project.priority ? 0 : 10), 0, 0);
+					project.countVote = 0;
 				} else {
 					time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30);
 				}
@@ -1793,6 +1794,8 @@ v3.2.2
 У MinecraftMp оказалась дополнительная проверка капчи, исправлены некоторые ошибки с ним
 В Tooltip'е ID проекта теперь более адекватно и понятно показывается где и как достать ID проекта (было слишком много вопросов как его доставать)
 Исправлена ошибка когда скрипт загружался во вкладку раньше чем загрузилась вкладка
+CubeCraft оказался жопой с ручкой который не даёт награду за голосование если вы не на сервере и поэтому вместо него в списке Legends Evolved
+Исправлена ошибка неверного подсчёта сделанных голосов в день для ServeurPrive
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)

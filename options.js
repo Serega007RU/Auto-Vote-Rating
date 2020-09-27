@@ -1597,7 +1597,7 @@ selectedTop.addEventListener("change", function() {
     } else if(selectedTop.value == "IonMc") {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://ionmc.top/vote/<span style="color:red;">80</span>') + '</span></span></div>' + dataInput + '<option value="80">Pixelmon.PRO 1.12.2</option><option value="83">FineMine.RU</option></datalist>';
     } else if(selectedTop.value == "MinecraftServersOrg") {
-       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraftservers.org/vote/<span style="color:red;">25531</span>') + '</span></span></div>' + dataInput + '<option value="25531">CubeCraft Games</option></datalist>';
+       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraftservers.org/vote/<span style="color:red;">25531</span>') + '</span></span></div>' + dataInput + '<option value="564053">Legends Evolved</option></datalist>';
     } else if(selectedTop.value == "ServeurPrive") {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://serveur-prive.net/minecraft/<span style="color:red;">gommehd-net-4932</span>/vote') + '</span></span></div>' + dataInput + '<option value="gommehd-net-4932">GommeHD.net</option></datalist>';
     } else if(selectedTop.value == "PlanetMinecraft") {
