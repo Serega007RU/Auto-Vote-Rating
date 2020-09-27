@@ -81,7 +81,7 @@ select {
 
 select, input, textarea {
   width: 100%;
-  display: block;
+  /* display: block; */
   background-color: #2A2A2F;
   border: none;
   border-radius: 3px;

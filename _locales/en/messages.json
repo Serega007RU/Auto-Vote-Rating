@@ -526,5 +526,29 @@
   },
   "notWork": {
     "message": "Now working"
+  },
+  "useMultiVote": {
+    "message": "Use VK and Proxy when voting"
+  },
+  "added": {
+    "message": "Already added"
+  },
+  "notAuthVK": {
+    "message": "You are not logged in to Vkontakte"
+  },
+  "type": {
+    "message": "Choose type"
+  },
+  "notFoundProxy": {
+    "message": "There is no free proxy, auto-voting is completely suspended for 24 hours. Restart the extension to reset the 24-hour break"
+  },
+  "notFoundVK": {
+    "message": "There is no free Vkontakte account, auto-voting is completely suspended for 24 hours. Restart the extension to reset the 24-hour break"
+  },
+  "notFoundProxyTitle": {
+    "message": "No free proxy available"
+  },
+  "notFoundVKTitle": {
+    "message": "There is no free account Vkontakte"
   }
 }

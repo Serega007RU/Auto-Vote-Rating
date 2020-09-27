@@ -322,6 +322,11 @@
 			<div id="multivote" class="tabcontent" style="display: none;">
 				<h4 data-resource="multivote" align="center"></h4>
 				<hr color="#5A5A5C">
+
+				<input class="checkbox" id="useMultiVote" type="checkbox" name="checkbox" />
+				<label data-resource="useMultiVote" for="useMultiVote"></label>
+				<br>
+				
 				<div class="row">
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
 						<button data-resource="VK" class="selectsite" id="VKButton"></button>
@@ -343,8 +348,15 @@
 						</div>
 						<div class="listcontent" id="ProxyTab" style="display: none;">
                             <form id="addProxy">
-                                <input name="ip" id="ip" required placeholder="ip">
+                                <input class="w-25" name="ip" id="ip" required placeholder="ip">
                                 <input class="w-25" type="number" name="port" id="port" required placeholder="port">
+								<select class="w-25" required id="proxyType">
+									<option data-resource="type" value="" selected disabled></option>
+									<option value="http">http</option>
+									<option value="https">https</option>
+									<option value="socks4">socks4</option>
+									<option value="socks5">socks5</option>
+								</select>
                                 <button class="addButton" data-resource="addButton" id="submitAddProxy" type="submit"></button>
                             </form>
                             <span id="addProxydiv">&nbsp;</span>

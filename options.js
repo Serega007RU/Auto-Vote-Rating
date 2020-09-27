@@ -17,6 +17,8 @@ var projectsMinecraftIpList = [];
 var projectsTopMinecraftServers = [];
 var projectsMinecraftServersBiz = [];
 var projectsCustom = [];
+var VKs = [];
+var proxies = [];
 
 var settings;
 //Хранит значение отключения проверки на совпадение проектов
@@ -69,8 +71,7 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
     this.enabledSilentVote = enabledSilentVote;
     this.disabledCheckTime = disabledCheckTime;
     this.cooldown = cooldown;
-    this.VKs = [];
-    this.proxies = [];
+    this.useMultiVote = false;
 };
 
 // Restores select box and checkbox state using the preferences
@@ -112,6 +113,10 @@ async function restoreOptions() {
     projectsMinecraftServersBiz = projectsMinecraftServersBiz.AVMRprojectsMinecraftServersBiz;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
+    VKs = await getValue('AVMRVKs');
+    VKs = VKs.AVMRVKs;
+    proxies = await getValue('AVMRproxies');
+    proxies = proxies.AVMRproxies;
     settings = await getValue('AVMRsettings');
     settings = settings.AVMRsettings;
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
@@ -135,6 +140,10 @@ async function restoreOptions() {
         projectsMinecraftServersBiz = [];
 
         projectsCustom = [];
+
+        VKs = [];
+        proxies = [];
+
         await setValue('AVMRprojectsTopCraft', projectsTopCraft, false);
         await setValue('AVMRprojectsMcTOP', projectsMcTOP, false);
         await setValue('AVMRprojectsMCRate', projectsMCRate, false);
@@ -153,6 +162,8 @@ async function restoreOptions() {
         await setValue('AVMRprojectsTopMinecraftServers', projectsTopMinecraftServers, false);
         await setValue('AVMRprojectsMinecraftServersBiz', projectsMinecraftServersBiz, false);
         await setValue('AVMRprojectsCustom', projectsCustom, false);
+        await setValue('AVMRVKs', VKs, false);
+        await setValue('AVMRproxies', proxies, false);
         console.log(chrome.i18n.getMessage('settingsGen'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
         alert(chrome.i18n.getMessage('firstInstall'));
@@ -205,22 +216,23 @@ async function restoreOptions() {
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false);
     }
 
+    //Если пользователь обновился с версии без MultiVote
+    if (VKs == null || !(typeof VKs[Symbol.iterator] === 'function') || proxies == null || !(typeof proxies[Symbol.iterator] === 'function')) {
+        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true);
+        VKs = [];
+        proxies = [];
+        await setValue('AVMRVKs', VKs, false);
+        await setValue('AVMRproxies', proxies, false);
+        console.log(chrome.i18n.getMessage('settingsUpdateEnd'));
+        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false);
+    }
+
     if (settings == null || settings == "") {
         updateStatusSave('<div>' + chrome.i18n.getMessage('firstSettings') +'</div>', true);
         settings = new Settings(false, false, false, false, true, false, 1000, false);
         await setValue('AVMRsettings', settings, false);
         console.log(chrome.i18n.getMessage('firstAddSettings'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
-    }
-
-    //Если пользователь обновился с версии без MultiVote
-    if (settings.VKs == null || !(typeof settings.VKs[Symbol.iterator] === 'function') || settings.proxies == null || !(typeof settings.proxies[Symbol.iterator] === 'function')) {
-        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true);
-        settings.VKs = [];
-        settings.proxies = [];
-        await setValue('AVMRsettings', settings, false);
-        console.log(chrome.i18n.getMessage('settingsUpdateEnd'));
-        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false);
     }
 
     updateProjectList();
@@ -263,6 +275,7 @@ async function restoreOptions() {
                 }
                 return;
             }
+            if (this.id == "useMultiVote") settings.useMultiVote = this.checked;
             await setValue('AVMRsettings', settings, true);
         });
     }
@@ -278,6 +291,7 @@ async function restoreOptions() {
     }
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
+    document.getElementById("useMultiVote").checked = settings.useMultiVote;
     if (settings.enableMinecraftServersOrg) addMinecraftServersOrg();
 };
 
@@ -321,8 +335,8 @@ async function addVKList(VK, visually) {
         removeVKList(VK, false);
     });
     if (visually) return;
-    settings.VKs.push(VK);
-    await setValue('AVMRsettings', settings, true);
+    VKs.push(VK);
+    await setValue('AVMRVKs', VKs, true);
 }
 
 //Добавить прокси в список
@@ -337,8 +351,8 @@ async function addProxyList(proxy, visually) {
         removeProxyList(proxy, false);
     });
     if (visually) return;
-    settings.proxies.push(proxy);
-    await setValue('AVMRsettings', settings, true);
+    proxies.push(proxy);
+    await setValue('AVMRproxies', proxies, true);
 }
 
 //Удалить проект из списка проекта
@@ -459,11 +473,11 @@ async function removeVKList(VK, visually) {
     document.getElementById(VK.name + '┄' + VK.id).removeEventListener('click', function() {});
     document.getElementById('div' + '┄' + VK.name + '┄' + VK.id).remove();
     if (visually) return;
-    for (let i = settings.VKs.length; i--;) {
-        let temp = settings.VKs[i];
-        if (temp.id == VK.id && temp.name == VK.name) settings.VKs.splice(i, 1);
+    for (let i = VKs.length; i--;) {
+        let temp = VKs[i];
+        if (temp.id == VK.id && temp.name == VK.name) VKs.splice(i, 1);
     }
-    await setValue('AVMRsettings', settings, true);
+    await setValue('AVMRVKs', VKs, true);
 }
 
 async function removeProxyList(proxy, visually) {
@@ -472,11 +486,11 @@ async function removeProxyList(proxy, visually) {
     document.getElementById(proxy.ip + '┄' + proxy.port).removeEventListener('click', function() {});
     document.getElementById('div' + '┄' + proxy.ip + '┄' + proxy.port).remove();
     if (visually) return;
-    for (let i = settings.proxies.length; i--;) {
-        let temp = settings.proxies[i];
-        if (temp.ip == proxy.ip && temp.port == proxy.port) settings.proxies.splice(i, 1);
+    for (let i = proxies.length; i--;) {
+        let temp = proxies[i];
+        if (temp.ip == proxy.ip && temp.port == proxy.port) proxies.splice(i, 1);
     }
-    await setValue('AVMRsettings', settings, true);
+    await setValue('AVMRproxies', proxies, true);
 }
 
 //Перезагрузка списка проектов
@@ -541,7 +555,7 @@ function updateProjectList() {
     while (document.getElementById("VKList").nextElementSibling != null) {
         document.getElementById("VKList").nextElementSibling.remove();
     }
-    for (let vkontakte of settings.VKs) {
+    for (let vkontakte of VKs) {
         addVKList(vkontakte, true);
     }
 
@@ -549,7 +563,7 @@ function updateProjectList() {
     while (document.getElementById("ProxyList").nextElementSibling != null) {
         document.getElementById("ProxyList").nextElementSibling.remove();
     }
-    for (let proxy of settings.proxies) {
+    for (let proxy of proxies) {
         addProxyList(proxy, true);
     }
 }
@@ -589,7 +603,7 @@ document.getElementById('AddVK').addEventListener('click', async () => {
     let html = await response.text();
     let doc = new DOMParser().parseFromString(html, "text/html");
     if (doc.querySelector("#index_login_button") != null) {
-        updateStatusVK('<span style="color:#f44336;">' + 'А авторизоваться?' + '</span>', true);
+        updateStatusVK('<span style="color:#f44336;">' + chrome.i18n.getMessage('notAuthVK') + '</span>', true);
         return;
     }
 
@@ -609,9 +623,9 @@ document.getElementById('AddVK').addEventListener('click', async () => {
         return;
     }
 
-    for (let vkontakte of settings.VKs) {
+    for (let vkontakte of VKs) {
         if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
-            updateStatusVK('<span style="color:#4CAF50;">' + ' Уже добавлен ' + '</span>', false);
+            updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('added') + '</span>', false);
             return;
         }
     }
@@ -628,10 +642,11 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
     let proxy = {};
     proxy.ip = document.querySelector("#ip").value;
     proxy.port = document.querySelector("#port").value;
+    proxy.scheme = document.querySelector("#proxyType").value;
 
-    for (let prox of settings.proxies) {
+    for (let prox of proxies) {
         if (proxy.ip == prox.ip && proxy.port == prox.port) {
-            updateStatusProxy('<span style="color:#4CAF50;">' + ' Уже добавлен ' + '</span>', false);
+            updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('added') + '</span>', false);
             return;
         }
     }
@@ -1163,7 +1178,9 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         || key == 'AVMRprojectsMinecraftIpList'
         || key == 'AVMRprojectsTopMinecraftServers'
         || key == 'AVMRprojectsMinecraftServersBiz'
-        || key == 'AVMRprojectsCustom') {
+        || key == 'AVMRprojectsCustom'
+        || key == 'AVMRVKs'
+        || key == 'AVMRproxies') {
             if (key == 'AVMRprojectsTopCraft') projectsTopCraft = storageChange.newValue;
             if (key == 'AVMRprojectsMcTOP') projectsMcTOP = storageChange.newValue;
             if (key == 'AVMRprojectsMCRate') projectsMCRate = storageChange.newValue;
@@ -1182,6 +1199,8 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             if (key == 'AVMRprojectsTopMinecraftServers') projectsTopMinecraftServers = storageChange.newValue;
             if (key == 'AVMRprojectsMinecraftServersBiz') projectsMinecraftServersBiz = storageChange.newValue;
             if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
+            if (key == 'AVMRVKs') VKs = storageChange.newValue;
+            if (key == 'AVMRproxies') proxies = storageChange.newValue;
             if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function')) return;
             if (storageChange.oldValue.length == storageChange.newValue.length) {
                 updateProjectList(storageChange.newValue);
@@ -1322,6 +1341,8 @@ document.getElementById('file-download').addEventListener('click', () => {
         projectsTopMinecraftServers,
         projectsMinecraftServersBiz,
         projectsCustom,
+        VKs,
+        proxies,
         settings
     }
     var text = JSON.stringify(allSetting);
@@ -1364,6 +1385,8 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     projectsTopMinecraftServers = allSetting.projectsTopMinecraftServers;
                     projectsMinecraftServersBiz = allSetting.projectsMinecraftServersBiz;
                     projectsCustom = allSetting.projectsCustom;
+                    VKs = allSetting.VKs;
+                    proxies = allSetting.proxies;
                     settings = allSetting.settings;
 
                     //Если пользователь обновился с версии 2.2.0
@@ -1400,18 +1423,18 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                         projectsTopMinecraftServers = [];
                     }
 
+                    //Если пользователь обновился с версии без MultiVote
+                    if (VKs == null || !(typeof VKs[Symbol.iterator] === 'function') || proxies == null || !(typeof proxies[Symbol.iterator] === 'function')) {
+                        VKs = [];
+                        proxies = [];
+                    }
+
                     //Если пользователь обновился с версии 3.1.0
                     if (projectsMinecraftServersBiz == null || !(typeof projectsMinecraftServersBiz[Symbol.iterator] === 'function')) {
                         projectsMinecraftServersBiz = [];
                     }
                     if (projectsMinecraftServersOrg == null || !(typeof projectsMinecraftServersOrg[Symbol.iterator] === 'function')) {
                         projectsMinecraftServersOrg = [];
-                    }
-
-                    //Если пользователь обновился с версии без MultiVote
-                    if (settings.VKs == null || !(typeof settings.VKs[Symbol.iterator] === 'function') || settings.proxies == null || !(typeof settings.proxies[Symbol.iterator] === 'function')) {
-                        settings.VKs = [];
-                        settings.proxies = [];
                     }
 
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);
@@ -1434,6 +1457,8 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     await setValue('AVMRprojectsTopMinecraftServers', projectsTopMinecraftServers, false);
                     await setValue('AVMRprojectsMinecraftServersBiz', projectsMinecraftServersBiz, false);
                     await setValue('AVMRprojectsCustom', projectsCustom, false);
+                    await setValue('AVMRVKs', VKs, false);
+                    await setValue('AVMRproxies', proxies, false);
                     updateStatusSave('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('successSave') + '</div>', false);
 
                     document.getElementById("disabledNotifStart").checked = settings.disabledNotifStart;
@@ -1448,6 +1473,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                         document.getElementById("enabledSilentVote").value = 'disabled';
                     }
                     if (settings.enableMinecraftServersOrg) addMinecraftServersOrg();
+                    document.getElementById("useMultiVote").checked = settings.useMultiVote;
 
                     await updateProjectList();
 
