@@ -324,10 +324,10 @@
 				<hr color="#5A5A5C">
 				<div class="row">
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
-						<button class="selectsite" id="VKButton">VKontakte</button>
+						<button data-resource="VK" class="selectsite" id="VKButton"></button>
 					</div>
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
-                        <button class="selectsite" id="ProxyButton">Proxy</button>
+                        <button data-resource="proxy" class="selectsite" id="ProxyButton"></button>
 					</div>
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
                         <!--<button class="selectsite" id="IonMcButton">IonMc</button>-->
@@ -338,8 +338,8 @@
 					<div class="col-xl-12 mb-3">
 						<div class="listcontent"id="VKTab" style="display: none;">
 							<button class="addButton mt-0" data-resource="addButton" id="AddVK"></button>
-							<div class="MVlist">Иван Дурак <button style="float: right;">Удалить</button> <br></div>
-							<div class="MVlist">Афанасий Дебил <button style="float: right;">Удалить</button> <br></div>
+							<span id="addVKdiv">&nbsp;</span>
+							<div id="VKList"></div>
 						</div>
 						<div class="listcontent" id="ProxyTab" style="display: none;">
                             <form id="addProxy">
@@ -347,8 +347,8 @@
                                 <input class="w-25" type="number" name="port" id="port" required placeholder="port">
                                 <button class="addButton" data-resource="addButton" id="submitAddProxy" type="submit"></button>
                             </form>
-                            <div class="MVlist" id="div-192.168.1.0:25565">192.168.1.0:25565<button id="192.168.1.0:25565" style="float: right;">Удалить</button></div>
-                            <div class="MVlist" id="div-192.168.1.1:25565">192.168.1.1:25565<button id="192.168.1.1:25565" style="float: right;">Удалить</button></div>
+                            <span id="addProxydiv">&nbsp;</span>
+                            <div id="ProxyList"></div>
                         </div>
 						<!--<div class="listcontent" id="IonMcTab" style="display: none;">
 							

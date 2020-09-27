@@ -69,6 +69,8 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
     this.enabledSilentVote = enabledSilentVote;
     this.disabledCheckTime = disabledCheckTime;
     this.cooldown = cooldown;
+    this.VKs = [];
+    this.proxies = [];
 };
 
 // Restores select box and checkbox state using the preferences
@@ -211,6 +213,16 @@ async function restoreOptions() {
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
     }
 
+    //Если пользователь обновился с версии без MultiVote
+    if (settings.VKs == null || !(typeof settings.VKs[Symbol.iterator] === 'function') || settings.proxies == null || !(typeof settings.proxies[Symbol.iterator] === 'function')) {
+        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true);
+        settings.VKs = [];
+        settings.proxies = [];
+        await setValue('AVMRsettings', settings, false);
+        console.log(chrome.i18n.getMessage('settingsUpdateEnd'));
+        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false);
+    }
+
     updateProjectList();
 
     //Слушатель дополнительных настроек
@@ -295,6 +307,38 @@ async function addProjectList(project, visually) {
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
     //projects.push(project);
     //await setValue('AVMRprojects', projects, true);
+}
+
+//Добавить аккаунт ВКонтакте в список
+async function addVKList(VK, visually) {
+    let listVK = document.getElementById("VKList");
+    let html = document.createElement('div');
+    html.setAttribute("id", 'div' + '┄' + VK.name + '┄' + VK.id);
+    html.setAttribute('class', 'MVlist');
+    html.innerHTML = VK.name + ' – ' + VK.id + '<button id="' + VK.name + '┄' + VK.id + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>';
+    listVK.after(html);
+    document.getElementById(VK.name + '┄' + VK.id).addEventListener('click', function() {
+        removeVKList(VK, false);
+    });
+    if (visually) return;
+    settings.VKs.push(VK);
+    await setValue('AVMRsettings', settings, true);
+}
+
+//Добавить прокси в список
+async function addProxyList(proxy, visually) {
+    let listProxy = document.getElementById("ProxyList");
+    let html = document.createElement('div');
+    html.setAttribute("id", 'div' + '┄' + proxy.ip + '┄' + proxy.port);
+    html.setAttribute('class', 'MVlist');
+    html.innerHTML = proxy.ip + ':' + proxy.port + '<button id="' + proxy.ip + '┄' + proxy.port + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>';
+    listProxy.after(html);
+    document.getElementById(proxy.ip + '┄' + proxy.port).addEventListener('click', function() {
+        removeProxyList(proxy, false);
+    });
+    if (visually) return;
+    settings.proxies.push(proxy);
+    await setValue('AVMRsettings', settings, true);
 }
 
 //Удалить проект из списка проекта
@@ -409,6 +453,32 @@ async function removeProjectList(project, visually) {
     }
 }
 
+async function removeVKList(VK, visually) {
+    if (document.getElementById(VK.name + '┄' + VK.id) == null) return;
+    if (document.getElementById('div' + '┄' + VK.name + '┄' + VK.id) == null) return;
+    document.getElementById(VK.name + '┄' + VK.id).removeEventListener('click', function() {});
+    document.getElementById('div' + '┄' + VK.name + '┄' + VK.id).remove();
+    if (visually) return;
+    for (let i = settings.VKs.length; i--;) {
+        let temp = settings.VKs[i];
+        if (temp.id == VK.id && temp.name == VK.name) settings.VKs.splice(i, 1);
+    }
+    await setValue('AVMRsettings', settings, true);
+}
+
+async function removeProxyList(proxy, visually) {
+    if (document.getElementById(proxy.ip + '┄' + proxy.port) == null) return;
+    if (document.getElementById('div' + '┄' + proxy.ip + '┄' + proxy.port) == null) return;
+    document.getElementById(proxy.ip + '┄' + proxy.port).removeEventListener('click', function() {});
+    document.getElementById('div' + '┄' + proxy.ip + '┄' + proxy.port).remove();
+    if (visually) return;
+    for (let i = settings.proxies.length; i--;) {
+        let temp = settings.proxies[i];
+        if (temp.ip == proxy.ip && temp.port == proxy.port) settings.proxies.splice(i, 1);
+    }
+    await setValue('AVMRsettings', settings, true);
+}
+
 //Перезагрузка списка проектов
 function updateProjectList() {
     while (document.getElementById("TopCraftList").nextElementSibling != null) {
@@ -466,6 +536,22 @@ function updateProjectList() {
         document.getElementById("CustomList").nextElementSibling.remove();
     }
     forLoopAllProjects(function () {addProjectList(proj, true);}, true);
+
+    //Список ВКонтакте
+    while (document.getElementById("VKList").nextElementSibling != null) {
+        document.getElementById("VKList").nextElementSibling.remove();
+    }
+    for (let vkontakte of settings.VKs) {
+        addVKList(vkontakte, true);
+    }
+
+    //Список прокси
+    while (document.getElementById("ProxyList").nextElementSibling != null) {
+        document.getElementById("ProxyList").nextElementSibling.remove();
+    }
+    for (let proxy of settings.proxies) {
+        addProxyList(proxy, true);
+    }
 }
 
 //Слушатель кнопки "Добавить"
@@ -476,6 +562,82 @@ document.getElementById('addProject').addEventListener('submit', () => {
     } else {
         addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, priorityOption, null);
     }
+});
+
+//Слушатель кнопки "Добавить" на MultiVote VKontakte
+document.getElementById('AddVK').addEventListener('click', async () => {
+    event.preventDefault();
+    updateStatusVK(chrome.i18n.getMessage('adding'), true);
+    let response;
+    try {
+        response = await fetch('https://vk.com/');
+    } catch (e) {
+        if (e == 'TypeError: Failed to fetch') {
+            updateStatusVK('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnectInternet') + '</span>', true, element);
+            return;
+        } else {
+            updateStatusVK('<span style="color:#f44336;">' + e + '</span>', true, element);
+            return;
+        }
+    }
+    if (!response.ok) {
+        updateStatusVK('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status + '</span>', true);
+        return;
+    }
+    //Почему не UTF-8?
+    response = await new Response(new TextDecoder("windows-1251").decode(await response.arrayBuffer()));
+    let html = await response.text();
+    let doc = new DOMParser().parseFromString(html, "text/html");
+    if (doc.querySelector("#index_login_button") != null) {
+        updateStatusVK('<span style="color:#f44336;">' + 'А авторизоваться?' + '</span>', true);
+        return;
+    }
+
+    let VK = {};
+    let getVKCookies = new Promise(resolve => {
+        chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+            resolve(cookies);
+        });
+    });
+    VK.cookies = await getVKCookies;
+
+    try {
+        VK.name = doc.querySelector("#top_vkconnect_link > div > div.top_profile_vkconnect_name").textContent;
+        VK.id = doc.querySelector("#l_pr > a").href.replace('chrome-extension://' + chrome.runtime.id + '/', '');
+    } catch(e) {
+        updateStatusVK('<span style="color:#f44336;">' + e + '</span>', true, element);
+        return;
+    }
+
+    for (let vkontakte of settings.VKs) {
+        if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
+            updateStatusVK('<span style="color:#4CAF50;">' + ' Уже добавлен ' + '</span>', false);
+            return;
+        }
+    }
+
+    await addVKList(VK, false);
+    updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + VK.name + '</span>', false);
+});
+
+//Слушатель кнопки "Добавить" на Прокси
+document.getElementById('addProxy').addEventListener('submit', async () => {
+    event.preventDefault();
+    updateStatusProxy(chrome.i18n.getMessage('adding'), true);
+
+    let proxy = {};
+    proxy.ip = document.querySelector("#ip").value;
+    proxy.port = document.querySelector("#port").value;
+
+    for (let prox of settings.proxies) {
+        if (proxy.ip == prox.ip && proxy.port == prox.port) {
+            updateStatusProxy('<span style="color:#4CAF50;">' + ' Уже добавлен ' + '</span>', false);
+            return;
+        }
+    }
+
+    await addProxyList(proxy, false);
+    updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + '</span>', false);
 });
 
 //Слушатель кнопки "Установить" на кулдауне
@@ -804,6 +966,30 @@ function updateStatusSave(text, disableTimer) {
     status.innerHTML = text;
     if (disableTimer) return;
     timeoutSave = setTimeout(function() {
+        status.innerHTML = '&nbsp;';
+    }, 3000);
+}
+
+//Статус добавления аккаунта ВКонтакте
+var timeoutVK;
+function updateStatusVK(text, disableTimer) {
+    let status = document.getElementById("addVKdiv");
+    clearInterval(timeoutVK);
+    status.innerHTML = text;
+    if (disableTimer) return;
+    timeoutVK = setTimeout(function() {
+        status.innerHTML = '&nbsp;';
+    }, 3000);
+}
+
+//Статус добавления прокси
+var timeoutProxy;
+function updateStatusProxy(text, disableTimer) {
+    let status = document.getElementById("addProxydiv");
+    clearInterval(timeoutProxy);
+    status.innerHTML = text;
+    if (disableTimer) return;
+    timeoutProxy = setTimeout(function() {
         status.innerHTML = '&nbsp;';
     }, 3000);
 }
@@ -1220,6 +1406,12 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     }
                     if (projectsMinecraftServersOrg == null || !(typeof projectsMinecraftServersOrg[Symbol.iterator] === 'function')) {
                         projectsMinecraftServersOrg = [];
+                    }
+
+                    //Если пользователь обновился с версии без MultiVote
+                    if (settings.VKs == null || !(typeof settings.VKs[Symbol.iterator] === 'function') || settings.proxies == null || !(typeof settings.proxies[Symbol.iterator] === 'function')) {
+                        settings.VKs = [];
+                        settings.proxies = [];
                     }
 
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);

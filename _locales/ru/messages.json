@@ -480,5 +480,14 @@
   },
   "multivote": {
     "message": "MultiVote"
+  },
+  "VK": {
+    "message": "ВКонтакте"
+  },
+  "proxy": {
+    "message": "Прокси"
+  },
+  "notWork": {
+    "message": "Не работает"
   }
 }

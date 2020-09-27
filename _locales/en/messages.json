@@ -517,5 +517,14 @@
   },
   "multivote": {
     "message": "MultiVote"
+  },
+  "VK": {
+    "message": "VKontakte"
+  },
+  "proxy": {
+    "message": "Proxy"
+  },
+  "notWork": {
+    "message": "Now working"
   }
 }
