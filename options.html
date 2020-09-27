@@ -336,18 +336,20 @@
 					    
 					</div>
 					<div class="col-xl-12 mb-3">
-						<div class="listcontent" id="VKTab" style="display: none;">
-							<button data-resource="addButton" id="AddVK"></button>
-							<div id="div-test">Уася Пупкин<button id="test" style="float: right;">Удалить</button></div>
-							<div id="div-test2">Сергей Иванов<button id="test2" style="float: right;">Удалить</button></div>
+						<div class="listcontent"id="VKTab" style="display: none;">
+							<button class="addButton mt-0" data-resource="addButton" id="AddVK"></button>
+							<div class="MVlist">Иван Дурак <button style="float: right;">Удалить</button> <br></div>
+							<div class="MVlist">Афанасий Дебил <button style="float: right;">Удалить</button> <br></div>
 						</div>
 						<div class="listcontent" id="ProxyTab" style="display: none;">
-							<form id="addProxy">
-                                <input>
-                                    
-                                </input>
-							</form>
-						</div>
+                            <form id="addProxy">
+                                <input name="ip" id="ip" required placeholder="ip">
+                                <input class="w-25" type="number" name="port" id="port" required placeholder="port">
+                                <button class="addButton" data-resource="addButton" id="submitAddProxy" type="submit"></button>
+                            </form>
+                            <div class="MVlist" id="div-192.168.1.0:25565">192.168.1.0:25565<button id="192.168.1.0:25565" style="float: right;">Удалить</button></div>
+                            <div class="MVlist" id="div-192.168.1.1:25565">192.168.1.1:25565<button id="192.168.1.1:25565" style="float: right;">Удалить</button></div>
+                        </div>
 						<!--<div class="listcontent" id="IonMcTab" style="display: none;">
 							
 						</div>-->

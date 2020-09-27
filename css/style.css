@@ -125,6 +125,46 @@ button[type="submit"]:focus {
   opacity: 0.5;
 }
 
+#addProjectDiv div:not(:first-of-type) {
+  display: inline;
+}
+
+.addButton {
+  color: #fff;
+  background: #1A7BEE !important;
+  padding: 9px 25px;
+  font-size: 18px;
+  outline: none;
+  border: none;
+  transition: 0.3s;
+  cursor: pointer;
+  border-radius: 3px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border: none;
+  margin: 20px 0 !important;
+}
+
+.addButton:hover {
+  opacity: 0.85;
+}
+
+.addButton:hover {
+  outline: 0;
+  opacity: 0.5;
+}
+
+#addProxy input {
+  width: 74%;
+  display: inline;
+}
+
+.MVlist {
+  height: 65px;
+  padding: 10px 0px !important;
+}
+
 select:focus, input:focus {
   border-bottom: solid 2px #1A7BEE;
   outline: 0;
