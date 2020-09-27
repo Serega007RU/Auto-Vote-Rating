@@ -514,5 +514,8 @@
   },
   "requiresCaptcha": {
     "message": "Requires manually passing the captcha"
+  },
+  "multivote": {
+    "message": "MultiVote"
   }
 }

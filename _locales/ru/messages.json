@@ -477,5 +477,8 @@
   },
   "requiresCaptcha": {
     "message": "Требуется ручное прохождение капчи"
+  },
+  "multivote": {
+    "message": "MultiVote"
   }
 }

@@ -1476,6 +1476,9 @@ document.getElementById('addedTab').addEventListener('click', function() {
 document.getElementById('helpTab').addEventListener('click', function() {
     tabSelect(event, 'help');
 });
+document.getElementById('multivoteTab').addEventListener('click', function() {
+    tabSelect(event, 'multivote');
+});
 document.getElementById('addTab2').addEventListener('click', function() {
     tabSelect(event, 'add');
 });
@@ -1485,8 +1488,8 @@ document.getElementById('settingsTab2').addEventListener('click', function() {
 document.getElementById('addedTab2').addEventListener('click', function() {
     tabSelect(event, 'added');
 });
-document.getElementById('helpTab2').addEventListener('click', function() {
-    tabSelect(event, 'help');
+document.getElementById('multivoteTab2').addEventListener('click', function() {
+    tabSelect(event, 'multivote');
 });
 
 
@@ -1565,6 +1568,16 @@ document.getElementById('MinecraftServersBizButton').addEventListener('click', f
 document.getElementById('CustomButton').addEventListener('click', function() {
     listSelect(event, 'CustomTab');
 });
+
+document.getElementById('VKButton').addEventListener('click', function() {
+    listSelect(event, 'VKTab');
+});
+document.getElementById('ProxyButton').addEventListener('click', function() {
+    listSelect(event, 'ProxyTab');
+});
+// document.getElementById('IonMcButton').addEventListener('click', function() {
+//     listSelect(event, 'IonMcTab');
+// });
 
 //Генерация поля ввода ID
 var selectedTop = document.getElementById("project");

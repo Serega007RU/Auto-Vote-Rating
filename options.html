@@ -51,6 +51,12 @@
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
 			</svg></button>
+		<button data-resource="multivote" class="tablinks" id="multivoteTab2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg></button>
 	</ul>
 	<div class="container">
 		<div id="centerLayer">
@@ -89,6 +95,12 @@
                         <line x1="12" y1="16" x2="12" y2="12"></line>
                         <line x1="12" y1="8" x2="12.01" y2="8"></line>
 					</svg>
+					<br></button>
+				<button data-resource="multivote" class="tablinks" id="multivoteTab">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
+						<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+						<circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+						<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
 					<br></button>
 			</div>
 			<div id="add" class="tabcontent" style="display: block;">
@@ -305,7 +317,43 @@
 						<p class="mt-3"><span data-resource="feedback"></span> <a target="blank_" href="https://discord.gg/GyvMtbU"><span data-resource="dmDiscord"></span></a><span data-resource="feedback2"> </span> <a target="blank_" href="https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd/support"><span data-resource="dmChromeWebStore"></span></a></span>.</p>
 					</div>
 					<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
-				</div>	
+				</div>
+			</div>
+			<div id="multivote" class="tabcontent" style="display: none;">
+				<h4 data-resource="multivote" align="center"></h4>
+				<hr color="#5A5A5C">
+				<div class="row">
+					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+						<button class="selectsite" id="VKButton">VKontakte</button>
+					</div>
+					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+                        <button class="selectsite" id="ProxyButton">Proxy</button>
+					</div>
+					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+                        <!--<button class="selectsite" id="IonMcButton">IonMc</button>-->
+					</div>
+					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
+					    
+					</div>
+					<div class="col-xl-12 mb-3">
+						<div class="listcontent" id="VKTab" style="display: none;">
+							<button data-resource="addButton" id="AddVK"></button>
+							<div id="div-test">Уася Пупкин<button id="test" style="float: right;">Удалить</button></div>
+							<div id="div-test2">Сергей Иванов<button id="test2" style="float: right;">Удалить</button></div>
+						</div>
+						<div class="listcontent" id="ProxyTab" style="display: none;">
+							<form id="addProxy">
+                                <input>
+                                    
+                                </input>
+							</form>
+						</div>
+						<!--<div class="listcontent" id="IonMcTab" style="display: none;">
+							
+						</div>-->
+					</div>
+				</div>
+			</div>
 			</div> <a id="donate" data-resource="supportDev" target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
 			<div id="save">&nbsp;</div>
 			<script src="options.js"></script>
