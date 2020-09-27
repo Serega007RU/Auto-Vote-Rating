@@ -125,6 +125,10 @@ button[type="submit"]:focus {
   opacity: 0.5;
 }
 
+#addProjectDiv div:not(:first-of-type) {
+  display: inline;
+}
+
 select:focus, input:focus {
   border-bottom: solid 2px #1A7BEE;
   outline: 0;
