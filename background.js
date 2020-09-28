@@ -247,21 +247,10 @@ async function newWindow(project) {
 	//Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
 	if (settings.useMultiVote) {
 		if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
-			//Удаляет все существующие куки ВК
-			let getVKCookies = new Promise(resolve => {
-				chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
-					resolve(cookies);
-				});
-			});
-			let cookies = await getVKCookies;
-			for(let i=0; i<cookies.length;i++) {
-				await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
-			}
-            
             //Ищет не юзанный свободный аккаунт ВК
             let found = false;
             for (let vkontakte of VKs) {
-            	if (vkontakte.notWorking) break;
+            	if (vkontakte.notWorking) continue;
             	let usedProjects = getTopFromList(vkontakte, project);
                 let used = false;
 				for (let usedProject of usedProjects) {
@@ -273,6 +262,18 @@ async function newWindow(project) {
                 if (!used) {
                 	found = true;
                 	currentVK = vkontakte;
+
+					//Удаляет все существующие куки ВК
+					let getVKCookies = new Promise(resolve => {
+						chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+							resolve(cookies);
+						});
+					});
+					let cookies = await getVKCookies;
+					for(let i=0; i<cookies.length;i++) {
+						await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+					}
+					
                 	//Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
 					for(let i = 0; i < vkontakte.cookies.length; i++) {
 						let cookie = vkontakte.cookies[i];
@@ -284,6 +285,7 @@ async function newWindow(project) {
 			//Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк то приостанавливает ВСЁ авто-голосование на 24 часа
 			if (!found) {
 				stopVote = new Date().setDate(new Date().getDate() + 1);
+				console.error(chrome.i18n.getMessage('notFoundVK'));
 				if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('notFoundVKTitle'), chrome.i18n.getMessage('notFoundVK'));
 				return;
 			}
@@ -292,7 +294,7 @@ async function newWindow(project) {
 		//Ищет не юзанный свободный прокси
         let found = false;
         for (let proxy of proxies) {
-        	if (proxy.notWorking) break;
+        	if (proxy.notWorking) continue;
             let usedProjects = getTopFromList(proxy, project);
             let used = false;
 			for (let usedProject of usedProjects) {
@@ -328,6 +330,7 @@ async function newWindow(project) {
         //Если не удалось найти хотя бы одно свободное не заюзанное прокси то приостанавливает ВСЁ авто-голосование на 24 часа
         if (!found) {
         	stopVote = new Date().setDate(new Date().getDate() + 1);
+        	console.error(chrome.i18n.getMessage('notFoundProxy'));
             if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('notFoundProxyTitle'), chrome.i18n.getMessage('notFoundProxy'));
             return;
         }
@@ -1125,18 +1128,14 @@ async function endVote(message, sender, project) {
         project = openedProjects.get(sender.tab.id);
         openedProjects.delete(sender.tab.id);
 	} else if (!project) return;//Если сообщение пришло от вкладки от другого расширения
-	if (cooldown < 10000) {
-		let retryTimeOut = 10000;
-		if (settings.MultiVote) {
-			retryTimeOut = 0;
-		}
+	if (cooldown < 10000 && !settings.useMultiVote) {
 		setTimeout(() => {
 			for (let value of queueProjects) {
 				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
 					queueProjects.delete(value)
 				}
 			}
-		}, retryTimeOut);
+		}, 10000);
 	} else {
 		for (let value of queueProjects) {
 			if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
@@ -1273,7 +1272,7 @@ async function endVote(message, sender, project) {
 		if (project.MonitoringMinecraft && message.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
 			clearCookieMonitoringMinecraft = false;
 		} else if (settings.useMultiVote) {
-			if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft && (message.includes(' ВК') || message.includes(' VK')) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+			if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (message.includes(' ВК') || message.includes(' VK')) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
 				currentVK.notWorking = true;
 				VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
 				await setValue('AVMRVKs', VKs);

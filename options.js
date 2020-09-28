@@ -329,7 +329,7 @@ async function addVKList(VK, visually) {
     let html = document.createElement('div');
     html.setAttribute("id", 'div' + '┄' + VK.name + '┄' + VK.id);
     html.setAttribute('class', 'MVlist');
-    html.innerHTML = VK.name + ' – ' + VK.id + '<button id="' + VK.name + '┄' + VK.id + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>';
+    html.innerHTML = VK.name + ' – ' + VK.id + '<button id="' + VK.name + '┄' + VK.id + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + (VK.notWorking ? '<span style="color:#f44336;">' + chrome.i18n.getMessage('notWork') + '</span>' : '');
     listVK.after(html);
     document.getElementById(VK.name + '┄' + VK.id).addEventListener('click', function() {
         removeVKList(VK, false);
@@ -345,7 +345,7 @@ async function addProxyList(proxy, visually) {
     let html = document.createElement('div');
     html.setAttribute("id", 'div' + '┄' + proxy.ip + '┄' + proxy.port);
     html.setAttribute('class', 'MVlist');
-    html.innerHTML = proxy.ip + ':' + proxy.port + '<button id="' + proxy.ip + '┄' + proxy.port + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>';
+    html.innerHTML = proxy.ip + ':' + proxy.port + '<button id="' + proxy.ip + '┄' + proxy.port + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + (proxy.notWorking ? '<span style="color:#f44336;">' + chrome.i18n.getMessage('notWork') + '</span>' : '');
     listProxy.after(html);
     document.getElementById(proxy.ip + '┄' + proxy.port).addEventListener('click', function() {
         removeProxyList(proxy, false);
@@ -691,32 +691,50 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     }
 
     forLoopAllProjects(function () {
-        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom) {
-            if (secondBonus === "") {
-                updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
-            } else if (element != null) {
-                updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div> ' + secondBonus, false, element);
-            } else {
-                updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div> ' + secondBonus, true, element);
+        if (settings.useMultiVote) {
+            if (getProjectName(proj) == choice && proj.id == project.id && proj.nick == project.nick && !project.Custom) {
+                if (secondBonus === "") {
+                    updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
+                } else if (element != null) {
+                    updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div> ' + secondBonus, false, element);
+                } else {
+                    updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div> ' + secondBonus, true, element);
+                }
+                returnAdd = true;
+                return;
+            } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
+                updateStatusAdd('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
+                returnAdd = true;
+                return;
             }
-            returnAdd = true;
-            return;
-        } else if (((proj.MCRate && choice == "MCRate") || (proj.ServerPact && choice == "ServerPact") || (proj.MinecraftServersOrg && choice == "MinecraftServersOrg")) && proj.nick && project.nick && !disableCheckProjects) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProject', getProjectName(proj)) + '</div>', false, element);
-            returnAdd = true;
-            return;
-        } else if (proj.FairTop && choice == "FairTop" && proj.nick && project.nick && !disableCheckProjects) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProjectFairTop') + '</div>', true, element);
-            returnAdd = true;
-            return;
-        } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProjectMinecraftIpList') + '</div>', true, element);
-            returnAdd = true;
-            return;
-        } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
-            updateStatusAdd('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
-            returnAdd = true;
-            return;
+        } else {
+            if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom) {
+                if (secondBonus === "") {
+                    updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
+                } else if (element != null) {
+                    updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div> ' + secondBonus, false, element);
+                } else {
+                    updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div> ' + secondBonus, true, element);
+                }
+                returnAdd = true;
+                return;
+            } else if (((proj.MCRate && choice == "MCRate") || (proj.ServerPact && choice == "ServerPact") || (proj.MinecraftServersOrg && choice == "MinecraftServersOrg")) && proj.nick && project.nick && !disableCheckProjects) {
+                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProject', getProjectName(proj)) + '</div>', false, element);
+                returnAdd = true;
+                return;
+            } else if (proj.FairTop && choice == "FairTop" && proj.nick && project.nick && !disableCheckProjects) {
+                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProjectFairTop') + '</div>', true, element);
+                returnAdd = true;
+                return;
+            } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
+                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProjectMinecraftIpList') + '</div>', true, element);
+                returnAdd = true;
+                return;
+            } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
+                updateStatusAdd('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
+                returnAdd = true;
+                return;
+            }
         }
     });
     if (returnAdd) {
