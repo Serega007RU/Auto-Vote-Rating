@@ -2,7 +2,7 @@ vote();
 function vote() {
 	chrome.storage.local.get('AVMRprojectsTopCraft', function(result) {
 		if (document.URL.includes('.vk')) {
-			sendMessage('Требуется авторизация вк! Авторизуйтесь в вк для того что б расширение могло авто-голосовать');
+			sendMessage('Требуется авторизация ВК! Авторизуйтесь в ВК для того что б расширение могло авто-голосовать');
 			return;
 		}
 		try {

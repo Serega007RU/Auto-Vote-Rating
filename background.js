@@ -1126,13 +1126,17 @@ async function endVote(message, sender, project) {
         openedProjects.delete(sender.tab.id);
 	} else if (!project) return;//Если сообщение пришло от вкладки от другого расширения
 	if (cooldown < 10000) {
+		let retryTimeOut = 10000;
+		if (settings.MultiVote) {
+			retryTimeOut = 0;
+		}
 		setTimeout(() => {
 			for (let value of queueProjects) {
 				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
 					queueProjects.delete(value)
 				}
 			}
-		}, 10000);
+		}, retryTimeOut);
 	} else {
 		for (let value of queueProjects) {
 			if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
@@ -1231,20 +1235,20 @@ async function endVote(message, sender, project) {
 		}
 
 		if (settings.useMultiVote) {
-			if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft && VKs.find(currentVK)) {
+			if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
 				let usedProject = {};
 				usedProject.id = project.id;
 				usedProject.nextFreeVote = time;
 				getTopFromList(currentVK, project).push(usedProject);
-				VKs[proxies.find(currentVK)] = currentVK;
+				VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
 				await setValue('AVMRVKs', VKs);
 			}
-			if (proxies.find(currentProxy)) {
+			if (proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
 				let usedProject = {};
 				usedProject.id = project.id;
 				usedProject.nextFreeVote = time;
 				getTopFromList(currentProxy, project).push(usedProject);
-				proxies[proxies.find(currentProxy)] = currentProxy;
+				proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy;
 				await setValue('AVMRproxies', proxies);
 			}
 		}
@@ -1268,9 +1272,28 @@ async function endVote(message, sender, project) {
 	} else {
 		if (project.MonitoringMinecraft && message.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
 			clearCookieMonitoringMinecraft = false;
+		} else if (settings.useMultiVote) {
+			if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft && (message.includes(' ВК') || message.includes(' VK')) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+				currentVK.notWorking = true;
+				VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
+				await setValue('AVMRVKs', VKs);
+			}
+			if (proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
+				currentProxy.notWorking = true;
+				proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy;
+				await setValue('AVMRproxies', proxies);
+			}
+
+			for (let [key, value] of retryProjects.entries()) {
+				if (key.nick == project.nick && key.id == project.id && getProjectName(key) == getProjectName(project)) {
+					retryProjects.delete(key);
+				}
+			}
 		}
 		let sendMessage;
-		if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
+		if (settings.useMultiVote) {
+			sendMessage = message;
+		} else if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
 		} else {
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "15");
