@@ -44,6 +44,8 @@ var clearCookieMonitoringMinecraft = true;
 var secondVoteMinecraftIpList = false;
 
 var stopVote = 0;
+var currentVK;
+var currentProxy;
 
 //Инициализация настроек расширения
 initializeConfig();
@@ -84,6 +86,10 @@ async function initializeConfig() {
     projectsMinecraftServersBiz = projectsMinecraftServersBiz.AVMRprojectsMinecraftServersBiz;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
+    VKs = await getValue('AVMRVKs');
+    VKs = VKs.AVMRVKs;
+    proxies = await getValue('AVMRproxies');
+    proxies = proxies.AVMRproxies;
     settings = await getValue('AVMRsettings');
     settings = settings.AVMRsettings;
 
@@ -256,31 +262,17 @@ async function newWindow(project) {
             let found = false;
             for (let vkontakte of VKs) {
             	if (vkontakte.notWorking) break;
-            	let usedProjects;
-            	if (project.TopCraft && vkontakte.TopCraft) {
-                    usedProjects = vkontakte.TopCraft;
-            	} else if (project.McTOP && vkontakte.McTOP) {
-            		usedProjects = vkontakte2.McTOP;
-            	} else if (project.MCRate && vkontakte.MCRate) {
-            		usedProjects = vkontakte.MCRate;
-            	} else if (project.MinecraftRating && vkontakte.MinecraftRating) {
-            		usedProjects = vkontakte.MinecraftRating;
-            	} else if (project.MonitoringMinecraft && vkontakte.MonitoringMinecraft) {
-            		usedProjects = vkontakte.MonitoringMinecraft;
-            	} else {
-            		found = true;
-            	}
+            	let usedProjects = getTopFromList(vkontakte, project);
                 let used = false;
-                if (!found) {
-					for (let usedProject of usedProjects) {
-						if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
-							used = true;
-							break;
-						}
+				for (let usedProject of usedProjects) {
+					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+						used = true;
+						break;
 					}
-                }
+				}
                 if (!used) {
                 	found = true;
+                	currentVK = vkontakte;
                 	//Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
 					for(let i = 0; i < vkontakte.cookies.length; i++) {
 						let cookie = vkontakte.cookies[i];
@@ -301,55 +293,17 @@ async function newWindow(project) {
         let found = false;
         for (let proxy of proxies) {
         	if (proxy.notWorking) break;
-            let usedProjects;
-            if (project.TopCraft && proxy.TopCraft) {
-                usedProjects = proxy.TopCraft;
-            } else if (project.McTOP && proxy.McTOP) {
-            	usedProjects = proxy.McTOP;
-            } else if (project.MCRate && proxy.MCRate) {
-            	usedProjects = proxy.MCRate;
-            } else if (project.MinecraftRating && proxy.MinecraftRating) {
-            	usedProjects = proxy.MinecraftRating;
-            } else if (project.MonitoringMinecraft && proxy.MonitoringMinecraft) {
-            	usedProjects = proxy.MonitoringMinecraft;
-            } else if (project.FairTop && proxy.FairTop) {
-            	usedProjects = proxy.FairTop;
-            } else if (project.IonMc && proxy.IonMc) {
-            	usedProjects = proxy.IonMc;
-            } else if (project.ServeurPrive && proxy.ServeurPrive) {
-            	usedProjects = proxy.ServeurPrive;
-            } else if (project.MinecraftServersOrg && proxy.MinecraftServersOrg) {
-            	usedProjects = proxy.MinecraftServersOrg;
-            } else if (project.PlanetMinecraft && proxy.PlanetMinecraft) {
-            	usedProjects = proxy.PlanetMinecraft;
-            } else if (project.TopG && proxy.TopG) {
-            	usedProjects = proxy.TopG;
-            } else if (project.MinecraftMp && proxy.MinecraftMp) {
-            	usedProjects = proxy.MinecraftMp;
-            } else if (project.MinecraftServerList && proxy.MinecraftServerList) {
-            	usedProjects = proxy.MinecraftServerList;
-            } else if (project.ServerPact && proxy.ServerPact) {
-            	usedProjects = proxy.ServerPact;
-            } else if (project.MinecraftIpList && proxy.MinecraftIpList) {
-            	usedProjects = proxy.MinecraftIpList;
-            } else if (project.TopMinecraftServers && proxy.TopMinecraftServers) {
-            	usedProjects = proxy.TopMinecraftServers;
-            } else if (project.MinecraftServersBiz && proxy.MinecraftServersBiz) {
-            	usedProjects = proxy.MinecraftServersBiz;
-            } else {
-            	found = true;
-            }
+            let usedProjects = getTopFromList(proxy, project);
             let used = false;
-            if (!found) {
-				for (let usedProject of usedProjects) {
-					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
-						used = true;
-						break;
-					}
+			for (let usedProject of usedProjects) {
+				if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+					used = true;
+					break;
 				}
-            }
+			}
             if (!used) {
             	found = true;
+            	currentProxy = proxy;
                 //Применяет найденный незаюзанный свободный прокси
                 var config = {
 				  mode: "fixed_servers",
@@ -361,9 +315,12 @@ async function newWindow(project) {
 					}
 				  }
 				};
-				chrome.proxy.settings.set(
-					{value: config, scope: 'regular'},
-					function() {});
+				let setProxy = new Promise(resolve => {
+					chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
+						resolve();
+					});
+				});
+                await setProxy;
 				break;
             }
         }
@@ -419,7 +376,11 @@ async function newWindow(project) {
 		});
 		let cookies = await getCookies;
 		for(let i=0; i<cookies.length;i++) {
-			await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+			if (cookies[i].domain.charAt(0) == ".") {
+				await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+			} else {
+				await removeCookie("https://" + cookies[i].domain + cookies[i].path, cookies[i].name);
+			}
 		}
 	}
     let silentVoteMode = false;
@@ -1181,9 +1142,12 @@ async function endVote(message, sender, project) {
 	}
 	if (settings.useMultiVote) {
 		//Прекращаем использование прокси
-		chrome.proxy.settings.clear(
-			{scope: 'regular'},
-			function() {});
+		let clearProxy = new Promise(resolve => {
+			chrome.proxy.settings.clear({scope: 'regular'},function() {
+				resolve();
+			});
+		});
+        await clearProxy;
 	}
 	//Если усё успешно
 	if (message == "successfully" || message.includes("later")) {
@@ -1264,6 +1228,25 @@ async function endVote(message, sender, project) {
 			}
 			project.time = time.getTime();
 			time = time.getTime();
+		}
+
+		if (settings.useMultiVote) {
+			if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft && VKs.find(currentVK)) {
+				let usedProject = {};
+				usedProject.id = project.id;
+				usedProject.nextFreeVote = time;
+				getTopFromList(currentVK, project).push(usedProject);
+				VKs[proxies.find(currentVK)] = currentVK;
+				await setValue('AVMRVKs', VKs);
+			}
+			if (proxies.find(currentProxy)) {
+				let usedProject = {};
+				usedProject.id = project.id;
+				usedProject.nextFreeVote = time;
+				getTopFromList(currentProxy, project).push(usedProject);
+				proxies[proxies.find(currentProxy)] = currentProxy;
+				await setValue('AVMRproxies', proxies);
+			}
 		}
 
 		if (project.priority) {
@@ -1778,6 +1761,61 @@ chrome.runtime.onInstalled.addListener(function (details) {
         });
 	}
 })
+
+function getTopFromList(list, project) {
+    if (project.TopCraft) {
+    	if (!list.TopCraft) list.TopCraft = [];
+        return list.TopCraft;
+    } else if (project.McTOP) {
+    	if (!list.McTOP) list.McTOP = [];
+       	return list.McTOP;
+    } else if (project.MCRate) {
+    	if (!list.MCRate) list.MCRate = [];
+       	return list.MCRate;
+    } else if (project.MinecraftRating) {
+    	if (!list.MinecraftRating) list.MinecraftRating = [];
+       	return list.MinecraftRating;
+    } else if (project.MonitoringMinecraft) {
+    	if (!list.MonitoringMinecraft) list.MonitoringMinecraft = [];
+       	return list.MonitoringMinecraft;
+    } else if (project.FairTop) {
+    	if (!list.FairTop) list.FairTop = [];
+       	return list.FairTop;
+    } else if (project.IonMc) {
+    	if (!list.IonMc) list.IonMc = [];
+       	return list.IonMc;
+    } else if (project.ServeurPrive) {
+    	if (!list.ServeurPrive) list.ServeurPrive = [];
+       	return list.ServeurPrive;
+    } else if (project.MinecraftServersOrg) {
+    	if (!list.MinecraftServersOrg) list.MinecraftServersOrg = [];
+       	return list.MinecraftServersOrg;
+    } else if (project.PlanetMinecraft) {
+    	if (!list.PlanetMinecraft) list.PlanetMinecraft = [];
+       	return list.PlanetMinecraft;
+    } else if (project.TopG) {
+    	if (!list.TopG) list.TopG = [];
+       	return list.TopG;
+    } else if (project.MinecraftMp) {
+    	if (!list.MinecraftMp) list.MinecraftMp = [];
+      	return list.MinecraftMp;
+    } else if (project.MinecraftServerList) {
+    	if (!list.MinecraftServerList) list.MinecraftServerList = [];
+       	return list.MinecraftServerList;
+    } else if (project.ServerPact) {
+    	if (!list.ServerPact) list.ServerPact = [];
+       	return list.ServerPact;
+    } else if (project.MinecraftIpList) {
+    	if (!list.MinecraftIpList) list.MinecraftIpList = [];
+       	return list.MinecraftIpList;
+    } else if (project.TopMinecraftServers) {
+    	if (!list.TopMinecraftServers) list.TopMinecraftServers = [];
+       	return list.TopMinecraftServers;
+    } else if (project.MinecraftServersBiz) {
+    	if (!list.MinecraftServersBiz) list.MinecraftServersBiz = [];
+       	return list.MinecraftServersBiz;
+    }
+}
 
 /*
 История настроек:

@@ -641,7 +641,7 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
 
     let proxy = {};
     proxy.ip = document.querySelector("#ip").value;
-    proxy.port = document.querySelector("#port").value;
+    proxy.port = parseInt(document.querySelector("#port").value);
     proxy.scheme = document.querySelector("#proxyType").value;
 
     for (let prox of proxies) {
