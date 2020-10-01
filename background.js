@@ -925,7 +925,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
           {hostSuffix: 'minecraftservers.biz'}
           ]});
 
-chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
+chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (details.frameId != 0) {
 		let project = openedProjects.get(details.tabId);
 		if (project == null) return;
