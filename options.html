@@ -201,7 +201,7 @@
 						<label data-resource="importSettings" for="file-upload" class="custom-file-upload mb-2">
 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /> </svg></label>
-						<input id="file-upload" type="file" accept="application/json" />
+						<input id="file-upload" type="file" accept="application/json"/>
 						<label data-resource="exportSettings" id="file-download" class="custom-file-upload">
 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
 								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" /> </svg></label>
@@ -348,17 +348,22 @@
 						</div>
 						<div class="listcontent" id="ProxyTab" style="display: none;">
                             <form id="addProxy">
-                                <input class="w-25" name="ip" id="ip" required placeholder="ip">
-                                <input class="w-25" type="number" name="port" id="port" required placeholder="port">
-								<select class="w-25" required id="proxyType">
+                                <input name="ip" id="ip" required placeholder="ip">
+                                <input type="number" name="port" id="port" required placeholder="port">
+								<select id="proxyType" required>
 									<option data-resource="type" value="" selected disabled></option>
 									<option value="http">http</option>
 									<option value="https">https</option>
+									<option value="quic">quic</option>
 									<option value="socks4">socks4</option>
 									<option value="socks5">socks5</option>
 								</select>
+								<input name="login" id="login" placeholder="login">
+								<input name="password" id="password" placeholder="password">
                                 <button class="addButton" data-resource="addButton" id="submitAddProxy" type="submit"></button>
                             </form>
+                            <label class="addButton" data-resource="importProxy" for="importProxy" type="click"></label>
+                            <input id="importProxy" type="file" accept=".txt"/>
                             <span id="addProxydiv">&nbsp;</span>
                             <div id="ProxyList"></div>
                         </div>

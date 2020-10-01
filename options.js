@@ -637,13 +637,59 @@ document.getElementById('AddVK').addEventListener('click', async () => {
 //Слушатель кнопки "Добавить" на Прокси
 document.getElementById('addProxy').addEventListener('submit', async () => {
     event.preventDefault();
-    updateStatusProxy(chrome.i18n.getMessage('adding'), true);
 
     let proxy = {};
     proxy.ip = document.querySelector("#ip").value;
     proxy.port = parseInt(document.querySelector("#port").value);
-    proxy.scheme = document.querySelector("#proxyType").value;
+    if (document.querySelector("#proxyType").value != "") {
+        proxy.scheme = document.querySelector("#proxyType").value;
+//     } else {
+//         //Если не указан тип прокси пытаемся его определить самому
+//         updateStatusProxy(chrome.i18n.getMessage('checkSchemeProxy', "socks5"), true);
+//         let error = await checkProxy(proxy, "socks5");
+//         if (!error) {
+//             proxy.scheme = "socks5";
+//         }
 
+//         if (error) {
+//             updateStatusProxy(chrome.i18n.getMessage('checkSchemeProxy', "socks4"), true);
+//             error = await checkProxy(proxy, "socks4");
+//             if (!error) {
+//                 proxy.scheme = "socks4";
+//             }
+//         }
+
+//         if (error) {
+//             updateStatusProxy(chrome.i18n.getMessage('checkSchemeProxy', "https"), true);
+//             error = await checkProxy(proxy, "https");
+//             if (!error) {
+//                 proxy.scheme = "https";
+//             }
+//         }
+        
+//         if (error) {
+//             updateStatusProxy(chrome.i18n.getMessage('checkSchemeProxy', "http"), true);
+//             error = await checkProxy(proxy, "http");
+//             if (!error) {
+//                 proxy.scheme = "http";
+//             }
+//         }
+
+//         if (error) {
+//             updateStatusProxy('<span style="color:#f44336;">' + chrome.i18n.getMessage('errorCheckSchemeProxy') + '</span>', true);
+//             return;
+//         }
+    }
+    if (document.querySelector("#login").value != "") {
+        proxy.login = document.querySelector("#login").value;
+        proxy.password = document.querySelector("#password").value;
+    }
+
+    await addProxy(proxy);
+});
+
+async function addProxy(proxy) {
+    updateStatusProxy(chrome.i18n.getMessage('adding'), true);
     for (let prox of proxies) {
         if (proxy.ip == prox.ip && proxy.port == prox.port) {
             updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('added') + '</span>', false);
@@ -653,7 +699,40 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
 
     await addProxyList(proxy, false);
     updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + '</span>', false);
-});
+}
+
+async function checkProxy(proxy, scheme) {
+    var config = {
+	    mode: "fixed_servers",
+	    rules: {
+		    singleProxy: {
+			    scheme: scheme,
+				host: proxy.ip,
+				port: proxy.port
+		    }
+		}
+	};
+	let setProxy = new Promise(resolve => {
+	    chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
+		    resolve();
+		});
+	});
+    await setProxy;
+    let error = false;
+    try {
+        let response = await fetch('http://example.com/');
+        error = !response.ok;
+    } catch (e) {
+        error = true;
+    }
+	let clearProxy = new Promise(resolve => {
+		chrome.proxy.settings.clear({scope: 'regular'},function() {
+			resolve();
+		});
+	});
+    await clearProxy;
+    return error;
+}
 
 //Слушатель кнопки "Установить" на кулдауне
 document.getElementById('timeout').addEventListener('submit', () => {
@@ -1373,6 +1452,54 @@ document.getElementById('file-download').addEventListener('click', () => {
     anchor.click();
     updateStatusFile('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('exportingEnd') + '</div>', false);
 });
+
+//Слушатель на импорт прокси листа
+document.getElementById('importProxy').addEventListener('change', (evt) => {
+    updateStatusProxy(chrome.i18n.getMessage('importing'), true);
+    try {
+        if (evt.target.files.length == 0) return;
+        let file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.onload = (function(theFile) {
+            return async function(e) {
+                try {
+                    let proxiesList = e.target.result;
+                    for (let proxyString of proxiesList.split(/\n/g)) {
+                        let varProxy = {};
+                        let num = 0;
+                        for (let proxyElement of proxyString.split(':')) {
+                            if (num == 0) {
+                                varProxy.ip = proxyElement;
+                            } else if (num == 1) {
+                                varProxy.port = parseInt(proxyElement);
+                            } else if (num == 2) {
+                                varProxy.scheme = proxyElement;
+                            } else if (num == 3) {
+                                varProxy.login = proxyElement;
+                            } else if (num == 4) {
+                                varProxy.password = proxyElement;
+                            }
+                            num++;
+                        }
+                        await addProxy(varProxy);
+                    }
+
+                    await updateProjectList();
+
+                    updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('importingEnd') + '</span>', false);
+                } catch (e) {
+                    console.error(e);
+                    updateStatusProxy('<span style="color:#f44336;">' + e + '</span>', true);
+                }
+            }
+        })(file);
+        reader.readAsText(file);
+        document.getElementById('file-upload').value = '';
+    } catch (e) {
+        console.error(e);
+        updateStatusProxy('<span style="color:#f44336;">' + e + '</span>', true);
+    }
+}, false);
 
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', (evt) => {

@@ -513,5 +513,19 @@
   },
   "notFoundVKTitle": {
     "message": "Нет свободного аккаунта ВКонтакте"
+  },
+  "importProxy": {
+    "message": "Импорт"
+  },
+  "checkSchemeProxy": {
+    "message": "Определяем тип прокси, текущий: $scheme$",
+    "placeholders": {
+      "scheme": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorCheckSchemeProxy": {
+    "message": "Не удалось определить тип прокси, возможно данный прокси сдох."
   }
 }

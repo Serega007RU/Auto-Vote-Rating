@@ -550,5 +550,14 @@
   },
   "notFoundVKTitle": {
     "message": "There is no free account VKontakte"
+  },
+  "importProxy": {
+    "message": "Импорт"
+  },
+  "checkSchemeProxy": {
+    "message": "Defining the proxy type"
+  },
+  "errorCheckSchemeProxy": {
+    "message": "Unable to determine the type of proxy, this proxy is probably dead."
   }
 }

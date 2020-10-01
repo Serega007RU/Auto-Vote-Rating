@@ -155,9 +155,16 @@ button[type="submit"]:focus {
   opacity: 0.5;
 }
 
-#addProxy input {
-  width: 74%;
-  display: inline;
+#ip, #login, #password {
+  width: 20%;
+}
+
+#port {
+  width: 10%;
+}
+
+#proxyType {
+  width: 15%;
 }
 
 .MVlist {

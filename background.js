@@ -1272,12 +1272,13 @@ async function endVote(message, sender, project) {
 		if (project.MonitoringMinecraft && message.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
 			clearCookieMonitoringMinecraft = false;
 		} else if (settings.useMultiVote) {
-			if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (message.includes(' ВК') || message.includes(' VK')) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
-				currentVK.notWorking = true;
-				VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
-				await setValue('AVMRVKs', VKs);
-			}
-			if (proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
+			if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (message.includes(' ВК') || message.includes(' VK'))) {
+				if (VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+					currentVK.notWorking = true;
+					VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
+					await setValue('AVMRVKs', VKs);
+				}
+			} else if (proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
 				currentProxy.notWorking = true;
 				proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy;
 				await setValue('AVMRproxies', proxies);
@@ -1765,6 +1766,19 @@ handler = function(n) {
     return {requestHeaders: n.requestHeaders}
 };
 chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serverpact.com/*", "*://www.minecraftiplist.com/*"]}, ["blocking", "requestHeaders"]);
+
+//Если требуется авторизация для Прокси
+chrome.webRequest.onAuthRequired.addListener(function (details) {
+	if (details.isProxy && currentProxy.login) {
+		return({
+			authCredentials : {
+				'username' : currentProxy.login,
+				'password' : currentProxy.password
+			}
+		});
+	}
+}, 	{urls: ["<all_urls>"]}, 
+	["blocking"])
 
 chrome.runtime.onInstalled.addListener(function (details) {
 	if (details.reason == "install") {
