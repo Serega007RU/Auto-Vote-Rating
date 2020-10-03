@@ -289,7 +289,7 @@ async function restoreOptions() {
     }
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
-    if (settings.enableMinecraftServersOrg) addMinecraftServersOrg();
+    if (settings.enableCustom) addCustom();
 };
 
 //Добавить проект в список проекта
@@ -790,8 +790,10 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
 
     await addProjectList(project, false);
 
-    if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet) && settings.enabledSilentVote) {
+    if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet) && settings.enabledSilentVote) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span>', true, element);
+    } else if (project.MinecraftServersOrg) {
+        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center">' + chrome.i18n.getMessage('privacyPass') +'</div>', true, element);
     } else {
         if (secondBonus === "") {
             updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div>', false, element);
@@ -1334,7 +1336,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     } else {
                         document.getElementById("enabledSilentVote").value = 'disabled';
                     }
-                    if (settings.enableMinecraftServersOrg) addMinecraftServersOrg();
+                    if (settings.enableCustom) addCustom();
 
                     await updateProjectList();
 
@@ -1477,27 +1479,27 @@ async function fastAdd() {
     }
 }
 
-function addMinecraftServersOrg() {
-    if (document.querySelector('#project').children[8].text != "MinecraftServersOrg") {
+function addCustom() {
+    if (document.querySelector('#project').children[21] == null) {
         let option = document.createElement('option');
-        option.setAttribute('value', 'MinecraftServersOrg');
-        option.innerHTML = "MinecraftServers.org";
-        document.querySelector('#project').insertBefore(option, document.querySelector('#project').children[8]);
+        option.setAttribute('value', 'Custom');
+        option.innerHTML = chrome.i18n.getMessage('Custom');
+        document.querySelector('#project').insertBefore(option, document.querySelector('#project').children[20]);
     }
 
-    if (document.querySelector('#MinecraftServersOrgButton') == null) {
+    if (document.querySelector('#CustomButton') == null) {
         let buttonMS = document.createElement('button');
         buttonMS.setAttribute('class', 'selectsite');
-        buttonMS.setAttribute('id', 'MinecraftServersOrgButton');
-        buttonMS.innerHTML = "MinecraftServers.org";
+        buttonMS.setAttribute('id', 'CustomButton');
+        buttonMS.innerHTML = chrome.i18n.getMessage('Custom');
         document.querySelector("#added > div > div:nth-child(4)").insertBefore(buttonMS, document.querySelector("#added > div > div:nth-child(4)").children[4]);
 
-        document.getElementById('MinecraftServersOrgButton').addEventListener('click', function() {
-            listSelect(event, 'MinecraftServersOrgTab');
+        document.getElementById('CustomButton').addEventListener('click', function() {
+            listSelect(event, 'CustomTab');
         });
     }
-    if (!settings.enableMinecraftServersOrg) {
-        settings.enableMinecraftServersOrg = true;
+    if (!settings.enableCustom) {
+        settings.enableCustom = true;
         setValue('AVMRsettings', settings, false);
     }
 }
@@ -1609,11 +1611,9 @@ document.getElementById('FairTopButton').addEventListener('click', function() {
 document.getElementById('IonMcButton').addEventListener('click', function() {
     listSelect(event, 'IonMcTab');
 });
-if (document.getElementById('MinecraftServersOrgButton') != null) {
-    document.getElementById('MinecraftServersOrgButton').addEventListener('click', function() {
-        listSelect(event, 'MinecraftServersOrgTab');
-    });
-}
+document.getElementById('MinecraftServersOrgButton').addEventListener('click', function() {
+    listSelect(event, 'MinecraftServersOrgTab');
+});
 document.getElementById('ServeurPriveButton').addEventListener('click', function() {
     listSelect(event, 'ServeurPriveTab');
 });
@@ -1647,9 +1647,11 @@ document.getElementById('HotMCButton').addEventListener('click', function() {
 document.getElementById('MinecraftServerNetButton').addEventListener('click', function() {
     listSelect(event, 'MinecraftServerNetTab');
 });
-document.getElementById('CustomButton').addEventListener('click', function() {
-    listSelect(event, 'CustomTab');
-});
+if (document.getElementById('CustomButton') != null) {
+    document.getElementById('CustomButton').addEventListener('click', function() {
+        listSelect(event, 'CustomTab');
+    });
+}
 
 //Генерация поля ввода ID
 var selectedTop = document.getElementById("project");

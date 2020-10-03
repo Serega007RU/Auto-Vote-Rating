@@ -477,5 +477,8 @@
   },
   "requiresCaptcha": {
     "message": "Требуется ручное прохождение капчи"
+  },
+  "privacyPass": {
+    "message": "Установите расширение <a target='blank_' href='https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'>Privacy Pass</a> что б при первом прохождении капчи получить 5 бесплатных прохождении капч для hCaptcha"
   }
 }
