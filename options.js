@@ -1701,6 +1701,10 @@ selectedTop.addEventListener("change", function() {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://topminecraftservers.org/vote/<span style="color:red;">9126</span>') + '</span></span></div>' + input;
     } else if(selectedTop.value == "MinecraftServersBiz") {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraftservers.biz/<span style="color:red;">servers/145999</span>/ or https://minecraftservers.biz/<span style="color:red;">universemc</span>/') + '</span></span></div>' + input;
+    } else if (selectedTop.value == "HotMC") {
+       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://hotmc.ru/vote-<span style="color:red;">195633</span>') + '</span></span></div>' + input;
+    } else if (selectedTop.value == "MinecraftServerNet") {
+       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraft-server.net/vote/<span style="color:red;">TitanicFreak</span>/') + '</span></span></div>' + input;
     } else {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip') + '</span></span></div>' + input;
     }
