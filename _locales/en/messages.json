@@ -559,5 +559,8 @@
   },
   "errorCheckSchemeProxy": {
     "message": "Unable to determine the type of proxy, this proxy is probably dead."
+  },
+  "privacyPass": {
+    "message": "Install the <a target='blank_' href='https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'>Privacy Pass</a> extension to get 5 free captcha passes for hCaptcha when you first pass the captcha"
   }
 }

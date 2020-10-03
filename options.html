@@ -119,23 +119,25 @@
 							</div>
 							<select required id="project" class="mb-2">
 								<option data-resource="selectTop" value="" selected disabled></option>
-								<option value="TopCraft">TopCraft</option>
-								<option value="McTOP">McTOP</option>
-								<option value="MCRate">MCRate</option>
-								<option value="MinecraftRating">MinecraftRating</option>
-								<option value="MonitoringMinecraft">MonitoringMinecraft</option>
-								<option value="FairTop">FairTop</option>
-								<option value="IonMc">IonMc</option>
-								<option value="ServeurPrive">ServeurPrive</option>
-								<option value="PlanetMinecraft">PlanetMinecraft</option>
-								<option value="TopG">TopG</option>
-								<option value="MinecraftMp">MinecraftMp</option>
-								<option value="MinecraftServerList">MinecraftServerList</option>
-								<option value="ServerPact">ServerPact</option>
-								<option value="MinecraftIpList">MinecraftIpList</option>
-								<option value="TopMinecraftServers">TopMinecraftServers</option>
-								<option value="MinecraftServersBiz">MinecraftServersBiz</option>
-								<option data-resource="custom" value="Custom"></option>
+								<option value="TopCraft">TopCraft.ru</option>
+								<option value="McTOP">McTOP.su</option>
+								<option value="MCRate">MCRate.su</option>
+								<option value="MinecraftRating">MinecraftRating.ru</option>
+								<option value="MonitoringMinecraft">MonitoringMinecraft.ru</option>
+								<option value="FairTop">FairTop.in</option>
+								<option value="IonMc">IonMc.top</option>
+								<option value="MinecraftServersOrg">MinecraftServers.org</option>
+								<option value="ServeurPrive">Serveur-Prive.net</option>
+								<option value="PlanetMinecraft">PlanetMinecraft.com</option>
+								<option value="TopG">TopG.org</option>
+								<option value="MinecraftMp">Minecraft-Mp.com</option>
+								<option value="MinecraftServerList">Minecraft-Server-List.com</option>
+								<option value="ServerPact">ServerPact.com</option>
+								<option value="MinecraftIpList">MinecraftIpList.com</option>
+								<option value="TopMinecraftServers">TopMinecraftServers.org</option>
+								<option value="MinecraftServersBiz">MinecraftServers.biz</option>
+								<option value="HotMC">HotMC.ru</option>
+								<option value="MinecraftServerNet">Minecraft-Server.net</option>
 							</select>
 							<div id="idSelector"></div>
 							<div id="submit" class="mt-3">
@@ -225,18 +227,20 @@
 						<button class="selectsite" id="FairTopButton">FairTop.in</button>
 						<button class="selectsite" id="IonMcButton">IonMc.top</button>
 						<button class="selectsite" id="ServeurPriveButton">Serveur-Prive.net</button>
+						<button class="selectsite" id="HotMCButton">HotMC.ru</button>
 					</div>
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
 					    <button class="selectsite" id="PlanetMinecraftButton">PlanetMinecraft.com</button>
 					    <button class="selectsite" id="TopGButton">TopG.org</button>
 						<button class="selectsite" id="MinecraftMpButton">Minecraft-Mp.com</button>
-						<button class="selectsite" id="MinecraftServerListButton">Minecraft-Server-List.com</button>						
+						<button class="selectsite" id="MinecraftServerListButton">Minecraft-Server-List.com</button>
+						<button class="selectsite" id="MinecraftServerNetButton">Minecraft-Server.net</button>
 					</div>
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
 					    <button class="selectsite" id="ServerPactButton">ServerPact.com</button>
 					    <button class="selectsite" id="MinecraftIpListButton">MinecraftIpList.com</button>
 					    <button class="selectsite" id="TopMinecraftServersButton">TopMinecraftServers.org</button>
-						<button data-resource="custom" class="selectsite" id="CustomButton"></button>
+					    <button class="selectsite" id="MinecraftServersOrgButton">MinecraftServers.org</button>
 					</div>
 					<div class="col-xl-12 mb-3">
 						<div class="listcontent" id="TopCraftTab" style="display: none;">
@@ -299,6 +303,14 @@
 						<div class="listcontent" id="MinecraftServersBizTab" style="display: none;">
 						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
 							<div data-resource="notAdded" id="MinecraftServersBizList"></div>
+						</div>
+						<div class="listcontent" id="HotMCTab" style="display: none;">
+						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+							<div data-resource="notAdded" id="HotMCList"></div>
+						</div>
+						<div class="listcontent" id="MinecraftServerNetTab" style="display: none;">
+						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+							<div data-resource="notAdded" id="MinecraftServerNetList"></div>
 						</div>
 						<div class="listcontent" id="CustomTab" style="display: none;">
 							<div data-resource="notAdded" id="CustomList"></div>
