@@ -16,6 +16,8 @@ var projectsServerPact = [];
 var projectsMinecraftIpList = [];
 var projectsTopMinecraftServers = [];
 var projectsMinecraftServersBiz = [];
+var projectsHotMC = [];
+var projectsMinecraftServerNet = [];
 var projectsCustom = [];
 
 var settings;
@@ -45,6 +47,8 @@ function Project(top, nick, id, time, responseURL, priority) {
     if (top == "MinecraftIpList") this.MinecraftIpList = true;
     if (top == "TopMinecraftServers") this.TopMinecraftServers = true;
     if (top == "MinecraftServersBiz") this.MinecraftServersBiz = true;
+    if (top == "HotMC") this.HotMC = true;
+    if (top == "MinecraftServerNet") this.MinecraftServerNet = true;
     if (top == "Custom") {
         this.Custom = true;
         this.timeout = parseInt(time);
@@ -108,6 +112,10 @@ async function restoreOptions() {
     projectsTopMinecraftServers = projectsTopMinecraftServers.AVMRprojectsTopMinecraftServers;
     projectsMinecraftServersBiz = await getValue('AVMRprojectsMinecraftServersBiz');
     projectsMinecraftServersBiz = projectsMinecraftServersBiz.AVMRprojectsMinecraftServersBiz;
+    projectsHotMC = await getValue('AVMRprojectsHotMC');
+    projectsHotMC = projectsHotMC.AVMRprojectsHotMC;
+    projectsMinecraftServerNet = await getValue('AVMRprojectsMinecraftServerNet');
+    projectsMinecraftServerNet = projectsMinecraftServerNet.AVMRprojectsMinecraftServerNet;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
     settings = await getValue('AVMRsettings');
@@ -131,6 +139,8 @@ async function restoreOptions() {
         projectsMinecraftIpList = [];
         projectsTopMinecraftServers = [];
         projectsMinecraftServersBiz = [];
+        projectsHotMC = [];
+        projectsMinecraftServerNet = [];
 
         projectsCustom = [];
         await setValue('AVMRprojectsTopCraft', projectsTopCraft, false);
@@ -150,6 +160,8 @@ async function restoreOptions() {
         await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
         await setValue('AVMRprojectsTopMinecraftServers', projectsTopMinecraftServers, false);
         await setValue('AVMRprojectsMinecraftServersBiz', projectsMinecraftServersBiz, false);
+        await setValue('AVMRprojectsHotMC', projectsHotMC, false);
+        await setValue('AVMRprojectsMinecraftServerNet', projectsMinecraftServerNet, false);
         await setValue('AVMRprojectsCustom', projectsCustom, false);
         console.log(chrome.i18n.getMessage('settingsGen'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
@@ -199,6 +211,17 @@ async function restoreOptions() {
         await setValue('AVMRprojectsMinecraftServersBiz', projectsMinecraftServersBiz, false);
         projectsMinecraftServersOrg = [];
         await setValue('AVMRprojectsMinecraftServersOrg', projectsMinecraftServersOrg, false);
+        console.log(chrome.i18n.getMessage('settingsUpdateEnd'));
+        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false);
+    }
+
+    //Если пользователь обновился с версии 3.2.2
+    if (projectsHotMC == null || !(typeof projectsHotMC[Symbol.iterator] === 'function')) {
+        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true);
+        projectsHotMC = [];
+        await setValue('AVMRprojectsHotMC', projectsHotMC, false);
+        projectsMinecraftServerNet = [];
+        await setValue('AVMRprojectsMinecraftServerNet', projectsMinecraftServerNet, false);
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false);
     }
@@ -321,6 +344,8 @@ async function removeProjectList(project, visually) {
     let countMinecraftIpList = 0;
     let countTopMinecraftServers = 0;
     let countMinecraftServersBiz = 0;
+    let countHotMC = 0;
+    let countMinecraftServerNet = 0;
     let countCustom = 0;
     forLoopAllProjects(function () {
         if (proj.TopCraft) countTopCaft++;
@@ -340,6 +365,8 @@ async function removeProjectList(project, visually) {
         if (proj.MinecraftIpList) countMinecraftIpList++;
         if (proj.TopMinecraftServers) countTopMinecraftServers++;
         if (proj.MinecraftServersBiz) countMinecraftServersBiz++;
+        if (proj.HotMC) countHotMC++;
+        if (proj.MinecraftServerNet) countMinecraftServerNet++;
         if (proj.Custom) countCustom++;
 
         if (proj.nick == project.nick && (project.Custom || proj.id == project.id) && getProjectName(proj) == getProjectName(project)) {
@@ -360,6 +387,8 @@ async function removeProjectList(project, visually) {
             if (proj.MinecraftIpList) countMinecraftIpList--;
             if (proj.TopMinecraftServers) countTopMinecraftServers--;
             if (proj.MinecraftServersBiz) countMinecraftServersBiz--;
+            if (proj.HotMC) countHotMC--;
+            if (proj.MinecraftServerNet) countMinecraftServerNet--;
             if (proj.Custom) countCustom--;
         }
     });
@@ -380,6 +409,8 @@ async function removeProjectList(project, visually) {
     if (countMinecraftIpList == 0) document.getElementById("MinecraftIpListList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countTopMinecraftServers == 0) document.getElementById("TopMinecraftServersList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countMinecraftServersBiz == 0) document.getElementById("MinecraftServersBizList").innerHTML = (chrome.i18n.getMessage('notAdded'));
+    if (countHotMC == 0) document.getElementById("HotMCList").innerHTML = (chrome.i18n.getMessage('notAdded'));
+    if (countMinecraftServerNet == 0) document.getElementById("MinecraftServerNetList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countCustom == 0) document.getElementById("CustomList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (visually) return;
     for (let i = getProjectList(project).length; i--;) {
@@ -462,6 +493,12 @@ function updateProjectList() {
     while (document.getElementById("MinecraftServersBizList").nextElementSibling != null) {
         document.getElementById("MinecraftServersBizList").nextElementSibling.remove();
     }
+    while (document.getElementById("HotMCList").nextElementSibling != null) {
+        document.getElementById("HotMCList").nextElementSibling.remove();
+    }
+    while (document.getElementById("MinecraftServerNetList").nextElementSibling != null) {
+        document.getElementById("MinecraftServerNetList").nextElementSibling.remove();
+    }
     while (document.getElementById("CustomList").nextElementSibling != null) {
         document.getElementById("CustomList").nextElementSibling.remove();
     }
@@ -524,15 +561,15 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             }
             returnAdd = true;
             return;
-        } else if (((proj.MCRate && choice == "MCRate") || (proj.ServerPact && choice == "ServerPact") || (proj.MinecraftServersOrg && choice == "MinecraftServersOrg")) && proj.nick && project.nick && !disableCheckProjects) {
+        } else if (((proj.MCRate && choice == "MCRate") || (proj.ServerPact && choice == "ServerPact") || (proj.MinecraftServersOrg && choice == "MinecraftServersOrg") || (proj.HotMC && choice == "HotMC")) && proj.nick && project.nick && !disableCheckProjects) {
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProject', getProjectName(proj)) + '</div>', false, element);
             returnAdd = true;
             return;
-        } else if (proj.FairTop && choice == "FairTop" && proj.nick && project.nick && !disableCheckProjects) {
+        } /*else if (proj.FairTop && choice == "FairTop" && proj.nick && project.nick && !disableCheckProjects) {
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProjectFairTop') + '</div>', true, element);
             returnAdd = true;
             return;
-        } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
+        }*/ else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProjectMinecraftIpList') + '</div>', true, element);
             returnAdd = true;
             return;
@@ -619,6 +656,14 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         if (project.MinecraftServersBiz) {
             url = 'https://minecraftservers.biz/' + project.id + "/";
             jsPath = "table[class='table table-hover table-striped'] > tbody > tr:nth-child(4) > td:nth-child(2)"
+        }
+        if (project.HotMC) {
+            url = 'https://hotmc.ru/minecraft-server-' + project.id;
+            jsPath = "#copy-ip"
+        }
+        if (project.MinecraftServerNet) {
+            url = 'https://minecraft-server.net/details/' + project.id + "/";
+            jsPath = "h1[class='text-break col-xl']"
         }
         let response;
         try {
@@ -745,7 +790,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
 
     await addProjectList(project, false);
 
-    if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz) && settings.enabledSilentVote) {
+    if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet) && settings.enabledSilentVote) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span>', true, element);
     } else {
         if (secondBonus === "") {
@@ -851,6 +896,8 @@ function getProjectName(project) {
     if (project.MinecraftIpList) return "MinecraftIpList";
     if (project.TopMinecraftServers) return "TopMinecraftServers";
     if (project.MinecraftServersBiz) return "MinecraftServersBiz";
+    if (project.HotMC) return "HotMC";
+    if (project.MinecraftServerNet) return "MinecraftServerNet";
     if (project.Custom) return "Custom"
 }
 
@@ -872,6 +919,8 @@ function getProjectList(project) {
     if (project.MinecraftIpList) return projectsMinecraftIpList;
     if (project.TopMinecraftServers) return projectsTopMinecraftServers;
     if (project.MinecraftServersBiz) return projectsMinecraftServersBiz;
+    if (project.HotMC) return projectsHotMC;
+    if (project.MinecraftServerNet) return projectsMinecraftServerNet;
     if (project.Custom) return projectsCustom;
 }
 
@@ -977,6 +1026,8 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         || key == 'AVMRprojectsMinecraftIpList'
         || key == 'AVMRprojectsTopMinecraftServers'
         || key == 'AVMRprojectsMinecraftServersBiz'
+        || key == 'AVMRprojectsHotMC'
+        || key == 'AVMRprojectsMinecraftServerNet'
         || key == 'AVMRprojectsCustom') {
             if (key == 'AVMRprojectsTopCraft') projectsTopCraft = storageChange.newValue;
             if (key == 'AVMRprojectsMcTOP') projectsMcTOP = storageChange.newValue;
@@ -995,6 +1046,8 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             if (key == 'AVMRprojectsMinecraftIpList') projectsMinecraftIpList = storageChange.newValue;
             if (key == 'AVMRprojectsTopMinecraftServers') projectsTopMinecraftServers = storageChange.newValue;
             if (key == 'AVMRprojectsMinecraftServersBiz') projectsMinecraftServersBiz = storageChange.newValue;
+            if (key == 'AVMRprojectsHotMC') projectsHotMC = storageChange.newValue;
+            if (key == 'AVMRprojectsMinecraftServerNet') projectsMinecraftServerNet = storageChange.newValue;
             if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
             if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function')) return;
             if (storageChange.oldValue.length == storageChange.newValue.length) {
@@ -1107,6 +1160,18 @@ function forLoopAllProjects (fuc, reverse) {
     }
     if (reverse) projectsMinecraftServersBiz.reverse();
 
+    if (reverse) projectsHotMC.reverse();
+    for (proj of projectsHotMC) {
+        fuc();
+    }
+    if (reverse) projectsHotMC.reverse();
+
+    if (reverse) projectsMinecraftServerNet.reverse();
+    for (proj of projectsMinecraftServerNet) {
+        fuc();
+    }
+    if (reverse) projectsMinecraftServerNet.reverse();
+
     if (reverse) projectsCustom.reverse();
     for (proj of projectsCustom) {
         fuc();
@@ -1135,6 +1200,8 @@ document.getElementById('file-download').addEventListener('click', () => {
         projectsMinecraftIpList,
         projectsTopMinecraftServers,
         projectsMinecraftServersBiz,
+        projectsHotMC,
+        projectsMinecraftServerNet,
         projectsCustom,
         settings
     }
@@ -1177,6 +1244,8 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     projectsMinecraftIpList = allSetting.projectsMinecraftIpList;
                     projectsTopMinecraftServers = allSetting.projectsTopMinecraftServers;
                     projectsMinecraftServersBiz = allSetting.projectsMinecraftServersBiz;
+                    projectsHotMC = allSetting.projectsHotMC;
+                    projectsMinecraftServerNet = allSetting.projectsMinecraftServerNet;
                     projectsCustom = allSetting.projectsCustom;
                     settings = allSetting.settings;
 
@@ -1222,6 +1291,14 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                         projectsMinecraftServersOrg = [];
                     }
 
+                    //Если пользователь обновился с версии 3.2.2
+                    if (projectsHotMC == null || !(typeof projectsHotMC[Symbol.iterator] === 'function')) {
+                        projectsHotMC = [];
+                    }
+                    if (projectsMinecraftServerNet == null || !(typeof projectsMinecraftServerNet[Symbol.iterator] === 'function')) {
+                        projectsMinecraftServerNet = [];
+                    }
+
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);
                     await setValue('AVMRsettings', settings, false);
                     await setValue('AVMRprojectsTopCraft', projectsTopCraft, false);
@@ -1241,6 +1318,8 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     await setValue('AVMRprojectsMinecraftIpList', projectsMinecraftIpList, false);
                     await setValue('AVMRprojectsTopMinecraftServers', projectsTopMinecraftServers, false);
                     await setValue('AVMRprojectsMinecraftServersBiz', projectsMinecraftServersBiz, false);
+                    await setValue('AVMRprojectsHotMC', projectsHotMC, false);
+                    await setValue('AVMRprojectsMinecraftServerNet', projectsMinecraftServerNet, false);
                     await setValue('AVMRprojectsCustom', projectsCustom, false);
                     updateStatusSave('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('successSave') + '</div>', false);
 
@@ -1402,7 +1481,7 @@ function addMinecraftServersOrg() {
     if (document.querySelector('#project').children[8].text != "MinecraftServersOrg") {
         let option = document.createElement('option');
         option.setAttribute('value', 'MinecraftServersOrg');
-        option.innerHTML = "MinecraftServersOrg";
+        option.innerHTML = "MinecraftServers.org";
         document.querySelector('#project').insertBefore(option, document.querySelector('#project').children[8]);
     }
 
@@ -1411,7 +1490,7 @@ function addMinecraftServersOrg() {
         buttonMS.setAttribute('class', 'selectsite');
         buttonMS.setAttribute('id', 'MinecraftServersOrgButton');
         buttonMS.innerHTML = "MinecraftServers.org";
-        document.querySelector("#added > div > div:nth-child(2)").insertBefore(buttonMS, document.querySelector("#added > div > div:nth-child(2)").children[4]);
+        document.querySelector("#added > div > div:nth-child(4)").insertBefore(buttonMS, document.querySelector("#added > div > div:nth-child(4)").children[4]);
 
         document.getElementById('MinecraftServersOrgButton').addEventListener('click', function() {
             listSelect(event, 'MinecraftServersOrgTab');
@@ -1561,6 +1640,12 @@ document.getElementById('TopMinecraftServersButton').addEventListener('click', f
 });
 document.getElementById('MinecraftServersBizButton').addEventListener('click', function() {
     listSelect(event, 'MinecraftServersBizTab');
+});
+document.getElementById('HotMCButton').addEventListener('click', function() {
+    listSelect(event, 'HotMCTab');
+});
+document.getElementById('MinecraftServerNetButton').addEventListener('click', function() {
+    listSelect(event, 'MinecraftServerNetTab');
 });
 document.getElementById('CustomButton').addEventListener('click', function() {
     listSelect(event, 'CustomTab');

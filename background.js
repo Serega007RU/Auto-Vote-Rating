@@ -16,6 +16,8 @@ var projectsServerPact = [];
 var projectsMinecraftIpList = [];
 var projectsTopMinecraftServers = [];
 var projectsMinecraftServersBiz = [];
+var projectsHotMC = [];
+var projectsMinecraftServerNet = [];
 var projectsCustom = [];
 
 //Настройки
@@ -78,6 +80,10 @@ async function initializeConfig() {
     projectsTopMinecraftServers = projectsTopMinecraftServers.AVMRprojectsTopMinecraftServers;
     projectsMinecraftServersBiz = await getValue('AVMRprojectsMinecraftServersBiz');
     projectsMinecraftServersBiz = projectsMinecraftServersBiz.AVMRprojectsMinecraftServersBiz;
+    projectsHotMC = await getValue('AVMRprojectsHotMC');
+    projectsHotMC = projectsHotMC.AVMRprojectsHotMC;
+    projectsMinecraftServerNet = await getValue('AVMRprojectsMinecraftServerNet');
+    projectsMinecraftServerNet = projectsMinecraftServerNet.AVMRprojectsMinecraftServerNet;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
     settings = await getValue('AVMRsettings');
@@ -113,6 +119,12 @@ async function initializeConfig() {
             		await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj));
             	}
             });
+		}
+
+		//Если пользователь обновился с версии 3.2.2
+		if (projectsHotMC == null || !(typeof projectsHotMC[Symbol.iterator] === 'function')) {
+			projectsHotMC = [];
+			projectsMinecraftServerNet = [];
 		}
     }
 
@@ -320,6 +332,16 @@ async function newWindow(project) {
 			}
 			if (project.MinecraftServersBiz) {
 				chrome.tabs.create({"url":"https://minecraftservers.biz/" + project.id + "/", "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.HotMC) {
+				chrome.tabs.create({"url":"https://hotmc.ru/vote-" + project.id, "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project);
+				});
+			}
+			if (project.MinecraftServerNet) {
+				chrome.tabs.create({"url":"https://minecraft-server.net/vote/" + project.id + "/", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
@@ -905,6 +927,10 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 		chrome.tabs.executeScript(details.tabId, {file: "scripts/topminecraftservers.js"});
 	} else if (project.MinecraftServersBiz) {
 		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftserversbiz.js"});
+	} else if (project.HotMC) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/hotmc.js"});
+	} else if (project.MinecraftServerNet) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftservernet.js"});
 	}
 }, {url: [{hostSuffix: 'topcraft.ru'},
           {hostSuffix: 'mctop.su'},
@@ -922,14 +948,16 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
           {hostSuffix: 'serverpact.com'},
           {hostSuffix: 'minecraftiplist.com'},
           {hostSuffix: 'topminecraftservers.org'},
-          {hostSuffix: 'minecraftservers.biz'}
+          {hostSuffix: 'minecraftservers.biz'},
+          {hostSuffix: 'hotmc.ru'},
+          {hostSuffix: 'minecraft-server.net'}
           ]});
 
 chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (details.frameId != 0) {
 		let project = openedProjects.get(details.tabId);
 		if (project == null) return;
-		if (project.ServeurPrive || project.IonMc || project.MinecraftServersBiz || project.MinecraftServersBiz || project.MinecraftServersOrg || project.MinecraftMp) {
+		if (project.ServeurPrive || project.IonMc || project.MinecraftServersBiz || project.MinecraftServersBiz || project.MinecraftServersOrg || project.MinecraftMp || project.HotMC || project.MinecraftServerNet) {
 			chrome.tabs.executeScript(details.tabId, {file: "scripts/captchaclicker.js", frameId: details.frameId});
 		}
 	}
@@ -1040,7 +1068,7 @@ async function endVote(message, sender, project) {
 		} else {
 			if (project.TopG || project.ServerPact || project.MinecraftServersBiz) {
 				time.setUTCHours(time.getUTCHours() + 12);
-			} else if (project.MinecraftIpList || project.MonitoringMinecraft) {
+			} else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet/*ToDo Serega007 предпологается что MinecraftServerNet сбрасывает голос через 24 часа*/) {
 				time.setUTCDate(time.getUTCDate() + 1);
 			} else if (project.ServeurPrive) {
 				project.countVote = project.countVote + 1;
@@ -1124,6 +1152,8 @@ function getProjectName(project) {
 	if (project.MinecraftIpList) return "MinecraftIpList";
 	if (project.TopMinecraftServers) return "TopMinecraftServers";
 	if (project.MinecraftServersBiz) return "MinecraftServersBiz";
+	if (project.HotMC) return "HotMC";
+	if (project.MinecraftServerNet) return "MinecraftServerNet";
 	if (project.Custom) return "Custom";
 }
 
@@ -1145,6 +1175,8 @@ function getProjectList(project) {
     if (project.MinecraftIpList) return projectsMinecraftIpList;
     if (project.TopMinecraftServers) return projectsTopMinecraftServers;
     if (project.MinecraftServersBiz) return projectsMinecraftServersBiz;
+    if (project.HotMC) return projectsHotMC;
+    if (project.MinecraftServerNet) return projectsMinecraftServerNet;
     if (project.Custom) return projectsCustom;
 }
 
@@ -1294,6 +1326,12 @@ function forLoopAllProjects (fuc) {
     for (let proj of projectsMinecraftServersBiz) {
         fuc(proj);
     }
+    for (let proj of projectsHotMC) {
+        fuc(proj);
+    }
+    for (let proj of projectsMinecraftServerNet) {
+        fuc(proj);
+    }
     for (let proj of projectsCustom) {
         fuc(proj);
     }
@@ -1339,6 +1377,8 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         if (key == 'AVMRprojectsMinecraftIpList') projectsMinecraftIpList = storageChange.newValue;
         if (key == 'AVMRprojectsTopMinecraftServers') projectsTopMinecraftServers = storageChange.newValue;
         if (key == 'AVMRprojectsMinecraftServersBiz') projectsMinecraftServersBiz = storageChange.newValue;
+        if (key == 'AVMRprojectsHotMC') projectsHotMC = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftServerNet') projectsMinecraftServerNet = storageChange.newValue;
         if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
         if (key == 'AVMRsettings') {
         	settings = storageChange.newValue;
@@ -1796,6 +1836,10 @@ v3.2.2
 Исправлена ошибка когда скрипт загружался во вкладку раньше чем загрузилась вкладка
 CubeCraft оказался жопой с ручкой который не даёт награду за голосование если вы не на сервере и поэтому вместо него в списке Legends Evolved
 Исправлена ошибка неверного подсчёта сделанных голосов в день для ServeurPrive
+
+v3.2.3
+Добавлен новый топ - HotMC по просьбе asphaltnoises#4557
+Добавлен новый топ - MinecraftServerNet по просьбе MaketBoss#0133
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
