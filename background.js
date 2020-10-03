@@ -219,12 +219,29 @@ async function checkOpen(project) {
 	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('startedAutoVote'));
     if (!settings.disabledNotifStart) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('startedAutoVote'));
 
-    if (project.MonitoringMinecraft) {
-    	if (clearCookieMonitoringMinecraft) {
-    		await removeCookie('http://monitoringminecraft.ru/', 'session');
-    	} else {
-    		clearCookieMonitoringMinecraft = true;
+    if ((clearCookieMonitoringMinecraft && project.MonitoringMinecraft) || project.FairTop) {
+    	let url;
+    	if (project.MonitoringMinecraft) {
+            url = '.fairtop.in';
+    	} else if (project.FairTop) {
+    		url = '.monitoringminecraft.ru';
     	}
+	    let getCookies = new Promise(resolve => {
+	    	chrome.cookies.getAll({domain: url}, function(cookies) {
+	    		resolve(cookies);
+	    	});
+	    });
+	    let cookies = await getCookies;
+	    for(let i=0; i<cookies.length;i++) {
+	    	if (cookies[i].domain.charAt(0) == ".") {
+	    		await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+	    	} else {
+	    		await removeCookie("https://" + cookies[i].domain + cookies[i].path, cookies[i].name);
+	    	}
+	    }
+    }
+    if (!clearCookieMonitoringMinecraft) {
+    	clearCookieMonitoringMinecraft = true;
     }
 
 	newWindow(project);
@@ -1840,6 +1857,7 @@ CubeCraft оказался жопой с ручкой который не даё
 v3.2.3
 Добавлен новый топ - HotMC по просьбе asphaltnoises#4557
 Добавлен новый топ - MinecraftServerNet по просьбе MaketBoss#0133
+Для FairTop и MonitoringMinecraft теперь адекватно очищаются куки что бы можно было голосовать в 1 день за несколько проектов (а не только за 1)
 
 Планируется:
 Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
