@@ -316,6 +316,8 @@ async function newWindow(project) {
 					for(let i=0; i<cookies.length;i++) {
 						await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
 					}
+
+					console.log('Применяю куки ВК: ' + VK.id + ' - ' + VK.name);
 					
                 	//Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
 					for(let i = 0; i < vkontakte.cookies.length; i++) {
@@ -350,6 +352,7 @@ async function newWindow(project) {
             	found = true;
             	currentProxy = proxy;
                 //Применяет найденный незаюзанный свободный прокси
+                console.log('Применяю прокси: ' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme);
                 var config = {
 				  mode: "fixed_servers",
 				  rules: {
