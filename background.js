@@ -361,7 +361,7 @@ async function newWindow(project) {
 					  host: proxy.ip,
 					  port: proxy.port
 					},
-					bypassList: ["*.vk.com"]
+					bypassList: ["*vk.com"]
 				  }
 				};
 				let setProxy = new Promise(resolve => {
