@@ -1315,6 +1315,7 @@ async function endVote(message, sender, project) {
 				getTopFromList(currentVK, project).push(usedProject);
 				VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
 				await setValue('AVMRVKs', VKs);
+				currentVK = null;
 			}
 			if (proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
 				let usedProject = {};
@@ -1323,6 +1324,7 @@ async function endVote(message, sender, project) {
 				getTopFromList(currentProxy, project).push(usedProject);
 				proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy;
 				await setValue('AVMRproxies', proxies);
+				currentProxy = null;
 			}
 		}
 
@@ -1351,11 +1353,13 @@ async function endVote(message, sender, project) {
 					currentVK.notWorking = true;
 					VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
 					await setValue('AVMRVKs', VKs);
+					currentVK = null;
 				}
 			} else if (proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
 				currentProxy.notWorking = true;
 				proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy;
 				await setValue('AVMRproxies', proxies);
+				currentProxy = null;
 			}
 
 			for (let [key, value] of retryProjects.entries()) {
@@ -1642,6 +1646,18 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
         if (key == 'AVMRVKs') VKs = storageChange.newValue;
         if (key == 'AVMRproxies') proxies = storageChange.newValue;
+        //Если прокси удалили во время его использования
+        if (currentProxy && currentProxy != null) {
+        	if (proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) == -1) {
+				//Прекращаем использование удалённого прокси
+				let clearProxy = new Promise(resolve => {
+					chrome.proxy.settings.clear({scope: 'regular'},function() {
+						resolve();
+					});
+				});
+				clearProxy;
+        	}
+        }
         if (key == 'AVMRsettings') {
         	settings = storageChange.newValue;
         	cooldown = settings.cooldown;
@@ -1855,7 +1871,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serv
 
 //Если требуется авторизация для Прокси
 chrome.webRequest.onAuthRequired.addListener(function (details) {
-	if (details.isProxy && currentProxy.login) {
+	if (details.isProxy && currentProxy && currentProxy != null && currentProxy.login) {
 		return({
 			authCredentials : {
 				'username' : currentProxy.login,

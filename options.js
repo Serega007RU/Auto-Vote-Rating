@@ -669,6 +669,31 @@ document.getElementById('AddVK').addEventListener('click', async () => {
     updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + VK.name + '</span>', false);
 });
 
+//Слушатель кнопки "Удалить куки" на MultiVote VKontakte
+document.getElementById('deleteAllVKCookies').addEventListener('click', async () => {
+    updateStatusVK(chrome.i18n.getMessage('deletingAllVKCookies'), true);
+    let getVKCookies = new Promise(resolve => {
+        chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+            resolve(cookies);
+        });
+    });
+    let cookies = await getVKCookies;
+    for(let i=0; i<cookies.length;i++) {
+        await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+    }
+    updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('deletedAllVKCookies') + '</span>', false);
+});
+
+//Слушатель кнопки "Удалить всё" на Прокси
+document.getElementById('deleteAllProxies').addEventListener('click', async () => {
+    updateStatusProxy(chrome.i18n.getMessage('deletingAllProxies'), true);
+    let proxiesCopy = [...proxies];
+    for (let prox of proxiesCopy) {
+        await removeProxyList(prox, false);
+    }
+    updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('deletedAllProxies') + '</span>', false);
+});
+
 //Слушатель кнопки "Добавить" на Прокси
 document.getElementById('addProxy').addEventListener('submit', async () => {
     event.preventDefault();
@@ -2176,6 +2201,14 @@ selectedTop.addEventListener("change", function() {
 
     laterChoose = selectedTop.value;
 });
+
+async function removeCookie(url, name) {
+	return new Promise(resolve => {
+		chrome.cookies.remove({'url': url, 'name': name}, function(details) {
+			resolve(details);
+		})
+	})
+}
 
 //Локализация
 var elements = document.querySelectorAll('[data-resource]');

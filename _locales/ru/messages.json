@@ -491,7 +491,7 @@
     "message": "Не работает"
   },
   "useMultiVote": {
-    "message": "Использовать ВК и прокси при голосовании"
+    "message": "Использовать ВК и прокси при голосовании (включить MultiVote)"
   },
   "added": {
     "message": "Уже добавлен"
@@ -530,5 +530,23 @@
   },
   "privacyPass": {
     "message": "Установите расширение <a target='blank_' href='https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'>Privacy Pass</a> что б при первом прохождении капчи получить 5 бесплатных прохождении капч для hCaptcha"
+  },
+  "deleteAll": {
+    "message": "Удалить всё"
+  },
+  "clearCookies": {
+    "message": "Удалить куки"
+  },
+  "deletingAllProxies": {
+    "message": "Удаляю все добавленные прокси..."
+  },
+  "deletedAllProxies": {
+    "message": "Все прокси успешно удалены!"
+  },
+  "deletingAllVKCookies": {
+    "message": "Удаляю все куки ВКонтакте..."
+  },
+  "deletedAllVKCookies": {
+    "message": "Все куки ВКонтакте успешно удалены!"
   }
 }
