@@ -366,7 +366,7 @@ async function addProxyList(proxy, visually) {
     let html = document.createElement('div');
     html.setAttribute("id", 'div' + '┄' + proxy.ip + '┄' + proxy.port);
     html.setAttribute('class', 'MVlist');
-    html.innerHTML = proxy.ip + ':' + proxy.port + '<button id="' + proxy.ip + '┄' + proxy.port + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + (proxy.notWorking ? '<span style="color:#f44336;">' + chrome.i18n.getMessage('notWork') + '</span>' : '');
+    html.innerHTML = proxy.ip + ':' + proxy.port + ' ' + proxy.scheme + '<button id="' + proxy.ip + '┄' + proxy.port + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + (proxy.notWorking ? '<span style="color:#f44336;">' + chrome.i18n.getMessage('notWork') + '</span>' : '');
     listProxy.after(html);
     document.getElementById(proxy.ip + '┄' + proxy.port).addEventListener('click', function() {
         removeProxyList(proxy, false);
@@ -1069,7 +1069,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         updateStatusAdd('<div>' + chrome.i18n.getMessage('checkHasProjectSuccess') + '</div>', true, element);
 
         //Проверка авторизации ВКонтакте
-        if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
+        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && !settings.useMultiVote) {
             updateStatusAdd('<div>' + chrome.i18n.getMessage('checkAuthVK') + '</div>', true, element);
             let url2;
             if (project.TopCraft) url2 = "https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email";

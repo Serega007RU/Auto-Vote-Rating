@@ -1167,7 +1167,6 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
-	console.log(details);
 	if (details.error.includes('net::ERR_ABORTED')) {
 		setTimeout(() => {
 			if (openedProjects.get(details.tabId) == null) {
