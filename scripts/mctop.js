@@ -6,6 +6,10 @@ function vote () {
 			return;
 		}
 		try {
+			//Если мы находимся на странице проверки CloudFlare
+			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+				return;
+			}
 			//Если погльзователь уже авторизован в вк, сразу голосует
 			if (document.querySelector("button[data-type=vote]") == null) {
 				//Клик "Голосовать"

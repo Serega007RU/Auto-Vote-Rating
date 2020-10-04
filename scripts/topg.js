@@ -2,6 +2,10 @@ vote();
 function vote () {
 	chrome.storage.local.get('AVMRprojectsTopG', function(result) {
 		try {
+			//Если мы находимся на странице проверки CloudFlare
+			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+				return;
+			}
 			if (document.querySelector("body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong") != null && document.querySelector("body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong").textContent.includes('You have voted successfully!')) {
 				sendMessage('successfully');
 			} else if (document.querySelector("#voting > div > div > div:nth-child(3) > p") != null && document.querySelector("#voting > div > div > div:nth-child(3) > p").textContent.includes('You have already voted!')) {

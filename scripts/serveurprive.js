@@ -12,6 +12,10 @@ function vote(first) {
 			if (document.querySelector("#cf-content > h1 > span") != null) {
 				return;
 			}
+			//Если мы находимся на странице проверки CloudFlare
+			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+				return;
+			}
             //Ессли есть ошибка
             if (document.querySelector("#c > div > div > div.bvt > p.alert.alert-danger") != null) {
             	//Если не удалось пройти капчу
