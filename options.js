@@ -677,6 +677,14 @@ document.getElementById('AddVK').addEventListener('click', async () => {
         });
     });
     VK.cookies = await getVKCookies;
+    
+    let i = 0;
+    for (let cookie of VK.cookies) {
+        if (cookie.name == "tmr_detect") {
+            VK.cookies.splice(i, 1);
+        }
+        i++;
+    }
 
     try {
         VK.name = doc.querySelector("#top_vkconnect_link > div > div.top_profile_vkconnect_name").textContent;
@@ -1586,14 +1594,15 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
                 try {
                     let proxiesList = e.target.result;
                     for (let proxyString of proxiesList.split(/\n/g)) {
-                        if (!proxyString || proxyString == null || proxyString == "") {
+                        proxyString = proxyString.replace(/(?:\r\n|\r|\n)/g, '');
+                        if (proxyString == null || proxyString == "") {
                             continue;
                         }
                         let varProxy = {};
                         let num = 0;
                         let continueFor = false;
                         for (let proxyElement of proxyString.split(':')) {
-                            if (!proxyElement || proxyElement == null || proxyElement == "") {
+                            if (proxyElement == null || proxyElement == "") {
                                 continueFor = true;
                                 break;
                             }
@@ -1602,7 +1611,7 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
                             } else if (num == 1) {
                                 varProxy.port = parseInt(proxyElement);
                             } else if (num == 2) {
-                                varProxy.scheme = proxyElement.replace(/(?:\r\n|\r|\n)/g, '');
+                                varProxy.scheme = proxyElement;
                             } else if (num == 3) {
                                 varProxy.login = proxyElement;
                             } else if (num == 4) {
