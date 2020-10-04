@@ -317,7 +317,7 @@ async function newWindow(project) {
 						await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
 					}
 
-					console.log('Применяю куки ВК: ' + VK.id + ' - ' + VK.name);
+					console.log('Применяю куки ВК: ' + vkontakte.id + ' - ' + vkontakte.name);
 					
                 	//Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
 					for(let i = 0; i < vkontakte.cookies.length; i++) {
