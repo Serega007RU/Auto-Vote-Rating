@@ -494,6 +494,19 @@ async function removeProjectList(project, visually) {
             chrome.tabs.remove(key);
         }
     }
+    //Если в этот момент прокси использовался
+    if (settings.useMultiVote && chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
+        if (chrome.extension.getBackgroundPage().currentProxy.ip == proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port == proxy.port) {
+            chrome.extension.getBackgroundPage().currentProxy = null;
+            //Прекращаем использование прокси
+            let clearProxy = new Promise(resolve => {
+                chrome.proxy.settings.clear({scope: 'regular'},function() {
+                    resolve();
+                });
+            });
+            await clearProxy;
+        }
+    }
 }
 
 async function removeVKList(VK, visually) {
@@ -520,6 +533,19 @@ async function removeProxyList(proxy, visually) {
         if (temp.ip == proxy.ip && temp.port == proxy.port) proxies.splice(i, 1);
     }
     await setValue('AVMRproxies', proxies, true);
+    //Если в этот момент прокси использовался
+    if (chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
+        if (chrome.extension.getBackgroundPage().currentProxy.ip == proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port == proxy.port) {
+            chrome.extension.getBackgroundPage().currentProxy = null;
+            //Прекращаем использование прокси
+            let clearProxy = new Promise(resolve => {
+                chrome.proxy.settings.clear({scope: 'regular'},function() {
+                    resolve();
+                });
+            });
+            await clearProxy;
+        }
+    }
 }
 
 //Перезагрузка списка проектов
@@ -1558,21 +1584,32 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
                 try {
                     let proxiesList = e.target.result;
                     for (let proxyString of proxiesList.split(/\n/g)) {
+                        if (!proxyString || proxyString == null || proxyString == "") {
+                            continue;
+                        }
                         let varProxy = {};
                         let num = 0;
+                        let continueFor = false;
                         for (let proxyElement of proxyString.split(':')) {
+                            if (!proxyElement || proxyElement == null || proxyElement == "") {
+                                continueFor = true;
+                                break;
+                            }
                             if (num == 0) {
                                 varProxy.ip = proxyElement;
                             } else if (num == 1) {
                                 varProxy.port = parseInt(proxyElement);
                             } else if (num == 2) {
-                                varProxy.scheme = proxyElement;
+                                varProxy.scheme = proxyElement.replace(/(?:\r\n|\r|\n)/g, '');
                             } else if (num == 3) {
                                 varProxy.login = proxyElement;
                             } else if (num == 4) {
                                 varProxy.password = proxyElement;
                             }
                             num++;
+                        }
+                        if (continueFor) {
+                            continue;
                         }
                         await addProxy(varProxy);
                     }
