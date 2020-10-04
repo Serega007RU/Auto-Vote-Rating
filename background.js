@@ -1201,7 +1201,8 @@ chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
           {hostSuffix: 'topminecraftservers.org'},
           {hostSuffix: 'minecraftservers.biz'},
           {hostSuffix: 'hotmc.ru'},
-          {hostSuffix: 'minecraft-server.net'}
+          {hostSuffix: 'minecraft-server.net'},
+          {hostSuffix: 'vk.com'}
           ]});
 
 //Слушатель сообщений и ошибок
