@@ -987,7 +987,10 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
-	endVote(chrome.i18n.getMessage('errorVoteUnknown') + details.error, null, project);
+	let sender = {};
+	sender.tab = {};
+	sender.tab.id = details.tabId;
+	endVote(chrome.i18n.getMessage('errorVoteUnknown') + details.error, sender, project);
 }, {url: [{hostSuffix: 'topcraft.ru'},
           {hostSuffix: 'mctop.su'},
           {hostSuffix: 'mcrate.su'},
