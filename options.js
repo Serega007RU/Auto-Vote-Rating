@@ -298,13 +298,6 @@ async function restoreOptions() {
             }
             if (this.id == "useMultiVote") {
                 settings.useMultiVote = this.checked;
-                if (this.checked && settings.enabledSilentVote) {
-                    settings.enabledSilentVote = false;
-                    document.getElementById("enabledSilentVote").value = 'disabled';
-                    document.getElementById("enabledSilentVote").options[0].disabled = true;
-                } else {
-                    document.getElementById("enabledSilentVote").options[0].disabled = false;
-                }
             }
             await setValue('AVMRsettings', settings, true);
         });
@@ -322,12 +315,6 @@ async function restoreOptions() {
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
     document.getElementById("useMultiVote").checked = settings.useMultiVote;
-    if (settings.useMultiVote && settings.enabledSilentVote) {
-        settings.enabledSilentVote = false;
-        document.getElementById("enabledSilentVote").value = 'disabled';
-        document.getElementById("enabledSilentVote").options[0].disabled = true;
-        await setValue('AVMRsettings', settings, true);
-    }
     if (settings.enableCustom) addCustom();
 };
 
