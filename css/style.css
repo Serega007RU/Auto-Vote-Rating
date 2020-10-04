@@ -10,6 +10,7 @@ h1 {
 }
 
 .custom-file-upload {
+  text-align: center !important;
   cursor: pointer;
   width: 100%;
   background-color: #2A2A2F;
@@ -25,7 +26,7 @@ h1 {
   transition: 0.2s;
 }
 
-.custom-file-upload > svg {
+.custom-file-upload > svg, .addButton > svg {
   margin-right: 10px;
 }
 
@@ -130,9 +131,9 @@ button[type="submit"]:focus {
 }
 
 .addButton {
-  color: #fff;
+  color: #fff !important;
   background: #1A7BEE !important;
-  padding: 9px 25px;
+  padding: 10px 30px;
   font-size: 18px;
   outline: none;
   border: none;
@@ -141,18 +142,14 @@ button[type="submit"]:focus {
   border-radius: 3px;
   max-width: 100%;
   height: auto;
-  display: block;
+  display: inline !important;
   border: none;
   margin: 20px 0 !important;
 }
 
 .addButton:hover {
-  opacity: 0.85;
-}
-
-.addButton:hover {
   outline: 0;
-  opacity: 0.5;
+  opacity: 0.85;
 }
 
 #ip, #login, #password {

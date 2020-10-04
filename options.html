@@ -202,11 +202,13 @@
 						</div>
 						<label data-resource="importSettings" for="file-upload" class="custom-file-upload mb-2">
 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /> </svg></label>
+								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /> </svg>
+						</label>
 						<input id="file-upload" type="file" accept="application/json"/>
 						<label data-resource="exportSettings" id="file-download" class="custom-file-upload">
 							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" /> </svg></label>
+								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" /> </svg>
+						</label>
 						<div id="file">&nbsp;</div>
 					</div>
 				</div>
@@ -355,6 +357,7 @@
 					<div class="col-xl-12 mb-3">
 						<div class="listcontent"id="VKTab" style="display: none;">
 							<button class="addButton mt-0" data-resource="addButton" id="AddVK"></button>
+							<button class="float-right">Очистить куки</button>
 							<span id="addVKdiv">&nbsp;</span>
 							<div id="VKList"></div>
 						</div>
@@ -370,12 +373,18 @@
 									<option value="socks4">socks4</option>
 									<option value="socks5">socks5</option>
 								</select>
-								<input name="login" id="login" placeholder="login">
-								<input name="password" id="password" placeholder="password">
+								<input type="text" name="login" id="login" placeholder="login">
+								<input type="password" name="password" id="password" placeholder="password">
                                 <button class="addButton" data-resource="addButton" id="submitAddProxy" type="submit"></button>
                             </form>
-                            <label class="addButton" data-resource="importProxy" for="importProxy" type="click"></label>
-                            <input id="importProxy" type="file" accept=".txt"/>
+                            <span class="d-block">
+                            	<label class="addButton mt-0" data-resource="importProxy" for="importProxy">
+                            		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
+									<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /> </svg>
+                            	</label>
+                            	<input id="importProxy" type="file" accept=".txt"/>
+                            	<button class="float-right" style="margin-top: -9px;">Удалить всё</button>
+							</span>	
                             <span id="addProxydiv">&nbsp;</span>
                             <div id="ProxyList"></div>
                         </div>
