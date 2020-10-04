@@ -2,6 +2,10 @@ vote();
 function vote () {
 	chrome.storage.local.get('AVMRprojectsTopMinecraftServers', function(result) {
 		try {
+			//Если мы находимся на странице проверки CloudFlare
+			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+				return;
+			}
 			if (document.querySelector("body > div.container > div > div > div.alert.alert-danger") != null) {
 				if (document.querySelector("body > div.container > div > div > div.alert.alert-danger").textContent.includes('already voted')) {
                     sendMessage('later');

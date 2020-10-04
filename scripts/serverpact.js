@@ -2,6 +2,10 @@ vote();
 function vote () {
 	chrome.storage.local.get('AVMRprojectsServerPact', async function(result) {
 		try {
+			//Если мы находимся на странице проверки CloudFlare
+			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+				return;
+			}
 			if (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {
 				sendMessage('successfully');
 			} else if (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || document.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {

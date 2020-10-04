@@ -21,13 +21,12 @@ this.check2 = setInterval(()=>{
 
 //Проверяет прошла ли проверка ReCaptcha или hCaptcha
 let notified = false;
-this.check4 = setInterval(()=>{
+this.check3 = setInterval(()=>{
    	if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || document.getElementsByClassName('checkbox checked').length >= 1) {
    		window.top.postMessage('vote', '*');
    		clearInterval(this.check);
    		clearInterval(this.check2);
    		clearInterval(this.check3);
-   		clearInterval(this.check4);
    	}
    	if (document.querySelector("#solver-button") == null && !notified && document.querySelector("#recaptcha-verify-button") != null && !document.referrer.includes('minecraft-mp')) {
    	    notified = true;

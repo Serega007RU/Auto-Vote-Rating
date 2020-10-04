@@ -2,6 +2,10 @@ vote();
 function vote () {
 	chrome.storage.local.get('AVMRprojectsMinecraftIpList', async function(result) {
 		try {
+			//Если мы находимся на странице проверки CloudFlare
+			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+				return;
+			}
 			if (document.querySelector("#Content > div.Error") != null) {
                 if (document.querySelector("#Content > div.Error").textContent.includes('You did not complete the crafting table correctly')) {
 				    sendMessage('Не удалось пройти капчу');
