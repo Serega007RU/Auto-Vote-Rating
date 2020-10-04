@@ -1172,8 +1172,6 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 
 //Слушатель ошибок net::ERR для вкладок
 chrome.webNavigation.onErrorOccurred.addListener(function (details) {
-	console.log(details);
-	return;
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
 	if (details.error.includes('net::ERR_ABORTED')) return;
