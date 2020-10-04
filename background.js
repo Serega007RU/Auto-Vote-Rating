@@ -360,7 +360,8 @@ async function newWindow(project) {
 					  scheme: proxy.scheme,
 					  host: proxy.ip,
 					  port: proxy.port
-					}
+					},
+					bypassList: ["*.vk.com"]
 				  }
 				};
 				let setProxy = new Promise(resolve => {
@@ -386,7 +387,7 @@ async function newWindow(project) {
         if (project.TopCraft) {
             url = '.topcraft.ru'
         } else if (project.McTOP) {
-        	url = '.mctop.ru'
+        	url = '.mctop.su'
         } else if (project.MCRate) {
         	url = '.mcrate.su'
         } else if (project.MinecraftRating) {
