@@ -152,11 +152,6 @@ async function initializeConfig() {
         chrome.proxy.settings.get({}, async function(config) {
             if (config && config.value && config.value.mode && config.value.mode == 'fixed_servers') {
 				//Прекращаем использование прокси
-				let clearProxy = new Promise(resolve => {
-					chrome.proxy.settings.clear({scope: 'regular'},function() {
-						resolve();
-					});
-				});
 				await clearProxy;
             }
         });
@@ -202,7 +197,7 @@ async function checkOpen(project) {
 	//Таймаут для голосования, если попыток срабатывая превышает retryCoolDown (5 минут) или retryCoolDownEmulation (15 минут), разрешает снова попытаться проголосовать
 	let has = false;
 	let rcd;
-	if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
+	if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || settings.useMultiVote) {
         rcd = retryCoolDown;
 	} else {
 		rcd = retryCoolDownEmulation;
@@ -214,7 +209,15 @@ async function checkOpen(project) {
         	    retryProjects.set(key, 1);
         	    for (let value2 of queueProjects) {
                     if (value2.nick == project.nick && value2.id == project.id && getProjectName(value2) == getProjectName(project)) {
-                        queueProjects.delete(value2)
+                        queueProjects.delete(value2);
+                        //Если прошёл таймаут то прокси засчитывается как нерабочий
+                        if (settings.useMultiVote && currentProxy != null) {
+							await clearProxy;
+							currentProxy.notWorking = true;
+							await setValue('AVMRproxies', proxies);
+							currentProxy = null;
+							currentVK = null;
+                        }
                     }
 	            }
         	} else if (value >= 1) {
@@ -1169,6 +1172,8 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 
 //Слушатель ошибок net::ERR для вкладок
 chrome.webNavigation.onErrorOccurred.addListener(function (details) {
+	console.log(details);
+	return;
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
 	if (details.error.includes('net::ERR_ABORTED')) return;
@@ -1239,11 +1244,6 @@ async function endVote(message, sender, project) {
 	}
 	if (settings.useMultiVote) {
 		//Прекращаем использование прокси
-		let clearProxy = new Promise(resolve => {
-			chrome.proxy.settings.clear({scope: 'regular'},function() {
-				resolve();
-			});
-		});
         await clearProxy;
 	}
 	//Если усё успешно
@@ -1328,21 +1328,19 @@ async function endVote(message, sender, project) {
 		}
 
 		if (settings.useMultiVote) {
-			if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+            if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
 				let usedProject = {};
 				usedProject.id = project.id;
 				usedProject.nextFreeVote = time;
 				getTopFromList(currentVK, project).push(usedProject);
-				VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
 				await setValue('AVMRVKs', VKs);
 				currentVK = null;
-			}
-			if (currentProxy != null && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
+            }
+			if (currentProxy != null) {
 				let usedProject = {};
 				usedProject.id = project.id;
 				usedProject.nextFreeVote = time;
 				getTopFromList(currentProxy, project).push(usedProject);
-				proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy;
 				await setValue('AVMRproxies', proxies);
 				currentProxy = null;
 			}
@@ -1368,16 +1366,12 @@ async function endVote(message, sender, project) {
 		if (project.MonitoringMinecraft && message.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
 			clearCookieMonitoringMinecraft = false;
 		} else if (settings.useMultiVote) {
-			if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (message.includes(' ВК') || message.includes(' VK'))) {
-				if (currentVK != null && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+			if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (message.includes(' ВК') || message.includes(' VK')) && currentVK != null) {
 					currentVK.notWorking = true;
-					VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
 					await setValue('AVMRVKs', VKs);
 					currentVK = null;
-				}
-			} else if (currentProxy != null && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
+			} else if (currentProxy != null) {
 				currentProxy.notWorking = true;
-				proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy;
 				await setValue('AVMRproxies', proxies);
 				currentProxy = null;
 			}
@@ -1557,6 +1551,12 @@ async function setValue(key, value) {
         });
     });
 }
+
+let clearProxy = new Promise(resolve => {
+    chrome.proxy.settings.clear({scope: 'regular'},function() {
+        resolve();
+    });
+});
 
 function forLoopAllProjects (fuc) {
     for (let proj of projectsTopCraft) {
