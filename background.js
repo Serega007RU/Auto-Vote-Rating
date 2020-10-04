@@ -240,7 +240,7 @@ async function checkOpen(project) {
 	    	}
 	    }
     }
-    if (!clearCookieMonitoringMinecraft) {
+    if (project.MonitoringMinecraft && !clearCookieMonitoringMinecraft) {
     	clearCookieMonitoringMinecraft = true;
     }
 
@@ -987,6 +987,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
+	if (details.error.includes('net::ERR_ABORTED')) return;
 	let sender = {};
 	sender.tab = {};
 	sender.tab.id = details.tabId;
@@ -1009,7 +1010,8 @@ chrome.webNavigation.onErrorOccurred.addListener(function (details) {
           {hostSuffix: 'topminecraftservers.org'},
           {hostSuffix: 'minecraftservers.biz'},
           {hostSuffix: 'hotmc.ru'},
-          {hostSuffix: 'minecraft-server.net'}
+          {hostSuffix: 'minecraft-server.net'},
+          {hostSuffix: 'vk.com'}
           ]});
 
 //Слушатель сообщений и ошибок
