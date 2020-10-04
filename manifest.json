@@ -20,7 +20,7 @@
       "64": "images/icon64.png",
       "128": "images/icon128.png"
    },
-   "permissions": [ "cookies", "storage", "notifications", "background", "\u003Call_urls>", "webRequest", "webRequestBlocking", "webNavigation" ],
+   "permissions": [ "cookies", "storage", "notifications", "background", "\u003Call_urls>", "webRequest", "webRequestBlocking", "webNavigation", "proxy" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
    "version": "3.2.2",
    "default_locale": "ru",

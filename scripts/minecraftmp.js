@@ -2,6 +2,10 @@ vote();
 function vote () {
 	chrome.storage.local.get('AVMRprojectsMinecraftMp', function(result) {
 		try {
+			//Если мы находимся на странице проверки CloudFlare
+			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+				return;
+			}
 			if (document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong") != null && document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong").textContent.includes('Thank you for your vote!')) {
                 sendMessage('successfully');
                 return;

@@ -2,6 +2,10 @@
 function vote () {
 	chrome.storage.local.get('AVMRprojectsMinecraftServerList', function(result) {
 		try {
+			//Если мы находимся на странице проверки CloudFlare
+			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+				return;
+			}
 			if (document.querySelector("#voteerror > font") != null && document.querySelector("#voteerror > font").textContent.includes('Thanks, Vote Registered')) {
                 sendMessage('successfully');
                 return;

@@ -8,6 +8,10 @@ vote(true);
 function vote(first) {
 	chrome.storage.local.get('AVMRprojectsMinecraftServerNet', function(result) {
 		try {
+			//Если мы находимся на странице проверки CloudFlare
+			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+				return;
+			}
             //Если есть сообщение
             if (document.querySelector('h4[class="alert-heading text-center"]') != null) {
             	if (document.querySelector('h4[class="alert-heading text-center"]').textContent.includes('Vote Successful')) {

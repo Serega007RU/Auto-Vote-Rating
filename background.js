@@ -974,13 +974,39 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (details.frameId != 0) {
 		let project = openedProjects.get(details.tabId);
 		if (project == null) return;
-		if (project.ServeurPrive || project.IonMc || project.MinecraftServersBiz || project.MinecraftServersBiz || project.MinecraftServersOrg || project.MinecraftMp || project.HotMC || project.MinecraftServerNet) {
+// 		if (project.ServeurPrive || project.IonMc || project.MinecraftServersBiz || project.MinecraftServersBiz || project.MinecraftServersOrg || project.MinecraftMp || project.HotMC || project.MinecraftServerNet) {
 			chrome.tabs.executeScript(details.tabId, {file: "scripts/captchaclicker.js", frameId: details.frameId});
-		}
+// 		}
 	}
 }, {url: [{hostSuffix: 'hcaptcha.com'},
           {hostSuffix: 'recaptcha.net'},
           {urlContains: '://www.google.com/recaptcha/'}
+          ]});
+
+//Слушатель ошибок net::ERR для вкладок
+chrome.webNavigation.onErrorOccurred.addListener(function (details) {
+	let project = openedProjects.get(details.tabId);
+	if (project == null) return;
+	endVote(chrome.i18n.getMessage('errorVoteUnknown') + details.error, null, project);
+}, {url: [{hostSuffix: 'topcraft.ru'},
+          {hostSuffix: 'mctop.su'},
+          {hostSuffix: 'mcrate.su'},
+          {hostSuffix: 'minecraftrating.ru'},
+          {hostSuffix: 'monitoringminecraft.ru'},
+          {hostSuffix: 'fairtop.in'},
+          {hostSuffix: 'ionmc.top'},
+          {hostSuffix: 'minecraftservers.org'},
+          {hostSuffix: 'serveur-prive.net'},
+          {hostSuffix: 'planetminecraft.com'},
+          {hostSuffix: 'topg.org'},
+          {hostSuffix: 'minecraft-mp.com'},
+          {hostSuffix: 'minecraft-server-list.com'},
+          {hostSuffix: 'serverpact.com'},
+          {hostSuffix: 'minecraftiplist.com'},
+          {hostSuffix: 'topminecraftservers.org'},
+          {hostSuffix: 'minecraftservers.biz'},
+          {hostSuffix: 'hotmc.ru'},
+          {hostSuffix: 'minecraft-server.net'}
           ]});
 
 //Слушатель сообщений и ошибок
@@ -1854,14 +1880,14 @@ v3.2.2
 CubeCraft оказался жопой с ручкой который не даёт награду за голосование если вы не на сервере и поэтому вместо него в списке Legends Evolved
 Исправлена ошибка неверного подсчёта сделанных голосов в день для ServeurPrive
 
-v3.2.3
+v3.3.0
 Добавлен новый топ - HotMC по просьбе asphaltnoises#4557
 Добавлен новый топ - MinecraftServerNet по просьбе MaketBoss#0133
 Для FairTop и MonitoringMinecraft теперь адекватно очищаются куки что бы можно было голосовать в 1 день за несколько проектов (а не только за 1)
 Из-за тупых вопросов от пользователей расширения теперь Custom скрыт (его теперь нужно вручную включать в консоле addCustom();) и MinecraftServersOrg теперь не скрыт но пользователей предупреждает что лучше всего его использовать с расширением Privacy Pass
-
-Планируется:
-Полная реализация MultiVote (следует разобраться с работой прокси, впн, ип ротатора или ещё чего-нибудь)
+Для режима эмуляции теперь расширение видит ошибки net::ERR
+Теперь для всех топов расширение ищет капчу
+Исправление ошибки если мы натыкаемся на проверку CloudFlare, расширение теперь ждёт когда сам пользователь пройдёт эту проврку
 
 https://minecraftservers.org/ под вопросом насчёт капчи
 https://www.minetrack.net/ на момент проверки сайт лежал
