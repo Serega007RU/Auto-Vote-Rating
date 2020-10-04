@@ -278,7 +278,7 @@ async function checkOpen(project) {
 	    	}
 	    }
     }
-    if (!clearCookieMonitoringMinecraft) {
+    if (project.MonitoringMinecraft && !clearCookieMonitoringMinecraft) {
     	clearCookieMonitoringMinecraft = true;
     }
 
@@ -1168,21 +1168,10 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
           ]});
 
 //Слушатель ошибок net::ERR для вкладок
-chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
+chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
-	if (details.error.includes('net::ERR_ABORTED')) {
-		setTimeout(() => {
-			if (openedProjects.get(details.tabId) == null) {
-				return;
-			}
-			let sender = {};
-			sender.tab = {};
-			sender.tab.id = details.tabId;
-			endVote(chrome.i18n.getMessage('errorVoteUnknown') + details.error, sender, project);
-		}, 60000);
-		return;
-	}
+	if (details.error.includes('net::ERR_ABORTED')) return;
 	let sender = {};
 	sender.tab = {};
 	sender.tab.id = details.tabId;
