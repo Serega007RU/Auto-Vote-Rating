@@ -455,22 +455,22 @@ async function newWindow(project) {
 				})
 			}
 			if (project.TopCraft) {
-				chrome.tabs.create({"url":"https://topcraft.ru/servers/" + project.id + "/", "selected":false}, function(tab) {
+				chrome.tabs.create({"url":"https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
 			if (project.McTOP) {
-				chrome.tabs.create({"url":"https://mctop.su/servers/" + project.id + "/", "selected":false}, function(tab) {
+				chrome.tabs.create({"url":"https://mctop.su/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
 			if (project.MCRate) {
-				chrome.tabs.create({"url":"http://mcrate.su/rate/" + project.id, "selected":false}, function(tab) {
+				chrome.tabs.create({"url":"https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=" + project.id + "&response_type=code", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
 			if (project.MinecraftRating) {
-				chrome.tabs.create({"url":"http://minecraftrating.ru/projects/" + project.id + "/", "selected":false}, function(tab) {
+				chrome.tabs.create({"url":"https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/" + project.id + "/&state=" + project.nick + "&response_type=code&v=5.45", "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
@@ -556,7 +556,7 @@ async function newWindow(project) {
 async function silentVote(project) {
 	try {
         if (project.TopCraft) {
-			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id)
+			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/")
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
 				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
@@ -587,7 +587,7 @@ async function silentVote(project) {
 	    }
 
 	    if (project.McTOP) {
-			let response = await fetch("https://mctop.su/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id)
+			let response = await fetch("https://mctop.su/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/")
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
 				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
