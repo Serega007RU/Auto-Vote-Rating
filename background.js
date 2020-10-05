@@ -240,7 +240,7 @@ async function checkOpen(project) {
     if (settings.useMultiVote) {
     	//Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
         if (queueProjects.size > 0) {
-        	if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
+        	if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && currentVK != null) {
                 let usedProjects = getTopFromList(currentVK, project);
 				for (let usedProject of usedProjects) {
 					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
@@ -248,12 +248,14 @@ async function checkOpen(project) {
 					}
 				}
         	}
-            let usedProjects = getTopFromList(currentProxy, project);
-			for (let usedProject of usedProjects) {
-				if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
-                    return;
+        	if (currentProxy != null) {
+				let usedProjects = getTopFromList(currentProxy, project);
+				for (let usedProject of usedProjects) {
+					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+						return;
+					}
 				}
-			}
+        	}
         }
     }
 
