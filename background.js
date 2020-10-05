@@ -1111,7 +1111,7 @@ async function silentVote(project) {
 	    }
     } catch (e) {
     	if (e.name == 'AbortError') {
-    		console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' Fetch запрос прерван')
+    		console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' Fetch запрос прерван ' + e);
     	} else if (e == 'TypeError: Failed to fetch') {
           	endVote(chrome.i18n.getMessage('notConnectInternet'), null, project);
         } else {
