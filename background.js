@@ -230,14 +230,28 @@ async function checkOpen(project) {
 	}
     
     
+	for (let value of queueProjects) {
+		//Не позволяет открыть больше одной вкладки для одного топа
+		if (getProjectName(value) == getProjectName(project)) return;
+	}
     if (settings.useMultiVote) {
-    	//Не позволяет голосовать больше 1-го проекта если включён MultiVote
-        if (queueProjects.size > 0) return;
-    } else {
-		for (let value of queueProjects) {
-			//Не позволяет открыть больше одной вкладки для одного топа
-			if (getProjectName(value) == getProjectName(project)) return;
-		}
+    	//Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
+        if (queueProjects.size > 0) {
+        	if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
+                let usedProjects = getTopFromList(currentVK, project);
+				for (let usedProject of usedProjects) {
+					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+                        return;
+					}
+				}
+        	}
+            let usedProjects = getTopFromList(currentProxy, project);
+			for (let usedProject of usedProjects) {
+				if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+                    return;
+				}
+			}
+        }
     }
 
 	queueProjects.add(project);
@@ -1224,26 +1238,7 @@ async function endVote(message, sender, project) {
         });
         project = openedProjects.get(sender.tab.id);
         openedProjects.delete(sender.tab.id);
-	} else if (!project) return;//Если сообщение пришло от вкладки от другого расширения
-	if (cooldown < 10000 && !settings.useMultiVote) {
-		setTimeout(() => {
-			for (let value of queueProjects) {
-				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
-					queueProjects.delete(value)
-				}
-			}
-		}, 10000);
-	} else {
-		for (let value of queueProjects) {
-			if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
-				queueProjects.delete(value)
-			}
-		}
-	}
-	if (settings.useMultiVote) {
-		//Прекращаем использование прокси
-        await clearProxy;
-	}
+	} else if (!project) return;//Что?
 	//Если усё успешно
 	if (message == "successfully" || message.includes("later")) {
 	    for (let [key, value] of retryProjects.entries()) {
@@ -1332,7 +1327,6 @@ async function endVote(message, sender, project) {
 				usedProject.nextFreeVote = time;
 				getTopFromList(currentVK, project).push(usedProject);
 				await setValue('AVMRVKs', VKs);
-				currentVK = null;
             }
 			if (currentProxy != null) {
 				let usedProject = {};
@@ -1340,7 +1334,11 @@ async function endVote(message, sender, project) {
 				usedProject.nextFreeVote = time;
 				getTopFromList(currentProxy, project).push(usedProject);
 				await setValue('AVMRproxies', proxies);
+			}
+			if (queueProjects.size == 1) {
+				await clearProxy;
 				currentProxy = null;
+				currentVK = null;
 			}
 		}
 
@@ -1365,20 +1363,21 @@ async function endVote(message, sender, project) {
 			clearCookieMonitoringMinecraft = false;
 		} else if (settings.useMultiVote) {
 			if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (message.includes(' ВК') || message.includes(' VK')) && currentVK != null) {
-					currentVK.notWorking = true;
-					await setValue('AVMRVKs', VKs);
-					currentVK = null;
+				currentVK.notWorking = true;
+				await setValue('AVMRVKs', VKs);
 			} else if (currentProxy != null) {
 				currentProxy.notWorking = true;
 				await setValue('AVMRproxies', proxies);
-				currentProxy = null;
 			}
-
-			for (let [key, value] of retryProjects.entries()) {
-				if (key.nick == project.nick && key.id == project.id && getProjectName(key) == getProjectName(project)) {
-					retryProjects.delete(key);
-				}
+			await clearProxy;
+			currentVK = null;
+			currentProxy = null;
+            retryProjects.clear();
+            queueProjects.clear();
+			for (let [key, value] of openedProjects.entries()) {
+				chrome.tabs.remove(key);
 			}
+            openedProjects.clear();
 		}
 		let sendMessage;
 		if (settings.useMultiVote) {
@@ -1397,6 +1396,21 @@ async function endVote(message, sender, project) {
 	//	console.error(message);
     //    if (!settings.disabledNotifError) sendNotification('Непредвиденная ошибка', message);
 	//}
+	if (cooldown < 10000 && !settings.useMultiVote) {
+		setTimeout(() => {
+			for (let value of queueProjects) {
+				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+					queueProjects.delete(value)
+				}
+			}
+		}, 10000);
+	} else {
+		for (let value of queueProjects) {
+			if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+				queueProjects.delete(value)
+			}
+		}
+	}
 }
 
 //Отправитель уведомлений
