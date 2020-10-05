@@ -183,11 +183,26 @@ async function checkVote() {
     	}
     }
     
-	await forLoopAllProjects(await async function (proj) {
+// 	forLoopAllProjects(async function (proj) {
+// 		if (proj.time == null || proj.time < Date.now()) {
+//             await checkOpen(proj);
+// 		}
+// 	});
+    for (let proj of projectsTopCraft) {
 		if (proj.time == null || proj.time < Date.now()) {
             await checkOpen(proj);
 		}
-	});
+    }
+    for (let proj of projectsMcTOP) {
+		if (proj.time == null || proj.time < Date.now()) {
+            await checkOpen(proj);
+		}
+    }
+    for (let proj of projectsMCRate) {
+		if (proj.time == null || proj.time < Date.now()) {
+            await checkOpen(proj);
+		}
+    }
 }
 
 async function checkOpen(project) {
@@ -309,9 +324,6 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
-// 	if (controller.signal) {
-// 		controller = new AbortController();
-// 	}
 	//Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
 	if (settings.useMultiVote) {
 		if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && currentVK == null) {
@@ -392,6 +404,8 @@ async function newWindow(project) {
 					};
 					await setProxy(config);
 
+					await wait(15000);
+
 					currentProxy = proxy;
 					break;
 				}
@@ -466,8 +480,9 @@ async function newWindow(project) {
     		silentVoteMode = true;
     	}
     }
+    console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (settings.enabledSilentVote ? ' Начинаю Fetch запрос' : ' Открываю вкладку'));
 	if (silentVoteMode) {
-        await silentVote(project);
+        silentVote(project);
 	} else {
 		chrome.windows.getCurrent(function(win) {
 			if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError);}
@@ -576,6 +591,9 @@ async function newWindow(project) {
 }
 
 async function silentVote(project) {
+	if (controller.signal) {
+		controller = new AbortController();
+	}
 	try {
         if (project.TopCraft) {
 			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/", {signal: controller.signal})
@@ -1401,7 +1419,7 @@ async function endVote(message, sender, project) {
 					}
 				});
 			}
-// 			controller.abort();
+			controller.abort();
             openedProjects.clear();
 		}
 		let sendMessage;
@@ -1421,14 +1439,14 @@ async function endVote(message, sender, project) {
 	//	console.error(message);
     //    if (!settings.disabledNotifError) sendNotification('Непредвиденная ошибка', message);
 	//}
-	if (cooldown < 10000 && !settings.useMultiVote) {
+	if (cooldown < 10000) {
 		setTimeout(() => {
 			for (let value of queueProjects) {
 				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
 					queueProjects.delete(value)
 				}
 			}
-		}, 10000);
+		}, settings.useMultiVote ? 3000 : 10000);
 	} else {
 		for (let value of queueProjects) {
 			if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
@@ -1600,13 +1618,13 @@ async function clearProxy() {
 async function setProxy(config) {
     return new Promise(resolve => {
         chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
-		    resolve();
+            resolve();
 		});
 	});
 }
 
 async function wait(ms) {
-	return new Promise(resolve => {
+    return new Promise(resolve => {
 		setTimeout(() => {
 			resolve();
 		}, ms);
