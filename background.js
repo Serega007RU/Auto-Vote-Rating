@@ -183,7 +183,7 @@ async function checkVote() {
     	}
     }
     
-	forLoopAllProjects(async function (proj) {
+	await forLoopAllProjects(await async function (proj) {
 		if (proj.time == null || proj.time < Date.now()) {
             await checkOpen(proj);
 		}
@@ -309,6 +309,9 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
+// 	if (controller.signal) {
+// 		controller = new AbortController();
+// 	}
 	//Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
 	if (settings.useMultiVote) {
 		if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && currentVK == null) {
@@ -326,23 +329,17 @@ async function newWindow(project) {
 				}
                 if (!used) {
                 	found = true;
-
-					//Удаляет все данные с ВК
-					let clearVKData = new Promise(resolve => {
-						chrome.browsingData.remove({
-							"origins": ["https://vk.com"]
-						}, {
-							"cacheStorage": true,
-							"cookies": true,
-							"fileSystems": true,
-							"indexedDB": true,
-							"localStorage": true,
-							"pluginData": true,
-							"serviceWorkers": true,
-							"webSQL": true
-						}, function() {resolve()});
+                    
+					//Удаляет все существующие куки ВК
+					let getVKCookies = new Promise(resolve => {
+						chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+							resolve(cookies);
+						});
 					});
-					await clearVKData;
+					let cookies = await getVKCookies;
+					for(let i=0; i<cookies.length;i++) {
+						await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+					}
 
 					console.log('Применяю куки ВК: ' + vkontakte.id + ' - ' + vkontakte.name);
 					
@@ -409,63 +406,56 @@ async function newWindow(project) {
 			}
         }
 
-        //Очистка данных
+        //Очистка куки
         let url;
         if (project.TopCraft) {
-            url = 'https://topcraft.ru/'
+            url = '.topcraft.ru'
         } else if (project.McTOP) {
-        	url = 'https://mctop.su/'
+        	url = '.mctop.su'
         } else if (project.MCRate) {
-        	url = 'http://mcrate.su/'
+        	url = '.mcrate.su'
         } else if (project.MinecraftRating) {
-        	url = 'http://minecraftrating.ru/'
+        	url = '.minecraftrating.ru'
         } else if (project.MonitoringMinecraft) {
-        	url = 'http://monitoringminecraft.ru/'
+        	url = '.monitoringminecraft.ru'
         } else if (project.FairTop) {
-        	url = 'https://fairtop.in/'
+        	url = '.fairtop.in'
         } else if (project.IonMc) {
-        	url = 'https://ionmc.top/'
+        	url = '.ionmc.top'
         } else if (project.ServeurPrive) {
-        	url = 'https://serveur-prive.net/'
+        	url = '.serveur-prive.net'
         } else if (project.PlanetMinecraft) {
-        	url = 'https://planetminecraft.com/'
+        	url = '.planetminecraft.com'
         } else if (project.TopG) {
-        	url = 'https://topg.org/'
+        	url = '.topg.org'
         } else if (project.MinecraftMp) {
-        	url = 'https://minecraft-mp.com/'
+        	url = '.minecraft-mp.com'
         } else if (project.MinecraftServerList) {
-        	url = 'https://minecraft-server-list.com/'
+        	url = '.minecraft-server-list.com'
         } else if (project.ServerPact) {
-        	url = 'https://serverpact.com/'
+        	url = '.serverpact.com'
         } else if (project.MinecraftIpList) {
-        	url = 'https://minecraftiplist.com/'
+        	url = '.minecraftiplist.com'
         } else if (project.TopMinecraftServers) {
-        	url = 'https://topminecraftservers.org/'
+        	url = '.topminecraftservers.org'
         } else if (project.MinecraftServersBiz) {
-        	url = 'https://minecraftservers.biz/'
+        	url = '.minecraftservers.biz'
         } else if (project.MinecraftServersOrg) {
-        	url = 'https://minecraftservers.org/'
-        } else if (project.HotMC) {
-            url = 'https://hotmc.ru/'
-        } else if (project.MinecraftServerNet) {
-        	url = 'https://minecraft-server.net/'
+        	url = '.minecraftservers.org'
         }
-        
-        let clearData = new Promise(resolve => {
-			chrome.browsingData.remove({
-				"origins": [url]
-			}, {
-				"cacheStorage": true,
-				"cookies": true,
-				"fileSystems": true,
-				"indexedDB": true,
-				"localStorage": true,
-				"pluginData": true,
-				"serviceWorkers": true,
-				"webSQL": true
-			}, function() {resolve()});
-        });
-        await clearData;
+		let getCookies = new Promise(resolve => {
+			chrome.cookies.getAll({domain: url}, function(cookies) {
+				resolve(cookies);
+			});
+		});
+		let cookies = await getCookies;
+		for(let i=0; i<cookies.length;i++) {
+			if (cookies[i].domain.charAt(0) == ".") {
+				await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+			} else {
+				await removeCookie("https://" + cookies[i].domain + cookies[i].path, cookies[i].name);
+			}
+		}
 
 	}
     let silentVoteMode = false;
@@ -477,7 +467,7 @@ async function newWindow(project) {
     	}
     }
 	if (silentVoteMode) {
-        silentVote(project);
+        await silentVote(project);
 	} else {
 		chrome.windows.getCurrent(function(win) {
 			if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError);}
@@ -586,9 +576,6 @@ async function newWindow(project) {
 }
 
 async function silentVote(project) {
-	if (controller.signal) {
-		controller = new AbortController();
-	}
 	try {
         if (project.TopCraft) {
 			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/", {signal: controller.signal})
@@ -1414,7 +1401,7 @@ async function endVote(message, sender, project) {
 					}
 				});
 			}
-			controller.abort();
+// 			controller.abort();
             openedProjects.clear();
 		}
 		let sendMessage;

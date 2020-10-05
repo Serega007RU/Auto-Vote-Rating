@@ -498,7 +498,7 @@ async function removeProjectList(project, visually) {
     }
     //Если в этот момент прокси использовался
     if (settings.useMultiVote && chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
-        if (chrome.extension.getBackgroundPage().currentProxy.ip == proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port == proxy.port) {
+        if (chrome.extension.getBackgroundPage().queueProjects == 0) {
             chrome.extension.getBackgroundPage().currentProxy = null;
             //Прекращаем использование прокси
             await clearProxy();
