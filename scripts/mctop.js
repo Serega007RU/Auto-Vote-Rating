@@ -1,4 +1,6 @@
-vote();
+setTimeout(() => {
+    vote();
+}, 4000);
 function vote () {
 	chrome.storage.local.get('AVMRprojectsMcTOP', function(result) {
 		if (document.URL.includes('.vk')) {

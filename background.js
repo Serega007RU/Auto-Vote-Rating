@@ -164,11 +164,11 @@ async function initializeConfig() {
     retryCoolDown = 300 / (cooldown / 1000);
     retryCoolDownEmulation = 900 / (cooldown / 1000);
     //Проверка на голосование
-    setInterval(function() {checkVote()}, cooldown);
+    setInterval(async function() {await checkVote()}, cooldown);
 }
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
-function checkVote() {
+async function checkVote() {
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) return;
 
     if (stopVote > Date.now()) return;
@@ -188,6 +188,16 @@ function checkVote() {
             await checkOpen(proj);
 		}
 	});
+//     for (let proj of projectsTopCraft) {
+// 		if (proj.time == null || proj.time < Date.now()) {
+//             await checkOpen(proj);
+// 		}
+//     }
+//     for (let proj of projectsMcTOP) {
+// 		if (proj.time == null || proj.time < Date.now()) {
+//             await checkOpen(proj);
+// 		}
+//     }
 }
 
 async function checkOpen(project) {
@@ -1214,7 +1224,9 @@ chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 	let sender = {};
 	sender.tab = {};
 	sender.tab.id = details.tabId;
-	endVote(chrome.i18n.getMessage('errorVoteUnknown') + details.error, sender, project);
+	setTimeout(() => {
+		endVote(chrome.i18n.getMessage('errorVoteUnknown') + details.error, sender, project);
+	}, 3000);
 }, {url: [{hostSuffix: 'topcraft.ru'},
           {hostSuffix: 'mctop.su'},
           {hostSuffix: 'mcrate.su'},
@@ -1343,13 +1355,14 @@ async function endVote(message, sender, project) {
 		}
 
 		if (settings.useMultiVote) {
-            if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-				let usedProject = {};
-				usedProject.id = project.id;
-				usedProject.nextFreeVote = time;
-				getTopFromList(currentVK, project).push(usedProject);
-				await setValue('AVMRVKs', VKs);
-            }
+			//ToDo Serega007 временно отключено для тестирования
+//             if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+// 				let usedProject = {};
+// 				usedProject.id = project.id;
+// 				usedProject.nextFreeVote = time;
+// 				getTopFromList(currentVK, project).push(usedProject);
+// 				await setValue('AVMRVKs', VKs);
+//             }
 			if (currentProxy != null) {
 				let usedProject = {};
 				usedProject.id = project.id;
@@ -1598,66 +1611,66 @@ let clearProxy = new Promise(resolve => {
     });
 });
 
-function forLoopAllProjects (fuc) {
+async function forLoopAllProjects (fuc) {
     for (let proj of projectsTopCraft) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMcTOP) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMCRate) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMinecraftRating) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMonitoringMinecraft) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsFairTop) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsIonMc) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMinecraftServersOrg) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsServeurPrive) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsPlanetMinecraft) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsTopG) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMinecraftMp) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMinecraftServerList) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsServerPact) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMinecraftIpList) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsTopMinecraftServers) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMinecraftServersBiz) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsHotMC) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsMinecraftServerNet) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsCustom) {
-        fuc(proj);
+        await fuc(proj);
     }
 }
 
