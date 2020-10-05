@@ -49,6 +49,9 @@ var stopVote = 0;
 var currentVK;
 var currentProxy;
 
+//Прерывает выполнение fetch запросов на случай ошибки в режиме MultiVote
+var controller = new AbortController();
+
 //Инициализация настроек расширения
 initializeConfig();
 async function initializeConfig() {
@@ -568,9 +571,12 @@ async function newWindow(project) {
 }
 
 async function silentVote(project) {
+	if (controller.signal) {
+		controller = new AbortController();
+	}
 	try {
         if (project.TopCraft) {
-			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/")
+			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/", {signal: controller.signal})
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
 				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
@@ -585,7 +591,7 @@ async function silentVote(project) {
                 return;
 			}
 			let cookie = await getCookie('https://topcraft.ru/', 'csrftoken');
-			response = await fetch("https://topcraft.ru/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
+			response = await fetch("https://topcraft.ru/projects/vote/", {signal: controller.signal, credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 			if (!extractHostname(response.url).includes('topcraft.')) {
 				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
 				return;
@@ -601,7 +607,7 @@ async function silentVote(project) {
 	    }
 
 	    if (project.McTOP) {
-			let response = await fetch("https://mctop.su/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/")
+			let response = await fetch("https://mctop.su/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/", {signal: controller.signal})
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
 				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
@@ -616,7 +622,7 @@ async function silentVote(project) {
                 return;
 			}
 			let cookie = await getCookie('https://mctop.su/', 'csrftoken');
-			response = await fetch("https://mctop.su/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
+			response = await fetch("https://mctop.su/projects/vote/", {signal: controller.signal, credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 			if (!extractHostname(response.url).includes('mctop.')) {
 				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
 				return;
@@ -632,7 +638,7 @@ async function silentVote(project) {
 	    }
 
 	    if (project.MCRate) {
-			let response = await fetch("https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=" + project.id + "&response_type=code");
+			let response = await fetch("https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=" + project.id + "&response_type=code", {signal: controller.signal});
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
 				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
@@ -650,7 +656,7 @@ async function silentVote(project) {
             let doc = new DOMParser().parseFromString(html, "text/html");
             let code = response.url.substring(response.url.length - 18)
             if (doc.querySelector('input[name=login_player]') != null) {
-                await fetch("http://mcrate.su/save/rate", {"headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en-US;q=0.9,en;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","upgrade-insecure-requests":"1"},"referrer":"http://mcrate.su/add/rate?idp=" + project.id + "&code=" + code,"referrerPolicy":"no-referrer-when-downgrade","body":"login_player=" + project.nick + "&token_vk_secure=" + doc.getElementsByName("token_vk_secure").item(0).value + "&uid_vk_secure=" + doc.getElementsByName("uid_vk_secure").item(0).value + "&id_project=" + project.id + "&code_vk_secure=" + doc.getElementsByName("code_vk_secure").item(0).value + "&mcrate_hash=" + doc.getElementsByName("mcrate_hash").item(0).value,"method":"POST"})
+                await fetch("http://mcrate.su/save/rate", {signal: controller.signal, "headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en-US;q=0.9,en;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","upgrade-insecure-requests":"1"},"referrer":"http://mcrate.su/add/rate?idp=" + project.id + "&code=" + code,"referrerPolicy":"no-referrer-when-downgrade","body":"login_player=" + project.nick + "&token_vk_secure=" + doc.getElementsByName("token_vk_secure").item(0).value + "&uid_vk_secure=" + doc.getElementsByName("uid_vk_secure").item(0).value + "&id_project=" + project.id + "&code_vk_secure=" + doc.getElementsByName("code_vk_secure").item(0).value + "&mcrate_hash=" + doc.getElementsByName("mcrate_hash").item(0).value,"method":"POST"})
                 .then(response => response.text().then((html) => {
                 	doc = new DOMParser().parseFromString(html, "text/html");
                 	response = response;
@@ -690,7 +696,7 @@ async function silentVote(project) {
 	    }
 
 	    if (project.MinecraftRating) {
-			let response = await fetch("https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/" + project.id + "/&state=" + project.nick + "&response_type=code&v=5.45");
+			let response = await fetch("https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/" + project.id + "/&state=" + project.nick + "&response_type=code&v=5.45", {signal: controller.signal});
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
 				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
@@ -749,7 +755,7 @@ async function silentVote(project) {
 	    }
 
 	    if (project.MonitoringMinecraft) {
-			let response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
+			let response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {signal: controller.signal, "headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
 				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
@@ -773,7 +779,7 @@ async function silentVote(project) {
 				return;
 			}
 			if (doc.querySelector("input[name=player]") != null) {
-                response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
+                response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {signal: controller.signal, "headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
 			    host = extractHostname(response.url);
 			    if (!host.includes('monitoringminecraft.')) {
                     endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
@@ -823,6 +829,7 @@ async function silentVote(project) {
 
 	    if (project.ServerPact) {
 			let response = await fetch("https://www.serverpact.com/vote-" + project.id, {
+			  signal: controller.signal,
 			  "headers": {
 				"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
 				"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
@@ -862,6 +869,7 @@ async function silentVote(project) {
             }
             let captchaPass = generatePass(32);
             let captcha = await fetch("https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php", {
+              signal: controller.signal,
 			  "headers": {
 			 	"accept": "application/json, text/javascript, */*; q=0.01",
 				"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
@@ -886,6 +894,7 @@ async function silentVote(project) {
 			}
 
 			let response2 = await fetch("https://www.serverpact.com/vote-" + project.id, {
+				signal: controller.signal,
 				"headers": {
 					"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
 					"accept-language": "ru,en;q=0.9,en-US;q=0.8",
@@ -923,6 +932,7 @@ async function silentVote(project) {
 
 	    if (project.MinecraftIpList) {
 			let response = await fetch("https://www.minecraftiplist.com/index.php?action=vote&listingID=" + project.id, {
+			  signal: controller.signal,
 			  "headers": {
 				"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
 				"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
@@ -959,6 +969,7 @@ async function silentVote(project) {
             		return;
             	}
 				await fetch("https://www.minecraftiplist.com/timezone.php?timezone=Europe/Moscow", {
+				  signal: controller.signal,
 				  "headers": {
 					"accept": "*/*",
 					"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
@@ -1027,6 +1038,7 @@ async function silentVote(project) {
 			}
 
 			response = await fetch("https://www.minecraftiplist.com/index.php?action=vote&listingID=" + project.id, {
+			  signal: controller.signal,
 			  "headers": {
 				"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
 				"accept-language": "ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7",
@@ -1098,7 +1110,9 @@ async function silentVote(project) {
 	    	}
 	    }
     } catch (e) {
-        if (e == 'TypeError: Failed to fetch') {
+    	if (e.name == 'AbortError') {
+    		console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' Fetch запрос прерван')
+    	} else if (e == 'TypeError: Failed to fetch') {
           	endVote(chrome.i18n.getMessage('notConnectInternet'), null, project);
         } else {
         	console.error(e);
@@ -1377,6 +1391,7 @@ async function endVote(message, sender, project) {
 			for (let [key, value] of openedProjects.entries()) {
 				chrome.tabs.remove(key);
 			}
+			controller.abort();
             openedProjects.clear();
 		}
 		let sendMessage;
