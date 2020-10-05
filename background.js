@@ -311,7 +311,7 @@ async function checkOpen(project) {
 async function newWindow(project) {
 	//Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
 	if (settings.useMultiVote) {
-		if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
+		if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && currentVK == null) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false;
             for (let vkontakte of VKs) {
@@ -358,50 +358,52 @@ async function newWindow(project) {
 			}
 		}
 
-		//Ищет не юзанный свободный прокси
-        let found = false;
-        for (let proxy of proxies) {
-        	if (proxy.notWorking) continue;
-            let usedProjects = getTopFromList(proxy, project);
-            let used = false;
-			for (let usedProject of usedProjects) {
-				if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
-					used = true;
+        if (currentProxy == null) {
+			//Ищет не юзанный свободный прокси
+			let found = false;
+			for (let proxy of proxies) {
+				if (proxy.notWorking) continue;
+				let usedProjects = getTopFromList(proxy, project);
+				let used = false;
+				for (let usedProject of usedProjects) {
+					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+						used = true;
+						break;
+					}
+				}
+				if (!used) {
+					found = true;
+					currentProxy = proxy;
+					//Применяет найденный незаюзанный свободный прокси
+					console.log('Применяю прокси: ' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme);
+					var config = {
+					  mode: "fixed_servers",
+					  rules: {
+						singleProxy: {
+						  scheme: proxy.scheme,
+						  host: proxy.ip,
+						  port: proxy.port
+						},
+						bypassList: ["*vk.com", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com"]
+					  }
+					};
+					let setProxy = new Promise(resolve => {
+						chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
+							resolve();
+						});
+					});
+					await setProxy;
 					break;
 				}
 			}
-            if (!used) {
-            	found = true;
-            	currentProxy = proxy;
-                //Применяет найденный незаюзанный свободный прокси
-                console.log('Применяю прокси: ' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme);
-                var config = {
-				  mode: "fixed_servers",
-				  rules: {
-					singleProxy: {
-					  scheme: proxy.scheme,
-					  host: proxy.ip,
-					  port: proxy.port
-					},
-					bypassList: ["*vk.com", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com"]
-				  }
-				};
-				let setProxy = new Promise(resolve => {
-					chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
-						resolve();
-					});
-				});
-                await setProxy;
-				break;
-            }
-        }
 
-        //Если не удалось найти хотя бы одно свободное не заюзанное прокси то приостанавливает ВСЁ авто-голосование на 24 часа
-        if (!found) {
-        	stopVote = new Date().setDate(new Date().getDate() + 1);
-        	console.error(chrome.i18n.getMessage('notFoundProxy'));
-            if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('notFoundProxyTitle'), chrome.i18n.getMessage('notFoundProxy'));
-            return;
+			//Если не удалось найти хотя бы одно свободное не заюзанное прокси то приостанавливает ВСЁ авто-голосование на 24 часа
+			if (!found) {
+				stopVote = new Date().setDate(new Date().getDate() + 1);
+				console.error(chrome.i18n.getMessage('notFoundProxy'));
+				if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('notFoundProxyTitle'), chrome.i18n.getMessage('notFoundProxy'));
+				return;
+			}
         }
 
         //Очистка куки
