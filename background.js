@@ -183,9 +183,9 @@ function checkVote() {
     	}
     }
     
-	forLoopAllProjects(function (proj) {
+	forLoopAllProjects(async function (proj) {
 		if (proj.time == null || proj.time < Date.now()) {
-            checkOpen(proj);
+            await checkOpen(proj);
 		}
 	});
 }
@@ -304,7 +304,7 @@ async function checkOpen(project) {
     	clearCookieMonitoringMinecraft = true;
     }
 
-	newWindow(project);
+	await newWindow(project);
 }
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
@@ -326,7 +326,6 @@ async function newWindow(project) {
 				}
                 if (!used) {
                 	found = true;
-                	currentVK = vkontakte;
 
 					//Удаляет все существующие куки ВК
 					let getVKCookies = new Promise(resolve => {
@@ -346,6 +345,8 @@ async function newWindow(project) {
 						let cookie = vkontakte.cookies[i];
 						await setCookieDetails({url: "https://" + cookie.domain.substring(1, cookie.domain.length) + cookie.path, name: cookie.name, value: cookie.value, domain: cookie.domain, path: cookie.path, secure: cookie.secure, httpOnly: cookie.httpOnly, sameSite: cookie.sameSite, expirationDate: cookie.expirationDate, storeId: cookie.storeId});
 					}
+
+					currentVK = vkontakte;
 					break;
                 }
             }
@@ -373,7 +374,6 @@ async function newWindow(project) {
 				}
 				if (!used) {
 					found = true;
-					currentProxy = proxy;
 					//Применяет найденный незаюзанный свободный прокси
 					console.log('Применяю прокси: ' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme);
 					var config = {
@@ -393,6 +393,8 @@ async function newWindow(project) {
 						});
 					});
 					await setProxy;
+
+					currentProxy = proxy;
 					break;
 				}
 			}
@@ -1132,7 +1134,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (project.TopCraft) {
         chrome.tabs.executeScript(details.tabId, {file: "scripts/topcraft.js"});
 	} else if (project.McTOP) {
-        setTimeout(() => chrome.tabs.executeScript(details.tabId, {file: "scripts/mctop.js"}), 5000);
+        chrome.tabs.executeScript(details.tabId, {file: "scripts/mctop.js"});
 	} else if (project.MCRate) {
 		chrome.tabs.executeScript(details.tabId, {file: "scripts/mcrate.js"});
 	} else if (project.MinecraftRating) {
@@ -1193,6 +1195,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (details.frameId != 0) {
 		let project = openedProjects.get(details.tabId);
 		if (project == null) return;
+		if (project.TopCraft || project.McTOP || project.MCRate) return;
 // 		if (project.ServeurPrive || project.IonMc || project.MinecraftServersBiz || project.MinecraftServersBiz || project.MinecraftServersOrg || project.MinecraftMp || project.HotMC || project.MinecraftServerNet) {
 			chrome.tabs.executeScript(details.tabId, {file: "scripts/captchaclicker.js", frameId: details.frameId});
 // 		}
@@ -1394,7 +1397,12 @@ async function endVote(message, sender, project) {
             retryProjects.clear();
             queueProjects.clear();
 			for (let [key, value] of openedProjects.entries()) {
-				chrome.tabs.remove(key);
+				chrome.tabs.remove(key, function() {
+					if (chrome.runtime.lastError) {
+						console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
+						if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
+					}
+				});
 			}
 			controller.abort();
             openedProjects.clear();
