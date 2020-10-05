@@ -501,12 +501,7 @@ async function removeProjectList(project, visually) {
         if (chrome.extension.getBackgroundPage().currentProxy.ip == proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port == proxy.port) {
             chrome.extension.getBackgroundPage().currentProxy = null;
             //Прекращаем использование прокси
-            let clearProxy = new Promise(resolve => {
-                chrome.proxy.settings.clear({scope: 'regular'},function() {
-                    resolve();
-                });
-            });
-            await clearProxy;
+            await clearProxy();
         }
     }
 }
@@ -540,12 +535,7 @@ async function removeProxyList(proxy, visually) {
         if (chrome.extension.getBackgroundPage().currentProxy.ip == proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port == proxy.port) {
             chrome.extension.getBackgroundPage().currentProxy = null;
             //Прекращаем использование прокси
-            let clearProxy = new Promise(resolve => {
-                chrome.proxy.settings.clear({scope: 'regular'},function() {
-                    resolve();
-                });
-            });
-            await clearProxy;
+            await clearProxy();
         }
     }
 }
@@ -821,12 +811,7 @@ async function checkProxy(proxy, scheme) {
     } catch (e) {
         error = true;
     }
-	let clearProxy = new Promise(resolve => {
-		chrome.proxy.settings.clear({scope: 'regular'},function() {
-			resolve();
-		});
-	});
-    await clearProxy;
+    await clearProxy();
     return error;
 }
 
@@ -1362,6 +1347,14 @@ async function setSyncValue(key, value) {
             }
         });
     });
+}
+
+async function clearProxy() {
+	return new Promise(resolve => {
+		chrome.proxy.settings.clear({scope: 'regular'},function() {
+			resolve();
+		});
+	});
 }
 
 //Слушатель на изменение настроек

@@ -155,7 +155,7 @@ async function initializeConfig() {
         chrome.proxy.settings.get({}, async function(config) {
             if (config && config.value && config.value.mode && config.value.mode == 'fixed_servers') {
 				//Прекращаем использование прокси
-				await clearProxy;
+				await clearProxy();
             }
         });
     }
@@ -188,16 +188,6 @@ async function checkVote() {
             await checkOpen(proj);
 		}
 	});
-//     for (let proj of projectsTopCraft) {
-// 		if (proj.time == null || proj.time < Date.now()) {
-//             await checkOpen(proj);
-// 		}
-//     }
-//     for (let proj of projectsMcTOP) {
-// 		if (proj.time == null || proj.time < Date.now()) {
-//             await checkOpen(proj);
-// 		}
-//     }
 }
 
 async function checkOpen(project) {
@@ -225,7 +215,7 @@ async function checkOpen(project) {
                         queueProjects.delete(value2);
                         //Если прошёл таймаут то прокси засчитывается как нерабочий
                         if (settings.useMultiVote && currentProxy != null) {
-							await clearProxy;
+							await clearProxy();
 							currentProxy.notWorking = true;
 							await setValue('AVMRproxies', proxies);
 							currentProxy = null;
@@ -337,16 +327,22 @@ async function newWindow(project) {
                 if (!used) {
                 	found = true;
 
-					//Удаляет все существующие куки ВК
-					let getVKCookies = new Promise(resolve => {
-						chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
-							resolve(cookies);
-						});
+					//Удаляет все данные с ВК
+					let clearVKData = new Promise(resolve => {
+						chrome.browsingData.remove({
+							"origins": ["https://vk.com"]
+						}, {
+							"cacheStorage": true,
+							"cookies": true,
+							"fileSystems": true,
+							"indexedDB": true,
+							"localStorage": true,
+							"pluginData": true,
+							"serviceWorkers": true,
+							"webSQL": true
+						}, function() {resolve()});
 					});
-					let cookies = await getVKCookies;
-					for(let i=0; i<cookies.length;i++) {
-						await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
-					}
+					await clearVKData;
 
 					console.log('Применяю куки ВК: ' + vkontakte.id + ' - ' + vkontakte.name);
 					
@@ -386,7 +382,7 @@ async function newWindow(project) {
 					found = true;
 					//Применяет найденный незаюзанный свободный прокси
 					console.log('Применяю прокси: ' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme);
-					var config = {
+					let config = {
 					  mode: "fixed_servers",
 					  rules: {
 						singleProxy: {
@@ -397,12 +393,7 @@ async function newWindow(project) {
 						bypassList: ["*vk.com", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com"]
 					  }
 					};
-					let setProxy = new Promise(resolve => {
-						chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
-							resolve();
-						});
-					});
-					await setProxy;
+					await setProxy(config);
 
 					currentProxy = proxy;
 					break;
@@ -418,56 +409,64 @@ async function newWindow(project) {
 			}
         }
 
-        //Очистка куки
+        //Очистка данных
         let url;
         if (project.TopCraft) {
-            url = '.topcraft.ru'
+            url = 'https://topcraft.ru/'
         } else if (project.McTOP) {
-        	url = '.mctop.su'
+        	url = 'https://mctop.su/'
         } else if (project.MCRate) {
-        	url = '.mcrate.su'
+        	url = 'http://mcrate.su/'
         } else if (project.MinecraftRating) {
-        	url = '.minecraftrating.ru'
+        	url = 'http://minecraftrating.ru/'
         } else if (project.MonitoringMinecraft) {
-        	url = '.monitoringminecraft.ru'
+        	url = 'http://monitoringminecraft.ru/'
         } else if (project.FairTop) {
-        	url = '.fairtop.in'
+        	url = 'https://fairtop.in/'
         } else if (project.IonMc) {
-        	url = '.ionmc.top'
+        	url = 'https://ionmc.top/'
         } else if (project.ServeurPrive) {
-        	url = '.serveur-prive.net'
+        	url = 'https://serveur-prive.net/'
         } else if (project.PlanetMinecraft) {
-        	url = '.planetminecraft.com'
+        	url = 'https://planetminecraft.com/'
         } else if (project.TopG) {
-        	url = '.topg.org'
+        	url = 'https://topg.org/'
         } else if (project.MinecraftMp) {
-        	url = '.minecraft-mp.com'
+        	url = 'https://minecraft-mp.com/'
         } else if (project.MinecraftServerList) {
-        	url = '.minecraft-server-list.com'
+        	url = 'https://minecraft-server-list.com/'
         } else if (project.ServerPact) {
-        	url = '.serverpact.com'
+        	url = 'https://serverpact.com/'
         } else if (project.MinecraftIpList) {
-        	url = '.minecraftiplist.com'
+        	url = 'https://minecraftiplist.com/'
         } else if (project.TopMinecraftServers) {
-        	url = '.topminecraftservers.org'
+        	url = 'https://topminecraftservers.org/'
         } else if (project.MinecraftServersBiz) {
-        	url = '.minecraftservers.biz'
+        	url = 'https://minecraftservers.biz/'
         } else if (project.MinecraftServersOrg) {
-        	url = '.minecraftservers.org'
+        	url = 'https://minecraftservers.org/'
+        } else if (project.HotMC) {
+            url = 'https://hotmc.ru/'
+        } else if (project.MinecraftServerNet) {
+        	url = 'https://minecraft-server.net/'
         }
-		let getCookies = new Promise(resolve => {
-			chrome.cookies.getAll({domain: url}, function(cookies) {
-				resolve(cookies);
-			});
-		});
-		let cookies = await getCookies;
-		for(let i=0; i<cookies.length;i++) {
-			if (cookies[i].domain.charAt(0) == ".") {
-				await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
-			} else {
-				await removeCookie("https://" + cookies[i].domain + cookies[i].path, cookies[i].name);
-			}
-		}
+        
+        let clearData = new Promise(resolve => {
+			chrome.browsingData.remove({
+				"origins": [url]
+			}, {
+				"cacheStorage": true,
+				"cookies": true,
+				"fileSystems": true,
+				"indexedDB": true,
+				"localStorage": true,
+				"pluginData": true,
+				"serviceWorkers": true,
+				"webSQL": true
+			}, function() {resolve()});
+        });
+        await clearData;
+
 	}
     let silentVoteMode = false;
     if (project.Custom) {
@@ -1218,15 +1217,13 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 //Слушатель ошибок net::ERR для вкладок
 chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 	if (details.processId != -1 || details.parentFrameId != -1) return;
-	if (details.error.includes('net::ERR_ABORTED')) return;
+	if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED')) return;
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
 	let sender = {};
 	sender.tab = {};
 	sender.tab.id = details.tabId;
-	setTimeout(() => {
-		endVote(chrome.i18n.getMessage('errorVoteUnknown') + details.error, sender, project);
-	}, 3000);
+	endVote(chrome.i18n.getMessage('errorVoteUnknown') + details.error, sender, project);
 }, {url: [{hostSuffix: 'topcraft.ru'},
           {hostSuffix: 'mctop.su'},
           {hostSuffix: 'mcrate.su'},
@@ -1371,7 +1368,7 @@ async function endVote(message, sender, project) {
 				await setValue('AVMRproxies', proxies);
 			}
 			if (queueProjects.size == 1) {
-				await clearProxy;
+				await clearProxy();
 				currentProxy = null;
 				currentVK = null;
 			}
@@ -1404,7 +1401,7 @@ async function endVote(message, sender, project) {
 				currentProxy.notWorking = true;
 				await setValue('AVMRproxies', proxies);
 			}
-			await clearProxy;
+			await clearProxy();
 			currentVK = null;
 			currentProxy = null;
             retryProjects.clear();
@@ -1605,11 +1602,29 @@ async function setValue(key, value) {
     });
 }
 
-let clearProxy = new Promise(resolve => {
-    chrome.proxy.settings.clear({scope: 'regular'},function() {
-        resolve();
-    });
-});
+async function clearProxy() {
+	return new Promise(resolve => {
+		chrome.proxy.settings.clear({scope: 'regular'},function() {
+			resolve();
+		});
+	});
+}
+
+async function setProxy(config) {
+    return new Promise(resolve => {
+        chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
+		    resolve();
+		});
+	});
+}
+
+async function wait(ms) {
+	return new Promise(resolve => {
+		setTimeout(() => {
+			resolve();
+		}, ms);
+	});
+}
 
 async function forLoopAllProjects (fuc) {
     for (let proj of projectsTopCraft) {
