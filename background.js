@@ -52,6 +52,10 @@ var currentProxy;
 //Прерывает выполнение fetch запросов на случай ошибки в режиме MultiVote
 var controller = new AbortController();
 
+var check;
+
+var debug = true;
+
 //Инициализация настроек расширения
 initializeConfig();
 async function initializeConfig() {
@@ -164,7 +168,9 @@ async function initializeConfig() {
     retryCoolDown = 300 / (cooldown / 1000);
     retryCoolDownEmulation = 900 / (cooldown / 1000);
     //Проверка на голосование
-    setInterval(async function() {await checkVote()}, cooldown);
+    check = setInterval(async ()=> {
+    	await checkVote();
+    }, cooldown);
 }
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
@@ -183,26 +189,32 @@ async function checkVote() {
     	}
     }
     
-// 	forLoopAllProjects(async function (proj) {
+    if (debug) console.log('Проверка');
+    clearInterval(check);
+    
+	await forLoopAllProjects(await async function (proj) {
+		if (proj.time == null || proj.time < Date.now()) {
+            await checkOpen(proj);
+		}
+	});
+//     for (let proj of projectsTopCraft) {
 // 		if (proj.time == null || proj.time < Date.now()) {
 //             await checkOpen(proj);
 // 		}
-// 	});
-    for (let proj of projectsTopCraft) {
-		if (proj.time == null || proj.time < Date.now()) {
-            await checkOpen(proj);
-		}
-    }
-    for (let proj of projectsMcTOP) {
-		if (proj.time == null || proj.time < Date.now()) {
-            await checkOpen(proj);
-		}
-    }
-    for (let proj of projectsMCRate) {
-		if (proj.time == null || proj.time < Date.now()) {
-            await checkOpen(proj);
-		}
-    }
+//     }
+//     for (let proj of projectsMcTOP) {
+// 		if (proj.time == null || proj.time < Date.now()) {
+//             await checkOpen(proj);
+// 		}
+//     }
+//     for (let proj of projectsMCRate) {
+// 		if (proj.time == null || proj.time < Date.now()) {
+//             await checkOpen(proj);
+// 		}
+//     }
+    check = setInterval(async ()=> {
+    	await checkVote();
+    }, cooldown);
 }
 
 async function checkOpen(project) {
@@ -307,6 +319,7 @@ async function checkOpen(project) {
 	    	});
 	    });
 	    let cookies = await getCookies;
+	    if (debug) console.log('Удаляю куки ' + url);
 	    for(let i=0; i<cookies.length;i++) {
 	    	if (cookies[i].domain.charAt(0) == ".") {
 	    		await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
@@ -342,16 +355,33 @@ async function newWindow(project) {
                 if (!used) {
                 	found = true;
                     
-					//Удаляет все существующие куки ВК
-					let getVKCookies = new Promise(resolve => {
-						chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
-							resolve(cookies);
-						});
+// 					//Удаляет все существующие куки ВК
+// 					let getVKCookies = new Promise(resolve => {
+// 						chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+// 							resolve(cookies);
+// 						});
+// 					});
+// 					let cookies = await getVKCookies;
+// 					for(let i=0; i<cookies.length;i++) {
+// 						await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+// 					}
+
+					//Удаляет все данные с ВК
+					let clearVKData = new Promise(resolve => {
+						chrome.browsingData.remove({
+							"origins": ["https://vk.com"]
+						}, {
+							"cacheStorage": true,
+							"cookies": true,
+							"fileSystems": true,
+							"indexedDB": true,
+							"localStorage": true,
+							"pluginData": true,
+							"serviceWorkers": true,
+							"webSQL": true
+						}, function() {resolve()});
 					});
-					let cookies = await getVKCookies;
-					for(let i=0; i<cookies.length;i++) {
-						await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
-					}
+					await clearVKData;
 
 					console.log('Применяю куки ВК: ' + vkontakte.id + ' - ' + vkontakte.name);
 					
@@ -404,7 +434,22 @@ async function newWindow(project) {
 					};
 					await setProxy(config);
 
-					await wait(15000);
+					//Очистка кэша
+					await new Promise(resolve => {
+						chrome.browsingData.removeCache({}, function(){
+							resolve();
+						});
+					});
+					await new Promise(resolve => {
+						chrome.browsingData.removeCacheStorage({}, function(){
+							resolve();
+						});
+					});
+					await new Promise(resolve => {
+						chrome.browsingData.removeAppcache({}, function(){
+							resolve();
+						});
+					});
 
 					currentProxy = proxy;
 					break;
@@ -463,6 +508,7 @@ async function newWindow(project) {
 			});
 		});
 		let cookies = await getCookies;
+		if (debug) console.log('Удаляю куки ' + url);
 		for(let i=0; i<cookies.length;i++) {
 			if (cookies[i].domain.charAt(0) == ".") {
 				await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
@@ -470,6 +516,66 @@ async function newWindow(project) {
 				await removeCookie("https://" + cookies[i].domain + cookies[i].path, cookies[i].name);
 			}
 		}
+
+//         //Очистка данных
+//         let url;
+//         if (project.TopCraft) {
+//             url = 'https://topcraft.ru/'
+//         } else if (project.McTOP) {
+//         	url = 'https://mctop.su/'
+//         } else if (project.MCRate) {
+//         	url = 'http://mcrate.su/'
+//         } else if (project.MinecraftRating) {
+//         	url = 'http://minecraftrating.ru/'
+//         } else if (project.MonitoringMinecraft) {
+//         	url = 'http://monitoringminecraft.ru/'
+//         } else if (project.FairTop) {
+//         	url = 'https://fairtop.in/'
+//         } else if (project.IonMc) {
+//         	url = 'https://ionmc.top/'
+//         } else if (project.ServeurPrive) {
+//         	url = 'https://serveur-prive.net/'
+//         } else if (project.PlanetMinecraft) {
+//         	url = 'https://planetminecraft.com/'
+//         } else if (project.TopG) {
+//         	url = 'https://topg.org/'
+//         } else if (project.MinecraftMp) {
+//         	url = 'https://minecraft-mp.com/'
+//         } else if (project.MinecraftServerList) {
+//         	url = 'https://minecraft-server-list.com/'
+//         } else if (project.ServerPact) {
+//         	url = 'https://serverpact.com/'
+//         } else if (project.MinecraftIpList) {
+//         	url = 'https://minecraftiplist.com/'
+//         } else if (project.TopMinecraftServers) {
+//         	url = 'https://topminecraftservers.org/'
+//         } else if (project.MinecraftServersBiz) {
+//         	url = 'https://minecraftservers.biz/'
+//         } else if (project.MinecraftServersOrg) {
+//         	url = 'https://minecraftservers.org/'
+//         } else if (project.HotMC) {
+//             url = 'https://hotmc.ru/'
+//         } else if (project.MinecraftServerNet) {
+//         	url = 'https://minecraft-server.net/'
+//         }
+        
+//         let clearData = new Promise(resolve => {
+// 			chrome.browsingData.remove({
+// 				"origins": [url]
+// 			}, {
+// 				"cacheStorage": true,
+// 				"cookies": true,
+// 				"fileSystems": true,
+// 				"indexedDB": true,
+// 				"localStorage": true,
+// 				"pluginData": true,
+// 				"serviceWorkers": true,
+// 				"webSQL": true
+// 			}, function() {resolve()});
+//         });
+//         await clearData;
+
+//         await wait(5000);
 
 	}
     let silentVoteMode = false;
@@ -591,8 +697,9 @@ async function newWindow(project) {
 }
 
 async function silentVote(project) {
-	if (controller.signal) {
+	if (controller.signal.aborted) {
 		controller = new AbortController();
+		if (debug) console.log('Отмена отмены fetch запросов');
 	}
 	try {
         if (project.TopCraft) {
@@ -1222,6 +1329,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 //Слушатель ошибок net::ERR для вкладок
 chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 	if (details.processId != -1 || details.parentFrameId != -1) return;
+	if (debug) console.log(details.error);
 	if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED')) return;
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
@@ -1372,11 +1480,6 @@ async function endVote(message, sender, project) {
 				getTopFromList(currentProxy, project).push(usedProject);
 				await setValue('AVMRproxies', proxies);
 			}
-			if (queueProjects.size == 1) {
-				await clearProxy();
-				currentProxy = null;
-				currentVK = null;
-			}
 		}
 
 		if (project.priority) {
@@ -1394,6 +1497,27 @@ async function endVote(message, sender, project) {
         }
         await setValue('AVMRprojects' + getProjectName(project), getProjectList(project));
         console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + time);
+		if (cooldown < 10000) {
+			setTimeout(async () => {
+				for (let value of queueProjects) {
+					if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+						queueProjects.delete(value)
+					}
+				}
+				if (queueProjects.size == 1) {
+					if (debug) console.log('queueProjects.size == 1, удаляю прокси и очищаю текущий ВК и прокси');
+					await clearProxy();
+					currentProxy = null;
+					currentVK = null;
+				}
+			}, settings.useMultiVote ? 3000 : 10000);
+		} else {
+			for (let value of queueProjects) {
+				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+					queueProjects.delete(value)
+				}
+			}
+		}
 	//Если ошибка
 	} else {
 		if (project.MonitoringMinecraft && message.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
@@ -1406,6 +1530,7 @@ async function endVote(message, sender, project) {
 				currentProxy.notWorking = true;
 				await setValue('AVMRproxies', proxies);
 			}
+			if (debug) console.log('Произошла ошибка, отмена и очистка всего');
 			await clearProxy();
 			currentVK = null;
 			currentProxy = null;
@@ -1439,21 +1564,6 @@ async function endVote(message, sender, project) {
 	//	console.error(message);
     //    if (!settings.disabledNotifError) sendNotification('Непредвиденная ошибка', message);
 	//}
-	if (cooldown < 10000) {
-		setTimeout(() => {
-			for (let value of queueProjects) {
-				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
-					queueProjects.delete(value)
-				}
-			}
-		}, settings.useMultiVote ? 3000 : 10000);
-	} else {
-		for (let value of queueProjects) {
-			if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
-				queueProjects.delete(value)
-			}
-		}
-	}
 }
 
 //Отправитель уведомлений
@@ -1608,6 +1718,7 @@ async function setValue(key, value) {
 }
 
 async function clearProxy() {
+	if (debug) console.log('Удаляю прокси');
 	return new Promise(resolve => {
 		chrome.proxy.settings.clear({scope: 'regular'},function() {
 			resolve();
