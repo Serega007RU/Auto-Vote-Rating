@@ -155,7 +155,7 @@ async function initializeConfig() {
 
     if (settings && !settings.disabledCheckTime) checkTime();
 
-    if (settings.useMultiVote) {
+    if (settings && settings.useMultiVote) {
         chrome.proxy.settings.get({}, async function(config) {
             if (config && config.value && config.value.mode && config.value.mode == 'fixed_servers') {
 				//Прекращаем использование прокси
@@ -1988,6 +1988,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serv
 //Если требуется авторизация для Прокси
 chrome.webRequest.onAuthRequired.addListener(function (details) {
 	if (details.isProxy && currentProxy && currentProxy != null && currentProxy.login) {
+		console.log('Прокси требует авторизацию по логину и паролю, авторизовываюсь...')
 		return({
 			authCredentials : {
 				'username' : currentProxy.login,

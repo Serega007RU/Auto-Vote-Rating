@@ -584,10 +584,10 @@
   "importTunnelBear": {
     "message": "Importing proxies from TunnelBear"
   },
-  "importTunnelBearStart" {
+  "importTunnelBearStart": {
     "message": "Starting import from TunnelBear"
   },
-  "importTunnelBearEnd" {
+  "importTunnelBearEnd": {
     "message": "Import from TunnelBear completed successfully"
   }
 }

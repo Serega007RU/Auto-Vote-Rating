@@ -552,10 +552,10 @@
   "importTunnelBear": {
     "message": "Импорт прокси с TunnelBear"
   },
-  "importTunnelBearStart" {
+  "importTunnelBearStart": {
     "message": "Начинаю импорт с TunnelBear"
   },
-  "importTunnelBearEnd" {
+  "importTunnelBearEnd": {
     "message": "Импорт с TunnelBear успешно завершён"
   }
 }

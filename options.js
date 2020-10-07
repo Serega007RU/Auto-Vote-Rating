@@ -790,7 +790,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
             await addProxy(proxy);
         }
     }
-    updateStatusProxy(chrome.i18n.getMessage('importTunnelBearEnd'), false);
+    updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('importTunnelBearEnd') + '</span>', false);
 });
 
 async function addProxy(proxy) {
