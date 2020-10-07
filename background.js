@@ -279,23 +279,21 @@ async function checkOpen(project) {
 	}
     if (settings.useMultiVote) {
     	//Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
-        if (queueProjects.size > 0) {
-        	if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && currentVK != null) {
-                let usedProjects = getTopFromList(currentVK, project);
-				for (let usedProject of usedProjects) {
-					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
-                        return;
-					}
+        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && currentVK != null) {
+            let usedProjects = getTopFromList(currentVK, project);
+			for (let usedProject of usedProjects) {
+				if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+                    return;
 				}
-        	}
-        	if (currentProxy != null) {
-				let usedProjects = getTopFromList(currentProxy, project);
-				for (let usedProject of usedProjects) {
-					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
-						return;
-					}
+			}
+        }
+        if (currentProxy != null) {
+			let usedProjects = getTopFromList(currentProxy, project);
+			for (let usedProject of usedProjects) {
+				if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+					return;
 				}
-        	}
+			}
         }
     }
 
@@ -1390,19 +1388,25 @@ async function endVote(message, sender, project) {
 		}
 
 		if (settings.useMultiVote) {
-            if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-				let usedProject = {};
-				usedProject.id = project.id;
-				usedProject.nextFreeVote = time;
-				getTopFromList(currentVK, project).push(usedProject);
-				await setValue('AVMRVKs', VKs);
-            }
-			if (currentProxy != null) {
+//             if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+// 				let usedProject = {};
+// 				usedProject.id = project.id;
+// 				usedProject.nextFreeVote = time;
+// 				getTopFromList(currentVK, project).push(usedProject);
+//              VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
+// 				await setValue('AVMRVKs', VKs);
+//             } else {
+// 			    console.warn('currentVK является null либо не найден');
+// 			   }
+			if (currentProxy != null && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
 				let usedProject = {};
 				usedProject.id = project.id;
 				usedProject.nextFreeVote = time;
 				getTopFromList(currentProxy, project).push(usedProject);
-				await setValue('AVMRproxies', proxies);
+                proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy;
+                await setValue('AVMRproxies', proxies);
+			} else {
+				console.warn('currentProxy является null либо не найден');
 			}
 		}
 
