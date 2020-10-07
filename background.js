@@ -1390,14 +1390,13 @@ async function endVote(message, sender, project) {
 		}
 
 		if (settings.useMultiVote) {
-			//ToDo Serega007 временно отключено для тестирования
-//             if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
-// 				let usedProject = {};
-// 				usedProject.id = project.id;
-// 				usedProject.nextFreeVote = time;
-// 				getTopFromList(currentVK, project).push(usedProject);
-// 				await setValue('AVMRVKs', VKs);
-//             }
+            if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft)) {
+				let usedProject = {};
+				usedProject.id = project.id;
+				usedProject.nextFreeVote = time;
+				getTopFromList(currentVK, project).push(usedProject);
+				await setValue('AVMRVKs', VKs);
+            }
 			if (currentProxy != null) {
 				let usedProject = {};
 				usedProject.id = project.id;
@@ -1643,6 +1642,7 @@ async function setValue(key, value) {
 }
 
 async function clearProxy() {
+	if (debug) console.log('Удаляю прокси');
 	return new Promise(resolve => {
 		chrome.proxy.settings.clear({scope: 'regular'},function() {
 			resolve();
