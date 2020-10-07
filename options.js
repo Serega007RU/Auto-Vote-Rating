@@ -772,6 +772,27 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
     await addProxy(proxy);
 });
 
+//Слушатель на импорт с TunnelBear
+document.getElementById('importTunnelBear').addEventListener('click', async () => {
+    updateStatusProxy(chrome.i18n.getMessage('importTunnelBearStart'), true);
+    let token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDIxNTI1NDMsImlhdCI6MTYwMjA2NjE0MywiaXNzIjoicGIiLCJwYXJ0bmVyIjoidHVubmVsYmVhciIsInVpZCI6IjI5NTc4MjQzIiwiZGlkIjoiMjUxMTQxNzU5LTEwMTQxMjEwLTQxMTc5LTkxMDE0MC00MzE0MTQ2NzIwMTQwMTUxMCJ9.1DAijmCvL0UVKcDPE10bK6p7L2aHnnmFjBvUCJ2LNcg";
+    let countries = ['AR', 'BR', 'AU', 'CA', 'DK', 'FI', 'FR', 'DE', 'IN', 'IE', 'IT', 'JP', 'MX', 'NL', 'NZ', 'NO', 'RO', 'SG', 'ES', 'SE', 'CH', 'GB', 'US']
+    for (let country of countries) {
+        let response = await fetch("https://api.polargrizzly.com/vpns/countries/" + country, {"headers": {"authorization": token}});
+        let json = await response.json();
+        for (vpn of json.vpns) {
+            let proxy = {};
+            proxy.ip = vpn.url;
+            proxy.port = 8080;
+            proxy.scheme = "https";
+            proxy.login = token;
+            proxy.password = token;
+            await addProxy(proxy);
+        }
+    }
+    updateStatusProxy(chrome.i18n.getMessage('importTunnelBearEnd'), false);
+});
+
 async function addProxy(proxy) {
     updateStatusProxy(chrome.i18n.getMessage('adding'), true);
     for (let prox of proxies) {
