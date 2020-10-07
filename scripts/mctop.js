@@ -1,6 +1,6 @@
 setTimeout(() => {
     vote();
-}, 4000);
+}, 3000);
 function vote () {
 	chrome.storage.local.get('AVMRprojectsMcTOP', function(result) {
 		if (document.URL.includes('.vk')) {
@@ -80,5 +80,4 @@ this.check = setInterval(()=>{
         sendMessage(message);
         clearInterval(this.check);
     }
-}
-, 1000);
+}, 1000);
