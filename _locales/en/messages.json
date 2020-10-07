@@ -580,5 +580,14 @@
   },
   "deletedAllVKCookies": {
     "message": "All VK cookies have been successfully deleted!"
+  },
+  "importTunnelBear": {
+    "message": "Importing proxies from TunnelBear"
+  },
+  "importTunnelBearStart": {
+    "message": "Starting import from TunnelBear"
+  },
+  "importTunnelBearEnd": {
+    "message": "Import from TunnelBear completed successfully"
   }
 }

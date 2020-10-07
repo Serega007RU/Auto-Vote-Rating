@@ -548,5 +548,14 @@
   },
   "deletedAllVKCookies": {
     "message": "Все куки ВКонтакте успешно удалены!"
+  },
+  "importTunnelBear": {
+    "message": "Импорт прокси с TunnelBear"
+  },
+  "importTunnelBearStart": {
+    "message": "Начинаю импорт с TunnelBear"
+  },
+  "importTunnelBearEnd": {
+    "message": "Импорт с TunnelBear успешно завершён"
   }
 }
