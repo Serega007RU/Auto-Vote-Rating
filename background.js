@@ -210,21 +210,7 @@ async function checkVote() {
             await checkOpen(proj);
 		}
 	});
-//     for (let proj of projectsTopCraft) {
-// 		if (proj.time == null || proj.time < Date.now()) {
-//             await checkOpen(proj);
-// 		}
-//     }
-//     for (let proj of projectsMcTOP) {
-// 		if (proj.time == null || proj.time < Date.now()) {
-//             await checkOpen(proj);
-// 		}
-//     }
-//     for (let proj of projectsMCRate) {
-// 		if (proj.time == null || proj.time < Date.now()) {
-//             await checkOpen(proj);
-// 		}
-//     }
+	
     check = setInterval(async ()=> {
     	await checkVote();
     }, cooldown);
@@ -1241,7 +1227,6 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (details.frameId != 0) {
 		let project = openedProjects.get(details.tabId);
 		if (project == null) return;
-		if (project.TopCraft || project.McTOP || project.MCRate) return;
 // 		if (project.ServeurPrive || project.IonMc || project.MinecraftServersBiz || project.MinecraftServersBiz || project.MinecraftServersOrg || project.MinecraftMp || project.HotMC || project.MinecraftServerNet) {
 			chrome.tabs.executeScript(details.tabId, {file: "scripts/captchaclicker.js", frameId: details.frameId});
 // 		}
@@ -2307,6 +2292,7 @@ v3.3.0
 Для режима эмуляции теперь расширение видит ошибки net::ERR
 Теперь для всех топов расширение ищет капчу
 Исправление ошибки если мы натыкаемся на проверку CloudFlare, расширение теперь ждёт когда сам пользователь пройдёт эту проврку
+Теперь больше не будет требовать пройти вручную капчу когда это не нужно
 
 https://minecraftservers.org/ под вопросом насчёт капчи
 https://www.minetrack.net/ на момент проверки сайт лежал
