@@ -226,12 +226,11 @@ async function checkOpen(project) {
     	} else if (project.FairTop) {
     		url = '.monitoringminecraft.ru';
     	}
-	    let getCookies = new Promise(resolve => {
+	    let cookies = await new Promise(resolve => {
 	    	chrome.cookies.getAll({domain: url}, function(cookies) {
 	    		resolve(cookies);
 	    	});
 	    });
-	    let cookies = await getCookies;
 	    for(let i=0; i<cookies.length;i++) {
 	    	if (cookies[i].domain.charAt(0) == ".") {
 	    		await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
@@ -986,6 +985,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 //Слушатель ошибок net::ERR для вкладок
 chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 	if (details.processId != -1 || details.parentFrameId != -1) return;
+	if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED')) return;
 	let project = openedProjects.get(details.tabId);
 	if (project == null) return;
 	let sender = {};
@@ -1893,6 +1893,7 @@ v3.3.0
 Для режима эмуляции теперь расширение видит ошибки net::ERR
 Теперь для всех топов расширение ищет капчу
 Исправление ошибки если мы натыкаемся на проверку CloudFlare, расширение теперь ждёт когда сам пользователь пройдёт эту проврку
+Теперь больше не будет требовать пройти вручную капчу когда это не нужно
 
 https://minecraftservers.org/ под вопросом насчёт капчи
 https://www.minetrack.net/ на момент проверки сайт лежал

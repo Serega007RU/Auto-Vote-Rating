@@ -1,5 +1,12 @@
 //Клик "Я не робот" для ReCaptcha или hCaptcha
 this.check = setInterval(()=>{
+    //Если мы находимся на странице проверки CloudFlare
+    if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+        clearInterval(this.check);
+        clearInterval(this.check2);
+        clearInterval(this.check3);
+        return;
+    }
    	if (document.querySelector("#recaptcha-anchor > div.recaptcha-checkbox-border") != null) {
    		document.querySelector("#recaptcha-anchor > div.recaptcha-checkbox-border").click();
    		clearInterval(this.check);
@@ -28,7 +35,7 @@ this.check3 = setInterval(()=>{
    		clearInterval(this.check2);
    		clearInterval(this.check3);
    	}
-   	if (document.querySelector("#solver-button") == null && !notified && document.querySelector("#recaptcha-verify-button") != null && !document.referrer.includes('minecraft-mp')) {
+   	if (document.querySelector("#solver-button") == null && !notified && document.querySelector("#recaptcha-verify-button") != null && !document.querySelector("#recaptcha-verify-button").disabled) {
    	    notified = true;
         sendMessage("Requires manually passing the captcha");
    	}
