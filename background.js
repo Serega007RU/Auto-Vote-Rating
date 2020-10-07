@@ -222,9 +222,9 @@ async function checkOpen(project) {
     if ((clearCookieMonitoringMinecraft && project.MonitoringMinecraft) || project.FairTop) {
     	let url;
     	if (project.MonitoringMinecraft) {
-            url = '.fairtop.in';
+            url = '.monitoringminecraft.ru';
     	} else if (project.FairTop) {
-    		url = '.monitoringminecraft.ru';
+    		url = '.fairtop.in';
     	}
 	    let cookies = await new Promise(resolve => {
 	    	chrome.cookies.getAll({domain: url}, function(cookies) {
@@ -912,7 +912,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 	if (project.TopCraft) {
         chrome.tabs.executeScript(details.tabId, {file: "scripts/topcraft.js"});
 	} else if (project.McTOP) {
-        setTimeout(() => chrome.tabs.executeScript(details.tabId, {file: "scripts/mctop.js"}), 5000);
+        chrome.tabs.executeScript(details.tabId, {file: "scripts/mctop.js"});
 	} else if (project.MCRate) {
 		chrome.tabs.executeScript(details.tabId, {file: "scripts/mcrate.js"});
 	} else if (project.MinecraftRating) {
@@ -1894,6 +1894,7 @@ v3.3.0
 Теперь для всех топов расширение ищет капчу
 Исправление ошибки если мы натыкаемся на проверку CloudFlare, расширение теперь ждёт когда сам пользователь пройдёт эту проврку
 Теперь больше не будет требовать пройти вручную капчу когда это не нужно
+На FairTop теперь 100% кликает проголосовать
 
 https://minecraftservers.org/ под вопросом насчёт капчи
 https://www.minetrack.net/ на момент проверки сайт лежал

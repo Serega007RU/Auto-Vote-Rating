@@ -10,9 +10,6 @@ function vote () {
 				document.querySelector("body > div.container > div > div > div > div.page-data-units > div.page-unit > div.vote-form > form > input.form-control.input-vote.col-sm-60").value = nick;
 				//Кликает на "Проголосовать"
 				document.querySelector("body > div.container > div > div > div > div.page-data-units > div.page-unit > div.vote-form > form > button").click();
-			} else if (document.querySelector("#submit-form") != null) {//Если мы на второй странице и есть опять же кнопка "Проголосовать"
-				//Кликает на кнопку "Проголосовать"
-				document.querySelector("#submit-form").click();
 			}
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
@@ -44,6 +41,9 @@ function sendMessage(message) {
 }
 
 this.check = setInterval(()=>{
+	if (document.querySelector("#submit-form") != null && document.querySelector("#submit-form").innerText.includes('Проголосовать')) {
+		document.querySelector("#submit-form").click();
+	}
     //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
     if (document.readyState == 'complete' && (document.querySelector("#result > div") != null || document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div") != null)) {
         var message;
