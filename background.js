@@ -326,12 +326,11 @@ async function checkOpen(project) {
     	} else if (project.FairTop) {
     		url = '.monitoringminecraft.ru';
     	}
-	    let getCookies = new Promise(resolve => {
+	    let cookies = await new Promise(resolve => {
 	    	chrome.cookies.getAll({domain: url}, function(cookies) {
 	    		resolve(cookies);
 	    	});
 	    });
-	    let cookies = await getCookies;
 	    if (debug) console.log('Удаляю куки ' + url);
 	    for(let i=0; i<cookies.length;i++) {
 	    	if (cookies[i].domain.charAt(0) == ".") {
@@ -369,12 +368,11 @@ async function newWindow(project) {
                 	found = true;
                     
 					//Удаляет все существующие куки ВК
-					let getVKCookies = new Promise(resolve => {
+					let cookies = await new Promise(resolve => {
 						chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
 							resolve(cookies);
 						});
 					});
-					let cookies = await getVKCookies;
 					for(let i=0; i<cookies.length;i++) {
 						await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
 					}
@@ -429,6 +427,13 @@ async function newWindow(project) {
 					  }
 					};
 					await setProxy(config);
+                    
+//                     if (chrome.benchmarking) {
+// 						await chrome.benchmarking.closeConnections();
+// 						await chrome.benchmarking.clearCache();
+// 						await chrome.benchmarking.clearHostResolverCache();
+// 						await chrome.benchmarking.clearPredictorCache();
+//                     }
 
 					currentProxy = proxy;
 					break;
@@ -481,12 +486,11 @@ async function newWindow(project) {
         } else if (project.MinecraftServersOrg) {
         	url = '.minecraftservers.org'
         }
-		let getCookies = new Promise(resolve => {
+		let cookies = await new Promise(resolve => {
 			chrome.cookies.getAll({domain: url}, function(cookies) {
 				resolve(cookies);
 			});
 		});
-		let cookies = await getCookies;
 		if (debug) console.log('Удаляю куки ' + url);
 		for(let i=0; i<cookies.length;i++) {
 			if (cookies[i].domain.charAt(0) == ".") {

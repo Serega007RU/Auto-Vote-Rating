@@ -661,12 +661,11 @@ document.getElementById('AddVK').addEventListener('click', async () => {
     }
 
     let VK = {};
-    let getVKCookies = new Promise(resolve => {
+    VK.cookies = await new Promise(resolve => {
         chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
             resolve(cookies);
         });
     });
-    VK.cookies = await getVKCookies;
     
     let i = 0;
     for (let cookie of VK.cookies) {
@@ -698,12 +697,11 @@ document.getElementById('AddVK').addEventListener('click', async () => {
 //Слушатель кнопки "Удалить куки" на MultiVote VKontakte
 document.getElementById('deleteAllVKCookies').addEventListener('click', async () => {
     updateStatusVK(chrome.i18n.getMessage('deletingAllVKCookies'), true);
-    let getVKCookies = new Promise(resolve => {
+    let cookies = await new Promise(resolve => {
         chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
             resolve(cookies);
         });
     });
-    let cookies = await getVKCookies;
     for(let i=0; i<cookies.length;i++) {
         await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
     }
@@ -798,12 +796,11 @@ async function checkProxy(proxy, scheme) {
 		    }
 		}
 	};
-	let setProxy = new Promise(resolve => {
+	await new Promise(resolve => {
 	    chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
 		    resolve();
 		});
 	});
-    await setProxy;
     let error = false;
     try {
         let response = await fetch('http://example.com/');
