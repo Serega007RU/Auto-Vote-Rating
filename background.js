@@ -1114,9 +1114,9 @@ async function endVote(message, sender, project) {
 			}
 			project.time = time;
 		} else {
-			if (project.TopG || project.ServerPact || project.MinecraftServersBiz) {
+			if (project.TopG || project.MinecraftServersBiz) {
 				time.setUTCHours(time.getUTCHours() + 12);
-			} else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet/*ToDo Serega007 предпологается что MinecraftServerNet сбрасывает голос через 24 часа*/) {
+			} else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet) {
 				time.setUTCDate(time.getUTCDate() + 1);
 			} else if (project.ServeurPrive) {
 				project.countVote = project.countVote + 1;
@@ -1127,6 +1127,9 @@ async function endVote(message, sender, project) {
 				} else {
 					time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30);
 				}
+			} else if (project.ServerPact) {
+				time.setUTCHours(time.getUTCHours() + 11);
+				time.setUTCMinutes(time.getUTCMinutes() + 7);
 			} else if (project.Custom) {
 				time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout);
 			}
@@ -1906,6 +1909,7 @@ v3.3.0
 
 v3.3.1
 Добавлена возможность рандомизировать время следующего голосования. Это сделано что бы сложнее было определить что мы авто-голосуем (тригером появления этого функционала стал проект Pandamium который стал запрешать авто-голосование)
+По просьбе fightfire#8153 на ServerPact теперь время следующего голосования после последнего голоса наступает ровно через 11 часов и 7 минут вместо 12-ти часов
 
 https://minecraftservers.org/ под вопросом насчёт капчи
 https://www.minetrack.net/ на момент проверки сайт лежал
