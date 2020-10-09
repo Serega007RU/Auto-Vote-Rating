@@ -1133,6 +1133,10 @@ async function endVote(message, sender, project) {
 			project.time = time.getTime();
 			time = time.getTime();
 		}
+		
+		if (project.randomize) {
+            project.time = project.time + randomInteger();
+		}
 
 		if (project.priority) {
             getProjectList(project).unshift(project);
@@ -1169,6 +1173,10 @@ async function endVote(message, sender, project) {
 	//	console.error(message);
     //    if (!settings.disabledNotifError) sendNotification('Непредвиденная ошибка', message);
 	//}
+}
+
+function randomInteger() {
+  return Math.floor(Math.random() * (43200000 - 3600000 + 1)) + 3600000;//Минимальное 1 час и максимальное 12 часов
 }
 
 //Отправитель уведомлений
@@ -1895,6 +1903,9 @@ v3.3.0
 Исправление ошибки если мы натыкаемся на проверку CloudFlare, расширение теперь ждёт когда сам пользователь пройдёт эту проврку
 Теперь больше не будет требовать пройти вручную капчу когда это не нужно
 На FairTop теперь 100% кликает проголосовать
+
+v3.3.1
+Добавлена возможность рандомизировать время следующего голосования. Это сделано что бы сложнее было определить что мы авто-голосуем (тригером появления этого функционала стал проект Pandamium который стал запрешать авто-голосование)
 
 https://minecraftservers.org/ под вопросом насчёт капчи
 https://www.minetrack.net/ на момент проверки сайт лежал

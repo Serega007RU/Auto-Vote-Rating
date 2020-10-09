@@ -517,5 +517,14 @@
   },
   "privacyPass": {
     "message": "Install the <a target='blank_' href='https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'>Privacy Pass</a> extension to get 5 free captcha passes for hCaptcha when you first pass the captcha"
+  },
+  "randomize": {
+    "message": "When adding a project: Randomize the next vote"
+  },
+  "randomizeTooltip": {
+    "message": "The time of the next vote will be randomized within 1-12 hours, this is mainly necessary to make it harder for server administrators to guess that you are using auto-voting"
+  },
+  "inRandomize": {
+    "message": "In randomized"
   }
 }

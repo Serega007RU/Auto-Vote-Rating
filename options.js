@@ -25,6 +25,8 @@ var settings;
 var disableCheckProjects = false;
 //Нужно ли добавлять проект с приоритетом
 var priorityOption = false;
+//Нужно ли добавлять проект с рандомным временем голосованием
+var randomizeOption = false;
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd;
 
@@ -274,6 +276,10 @@ async function restoreOptions() {
                 }
                 return;
             }
+            if (this.id == "randomize") {
+                randomizeOption = this.checked;
+                return;
+            }
             await setValue('AVMRsettings', settings, true);
         });
     }
@@ -304,7 +310,7 @@ async function addProjectList(project, visually) {
         let time = new Date(project.time);
         if (Date.now() < project.time) text = ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth()+1)).slice(-2) + '.' + time.getFullYear() + ' ' + ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2) + ':' + ('0' + time.getSeconds()).slice(-2);
     }
-    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + chrome.i18n.getMessage('nextVote') + ' ' + text;
+    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + chrome.i18n.getMessage('nextVote') + ' ' + text;
     listProject.after(html)
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).addEventListener('click', function() {
         removeProjectList(project, false);
@@ -537,6 +543,10 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         project = new Project(choice, nick, id, null, null, priorityOpt);
     }
 
+    if (randomizeOption) {
+        project.randomize = true;
+    }
+
     if (choice == 'ServeurPrive') {
         project.maxCountVote = document.querySelector("#countVote").valueAsNumber;
         project.countVote = 0;
@@ -635,7 +645,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         }
         if (project.MinecraftMp) {
             url = 'https://minecraft-mp.com/server-s' + project.id;
-            jsPath = 'table[class="table table-bordered"] > tbody > tr:nth-child(7) > td:nth-child(2) > a'
+            jsPath = 'table[class="table table-bordered"] > tbody > tr:nth-child(1) > td:nth-child(2) > strong'
         }
         if (project.MinecraftServerList) {
             url = 'https://minecraft-server-list.com/server/' + project.id + '/';
@@ -787,10 +797,18 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             updateStatusAdd('<div>' + chrome.i18n.getMessage('checkAuthVKSuccess') + '</div>', true, element);
         }
     }
+    
+    let random = false;
+    if (projectURL.toLowerCase().includes('pandamium')) {
+        project.randomize = true;
+        random = true;
+    }
 
     await addProjectList(project, false);
-
-    if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet) && settings.enabledSilentVote) {
+    
+    if (random) {
+        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
+    } else if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet) && settings.enabledSilentVote) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span>', true, element);
     } else if (project.MinecraftServersOrg) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center">' + chrome.i18n.getMessage('privacyPass') +'</div>', true, element);
