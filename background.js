@@ -1138,7 +1138,7 @@ async function endVote(message, sender, project) {
 		}
 		
 		if (project.randomize) {
-            project.time = project.time + randomInteger();
+            project.time = project.time + Math.floor(Math.random() * 43200000);
 		}
 
 		if (project.priority) {
@@ -1176,10 +1176,6 @@ async function endVote(message, sender, project) {
 	//	console.error(message);
     //    if (!settings.disabledNotifError) sendNotification('Непредвиденная ошибка', message);
 	//}
-}
-
-function randomInteger() {
-  return Math.floor(Math.random() * (43200000 - 3600000 + 1)) + 3600000;//Минимальное 1 час и максимальное 12 часов
 }
 
 //Отправитель уведомлений
