@@ -194,9 +194,9 @@ async function checkOpen(project) {
         }
 	}
     
-    //Не позволяет открыть больше одной вкладки для одного топа
+    //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован
 	for (let value of queueProjects) {
-		if (getProjectName(value) == getProjectName(project)) return;
+		if (getProjectName(value) == getProjectName(project) || (value.randomize && project.randomize)) return;
 	}
 
 	queueProjects.add(project);
