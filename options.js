@@ -773,24 +773,67 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
 });
 
 //Слушатель на импорт с TunnelBear
+let token
 document.getElementById('importTunnelBear').addEventListener('click', async () => {
-    updateStatusProxy(chrome.i18n.getMessage('importTunnelBearStart'), true);
-    let token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MDIxNTI1NDMsImlhdCI6MTYwMjA2NjE0MywiaXNzIjoicGIiLCJwYXJ0bmVyIjoidHVubmVsYmVhciIsInVpZCI6IjI5NTc4MjQzIiwiZGlkIjoiMjUxMTQxNzU5LTEwMTQxMjEwLTQxMTc5LTkxMDE0MC00MzE0MTQ2NzIwMTQwMTUxMCJ9.1DAijmCvL0UVKcDPE10bK6p7L2aHnnmFjBvUCJ2LNcg";
-    let countries = ['AR', 'BR', 'AU', 'CA', 'DK', 'FI', 'FR', 'DE', 'IN', 'IE', 'IT', 'JP', 'MX', 'NL', 'NZ', 'NO', 'RO', 'SG', 'ES', 'SE', 'CH', 'GB', 'US']
-    for (let country of countries) {
-        let response = await fetch("https://api.polargrizzly.com/vpns/countries/" + country, {"headers": {"authorization": token}});
-        let json = await response.json();
-        for (vpn of json.vpns) {
-            let proxy = {};
-            proxy.ip = vpn.url;
-            proxy.port = 8080;
-            proxy.scheme = "https";
-            proxy.login = token;
-            proxy.password = token;
-            await addProxy(proxy);
+    updateStatusProxy(chrome.i18n.getMessage('importTunnelBearStart'), true)
+    try {
+        if (token == null) {
+            let response = await fetch("https://api.tunnelbear.com/v2/cookieToken", {
+              "headers": {
+                "accept": "application/json, text/plain, */*",
+                "accept-language": "ru,en-US;q=0.9,en;q=0.8",
+                "authorization": "Bearer undefined",
+                "cache-control": "no-cache",
+                "device": Math.floor(Math.random() * 999999999) + "-" + Math.floor(Math.random() * 99999999) + "-" + Math.floor(Math.random() * 99999) + "-" + Math.floor(Math.random() * 999999) + "-" + Math.floor(Math.random() * 99999999999999999),
+                "pragma": "no-cache",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "none",
+                "tunnelbear-app-id": "com.tunnelbear",
+                "tunnelbear-app-version": "1.0",
+                "tunnelbear-platform": "Chrome",
+                "tunnelbear-platform-version": "c3.3.3"
+              },
+              "referrerPolicy": "strict-origin-when-cross-origin",
+              "body": null,
+              "method": "POST",
+              "mode": "cors",
+              "credentials": "include"
+            });
+            if (!response.ok) {
+                updateStatusProxy('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', [response.url, response.status]) + '</span>', true);
+                return;
+            }
+            let json = await response.json();
+            token = "Bearer " + json.access_token;
         }
+
+        let countries = ['AR', 'BR', 'AU', 'CA', 'DK', 'FI', 'FR', 'DE', 'IN', 'IE', 'IT', 'JP', 'MX', 'NL', 'NZ', 'NO', 'RO', 'SG', 'ES', 'SE', 'CH', 'GB', 'US']
+        for (let country of countries) {
+            response = await fetch("https://api.polargrizzly.com/vpns/countries/" + country, {"headers": {"authorization": token}})
+            if (!response.ok) {
+                updateStatusProxy('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', [response.url, response.status]) + '</span>', true);
+                if (response.status == 401) {
+                    return;
+                } else {
+                    continue;
+                }
+            }
+            json = await response.json();
+            for (vpn of json.vpns) {
+                let proxy = {};
+                proxy.ip = vpn.url;
+                proxy.port = 8080;
+                proxy.scheme = "https";
+                await addProxy(proxy);
+            }
+        }
+    } catch (e) {
+        updateStatusProxy('<span style="color:#f44336;">' + e + '</span>', true)
+        console.error(e)
+        return
     }
-    updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('importTunnelBearEnd') + '</span>', false);
+    updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('importTunnelBearEnd') + '</span>', false)
 });
 
 async function addProxy(proxy) {

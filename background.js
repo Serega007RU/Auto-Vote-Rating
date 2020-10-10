@@ -56,6 +56,9 @@ var check;
 
 var debug = true;
 
+//Токен TunnelBear
+let tokenTunnelBear
+
 //Инициализация настроек расширения
 initializeConfig();
 async function initializeConfig() {
@@ -399,6 +402,39 @@ async function newWindow(project) {
 					found = true;
 					//Применяет найденный незаюзанный свободный прокси
 					console.log('Применяю прокси: ' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme);
+
+                    if (proxy.ip.includes('lazerpenguin') && tokenTunnelBear == null) {
+                        console.log('Токен TunnelBear является null, пытаюсь его достать...')
+						let response = await fetch("https://api.tunnelbear.com/v2/cookieToken", {
+						  "headers": {
+							"accept": "application/json, text/plain, */*",
+							"accept-language": "ru,en-US;q=0.9,en;q=0.8",
+							"authorization": "Bearer undefined",
+							"cache-control": "no-cache",
+							"device": Math.floor(Math.random() * 999999999) + "-" + Math.floor(Math.random() * 99999999) + "-" + Math.floor(Math.random() * 99999) + "-" + Math.floor(Math.random() * 999999) + "-" + Math.floor(Math.random() * 99999999999999999),
+							"pragma": "no-cache",
+							"sec-fetch-dest": "empty",
+							"sec-fetch-mode": "cors",
+							"sec-fetch-site": "none",
+							"tunnelbear-app-id": "com.tunnelbear",
+							"tunnelbear-app-version": "1.0",
+							"tunnelbear-platform": "Chrome",
+							"tunnelbear-platform-version": "c3.3.3"
+						  },
+						  "referrerPolicy": "strict-origin-when-cross-origin",
+						  "body": null,
+						  "method": "POST",
+						  "mode": "cors",
+						  "credentials": "include"
+						});
+						if (!response.ok) {
+							console.error(chrome.i18n.getMessage('notConnect', [response.url, response.status]));
+							return;
+						}
+						let json = await response.json();
+						tokenTunnelBear = "Bearer " + json.access_token;
+                    }
+
 					let config = {
 					  mode: "fixed_servers",
 					  rules: {
@@ -1975,12 +2011,24 @@ chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serv
 
 //Если требуется авторизация для Прокси
 chrome.webRequest.onAuthRequired.addListener(function (details) {
-	if (details.isProxy && currentProxy && currentProxy != null && currentProxy.login) {
+	if (details.isProxy && currentProxy && currentProxy != null && (currentProxy.login || currentProxy.ip.includes('lazerpenguin'))) {
 		console.log('Прокси требует авторизацию по логину и паролю, авторизовываюсь...')
+		let login, password
+		if (currentProxy.login) {
+			login = currentProxy.login
+			password = currentProxy.password
+		} else {
+			if (tokenTunnelBear != null) {
+				login = tokenTunnelBear
+				password = tokenTunnelBear
+			} else {
+				console.warn('Токен TunnelBear является null, нечем авторизоваться в прокси!')
+			}
+		}
 		return({
 			authCredentials : {
-				'username' : currentProxy.login,
-				'password' : currentProxy.password
+				'username' : login,
+				'password' : password
 			}
 		});
 	}
