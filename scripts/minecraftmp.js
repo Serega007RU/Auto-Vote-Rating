@@ -17,7 +17,7 @@ function vote () {
 			}
 			let nick = getNickName(result.AVMRprojectsMinecraftMp);
 	        if (nick == null || nick == "") return;
-            document.querySelector("#accept").checked = true;
+            if (document.querySelector("#accept") != null) document.querySelector("#accept").checked = true;
             document.querySelector("#nickname").value = nick;
             document.querySelector("#voteBtn").click();
 		} catch (e) {
