@@ -295,7 +295,7 @@ async function restoreOptions() {
     }
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
-    if (settings.enableCustom) addCustom();
+    if (settings.enableCustom || projectsCustom.length > 0) addCustom();
 };
 
 //Добавить проект в список проекта
@@ -322,6 +322,7 @@ async function addProjectList(project, visually) {
         getProjectList(project).push(project);
     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
+    if (project.Custom && !settings.enableCustom) addCustom();
     //projects.push(project);
     //await setValue('AVMRprojects', projects, true);
 }
