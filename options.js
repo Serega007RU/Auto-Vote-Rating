@@ -305,7 +305,7 @@ async function addProjectList(project, visually) {
     let html = document.createElement('div');
     html.setAttribute("id", 'div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id));
     //Расчёт времени
-    let text = "скоро...";
+    let text = chrome.i18n.getMessage('soon');
     if (!(project.time == null || project.time == "")) {
         let time = new Date(project.time);
         if (Date.now() < project.time) text = ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth()+1)).slice(-2) + '.' + time.getFullYear() + ' ' + ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2) + ':' + ('0' + time.getSeconds()).slice(-2);

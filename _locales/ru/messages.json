@@ -489,5 +489,8 @@
   },
   "inRandomize": {
     "message": "В рандоме"
+  },
+  "soon": {
+    "message": "скоро..."
   }
 }

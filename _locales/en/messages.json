@@ -526,5 +526,8 @@
   },
   "inRandomize": {
     "message": "In randomized"
+  },
+  "soon": {
+    "message": "soon..."
   }
 }
