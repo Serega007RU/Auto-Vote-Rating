@@ -7,7 +7,7 @@ function vote() {
 		}
 		try {
 			if (document.querySelector("body") != null && document.querySelector("body").textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-				sendMessage(document.querySelector("body").textContent);
+				window.location.reload();
 				return;
 			}
 			//Чистит куки

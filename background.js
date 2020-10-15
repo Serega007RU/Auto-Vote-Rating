@@ -40,7 +40,6 @@ var retryCoolDown = 300;
 //Таймаут 15 минут
 var retryCoolDownEmulation = 900;
 
-var clearCookieMonitoringMinecraft = true;
 var secondVoteMinecraftIpList = false;
 
 //Инициализация настроек расширения
@@ -219,7 +218,7 @@ async function checkOpen(project) {
 	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('startedAutoVote'));
     if (!settings.disabledNotifStart) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('startedAutoVote'));
 
-    if ((clearCookieMonitoringMinecraft && project.MonitoringMinecraft) || project.FairTop) {
+    if (project.MonitoringMinecraft || project.FairTop) {
     	let url;
     	if (project.MonitoringMinecraft) {
             url = '.monitoringminecraft.ru';
@@ -238,9 +237,6 @@ async function checkOpen(project) {
 	    		await removeCookie("https://" + cookies[i].domain + cookies[i].path, cookies[i].name);
 	    	}
 	    }
-    }
-    if (project.MonitoringMinecraft && !clearCookieMonitoringMinecraft) {
-    	clearCookieMonitoringMinecraft = true;
     }
 
 	newWindow(project);
@@ -396,6 +392,7 @@ async function silentVote(project) {
 				return;
 			}
 			endVote('successfully', null, project);
+			return
 	    }
 
 	    if (project.McTOP) {
@@ -427,6 +424,7 @@ async function silentVote(project) {
 				return;
 			}
 			endVote('successfully', null, project);
+			return
 	    }
 
 	    if (project.MCRate) {
@@ -471,6 +469,7 @@ async function silentVote(project) {
 				    message = doc.querySelector('div[class=report]').textContent;
 				}
 				endVote(message, null, project);
+				return
 			} else if (doc.querySelector('span[class=count_hour]') != null) {//Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
                 //Берёт из скрипта переменную в которой хранится сколько осталось до следующего голосования
 //			    let count2 = doc.querySelector("#center-main > div.center_panel > script:nth-child(2)").text.substring(30, 45);
@@ -482,8 +481,10 @@ async function silentVote(project) {
 				//if (milliseconds == 0) return;
 //				let later = Date.now() - (86400000 - milliseconds);
 				endVote('later', null, project);
+				return
 			} else {
 			    endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project);
+			    return
 			}
 	    }
 
@@ -532,91 +533,99 @@ async function silentVote(project) {
 //					}
 //					let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000;
 					endVote('later', null, project);
+					return
 				} else {
 					endVote(doc.querySelector('div.alert.alert-danger').textContent, null, project);
+					return
 				}
 			} else if (doc.querySelector('div.alert.alert-success') != null) {
 				if (doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
 					endVote('successfully', null, project);
+					return
 				} else {
 					endVote(doc.querySelector('div.alert.alert-success').textContent, null, project);
+					return
 				}
 			} else {
                 endVote('Ошибка! div.alert.alert-success или div.alert.alert-danger является null', null, project);
+                return
 			}
 	    }
 
 	    if (project.MonitoringMinecraft) {
-			let response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
-			let host = extractHostname(response.url);
-			if (host.includes('vk.')) {
-				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
-				return;
-			}
-			if (!host.includes('monitoringminecraft.')) {
-                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
-                return;
-			}
-			if (!response.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
-				if (response.status == 503) {
-					clearCookieMonitoringMinecraft = false;
+	    	let i = 0
+	    	while (i <= 3) {
+	    		i++
+				let response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
+				let host = extractHostname(response.url)
+				if (host.includes('vk.')) {
+					endVote(chrome.i18n.getMessage('errorAuthVK'), null, project)
+					return
 				}
-                return;
-			}
-            let html = await response.text();
-            let doc = new DOMParser().parseFromString(html, "text/html");
-			if (doc.querySelector("body") != null && doc.querySelector("body").textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-				sendMessage(doc.querySelector("body").textContent);
-				return;
-			}
-			if (doc.querySelector("input[name=player]") != null) {
-                response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
-			    host = extractHostname(response.url);
-			    if (!host.includes('monitoringminecraft.')) {
-                    endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
-                    return;
-			    }
+				if (!host.includes('monitoringminecraft.')) {
+					endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project)
+					return
+				}
 				if (!response.ok) {
-					endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
 					if (response.status == 503) {
-						clearCookieMonitoringMinecraft = false;
+						if (i == 3) {
+							endVote("Превышено максимально кол-во попыток голосования, код ошибки HTTP: " + response.status, null, project)
+							return
+						}
+						await wait(3000)
+						continue
+					} else {
+						endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project)
 					}
-					return;
 				}
-				html = await response.text();
-                doc = new DOMParser().parseFromString(html, "text/html");
+
+				let html = await response.text()
+				let doc = new DOMParser().parseFromString(html, "text/html")
 				if (doc.querySelector("body") != null && doc.querySelector("body").textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-					sendMessage(doc.querySelector("body").textContent);
-					return;
-				}
-			}
-			if (doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
-				//Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
-				//Берёт последние 30 символов
-				let string = doc.querySelector('center').textContent.substring(doc.querySelector('center').textContent.length - 30);
-				//Из полученного текста достаёт все цифры в Array List
-				let numbers = string.match(/\d+/g).map(Number);
-				let count = 0;
-				let hour = 0;
-				let min = 0;
-				let sec = 0;
-				for (let i in numbers) {
-					if (count == 0) {
-						hour = numbers[i];
-					} else if (count == 1) {
-						min = numbers[i];
+					if (i == 3) {
+						endVote("Превышено максимально кол-во попыток голосования, " + doc.querySelector("body").textContent, null, project)
+						return
 					}
-					count++;
+					continue
 				}
-				let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-				let later = Date.now() + milliseconds;
-				endVote('later ' + later, null, project);
-			} else if (doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
-				endVote('successfully', null, project);
-			} else {
-				endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project);
-			}
+				if (doc.querySelector("input[name=player]") != null) {
+					if (i == 3) {
+						endVote("Превышено максимально кол-во попыток голосования, input[name=player] является " + doc.querySelector("input[name=player]"), null, project)
+						return
+					}
+                    continue
+				}
+
+				if (doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
+					//Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
+					//Берёт последние 30 символов
+					let string = doc.querySelector('center').textContent.substring(doc.querySelector('center').textContent.length - 30)
+					//Из полученного текста достаёт все цифры в Array List
+					let numbers = string.match(/\d+/g).map(Number)
+					let count = 0
+					let hour = 0
+					let min = 0
+					let sec = 0
+					for (let i in numbers) {
+						if (count == 0) {
+							hour = numbers[i]
+						} else if (count == 1) {
+							min = numbers[i]
+						}
+						count++;
+					}
+					let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+					let later = Date.now() + milliseconds
+					endVote('later ' + later, null, project)
+					return
+				} else if (doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
+					endVote('successfully', null, project)
+					return
+				} else {
+					endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project)
+					return
+				}
+	    	}
 	    }
 
 	    if (project.ServerPact) {
@@ -710,12 +719,16 @@ async function silentVote(project) {
             doc = new DOMParser().parseFromString(html, "text/html");
 			if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {
 			    endVote('successfully', null, project);
+			    return
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {
 			    endVote('later ' + (Date.now() + 43200000), null, project);
+			    return
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null) {
 			    endVote(doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.substring(0, doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.indexOf('\n')), null, project);
+			    return
 			} else {
 			   	endVote(chrome.i18n.getMessage('errorVoteUnknown2'), null, project)
+			    return
 			}
 	    }
 
@@ -891,8 +904,10 @@ async function silentVote(project) {
 	    	let response = await fetch(project.responseURL, project.id);
 	    	if (response.ok) {
 	    		endVote('successfully', null, project);
+	    		return
 	    	} else {
 	    		endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+	    		return
 	    	}
 	    }
     } catch (e) {
@@ -1158,9 +1173,6 @@ async function endVote(message, sender, project) {
         console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + time);
 	//Если ошибка
 	} else {
-		if (project.MonitoringMinecraft && message.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-			clearCookieMonitoringMinecraft = false;
-		}
 		let sendMessage;
 		if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
@@ -1327,6 +1339,14 @@ async function setValue(key, value) {
             resolve(data);
         });
     });
+}
+
+async function wait(ms) {
+    return new Promise(resolve => {
+		setTimeout(() => {
+			resolve();
+		}, ms);
+	});
 }
 
 function forLoopAllProjects (fuc) {
