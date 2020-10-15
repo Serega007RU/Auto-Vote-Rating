@@ -321,7 +321,7 @@ async function restoreOptions() {
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
     document.getElementById("cooldown").value = settings.cooldown;
     document.getElementById("useMultiVote").checked = settings.useMultiVote;
-    if (settings.enableCustom) addCustom();
+    if (settings.enableCustom || projectsCustom.length > 0) addCustom();
 };
 
 //Добавить проект в список проекта
@@ -331,7 +331,7 @@ async function addProjectList(project, visually) {
     let html = document.createElement('div');
     html.setAttribute("id", 'div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id));
     //Расчёт времени
-    let text = "скоро...";
+    let text = chrome.i18n.getMessage('soon');
     if (!(project.time == null || project.time == "")) {
         let time = new Date(project.time);
         if (Date.now() < project.time) text = ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth()+1)).slice(-2) + '.' + time.getFullYear() + ' ' + ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2) + ':' + ('0' + time.getSeconds()).slice(-2);
@@ -348,6 +348,7 @@ async function addProjectList(project, visually) {
         getProjectList(project).push(project);
     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
+    if (project.Custom && !settings.enableCustom) addCustom();
     //projects.push(project);
     //await setValue('AVMRprojects', projects, true);
 }
@@ -2196,9 +2197,9 @@ selectedTop.addEventListener("change", function() {
     } else if(selectedTop.value == "MCRate") {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://mcrate.su/rate/<span style="color:red;">4396</span>') + '</span></span></div>' + dataInput + '<option value="8876">StarWay</option><option value="7003">CubixWorld</option><option value="4396">Excalibur-Craft</option><option value="4703">FineMine</option><option value="7450">FrostLand</option><option value="8428">Gamai</option><option value="8493">GrandGear</option><option value="10">LavaCraft</option><option value="4852">Letragon</option><option value="5154">MinecraftOnly</option><option value="6099">MythicalWorld</option><option value="6071">PentaCraft</option><option value="6434">Pixelmon.PRO</option><option value="1762">qoobworld</option><option value="4692">SimpleMinecraft</option><option value="4427">HillMine</option></datalist>';
     } else if(selectedTop.value == "MinecraftRating") {
-       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://minecraftrating.ru/projects/<span style="color:red;">cubixworld</span>/') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="diversemine">DiverseMine</option><option value="excalibur-craft">Excalibur-Craft</option><option value="gamepoint">GamePoint</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mytdicalworld">MythicalWorld</option><option value="oneland">OneLand</option><option value="orangecraft">OrangeCraft</option><option value="pixelmon">Pixelmon.PRO</option><option value="shadowcraft">ShadowCraft</option><option value="sidemc">SideMC</option><option value="smc">SimpleMinecraft</option><option value="victorycraft">VictoryCraft</option><option value="hillmine">HillMine</option></datalist>';
+       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://minecraftrating.ru/projects/<span style="color:red;">cubixworld</span>/') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="diversemine">DiverseMine</option><option value="excalibur-craft">Excalibur-Craft</option><option value="gamepoint">GamePoint</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="oneland">OneLand</option><option value="orangecraft">OrangeCraft</option><option value="pixelmon">Pixelmon.PRO</option><option value="shadowcraft">ShadowCraft</option><option value="sidemc">SideMC</option><option value="smc">SimpleMinecraft</option><option value="victorycraft">VictoryCraft</option><option value="hillmine">HillMine</option></datalist>';
     } else if(selectedTop.value == "MonitoringMinecraft") {
-       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://monitoringminecraft.ru/top/<span style="color:red;">gg</span>/vote') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="gg">GrandGear</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mytdicalworld">MythicalWorld</option><option value="orangecraft">OrangeCraft</option><option value="pixelmonpro">Pixelmon.PRO</option><option value="skolotfun">skolot.fun</option></datalist>';
+       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://monitoringminecraft.ru/top/<span style="color:red;">gg</span>/vote') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="gg">GrandGear</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="orangecraft">OrangeCraft</option><option value="pixelmonpro">Pixelmon.PRO</option><option value="skolotfun">skolot.fun</option></datalist>';
     } else if(selectedTop.value == "FairTop") {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://fairtop.in/vote/<span style="color:red;">731</span>') + '</span></span></div>' + dataInput + '<option value="354">FineMine</option><option value="1356">GrandGear</option><option value="731">PentaCraft</option><option value="1404">Pixelmon.PRO</option><option value="797">qoobworld</option><option value="6">SMARTYcraft</option><option value="224">HillMine</option></datalist>';
     } else if(selectedTop.value == "IonMc") {

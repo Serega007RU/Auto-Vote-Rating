@@ -42,7 +42,6 @@ var retryCoolDown = 300;
 //Таймаут 15 минут
 var retryCoolDownEmulation = 900;
 
-var clearCookieMonitoringMinecraft = true;
 var secondVoteMinecraftIpList = false;
 
 var stopVote = 0;
@@ -305,7 +304,7 @@ async function checkOpen(project) {
 	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('startedAutoVote'));
     if (!settings.disabledNotifStart) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('startedAutoVote'));
 
-    if ((clearCookieMonitoringMinecraft && project.MonitoringMinecraft) || project.FairTop) {
+    if (project.MonitoringMinecraft || project.FairTop) {
     	let url;
     	if (project.MonitoringMinecraft) {
             url = '.monitoringminecraft.ru';
@@ -325,9 +324,6 @@ async function checkOpen(project) {
 	    		await removeCookie("https://" + cookies[i].domain + cookies[i].path, cookies[i].name);
 	    	}
 	    }
-    }
-    if (project.MonitoringMinecraft && !clearCookieMonitoringMinecraft) {
-    	clearCookieMonitoringMinecraft = true;
     }
 
 	await newWindow(project);
@@ -675,6 +671,7 @@ async function silentVote(project) {
 				return;
 			}
 			endVote('successfully', null, project);
+			return
 	    }
 
 	    if (project.McTOP) {
@@ -706,6 +703,7 @@ async function silentVote(project) {
 				return;
 			}
 			endVote('successfully', null, project);
+			return
 	    }
 
 	    if (project.MCRate) {
@@ -750,6 +748,7 @@ async function silentVote(project) {
 				    message = doc.querySelector('div[class=report]').textContent;
 				}
 				endVote(message, null, project);
+				return
 			} else if (doc.querySelector('span[class=count_hour]') != null) {//Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
                 //Берёт из скрипта переменную в которой хранится сколько осталось до следующего голосования
 //			    let count2 = doc.querySelector("#center-main > div.center_panel > script:nth-child(2)").text.substring(30, 45);
@@ -761,8 +760,10 @@ async function silentVote(project) {
 				//if (milliseconds == 0) return;
 //				let later = Date.now() - (86400000 - milliseconds);
 				endVote('later', null, project);
+				return
 			} else {
 			    endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project);
+			    return
 			}
 	    }
 
@@ -811,91 +812,99 @@ async function silentVote(project) {
 //					}
 //					let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000;
 					endVote('later', null, project);
+					return
 				} else {
 					endVote(doc.querySelector('div.alert.alert-danger').textContent, null, project);
+					return
 				}
 			} else if (doc.querySelector('div.alert.alert-success') != null) {
 				if (doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
 					endVote('successfully', null, project);
+					return
 				} else {
 					endVote(doc.querySelector('div.alert.alert-success').textContent, null, project);
+					return
 				}
 			} else {
                 endVote('Ошибка! div.alert.alert-success или div.alert.alert-danger является null', null, project);
+                return
 			}
 	    }
 
 	    if (project.MonitoringMinecraft) {
-			let response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {signal: controller.signal, "headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
-			let host = extractHostname(response.url);
-			if (host.includes('vk.')) {
-				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
-				return;
-			}
-			if (!host.includes('monitoringminecraft.')) {
-                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
-                return;
-			}
-			if (!response.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
-				if (response.status == 503) {
-					clearCookieMonitoringMinecraft = false;
+	    	let i = 0
+	    	while (i <= 3) {
+	    		i++
+				let response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
+				let host = extractHostname(response.url)
+				if (host.includes('vk.')) {
+					endVote(chrome.i18n.getMessage('errorAuthVK'), null, project)
+					return
 				}
-                return;
-			}
-            let html = await response.text();
-            let doc = new DOMParser().parseFromString(html, "text/html");
-			if (doc.querySelector("body") != null && doc.querySelector("body").textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-				sendMessage(doc.querySelector("body").textContent);
-				return;
-			}
-			if (doc.querySelector("input[name=player]") != null) {
-                response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {signal: controller.signal, "headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
-			    host = extractHostname(response.url);
-			    if (!host.includes('monitoringminecraft.')) {
-                    endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
-                    return;
-			    }
+				if (!host.includes('monitoringminecraft.')) {
+					endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project)
+					return
+				}
 				if (!response.ok) {
-					endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
 					if (response.status == 503) {
-						clearCookieMonitoringMinecraft = false;
+						if (i == 3) {
+							endVote("Превышено максимально кол-во попыток голосования, код ошибки HTTP: " + response.status, null, project)
+							return
+						}
+						await wait(3000)
+						continue
+					} else {
+						endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project)
 					}
-					return;
 				}
-				html = await response.text();
-                doc = new DOMParser().parseFromString(html, "text/html");
+
+				let html = await response.text()
+				let doc = new DOMParser().parseFromString(html, "text/html")
 				if (doc.querySelector("body") != null && doc.querySelector("body").textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-					sendMessage(doc.querySelector("body").textContent);
-					return;
-				}
-			}
-			if (doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
-				//Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
-				//Берёт последние 30 символов
-				let string = doc.querySelector('center').textContent.substring(doc.querySelector('center').textContent.length - 30);
-				//Из полученного текста достаёт все цифры в Array List
-				let numbers = string.match(/\d+/g).map(Number);
-				let count = 0;
-				let hour = 0;
-				let min = 0;
-				let sec = 0;
-				for (let i in numbers) {
-					if (count == 0) {
-						hour = numbers[i];
-					} else if (count == 1) {
-						min = numbers[i];
+					if (i == 3) {
+						endVote("Превышено максимально кол-во попыток голосования, " + doc.querySelector("body").textContent, null, project)
+						return
 					}
-					count++;
+					continue
 				}
-				let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-				let later = Date.now() + milliseconds;
-				endVote('later ' + later, null, project);
-			} else if (doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
-				endVote('successfully', null, project);
-			} else {
-				endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project);
-			}
+				if (doc.querySelector("input[name=player]") != null) {
+					if (i == 3) {
+						endVote("Превышено максимально кол-во попыток голосования, input[name=player] является " + doc.querySelector("input[name=player]"), null, project)
+						return
+					}
+                    continue
+				}
+
+				if (doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
+					//Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
+					//Берёт последние 30 символов
+					let string = doc.querySelector('center').textContent.substring(doc.querySelector('center').textContent.length - 30)
+					//Из полученного текста достаёт все цифры в Array List
+					let numbers = string.match(/\d+/g).map(Number)
+					let count = 0
+					let hour = 0
+					let min = 0
+					let sec = 0
+					for (let i in numbers) {
+						if (count == 0) {
+							hour = numbers[i]
+						} else if (count == 1) {
+							min = numbers[i]
+						}
+						count++;
+					}
+					let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+					let later = Date.now() + milliseconds
+					endVote('later ' + later, null, project)
+					return
+				} else if (doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
+					endVote('successfully', null, project)
+					return
+				} else {
+					endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project)
+					return
+				}
+	    	}
 	    }
 
 	    if (project.ServerPact) {
@@ -992,12 +1001,16 @@ async function silentVote(project) {
             doc = new DOMParser().parseFromString(html, "text/html");
 			if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {
 			    endVote('successfully', null, project);
+			    return
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {
 			    endVote('later ' + (Date.now() + 43200000), null, project);
+			    return
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null) {
 			    endVote(doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.substring(0, doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.indexOf('\n')), null, project);
+			    return
 			} else {
 			   	endVote(chrome.i18n.getMessage('errorVoteUnknown2'), null, project)
+			    return
 			}
 	    }
 
@@ -1176,8 +1189,10 @@ async function silentVote(project) {
 	    	let response = await fetch(project.responseURL, project.id);
 	    	if (response.ok) {
 	    		endVote('successfully', null, project);
+	    		return
 	    	} else {
 	    		endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+	    		return
 	    	}
 	    }
     } catch (e) {
@@ -1474,9 +1489,7 @@ async function endVote(message, sender, project) {
 		}
 	//Если ошибка
 	} else {
-		if (project.MonitoringMinecraft && message.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-			clearCookieMonitoringMinecraft = false;
-		} else if (settings.useMultiVote) {
+        if (settings.useMultiVote) {
 			if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (message.includes(' ВК') || message.includes(' VK')) && currentVK != null) {
 				currentVK.notWorking = true;
 				await setValue('AVMRVKs', VKs);
@@ -1580,7 +1593,7 @@ function getProjectList(project) {
 //Проверяет правильное ли у вас время
 async function checkTime () {
 	try {
-        let response = await fetch('https://api-testing.cifrazia.com/');
+        let response = await fetch('https://api.cifrazia.com/');
 		if (response.ok && !response.redirected) { // если HTTP-статус в диапазоне 200-299 и не было переадресаций
 			// получаем тело ответа и сравниваем время
 			let json = await response.json();
@@ -1687,7 +1700,6 @@ async function setProxy(config) {
 		});
 	});
 }
-
 async function wait(ms) {
     return new Promise(resolve => {
 		setTimeout(() => {
@@ -2115,252 +2127,6 @@ function getTopFromList(list, project) {
 }
 
 /*
-История настроек:
-v1 http://ipic.su/img/img7/fs/options1.1597930655.png
-v2 http://ipic.su/img/img7/fs/options2.1597852890.png
-v3 http://ipic.su/img/img7/fs/options3.1597852881.png
-v4 http://ipic.su/img/img7/fs/options4.1597852840.png
-v5 http://ipic.su/img/img7/fs/options5.1597853028.png
-
-Change-Log:
-v1.0
-Первый релиз расширения!
-
-v1.1-1.2
-Уже и не помню какие изменения были в этих версиях
-
-v1.3
-Исправлена ошибка если какой-то из конфигов даты/времени являлся null что ломало всё расширение
-Теперь механизм голосования более точен, не должно быть больше такого что расширение недоконца проголусет
-На голосованиях time добавлен механизм высчитывающий сколько через сколько точно надо будет прогосовать если до расширения пользователь вручную голосовал
-MCRate перешёл с date на time (мой косяк, не заметил что он по времени а не по дате отсчитывает)
-Убрано из манифеста лишнее разрешение "Tabs"
-
-v1.3.1
-Исправление мелких ошибок:
-CoolDown возвращён на 5 минут (до этого был в целях теста 30 секунд или вроде меньше)
-Исправлено немного косячное определение URL на MCRate
-
-v1.3.2
-Исправлена ошибка голосования с McTOP
-Экспериментально изменён путь JS Path к кнопке авторизации ВК для TopCraft и McTOP
-
-v1.3.3
-minecraftrating - исправлена ошибка голосования (расширение теперь корректно ждёт когда страница загрузица)
-Предподготовка к добавлению функции тихого голосования которая позволит голосовать не открывая вкладки в браузере не мешая пользователю
-
-v1.3.4
-Дополнительные настройки - в разработке
-
-v1.3.5
-Снова исправлен косяк с дополнительными настройками - в разработке
-Временно закомментирован style и background.js (а его и не стоило пока добавлять)
-
-v1.4.0
-Как оказалось на одном топе можно голосовать сразу за несколько проектов и это реализовано тут (спасибо Алексей Костюкевич#6693)
-Таймаут проверки голосования снижен до 30-ти секунд, но таймаут при неудачном голосовании всё равно остался на 5-ти минутах
-И опять убрано несколько лишних разрешений из манифеста
-Расширение практически полностью переписано для реализации возможности голосовать на одном топе за несколько проектов
-Проведена оптимизация в сторону ООП (Объектно-ориентированное программирование), строчек кода сократился почти в два раза
-
-v1.4.1
-Исправлена ошибка "не удалось найти никнейм" на minecraftrating и monitoringminecraft
-Для более детального исследования ошибки "не удалось найти никнейм", в ошибке теперь пишется URL
-Исправлен таймаут голосования (5 минут) при неуспешном голосовании
-Ошибки теперь немного правильнее пишутся в уведомлении
-Исправлена глупая ошибка monitoringminecraft с get nickname
-Теперь при серии голосований для каждого топа голосует по одному проекту друг за другом, а не сразу за одну секунду
-В дополнительных настройках галочки теперь сохраняются при обновлении страницы после сохранения настроек
-retryProjects теперь работает с несколькими проектами, а не с одним
-Теперь в циклах for и if кроме никнейма и айди проекта проверяется топ во избежание случайных совпадений
-Оптимизирован поиск на совпадение проектов в настройках при добавлении проекта
-Таймаут проверки голосования снова снижен уже до 10-ти секунд
-Если пользователь копается во вкладке открытой расширением — его теперь оповещает что не фиг там лазит
-Теперь при голосовании ник из памяти запрашивается только тогда - когда надо (вместе с этим MCRate теперь не выдаёт ошибку при успешном голосовании)
-Теперь только одно сообщение об ошибке "не удалось найти никнейм" пишет
-В настройках добавлена возможность добавлять дубликаты проектов
-
-v1.4.2
-Исправлены грамматические ошибки в тесте в настройках
-Если отсутствует подключение к интернету, сайт упал или нет нужного элемента - ошибку теперь более внятно и понятно расписывает
-Добавлена поддержка часовых поясов (теперь расширением могут пользоваться люди с любой точки земли) (данная функция переписывалась 2 раза блин)
-Теперь сверяется время компьютера с интернетом и предупреждает пользователя о том что расширение может работать не корректно с неверным временем
-Теперь вкладки верно открываются если окно браузера было закрыто
-Добавлена поддержка для Yandex browser, вроде там всё работает (на FireFox видимо надо писать отдельно расширение, на Opera работает всё кроме настроек, их нужно в ручную открывать)
-Теперь ошибка обрабатывается если пользователь не авторизован в VK
-Частично исправлен баг не кликабельной кнопки "Сохранить настройки" в настройках если после добавления проекта менять дополнительные настройки
-При добавлении проекта теперь проверяется существует ли такой проект и проверяется авторизация VK
-
-v1.4.3
-При отключении проверки при добавлении проекта в настройках теперь игнорируется проверка на существование проекта и авторизации VK
-TopCraft и McTOP теперь правильно работает с часовым поясом (надеюсь я в последний раз работаю с этими долбанными часовыми поясами)
-И опять исправлены грамматические ошибки в русском тексте (на этот раз почти польностью)
-Удалены лишние ссылки в разрешениях в манифесте
-
-v1.4.4
-Ошибка авторизации вк теперь правильно обрабатывается
-Добавлен пункт в настройках "Справка" в ней же список проектов где выдают бонусы за голосование
-Исправлена ошибка с очередью голосования, теперь 100% не открывается больше одной вклаки на одном топе
-Изменения настроек:
-- в настройках изменения теперь автоматически сохраняются
-- была проведена оптимизация всего расширения по работе с настройками
-- были оптимизированы сами настройки (GUI и js)
-- можно теперь редактировать настройки прям во время голосования
-- теперь голосование прекращается если проект за который проходит голосование удаляется в настройках
-- код теперь синхронно работает при работе с настройками
-- добавлена возможность настраивать где хранить настройки (в дополнительных настройках - Сохранять настройки расширения в облаке)
-- ключевое слово при сохранении настроек изменён на более точное дабы не кофликтовать с другими расширениями
-- при добавлении проекта теперь пишется имя домена проекта которого вы добавили
-- теперь не голосует за проект во время добавления проекта (отключён redirect в fetch запросе при проверке авторизации ВК)
-На MonitoringMinecraft включено ограничение голосования (1 голос раз в 15 минут, это ограничение самого топа)
-Добавлен новый топ - FairTop
-
-v2.0.0
-Ура! Теперь есть возможность голосовать за проекты не открывая вкладки полностью в фоновом режиме (тихий режим)
-На MonitoringMinecraft теперь очищаются куки перед голосованием и снято ограничение 1 голоса в 10 минут
-Прправлена небольшая ошибка с высчитыванием времени на след голосование на MonitoringMinecraft
-(Опять?) Если произошла ошибка при голосовании и ответа не было получено - удаляет из очереди голосования
-Добавлена поддержка браузера Kiwi для Android смартфонов, протестировано расширение на Яндекс браузере на смартфоне, вроде всё работает
-Для совместимости с другими браузерами настройки теперь открываются в новой вкладке, интерфейс настроек теперь отображается по середине в отедельной вкладке, раззмер текста немного увеличен
-В манифесте временно отключён background.persistent, посмотрим как будет работать расширение в этом режиме
-
-v2.0.1
-Добавлена возможность кастомного голосования
-И опять настройки немного переделаны из-за ограничений chrome.storage сохранённые проекты теперь храняться не в одном элементе а каждый топ в своём элементе
-Добавлена возможность экспорта и импорта настроек
-
-v2.0.2
-Тихий режим теперь по умолчанию включён
-У настроек теперь есть название
-Добавлена возможность отключать проверку времени
-Теперь при первой установке расширения открывается страница настроек расшрения
-Ошибки теперь правильнее и точнее обрабатываются в fetch запросах
-В настройках сделано более внятное и понятное переключение между тихим режимом и обычным
-С этой версии планируется публикация расширения в общий доступ
-
-v2.0.3 (rejected)
-В связи с обновлением правил голосования на MinecraftRating была исправлена критическая ошибка при повторном голосовании и теперь на этом топе следующее время голосования наступает не через 24 часа а на следующий день в 00:10 по МСК
-На MCRate следующее время голосования наступает не через 24 часа а на следующий день в 01:10 по МСК
-"Следующая попытка голосования будет сделана через 5 минут" пишется теперь в одном уведомлении дабы избежать большой флуд уведомлений
-Расширение больше не будет флудить ошибками если нет соединения с интернетом, вместо этого он теперь терпиливо ждёт когда появиться интернет
-Теперь во всех уведомлениях ставятся квадратные скобки в названии проекта
-В настройках теперь правильно проверяется существование проекта на MCRate
-Более менее рассортированы файлы расширения по папкам
-
-v2.0.4
-Добавлена возможность приоритетного голосования
-Задержка проверки на голосования снижена с 10 секунд до 1-ой
-Обновлена иконка расширения, создалны рекламные баннеры
-Добавлена возможность настраивать кулдаун проверки голосования
-При первом запуске расширения уведомление с настройкой расширения теперь адекватно отображается а не отдельным окном (на Win 10 с несколькоими мониторами была с этим проблема)
-Исправлена ошибка не удаления Custom project после добавления при удалении
-
-v2.0.5
-Устранена путаница с настройкой уведомлений о Info и Warn
-cooldown проверки голосования по умолчанию изменён на 1 секунду (при этом cooldown 10 секунд всё равно остался после успешного голосования до следующего голосования)
-
-v2.1.0
-По просьбе Алексей Костюкевич#6693 в список проектов где дают бонусы за голосование добавлен CenturyMine
-В список проектов где дают бонусы за голосование: обновлён MythicalWorld, удалён EinCraft и PlayWars - больше не дают бонусов за голосование
-Дизайн настроек расширения был полностью переделан, огромное спасибо Qworte за этот дизайн
-Для владельцев проекта добавлена возможность сделать для пользователя одну кнопку которая позволит в один клик настроить расширение специально под проект
-Исправлена ошибка в настройках с фантомным удалением проекта
-Для проектов MythicalWorld и VictoryCraft при добавлении проекта теперь предлагает автоматизировать процесс забирания награды за голосование
-
-v2.2.0
-Возможно это ошибка но исправлен cooldown и retryCoolDown если cooldown не по умолчанию 10000
-Добавлена возможность голосовать с нескольких аккаунтов вк, пока что данная настройка скрыта из-за нарушений правил топов (данная функция не протестирована!!! может что-то не работать или вызывать ошибки)
-Исправлена критическая ошибка с голосованием на MonitoringMinecraft в режиме эмуляции (спасибо Ружбайка#8839 за найденный баг), если вы уже голосовали на этом топе то страница циклически перезагружалась
-Авторизация вк теперь более правильно и понятно проходит для пользователя (в отдельном модальном окне)
-
-v3.0.0 (rejected)
-Обновлён дизайн настроек - спасибо огромное за проделанную работу Qworte
-Изменения в настройках:
-- В списке добавленных топов написано теперь "Следующее голосование после" а не "Следующее голосование в", народ немного тупит на этом (спасибо YaMotλaV)
-- Настройки разнесены по вкладкам (также и сами топы разнесены по вкладкам)
-- В поле выбора ID теперь предлагается список проектов наиболее популярных на выбранном топе
-Теперь если у проекта есть name то пишется его имя (ссылка) вместо id
-Мелкие исправления с MultiVote
-Чтобы пишется слитно а не раздельно (спасибо ребятам из 300iq Squad)
-Попытка исправить ошибку на MonitoringMinecraft "Вы слишком часто обновляете страницу. Умерьте пыл."
-Новые топы:
-- PlanetMinecraft
-- TopG
-- MinecraftMp
-- MinecraftServerList
-- ServerPact
-- MinecraftIpList
-
-v3.0.1
-Если выдало ошибку в проверке времени то дальше код не должен выполняться
-Исправление критической ошибки с MinecraftIpList, если нет куки PHPSESSID то голосование не происходило
-Оптимизация кода работы с куки
-Изменено описание расширения
-После rejected:
-Попытка заставить нормально работать MinecraftIpList в фоновом режиме (конфликт с timezone)
-Попытка отказаться от написания политики конфиденциальности: вырезан функционал MultiVote, теперь это будет доступно только в неофициальной версии разработчика
-
-v3.1.0
-Теперь нет ошибок если автоголосовать с телефона на ServerPact и MinecraftIpList
-Возвращение MultiVote но теперь пользователя предупреждает что токен ВКонтакте хранится в НЕзашифрованном виде (нужно реализовать функционал смены айпи, без него MultiVote не будет нормально функцианировать)
-Ошибка на ServerPact теперь адекватно показывается
-worldclockapi успешно сдох и поэтому мы перешли на своё API: https://api-testing.cifrazia.com/
-Повторная попытка исправить ошибку на MonitoringMinecraft "Вы слишком часто обновляете страницу. Умерьте пыл." (Ошибка 503)
-При закрытии вкладки теперь выводиться в уведомления ошибка chrome.runtime.lastError
-Новые топы:
-- IonMc
-- ServeurPrive
-- MinecraftServers (проблемы с капчей, не будет доступно по умолчанию, используйте Privacy Pass)
-- TopMinecraftServers
-Для топов где недоступен режим тихого голосования увеличен таймаут на повторное голосование после ошибки до 15 минут (это сделано для того что б потом капча не подозревала нас во флуде)
-Исправлена ошибка подключения к интернету если пропало подключение к интернету, расширение теперь верно детектит неподключение к интернету (Unchecked runtime.lastError: Cannot access contents of url "chrome-error://chromewebdata/". Extension manifest must request permission to access this host.)
-В импорте настроек добавлена поддержка старых версий (2.2.0)
-В манифест возвращён в background persistent true
-В настройках при изменении кулдауна расширение теперь может сам себя перезапускать
-
-v3.2.0
-Как выяснилось Kiwi Browser не способен работать в необязательными разрешениями что теперь разрешениями webRequest и webRequestBlocking теперь являются обязательными (в частности с методами chrome.permissions.request, alert, confirm или с любыми другими всплывающими окнами chrome (также выдавало ошибку при использвании chrome.runtime.getPlatformInfo что и так осложняло поддержку необязаных разрешений для мобильных устройств))
-Избавились от функционала синхронизации настроек между браузерами, ненужный функционал от которого много проблем. Используйте вместо него импорт/экспорт настроек
-Оптимизация работы с проверкой на следующее голосование, должно меньше жрать ЦП при расчёте след голосования (я ваще не заметил нагрузки, скорее эта оптимизация будет полезна если кто-то голосует за больше 1000 проектов)
-Мелкие исправления ошибок
-Новый топ - MinecraftServersBiz (добавлен по просьбе Zeudon#5060)
-Оптимизирована работа с executeScript и теперь executeScript выполняется только тогда когда страница полностью загрузилась
-Теперь адекватнее капча проходится (а не то что было костылями с задержакми), теперь расширение ждёт когда капча будет пройдена
-Добавлена небольшая интеграция с расширением Buster: Captcha Solver for Humans (требуется редактирование расширения, нужно убрать проверку isTrusted у слушателя кнопки solver-button)
-Теперь выводиться уведомление если требуется пройти капчу вручную
-MinecraftServers переименован в MinecraftServersOrg дабы избежать путаницы
-Исправлена ошибка бесконечного голосования на MinecraftIpList если вы уже голосовали
-Удалён MultiVote (будет доступен только в версии разработчика), как оказалось бесполезен без proxy
-
-v3.2.1 HotFix
-Исправление критической ошибки при переходе на новую версию расчёта следующего голосования. При обновлении на версию 3.2.0 расширение не переходило на новую систему расчёта след голосования что приводило к не работоспособностью добавленных проектов в старой версии.
-
-v3.2.2
-У MinecraftMp оказалась дополнительная проверка капчи, исправлены некоторые ошибки с ним
-В Tooltip'е ID проекта теперь более адекватно и понятно показывается где и как достать ID проекта (было слишком много вопросов как его доставать)
-Исправлена ошибка когда скрипт загружался во вкладку раньше чем загрузилась вкладка
-CubeCraft оказался жопой с ручкой который не даёт награду за голосование если вы не на сервере и поэтому вместо него в списке Legends Evolved
-Исправлена ошибка неверного подсчёта сделанных голосов в день для ServeurPrive
-
-v3.3.0
-Добавлен новый топ - HotMC по просьбе asphaltnoises#4557
-Добавлен новый топ - MinecraftServerNet по просьбе MaketBoss#0133
-Для FairTop и MonitoringMinecraft теперь адекватно очищаются куки что бы можно было голосовать в 1 день за несколько проектов (а не только за 1)
-Из-за тупых вопросов от пользователей расширения теперь Custom скрыт (его теперь нужно вручную включать в консоле addCustom();) и MinecraftServersOrg теперь не скрыт но пользователей предупреждает что лучше всего его использовать с расширением Privacy Pass
-Для режима эмуляции теперь расширение видит ошибки net::ERR
-Теперь для всех топов расширение ищет капчу
-Исправление ошибки если мы натыкаемся на проверку CloudFlare, расширение теперь ждёт когда сам пользователь пройдёт эту проврку
-Теперь больше не будет требовать пройти вручную капчу когда это не нужно
-На FairTop теперь 100% кликает проголосовать
-
-v3.3.1
-Добавлена возможность рандомизировать время следующего голосования. Это сделано что бы сложнее было определить что мы авто-голосуем (тригером появления этого функционала стал проект Pandamium который стал запрешать авто-голосование)
-По просьбе fightfire#8153 на ServerPact теперь время следующего голосования после последнего голоса наступает ровно через 11 часов и 7 минут вместо 12-ти часов
-
-https://minecraftservers.org/ под вопросом насчёт капчи
-https://www.minetrack.net/ на момент проверки сайт лежал
-https://www.minestatus.net/ фоновая капча и потом этот сайт лёг
-
 Открытый репозиторий:
 https://gitlab.com/Serega007/auto-vote-minecraft-rating
 */

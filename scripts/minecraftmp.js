@@ -6,7 +6,8 @@ function vote () {
 			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
 				return;
 			}
-			if (document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong") != null && document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong").textContent.includes('Thank you for your vote!')) {
+			if ((document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong") != null && document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong").textContent.includes('Thank you for your vote'))
+                || (document.querySelector("strong") != null && document.querySelector("strong").textContent.includes('Thank you for your vote'))) {
                 sendMessage('successfully');
                 return;
 			} else if (document.querySelector("#vote_form > div.alert.alert-danger") != null && document.querySelector("#vote_form > div.alert.alert-danger").textContent.includes('You have already voted for this server today.')) {
