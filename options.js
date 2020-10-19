@@ -256,6 +256,7 @@ async function restoreOptions() {
                 }
             }
             if (this.id == "disabledCheckTime") settings.disabledCheckTime = this.checked;
+            if (this.id == "disabledCheckInternet") settings.disabledCheckInternet = this.checked
             if (this.id == "disableCheckProjects") {
                 if (this.checked && confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                     disableCheckProjects = this.checked;
@@ -294,6 +295,7 @@ async function restoreOptions() {
         document.getElementById("enabledSilentVote").value = 'disabled';
     }
     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
+    document.getElementById("disabledCheckInternet").checked = settings.disabledCheckInternet;
     document.getElementById("cooldown").value = settings.cooldown;
     if (settings.enableCustom || projectsCustom.length > 0) addCustom();
 };
@@ -1349,6 +1351,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     document.getElementById("disabledNotifWarn").checked = settings.disabledNotifWarn;
                     document.getElementById("disabledNotifError").checked = settings.disabledNotifError;
                     document.getElementById("disabledCheckTime").checked = settings.disabledCheckTime;
+                    document.getElementById("disabledCheckInternet").checked = settings.disabledCheckInternet;
                     document.getElementById("cooldown").value = settings.cooldown;
                     if (settings.enabledSilentVote) {
                         document.getElementById("enabledSilentVote").value = 'enabled';
