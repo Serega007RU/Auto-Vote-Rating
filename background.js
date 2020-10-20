@@ -56,7 +56,7 @@ var check;
 var debug = true;
 
 //Токен TunnelBear
-let tokenTunnelBear
+let tunnelBear = {}
 
 //Инициализация настроек расширения
 initializeConfig();
@@ -403,7 +403,7 @@ async function newWindow(project) {
 					//Применяет найденный незаюзанный свободный прокси
 					console.log('Применяю прокси: ' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme);
 
-                    if (proxy.ip.includes('lazerpenguin') && tokenTunnelBear == null) {
+                    if (proxy.ip.includes('lazerpenguin') && (tunnelBear.token == null) || tunnelBear.expires < Date.now()) {
                         console.log('Токен TunnelBear является null, пытаюсь его достать...')
 						let response = await fetch("https://api.tunnelbear.com/v2/cookieToken", {
 						  "headers": {
@@ -432,7 +432,8 @@ async function newWindow(project) {
 							return;
 						}
 						let json = await response.json();
-						tokenTunnelBear = "Bearer " + json.access_token;
+						tunnelBear.token = "Bearer " + json.access_token;
+						tunnelBear.expires = Date.now()
                     }
 
 					let config = {
@@ -2041,11 +2042,11 @@ chrome.webRequest.onAuthRequired.addListener(function (details) {
 			login = currentProxy.login
 			password = currentProxy.password
 		} else {
-			if (tokenTunnelBear != null) {
-				login = tokenTunnelBear
-				password = tokenTunnelBear
+			if (tunnelBear.token != null && tunnelBear.expires > Date.now()) {
+				login = tunnelBear.token
+				password = tunnelBear.token
 			} else {
-				console.warn('Токен TunnelBear является null, нечем авторизоваться в прокси!')
+				console.warn('Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси!')
 			}
 		}
 		return({

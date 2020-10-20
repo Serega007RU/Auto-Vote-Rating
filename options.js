@@ -810,7 +810,11 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
               "credentials": "include"
             });
             if (!response.ok) {
-                updateStatusProxy('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', [response.url, response.status]) + '</span>', true);
+                if (response.status == 401) {
+                    updateStatusProxy('<span style="color:#f44336;"> Что бы сделать импорт прокси с TunnelBear необходима авторизация, <a target="blank_" href="https://www.tunnelbear.com/account/login">Авторизоваться</a></span>', true)
+                    return;
+                }
+                updateStatusProxy('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', response.url) + response.status + '</span>', true);
                 return;
             }
             let json = await response.json();
@@ -821,8 +825,9 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
         for (let country of countries) {
             response = await fetch("https://api.polargrizzly.com/vpns/countries/" + country, {"headers": {"authorization": token}})
             if (!response.ok) {
-                updateStatusProxy('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', [response.url, response.status]) + '</span>', true);
+                updateStatusProxy('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', response.url) + response.status + '</span>', true);
                 if (response.status == 401) {
+                    updateStatusProxy('<span style="color:#f44336;"> Что бы сделать импорт прокси с TunnelBear необходима авторизация, <a target="blank_" href="https://www.tunnelbear.com/account/login">Авторизоваться</a></span>', true)
                     return;
                 } else {
                     continue;
