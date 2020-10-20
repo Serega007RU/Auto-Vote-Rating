@@ -195,7 +195,7 @@ async function checkVote() {
     if (stopVote > Date.now()) return;
 
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
-    if (!online) {
+    if (!settings.disabledCheckInternet && !online) {
     	if (navigator.onLine) {
     		console.log(chrome.i18n.getMessage('internetRestored'));
     		online = true;
@@ -220,11 +220,16 @@ async function checkVote() {
 
 async function checkOpen(project) {
 	//Если нет подключения к интернету
-	if (!navigator.onLine && online) {
-        online = false;
-        console.warn(chrome.i18n.getMessage('internetDisconected'));
-        return;
-    }
+	if (!settings.disabledCheckInternet) {
+		if (!navigator.onLine && online) {
+			online = false;
+			console.warn(chrome.i18n.getMessage('internetDisconected'));
+			if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('internetDisconected'));
+			return;
+		} else if (!online) {
+			return;
+		}
+	}
 	//Таймаут для голосования, если попыток срабатывая превышает retryCoolDown (5 минут) или retryCoolDownEmulation (15 минут), разрешает снова попытаться проголосовать
 	let has = false;
 	let rcd;

@@ -91,6 +91,9 @@
     "message": "Disable time checking at extension start",
     "description": "Checkbox. Disable time checking"
   },
+  "disabledCheckInternet": {
+    "message": "Disable Internet connection verification"
+  },
   "disableCheckProjects": {
     "message": "Disable check when adding a project",
     "description": "Checkbox. Disable check when adding a project"

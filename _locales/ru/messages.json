@@ -68,6 +68,9 @@
   "disabledCheckTime": {
     "message": "Отключить проверку времени при старте расширения"
   },
+  "disabledCheckInternet": {
+    "message": "Отключить проверку соединения интернета"
+  },
   "disableCheckProjects": {
     "message": "Отключить проверку при добавлении проекта"
   },
