@@ -428,7 +428,13 @@ async function newWindow(project) {
 						  "credentials": "include"
 						});
 						if (!response.ok) {
-							console.error(chrome.i18n.getMessage('notConnect', [response.url, response.status]));
+							stopVote = Date.now() + 86400000
+							if (response.status == 401) {
+								console.error('Необходима авторизация с TunnelBear, пожалуйста авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login')
+								if (!settings.disabledNotifError) sendNotification('Необходима авторизация с TunnelBear', 'Авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login', true)
+								return;
+							}
+							console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status);
 							return;
 						}
 						let json = await response.json();
