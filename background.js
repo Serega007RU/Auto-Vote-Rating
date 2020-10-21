@@ -403,8 +403,8 @@ async function newWindow(project) {
 					//Применяет найденный незаюзанный свободный прокси
 					console.log('Применяю прокси: ' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme);
 
-                    if (proxy.ip.includes('lazerpenguin') && (tunnelBear.token == null) || tunnelBear.expires < Date.now()) {
-                        console.log('Токен TunnelBear является null, пытаюсь его достать...')
+                    if (proxy.ip.includes('lazerpenguin') && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
+                        console.log('Токен TunnelBear является null или истекло его время действия, пытаюсь достать новый...')
 						let response = await fetch("https://api.tunnelbear.com/v2/cookieToken", {
 						  "headers": {
 							"accept": "application/json, text/plain, */*",
