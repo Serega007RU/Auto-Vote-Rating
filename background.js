@@ -430,8 +430,8 @@ async function newWindow(project) {
 						if (!response.ok) {
 							stopVote = Date.now() + 86400000
 							if (response.status == 401) {
-								console.error('Необходима авторизация с TunnelBear, пожалуйста авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login')
-								if (!settings.disabledNotifError) sendNotification('Необходима авторизация с TunnelBear', 'Авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login', true)
+								console.error('Необходима авторизация с TunnelBear, пожалуйста авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login Голосование приостановлено на 24 часа')
+								if (!settings.disabledNotifError) sendNotification('Необходима авторизация с TunnelBear', 'Авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login Голосование приостановлено на 24 часа')
 								return;
 							}
 							console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status);
@@ -439,7 +439,7 @@ async function newWindow(project) {
 						}
 						let json = await response.json();
 						tunnelBear.token = "Bearer " + json.access_token;
-						tunnelBear.expires = Date.now()
+						tunnelBear.expires = Date.now() + 86400000
                     }
 
 					let config = {
@@ -2052,7 +2052,9 @@ chrome.webRequest.onAuthRequired.addListener(function (details) {
 				login = tunnelBear.token
 				password = tunnelBear.token
 			} else {
-				console.warn('Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси!')
+				stopVote = Date.now() + 86400000
+				console.error('Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
+				if (!settings.disabledNotifError) sendNotification('Ошибка авторизации прокси', 'Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
 			}
 		}
 		return({
