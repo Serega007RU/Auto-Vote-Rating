@@ -835,10 +835,12 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
             }
             json = await response.json();
             for (vpn of json.vpns) {
-                let proxy = {};
-                proxy.ip = vpn.url;
-                proxy.port = 8080;
-                proxy.scheme = "https";
+                const proxy = {
+                    ip: vpn.url,
+                    port: 8080,
+                    scheme: "https",
+                    TunnelBear: true
+                }
                 await addProxy(proxy);
             }
         }
@@ -848,6 +850,48 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
         return
     }
     updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('importTunnelBearEnd') + '</span>', false)
+});
+
+//Слушатель на импорт с Windscribe
+document.getElementById('importWindscribe').addEventListener('click', async () => {
+    updateStatusProxy(chrome.i18n.getMessage('importWindscribeStart'), true)
+    let i = 0
+    while (i < 1) {
+        i++
+        try {
+            let response
+            if (i == 1) {
+                response = await fetch('https://assets.windscribe.com/serverlist/openvpn/0/ef53494bc440751713a7ad93e939aa190cee7458')
+            } else if (false) {//Для Pro аккаунта
+                response = await fetch('https://assets.windscribe.com/serverlist/openvpn/1/ef53494bc440751713a7ad93e939aa190cee7458')
+            }
+            if (!response.ok) {
+                updateStatusProxy('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', response.url) + response.status + '</span>', true);
+                return;
+            }
+            const json = await response.json();
+            for (const data of json.data) {
+                if (data.nodes) {
+                    for (const node of data.nodes) {
+                        if (node.hostname) {
+                            const proxy = {
+                                ip: node.hostname,
+                                port: 443,
+                                scheme: "https",
+                                Windscribe: true
+                            }
+                            await addProxy(proxy)
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            updateStatusProxy('<span style="color:#f44336;">' + e + '</span>', true)
+            console.error(e)
+            return
+        }
+    }
+    updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('importWindscribeEnd') + '</span>', false)
 });
 
 async function addProxy(proxy) {

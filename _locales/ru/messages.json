@@ -561,6 +561,15 @@
   "importTunnelBearEnd": {
     "message": "Импорт с TunnelBear успешно завершён"
   },
+  "importWindscribe": {
+    "message": "Импорт прокси с Windscribe"
+  },
+  "importWindscribeStart": {
+    "message": "Начинаю импорт с Windscribe"
+  },
+  "importWindscribeEnd": {
+    "message": "Импорт с Windscribe успешно завершён"
+  },
   "randomize": {
     "message": "При добавлении проекта: Рандомизировать следующее голосование"
   },

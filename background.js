@@ -1442,12 +1442,12 @@ async function endVote(message, sender, project) {
 		}
 
 		if (settings.useMultiVote) {
-            if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
 				let usedProject = {};
 				usedProject.id = project.id;
 				usedProject.nextFreeVote = time;
 				getTopFromList(currentVK, project).push(usedProject);
-                 VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
+                VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
 				await setValue('AVMRVKs', VKs);
             }
             
@@ -2040,29 +2040,56 @@ handler = function(n) {
 chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serverpact.com/*", "*://www.minecraftiplist.com/*"]}, ["blocking", "requestHeaders"]);
 
 //Если требуется авторизация для Прокси
+let errorProxy = {
+	ip: "",
+	count: 0
+}
 chrome.webRequest.onAuthRequired.addListener(function (details) {
-	if (details.isProxy && currentProxy && currentProxy != null && (currentProxy.login || currentProxy.ip.includes('lazerpenguin'))) {
-		console.log('Прокси требует авторизацию по логину и паролю, авторизовываюсь...')
-		let login, password
+	if (details.isProxy && currentProxy && currentProxy != null) {
+		if (errorProxy.ip != currentProxy.ip) {
+			errorProxy.count = 0
+		}
+		errorProxy.ip = currentProxy.ip
+		if (errorProxy.count++ > 5) {
+			console.error('Ошибка авторизации прокси! Превышено максимальное кол-во попыток авторизации, скорее всего логин или пароль не правильные')
+			if (!settings.disabledNotifError) sendNotification('Ошибка авторизации прокси', 'Превышено максимальное кол-во попыток авторизации, скорее всего логин или пароль не правильные')
+		    return
+		}
 		if (currentProxy.login) {
-			login = currentProxy.login
-			password = currentProxy.password
-		} else {
+			console.log('Прокси требует авторизацию, авторизовываюсь...')
+			return({
+				authCredentials : {
+					'username' : currentProxy.login,
+					'password' : currentProxy.password
+				}
+			})
+		} else if (currentProxy.TunnelBear) {
+			console.log('Прокси TunnelBear требует авторизацию, авторизовываюсь...')
 			if (tunnelBear.token != null && tunnelBear.expires > Date.now()) {
-				login = tunnelBear.token
-				password = tunnelBear.token
+				return({
+					authCredentials : {
+						'username' : tunnelBear.token,
+						'password' : tunnelBear.token
+					}
+				})
 			} else {
 				stopVote = Date.now() + 86400000
 				console.error('Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
 				if (!settings.disabledNotifError) sendNotification('Ошибка авторизации прокси', 'Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
 			}
+		} else if (currentProxy.Windscribe) {
+            console.log('Прокси Windscribe требует авторизацию, авторизовываюсь...')
+			return({
+				authCredentials : {
+					'username' : "mdib1352-t94rvyq",
+					'password' : "uem29h65n8"
+				}
+			})
+		} else {
+			currentProxy.notWorking = true
+			console.error('Ошибка авторизации прокси! Данный прокси требует авторизацию по логину и паролю но вы его не задали в прокси')
+			if (!settings.disabledNotifError) sendNotification('Ошибка авторизации прокси', 'Данный прокси требует авторизацию по логину и паролю но вы его не задали в прокси')
 		}
-		return({
-			authCredentials : {
-				'username' : login,
-				'password' : password
-			}
-		});
 	}
 }, 	{urls: ["<all_urls>"]}, 
 	["blocking"])
