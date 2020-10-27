@@ -312,7 +312,7 @@ async function addProjectList(project, visually) {
         let time = new Date(project.time);
         if (Date.now() < project.time) text = ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth()+1)).slice(-2) + '.' + time.getFullYear() + ' ' + ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2) + ':' + ('0' + time.getSeconds()).slice(-2);
     }
-    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + chrome.i18n.getMessage('nextVote') + ' ' + text;
+    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + (project.error ? '<span style="color:#f44336;">' + project.error + '</span><br>' : '') + chrome.i18n.getMessage('nextVote') + ' ' + text;
     listProject.after(html)
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).addEventListener('click', function() {
         removeProjectList(project, false);
@@ -429,12 +429,6 @@ async function removeProjectList(project, visually) {
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
     //projects.splice(deleteCount, 1);
     //await setValue('AVMRprojects', projects, true);
-    //Удаляет из очередей удалённый проект если он был открыт
-    for (let [key, value] of chrome.extension.getBackgroundPage().retryProjects.entries()) {
-        if (key.nick == project.nick && key.id == project.id && getProjectName(key) == getProjectName(project)) {
-            chrome.extension.getBackgroundPage().retryProjects.delete(key);
-        }
-    }
     for (let value of chrome.extension.getBackgroundPage().queueProjects) {
         if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)

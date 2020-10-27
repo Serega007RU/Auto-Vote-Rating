@@ -25,20 +25,11 @@ var settings;
 
 //Текущие открытые вкладки расширением
 var openedProjects = new Map();
-//Вкладки на повторное голосование при неудаче
-var retryProjects = new Map();
-//Очередь проектов
+//Текущие проекты за которые сейчас голосует расширение
 var queueProjects = new Set();
 
 //Есть ли доступ в интернет?
 var online = true;
-
-//Таймаут проверки голосования
-var cooldown = 1000;
-//Таймаут 5 минут на повторное голосование после ошибки (вычисляется из таймаунт проверки голосования (cooldown))
-var retryCoolDown = 300;
-//Таймаут 15 минут
-var retryCoolDownEmulation = 900;
 
 var secondVoteMinecraftIpList = false;
 
@@ -126,14 +117,12 @@ async function initializeConfig() {
 			projectsMinecraftServerNet = [];
 		}
     }
-
+    
+    let cooldown = 1000
     if (settings && settings.cooldown && Number.isInteger(settings.cooldown)) cooldown = settings.cooldown;
 
     if (settings && !settings.disabledCheckTime) checkTime();
     
-    //Вычисляет сколько раз повторится проверка голосования в 5 минут
-    retryCoolDown = 300 / (cooldown / 1000);
-    retryCoolDownEmulation = 900 / (cooldown / 1000);
     //Проверка на голосование
     setInterval(function() {checkVote()}, cooldown);
 }
@@ -171,41 +160,13 @@ async function checkOpen(project) {
 			return;
 		}
 	}
-	//Таймаут для голосования, если попыток срабатывая превышает retryCoolDown (5 минут) или retryCoolDownEmulation (15 минут), разрешает снова попытаться проголосовать
-	let has = false;
-	let rcd;
-	if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
-        rcd = retryCoolDown;
-	} else {
-		rcd = retryCoolDownEmulation;
-	}
-	for (let [key, value] of retryProjects.entries()) {
-        if (key.nick == project.nick && key.id == project.id && getProjectName(key) == getProjectName(project)) {
-        	has = true;
-        	if (value >= rcd) {
-        	    retryProjects.set(key, 1);
-        	    for (let value2 of queueProjects) {
-                    if (value2.nick == project.nick && value2.id == project.id && getProjectName(value2) == getProjectName(project)) {
-                        queueProjects.delete(value2)
-                    }
-	            }
-        	} else if (value >= 1) {
-        	    retryProjects.set(key, value + 1);
-        	    return;
-        	} else if (value == 0) {
-        	    retryProjects.set(key, value + 1);
-            }
-        }
-	}
-    
+
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован
 	for (let value of queueProjects) {
 		if (getProjectName(value) == getProjectName(project) || (value.randomize && project.randomize)) return;
 	}
 
 	queueProjects.add(project);
-
-	if (!has) retryProjects.set(project, 1);
     
     //Если эта вкладка была уже открыта, он закрывает её
 	for (let [key, value] of openedProjects.entries()) {
@@ -218,6 +179,10 @@ async function checkOpen(project) {
             	}
             });
         }
+    }
+
+    if (project.error) {
+    	delete project.error
     }
 	
 	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('startedAutoVote'));
@@ -1057,8 +1022,8 @@ async function endVote(message, sender, project) {
         });
         project = openedProjects.get(sender.tab.id);
         openedProjects.delete(sender.tab.id);
-	} else if (!project) return;//Если сообщение пришло от вкладки от другого расширения
-	if (cooldown < 10000) {
+	} else if (!project) return;//Что?
+	if (settings.cooldown < 10000) {
 		setTimeout(() => {
 			for (let value of queueProjects) {
 				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
@@ -1073,27 +1038,22 @@ async function endVote(message, sender, project) {
 			}
 		}
 	}
-	//Если усё успешно
-	if (message == "successfully" || message.includes("later")) {
-	    for (let [key, value] of retryProjects.entries()) {
-            if (key.nick == project.nick && key.id == project.id && getProjectName(key) == getProjectName(project)) {
-                retryProjects.delete(key);
-            }
-		}
-		let count = 0;
-		let deleteCount = 0;
-		let deleted = true;
-        for (let i = getProjectList(project).length; i--;) {
-        	let temp = getProjectList(project)[i];
-            if (temp.nick == project.nick && temp.id == project.id && getProjectName(temp) == getProjectName(project)) {
-            	getProjectList(project).splice(i, 1);
-            	deleted = false;
-            }
-        }
-        if (deleted) {
-        	return;
-        }
 
+	let deleted = true;
+    for (let i = getProjectList(project).length; i--;) {
+       	let temp = getProjectList(project)[i];
+        if (temp.nick == project.nick && temp.id == project.id && getProjectName(temp) == getProjectName(project)) {
+           	getProjectList(project).splice(i, 1);
+           	deleted = false;
+        }
+    }
+    if (deleted) {
+       	return;
+    }
+
+	//Если усё успешно
+	let sendMessage = '';
+	if (message == "successfully" || message.includes("later")) {
         let time = new Date();
         if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.IonMc) {//Топы на которых время сбрасывается в 00:00 по МСК
             if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
@@ -1161,12 +1121,6 @@ async function endVote(message, sender, project) {
             project.time = project.time + Math.floor(Math.random() * 43200000);
 		}
 
-		if (project.priority) {
-            getProjectList(project).unshift(project);
-	    } else {
-	    	getProjectList(project).push(project);
-	    }
-        let sendMessage = '';
         if (message == "successfully") {
             sendMessage = chrome.i18n.getMessage('successAutoVote');
             if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
@@ -1174,19 +1128,33 @@ async function endVote(message, sender, project) {
             sendMessage = chrome.i18n.getMessage('alreadyVoted');
             if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         }
-        await setValue('AVMRprojects' + getProjectName(project), getProjectList(project));
-        console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + time);
 	//Если ошибка
 	} else {
-		let sendMessage;
+		let retryCoolDown
 		if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
+			retryCoolDown = 300000;
+			sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
 		} else {
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "15");
+			retryCoolDown = 900000;
+			sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "15");
 		}
+        if (project.randomize) {
+        	retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)
+        }
+        project.time = Date.now() + retryCoolDown
+        project.error = message
         console.error('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage);
 	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
 	}
+    
+    console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
+
+	if (project.priority) {
+        getProjectList(project).unshift(project);
+	} else {
+	   	getProjectList(project).push(project);
+	}
+	await setValue('AVMRprojects' + getProjectName(project), getProjectList(project));
 	// else {
 	//	//Если прям совсем всё плохо
 	//	let message = 'Произошло что-то не понятное. Вот что известно: request.message: ' + request.message + ' sender.tab.id: ' + sender.tab.id + ' в openedProjects этой вкладки нет';
@@ -1462,8 +1430,6 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
         if (key == 'AVMRsettings') {
         	settings = storageChange.newValue;
-        	cooldown = settings.cooldown;
-        	retryCoolDown = 300 / (cooldown / 1000);
         }
     }
 });
