@@ -129,7 +129,7 @@ async function initializeConfig() {
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
 function checkVote() {
-    if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) return;
+    if (!settings || projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) return;
 
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
     if (!settings.disabledCheckInternet && !online) {
