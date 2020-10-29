@@ -8,8 +8,9 @@ Auto Vote Minecraft Rating - Chrome Extension
 - Google Chrome
 - Opera
 - Яндекс Браузер
+- Яндекс Браузер на Android
 - Microsoft Edge
-- Kiwi Browser
+- Kiwi Browser (имеются проблемы с диалоговыми окнами и тихим голосованием на MinecraftRating)
 
 Если хотите скачать и установить расширение с репозитория:
 1. скачайте данный репозиторий
