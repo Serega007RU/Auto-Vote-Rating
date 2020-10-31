@@ -515,6 +515,9 @@
   "countVote": {
     "message": "How many votes make per day"
   },
+  "warnSilentVoteTooltip": {
+    "message": "This rating will always work in emulation mode (regardless of the voting mode setting). This is done because this top has a ReCaptcha that is impossible to circumvent. We do not recommend adding more than 1 project to one top where ReCaptcha is active. ReCaptcha operates on the basis of trust, if you pass it too often, then ReCaptcha may ask you to pass it (select images where something is shown), which this extension does not know how to do. Also if you are using a proxy or VPN you may not be able to trust ReCaptcha"
+  },
   "requiresCaptcha": {
     "message": "Requires manually passing the captcha"
   },
