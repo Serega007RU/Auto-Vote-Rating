@@ -535,5 +535,8 @@
   },
   "soon": {
     "message": "soon..."
+  },
+  "timeout": {
+    "message": "The waiting time for the vote has expired, I'm restarting the vote"
   }
 }
