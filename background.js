@@ -164,16 +164,15 @@ async function checkOpen(project) {
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
 	for (let value of queueProjects) {
 		if (getProjectName(value) == getProjectName(project) || value.randomize && project.randomize) {
-			if (Date.now() < project.nextAttempt) {
+			if (!value.nextAttempt) return
+			if (Date.now() < value.nextAttempt) {
 				return
 			} else {
-            	console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('timeout'))
-            	if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('timeout'))
+				console.warn('[' + getProjectName(value) + '] ' + value.nick + (value.Custom ? '' : ' – ' + value.id) + (value.name != null ? ' – ' + value.name : '') + ' ' + chrome.i18n.getMessage('timeout'))
+				if (!settings.disabledNotifError) sendNotification('[' + getProjectName(value) + '] ' + value.nick + (value.Custom ? '' : value.name != null ? ' – ' + value.name : ' – ' + value.id), chrome.i18n.getMessage('timeout'))
 			}
 		}
 	}
-
-	queueProjects.add(project);
 
 	let retryCoolDown
 	if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
@@ -182,6 +181,7 @@ async function checkOpen(project) {
 		retryCoolDown = 900000;
 	}
 	project.nextAttempt = Date.now() + retryCoolDown
+	queueProjects.add(project)
     
     //Если эта вкладка была уже открыта, он закрывает её
 	for (let [key, value] of openedProjects.entries()) {
