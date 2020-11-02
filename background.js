@@ -42,7 +42,7 @@ var currentProxy;
 //Прерывает выполнение fetch запросов на случай ошибки в режиме MultiVote
 var controller = new AbortController();
 
-var check;
+var check = true
 
 var debug = true;
 
@@ -172,7 +172,7 @@ async function initializeConfig() {
     }
     
     //Проверка на голосование
-    check = setInterval(async ()=> {
+    setInterval(async ()=> {
     	await checkVote();
     }, cooldown);
 }
@@ -194,7 +194,11 @@ async function checkVote() {
     }
     
 //     if (debug) console.log('Проверка');
-    clearInterval(check);
+    if (check) {
+    	check = false
+    } else {
+    	return
+    }
     
 	await forLoopAllProjects(await async function (proj) {
 		if (proj.time == null || proj.time < Date.now()) {
@@ -202,9 +206,7 @@ async function checkVote() {
 		}
 	});
 	
-    check = setInterval(async ()=> {
-    	await checkVote();
-    }, settings.cooldown);
+    check = true
 }
 
 async function checkOpen(project) {
@@ -509,7 +511,7 @@ async function newWindow(project) {
     		silentVoteMode = true;
     	}
     }
-    console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (settings.enabledSilentVote ? ' Начинаю Fetch запрос' : ' Открываю вкладку'));
+    console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (silentVoteMode ? ' Начинаю Fetch запрос' : ' Открываю вкладку'));
 	if (silentVoteMode) {
         silentVote(project);
 	} else {
