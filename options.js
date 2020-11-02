@@ -338,11 +338,30 @@ async function addProjectList(project, visually) {
         let time = new Date(project.time);
         if (Date.now() < project.time) text = ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth()+1)).slice(-2) + '.' + time.getFullYear() + ' ' + ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2) + ':' + ('0' + time.getSeconds()).slice(-2);
     }
-    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + chrome.i18n.getMessage('nextVote') + ' ' + text;
+    html.innerHTML = project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + (project.error ? '<span style="color:#f44336;">' + project.error + '</span><br>' : '') + chrome.i18n.getMessage('nextVote') + ' ' + text;
     listProject.after(html)
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).addEventListener('click', function() {
         removeProjectList(project, false);
     });
+    if (document.getElementById(getProjectName(project) + 'Button') == null) {
+        let button = document.createElement('button')
+        button.setAttribute('class', 'selectsite')
+        button.setAttribute('id', getProjectName(project) + 'Button')
+        button.innerHTML = getFullProjectName(project)
+
+        if (document.querySelector("#addedProjectsTable1").childElementCount > document.querySelector("#addedProjectsTable2").childElementCount) {
+            document.querySelector("#addedProjectsTable2").insertBefore(button, document.querySelector("#addedProjectsTable2").firstElementChild)
+        } else if (document.querySelector("#addedProjectsTable2").childElementCount > document.querySelector("#addedProjectsTable3").childElementCount) {
+            document.querySelector("#addedProjectsTable3").insertBefore(button, document.querySelector("#addedProjectsTable3").firstElementChild)
+        } else if (document.querySelector("#addedProjectsTable3").childElementCount > document.querySelector("#addedProjectsTable4").childElementCount) {
+            document.querySelector("#addedProjectsTable4").insertBefore(button, document.querySelector("#addedProjectsTable4").firstElementChild)
+        } else {
+            document.querySelector("#addedProjectsTable1").insertBefore(button, document.querySelector("#addedProjectsTable1").firstElementChild)
+        }
+        document.getElementById(getProjectName(project) + 'Button').addEventListener('click', function() {
+            listSelect(event, getProjectName(project) + 'Tab');
+        });
+    }
     if (visually) return;
     if (project.priority) {
         getProjectList(project).unshift(project);
@@ -487,12 +506,6 @@ async function removeProjectList(project, visually) {
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
     //projects.splice(deleteCount, 1);
     //await setValue('AVMRprojects', projects, true);
-    //Удаляет из очередей удалённый проект если он был открыт
-    for (let [key, value] of chrome.extension.getBackgroundPage().retryProjects.entries()) {
-        if (key.nick == project.nick && key.id == project.id && getProjectName(key) == getProjectName(project)) {
-            chrome.extension.getBackgroundPage().retryProjects.delete(key);
-        }
-    }
     for (let value of chrome.extension.getBackgroundPage().queueProjects) {
         if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
@@ -1357,8 +1370,8 @@ function getProjectName(project) {
     if (project.TopCraft) return "TopCraft";
     if (project.McTOP) return "McTOP";
     if (project.MCRate) return "MCRate";
-    if (project.MonitoringMinecraft) return "MonitoringMinecraft";
     if (project.MinecraftRating) return "MinecraftRating";
+    if (project.MonitoringMinecraft) return "MonitoringMinecraft";
     if (project.FairTop) return "FairTop";
     if (project.IonMc) return "IonMc";
     if (project.MinecraftServersOrg) return "MinecraftServersOrg";
@@ -1374,6 +1387,29 @@ function getProjectName(project) {
     if (project.HotMC) return "HotMC";
     if (project.MinecraftServerNet) return "MinecraftServerNet";
     if (project.Custom) return "Custom"
+}
+
+function getFullProjectName(project) {
+    if (project.TopCraft) return "TopCraft.ru"
+    if (project.McTOP) return "McTOP.su"
+    if (project.MCRate) return "MCRate.su"
+    if (project.MinecraftRating) return "MinecraftRating.ru"
+    if (project.MonitoringMinecraft) return "MonitoringMinecraft.ru"
+    if (project.FairTop) return "FairTop.in"
+    if (project.IonMc) return "IonMc.top"
+    if (project.MinecraftServersOrg) return "MinecraftServers.org"
+    if (project.ServeurPrive) return "Serveur-Prive.net"
+    if (project.PlanetMinecraft) return "PlanetMinecraft.com"
+    if (project.TopG) return "TopG.org"
+    if (project.MinecraftMp) return "Minecraft-Mp.com"
+    if (project.MinecraftServerList) return "Minecraft-Server-List.com"
+    if (project.ServerPact) return "ServerPact.com"
+    if (project.MinecraftIpList) return "MinecraftIpList.com"
+    if (project.TopMinecraftServers) return "TopMinecraftServers.org"
+    if (project.MinecraftServersBiz) return "MinecraftServers.biz"
+    if (project.HotMC) return "HotMC.ru"
+    if (project.MinecraftServerNet) return "Minecraft-Server.net"
+    if (project.Custom) return chrome.i18n.getMessage('Custom')
 }
 
 function getProjectList(project) {
@@ -2047,17 +2083,18 @@ function addCustom() {
         document.querySelector('#project').insertBefore(option, document.querySelector('#project').children[20]);
     }
 
-    if (document.querySelector('#CustomButton') == null) {
-        let buttonMS = document.createElement('button');
-        buttonMS.setAttribute('class', 'selectsite');
-        buttonMS.setAttribute('id', 'CustomButton');
-        buttonMS.innerHTML = chrome.i18n.getMessage('Custom');
-        document.querySelector("#added > div > div:nth-child(4)").insertBefore(buttonMS, document.querySelector("#added > div > div:nth-child(4)").children[4]);
+//     if (document.querySelector('#CustomButton') == null) {
+//         let buttonMS = document.createElement('button');
+//         buttonMS.setAttribute('class', 'selectsite');
+//         buttonMS.setAttribute('id', 'CustomButton');
+//         buttonMS.setAttribute('hidden', false)
+//         buttonMS.innerHTML = chrome.i18n.getMessage('Custom');
+//         document.querySelector("#added > div > div:nth-child(4)").insertBefore(buttonMS, document.querySelector("#added > div > div:nth-child(4)").children[4]);
 
-        document.getElementById('CustomButton').addEventListener('click', function() {
-            listSelect(event, 'CustomTab');
-        });
-    }
+//         document.getElementById('CustomButton').addEventListener('click', function() {
+//             listSelect(event, 'CustomTab');
+//         });
+//     }
     if (!settings.enableCustom) {
         settings.enableCustom = true;
         setValue('AVMRsettings', settings, false);
@@ -2153,63 +2190,7 @@ function listSelect(evt, tabs) {
 }
 
 //Слушатели кнопок списка доавленных проектов
-document.getElementById('TopCraftButton').addEventListener('click', function() {
-    listSelect(event, 'TopCraftTab');
-});
-document.getElementById('McTOPButton').addEventListener('click', function() {
-    listSelect(event, 'McTOPTab');
-});
-document.getElementById('MCRateButton').addEventListener('click', function() {
-    listSelect(event, 'MCRateTab');
-});
-document.getElementById('MinecraftRatingButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftRatingTab');
-});
-document.getElementById('MonitoringMinecraftButton').addEventListener('click', function() {
-    listSelect(event, 'MonitoringMinecraftTab');
-});
-document.getElementById('FairTopButton').addEventListener('click', function() {
-    listSelect(event, 'FairTopTab');
-});
-document.getElementById('IonMcButton').addEventListener('click', function() {
-    listSelect(event, 'IonMcTab');
-});
-document.getElementById('MinecraftServersOrgButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftServersOrgTab');
-});
-document.getElementById('ServeurPriveButton').addEventListener('click', function() {
-    listSelect(event, 'ServeurPriveTab');
-});
-document.getElementById('PlanetMinecraftButton').addEventListener('click', function() {
-    listSelect(event, 'PlanetMinecraftTab');
-});
-document.getElementById('TopGButton').addEventListener('click', function() {
-    listSelect(event, 'TopGTab');
-});
-document.getElementById('MinecraftMpButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftMpTab');
-});
-document.getElementById('MinecraftServerListButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftServerListTab');
-});
-document.getElementById('ServerPactButton').addEventListener('click', function() {
-    listSelect(event, 'ServerPactTab');
-});
-document.getElementById('MinecraftIpListButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftIpListTab');
-});
-document.getElementById('TopMinecraftServersButton').addEventListener('click', function() {
-    listSelect(event, 'TopMinecraftServersTab');
-});
-document.getElementById('MinecraftServersBizButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftServersBizTab');
-});
-document.getElementById('HotMCButton').addEventListener('click', function() {
-    listSelect(event, 'HotMCTab');
-});
-document.getElementById('MinecraftServerNetButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftServerNetTab');
-});
+
 if (document.getElementById('CustomButton') != null) {
     document.getElementById('CustomButton').addEventListener('click', function() {
         listSelect(event, 'CustomTab');
@@ -2249,9 +2230,9 @@ selectedTop.addEventListener("change", function() {
     } else if(selectedTop.value == "MCRate") {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://mcrate.su/rate/<span style="color:red;">4396</span>') + '</span></span></div>' + dataInput + '<option value="8876">StarWay</option><option value="7003">CubixWorld</option><option value="4396">Excalibur-Craft</option><option value="4703">FineMine</option><option value="7450">FrostLand</option><option value="8428">Gamai</option><option value="8493">GrandGear</option><option value="10">LavaCraft</option><option value="4852">Letragon</option><option value="5154">MinecraftOnly</option><option value="6099">MythicalWorld</option><option value="6071">PentaCraft</option><option value="6434">Pixelmon.PRO</option><option value="1762">qoobworld</option><option value="4692">SimpleMinecraft</option><option value="4427">HillMine</option></datalist>';
     } else if(selectedTop.value == "MinecraftRating") {
-       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://minecraftrating.ru/projects/<span style="color:red;">cubixworld</span>/') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="diversemine">DiverseMine</option><option value="excalibur-craft">Excalibur-Craft</option><option value="gamepoint">GamePoint</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="oneland">OneLand</option><option value="orangecraft">OrangeCraft</option><option value="pixelmon">Pixelmon.PRO</option><option value="shadowcraft">ShadowCraft</option><option value="sidemc">SideMC</option><option value="smc">SimpleMinecraft</option><option value="victorycraft">VictoryCraft</option><option value="hillmine">HillMine</option></datalist>';
+       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://minecraftrating.ru/projects/<span style="color:red;">cubixworld</span>/') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="diversemine">DiverseMine</option><option value="excalibur-craft">Excalibur-Craft</option><option value="borealis">Borealis</option><option value="gamepoint">GamePoint</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="oneland">OneLand</option><option value="orangecraft">OrangeCraft</option><option value="pixelmon">Pixelmon.PRO</option><option value="shadowcraft">ShadowCraft</option><option value="sidemc">SideMC</option><option value="smc">SimpleMinecraft</option><option value="victorycraft">VictoryCraft</option><option value="hillmine">HillMine</option></datalist>';
     } else if(selectedTop.value == "MonitoringMinecraft") {
-       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://monitoringminecraft.ru/top/<span style="color:red;">gg</span>/vote') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="gg">GrandGear</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="orangecraft">OrangeCraft</option><option value="pixelmonpro">Pixelmon.PRO</option><option value="skolotfun">skolot.fun</option></datalist>';
+       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://monitoringminecraft.ru/top/<span style="color:red;">gg</span>/vote') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="gg">GrandGear</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="orangecraft">OrangeCraft</option><option value="pixelmonpro">Pixelmon.PRO</option><option value="skolotfun">skolot.fun</option><option value="smc">SimpleMinecraft</option></datalist>';
     } else if(selectedTop.value == "FairTop") {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://fairtop.in/vote/<span style="color:red;">731</span>') + '</span></span></div>' + dataInput + '<option value="354">FineMine</option><option value="1356">GrandGear</option><option value="731">PentaCraft</option><option value="1404">Pixelmon.PRO</option><option value="797">qoobworld</option><option value="6">SMARTYcraft</option><option value="224">HillMine</option></datalist>';
     } else if(selectedTop.value == "IonMc") {
