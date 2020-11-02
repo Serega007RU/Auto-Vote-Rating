@@ -1794,6 +1794,13 @@ selectedTop.addEventListener("change", function() {
             if (document.getElementById('time') != null) document.getElementById('time').remove()
             if (document.getElementById('countVote') != null) document.getElementById('countVote').remove()
             if (document.getElementById('labelServeurPrive') != null) document.getElementById('labelServeurPrive').remove()
+            if (document.getElementById('labelTopGames2') != null) document.getElementById('labelTopGames2').remove()
+            if (document.getElementById('labelTopGames1') != null) document.getElementById('labelTopGames1').remove()
+            if (document.getElementById('selectLang') != null) document.getElementById('selectLang').remove()
+            if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
+            if (document.getElementById('chooseGame') != null) document.getElementById('chooseGame').remove()
+            if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
+            if (document.getElementById('idGame') != null) document.getElementById('idGame').remove()
 
         if (selectedTop.value == 'Custom' && laterChoose != 'Custom') {
             idSelector.innerHTML = '';
@@ -1878,7 +1885,7 @@ selectedTop.addEventListener("change", function() {
 
             let labelCountVote = document.createElement('div');
             labelCountVote.className = 'form-group mb-1'
-            labelCountVote.id = 'labelServeurPrive'
+            labelCountVote.id = 'labelTopGames2'
             labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
             selectedTop.nextElementSibling.after(labelCountVote);
 
