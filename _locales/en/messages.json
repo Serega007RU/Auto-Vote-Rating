@@ -355,6 +355,9 @@
       }
     }
   },
+  "gameIDTooltip": {
+    "message": "Game <span style='color:red;'>ID</span> can be obtained from the address bar while on the project page, for example: <br> https://top-serveurs.net/<span style='color:red;'>minecraft</span>/hailcraft"
+  },
   "inputProjectID": {
     "message": "Enter ID"
   },
@@ -541,5 +544,14 @@
   },
   "timeout": {
     "message": "The waiting time for the vote has expired, I'm restarting the vote"
+  },
+  "chooseLang": {
+    "message": "Choose language/region"
+  },
+  "chooseGame": {
+    "message": "Enter a game or select from the list"
+  },
+  "idGame": {
+    "message": "Game ID"
   }
 }

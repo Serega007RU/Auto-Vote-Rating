@@ -18,6 +18,8 @@ var projectsTopMinecraftServers = [];
 var projectsMinecraftServersBiz = [];
 var projectsHotMC = [];
 var projectsMinecraftServerNet = [];
+var projectsMinecraftServerNet = [];
+var projectsTopGames = [];
 var projectsCustom = [];
 
 var settings;
@@ -51,6 +53,7 @@ function Project(top, nick, id, time, responseURL, priority) {
     if (top == "MinecraftServersBiz") this.MinecraftServersBiz = true;
     if (top == "HotMC") this.HotMC = true;
     if (top == "MinecraftServerNet") this.MinecraftServerNet = true;
+    if (top == "TopGames") this.TopGames = true;
     if (top == "Custom") {
         this.Custom = true;
         this.timeout = parseInt(time);
@@ -118,6 +121,8 @@ async function restoreOptions() {
     projectsHotMC = projectsHotMC.AVMRprojectsHotMC;
     projectsMinecraftServerNet = await getValue('AVMRprojectsMinecraftServerNet');
     projectsMinecraftServerNet = projectsMinecraftServerNet.AVMRprojectsMinecraftServerNet;
+    projectsTopGames = await getValue('AVMRprojectsTopGames');
+    projectsTopGames = projectsTopGames.AVMRprojectsTopGames;
     projectsCustom = await getValue('AVMRprojectsCustom');
     projectsCustom = projectsCustom.AVMRprojectsCustom;
     settings = await getValue('AVMRsettings');
@@ -143,6 +148,7 @@ async function restoreOptions() {
         projectsMinecraftServersBiz = [];
         projectsHotMC = [];
         projectsMinecraftServerNet = [];
+        projectsTopGames = [];
 
         projectsCustom = [];
         await setValue('AVMRprojectsTopCraft', projectsTopCraft, false);
@@ -164,6 +170,7 @@ async function restoreOptions() {
         await setValue('AVMRprojectsMinecraftServersBiz', projectsMinecraftServersBiz, false);
         await setValue('AVMRprojectsHotMC', projectsHotMC, false);
         await setValue('AVMRprojectsMinecraftServerNet', projectsMinecraftServerNet, false);
+        await setValue('AVMRprojectsTopGames', projectsTopGames, false);
         await setValue('AVMRprojectsCustom', projectsCustom, false);
         console.log(chrome.i18n.getMessage('settingsGen'));
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
@@ -225,6 +232,15 @@ async function restoreOptions() {
         projectsMinecraftServerNet = [];
         await setValue('AVMRprojectsMinecraftServerNet', projectsMinecraftServerNet, false);
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'));
+        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false);
+    }
+
+    //Если пользователь обновился с версии 3.3.1
+    if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
+        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
+        projectsTopGames = []
+        await setValue('AVMRprojectsTopGames', projectsTopGames, false)
+        console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false);
     }
 
@@ -378,6 +394,7 @@ async function removeProjectList(project, visually) {
     let countMinecraftServersBiz = 0;
     let countHotMC = 0;
     let countMinecraftServerNet = 0;
+    let countTopGames = 0;
     let countCustom = 0;
     forLoopAllProjects(function () {
         if (proj.TopCraft) countTopCaft++;
@@ -399,6 +416,7 @@ async function removeProjectList(project, visually) {
         if (proj.MinecraftServersBiz) countMinecraftServersBiz++;
         if (proj.HotMC) countHotMC++;
         if (proj.MinecraftServerNet) countMinecraftServerNet++;
+        if (proj.TopGames) countTopGames++;
         if (proj.Custom) countCustom++;
 
         if (proj.nick == project.nick && (project.Custom || proj.id == project.id) && getProjectName(proj) == getProjectName(project)) {
@@ -421,6 +439,7 @@ async function removeProjectList(project, visually) {
             if (proj.MinecraftServersBiz) countMinecraftServersBiz--;
             if (proj.HotMC) countHotMC--;
             if (proj.MinecraftServerNet) countMinecraftServerNet--;
+            if (proj.TopGames) countTopGames--;
             if (proj.Custom) countCustom--;
         }
     });
@@ -443,6 +462,7 @@ async function removeProjectList(project, visually) {
     if (countMinecraftServersBiz == 0) document.getElementById("MinecraftServersBizList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countHotMC == 0) document.getElementById("HotMCList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countMinecraftServerNet == 0) document.getElementById("MinecraftServerNetList").innerHTML = (chrome.i18n.getMessage('notAdded'));
+    if (countTopGames == 0) document.getElementById("TopGamesList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (countCustom == 0) document.getElementById("CustomList").innerHTML = (chrome.i18n.getMessage('notAdded'));
     if (visually) return;
     for (let i = getProjectList(project).length; i--;) {
@@ -525,6 +545,9 @@ function updateProjectList() {
     while (document.getElementById("MinecraftServerNetList").nextElementSibling != null) {
         document.getElementById("MinecraftServerNetList").nextElementSibling.remove();
     }
+    while (document.getElementById("TopGamesList").nextElementSibling != null) {
+        document.getElementById("TopGamesList").nextElementSibling.remove();
+    }
     while (document.getElementById("CustomList").nextElementSibling != null) {
         document.getElementById("CustomList").nextElementSibling.remove();
     }
@@ -538,7 +561,7 @@ function updateProjectList() {
 document.getElementById('addProject').addEventListener('submit', () => {
     event.preventDefault();
     if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, document.getElementById('time').value, document.getElementById('responseURL').value, priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, document.getElementById('time').value, document.getElementById('responseURL').value, priorityOption, null);
     } else {
         addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, priorityOption, null);
     }
@@ -570,9 +593,14 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         project.randomize = true;
     }
 
-    if (choice == 'ServeurPrive') {
-        project.maxCountVote = document.querySelector("#countVote").valueAsNumber;
+    if (project.ServeurPrive) {
+        project.maxCountVote = document.querySelector("#countVote").valueAsNumber
+        project.countVote = 0
+    } else if (project.TopGames) {
+        project.maxCountVote = document.querySelector("#countVote").valueAsNumber
         project.countVote = 0;
+        project.lang = document.querySelector("#selectLang").value
+        project.game = document.querySelector("#chooseGame").value
     }
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
@@ -697,6 +725,16 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         if (project.MinecraftServerNet) {
             url = 'https://minecraft-server.net/details/' + project.id + "/";
             jsPath = "h1[class='text-break col-xl']"
+        }
+        if (project.TopGames) {
+            if (project.lang == 'fr') {
+                url = 'https://top-serveurs.net/' + project.game + '/' + project.id
+            } else if (project.lang == 'en') {
+                url = 'https://top-games.net/' + project.game + '/' + project.id
+            } else {
+                url = 'https://' + project.lang + '.top-games.net/' + project.game + '/' + project.id
+            }
+            jsPath = "body > div.game-jumbotron > div > div > h1"
         }
         let response;
         try {
@@ -831,7 +869,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     
     if (random) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
-    } else if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet) && settings.enabledSilentVote) {
+    } else if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames) && settings.enabledSilentVote) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span>', true, element);
     } else if (project.MinecraftServersOrg) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center">' + chrome.i18n.getMessage('privacyPass') +'</div>', true, element);
@@ -941,6 +979,7 @@ function getProjectName(project) {
     if (project.MinecraftServersBiz) return "MinecraftServersBiz";
     if (project.HotMC) return "HotMC";
     if (project.MinecraftServerNet) return "MinecraftServerNet";
+    if (project.TopGames) return "TopGames";
     if (project.Custom) return "Custom"
 }
 
@@ -964,6 +1003,7 @@ function getFullProjectName(project) {
     if (project.MinecraftServersBiz) return "MinecraftServers.biz"
     if (project.HotMC) return "HotMC.ru"
     if (project.MinecraftServerNet) return "Minecraft-Server.net"
+    if (project.TopGames) return "Top-Games.net"
     if (project.Custom) return chrome.i18n.getMessage('Custom')
 }
 
@@ -987,6 +1027,7 @@ function getProjectList(project) {
     if (project.MinecraftServersBiz) return projectsMinecraftServersBiz;
     if (project.HotMC) return projectsHotMC;
     if (project.MinecraftServerNet) return projectsMinecraftServerNet;
+    if (project.TopGames) return projectsTopGames;
     if (project.Custom) return projectsCustom;
 }
 
@@ -1094,6 +1135,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         || key == 'AVMRprojectsMinecraftServersBiz'
         || key == 'AVMRprojectsHotMC'
         || key == 'AVMRprojectsMinecraftServerNet'
+        || key == 'AVMRprojectsTopGames'
         || key == 'AVMRprojectsCustom') {
             if (key == 'AVMRprojectsTopCraft') projectsTopCraft = storageChange.newValue;
             if (key == 'AVMRprojectsMcTOP') projectsMcTOP = storageChange.newValue;
@@ -1114,6 +1156,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             if (key == 'AVMRprojectsMinecraftServersBiz') projectsMinecraftServersBiz = storageChange.newValue;
             if (key == 'AVMRprojectsHotMC') projectsHotMC = storageChange.newValue;
             if (key == 'AVMRprojectsMinecraftServerNet') projectsMinecraftServerNet = storageChange.newValue;
+            if (key == 'AVMRprojectsTopGames') projectsTopGames = storageChange.newValue;
             if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
             if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function')) return;
             if (storageChange.oldValue.length == storageChange.newValue.length) {
@@ -1238,6 +1281,12 @@ function forLoopAllProjects (fuc, reverse) {
     }
     if (reverse) projectsMinecraftServerNet.reverse();
 
+    if (reverse) projectsTopGames.reverse();
+    for (proj of projectsTopGames) {
+        fuc();
+    }
+    if (reverse) projectsTopGames.reverse();
+
     if (reverse) projectsCustom.reverse();
     for (proj of projectsCustom) {
         fuc();
@@ -1268,6 +1317,7 @@ document.getElementById('file-download').addEventListener('click', () => {
         projectsMinecraftServersBiz,
         projectsHotMC,
         projectsMinecraftServerNet,
+        projectsTopGames,
         projectsCustom,
         settings
     }
@@ -1312,6 +1362,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     projectsMinecraftServersBiz = allSetting.projectsMinecraftServersBiz;
                     projectsHotMC = allSetting.projectsHotMC;
                     projectsMinecraftServerNet = allSetting.projectsMinecraftServerNet;
+                    projectsTopGames = allSetting.projectsTopGames;
                     projectsCustom = allSetting.projectsCustom;
                     settings = allSetting.settings;
 
@@ -1365,6 +1416,11 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                         projectsMinecraftServerNet = [];
                     }
 
+                    //Если пользователь обновился с версии 3.3.1
+                    if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
+                        projectsTopGames = [];
+                    }
+
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);
                     await setValue('AVMRsettings', settings, false);
                     await setValue('AVMRprojectsTopCraft', projectsTopCraft, false);
@@ -1386,6 +1442,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     await setValue('AVMRprojectsMinecraftServersBiz', projectsMinecraftServersBiz, false);
                     await setValue('AVMRprojectsHotMC', projectsHotMC, false);
                     await setValue('AVMRprojectsMinecraftServerNet', projectsMinecraftServerNet, false);
+                    await setValue('AVMRprojectsTopGames', projectsTopGames, false);
                     await setValue('AVMRprojectsCustom', projectsCustom, false);
                     updateStatusSave('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('successSave') + '</div>', false);
 
@@ -1549,7 +1606,7 @@ function addCustom() {
         let option = document.createElement('option');
         option.setAttribute('value', 'Custom');
         option.innerHTML = chrome.i18n.getMessage('Custom');
-        document.querySelector('#project').insertBefore(option, document.querySelector('#project').children[20]);
+        document.querySelector('#project').insertBefore(option, document.querySelector('#project').children[21]);
     }
 
 //     if (document.querySelector('#CustomButton') == null) {
@@ -1717,96 +1774,239 @@ selectedTop.addEventListener("change", function() {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://hotmc.ru/vote-<span style="color:red;">195633</span>') + '</span></span></div>' + input;
     } else if (selectedTop.value == "MinecraftServerNet") {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraft-server.net/vote/<span style="color:red;">TitanicFreak</span>/') + '</span></span></div>' + input;
+    } else if (selectedTop.value == "TopGames") {
+       idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://top-serveurs.net/minecraft/<span style="color:red;">icesword-pvpfaction-depuis-2014-crack-on</span>') + '</span></span></div>' + input
     } else {
        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip') + '</span></span></div>' + input;
     }
     
-    if(selectedTop.value == 'Custom' && laterChoose != 'Custom') {
-       if (laterChoose == 'ServeurPrive' && selectedTop.value != 'ServeurPrive') {
-           selectedTop.nextElementSibling.nextElementSibling.remove();
-           selectedTop.nextElementSibling.nextElementSibling.remove();
-       }
-       idSelector.innerHTML = '';
-       idSelector.setAttribute('style', 'height: 0px;')
+    if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames') {
+            document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('yourNick');
+            document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterNick');
 
-       let customBody = document.createElement('textarea');
-       customBody.required = true;
-       customBody.setAttribute("id", 'id');
-       customBody.setAttribute("name", 'customBody');
-       customBody.setAttribute('placeholder', chrome.i18n.getMessage('bodyFetch'));
-       selectedTop.after(customBody);
+            idSelector.removeAttribute('style');
 
-       let labelBody = document.createElement('div');
-       labelBody.setAttribute('class', 'form-group mb-1');
-       labelBody.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('bodyFetch') + '</label>'
-       selectedTop.after(labelBody);
-        
-       let customURL = document.createElement('input');
-       customURL.required = true;
-       customURL.setAttribute("id", 'responseURL');
-       customURL.setAttribute("name", 'customURL');
-       customURL.setAttribute('placeholder', chrome.i18n.getMessage('urlFetch'));
-       customURL.setAttribute('type', 'text');
-       customURL.setAttribute('class', 'mb-2');
-       selectedTop.after(customURL);
+            if (document.getElementById('customBody') != null) document.getElementById('customBody').remove()
+            if (document.getElementById('labelCustom1') != null) document.getElementById('labelCustom1').remove()
+            if (document.getElementById('labelCustom2') != null) document.getElementById('labelCustom2').remove()
+            if (document.getElementById('labelCustom3') != null) document.getElementById('labelCustom3').remove()
+            if (document.getElementById('responseURL') != null) document.getElementById('responseURL').remove()
+            if (document.getElementById('time') != null) document.getElementById('time').remove()
+            if (document.getElementById('countVote') != null) document.getElementById('countVote').remove()
+            if (document.getElementById('labelServeurPrive') != null) document.getElementById('labelServeurPrive').remove()
 
-       let labelURL = document.createElement('div');
-       labelURL.setAttribute('class', 'form-group mb-1');
-       labelURL.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('urlFetch') + '</label>'
-       selectedTop.after(labelURL);
+        if (selectedTop.value == 'Custom' && laterChoose != 'Custom') {
+            idSelector.innerHTML = '';
+            idSelector.setAttribute('style', 'height: 0px;')
 
-       let customTime = document.createElement('input');
-       customTime.required = true;
-       customTime.setAttribute("id", 'time');
-       customTime.setAttribute("name", 'customTime');
-       customTime.setAttribute('placeholder', chrome.i18n.getMessage('delayFetch'));
-       customTime.setAttribute('type', 'number');
-       customTime.setAttribute('min', '10000');
-       customTime.setAttribute('class', 'mb-2');
-       selectedTop.after(customTime);
+            let customBody = document.createElement('textarea');
+            customBody.required = true;
+            customBody.setAttribute("id", 'customBody');
+            customBody.setAttribute("name", 'customBody');
+            customBody.setAttribute('placeholder', chrome.i18n.getMessage('bodyFetch'));
+            selectedTop.after(customBody);
 
-       let labelTime = document.createElement('div');
-       labelTime.setAttribute('class', 'form-group mb-1');
-       labelTime.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('delayFetch') + '</label>'
-       selectedTop.after(labelTime);
+            let labelBody = document.createElement('div');
+            labelBody.setAttribute('class', 'form-group mb-1');
+            labelBody.setAttribute('id', 'labelCustom1')
+            labelBody.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('bodyFetch') + '</label>'
+            selectedTop.after(labelBody);
 
-       document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
-       document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterName');
+            let customURL = document.createElement('input');
+            customURL.required = true;
+            customURL.setAttribute("id", 'responseURL');
+            customURL.setAttribute("name", 'customURL');
+            customURL.setAttribute('placeholder', chrome.i18n.getMessage('urlFetch'));
+            customURL.setAttribute('type', 'text');
+            customURL.setAttribute('class', 'mb-2');
+            selectedTop.after(customURL);
 
-       selectedTop.after(' ');
-    } else if (laterChoose == 'Custom' && selectedTop.value != 'Custom') {
-       selectedTop.nextElementSibling.remove();
-       selectedTop.nextElementSibling.remove();
-       selectedTop.nextElementSibling.remove();
-       selectedTop.nextElementSibling.remove();
-       selectedTop.nextElementSibling.remove();
-       selectedTop.nextElementSibling.remove();
-        
-       document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('yourNick');
-       document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterNick');
+            let labelURL = document.createElement('div');
+            labelURL.setAttribute('class', 'form-group mb-1');
+            labelURL.setAttribute('id', 'labelCustom2')
+            labelURL.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('urlFetch') + '</label>'
+            selectedTop.after(labelURL);
 
-       idSelector.removeAttribute('style');
-    }
+            let customTime = document.createElement('input');
+            customTime.required = true;
+            customTime.setAttribute("id", 'time');
+            customTime.setAttribute("name", 'customTime');
+            customTime.setAttribute('placeholder', chrome.i18n.getMessage('delayFetch'));
+            customTime.setAttribute('type', 'number');
+            customTime.setAttribute('min', '10000');
+            customTime.setAttribute('class', 'mb-2');
+            selectedTop.after(customTime);
 
-    if (selectedTop.value == 'ServeurPrive' && laterChoose != 'ServeurPrive') {
-       let countVote = document.createElement('input');
-       countVote.required = true;
-       countVote.setAttribute("id", 'countVote');
-       countVote.setAttribute("name", 'countVote');
-       countVote.setAttribute('type', 'number');
-       countVote.setAttribute('min', '1');
-       countVote.setAttribute('max', '16');
-       countVote.setAttribute('placeholder', chrome.i18n.getMessage('countVote'));
-       countVote.value = 5;
-       selectedTop.nextElementSibling.after(countVote);
+            let labelTime = document.createElement('div');
+            labelTime.setAttribute('class', 'form-group mb-1');
+            labelTime.setAttribute('id', 'labelCustom3')
+            labelTime.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('delayFetch') + '</label>'
+            selectedTop.after(labelTime);
 
-       let labelCountVote = document.createElement('div');
-       labelCountVote.setAttribute('class', 'form-group mb-1');
-       labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
-       selectedTop.nextElementSibling.after(labelCountVote);
-    } else if (laterChoose == 'ServeurPrive' && selectedTop.value != 'ServeurPrive' && selectedTop.value != 'Custom') {
-       selectedTop.nextElementSibling.nextElementSibling.remove();
-       selectedTop.nextElementSibling.nextElementSibling.remove();
+            document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
+            document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterName');
+
+            selectedTop.after(' ');
+        } else if (selectedTop.value == 'ServeurPrive' && laterChoose != 'ServeurPrive') {
+            let countVote = document.createElement('input');
+            countVote.required = true;
+            countVote.setAttribute("id", 'countVote');
+            countVote.setAttribute("name", 'countVote');
+            countVote.setAttribute('type', 'number');
+            countVote.setAttribute('min', '1');
+            countVote.setAttribute('max', '16');
+            countVote.setAttribute('placeholder', chrome.i18n.getMessage('countVote'));
+            countVote.value = 5;
+            selectedTop.nextElementSibling.after(countVote);
+
+            let labelCountVote = document.createElement('div');
+            labelCountVote.setAttribute('class', 'form-group mb-1');
+            labelCountVote.setAttribute('id', 'labelServeurPrive')
+            labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
+            selectedTop.nextElementSibling.after(labelCountVote);
+        } if (selectedTop.value == 'TopGames' && laterChoose != 'TopGames') {
+            let countVote = document.createElement('input');
+            countVote.required = true;
+            countVote.id = 'countVote'
+            countVote.name = 'countVote'
+            countVote.type = 'number'
+            countVote.min = 1
+            countVote.max = 16
+            countVote.placeholder = chrome.i18n.getMessage('countVote')
+            countVote.value = 5;
+            selectedTop.nextElementSibling.after(countVote);
+
+            let labelCountVote = document.createElement('div');
+            labelCountVote.className = 'form-group mb-1'
+            labelCountVote.id = 'labelServeurPrive'
+            labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
+            selectedTop.nextElementSibling.after(labelCountVote);
+
+            let selectLang = document.createElement('select')
+            selectLang.required = true
+            selectLang.id = 'selectLang'
+            for (var i = 0; i < 6; i++) {
+                let option = document.createElement('option')
+                switch (i) {
+                  case 0:
+                    option.value = 'de'
+                    option.innerHTML = 'Deutsch'
+                    break;
+                  case 1:
+                    option.value = 'en'
+                    option.innerHTML = 'English'
+                    break;
+                  case 2:
+                    option.value = 'es'
+                    option.innerHTML = 'Español'
+                    break;
+                  case 3:
+                    option.value = 'fr'
+                    option.innerHTML = 'Français'
+                    break;
+                  case 4:
+                    option.value = 'pt'
+                    option.innerHTML = 'Português'
+                    break;
+                  case 5:
+                    option.value = 'ru'
+                    option.innerHTML = 'Русский'
+                    break;
+                  default:
+                    
+                }
+                selectLang.appendChild(option)
+            }
+            selectLang.selectedIndex = 3
+            selectedTop.nextElementSibling.after(selectLang)
+
+            let labelLang = document.createElement('div')
+            labelLang.className = 'form-group mb-1'
+            labelLang.id = 'labelTopGames1'
+            labelLang.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('chooseLang') + '</label>'
+            selectedTop.nextElementSibling.after(labelLang)
+
+            let chooseGame = document.createElement('input')
+            chooseGame.className = 'mb-2'
+            chooseGame.name = 'chooseGame'
+            chooseGame.required = true
+            chooseGame.type = 'text'
+            chooseGame.id = 'chooseGame'
+            chooseGame.placeholder = chrome.i18n.getMessage('chooseGame')
+            chooseGame.value = 'minecraft'
+            chooseGame.setAttribute('list', 'gameList')
+            selectedTop.nextElementSibling.after(chooseGame)
+
+            let gameList = document.createElement('datalist')
+            gameList.id = 'gameList'
+            let option = document.createElement('option')
+            option.value = 'minecraft'
+            option.innerHTML = 'Minecraft'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'garrys-mod'
+            option.innerHTML = "Garry's mod"
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'discord'
+            option.innerHTML = 'Discord'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'roblox'
+            option.innerHTML = 'Roblox'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'rdr'
+            option.innerHTML = 'Red Dead Redemption 2'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'hytale'
+            option.innerHTML = 'Hytale'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'terraria'
+            option.innerHTML = 'Terraria'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'ark'
+            option.innerHTML = 'ARK'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'dayz'
+            option.innerHTML = 'Dayz'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'l4d2'
+            option.innerHTML = 'Left 4 Dead 2'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'rust'
+            option.innerHTML = 'Rust'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'gta'
+            option.innerHTML = 'GTA 5'
+            gameList.appendChild(option)
+            option = document.createElement('option')
+            option.value = 'discord'
+            option.innerHTML = 'Discord'
+            gameList.appendChild(option)
+            selectedTop.nextElementSibling.after(gameList)
+
+            let divGame = document.createElement('div')
+            divGame.id = 'idGame'
+            divGame.className = 'form-group mb-1'
+            let labelGame = document.createElement('label')
+            labelGame.setAttribute('for', 'idGame')
+            labelGame.innerHTML = chrome.i18n.getMessage('idGame')
+            let spanGame = document.createElement('span')
+            spanGame.className = 'tooltip1'
+            spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip') + ' </span>'
+            divGame.appendChild(labelGame)
+            divGame.innerHTML = divGame.innerHTML + ' '
+            divGame.appendChild(spanGame)
+            selectedTop.nextElementSibling.after(divGame)
+        }
     }
 
     laterChoose = selectedTop.value;

@@ -315,6 +315,9 @@
       }
     }
   },
+  "gameIDTooltip": {
+    "message": "<span style='color:red;'>ID</span> игры можно получить из адресной строки находясь на странице проекта, например: <br> https://top-serveurs.net/<span style='color:red;'>minecraft</span>/hailcraft"
+  },
   "inputProjectID": {
     "message": "Введите ID"
   },
@@ -501,5 +504,14 @@
   },
   "timeout": {
     "message": "Истекло время ожидания голосования, перезапускаю голосование"
+  },
+  "chooseLang": {
+    "message": "Выберите язык/регион"
+  },
+  "chooseGame": {
+    "message": "Введите игру или выберите из списка"
+  },
+  "idGame": {
+    "message": "ID игры"
   }
 }
