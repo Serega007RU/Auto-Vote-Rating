@@ -610,5 +610,8 @@
   },
   "timeout": {
     "message": "The waiting time for the vote has expired, I'm restarting the vote"
+  },
+  "repeatAttemptLater": {
+    "message": "Ignore the 'You have already voted' error at least 3 times"
   }
 }

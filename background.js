@@ -193,13 +193,14 @@ async function checkVote() {
     	}
     }
     
-//     if (debug) console.log('Проверка');
     if (check) {
     	check = false
     } else {
     	return
     }
     
+//     if (debug) console.log('Проверка')
+
 	await forLoopAllProjects(await async function (proj) {
 		if (proj.time == null || proj.time < Date.now()) {
             await checkOpen(proj);
@@ -1370,6 +1371,18 @@ async function endVote(message, sender, project) {
 	//Если усё успешно
 	let sendMessage = '';
 	if (message == "successfully" || message.includes("later")) {
+		if (settings.useMultiVote && settings.repeatAttemptLater) {
+			if (message == "successfully") {
+				delete project.later
+			} else {
+                if (project.later) {
+                	project.later = project.later + 1
+                } else {
+                	project.later = 1
+                }
+			}
+		}
+
         let time = new Date();
         if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.IonMc) {//Топы на которых время сбрасывается в 00:00 по МСК
             if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
@@ -1437,8 +1450,8 @@ async function endVote(message, sender, project) {
             project.time = project.time + Math.floor(Math.random() * 43200000);
 		}
 
-		if (settings.useMultiVote) {
-            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+		if (settings.useMultiVote && !(settings.repeatAttemptLater && project.later && project.later > 1))  {
+            if (false && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
 				let usedProject = {};
 				usedProject.id = project.id;
 				usedProject.nextFreeVote = time;
@@ -1463,6 +1476,14 @@ async function endVote(message, sender, project) {
             sendMessage = chrome.i18n.getMessage('successAutoVote');
             if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         } else {
+        	if (settings.useMultiVote && settings.repeatAttemptLater && project.later) {
+        		if (project.later < 3) {
+					project.time = null
+					console.warn('Вы уже голосовали, идём на повторную попытку с другим прокси...')
+        		} else {
+        			console.warn('Все попытки истелки, Вы уже голосовали, скорее всего кто-то с данного никнейма уже проголосовал')
+        		}
+        	}
             sendMessage = chrome.i18n.getMessage('alreadyVoted');
             if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         }
