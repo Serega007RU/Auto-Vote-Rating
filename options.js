@@ -318,6 +318,10 @@ async function addProjectList(project, visually) {
         removeProjectList(project, false);
     });
     if (document.getElementById(getProjectName(project) + 'Button') == null) {
+        if (document.querySelector("#addedProjectsTable1").childElementCount == 0) {
+            document.querySelector("#addedProjectsTable1").innerText = ""
+        }
+        
         let button = document.createElement('button')
         button.setAttribute('class', 'selectsite')
         button.setAttribute('id', getProjectName(project) + 'Button')
@@ -524,7 +528,10 @@ function updateProjectList() {
     while (document.getElementById("CustomList").nextElementSibling != null) {
         document.getElementById("CustomList").nextElementSibling.remove();
     }
-    forLoopAllProjects(function () {addProjectList(proj, true);}, true);
+    forLoopAllProjects(function () {addProjectList(proj, true)}, true)
+    if (document.querySelector("#addedProjectsTable1").childElementCount == 0) {
+        document.querySelector("#addedProjectsTable1").innerText = chrome.i18n.getMessage('notAddedAll')
+    }
 }
 
 //Слушатель кнопки "Добавить"

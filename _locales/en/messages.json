@@ -150,6 +150,9 @@
     "message": "List of projects you have already added",
     "description": "Header. Added projects"
   },
+  "notAddedAll": {
+    "message": "You haven't added anything here yet"
+  },
   "notAdded": {
     "message": "You haven't added any projects to this top yet!",
     "description": "Notification. You haven't added any projects"
