@@ -317,6 +317,25 @@ async function addProjectList(project, visually) {
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).addEventListener('click', function() {
         removeProjectList(project, false);
     });
+    if (document.getElementById(getProjectName(project) + 'Button') == null) {
+        let button = document.createElement('button')
+        button.setAttribute('class', 'selectsite')
+        button.setAttribute('id', getProjectName(project) + 'Button')
+        button.innerHTML = getFullProjectName(project)
+
+        if (document.querySelector("#addedProjectsTable1").childElementCount > document.querySelector("#addedProjectsTable2").childElementCount) {
+            document.querySelector("#addedProjectsTable2").insertBefore(button, document.querySelector("#addedProjectsTable2").firstElementChild)
+        } else if (document.querySelector("#addedProjectsTable2").childElementCount > document.querySelector("#addedProjectsTable3").childElementCount) {
+            document.querySelector("#addedProjectsTable3").insertBefore(button, document.querySelector("#addedProjectsTable3").firstElementChild)
+        } else if (document.querySelector("#addedProjectsTable3").childElementCount > document.querySelector("#addedProjectsTable4").childElementCount) {
+            document.querySelector("#addedProjectsTable4").insertBefore(button, document.querySelector("#addedProjectsTable4").firstElementChild)
+        } else {
+            document.querySelector("#addedProjectsTable1").insertBefore(button, document.querySelector("#addedProjectsTable1").firstElementChild)
+        }
+        document.getElementById(getProjectName(project) + 'Button').addEventListener('click', function() {
+            listSelect(event, getProjectName(project) + 'Tab');
+        });
+    }
     if (visually) return;
     if (project.priority) {
         getProjectList(project).unshift(project);
@@ -899,8 +918,8 @@ function getProjectName(project) {
     if (project.TopCraft) return "TopCraft";
     if (project.McTOP) return "McTOP";
     if (project.MCRate) return "MCRate";
-    if (project.MonitoringMinecraft) return "MonitoringMinecraft";
     if (project.MinecraftRating) return "MinecraftRating";
+    if (project.MonitoringMinecraft) return "MonitoringMinecraft";
     if (project.FairTop) return "FairTop";
     if (project.IonMc) return "IonMc";
     if (project.MinecraftServersOrg) return "MinecraftServersOrg";
@@ -916,6 +935,29 @@ function getProjectName(project) {
     if (project.HotMC) return "HotMC";
     if (project.MinecraftServerNet) return "MinecraftServerNet";
     if (project.Custom) return "Custom"
+}
+
+function getFullProjectName(project) {
+    if (project.TopCraft) return "TopCraft.ru"
+    if (project.McTOP) return "McTOP.su"
+    if (project.MCRate) return "MCRate.su"
+    if (project.MinecraftRating) return "MinecraftRating.ru"
+    if (project.MonitoringMinecraft) return "MonitoringMinecraft.ru"
+    if (project.FairTop) return "FairTop.in"
+    if (project.IonMc) return "IonMc.top"
+    if (project.MinecraftServersOrg) return "MinecraftServers.org"
+    if (project.ServeurPrive) return "Serveur-Prive.net"
+    if (project.PlanetMinecraft) return "PlanetMinecraft.com"
+    if (project.TopG) return "TopG.org"
+    if (project.MinecraftMp) return "Minecraft-Mp.com"
+    if (project.MinecraftServerList) return "Minecraft-Server-List.com"
+    if (project.ServerPact) return "ServerPact.com"
+    if (project.MinecraftIpList) return "MinecraftIpList.com"
+    if (project.TopMinecraftServers) return "TopMinecraftServers.org"
+    if (project.MinecraftServersBiz) return "MinecraftServers.biz"
+    if (project.HotMC) return "HotMC.ru"
+    if (project.MinecraftServerNet) return "Minecraft-Server.net"
+    if (project.Custom) return chrome.i18n.getMessage('Custom')
 }
 
 function getProjectList(project) {
@@ -1503,17 +1545,18 @@ function addCustom() {
         document.querySelector('#project').insertBefore(option, document.querySelector('#project').children[20]);
     }
 
-    if (document.querySelector('#CustomButton') == null) {
-        let buttonMS = document.createElement('button');
-        buttonMS.setAttribute('class', 'selectsite');
-        buttonMS.setAttribute('id', 'CustomButton');
-        buttonMS.innerHTML = chrome.i18n.getMessage('Custom');
-        document.querySelector("#added > div > div:nth-child(4)").insertBefore(buttonMS, document.querySelector("#added > div > div:nth-child(4)").children[4]);
+//     if (document.querySelector('#CustomButton') == null) {
+//         let buttonMS = document.createElement('button');
+//         buttonMS.setAttribute('class', 'selectsite');
+//         buttonMS.setAttribute('id', 'CustomButton');
+//         buttonMS.setAttribute('hidden', false)
+//         buttonMS.innerHTML = chrome.i18n.getMessage('Custom');
+//         document.querySelector("#added > div > div:nth-child(4)").insertBefore(buttonMS, document.querySelector("#added > div > div:nth-child(4)").children[4]);
 
-        document.getElementById('CustomButton').addEventListener('click', function() {
-            listSelect(event, 'CustomTab');
-        });
-    }
+//         document.getElementById('CustomButton').addEventListener('click', function() {
+//             listSelect(event, 'CustomTab');
+//         });
+//     }
     if (!settings.enableCustom) {
         settings.enableCustom = true;
         setValue('AVMRsettings', settings, false);
@@ -1606,63 +1649,7 @@ function listSelect(evt, tabs) {
 }
 
 //Слушатели кнопок списка доавленных проектов
-document.getElementById('TopCraftButton').addEventListener('click', function() {
-    listSelect(event, 'TopCraftTab');
-});
-document.getElementById('McTOPButton').addEventListener('click', function() {
-    listSelect(event, 'McTOPTab');
-});
-document.getElementById('MCRateButton').addEventListener('click', function() {
-    listSelect(event, 'MCRateTab');
-});
-document.getElementById('MinecraftRatingButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftRatingTab');
-});
-document.getElementById('MonitoringMinecraftButton').addEventListener('click', function() {
-    listSelect(event, 'MonitoringMinecraftTab');
-});
-document.getElementById('FairTopButton').addEventListener('click', function() {
-    listSelect(event, 'FairTopTab');
-});
-document.getElementById('IonMcButton').addEventListener('click', function() {
-    listSelect(event, 'IonMcTab');
-});
-document.getElementById('MinecraftServersOrgButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftServersOrgTab');
-});
-document.getElementById('ServeurPriveButton').addEventListener('click', function() {
-    listSelect(event, 'ServeurPriveTab');
-});
-document.getElementById('PlanetMinecraftButton').addEventListener('click', function() {
-    listSelect(event, 'PlanetMinecraftTab');
-});
-document.getElementById('TopGButton').addEventListener('click', function() {
-    listSelect(event, 'TopGTab');
-});
-document.getElementById('MinecraftMpButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftMpTab');
-});
-document.getElementById('MinecraftServerListButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftServerListTab');
-});
-document.getElementById('ServerPactButton').addEventListener('click', function() {
-    listSelect(event, 'ServerPactTab');
-});
-document.getElementById('MinecraftIpListButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftIpListTab');
-});
-document.getElementById('TopMinecraftServersButton').addEventListener('click', function() {
-    listSelect(event, 'TopMinecraftServersTab');
-});
-document.getElementById('MinecraftServersBizButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftServersBizTab');
-});
-document.getElementById('HotMCButton').addEventListener('click', function() {
-    listSelect(event, 'HotMCTab');
-});
-document.getElementById('MinecraftServerNetButton').addEventListener('click', function() {
-    listSelect(event, 'MinecraftServerNetTab');
-});
+
 if (document.getElementById('CustomButton') != null) {
     document.getElementById('CustomButton').addEventListener('click', function() {
         listSelect(event, 'CustomTab');
