@@ -504,10 +504,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         project.randomize = true;
     }
 
-    if (project.ServeurPrive) {
-        project.maxCountVote = document.querySelector("#countVote").valueAsNumber
-        project.countVote = 0
-    } else if (project.TopGames) {
+    if (project.TopGames || project.ServeurPrive) {
         project.maxCountVote = document.querySelector("#countVote").valueAsNumber
         project.countVote = 0;
         project.lang = document.querySelector("#selectLang").value
@@ -594,7 +591,11 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             jsPath = "#left > div > h1";
         }
         if (project.ServeurPrive) {
-            url = 'https://serveur-prive.net/minecraft/' + project.id + '/vote';
+			if (project.lang == 'en') {
+				url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
+			} else {
+				url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
+			}
             jsPath = "#t > div > div > h2";
         }
         if (project.PlanetMinecraft) {
@@ -1642,7 +1643,6 @@ selectedTop.addEventListener("click", function() {
     }
 });
 
-let laterChoose;
 selectedTop.addEventListener("change", function() {
     let label = '<div class="form-group mb-1"><label for="id">' + chrome.i18n.getMessage('projectID') + '</label> <span class="tooltip1"><span class="tooltip1text">';
     let input = '<input class="mb-2" name="id" id="id" required placeholder="' + chrome.i18n.getMessage('inputProjectID') + '" type="text">';
@@ -1698,22 +1698,19 @@ selectedTop.addEventListener("change", function() {
             idSelector.removeAttribute('style');
 
             if (document.getElementById('customBody') != null) document.getElementById('customBody').remove()
-            if (document.getElementById('labelCustom1') != null) document.getElementById('labelCustom1').remove()
-            if (document.getElementById('labelCustom2') != null) document.getElementById('labelCustom2').remove()
-            if (document.getElementById('labelCustom3') != null) document.getElementById('labelCustom3').remove()
+            if (document.getElementById('label1') != null) document.getElementById('label1').remove()
+            if (document.getElementById('label2') != null) document.getElementById('label2').remove()
+            if (document.getElementById('label3') != null) document.getElementById('label3').remove()
             if (document.getElementById('responseURL') != null) document.getElementById('responseURL').remove()
             if (document.getElementById('time') != null) document.getElementById('time').remove()
             if (document.getElementById('countVote') != null) document.getElementById('countVote').remove()
-            if (document.getElementById('labelServeurPrive') != null) document.getElementById('labelServeurPrive').remove()
-            if (document.getElementById('labelTopGames2') != null) document.getElementById('labelTopGames2').remove()
-            if (document.getElementById('labelTopGames1') != null) document.getElementById('labelTopGames1').remove()
             if (document.getElementById('selectLang') != null) document.getElementById('selectLang').remove()
             if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
             if (document.getElementById('chooseGame') != null) document.getElementById('chooseGame').remove()
             if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
             if (document.getElementById('idGame') != null) document.getElementById('idGame').remove()
 
-        if (selectedTop.value == 'Custom' && laterChoose != 'Custom') {
+        if (selectedTop.value == 'Custom') {
             idSelector.innerHTML = '';
             idSelector.setAttribute('style', 'height: 0px;')
 
@@ -1726,7 +1723,7 @@ selectedTop.addEventListener("change", function() {
 
             let labelBody = document.createElement('div');
             labelBody.setAttribute('class', 'form-group mb-1');
-            labelBody.setAttribute('id', 'labelCustom1')
+            labelBody.setAttribute('id', 'label1')
             labelBody.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('bodyFetch') + '</label>'
             selectedTop.after(labelBody);
 
@@ -1741,7 +1738,7 @@ selectedTop.addEventListener("change", function() {
 
             let labelURL = document.createElement('div');
             labelURL.setAttribute('class', 'form-group mb-1');
-            labelURL.setAttribute('id', 'labelCustom2')
+            labelURL.setAttribute('id', 'label2')
             labelURL.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('urlFetch') + '</label>'
             selectedTop.after(labelURL);
 
@@ -1757,32 +1754,18 @@ selectedTop.addEventListener("change", function() {
 
             let labelTime = document.createElement('div');
             labelTime.setAttribute('class', 'form-group mb-1');
-            labelTime.setAttribute('id', 'labelCustom3')
+            labelTime.setAttribute('id', 'label3')
             labelTime.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('delayFetch') + '</label>'
             selectedTop.after(labelTime);
 
             document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
             document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterName');
+//             document.querySelector("#nick").required = true
 
             selectedTop.after(' ');
-        } else if (selectedTop.value == 'ServeurPrive' && laterChoose != 'ServeurPrive') {
-            let countVote = document.createElement('input');
-            countVote.required = true;
-            countVote.setAttribute("id", 'countVote');
-            countVote.setAttribute("name", 'countVote');
-            countVote.setAttribute('type', 'number');
-            countVote.setAttribute('min', '1');
-            countVote.setAttribute('max', '16');
-            countVote.setAttribute('placeholder', chrome.i18n.getMessage('countVote'));
-            countVote.value = 5;
-            selectedTop.nextElementSibling.after(countVote);
+        } else if (selectedTop.value == 'TopGames' || selectedTop.value == 'ServeurPrive') {
+//             document.querySelector("#nick").required = false
 
-            let labelCountVote = document.createElement('div');
-            labelCountVote.setAttribute('class', 'form-group mb-1');
-            labelCountVote.setAttribute('id', 'labelServeurPrive')
-            labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
-            selectedTop.nextElementSibling.after(labelCountVote);
-        } if (selectedTop.value == 'TopGames' && laterChoose != 'TopGames') {
             let countVote = document.createElement('input');
             countVote.required = true;
             countVote.id = 'countVote'
@@ -1796,7 +1779,7 @@ selectedTop.addEventListener("change", function() {
 
             let labelCountVote = document.createElement('div');
             labelCountVote.className = 'form-group mb-1'
-            labelCountVote.id = 'labelTopGames2'
+            labelCountVote.id = 'label1'
             labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
             selectedTop.nextElementSibling.after(labelCountVote);
 
@@ -1805,42 +1788,65 @@ selectedTop.addEventListener("change", function() {
             selectLang.id = 'selectLang'
             for (var i = 0; i < 6; i++) {
                 let option = document.createElement('option')
-                switch (i) {
-                  case 0:
-                    option.value = 'de'
-                    option.innerHTML = 'Deutsch'
-                    break;
-                  case 1:
-                    option.value = 'en'
-                    option.innerHTML = 'English'
-                    break;
-                  case 2:
-                    option.value = 'es'
-                    option.innerHTML = 'Español'
-                    break;
-                  case 3:
-                    option.value = 'fr'
-                    option.innerHTML = 'Français'
-                    break;
-                  case 4:
-                    option.value = 'pt'
-                    option.innerHTML = 'Português'
-                    break;
-                  case 5:
-                    option.value = 'ru'
-                    option.innerHTML = 'Русский'
-                    break;
-                  default:
-                    
+                if (selectedTop.value == 'ServeurPrive') {
+                    switch (i) {
+                      case 1:
+                        option.value = 'en'
+                        option.innerHTML = 'English'
+                        selectLang.appendChild(option)
+                        break;
+                      case 3:
+                        option.value = 'fr'
+                        option.innerHTML = 'Français'
+                        selectLang.appendChild(option)
+                        break;
+                      default:
+
+                    }
+                    selectLang.selectedIndex = 1
+                } else {
+                    switch (i) {
+                      case 0:
+                        option.value = 'de'
+                        option.innerHTML = 'Deutsch'
+                        selectLang.appendChild(option)
+                        break;
+                      case 1:
+                        option.value = 'en'
+                        option.innerHTML = 'English'
+                        selectLang.appendChild(option)
+                        break;
+                      case 2:
+                        option.value = 'es'
+                        option.innerHTML = 'Español'
+                        selectLang.appendChild(option)
+                        break;
+                      case 3:
+                        option.value = 'fr'
+                        option.innerHTML = 'Français'
+                        selectLang.appendChild(option)
+                        break;
+                      case 4:
+                        option.value = 'pt'
+                        option.innerHTML = 'Português'
+                        selectLang.appendChild(option)
+                        break;
+                      case 5:
+                        option.value = 'ru'
+                        option.innerHTML = 'Русский'
+                        selectLang.appendChild(option)
+                        break;
+                      default:
+
+                    }
+                    selectLang.selectedIndex = 3
                 }
-                selectLang.appendChild(option)
             }
-            selectLang.selectedIndex = 3
             selectedTop.nextElementSibling.after(selectLang)
 
             let labelLang = document.createElement('div')
             labelLang.className = 'form-group mb-1'
-            labelLang.id = 'labelTopGames1'
+            labelLang.id = 'label2'
             labelLang.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('chooseLang') + '</label>'
             selectedTop.nextElementSibling.after(labelLang)
 
@@ -1858,57 +1864,96 @@ selectedTop.addEventListener("change", function() {
             let gameList = document.createElement('datalist')
             gameList.id = 'gameList'
             let option = document.createElement('option')
-            option.value = 'minecraft'
-            option.innerHTML = 'Minecraft'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'garrys-mod'
-            option.innerHTML = "Garry's mod"
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'discord'
-            option.innerHTML = 'Discord'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'roblox'
-            option.innerHTML = 'Roblox'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'rdr'
-            option.innerHTML = 'Red Dead Redemption 2'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'hytale'
-            option.innerHTML = 'Hytale'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'terraria'
-            option.innerHTML = 'Terraria'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'ark'
-            option.innerHTML = 'ARK'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'dayz'
-            option.innerHTML = 'Dayz'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'l4d2'
-            option.innerHTML = 'Left 4 Dead 2'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'rust'
-            option.innerHTML = 'Rust'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'gta'
-            option.innerHTML = 'GTA 5'
-            gameList.appendChild(option)
-            option = document.createElement('option')
-            option.value = 'discord'
-            option.innerHTML = 'Discord'
-            gameList.appendChild(option)
+            if (selectedTop.value == 'ServeurPrive') {
+                option.value = 'minecraft'
+                option.innerHTML = 'Minecraft'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'discord'
+                option.innerHTML = 'Discord'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'grand-theft-auto'
+                option.innerHTML = 'Grand Theft Auto V'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'ark-survival-evolved'
+                option.innerHTML = 'Ark : Survival Evolved'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'rust'
+                option.innerHTML = 'Rust'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'hytale'
+                option.innerHTML = 'Hytale'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'minecraft-bedrock'
+                option.innerHTML = 'Minecraft Bedrock'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'ark'
+                option.innerHTML = 'ARK'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'garrys-mod'
+                option.innerHTML = "Garry's Mod"
+                gameList.appendChild(option)
+
+            } else {
+                option.value = 'minecraft'
+                option.innerHTML = 'Minecraft'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'garrys-mod'
+                option.innerHTML = "Garry's mod"
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'discord'
+                option.innerHTML = 'Discord'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'roblox'
+                option.innerHTML = 'Roblox'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'rdr'
+                option.innerHTML = 'Red Dead Redemption 2'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'hytale'
+                option.innerHTML = 'Hytale'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'terraria'
+                option.innerHTML = 'Terraria'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'ark'
+                option.innerHTML = 'ARK'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'dayz'
+                option.innerHTML = 'Dayz'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'l4d2'
+                option.innerHTML = 'Left 4 Dead 2'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'rust'
+                option.innerHTML = 'Rust'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'gta'
+                option.innerHTML = 'GTA 5'
+                gameList.appendChild(option)
+                option = document.createElement('option')
+                option.value = 'discord'
+                option.innerHTML = 'Discord'
+                gameList.appendChild(option)
+            }
             selectedTop.nextElementSibling.after(gameList)
 
             let divGame = document.createElement('div')
@@ -1919,7 +1964,11 @@ selectedTop.addEventListener("change", function() {
             labelGame.innerHTML = chrome.i18n.getMessage('idGame')
             let spanGame = document.createElement('span')
             spanGame.className = 'tooltip1'
-            spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip') + ' </span>'
+            if (selectedTop.value == 'ServeurPrive') {
+                spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip', 'https://serveur-prive.net/<span style="color:red;">minecraft</span>/gommehd-net-4932') + ' </span>'
+            } else {
+                spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip', 'https://top-serveurs.net/<span style="color:red;">minecraft</span>/hailcraft') + ' </span>'
+            }
             divGame.appendChild(labelGame)
             divGame.innerHTML = divGame.innerHTML + ' '
             divGame.appendChild(spanGame)
@@ -1927,7 +1976,6 @@ selectedTop.addEventListener("change", function() {
         }
     }
 
-    laterChoose = selectedTop.value;
 });
 
 //Локализация

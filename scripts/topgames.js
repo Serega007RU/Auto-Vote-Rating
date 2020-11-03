@@ -50,7 +50,7 @@ function vote() {
 
             if (document.querySelector("#playername") != null) {
 				let nick = getNickName(result.AVMRprojectsTopGames)
-				if (nick == null || nick == "") return;
+				if (nick == null) return;
 				document.querySelector("#playername").value = nick;
             }
             

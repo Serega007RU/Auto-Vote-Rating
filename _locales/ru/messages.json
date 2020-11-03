@@ -316,7 +316,12 @@
     }
   },
   "gameIDTooltip": {
-    "message": "<span style='color:red;'>ID</span> игры можно получить из адресной строки находясь на странице проекта, например: <br> https://top-serveurs.net/<span style='color:red;'>minecraft</span>/hailcraft"
+    "message": "<span style='color:red;'>ID</span> игры можно получить из адресной строки находясь на странице проекта, например: <br> $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
   "inputProjectID": {
     "message": "Введите ID"

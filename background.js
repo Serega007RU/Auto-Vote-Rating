@@ -296,7 +296,13 @@ async function newWindow(project) {
 				});
 			}
 			if (project.ServeurPrive) {
-				chrome.tabs.create({"url":"https://serveur-prive.net/minecraft/" + project.id + "/vote", "selected":false}, function(tab) {
+				let url
+				if (project.lang == 'en') {
+					url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
+				} else {
+					url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
+				}
+				chrome.tabs.create({"url": url, "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}

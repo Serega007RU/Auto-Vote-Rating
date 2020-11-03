@@ -356,7 +356,12 @@
     }
   },
   "gameIDTooltip": {
-    "message": "Game <span style='color:red;'>ID</span> can be obtained from the address bar while on the project page, for example: <br> https://top-serveurs.net/<span style='color:red;'>minecraft</span>/hailcraft"
+    "message": "Game <span style='color:red;'>ID</span> can be obtained from the address bar while on the project page, for example: <br> $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
   "inputProjectID": {
     "message": "Enter ID"

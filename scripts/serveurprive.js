@@ -56,7 +56,7 @@ function vote(first) {
             	return;
             }
             let nick = getNickName(result.AVMRprojectsServeurPrive);
-			if (nick == null || nick == "") return;
+			if (nick == null) return;
 			document.querySelector("#c > div > div > div.bvt > form > input.pseudov").value = nick;
 			document.querySelector("#c > div > div > div.bvt > form > button").click();
 		} catch (e) {
@@ -71,15 +71,12 @@ function vote(first) {
 
 function getNickName(projects) {
     for (project of projects) {
-        if (project.ServeurPrive && document.URL.startsWith('https://serveur-prive.net/minecraft/' + project.id + '/')) {
-            return project.nick;
+        if (project.ServeurPrive && document.URL.includes(project.game) && document.URL.includes(project.id)) {
+            return project.nick
         }
     }
-    if (!document.URL.startsWith('https://serveur-prive.net/minecraft/')) {
-    	sendMessage('Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL');
-    } else {
-        sendMessage('Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL);
-    }
+
+    sendMessage('Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL);
 }
 
 function sendMessage(message) {
