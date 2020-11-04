@@ -369,13 +369,18 @@ async function silentVote(project) {
                 endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
-			let cookie = await getCookie('https://topcraft.ru/', 'csrftoken');
-			response = await fetch("https://topcraft.ru/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
+            let html = await response.text()
+            let doc = new DOMParser().parseFromString(html, "text/html")
+			let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
+			response = await fetch("https://topcraft.ru/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + csrftoken + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 			if (!extractHostname(response.url).includes('topcraft.')) {
 				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
 				return;
 			}
 			if (response.status == 400) {
+				html = await response.text()
+				doc = new DOMParser().parseFromString(html, "text/html")
+				console.warn('Текст ошибки 400: ' + doc.body.innerText)
 				endVote('later', null, project);
 				return;
 			} else if (!response.ok) {
@@ -401,13 +406,18 @@ async function silentVote(project) {
                 endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
-			let cookie = await getCookie('https://mctop.su/', 'csrftoken');
-			response = await fetch("https://mctop.su/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
+            let html = await response.text()
+            let doc = new DOMParser().parseFromString(html, "text/html")
+			let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
+			response = await fetch("https://mctop.su/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + csrftoken + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 			if (!extractHostname(response.url).includes('mctop.')) {
 				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
 				return;
 			}
 			if (response.status == 400) {
+				html = await response.text()
+				doc = new DOMParser().parseFromString(html, "text/html")
+				console.warn('Текст ошибки 400: ' + doc.body.innerText)
 				endVote('later', null, project);
 				return;
 			} else if (!response.ok) {
