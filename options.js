@@ -82,6 +82,7 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
     this.cooldown = cooldown;
     this.useMultiVote = false;
     this.repeatAttemptLater = false
+    this.stopVote = 0
 };
 
 // Restores select box and checkbox state using the preferences
@@ -251,6 +252,15 @@ async function restoreOptions() {
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false);
     }
 
+    //Если пользователь обновился с версии без MultiVote (special for settings)
+    if (settings.stopVote == null) {
+        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
+        settings.stopVote = 0
+        await setValue('AVMRsettings', settings, false)
+        console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
+        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false)
+    }
+
     updateProjectList();
 
     //Слушатель дополнительных настроек
@@ -305,6 +315,23 @@ async function restoreOptions() {
             await setValue('AVMRsettings', settings, true);
         });
     }
+    let stopVoteButton = async function () {
+        if (settings.stopVote > Date.now()) {
+            settings.stopVote = 0
+            document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#00d510')
+            document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#00d510')
+            updateStatusSave('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('voteResumed') + '</div>', false)
+        } else {
+            settings.stopVote = Date.now() + 86400000
+            document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
+            document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
+            updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('voteSuspended') + '</div>', false)
+        }
+        await setValue('AVMRsettings', settings, false)
+    }
+    document.getElementById('stopVote').addEventListener('click', stopVoteButton)
+    document.getElementById('stopVote2').addEventListener('click', stopVoteButton)
+
     //Считывает настройки расширение и выдаёт их в html
     document.getElementById("disabledNotifStart").checked = settings.disabledNotifStart;
     document.getElementById("disabledNotifInfo").checked = settings.disabledNotifInfo;
@@ -320,6 +347,10 @@ async function restoreOptions() {
     document.getElementById("cooldown").value = settings.cooldown;
     document.getElementById("useMultiVote").checked = settings.useMultiVote;
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
+    if (settings.stopVote > Date.now()) {
+        document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
+        document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
+    }
     if (settings.enableCustom || projectsCustom.length > 0) addCustom();
 };
 
@@ -1516,6 +1547,16 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
             if (key == 'AVMRVKs') VKs = storageChange.newValue;
             if (key == 'AVMRproxies') proxies = storageChange.newValue;
+            if (key == 'AVMRsettings') {//ToDo <Serega007> пока что не совсем расчитано что из вне могут быть обновлены настроки, стоит вынести в функцию обновление настроек
+                settings = storageChange.newValue
+                if (settings.stopVote > Date.now()) {
+                    document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
+                    document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
+                } else {
+                    document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#00d510')
+                    document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#00d510')
+                }
+            }
             if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function')) return;
             if (storageChange.oldValue.length == storageChange.newValue.length) {
                 updateProjectList(storageChange.newValue);

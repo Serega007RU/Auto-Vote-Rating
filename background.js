@@ -36,7 +36,6 @@ var online = true;
 
 var secondVoteMinecraftIpList = false;
 
-var stopVote = 0;
 var currentVK;
 var currentProxy;
 
@@ -127,6 +126,9 @@ async function initializeConfig() {
     	VKs = [];
     	proxies = [];
     }
+    if (settings.stopVote == null) {
+    	settings.stopVote = 0
+    }
     
     let cooldown = 1000
     if (settings && settings.cooldown && Number.isInteger(settings.cooldown)) cooldown = settings.cooldown;
@@ -165,7 +167,7 @@ async function initializeConfig() {
 async function checkVote() {
     if (!settings || projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) return;
 
-    if (stopVote > Date.now()) return;
+    if (settings.stopVote > Date.now()) return;
 
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
     if (!settings.disabledCheckInternet && !online) {
@@ -336,9 +338,10 @@ async function newWindow(project) {
             }
 			//Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк то приостанавливает ВСЁ авто-голосование на 24 часа
 			if (!found) {
-				stopVote = new Date().setDate(new Date().getDate() + 1);
+				settings.stopVote = Date.now() + 86400000
 				console.error(chrome.i18n.getMessage('notFoundVK'));
 				if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('notFoundVKTitle'), chrome.i18n.getMessage('notFoundVK'));
+				await setValue('AVMRsettings', settings)
 				return;
 			}
 		}
@@ -386,13 +389,14 @@ async function newWindow(project) {
 						  "credentials": "include"
 						});
 						if (!response.ok) {
-							stopVote = Date.now() + 86400000
+							settings.stopVote = Date.now() + 86400000
 							if (response.status == 401) {
 								console.error('Необходима авторизация с TunnelBear, пожалуйста авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login Голосование приостановлено на 24 часа')
 								if (!settings.disabledNotifError) sendNotification('Необходима авторизация с TunnelBear', 'Авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login Голосование приостановлено на 24 часа')
 								return;
 							}
 							console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status);
+							await setValue('AVMRsettings', settings)
 							return;
 						}
 						let json = await response.json();
@@ -427,9 +431,10 @@ async function newWindow(project) {
 
 			//Если не удалось найти хотя бы одно свободное не заюзанное прокси то приостанавливает ВСЁ авто-голосование на 24 часа
 			if (!found) {
-				stopVote = new Date().setDate(new Date().getDate() + 1);
+				stopVote = Date.now() + 86400000
 				console.error(chrome.i18n.getMessage('notFoundProxy'));
 				if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('notFoundProxyTitle'), chrome.i18n.getMessage('notFoundProxy'));
+				await setValue('AVMRsettings', settings)
 				return;
 			}
         }
@@ -2103,6 +2108,7 @@ chrome.webRequest.onAuthRequired.addListener(function (details) {
 				stopVote = Date.now() + 86400000
 				console.error('Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
 				if (!settings.disabledNotifError) sendNotification('Ошибка авторизации прокси', 'Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
+			    setValue('AVMRsettings', settings)
 			}
 		} else if (currentProxy.Windscribe) {
             console.log('Прокси Windscribe требует авторизацию, авторизовываюсь...')

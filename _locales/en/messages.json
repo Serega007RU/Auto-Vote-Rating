@@ -633,5 +633,14 @@
   },
   "idGame": {
     "message": "Game ID"
+  },
+  "stopVote": {
+    "message": "On/Off"
+  },
+  "voteSuspended": {
+    "message": "Auto-voting is suspended"
+  },
+  "voteResumed": {
+    "message": "Auto-voting resumed"
   }
 }

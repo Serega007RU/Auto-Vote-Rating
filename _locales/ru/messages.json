@@ -607,5 +607,14 @@
   },
   "idGame": {
     "message": "ID игры"
+  },
+  "stopVote": {
+    "message": "Вкл/Выкл"
+  },
+  "voteSuspended": {
+    "message": "Автоголосование приостановлено"
+  },
+  "voteResumed": {
+    "message": "Автоголосование возобновлено"
   }
 }
