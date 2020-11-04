@@ -1554,7 +1554,7 @@ async function endVote(message, sender, project) {
 	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
 	}
 
-	if (project.priority) {
+	if (project.priority || (settings.useMultiVote && settings.repeatAttemptLater && project.later && project.later < 3)) {
         getProjectList(project).unshift(project);
 	} else {
 	   	getProjectList(project).push(project);
