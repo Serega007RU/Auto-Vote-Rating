@@ -1474,7 +1474,7 @@ async function endVote(message, sender, project) {
             project.time = project.time + Math.floor(Math.random() * 43200000);
 		}
 
-		if (settings.useMultiVote && !(settings.repeatAttemptLater && project.later && project.later > 1))  {
+		if (settings.useMultiVote && !(settings.repeatAttemptLater && project.later && project.later >= 1 && message.includes("later")))  {
             if (false && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
 				let usedProject = {};
 				usedProject.id = project.id;
