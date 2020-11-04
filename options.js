@@ -84,49 +84,27 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
 // stored in chrome.storage.
 async function restoreOptions() {
     projectsTopCraft = await getValue('AVMRprojectsTopCraft');
-    projectsTopCraft = projectsTopCraft.AVMRprojectsTopCraft;
     projectsMcTOP = await getValue('AVMRprojectsMcTOP');
-    projectsMcTOP = projectsMcTOP.AVMRprojectsMcTOP;
     projectsMCRate = await getValue('AVMRprojectsMCRate');
-    projectsMCRate = projectsMCRate.AVMRprojectsMCRate;
     projectsMinecraftRating = await getValue('AVMRprojectsMinecraftRating');
-    projectsMinecraftRating = projectsMinecraftRating.AVMRprojectsMinecraftRating;
     projectsMonitoringMinecraft = await getValue('AVMRprojectsMonitoringMinecraft');
-    projectsMonitoringMinecraft = projectsMonitoringMinecraft.AVMRprojectsMonitoringMinecraft;
     projectsFairTop = await getValue('AVMRprojectsFairTop');
-    projectsFairTop = projectsFairTop.AVMRprojectsFairTop;
     projectsIonMc = await getValue('AVMRprojectsIonMc');
-    projectsIonMc = projectsIonMc.AVMRprojectsIonMc;
     projectsMinecraftServersOrg = await getValue('AVMRprojectsMinecraftServersOrg');
-    projectsMinecraftServersOrg = projectsMinecraftServersOrg.AVMRprojectsMinecraftServersOrg;
     projectsServeurPrive = await getValue('AVMRprojectsServeurPrive');
-    projectsServeurPrive = projectsServeurPrive.AVMRprojectsServeurPrive;
     projectsPlanetMinecraft = await getValue('AVMRprojectsPlanetMinecraft');
-    projectsPlanetMinecraft = projectsPlanetMinecraft.AVMRprojectsPlanetMinecraft;
     projectsTopG = await getValue('AVMRprojectsTopG');
-    projectsTopG = projectsTopG.AVMRprojectsTopG;
     projectsMinecraftMp = await getValue('AVMRprojectsMinecraftMp');
-    projectsMinecraftMp = projectsMinecraftMp.AVMRprojectsMinecraftMp;
     projectsMinecraftServerList = await getValue('AVMRprojectsMinecraftServerList');
-    projectsMinecraftServerList = projectsMinecraftServerList.AVMRprojectsMinecraftServerList;
     projectsServerPact = await getValue('AVMRprojectsServerPact');
-    projectsServerPact = projectsServerPact.AVMRprojectsServerPact;
     projectsMinecraftIpList = await getValue('AVMRprojectsMinecraftIpList');
-    projectsMinecraftIpList = projectsMinecraftIpList.AVMRprojectsMinecraftIpList;
     projectsTopMinecraftServers = await getValue('AVMRprojectsTopMinecraftServers');
-    projectsTopMinecraftServers = projectsTopMinecraftServers.AVMRprojectsTopMinecraftServers;
     projectsMinecraftServersBiz = await getValue('AVMRprojectsMinecraftServersBiz');
-    projectsMinecraftServersBiz = projectsMinecraftServersBiz.AVMRprojectsMinecraftServersBiz;
     projectsHotMC = await getValue('AVMRprojectsHotMC');
-    projectsHotMC = projectsHotMC.AVMRprojectsHotMC;
     projectsMinecraftServerNet = await getValue('AVMRprojectsMinecraftServerNet');
-    projectsMinecraftServerNet = projectsMinecraftServerNet.AVMRprojectsMinecraftServerNet;
     projectsTopGames = await getValue('AVMRprojectsTopGames');
-    projectsTopGames = projectsTopGames.AVMRprojectsTopGames;
     projectsCustom = await getValue('AVMRprojectsCustom');
-    projectsCustom = projectsCustom.AVMRprojectsCustom;
     settings = await getValue('AVMRsettings');
-    settings = settings.AVMRsettings;
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
         updateStatusSave('<div>' + chrome.i18n.getMessage('firstSettings') +'</div>', true);
         projectsTopCraft = [];
@@ -980,7 +958,7 @@ async function getValue(name) {
                 updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('storageError') + '</div>', false);
                 reject(chrome.runtime.lastError);
             } else {
-                resolve(data);
+                resolve(data[name]);
             }
         });
     });
@@ -1643,6 +1621,7 @@ selectedTop.addEventListener("click", function() {
     }
 });
 
+var laterChoose
 selectedTop.addEventListener("change", function() {
     let label = '<div class="form-group mb-1"><label for="id">' + chrome.i18n.getMessage('projectID') + '</label> <span class="tooltip1"><span class="tooltip1text">';
     let input = '<input class="mb-2" name="id" id="id" required placeholder="' + chrome.i18n.getMessage('inputProjectID') + '" type="text">';
@@ -1975,7 +1954,7 @@ selectedTop.addEventListener("change", function() {
             selectedTop.nextElementSibling.after(divGame)
         }
     }
-
+    laterChoose = selectedTop.value
 });
 
 //Локализация

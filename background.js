@@ -38,49 +38,27 @@ var secondVoteMinecraftIpList = false;
 initializeConfig();
 async function initializeConfig() {
     projectsTopCraft = await getValue('AVMRprojectsTopCraft');
-    projectsTopCraft = projectsTopCraft.AVMRprojectsTopCraft;
     projectsMcTOP = await getValue('AVMRprojectsMcTOP');
-    projectsMcTOP = projectsMcTOP.AVMRprojectsMcTOP;
     projectsMCRate = await getValue('AVMRprojectsMCRate');
-    projectsMCRate = projectsMCRate.AVMRprojectsMCRate;
     projectsMinecraftRating = await getValue('AVMRprojectsMinecraftRating');
-    projectsMinecraftRating = projectsMinecraftRating.AVMRprojectsMinecraftRating;
     projectsMonitoringMinecraft = await getValue('AVMRprojectsMonitoringMinecraft');
-    projectsMonitoringMinecraft = projectsMonitoringMinecraft.AVMRprojectsMonitoringMinecraft;
     projectsFairTop = await getValue('AVMRprojectsFairTop');
-    projectsFairTop = projectsFairTop.AVMRprojectsFairTop;
     projectsIonMc = await getValue('AVMRprojectsIonMc');
-    projectsIonMc = projectsIonMc.AVMRprojectsIonMc;
     projectsMinecraftServersOrg = await getValue('AVMRprojectsMinecraftServersOrg');
-    projectsMinecraftServersOrg = projectsMinecraftServersOrg.AVMRprojectsMinecraftServersOrg;
     projectsServeurPrive = await getValue('AVMRprojectsServeurPrive');
-    projectsServeurPrive = projectsServeurPrive.AVMRprojectsServeurPrive;
     projectsPlanetMinecraft = await getValue('AVMRprojectsPlanetMinecraft');
-    projectsPlanetMinecraft = projectsPlanetMinecraft.AVMRprojectsPlanetMinecraft;
     projectsTopG = await getValue('AVMRprojectsTopG');
-    projectsTopG = projectsTopG.AVMRprojectsTopG;
     projectsMinecraftMp = await getValue('AVMRprojectsMinecraftMp');
-    projectsMinecraftMp = projectsMinecraftMp.AVMRprojectsMinecraftMp;
     projectsMinecraftServerList = await getValue('AVMRprojectsMinecraftServerList');
-    projectsMinecraftServerList = projectsMinecraftServerList.AVMRprojectsMinecraftServerList;
     projectsServerPact = await getValue('AVMRprojectsServerPact');
-    projectsServerPact = projectsServerPact.AVMRprojectsServerPact;
     projectsMinecraftIpList = await getValue('AVMRprojectsMinecraftIpList');
-    projectsMinecraftIpList = projectsMinecraftIpList.AVMRprojectsMinecraftIpList;
     projectsTopMinecraftServers = await getValue('AVMRprojectsTopMinecraftServers');
-    projectsTopMinecraftServers = projectsTopMinecraftServers.AVMRprojectsTopMinecraftServers;
     projectsMinecraftServersBiz = await getValue('AVMRprojectsMinecraftServersBiz');
-    projectsMinecraftServersBiz = projectsMinecraftServersBiz.AVMRprojectsMinecraftServersBiz;
     projectsHotMC = await getValue('AVMRprojectsHotMC');
-    projectsHotMC = projectsHotMC.AVMRprojectsHotMC;
     projectsMinecraftServerNet = await getValue('AVMRprojectsMinecraftServerNet');
-    projectsMinecraftServerNet = projectsMinecraftServerNet.AVMRprojectsMinecraftServerNet;
     projectsTopGames = await getValue('AVMRprojectsTopGames');
-    projectsTopGames = projectsTopGames.AVMRprojectsTopGames;
     projectsCustom = await getValue('AVMRprojectsCustom');
-    projectsCustom = projectsCustom.AVMRprojectsCustom;
     settings = await getValue('AVMRsettings');
-    settings = settings.AVMRsettings;
 
     if (!(projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function'))) {
 		//Если пользователь обновился с версии 2.2.0
@@ -1181,6 +1159,7 @@ async function endVote(message, sender, project) {
             sendMessage = chrome.i18n.getMessage('alreadyVoted');
             if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         }
+        console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 	//Если ошибка
 	} else {
 		let retryCoolDown
@@ -1196,11 +1175,9 @@ async function endVote(message, sender, project) {
         }
         project.time = Date.now() + retryCoolDown
         project.error = message
-        console.error('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage);
+        console.error('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
 	}
-    
-    console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 
 	if (project.priority) {
         getProjectList(project).unshift(project);
@@ -1350,7 +1327,7 @@ async function removeCookie(url, name) {
 async function getValue(name) {
     return new Promise(resolve => {
         chrome.storage.local.get(name, data => {
-            resolve(data);
+            resolve(data[name]);
         });
     });
 }
