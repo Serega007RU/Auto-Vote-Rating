@@ -275,6 +275,7 @@ async function newWindow(project) {
 			}
 			if (project.ServeurPrive) {
 				let url
+				if (project.game == null) project.game = 'minecraft'
 				if (project.lang == 'en') {
 					url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
 				} else {

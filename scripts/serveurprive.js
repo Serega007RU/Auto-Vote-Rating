@@ -71,7 +71,7 @@ function vote(first) {
 
 function getNickName(projects) {
     for (project of projects) {
-        if (project.ServeurPrive && document.URL.includes(project.game) && document.URL.includes(project.id)) {
+        if (project.ServeurPrive && document.URL.includes((project.game == null ? 'minecraft' : project.game)) && document.URL.includes(project.id)) {
             return project.nick
         }
     }
