@@ -355,6 +355,14 @@
       }
     }
   },
+  "gameIDTooltip": {
+    "message": "Game <span style='color:red;'>ID</span> can be obtained from the address bar while on the project page, for example: <br> $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
   "inputProjectID": {
     "message": "Enter ID"
   },
@@ -616,5 +624,14 @@
   },
   "repeatAttemptLater": {
     "message": "Ignore the 'You have already voted' error at least 3 times"
+  },
+  "chooseLang": {
+    "message": "Choose language/region"
+  },
+  "chooseGame": {
+    "message": "Enter a game or select from the list"
+  },
+  "idGame": {
+    "message": "Game ID"
   }
 }

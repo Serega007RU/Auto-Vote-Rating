@@ -18,6 +18,7 @@ var projectsTopMinecraftServers = [];
 var projectsMinecraftServersBiz = [];
 var projectsHotMC = [];
 var projectsMinecraftServerNet = [];
+var projectsTopGames = [];
 var projectsCustom = [];
 var VKs = [];
 var proxies = [];
@@ -53,51 +54,29 @@ let tunnelBear = {}
 initializeConfig();
 async function initializeConfig() {
     projectsTopCraft = await getValue('AVMRprojectsTopCraft');
-    projectsTopCraft = projectsTopCraft.AVMRprojectsTopCraft;
     projectsMcTOP = await getValue('AVMRprojectsMcTOP');
-    projectsMcTOP = projectsMcTOP.AVMRprojectsMcTOP;
     projectsMCRate = await getValue('AVMRprojectsMCRate');
-    projectsMCRate = projectsMCRate.AVMRprojectsMCRate;
     projectsMinecraftRating = await getValue('AVMRprojectsMinecraftRating');
-    projectsMinecraftRating = projectsMinecraftRating.AVMRprojectsMinecraftRating;
     projectsMonitoringMinecraft = await getValue('AVMRprojectsMonitoringMinecraft');
-    projectsMonitoringMinecraft = projectsMonitoringMinecraft.AVMRprojectsMonitoringMinecraft;
     projectsFairTop = await getValue('AVMRprojectsFairTop');
-    projectsFairTop = projectsFairTop.AVMRprojectsFairTop;
     projectsIonMc = await getValue('AVMRprojectsIonMc');
-    projectsIonMc = projectsIonMc.AVMRprojectsIonMc;
     projectsMinecraftServersOrg = await getValue('AVMRprojectsMinecraftServersOrg');
-    projectsMinecraftServersOrg = projectsMinecraftServersOrg.AVMRprojectsMinecraftServersOrg;
     projectsServeurPrive = await getValue('AVMRprojectsServeurPrive');
-    projectsServeurPrive = projectsServeurPrive.AVMRprojectsServeurPrive;
     projectsPlanetMinecraft = await getValue('AVMRprojectsPlanetMinecraft');
-    projectsPlanetMinecraft = projectsPlanetMinecraft.AVMRprojectsPlanetMinecraft;
     projectsTopG = await getValue('AVMRprojectsTopG');
-    projectsTopG = projectsTopG.AVMRprojectsTopG;
     projectsMinecraftMp = await getValue('AVMRprojectsMinecraftMp');
-    projectsMinecraftMp = projectsMinecraftMp.AVMRprojectsMinecraftMp;
     projectsMinecraftServerList = await getValue('AVMRprojectsMinecraftServerList');
-    projectsMinecraftServerList = projectsMinecraftServerList.AVMRprojectsMinecraftServerList;
     projectsServerPact = await getValue('AVMRprojectsServerPact');
-    projectsServerPact = projectsServerPact.AVMRprojectsServerPact;
     projectsMinecraftIpList = await getValue('AVMRprojectsMinecraftIpList');
-    projectsMinecraftIpList = projectsMinecraftIpList.AVMRprojectsMinecraftIpList;
     projectsTopMinecraftServers = await getValue('AVMRprojectsTopMinecraftServers');
-    projectsTopMinecraftServers = projectsTopMinecraftServers.AVMRprojectsTopMinecraftServers;
     projectsMinecraftServersBiz = await getValue('AVMRprojectsMinecraftServersBiz');
-    projectsMinecraftServersBiz = projectsMinecraftServersBiz.AVMRprojectsMinecraftServersBiz;
     projectsHotMC = await getValue('AVMRprojectsHotMC');
-    projectsHotMC = projectsHotMC.AVMRprojectsHotMC;
     projectsMinecraftServerNet = await getValue('AVMRprojectsMinecraftServerNet');
-    projectsMinecraftServerNet = projectsMinecraftServerNet.AVMRprojectsMinecraftServerNet;
+    projectsTopGames = await getValue('AVMRprojectsTopGames');
     projectsCustom = await getValue('AVMRprojectsCustom');
-    projectsCustom = projectsCustom.AVMRprojectsCustom;
     VKs = await getValue('AVMRVKs');
-    VKs = VKs.AVMRVKs;
     proxies = await getValue('AVMRproxies');
-    proxies = proxies.AVMRproxies;
     settings = await getValue('AVMRsettings');
-    settings = settings.AVMRsettings;
 
     if (!(projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function'))) {
 		//Если пользователь обновился с версии 2.2.0
@@ -135,6 +114,11 @@ async function initializeConfig() {
 		if (projectsHotMC == null || !(typeof projectsHotMC[Symbol.iterator] === 'function')) {
 			projectsHotMC = [];
 			projectsMinecraftServerNet = [];
+		}
+
+		//Если пользователь обновился с версии 3.3.1
+		if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
+			projectsTopGames = [];
 		}
     }
 
@@ -229,7 +213,7 @@ async function checkOpen(project) {
 			if (Date.now() < value.nextAttempt) {
 				return
 			} else {
-				console.warn('[' + getProjectName(value) + '] ' + value.nick + (value.Custom ? '' : ' – ' + value.id) + (value.name != null ? ' – ' + value.name : '') + ' ' + chrome.i18n.getMessage('timeout'))
+				console.warn('[' + getProjectName(value) + '] ' + value.nick + (project.game != null ? ' – ' + project.game : '') + (value.Custom ? '' : ' – ' + value.id) + (value.name != null ? ' – ' + value.name : '') + ' ' + chrome.i18n.getMessage('timeout'))
 				if (!settings.disabledNotifError) sendNotification('[' + getProjectName(value) + '] ' + value.nick + (value.Custom ? '' : value.name != null ? ' – ' + value.name : ' – ' + value.id), chrome.i18n.getMessage('timeout'))
 			}
 		}
@@ -269,7 +253,7 @@ async function checkOpen(project) {
             openedProjects.delete(key);
             chrome.tabs.remove(key, function() {
             	if (chrome.runtime.lastError) {
-            		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
+            		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
             		if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
             	}
             });
@@ -280,7 +264,7 @@ async function checkOpen(project) {
     	delete project.error
     }
 	
-	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('startedAutoVote'));
+	console.log('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('startedAutoVote'));
     if (!settings.disabledNotifStart) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('startedAutoVote'));
 
     if (project.MonitoringMinecraft || project.FairTop) {
@@ -564,7 +548,14 @@ async function newWindow(project) {
 				});
 			}
 			if (project.ServeurPrive) {
-				chrome.tabs.create({"url":"https://serveur-prive.net/minecraft/" + project.id + "/vote", "selected":false}, function(tab) {
+				let url
+				if (project.game == null) project.game = 'minecraft'
+				if (project.lang == 'en') {
+					url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
+				} else {
+					url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
+				}
+				chrome.tabs.create({"url": url, "selected":false}, function(tab) {
 					openedProjects.set(tab.id, project);
 				});
 			}
@@ -618,6 +609,19 @@ async function newWindow(project) {
 					openedProjects.set(tab.id, project);
 				});
 			}
+			if (project.TopGames) {
+				let url
+				if (project.lang == 'fr') {
+					url = 'https://top-serveurs.net/' + project.game + '/vote/' + project.id
+				} else if (project.lang == 'en') {
+					url = 'https://top-games.net/' + project.game + '/vote/' + project.id
+				} else {
+					url = 'https://' + project.lang + '.top-games.net/' + project.game + '/vote/' + project.id
+				}
+				chrome.tabs.create({"url": url, "selected":false}, function(tab) {
+					openedProjects.set(tab.id, project)
+				});
+			}
 		});
 	}
 }
@@ -643,13 +647,18 @@ async function silentVote(project) {
                 endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
-			let cookie = await getCookie('https://topcraft.ru/', 'csrftoken');
-			response = await fetch("https://topcraft.ru/projects/vote/", {signal: controller.signal, credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
+            let html = await response.text()
+            let doc = new DOMParser().parseFromString(html, "text/html")
+			let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
+			response = await fetch("https://topcraft.ru/projects/vote/", {signal: controller.signal, credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + csrftoken + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 			if (!extractHostname(response.url).includes('topcraft.')) {
 				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
 				return;
 			}
 			if (response.status == 400) {
+				html = await response.text()
+				doc = new DOMParser().parseFromString(html, "text/html")
+				console.warn('Текст ошибки 400: ' + doc.body.innerText)
 				endVote('later', null, project);
 				return;
 			} else if (!response.ok) {
@@ -675,13 +684,18 @@ async function silentVote(project) {
                 endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
                 return;
 			}
-			let cookie = await getCookie('https://mctop.su/', 'csrftoken');
-			response = await fetch("https://mctop.su/projects/vote/", {signal: controller.signal, credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + cookie.value + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
+            let html = await response.text()
+            let doc = new DOMParser().parseFromString(html, "text/html")
+			let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
+			response = await fetch("https://mctop.su/projects/vote/", {signal: controller.signal, credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + csrftoken + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 			if (!extractHostname(response.url).includes('mctop.')) {
 				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
 				return;
 			}
 			if (response.status == 400) {
+				html = await response.text()
+				doc = new DOMParser().parseFromString(html, "text/html")
+				console.warn('Текст ошибки 400: ' + doc.body.innerText)
 				endVote('later', null, project);
 				return;
 			} else if (!response.ok) {
@@ -1235,6 +1249,8 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 		chrome.tabs.executeScript(details.tabId, {file: "scripts/hotmc.js"});
 	} else if (project.MinecraftServerNet) {
 		chrome.tabs.executeScript(details.tabId, {file: "scripts/minecraftservernet.js"});
+	} else if (project.TopGames) {
+		chrome.tabs.executeScript(details.tabId, {file: "scripts/topgames.js"})
 	}
 }, {url: [{hostSuffix: 'topcraft.ru'},
           {hostSuffix: 'mctop.su'},
@@ -1254,7 +1270,9 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
           {hostSuffix: 'topminecraftservers.org'},
           {hostSuffix: 'minecraftservers.biz'},
           {hostSuffix: 'hotmc.ru'},
-          {hostSuffix: 'minecraft-server.net'}
+          {hostSuffix: 'minecraft-server.net'},
+          {hostSuffix: 'top-games.net'},
+          {hostSuffix: 'top-serveurs.net'}
           ]});
 
 chrome.webNavigation.onCompleted.addListener(function(details) {
@@ -1300,6 +1318,8 @@ chrome.webNavigation.onErrorOccurred.addListener(function (details) {
           {hostSuffix: 'minecraftservers.biz'},
           {hostSuffix: 'hotmc.ru'},
           {hostSuffix: 'minecraft-server.net'},
+          {hostSuffix: 'top-games.net'},
+          {hostSuffix: 'top-serveurs.net'},
           {hostSuffix: 'vk.com'}
           ]});
 
@@ -1308,7 +1328,7 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
 	//Если требует ручное прохождение капчи
 	if (request.message == "Requires manually passing the captcha" && sender && openedProjects.has(sender.tab.id)) {
 		let project = openedProjects.get(sender.tab.id);
-		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('requiresCaptcha'));
+		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('requiresCaptcha'));
         if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('requiresCaptcha'));
 	} else {
 		endVote(request.message, sender, null);
@@ -1320,7 +1340,7 @@ async function endVote(message, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         chrome.tabs.remove(sender.tab.id, function() {
           	if (chrome.runtime.lastError) {
-          		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
+          		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
            		if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
            	}
         });
@@ -1412,7 +1432,7 @@ async function endVote(message, sender, project) {
         }
 		if (message.startsWith('later ')) {
 			time = parseInt(message.replace('later ', ''));
-			if (project.ServeurPrive) {
+			if (project.ServeurPrive || project.TopGames) {
 				project.countVote = project.countVote + 1;
 				if (project.countVote >= project.maxCountVote) {
 					time = new Date();
@@ -1427,14 +1447,18 @@ async function endVote(message, sender, project) {
 				time.setUTCHours(time.getUTCHours() + 12);
 			} else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet) {
 				time.setUTCDate(time.getUTCDate() + 1);
-			} else if (project.ServeurPrive) {
+			} else if (project.ServeurPrive || project.TopGames) {
 				project.countVote = project.countVote + 1;
 				if (project.countVote >= project.maxCountVote) {
 					time.setDate(time.getDate() + 1);
 					time.setHours(0, (project.priority ? 0 : 10), 0, 0);
 					project.countVote = 0;
 				} else {
-					time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30);
+					if (project.ServeurPrive) {
+                        time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30);
+					} else {
+						time.setUTCHours(time.getUTCHours() + 2);
+					}
 				}
 			} else if (project.ServerPact) {
 				time.setUTCHours(time.getUTCHours() + 11);
@@ -1474,7 +1498,6 @@ async function endVote(message, sender, project) {
 
         if (message == "successfully") {
             sendMessage = chrome.i18n.getMessage('successAutoVote');
-            if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         } else {
         	if (settings.useMultiVote && settings.repeatAttemptLater && project.later) {
         		if (project.later < 3) {
@@ -1485,8 +1508,9 @@ async function endVote(message, sender, project) {
         		}
         	}
             sendMessage = chrome.i18n.getMessage('alreadyVoted');
-            if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         }
+        if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
+        console.log('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 	//Если ошибка
 	} else {
 		let retryCoolDown
@@ -1526,11 +1550,9 @@ async function endVote(message, sender, project) {
         }
         if (!settings.useMultiVote) project.time = Date.now() + retryCoolDown
         project.error = message
-        console.error('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage);
+        console.error('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
 	}
-    
-    console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 
 	if (project.priority) {
         getProjectList(project).unshift(project);
@@ -1577,6 +1599,7 @@ function getProjectName(project) {
 	if (project.MinecraftServersBiz) return "MinecraftServersBiz";
 	if (project.HotMC) return "HotMC";
 	if (project.MinecraftServerNet) return "MinecraftServerNet";
+	if (project.TopGames) return 'TopGames'
 	if (project.Custom) return "Custom";
 }
 
@@ -1600,6 +1623,7 @@ function getProjectList(project) {
     if (project.MinecraftServersBiz) return projectsMinecraftServersBiz;
     if (project.HotMC) return projectsHotMC;
     if (project.MinecraftServerNet) return projectsMinecraftServerNet;
+    if (project.TopGames) return projectsTopGames;
     if (project.Custom) return projectsCustom;
 }
 
@@ -1678,7 +1702,7 @@ async function removeCookie(url, name) {
 async function getValue(name) {
     return new Promise(resolve => {
         chrome.storage.local.get(name, data => {
-            resolve(data);
+            resolve(data[name]);
         });
     });
 }
@@ -1779,6 +1803,9 @@ async function forLoopAllProjects (fuc) {
     for (let proj of projectsMinecraftServerNet) {
         await fuc(proj);
     }
+    for (let proj of projectsTopGames) {
+        fuc(proj);
+    }
     for (let proj of projectsCustom) {
         await fuc(proj);
     }
@@ -1826,6 +1853,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         if (key == 'AVMRprojectsMinecraftServersBiz') projectsMinecraftServersBiz = storageChange.newValue;
         if (key == 'AVMRprojectsHotMC') projectsHotMC = storageChange.newValue;
         if (key == 'AVMRprojectsMinecraftServerNet') projectsMinecraftServerNet = storageChange.newValue;
+        if (key == 'AVMRprojectsTopGames') projectsTopGames = storageChange.newValue;
         if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
         if (key == 'AVMRVKs') VKs = storageChange.newValue;
         if (key == 'AVMRproxies') proxies = storageChange.newValue;
