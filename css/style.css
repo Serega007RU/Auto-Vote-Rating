@@ -40,7 +40,6 @@ select:focus, input:focus, textarea:focus {
 
 .closeSettings {
   margin-top: 15px;
-  float: left !important;
 }
 
 .retryFastAdd {
@@ -474,56 +473,54 @@ p, form, label, details {
   width: 100%;
   max-width: 530px;
   position: relative;
-  padding: 1.8em;
-  opacity: 0;
+  transform: scale(0);
   background-color: #2A2A2F !important;
-  -webkit-transition: opacity .7s;
-  transition: opacity .7s;
+  transition: transform 500ms;
+}
+
+.anelumen figure > div {
+  padding: 15px;
+}
+
+.anelumen figure > h2 {
+  padding: 8px 15px !important;
 }
 
 .anelumen.lowingnuska figure {
   background: #f9f5f5;
   border-radius: 5px;
-  padding-top: 8px;
   border: 1px solid #aba4a4;
 }
 
 .anelumen.lowingnuska figure h2 {
   padding: 0em;
   margin-top: 0;
-  padding-bottom: 3px;
+  margin-bottom: 0px;
   font-size: 25px;
+  border-bottom: 1px solid #aba4a4;
 }
 
 .anelumen:target figure {
-  opacity: 1;
+  transform: scale(1);
 }
 
 .anelumen:target ~ input ~ label ~ ul ~ div .tooltip1 {
    position: initial;
 }
 
-.anelumen:target ~ input ~ label ~ ul ~ div .nav-panel, .anelumen:target ~ input ~ label {
+.anelumen:target ~ input ~ label ~ ul ~ div .nav-panel, .anelumen:target ~ input ~ label, .anelumen:target ~ input ~ ul {
    display: none !important;
 }
 
-
-
 figure svg {
   margin-right: 5px;
-}
-
-figure hr {
-  width: 530px;
-  position: relative; 
-  left: -30px;
 }
 
 .anelumen.lowingnuska .compatibg-ukastywise {
   text-decoration: none;
   position: absolute;
   right: 8px;
-  top: -7px;
+  top: -5px;
   font-size: 41px;
   color: #9E9E9E;
 }
