@@ -558,5 +558,8 @@
   },
   "idGame": {
     "message": "Game ID"
+  },
+  "stats": {
+    "message": "Statistics"
   }
 }

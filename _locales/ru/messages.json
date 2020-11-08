@@ -518,5 +518,8 @@
   },
   "idGame": {
     "message": "ID игры"
+  },
+  "stats": {
+    "message": "Статистика"
   }
 }

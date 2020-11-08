@@ -295,22 +295,36 @@ async function restoreOptions() {
 };
 
 //Добавить проект в список проекта
+let style = false
 async function addProjectList(project, visually) {
     let listProject = document.getElementById(getProjectName(project) + "List");
-    if (listProject.innerHTML.includes(chrome.i18n.getMessage('notAdded'))) listProject.innerHTML = "";
-    let html = document.createElement('div');
-    html.setAttribute("id", 'div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id));
+    if (listProject.innerHTML.includes(chrome.i18n.getMessage('notAdded'))) {
+        if (getProjectList(project).length % 2 == 1) {
+            style = false
+        }
+        listProject.innerHTML = ""
+    }
+    let html = document.createElement('li')
+    if (style) {
+        html.style = 'background-color: #38383b'
+    }
+    style = !style
+    let id = getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)
+    html.id = 'div┄' + id
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon');
     if (!(project.time == null || project.time == "")) {
         let time = new Date(project.time);
         if (Date.now() < project.time) text = ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth()+1)).slice(-2) + '.' + time.getFullYear() + ' ' + ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2) + ':' + ('0' + time.getSeconds()).slice(-2);
     }
-    html.innerHTML = project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + ' <button id="' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id) + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + (project.error ? '<span style="color:#f44336;">' + project.error + '</span><br>' : '') + chrome.i18n.getMessage('nextVote') + ' ' + text;
+    html.innerHTML = project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + '<span id="' + id + '" class="deleteProject"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> </span> <span id="stats┄' + id + '" class="mr-1 statsProject"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7"/><path d="M15 7h6v6"/></svg> </span> <br>' + (project.error ? '<span style="color:#f44336;">' + project.error + '</span><br>' : '') + chrome.i18n.getMessage('nextVote') + ' ' + text;
     listProject.after(html)
-    document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).addEventListener('click', function() {
+    document.getElementById(id).addEventListener('click', function() {
         removeProjectList(project, false);
-    });
+    })
+//     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).addEventListener('click', function() {
+//         removeProjectList(project, false);
+//     })
     if (document.getElementById(getProjectName(project) + 'Button') == null) {
         if (document.querySelector("#addedProjectsTable1").childElementCount == 0) {
             document.querySelector("#addedProjectsTable1").innerText = ""

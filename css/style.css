@@ -59,7 +59,7 @@ select:focus, input:focus, textarea:focus {
   margin-bottom: 10px;
   color: rgba(255, 255, 255, 0.56);
   background: #2A2A2F;
-  margin-right: 10px; 
+  margin-right: 10px;
   padding: 9px 12px;
   font-size: 18px;
   outline: none;
@@ -678,4 +678,51 @@ figure svg {
 
 textarea {
   height: 250px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul li {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: -1px; /* Prevent double borders */
+  background-color: #424249;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 18px;
+  display: block;
+  position: relative;
+}
+
+ul li:hover {
+  background-color: #2A2A2F !important;
+}
+
+.deleteProject:hover {
+  background: #d32f2f;
+}
+
+.statsProject:hover {
+  background: #1A7BEE;
+}
+
+.deleteProject {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  right: 0%;
+  padding: 22px 26px;
+  transform: translate(0%, -50%);
+}
+
+.statsProject {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  right: 6%;
+  padding: 22px 26px;
+  transform: translate(0%, -50%);
 }
