@@ -148,18 +148,9 @@ p, form, label, details {
   left: auto;
 }
 
-#TopCraftList, #McTOPList, #MCRateList, #MinecraftRatingList, #MonitoringMinecraftList, #FairTopList, #PlanetMinecraftList, #TopGList, #MinecraftMpList, #MinecraftServerListList, #ServerPactList, #MinecraftIpListList, #CustomList {
-  border-top: solid 1px #5A5A5C;
-}
-
-.listcontent div {
-  padding: 10px 0;
-  border-top: solid 1px #5A5A5C;
-}
-
-
+/*Возможно уже бесполезно :| */
 .listcontent div:first-of-type {
-  padding: 0;
+  padding: 0; 
 }
 
 .listcontent button, .closeSettings {
@@ -360,6 +351,21 @@ p, form, label, details {
 @media (max-width: 770px) { 
   .tooltip1text, .tooltip1 {
     display: none !important;
+  }
+
+  .statsProject, .deleteProject {
+    display: block;
+    padding: 12px;
+    margin-right: 0px !important;
+    padding: 11px 12px !important;
+  }
+
+  .deleteProject {
+    margin-top: 3px !important;
+  }
+
+  .listcontent li {
+    min-height: 130px;
   }
 }
 
@@ -687,9 +693,7 @@ ul {
 }
 
 ul li {
-  border: 1px solid rgba(0, 0, 0, 0.1);
   margin-top: -1px; /* Prevent double borders */
-  background-color: #424249;
   padding: 12px;
   text-decoration: none;
   font-size: 18px;
@@ -699,6 +703,7 @@ ul li {
 
 ul li:hover {
   background-color: #2A2A2F !important;
+  cursor: pointer;
 }
 
 .deleteProject:hover {
@@ -709,20 +714,17 @@ ul li:hover {
   background: #1A7BEE;
 }
 
-.deleteProject {
+.statsProject, .deleteProject {
   cursor: pointer;
-  position: absolute;
-  top: 50%;
-  right: 0%;
-  padding: 22px 26px;
+  padding: 23px;
   transform: translate(0%, -50%);
 }
 
-.statsProject {
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  right: 6%;
-  padding: 22px 26px;
-  transform: translate(0%, -50%);
+.deleteProject {
+  margin-right: 0.25rem;
+}
+
+.listcontent > li > div {
+  float: right;
+  margin-top: 14px;
 }
