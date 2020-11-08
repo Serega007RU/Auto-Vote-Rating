@@ -1978,4 +1978,13 @@ elements.forEach(function(el) {
     el.innerHTML = el.innerHTML + chrome.i18n.getMessage(el.getAttribute('data-resource'));
 });
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'));
-document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'));
+document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
+let play = true
+document.getElementById('donate').addEventListener("mouseover", function( event ) {
+    play = !play
+    if (play) {
+        document.getElementById('sound-link').play()
+    } else {
+        document.getElementById('sound-link2').play()
+    }
+})
