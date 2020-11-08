@@ -1980,11 +1980,15 @@ elements.forEach(function(el) {
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'));
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
 let play = true
+let sound1 = document.getElementById('sound-link')
+sound1.volume = 0.5
+let sound2 = document.getElementById('sound-link2')
+sound2.volume = 0.5
 document.getElementById('donate').addEventListener("mouseover", function( event ) {
     play = !play
     if (play) {
-        document.getElementById('sound-link').play()
+        sound1.play()
     } else {
-        document.getElementById('sound-link2').play()
+        sound2.play()
     }
 })
