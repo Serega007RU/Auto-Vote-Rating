@@ -155,7 +155,7 @@ p, form, label, details {
 
 .listcontent button, .closeSettings {
   color: #fff;
-  background: #e53935;
+  background: #d32f2f;
   padding: 9px 30px;
   font-size: 18px;
   outline: none;
@@ -329,6 +329,7 @@ p, form, label, details {
 }
 
 .btn-menu-back {
+  z-index: 2;
   position: fixed;
   top: 0;
   left: 0;
@@ -349,7 +350,7 @@ p, form, label, details {
 }
 
 @media (max-width: 770px) { 
-  .tooltip1text, .tooltip1 {
+  .tooltip1text, .tooltip1, .tooltip2, .tooltip2text {
     display: none !important;
   }
 
@@ -447,7 +448,7 @@ p, form, label, details {
 }
 
 .listcontent > label {
-  color: #f44336;
+  color: #d32f2f;
 }
 
 #help p {
@@ -506,16 +507,12 @@ p, form, label, details {
   border-bottom: 1px solid #aba4a4;
 }
 
+.anelumen:target {
+  z-index: 9999;
+}
+
 .anelumen:target figure {
   transform: scale(1);
-}
-
-.anelumen:target ~ input ~ label ~ ul ~ div .tooltip1 {
-   position: initial;
-}
-
-.anelumen:target ~ input ~ label ~ ul ~ div .nav-panel, .anelumen:target ~ input ~ label, .anelumen:target ~ input ~ ul {
-   display: none !important;
 }
 
 figure svg {
@@ -529,6 +526,11 @@ figure svg {
   top: -5px;
   font-size: 41px;
   color: #9E9E9E;
+  transition: .3s;
+}
+
+.anelumen.lowingnuska .compatibg-ukastywise:hover {
+  color: #d32f2f;
 }
 
 .anelumen .nedismiseg {
@@ -693,7 +695,7 @@ ul {
 }
 
 ul li {
-  margin-top: -1px; /* Prevent double borders */
+  margin-top: -1px;
   padding: 12px;
   text-decoration: none;
   font-size: 18px;
@@ -720,7 +722,7 @@ ul li:hover {
   transform: translate(0%, -50%);
 }
 
-.deleteProject {
+.statsProject {
   margin-right: 0.25rem;
 }
 
