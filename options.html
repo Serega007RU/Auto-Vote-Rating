@@ -293,6 +293,7 @@
 					    </ul>
 					</div>
 				</div>
+				<a id="generalStats" data-resource="generalStats" class="float-left" style="cursor: pointer;"></a>
 			</div>
 			<div id="help" class="tabcontent" style="display: none;">
 				<h4 data-resource="help" align="center"></h4>
@@ -306,7 +307,8 @@
 					</div>
 					<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
 				</div>	
-			</div> <a id="donate" data-resource="supportDev" target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
+			</div>
+			<a id="donate" data-resource="supportDev" target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
 		    <audio id="sound-link" preload="auto">
 			    <source src="audio/2_-_mp3_.mp3" type="audio/mpeg">
 		    </audio>
@@ -314,32 +316,37 @@
 			    <source src="audio/c3a54b52a16b1307.mp3" type="audio/mpeg">
 		    </audio>
 			<div id="save">&nbsp;</div>
-			<script src="options.js"></script>
 		</div>
 	</div>	
 	<div class="anelumen lowingnuska" id="addFastProject">
 		<a href="" class="nedismiseg"></a>
 		<figure>
-			<h2>Modal window<a href="" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
+			<h2 data-resource="fastAdd"><a href="" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
 			<div class="modalContent">
 				<div data-resource="load" id=modaltext></div>
 			</div>
 		</figure>
 	</div>
 	<div class="anelumen lowingnuska" id="stats">
-	    <a href="#/" class="nedismiseg"></a>
+	    <a href="#/" class="nedismiseg" id="closeStats"></a>
 		<a id="modalStats" href="#stats"></a>
 		<figure>
-			<h2>Modal window<a href="#/" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
+			<h2>
+			    <span data-resource="stats"></span>
+			    <p style="margin-top: 0em; margin-bottom: -0.5em;"></p>
+			    <span id="statsSubtitle" style="font-size: 12px;">&nbsp;</span>
+			    <a href="#/" class="compatibg-ukastywise" id="closeStats2" aria-label="Close Modal Box" style="top: 4px;">×</a>
+			</h2>
+
 			<div class="modalContent">
-				<div id=modaltext>
-	                Всего сделано голосов: 15<br>
-					За этот месяц сделано голосов: 4<br>
-					Ошибок: 1000<br>
-					Ошибок "Вы уже голосовали": 500<br>
-					Когда был сделан последний голос: 01.01.0001 в 00:20:00
-				</div>
+				<span data-resource="statsSuccessVotes"></span><br>
+				<span data-resource="statsMonthSuccessVotes"></span><br>
+				<span data-resource="statsLaterVotes"></span><br>
+				<span data-resource="statsErrorVotes"></span><br>
+				<span data-resource="statsLastSuccessVote"></span><br>
+				<span data-resource="statsLastAttemptVote"></span>
 			</div>
 		</figure>
 	</div>
+	<script src="options.js"></script>
 </body>

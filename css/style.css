@@ -148,11 +148,6 @@ p, form, label, details {
   left: auto;
 }
 
-/*Возможно уже бесполезно :| */
-.listcontent div:first-of-type {
-  padding: 0; 
-}
-
 .listcontent button, .closeSettings {
   color: #fff;
   background: #d32f2f;
@@ -482,7 +477,7 @@ p, form, label, details {
   position: relative;
   transform: scale(0);
   background-color: #2A2A2F !important;
-  transition: transform 500ms;
+  transition: transform 250ms;
 }
 
 .anelumen figure > div {
@@ -526,7 +521,7 @@ figure svg {
   top: -5px;
   font-size: 41px;
   color: #9E9E9E;
-  transition: .3s;
+  transition: .2s;
 }
 
 .anelumen.lowingnuska .compatibg-ukastywise:hover {
@@ -695,7 +690,6 @@ ul {
 }
 
 ul li {
-  margin-top: -1px;
   padding: 12px;
   text-decoration: none;
   font-size: 18px;
@@ -729,4 +723,8 @@ ul li:hover {
 .listcontent > li > div {
   float: right;
   margin-top: 14px;
+}
+
+.listcontent li:nth-of-type(odd) {
+  background: rgba(42, 42, 47, 0.6);
 }

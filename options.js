@@ -23,6 +23,7 @@ var projectsTopGames = [];
 var projectsCustom = [];
 
 var settings;
+var generalStats = {}
 //Хранит значение отключения проверки на совпадение проектов
 var disableCheckProjects = false;
 //Нужно ли добавлять проект с приоритетом
@@ -67,6 +68,7 @@ function Project(top, nick, id, time, responseURL, priority) {
         this.time = time;
     }
     if (priority) this.priority = true;
+    this.stats = {}
 };
 
 //Конструктор настроек
@@ -105,6 +107,8 @@ async function restoreOptions() {
     projectsTopGames = await getValue('AVMRprojectsTopGames');
     projectsCustom = await getValue('AVMRprojectsCustom');
     settings = await getValue('AVMRsettings');
+    generalStats = await getValue('generalStats')
+    if (generalStats == null) generalStats = {}
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
         updateStatusSave('<div>' + chrome.i18n.getMessage('firstSettings') +'</div>', true);
         projectsTopCraft = [];
@@ -295,35 +299,33 @@ async function restoreOptions() {
 };
 
 //Добавить проект в список проекта
-let style = false
 async function addProjectList(project, visually) {
     let listProject = document.getElementById(getProjectName(project) + "List");
-    if (listProject.innerHTML.includes(chrome.i18n.getMessage('notAdded'))) {
-        if (getProjectList(project).length % 2 == 1) {
-            style = false
-        }
-        listProject.innerHTML = ""
-    }
+    if (listProject.innerHTML.includes(chrome.i18n.getMessage('notAdded'))) listProject.innerHTML = ""
     let html = document.createElement('li')
-    if (style) {
-        html.style = 'background-color: rgba(42, 42, 47, .6)'
-    }
-    style = !style
     let id = getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)
     html.id = 'div┄' + id
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon');
     if (!(project.time == null || project.time == "")) {
-        let time = new Date(project.time);
-        if (Date.now() < project.time) text = ('0' + time.getDate()).slice(-2) + '.' + ('0' + (time.getMonth()+1)).slice(-2) + '.' + time.getFullYear() + ' ' + ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2) + ':' + ('0' + time.getSeconds()).slice(-2);
+        if (Date.now() < project.time) text = new Date(project.time).toLocaleString().replace(',', '')
     }
-    html.innerHTML = '<div></span> <span id="stats┄' + id + '" class="statsProject"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7"/><path d="M15 7h6v6"/></svg> </span><span id="' + id + '" class="deleteProject"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + '<br>' + (project.error ? '<span style="color:#f44336;">' + project.error + '</span><br>' : '') + chrome.i18n.getMessage('nextVote') + ' ' + text;
+    html.innerHTML = '<div></span> <span id="stats┄' + id + '" class="statsProject"> <svg width="24" height="24" viewBox="0 2 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7"/><path d="M15 7h6v6"/></svg> </span><span id="' + id + '" class="deleteProject"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="4" x2="6" y2="16"></line><line x1="6" y1="4" x2="18" y2="16"></line></svg></div>' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + '<br>' + (project.error ? '<span style="color:#f44336;">' + project.error + '</span><br>' : '') + chrome.i18n.getMessage('nextVote') + ' ' + text;
     listProject.after(html)
+    //Слушатель кнопки Удалить на проект
     document.getElementById(id).addEventListener('click', function() {
         removeProjectList(project, false);
     })
+    //Слушатель кнопки Статистики и вывод её в модалку
     document.getElementById('stats┄' + id).addEventListener('click', function() {
         document.getElementById('modalStats').click()
+        document.getElementById('statsSubtitle').textContent = getProjectName(project) + ' – ' + project.nick + ' – ' + (project.Custom ? '' : (project.name != null ? project.name : project.id))
+        document.querySelector('span[data-resource="statsSuccessVotes"]').after(project.stats.successVotes ? project.stats.successVotes : 0)
+        document.querySelector('span[data-resource="statsMonthSuccessVotes"]').after(project.stats.monthSuccessVotes ? project.stats.monthSuccessVotes : 0)
+        document.querySelector('span[data-resource="statsErrorVotes"]').after(project.stats.errorVotes ? project.stats.errorVotes : 0)
+        document.querySelector('span[data-resource="statsLaterVotes"]').after(project.stats.laterVotes ? project.stats.laterVotes : 0)
+        document.querySelector('span[data-resource="statsLastSuccessVote"]').after(project.stats.lastSuccessVote ? new Date(project.stats.lastSuccessVote).toLocaleString().replace(',', '') : 'None')
+        document.querySelector('span[data-resource="statsLastAttemptVote"]').after(project.stats.lastAttemptVote ? new Date(project.stats.lastAttemptVote).toLocaleString().replace(',', '') : 'None')
     })
     if (document.getElementById(getProjectName(project) + 'Button') == null) {
         if (document.querySelector("#addedProjectsTable1").childElementCount == 0) {
@@ -1020,52 +1022,38 @@ async function setSyncValue(key, value) {
 chrome.storage.onChanged.addListener(function(changes, namespace) {
     for (var key in changes) {
         var storageChange = changes[key];
-        if (key == 'AVMRprojectsTopCraft'
-        || key == 'AVMRprojectsMcTOP'
-        || key == 'AVMRprojectsMCRate'
-        || key == 'AVMRprojectsMinecraftRating'
-        || key == 'AVMRprojectsMonitoringMinecraft'
-        || key == 'AVMRprojectsFairTop'
-        || key == 'AVMRprojectsIonMc'
-        || key == 'AVMRprojectsMinecraftServersOrg'
-        || key == 'AVMRprojectsServeurPrive'
-        || key == 'AVMRprojectsPlanetMinecraft'
-        || key == 'AVMRprojectsTopG'
-        || key == 'AVMRprojectsMinecraftMp'
-        || key == 'AVMRprojectsMinecraftServerList'
-        || key == 'AVMRprojectsServerPact'
-        || key == 'AVMRprojectsMinecraftIpList'
-        || key == 'AVMRprojectsTopMinecraftServers'
-        || key == 'AVMRprojectsMinecraftServersBiz'
-        || key == 'AVMRprojectsHotMC'
-        || key == 'AVMRprojectsMinecraftServerNet'
-        || key == 'AVMRprojectsTopGames'
-        || key == 'AVMRprojectsCustom') {
-            if (key == 'AVMRprojectsTopCraft') projectsTopCraft = storageChange.newValue;
-            if (key == 'AVMRprojectsMcTOP') projectsMcTOP = storageChange.newValue;
-            if (key == 'AVMRprojectsMCRate') projectsMCRate = storageChange.newValue;
-            if (key == 'AVMRprojectsMinecraftRating') projectsMinecraftRating = storageChange.newValue;
-            if (key == 'AVMRprojectsMonitoringMinecraft') projectsMonitoringMinecraft = storageChange.newValue;
-            if (key == 'AVMRprojectsFairTop') projectsFairTop = storageChange.newValue;
-            if (key == 'AVMRprojectsIonMc') projectsIonMc = storageChange.newValue;
-            if (key == 'AVMRprojectsMinecraftServersOrg') projectsMinecraftServersOrg = storageChange.newValue;
-            if (key == 'AVMRprojectsServeurPrive') projectsServeurPrive = storageChange.newValue;
-            if (key == 'AVMRprojectsPlanetMinecraft') projectsPlanetMinecraft = storageChange.newValue;
-            if (key == 'AVMRprojectsTopG') projectsTopG = storageChange.newValue;
-            if (key == 'AVMRprojectsMinecraftMp') projectsMinecraftMp = storageChange.newValue;
-            if (key == 'AVMRprojectsMinecraftServerList') projectsMinecraftServerList = storageChange.newValue;
-            if (key == 'AVMRprojectsServerPact') projectsServerPact = storageChange.newValue;
-            if (key == 'AVMRprojectsMinecraftIpList') projectsMinecraftIpList = storageChange.newValue;
-            if (key == 'AVMRprojectsTopMinecraftServers') projectsTopMinecraftServers = storageChange.newValue;
-            if (key == 'AVMRprojectsMinecraftServersBiz') projectsMinecraftServersBiz = storageChange.newValue;
-            if (key == 'AVMRprojectsHotMC') projectsHotMC = storageChange.newValue;
-            if (key == 'AVMRprojectsMinecraftServerNet') projectsMinecraftServerNet = storageChange.newValue;
-            if (key == 'AVMRprojectsTopGames') projectsTopGames = storageChange.newValue;
-            if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
-            if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function')) return;
-            if (storageChange.oldValue.length == storageChange.newValue.length) {
-                updateProjectList(storageChange.newValue);
-            }
+        if (key == 'AVMRprojectsTopCraft') projectsTopCraft = storageChange.newValue;
+        if (key == 'AVMRprojectsMcTOP') projectsMcTOP = storageChange.newValue;
+        if (key == 'AVMRprojectsMCRate') projectsMCRate = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftRating') projectsMinecraftRating = storageChange.newValue;
+        if (key == 'AVMRprojectsMonitoringMinecraft') projectsMonitoringMinecraft = storageChange.newValue;
+        if (key == 'AVMRprojectsFairTop') projectsFairTop = storageChange.newValue;
+        if (key == 'AVMRprojectsIonMc') projectsIonMc = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftServersOrg') projectsMinecraftServersOrg = storageChange.newValue;
+        if (key == 'AVMRprojectsServeurPrive') projectsServeurPrive = storageChange.newValue;
+        if (key == 'AVMRprojectsPlanetMinecraft') projectsPlanetMinecraft = storageChange.newValue;
+        if (key == 'AVMRprojectsTopG') projectsTopG = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftMp') projectsMinecraftMp = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftServerList') projectsMinecraftServerList = storageChange.newValue;
+        if (key == 'AVMRprojectsServerPact') projectsServerPact = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftIpList') projectsMinecraftIpList = storageChange.newValue;
+        if (key == 'AVMRprojectsTopMinecraftServers') projectsTopMinecraftServers = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftServersBiz') projectsMinecraftServersBiz = storageChange.newValue;
+        if (key == 'AVMRprojectsHotMC') projectsHotMC = storageChange.newValue;
+        if (key == 'AVMRprojectsMinecraftServerNet') projectsMinecraftServerNet = storageChange.newValue;
+        if (key == 'AVMRprojectsTopGames') projectsTopGames = storageChange.newValue;
+        if (key == 'AVMRprojectsCustom') projectsCustom = storageChange.newValue;
+        if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function')) return;
+        if (key == 'AVMRsettings') {
+            settings = storageChange.newValue
+            return
+        }
+        if (key == 'generalStats') {
+            generalStats = storageChange.newValue
+            return
+        }
+        if (storageChange.oldValue.length == storageChange.newValue.length) {
+            updateProjectList(storageChange.newValue);
         }
     }
 });
@@ -1502,6 +1490,8 @@ async function fastAdd() {
         buttonClose.addEventListener('click', () => {
             window.close();
         });
+    } else if (window.location.href.includes('stats')) {
+        document.querySelector("#closeStats2").click()
     }
 }
 
@@ -1617,12 +1607,37 @@ function listSelect(evt, tabs) {
 }
 
 //Слушатели кнопок списка доавленных проектов
-
 if (document.getElementById('CustomButton') != null) {
     document.getElementById('CustomButton').addEventListener('click', function() {
         listSelect(event, 'CustomTab');
     });
 }
+
+//Слушатель закрытия модалки статистики и её сброс
+document.getElementById('closeStats').addEventListener('click', resetStats)
+document.getElementById('closeStats2').addEventListener('click', resetStats)
+function resetStats() {
+    if (document.querySelector('span[data-resource="statsSuccessVotes"]').nextSibling.nodeType == 3) {
+        document.getElementById('statsSubtitle').innerHTML = '&nbsp;'
+        document.querySelector('span[data-resource="statsSuccessVotes"]').nextSibling.remove()
+        document.querySelector('span[data-resource="statsMonthSuccessVotes"]').nextSibling.remove()
+        document.querySelector('span[data-resource="statsErrorVotes"]').nextSibling.remove()
+        document.querySelector('span[data-resource="statsLaterVotes"]').nextSibling.remove()
+        document.querySelector('span[data-resource="statsLastSuccessVote"]').nextSibling.remove()
+        document.querySelector('span[data-resource="statsLastAttemptVote"]').nextSibling.remove()
+    }
+}
+//Слушатель общей статистики и вывод её в модалку
+document.getElementById('generalStats').addEventListener('click', function() {
+    document.getElementById('modalStats').click()
+    document.getElementById('statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
+    document.querySelector('span[data-resource="statsSuccessVotes"]').after(generalStats.successVotes ? generalStats.successVotes : 0)
+    document.querySelector('span[data-resource="statsMonthSuccessVotes"]').after(generalStats.monthSuccessVotes ? generalStats.monthSuccessVotes : 0)
+    document.querySelector('span[data-resource="statsErrorVotes"]').after(generalStats.errorVotes ? generalStats.errorVotes : 0)
+    document.querySelector('span[data-resource="statsLaterVotes"]').after(generalStats.laterVotes ? generalStats.laterVotes : 0)
+    document.querySelector('span[data-resource="statsLastSuccessVote"]').after(generalStats.lastSuccessVote ? new Date(generalStats.lastSuccessVote).toLocaleString().replace(',', '') : 'None')
+    document.querySelector('span[data-resource="statsLastAttemptVote"]').after(generalStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None')
+})
 
 //Генерация поля ввода ID
 var selectedTop = document.getElementById("project");
@@ -1973,17 +1988,19 @@ selectedTop.addEventListener("change", function() {
 });
 
 //Локализация
-var elements = document.querySelectorAll('[data-resource]');
+let elements = document.querySelectorAll('[data-resource]')
 elements.forEach(function(el) {
-    el.innerHTML = el.innerHTML + chrome.i18n.getMessage(el.getAttribute('data-resource'));
-});
+    el.innerHTML = el.innerHTML + chrome.i18n.getMessage(el.getAttribute('data-resource'))
+})
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'));
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
+
+//Звук монеток когда наводишь курсор на ссылку поддержки))
 let play = true
 let sound1 = document.getElementById('sound-link')
-sound1.volume = 0.5
+sound1.volume = 0.3
 let sound2 = document.getElementById('sound-link2')
-sound2.volume = 0.5
+sound2.volume = 0.3
 document.getElementById('donate').addEventListener("mouseover", function( event ) {
     play = !play
     if (play) {
