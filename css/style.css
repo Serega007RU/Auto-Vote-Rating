@@ -98,7 +98,7 @@ input[type="file"] {
   display: none;
 }
 
-button[type="submit"], .retryFastAdd {
+button[type="submit"], .retryFastAdd, #generalStats {
   color: #fff;
   background: #1A7BEE;
   padding: 9px 25px;
@@ -115,11 +115,11 @@ button[type="submit"], .retryFastAdd {
   border: none;
 }
 
-button[type="submit"]:hover {
+button[type="submit"]:hover, #generalStats:hover {
   opacity: 0.85;
 }
 
-button[type="submit"]:focus {
+button[type="submit"]:focus, #generalStats:focus {
   outline: 0;
   opacity: 0.5;
 }
@@ -727,4 +727,25 @@ ul li:hover {
 
 .listcontent li:nth-of-type(odd) {
   background: rgba(42, 42, 47, 0.6);
+}
+
+.stats span {
+  color: #1A7BEE;
+}
+
+#statsSubtitle {
+  font-size: 13px;
+}
+
+#closeStats2 {
+  top: 2px;
+}
+
+#addedTab.active ~ div.nav-panel ~ #centerLayer #donate {
+  display: none !important;
+}
+
+#generalStats {
+  text-decoration: none !important;
+  margin-top: -20px;
 }

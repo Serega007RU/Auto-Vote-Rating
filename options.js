@@ -1559,6 +1559,11 @@ function tabSelect(evt, tabs) {
 
     document.getElementById(tabs).style.display = "block";
     evt.currentTarget.className += " active";
+    if (tabs == 'added') {
+    	document.getElementById('donate').style.display = 'none'
+    } else {
+    	document.getElementById('donate').style.display = 'inline'
+    }
 }
 
 //Слушателей кнопок для переключения вкладок
@@ -1629,7 +1634,7 @@ function resetStats() {
 }
 //Слушатель общей статистики и вывод её в модалку
 document.getElementById('generalStats').addEventListener('click', function() {
-    document.getElementById('modalStats').click()
+    // document.getElementById('modalStats').click()
     document.getElementById('statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
     document.querySelector('span[data-resource="statsSuccessVotes"]').after(generalStats.successVotes ? generalStats.successVotes : 0)
     document.querySelector('span[data-resource="statsMonthSuccessVotes"]').after(generalStats.monthSuccessVotes ? generalStats.monthSuccessVotes : 0)
