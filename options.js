@@ -320,12 +320,12 @@ async function addProjectList(project, visually) {
     document.getElementById('stats┄' + id).addEventListener('click', function() {
         document.getElementById('modalStats').click()
         document.getElementById('statsSubtitle').textContent = getProjectName(project) + ' – ' + project.nick + ' – ' + (project.Custom ? '' : (project.name != null ? project.name : project.id))
-        document.querySelector('span[data-resource="statsSuccessVotes"]').after(project.stats.successVotes ? project.stats.successVotes : 0)
-        document.querySelector('span[data-resource="statsMonthSuccessVotes"]').after(project.stats.monthSuccessVotes ? project.stats.monthSuccessVotes : 0)
-        document.querySelector('span[data-resource="statsErrorVotes"]').after(project.stats.errorVotes ? project.stats.errorVotes : 0)
-        document.querySelector('span[data-resource="statsLaterVotes"]').after(project.stats.laterVotes ? project.stats.laterVotes : 0)
-        document.querySelector('span[data-resource="statsLastSuccessVote"]').after(project.stats.lastSuccessVote ? new Date(project.stats.lastSuccessVote).toLocaleString().replace(',', '') : 'None')
-        document.querySelector('span[data-resource="statsLastAttemptVote"]').after(project.stats.lastAttemptVote ? new Date(project.stats.lastAttemptVote).toLocaleString().replace(',', '') : 'None')
+        document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes ? project.stats.successVotes : 0
+        document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes ? project.stats.monthSuccessVotes : 0
+        document.querySelector('td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = project.stats.errorVotes ? project.stats.errorVotes : 0
+        document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = project.stats.laterVotes ? project.stats.laterVotes : 0
+        document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = project.stats.lastSuccessVote ? new Date(project.stats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
+        document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = project.stats.lastAttemptVote ? new Date(project.stats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
     })
     if (document.getElementById(getProjectName(project) + 'Button') == null) {
         if (document.querySelector("#addedProjectsTable1").childElementCount == 0) {
@@ -372,19 +372,19 @@ async function removeProjectList(project, visually) {
     if (visually) return;
     for (let i = getProjectList(project).length; i--;) {
         let temp = getProjectList(project)[i];
-        if (temp.nick == project.nick && (project.Custom || temp.id == project.id)  && getProjectName(temp) == getProjectName(project)) getProjectList(project).splice(i, 1);
+        if (temp.nick == project.nick && JSON.stringify(temp.id) == JSON.stringify(project.id) && getProjectName(temp) == getProjectName(project)) getProjectList(project).splice(i, 1);
     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true);
     //projects.splice(deleteCount, 1);
     //await setValue('AVMRprojects', projects, true);
     for (let value of chrome.extension.getBackgroundPage().queueProjects) {
-        if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
         }
     }
     //Если эта вкладка была уже открыта, он закрывает её
     for (let [key, value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-        if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key);
             chrome.tabs.remove(key);
         }
@@ -514,7 +514,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
     }
 
     forLoopAllProjects(function () {
-        if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom) {
+        if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
             if (secondBonus === "") {
                 updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
             } else if (element != null) {
@@ -1311,6 +1311,9 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     //Если пользователь обновился с версии 3.3.1
                     if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
                         projectsTopGames = [];
+                        forLoopAllProjects(async function (proj) {
+                            proj.stats = {}
+                        })
                     }
 
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);
@@ -1622,26 +1625,26 @@ if (document.getElementById('CustomButton') != null) {
 document.getElementById('closeStats').addEventListener('click', resetStats)
 document.getElementById('closeStats2').addEventListener('click', resetStats)
 function resetStats() {
-    if (document.querySelector('span[data-resource="statsSuccessVotes"]').nextSibling.nodeType == 3) {
+    if (document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent != '') {
         document.getElementById('statsSubtitle').innerHTML = '&nbsp;'
-        document.querySelector('span[data-resource="statsSuccessVotes"]').nextSibling.remove()
-        document.querySelector('span[data-resource="statsMonthSuccessVotes"]').nextSibling.remove()
-        document.querySelector('span[data-resource="statsErrorVotes"]').nextSibling.remove()
-        document.querySelector('span[data-resource="statsLaterVotes"]').nextSibling.remove()
-        document.querySelector('span[data-resource="statsLastSuccessVote"]').nextSibling.remove()
-        document.querySelector('span[data-resource="statsLastAttemptVote"]').nextSibling.remove()
+        document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = ''
+        document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = ''
+        document.querySelector('td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = ''
+        document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = ''
+        document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = ''
+        document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = ''
     }
 }
 //Слушатель общей статистики и вывод её в модалку
 document.getElementById('generalStats').addEventListener('click', function() {
     // document.getElementById('modalStats').click()
     document.getElementById('statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
-    document.querySelector('span[data-resource="statsSuccessVotes"]').after(generalStats.successVotes ? generalStats.successVotes : 0)
-    document.querySelector('span[data-resource="statsMonthSuccessVotes"]').after(generalStats.monthSuccessVotes ? generalStats.monthSuccessVotes : 0)
-    document.querySelector('span[data-resource="statsErrorVotes"]').after(generalStats.errorVotes ? generalStats.errorVotes : 0)
-    document.querySelector('span[data-resource="statsLaterVotes"]').after(generalStats.laterVotes ? generalStats.laterVotes : 0)
-    document.querySelector('span[data-resource="statsLastSuccessVote"]').after(generalStats.lastSuccessVote ? new Date(generalStats.lastSuccessVote).toLocaleString().replace(',', '') : 'None')
-    document.querySelector('span[data-resource="statsLastAttemptVote"]').after(generalStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None')
+    document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = generalStats.successVotes ? generalStats.successVotes : 0
+    document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.monthSuccessVotes ? generalStats.monthSuccessVotes : 0
+    document.querySelector('td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = generalStats.errorVotes ? generalStats.errorVotes : 0
+    document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = generalStats.laterVotes ? generalStats.laterVotes : 0
+    document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = generalStats.lastSuccessVote ? new Date(generalStats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
+    document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = generalStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
 })
 
 //Генерация поля ввода ID

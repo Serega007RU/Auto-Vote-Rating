@@ -89,7 +89,7 @@ async function initializeConfig() {
 			projectsMinecraftServersBiz = [];
 			projectsMinecraftServersOrg = [];
 			//Сброс time для проектов где использовался String
-            forLoopAllProjects(async function (proj) {
+            await forLoopAllProjects(async function (proj) {
             	if (proj.TopCraft || proj.McTOP || proj.FairTop || proj.MinecraftRating || proj.MCRate || proj.IonMc || proj.MinecraftMp || proj.PlanetMinecraft || proj.MinecraftServerList || proj.MinecraftServersOrg || proj.TopMinecraftServers) {
             		proj.time = null
             		await changeProject(proj)
@@ -106,7 +106,7 @@ async function initializeConfig() {
 		//Если пользователь обновился с версии 3.3.1
 		if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
 			projectsTopGames = []
-			forLoopAllProjects(async function (proj) {
+			await forLoopAllProjects(async function (proj) {
             	proj.stats = {}
             	await changeProject(proj)
 			})
@@ -124,6 +124,7 @@ async function initializeConfig() {
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
 function checkVote() {
+// 	return
     if (!settings || projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) return;
 
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
@@ -180,7 +181,7 @@ async function checkOpen(project) {
     
     //Если эта вкладка была уже открыта, он закрывает её
 	for (let [key, value] of openedProjects.entries()) {
-        if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
             openedProjects.delete(key);
             chrome.tabs.remove(key, function() {
             	if (chrome.runtime.lastError) {
@@ -1084,14 +1085,14 @@ async function endVote(message, sender, project) {
 	if (settings.cooldown < 10000) {
 		setTimeout(() => {
 			for (let value of queueProjects) {
-				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+				if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
 					queueProjects.delete(value)
 				}
 			}
 		}, 10000);
 	} else {
 		for (let value of queueProjects) {
-			if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+			if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
 				queueProjects.delete(value)
 			}
 		}
@@ -1101,13 +1102,14 @@ async function endVote(message, sender, project) {
 	let deleted = true;
     for (let i = getProjectList(project).length; i--;) {
        	let temp = getProjectList(project)[i];
-        if (temp.nick == project.nick && temp.id == project.id && getProjectName(temp) == getProjectName(project)) {
+        if (temp.nick == project.nick && JSON.stringify(temp.id) == JSON.stringify(project.id) && getProjectName(temp) == getProjectName(project)) {
            	getProjectList(project).splice(i, 1);
            	deleted = false;
         }
     }
     if (deleted) {
-       	return;
+    	console.warn('Не удалось найти данный проект, возможно он был удалён', project)
+       	return
     }
 
 	//Если усё успешно
@@ -1414,7 +1416,7 @@ async function wait(ms) {
 async function changeProject(project) {
 	let projects = getProjectList(project)
     for (let i in projects) {
-        if (projects[i].nick == project.nick && projects[i].id == project.id && getProjectName(projects[i]) == getProjectName(project)) {
+        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id) && getProjectName(projects[i]) == getProjectName(project)) {
             projects[i] = project
             await setValue('AVMRprojects' + getProjectName(project), projects);
             break //Stop this loop, we found it!

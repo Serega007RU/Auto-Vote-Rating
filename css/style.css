@@ -81,7 +81,7 @@ select {
 select, input, textarea {
   width: 100%;
   display: block;
-  background-color: #2A2A2F;
+  background: #2A2A2F;
   border: none;
   border-radius: 3px;
   height: 48px;
@@ -491,7 +491,6 @@ p, form, label, details {
 .anelumen.lowingnuska figure {
   background: #f9f5f5;
   border-radius: 5px;
-  border: 1px solid #aba4a4;
 }
 
 .anelumen.lowingnuska figure h2 {
@@ -534,12 +533,12 @@ figure svg {
   width: 100%;
   height: 100%;
   position: fixed;
-  background-color: rgba(10, 10, 10, 0.47);
+  background: rgba(10, 10, 10, 0.47);
   content: "";
   cursor: default;
   visibility: hidden;
-  -webkit-transition: all .3s;
-  transition: all .3s;
+  -webkit-transition: all .1s;
+  transition: all .1s;
 }
 
 .anelumen:target .nedismiseg {
@@ -638,7 +637,7 @@ figure svg {
   font-size: initial !important;
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black;
+  border-bottom: 1px dotted #000;
 }
 
 .tooltip2:before {
@@ -648,7 +647,7 @@ figure svg {
 
 .tooltip2 .tooltip2text {
   visibility: hidden;
-  background-color: black;
+  background: #000;
   color: #fff;
   text-align: center;
   border-radius: 6px;
@@ -668,7 +667,7 @@ figure svg {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: transparent transparent black transparent;
+  border: transparent transparent #000 transparent;
 }
 
 .tooltip2:hover .tooltip2text {
@@ -729,8 +728,24 @@ ul li:hover {
   background: rgba(42, 42, 47, 0.6);
 }
 
-.stats span {
+.stats td {
   color: #1A7BEE;
+}
+
+.stats th {
+  text-align: right;
+}
+
+.stats table {
+  width: 100%;
+}
+
+.stats td, .stats th {
+  padding: 5px 10px;
+}
+
+.stats tr:nth-of-type(odd) {
+  background: #ffffff0a;
 }
 
 #statsSubtitle {
