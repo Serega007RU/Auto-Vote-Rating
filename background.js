@@ -226,11 +226,13 @@ async function checkOpen(project) {
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
 	if (project.stats.lastAttemptVote && (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear())) {
+		project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
 		project.stats.monthSuccessVotes = 0
 	}
     project.stats.lastAttemptVote = Date.now()
 
 	if (generalStats.lastAttemptVote && (new Date(generalStats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(generalStats.lastAttemptVote).getFullYear() < new Date().getFullYear())) {
+		generalStats.lastMonthSuccessVotes = generalStats.monthSuccessVotes
 		generalStats.monthSuccessVotes = 0
 	}
     generalStats.lastAttemptVote = Date.now()
@@ -1073,12 +1075,12 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(message, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
-        chrome.tabs.remove(sender.tab.id, function() {
-          	if (chrome.runtime.lastError) {
-          		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
-           		if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
-           	}
-        });
+		chrome.tabs.remove(sender.tab.id, function() {
+			if (chrome.runtime.lastError) {
+				console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
+				if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
+			}
+		});
         project = openedProjects.get(sender.tab.id);
         openedProjects.delete(sender.tab.id);
 	} else if (!project) return;//Что?
@@ -1342,7 +1344,7 @@ async function checkTime () {
 				if (!settings.disabledNotifWarn) sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2);
 			}
 		} else {
-			console.error(chrome.i18n.getMessage('errorClock2', response.status));
+			console.error(chrome.i18n.getMessage('errorClock2', response.status.toString()));
 		}
 	} catch (e) {
         console.error(chrome.i18n.getMessage('errorClock', e));

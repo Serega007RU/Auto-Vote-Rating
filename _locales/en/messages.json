@@ -568,22 +568,25 @@
     }
   },
   "statsSuccessVotes": {
-    "message": "Successful votes: "
+    "message": "Successful votes"
   },
   "statsMonthSuccessVotes": {
-    "message": "For this month of successful votes: "
+    "message": "For this month of successful votes"
+  },
+  "statsLastMonthSuccessVotes": {
+    "message": "For the previous month of successful votes"
   },
   "statsErrorVotes": {
-    "message": "Errors: "
+    "message": "Errors"
   },
   "statsLaterVotes": {
-    "message": "Errors 'You have already voted': "
+    "message": "Errors 'You have already voted'"
   },
   "statsLastSuccessVote": {
-    "message": "The last successful vote: "
+    "message": "The last successful vote"
   },
   "statsLastAttemptVote": {
-    "message": "Last attempt to vote: "
+    "message": "Last attempt to vote"
   },
   "generalStats": {
     "message": "General statistics"

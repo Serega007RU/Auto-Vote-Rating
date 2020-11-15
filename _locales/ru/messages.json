@@ -528,22 +528,25 @@
     }
   },
   "statsSuccessVotes": {
-    "message": "Успешных голосов: "
+    "message": "Успешных голосов"
   },
   "statsMonthSuccessVotes": {
-    "message": "За этот месяц успешных голосов: "
+    "message": "За этот месяц успешных голосов"
+  },
+  "statsLastMonthSuccessVotes": {
+    "message": "За предыдущий месяц успешных голосов"
   },
   "statsErrorVotes": {
-    "message": "Ошибок: "
+    "message": "Ошибок"
   },
   "statsLaterVotes": {
-    "message": "Ошибок 'Вы уже голосовали': "
+    "message": "Ошибок 'Вы уже голосовали'"
   },
   "statsLastSuccessVote": {
-    "message": "Последний успешный голос: "
+    "message": "Последний успешный голос"
   },
   "statsLastAttemptVote": {
-    "message": "Последняя попытка голосования: "
+    "message": "Последняя попытка голосования"
   },
   "generalStats": {
     "message": "Общая статистика"
