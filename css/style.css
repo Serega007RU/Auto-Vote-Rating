@@ -764,3 +764,7 @@ ul li:hover {
   text-decoration: none !important;
   margin-top: -20px;
 }
+
+.fw600 {
+  font-weight: 600;
+} 
