@@ -962,7 +962,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
 
     forLoopAllProjects(function () {
         if (settings.useMultiVote) {
-            if (getProjectName(proj) == choice && proj.id == project.id && proj.nick == project.nick && !project.Custom) {
+            if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick && !project.Custom) {
                 if (secondBonus === "") {
                     updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
                 } else if (element != null) {
@@ -978,7 +978,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                 return;
             }
         } else {
-            if (getProjectName(proj) == choice && proj.id == project.id && !project.Custom) {
+            if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
                 if (secondBonus === "") {
                     updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element);
                 } else if (element != null) {

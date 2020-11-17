@@ -236,7 +236,7 @@ async function checkOpen(project) {
         if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && currentVK != null) {
             let usedProjects = getTopFromList(currentVK, project);
 			for (let usedProject of usedProjects) {
-				if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+				if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
                     return;
 				}
 			}
@@ -244,7 +244,7 @@ async function checkOpen(project) {
         if (currentProxy != null) {
 			let usedProjects = getTopFromList(currentProxy, project);
 			for (let usedProject of usedProjects) {
-				if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+				if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
 					return;
 				}
 			}
@@ -317,7 +317,7 @@ async function newWindow(project) {
             	let usedProjects = getTopFromList(vkontakte, project);
                 let used = false;
 				for (let usedProject of usedProjects) {
-					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+					if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
 						used = true;
 						break;
 					}
@@ -365,7 +365,7 @@ async function newWindow(project) {
 				let usedProjects = getTopFromList(proxy, project);
 				let used = false;
 				for (let usedProject of usedProjects) {
-					if (project.id == usedProject.id && usedProject.nextFreeVote > Date.now()) {
+					if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
 						used = true;
 						break;
 					}
