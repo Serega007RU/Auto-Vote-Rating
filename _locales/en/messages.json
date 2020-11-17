@@ -95,7 +95,7 @@
     "message": "Disable Internet connection verification"
   },
   "disableCheckProjects": {
-    "message": "Disable check when adding a project",
+    "message": "When you add a project: to Disable the check",
     "description": "Checkbox. Disable check when adding a project"
   },
   "disableCheckProjectsTooltip": {
@@ -103,7 +103,7 @@
     "description": "Tooltip. Disable check when adding a project"
   },
   "priority": {
-    "message": "Prioritize project when adding project",
+    "message": "When adding a project: Add in priority",
     "description": "Checkbox. Priority"
   },
   "priorityTooltip": {
@@ -642,5 +642,37 @@
   },
   "voteResumed": {
     "message": "Auto-voting resumed"
+  },
+  "stats": {
+    "message": "Stats $project$",
+    "placeholders": {
+      "project": {
+        "content": "$1"
+      }
+    }
+  },
+  "statsSuccessVotes": {
+    "message": "Successful votes"
+  },
+  "statsMonthSuccessVotes": {
+    "message": "For this month of successful votes"
+  },
+  "statsLastMonthSuccessVotes": {
+    "message": "For the previous month of successful votes"
+  },
+  "statsErrorVotes": {
+    "message": "Errors"
+  },
+  "statsLaterVotes": {
+    "message": "Errors 'You have already voted'"
+  },
+  "statsLastSuccessVote": {
+    "message": "The last successful vote"
+  },
+  "statsLastAttemptVote": {
+    "message": "Last attempt to vote"
+  },
+  "generalStats": {
+    "message": "General statistics"
   }
 }

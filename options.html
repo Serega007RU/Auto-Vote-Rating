@@ -9,16 +9,66 @@
 </head>
 <body>
 	<div class="anelumen lowingnuska" id="addFastProject">
-		<a href="#/" class="nedismiseg"></a>
+		<a href="" class="nedismiseg"></a>
 		<figure>
-			<h2 data-resource="fastAdd"><a href="#/" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
-			<hr color="#aba4a4">
-			<div data-resource="load" id=modaltext></div>
+			<h2 data-resource="fastAdd"><a href="" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
+			<div class="modalContent">
+				<div data-resource="load" id=modaltext></div>
+			</div>
 		</figure>
 	</div>
+	<div class="anelumen lowingnuska" id="stats">
+	    <a href="#/" class="nedismiseg" id="closeStats"></a>
+		<a id="modalStats" href="#stats"></a>
+		<figure>
+			<h2>
+			    <span data-resource="stats"></span>
+			    <div id="statsSubtitle">&nbsp;</div>
+			    <a href="#/" class="compatibg-ukastywise" id="closeStats2" aria-label="Close Modal Box">×</a>
+			</h2>
+
+            <div class="modalContent stats">
+                <table>
+                    <tr>
+                        <td data-resource="statsSuccessVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsMonthSuccessVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLastMonthSuccessVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLaterVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsErrorVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLastSuccessVote"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLastAttemptVote"></td>
+                        <th></th>
+                    </tr>
+                </table>
+            </div>
+		</figure>
+	</div>
+
 	<input type="checkbox" id="hmt" class="hidden-menu-ticker">
 	<span class="btn-menu-back"></span>
-	<label class="btn-menu" for="hmt" style="display: none;"> <span class="first"></span> <span class="second"></span> <span class="third"></span> </label>
+	<label class="btn-menu" for="hmt" style="display: none;">
+		<span class="first"></span>
+		<span class="second"></span>
+		<span class="third"></span>
+	</label>
 	<ul class="hidden-menu">
 		<label data-resource="tabs" class="ml-2"></label>
 		<button data-resource="addButton" class="mt-4 tablinks active" id="addTab2">
@@ -243,84 +293,85 @@
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable4">
 					</div>
 					<div class="col-xl-12 mb-3">
-						<div class="listcontent" id="TopCraftTab" style="display: none;">
-							<div data-resource="notAdded" id="TopCraftList"></div>
-						</div>
-						<div class="listcontent" id="McTOPTab" style="display: none;">
-							<div data-resource="notAdded" id="McTOPList"></div>
-						</div>
-						<div class="listcontent" id="MCRateTab" style="display: none;">
-							<div data-resource="notAdded" id="MCRateList"></div>
-						</div>
-						<div class="listcontent" id="MinecraftRatingTab" style="display: none;">
-							<div data-resource="notAdded" id="MinecraftRatingList"></div>
-						</div>
-						<div class="listcontent" id="MonitoringMinecraftTab" style="display: none;">
-							<div data-resource="notAdded" id="MonitoringMinecraftList"></div>
-						</div>
-						<div class="listcontent" id="FairTopTab" style="display: none;">
-							<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="FairTopList"></div>
-						</div>
-						<div class="listcontent" id="IonMcTab" style="display: none;">
-							<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="IonMcList"></div>
-						</div>
-						<div class="listcontent" id="MinecraftServersOrgTab" style="display: none;">
-							<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="MinecraftServersOrgList"></div>
-						</div>
-						<div class="listcontent" id="ServeurPriveTab" style="display: none;">
-							<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="ServeurPriveList"></div>
-						</div>
-						<div class="listcontent" id="PlanetMinecraftTab" style="display: none;">
-							<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="PlanetMinecraftList"></div>
-						</div>
-						<div class="listcontent" id="TopGTab" style="display: none;">
-							<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="TopGList"></div>
-						</div>
-						<div class="listcontent" id="MinecraftMpTab" style="display: none;">
-							<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="MinecraftMpList"></div>
-						</div>
-						<div class="listcontent" id="MinecraftServerListTab" style="display: none;">
-							<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="MinecraftServerListList"></div>
-						</div>
-						<div class="listcontent" id="ServerPactTab" style="display: none;">
-							<div data-resource="notAdded" id="ServerPactList"></div>
-						</div>
-						<div class="listcontent" id="MinecraftIpListTab" style="display: none;">
-							<div data-resource="notAdded" id="MinecraftIpListList"></div>
-						</div>
-						<div class="listcontent" id="TopMinecraftServersTab" style="display: none;">
-						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="TopMinecraftServersList"></div>
-						</div>
-						<div class="listcontent" id="MinecraftServersBizTab" style="display: none;">
-						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="MinecraftServersBizList"></div>
-						</div>
-						<div class="listcontent" id="HotMCTab" style="display: none;">
-						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="HotMCList"></div>
-						</div>
-						<div class="listcontent" id="MinecraftServerNetTab" style="display: none;">
-						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="MinecraftServerNetList"></div>
-						</div>
-						<div class="listcontent" id="TopGamesTab" style="display: none;">
-						    <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-							<div data-resource="notAdded" id="TopGamesList"></div>
-						</div>
-						<div class="listcontent" id="CustomTab" style="display: none;">
-							<div data-resource="notAdded" id="CustomList"></div>
-						</div>
+					    <ul class="listcontent" id="TopCraftTab" style="display: none;">
+					        <div data-resource="notAdded" id="TopCraftList"></div>
+					    </ul>
+					    <ul class="listcontent" id="McTOPTab" style="display: none;">
+					        <div data-resource="notAdded" id="McTOPList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MCRateTab" style="display: none;">
+					        <div data-resource="notAdded" id="MCRateList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MinecraftRatingTab" style="display: none;">
+					        <div data-resource="notAdded" id="MinecraftRatingList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MonitoringMinecraftTab" style="display: none;">
+					        <div data-resource="notAdded" id="MonitoringMinecraftList"></div>
+					    </ul>
+					    <ul class="listcontent" id="FairTopTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="FairTopList"></div>
+					    </ul>
+					    <ul class="listcontent" id="IonMcTab" style="display: none;">
+					    	<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="IonMcList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MinecraftServersOrgTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="MinecraftServersOrgList"></div>
+					    </ul>
+					    <ul class="listcontent" id="ServeurPriveTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="ServeurPriveList"></div>
+					    </ul>
+					    <ul class="listcontent" id="PlanetMinecraftTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="PlanetMinecraftList"></div>
+					    </ul>
+					    <ul class="listcontent" id="TopGTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="TopGList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MinecraftMpTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="MinecraftMpList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MinecraftServerListTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="MinecraftServerListList"></div>
+					    </ul>
+					    <ul class="listcontent" id="ServerPactTab" style="display: none;">
+					        <div data-resource="notAdded" id="ServerPactList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MinecraftIpListTab" style="display: none;">
+					        <div data-resource="notAdded" id="MinecraftIpListList"></div>
+					    </ul>
+					    <ul class="listcontent" id="TopMinecraftServersTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="TopMinecraftServersList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MinecraftServersBizTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="MinecraftServersBizList"></div>
+					    </ul>
+					    <ul class="listcontent" id="HotMCTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="HotMCList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MinecraftServerNetTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="MinecraftServerNetList"></div>
+					    </ul>
+					    <ul class="listcontent" id="TopGamesTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="TopGamesList"></div>
+					    </ul>
+					    <ul class="listcontent" id="CustomTab" style="display: none;">
+					        <div data-resource="notAdded" id="CustomList"></div>
+					    </ul>
 					</div>
 				</div>
+				<a id="generalStats" data-resource="generalStats" class="float-right" href="#stats"></a>
 			</div>
 			<div id="help" class="tabcontent" style="display: none;">
 				<h4 data-resource="help" align="center"></h4>
@@ -329,7 +380,7 @@
 					<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
 					<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
 						<p class="mt-3"><span data-resource="developers"></span><br><span data-resource="developer"></span> <a target="blank_" href="https://discord.com/users/441823506200788992"><span>Serega007</span></a><br><span data-resource="designer"></span> <a target="blank_" href="https://discord.com/users/279936883277168640"><span>Qworte</span></a></p>
-						<p data-resource="itsFree" class="mt-3" style="font-weight: 600;"></p>
+						<p data-resource="itsFree" class="mt-3 fw600"></p>
 						<p class="mt-3"><span data-resource="feedback"></span> <a target="blank_" href="https://discord.gg/GyvMtbU"><span data-resource="dmDiscord"></span></a><span data-resource="feedback2"> </span> <a target="blank_" href="https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd/support"><span data-resource="dmChromeWebStore"></span></a></span>.</p>
 					</div>
 					<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
@@ -401,9 +452,16 @@
 					</div>
 				</div>
 			</div>
-			</div> <a id="donate" data-resource="supportDev" target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
+			<a id="donate" data-resource="supportDev" target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
+		    <audio id="sound-link" preload="auto">
+			    <source src="audio/2_-_mp3_.mp3" type="audio/mpeg">
+		    </audio>
+		    <audio id="sound-link2" preload="auto">
+			    <source src="audio/c3a54b52a16b1307.mp3" type="audio/mpeg">
+		    </audio>
 			<div id="save">&nbsp;</div>
-			<script src="options.js"></script>
 		</div>
 	</div>	
+
+	<script src="options.js"></script>
 </body>

@@ -10,8 +10,12 @@ function vote () {
                 || (document.querySelector("strong") != null && document.querySelector("strong").textContent.includes('Thank you for your vote'))) {
                 sendMessage('successfully');
                 return;
-			} else if (document.querySelector("#vote_form > div.alert.alert-danger") != null && document.querySelector("#vote_form > div.alert.alert-danger").textContent.includes('You have already voted for this server today.')) {
-				sendMessage('later');
+			} else if (document.querySelector("#vote_form > div.alert.alert-danger") != null) {
+				if (document.querySelector("#vote_form > div.alert.alert-danger").textContent.includes('already voted')) {
+					sendMessage('later')
+				} else {
+					sendMessage(document.querySelector("#vote_form > div.alert.alert-danger").textContent)
+				}
 				return;
 			} else if (document.querySelector("body > iframe") != null) {
 				return;

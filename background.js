@@ -26,6 +26,9 @@ var proxies = [];
 //Настройки
 var settings;
 
+//Общая статистика
+var generalStats = {}
+
 //Текущие открытые вкладки расширением
 var openedProjects = new Map();
 //Текущие проекты за которые сейчас голосует расширение
@@ -76,6 +79,8 @@ async function initializeConfig() {
     VKs = await getValue('AVMRVKs');
     proxies = await getValue('AVMRproxies');
     settings = await getValue('AVMRsettings');
+    generalStats = await getValue('generalStats')
+    if (generalStats == null) generalStats = {}
 
     if (!(projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function'))) {
 		//Если пользователь обновился с версии 2.2.0
@@ -101,10 +106,10 @@ async function initializeConfig() {
 			projectsMinecraftServersBiz = [];
 			projectsMinecraftServersOrg = [];
 			//Сброс time для проектов где использовался String
-            forLoopAllProjects(async function (proj) {
+            await forLoopAllProjects(async function (proj) {
             	if (proj.TopCraft || proj.McTOP || proj.FairTop || proj.MinecraftRating || proj.MCRate || proj.IonMc || proj.MinecraftMp || proj.PlanetMinecraft || proj.MinecraftServerList || proj.MinecraftServersOrg || proj.TopMinecraftServers) {
-            		proj.time = null;
-            		await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj));
+            		proj.time = null
+            		await changeProject(proj)
             	}
             });
 		}
@@ -117,7 +122,11 @@ async function initializeConfig() {
 
 		//Если пользователь обновился с версии 3.3.1
 		if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
-			projectsTopGames = [];
+			projectsTopGames = []
+			await forLoopAllProjects(async function (proj) {
+            	proj.stats = {}
+            	await changeProject(proj)
+			})
 		}
     }
 
@@ -165,6 +174,7 @@ async function initializeConfig() {
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
+// 	return
     if (!settings || projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) return;
 
     if (settings.stopVote > Date.now()) return;
@@ -215,6 +225,7 @@ async function checkOpen(project) {
 			if (Date.now() < value.nextAttempt) {
 				return
 			} else {
+				queueProjects.delete(value)
 				console.warn('[' + getProjectName(value) + '] ' + value.nick + (project.game != null ? ' – ' + project.game : '') + (value.Custom ? '' : ' – ' + value.id) + (value.name != null ? ' – ' + value.name : '') + ' ' + chrome.i18n.getMessage('timeout'))
 				if (!settings.disabledNotifError) sendNotification('[' + getProjectName(value) + '] ' + value.nick + (value.Custom ? '' : value.name != null ? ' – ' + value.name : ' – ' + value.id), chrome.i18n.getMessage('timeout'))
 			}
@@ -251,7 +262,7 @@ async function checkOpen(project) {
     
     //Если эта вкладка была уже открыта, он закрывает её
 	for (let [key, value] of openedProjects.entries()) {
-        if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
             openedProjects.delete(key);
             chrome.tabs.remove(key, function() {
             	if (chrome.runtime.lastError) {
@@ -493,6 +504,21 @@ async function newWindow(project) {
 //         await wait(5000);
 
 	}
+	
+	if (project.stats.lastAttemptVote && (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear())) {
+		project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
+		project.stats.monthSuccessVotes = 0
+	}
+    project.stats.lastAttemptVote = Date.now()
+
+	if (generalStats.lastAttemptVote && (new Date(generalStats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(generalStats.lastAttemptVote).getFullYear() < new Date().getFullYear())) {
+		generalStats.lastMonthSuccessVotes = generalStats.monthSuccessVotes
+		generalStats.monthSuccessVotes = 0
+	}
+    generalStats.lastAttemptVote = Date.now()
+    await setValue('generalStats', generalStats)
+    await changeProject(project)
+
     let silentVoteMode = false;
     if (project.Custom) {
     	silentVoteMode = true;
@@ -1343,19 +1369,19 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(message, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
-        chrome.tabs.remove(sender.tab.id, function() {
-          	if (chrome.runtime.lastError) {
-          		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
-           		if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
-           	}
-        });
+		chrome.tabs.remove(sender.tab.id, function() {
+			if (chrome.runtime.lastError) {
+				console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
+				if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
+			}
+		});
         project = openedProjects.get(sender.tab.id);
         openedProjects.delete(sender.tab.id);
 	} else if (!project) return;//Что?
 	if (settings.cooldown < 10000) {
 		setTimeout(async () => {
 			for (let value of queueProjects) {
-				if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+				if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
 					queueProjects.delete(value)
 				}
 			}
@@ -1368,7 +1394,7 @@ async function endVote(message, sender, project) {
 		}, settings.useMultiVote ? 3000 : 10000);
 	} else {
 		for (let value of queueProjects) {
-			if (value.nick == project.nick && value.id == project.id && getProjectName(value) == getProjectName(project)) {
+			if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
 				queueProjects.delete(value)
 			}
 		}
@@ -1384,13 +1410,14 @@ async function endVote(message, sender, project) {
 	let deleted = true;
     for (let i = getProjectList(project).length; i--;) {
        	let temp = getProjectList(project)[i];
-        if (temp.nick == project.nick && temp.id == project.id && getProjectName(temp) == getProjectName(project)) {
+        if (temp.nick == project.nick && JSON.stringify(temp.id) == JSON.stringify(project.id) && getProjectName(temp) == getProjectName(project)) {
            	getProjectList(project).splice(i, 1);
            	deleted = false;
         }
     }
     if (deleted) {
-       	return;
+    	console.warn('Не удалось найти данный проект, возможно он был удалён', project)
+       	return
     }
 
 	//Если усё успешно
@@ -1503,6 +1530,19 @@ async function endVote(message, sender, project) {
 
         if (message == "successfully") {
             sendMessage = chrome.i18n.getMessage('successAutoVote');
+            if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
+            
+            if (!project.stats.successVotes) project.stats.successVotes = 0
+            project.stats.successVotes++
+            if (!project.stats.monthSuccessVotes) project.stats.monthSuccessVotes = 0
+            project.stats.monthSuccessVotes++
+            project.stats.lastSuccessVote = Date.now()
+
+            if (!generalStats.successVotes) generalStats.successVotes = 0
+            generalStats.successVotes++
+            if (!generalStats.monthSuccessVotes) generalStats.monthSuccessVotes = 0
+            generalStats.monthSuccessVotes++
+            generalStats.lastSuccessVote = Date.now()
         } else {
         	if (settings.useMultiVote && settings.repeatAttemptLater && project.later) {
         		if (project.later < 3) {
@@ -1513,8 +1553,14 @@ async function endVote(message, sender, project) {
         		}
         	}
             sendMessage = chrome.i18n.getMessage('alreadyVoted');
+            if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
+            
+            if (!project.stats.laterVotes) project.stats.laterVotes = 0
+            project.stats.laterVotes++
+
+            if (!generalStats.laterVotes) generalStats.laterVotes = 0
+            generalStats.laterVotes++
         }
-        if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         console.log('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 	//Если ошибка
 	} else {
@@ -1557,6 +1603,12 @@ async function endVote(message, sender, project) {
         project.error = message
         console.error('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
+        
+        if (!project.stats.errorVotes) project.stats.errorVotes = 0
+        project.stats.errorVotes++
+
+        if (!generalStats.errorVotes) generalStats.errorVotes = 0
+        generalStats.errorVotes++
 	}
 
 	if (project.priority || (settings.useMultiVote && settings.repeatAttemptLater && project.later && project.later < 3)) {
@@ -1564,6 +1616,7 @@ async function endVote(message, sender, project) {
 	} else {
 	   	getProjectList(project).push(project);
 	}
+	await setValue('generalStats', generalStats)
 	await setValue('AVMRprojects' + getProjectName(project), getProjectList(project));
 	// else {
 	//	//Если прям совсем всё плохо
@@ -1663,7 +1716,7 @@ async function checkTime () {
 				if (!settings.disabledNotifWarn) sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2);
 			}
 		} else {
-			console.error(chrome.i18n.getMessage('errorClock2', response.status));
+			console.error(chrome.i18n.getMessage('errorClock2', response.status.toString()));
 		}
 	} catch (e) {
         console.error(chrome.i18n.getMessage('errorClock', e));
@@ -1750,6 +1803,17 @@ async function wait(ms) {
 	});
 }
 
+async function changeProject(project) {
+	let projects = getProjectList(project)
+    for (let i in projects) {
+        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id) && getProjectName(projects[i]) == getProjectName(project)) {
+            projects[i] = project
+            await setValue('AVMRprojects' + getProjectName(project), projects);
+            break //Stop this loop, we found it!
+        }
+    }
+}
+
 async function forLoopAllProjects (fuc) {
     for (let proj of projectsTopCraft) {
         await fuc(proj);
@@ -1809,7 +1873,7 @@ async function forLoopAllProjects (fuc) {
         await fuc(proj);
     }
     for (let proj of projectsTopGames) {
-        fuc(proj);
+        await fuc(proj);
     }
     for (let proj of projectsCustom) {
         await fuc(proj);
@@ -1865,6 +1929,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         if (key == 'AVMRsettings') {
         	settings = storageChange.newValue;
         }
+        if (key == 'generalStats') generalStats = storageChange.newValue
     }
 });
 
