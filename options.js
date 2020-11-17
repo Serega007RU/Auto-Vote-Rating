@@ -426,10 +426,11 @@ async function addProjectList(project, visually) {
 //Добавить аккаунт ВКонтакте в список
 async function addVKList(VK, visually) {
     let listVK = document.getElementById("VKList");
-    let html = document.createElement('div');
-    html.setAttribute("id", 'div' + '┄' + VK.name + '┄' + VK.id);
-    html.setAttribute('class', 'MVlist');
-    html.innerHTML = VK.name + ' – ' + VK.id + '<button id="' + VK.name + '┄' + VK.id + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + (VK.notWorking ? '<span style="color:#f44336;">' + chrome.i18n.getMessage('notWork') + '</span>' : '');
+    let html = document.createElement('li')
+    let id = VK.name + '┄' + VK.id
+    html.id = 'div┄' + id
+    html.className = 'multiVoteList'
+    html.innerHTML = '<div> <span id="' + id + '" class="deleteProject"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="4" x2="6" y2="16"></line><line x1="6" y1="4" x2="18" y2="16"></line></svg></div>' + VK.name + ' – ' + VK.id + (VK.notWorking ? '<br> <span style="color:#f44336;">' + chrome.i18n.getMessage('notWork') + '</span>' : '')
     listVK.after(html);
     document.getElementById(VK.name + '┄' + VK.id).addEventListener('click', function() {
         removeVKList(VK, false);
@@ -442,10 +443,11 @@ async function addVKList(VK, visually) {
 //Добавить прокси в список
 async function addProxyList(proxy, visually) {
     let listProxy = document.getElementById("ProxyList");
-    let html = document.createElement('div');
-    html.setAttribute("id", 'div' + '┄' + proxy.ip + '┄' + proxy.port);
-    html.setAttribute('class', 'MVlist');
-    html.innerHTML = proxy.ip + ':' + proxy.port + ' ' + proxy.scheme + '<button id="' + proxy.ip + '┄' + proxy.port + '" style="float: right;">' + chrome.i18n.getMessage('deleteButton') + '</button> <br>' + (proxy.notWorking ? '<span style="color:#f44336;">' + chrome.i18n.getMessage('notWork') + '</span>' : '');
+    let html = document.createElement('li')
+    let id = proxy.ip + '┄' + proxy.port
+    html.id = 'div┄' + id
+    html.className = 'multiVoteList'
+    html.innerHTML = '<div> <span id="' + id + '" class="deleteProject"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="4" x2="6" y2="16"></line><line x1="6" y1="4" x2="18" y2="16"></line></svg></div>' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme + (proxy.notWorking ? '<br> <span style="color:#f44336;">' + chrome.i18n.getMessage('notWork') + '</span>' : '')
     listProxy.after(html);
     document.getElementById(proxy.ip + '┄' + proxy.port).addEventListener('click', function() {
         removeProxyList(proxy, false);

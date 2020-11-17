@@ -163,11 +163,6 @@ button[type="submit"]:focus, #generalStats:focus {
   width: 15%;
 }
 
-.MVlist {
-  height: 65px;
-  padding: 10px 0px !important;
-}
-
 select:focus, input:focus {
   border-bottom: solid 2px #1A7BEE;
   outline: 0;
@@ -807,4 +802,8 @@ ul li:hover {
 
 .fw600 {
   font-weight: 600;
-} 
+}
+
+.multiVoteList {
+  min-height: 78px;
+}
