@@ -164,6 +164,7 @@ async function checkOpen(project) {
 			if (Date.now() < value.nextAttempt) {
 				return
 			} else {
+				queueProjects.delete(value)
 				console.warn('[' + getProjectName(value) + '] ' + value.nick + (project.game != null ? ' – ' + project.game : '') + (value.Custom ? '' : ' – ' + value.id) + (value.name != null ? ' – ' + value.name : '') + ' ' + chrome.i18n.getMessage('timeout'))
 				if (!settings.disabledNotifError) sendNotification('[' + getProjectName(value) + '] ' + value.nick + (value.Custom ? '' : value.name != null ? ' – ' + value.name : ' – ' + value.id), chrome.i18n.getMessage('timeout'))
 			}
