@@ -136,7 +136,7 @@ async function initializeConfig() {
     	VKs = [];
     	proxies = [];
     }
-    if (settings.stopVote == null) {
+    if (settings && settings.stopVote == null) {
     	settings.stopVote = 0
     }
     
