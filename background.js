@@ -1515,7 +1515,7 @@ async function endVote(message, sender, project) {
 		}
 
 		if (settings.useMultiVote && !(settings.repeatAttemptLater && project.later && project.later >= 1 && message.includes("later")))  {
-            if (false && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
 				let usedProject = {};
 				usedProject.id = project.id;
 				usedProject.nextFreeVote = time;
