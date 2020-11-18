@@ -1497,7 +1497,14 @@ async function endVote(message, sender, project) {
 				time.setUTCHours(time.getUTCHours() + 11);
 				time.setUTCMinutes(time.getUTCMinutes() + 7);
 			} else if (project.Custom) {
-				time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout);
+				if (project.nick.includes('DiscordOrganicaDaily')) {
+					if (time.getUTCHours() > 0 || (time.getUTCHours() == 0 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+						time.setUTCDate(time.getUTCDate() + 1)
+					}
+					time.setUTCHours(0, (project.priority ? 0 : 10), 0, 0)
+				} else {
+					time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
+				}
 			}
 			project.time = time.getTime();
 			time = time.getTime();
