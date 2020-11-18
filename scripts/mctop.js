@@ -1,6 +1,8 @@
-setTimeout(() => {
-	vote();
-}, 3000);
+//Совместимость с Rocket Loader
+document.addEventListener('DOMContentLoaded', (event) => {
+    vote()
+})
+
 function vote () {
 	chrome.storage.local.get('AVMRprojectsMcTOP', function(result) {
 		if (document.URL.includes('.vk')) {
@@ -29,6 +31,7 @@ function vote () {
 					//Клик VK
 					document.querySelector("#loginModal > div > div > div.modal-body > div > ul > li > a").click();
 					clearInterval(this.check);
+					clearInterval(this.check2)
 				} else {
 					let nick = getNickName(result.AVMRprojectsMcTOP);
 					if (nick == null || nick == "") return;
@@ -79,5 +82,6 @@ this.check = setInterval(()=>{
         }
         sendMessage(message);
         clearInterval(this.check);
+        clearInterval(this.check2)
     }
 }, 1000);
