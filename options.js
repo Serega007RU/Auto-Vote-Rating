@@ -593,7 +593,7 @@ function updateProjectList() {
     while (document.getElementById("CustomList").nextElementSibling != null) {
         document.getElementById("CustomList").nextElementSibling.remove();
     }
-    forLoopAllProjects(function () {addProjectList(proj, true)}, true)
+    forLoopAllProjects(async function (proj) {await addProjectList(proj, true)}, true)
     if (document.querySelector("#addedProjectsTable1").childElementCount == 0) {
         document.querySelector("#addedProjectsTable1").innerText = chrome.i18n.getMessage('notAddedAll')
     }
@@ -960,7 +960,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         secondBonus = chrome.i18n.getMessage('secondBonus', "VictoryCraft") + " <button type='button' id='secondBonusVictoryCraft'>" + chrome.i18n.getMessage('lets') + "</button>"
     }
 
-    forLoopAllProjects(function () {
+    await forLoopAllProjects(function (proj) {
         if (settings.useMultiVote) {
             if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick && !project.Custom) {
                 if (secondBonus === "") {
@@ -1006,7 +1006,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                 return;
             }
         }
-    });
+    }, false);
     if (returnAdd) {
         addProjectsBonus(project);
         returnAdd = false
@@ -1562,132 +1562,132 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
     }
 });
 
-function forLoopAllProjects (fuc, reverse) {
-    if (reverse) projectsTopCraft.reverse();
-    for (proj of projectsTopCraft) {
-        fuc();
+async function forLoopAllProjects (fuc, reverse) {
+    if (reverse) projectsTopCraft.reverse()
+    for (let proj of projectsTopCraft) {
+        await fuc(proj)
     }
-    if (reverse) projectsTopCraft.reverse();
+    if (reverse) projectsTopCraft.reverse()
 
-    if (reverse) projectsMcTOP.reverse();
-    for (proj of projectsMcTOP) {
-        fuc();
+    if (reverse) projectsMcTOP.reverse()
+    for (let proj of projectsMcTOP) {
+        await fuc(proj)
     }
-    if (reverse) projectsMcTOP.reverse();
+    if (reverse) projectsMcTOP.reverse()
 
-    if (reverse) projectsMCRate.reverse();
-    for (proj of projectsMCRate) {
-        fuc();
+    if (reverse) projectsMCRate.reverse()
+    for (let proj of projectsMCRate) {
+        await fuc(proj)
     }
-    if (reverse) projectsMCRate.reverse();
+    if (reverse) projectsMCRate.reverse()
 
-    if (reverse) projectsMinecraftRating.reverse();
-    for (proj of projectsMinecraftRating) {
-        fuc();
+    if (reverse) projectsMinecraftRating.reverse()
+    for (let proj of projectsMinecraftRating) {
+        await fuc(proj)
     }
-    if (reverse) projectsMinecraftRating.reverse();
+    if (reverse) projectsMinecraftRating.reverse()
 
-    if (reverse) projectsMonitoringMinecraft.reverse();
-    for (proj of projectsMonitoringMinecraft) {
-        fuc();
+    if (reverse) projectsMonitoringMinecraft.reverse()
+    for (let proj of projectsMonitoringMinecraft) {
+        await fuc(proj)
     }
-    if (reverse) projectsMonitoringMinecraft.reverse();
+    if (reverse) projectsMonitoringMinecraft.reverse()
     
-    if (reverse) projectsFairTop.reverse();
-    for (proj of projectsFairTop) {
-        fuc();
+    if (reverse) projectsFairTop.reverse()
+    for (let proj of projectsFairTop) {
+        await fuc(proj)
     }
-    if (reverse) projectsFairTop.reverse();
+    if (reverse) projectsFairTop.reverse()
 
-    if (reverse) projectsIonMc.reverse();
-    for (proj of projectsIonMc) {
-        fuc();
+    if (reverse) projectsIonMc.reverse()
+    for (let proj of projectsIonMc) {
+        await fuc(proj)
     }
-    if (reverse) projectsIonMc.reverse();
+    if (reverse) projectsIonMc.reverse()
 
-    if (reverse) projectsMinecraftServersOrg.reverse();
-    for (proj of projectsMinecraftServersOrg) {
-        fuc();
+    if (reverse) projectsMinecraftServersOrg.reverse()
+    for (let proj of projectsMinecraftServersOrg) {
+        await fuc(proj)
     }
-    if (reverse) projectsMinecraftServersOrg.reverse();
+    if (reverse) projectsMinecraftServersOrg.reverse()
 
-    if (reverse) projectsServeurPrive.reverse();
-    for (proj of projectsServeurPrive) {
-        fuc();
+    if (reverse) projectsServeurPrive.reverse()
+    for (let proj of projectsServeurPrive) {
+        await fuc(proj)
     }
-    if (reverse) projectsServeurPrive.reverse();
+    if (reverse) projectsServeurPrive.reverse()
 
-    if (reverse) projectsPlanetMinecraft.reverse();
-    for (proj of projectsPlanetMinecraft) {
-        fuc();
+    if (reverse) projectsPlanetMinecraft.reverse()
+    for (let proj of projectsPlanetMinecraft) {
+        await fuc(proj)
     }
-    if (reverse) projectsPlanetMinecraft.reverse();
+    if (reverse) projectsPlanetMinecraft.reverse()
 
-    if (reverse) projectsTopG.reverse();
-    for (proj of projectsTopG) {
-        fuc();
+    if (reverse) projectsTopG.reverse()
+    for (let proj of projectsTopG) {
+        await fuc(proj)
     }
-    if (reverse) projectsTopG.reverse();
+    if (reverse) projectsTopG.reverse()
 
-    if (reverse) projectsMinecraftMp.reverse();
-    for (proj of projectsMinecraftMp) {
-        fuc();
+    if (reverse) projectsMinecraftMp.reverse()
+    for (let proj of projectsMinecraftMp) {
+        await fuc(proj)
     }
-    if (reverse) projectsMinecraftMp.reverse();
+    if (reverse) projectsMinecraftMp.reverse()
 
-    if (reverse) projectsMinecraftServerList.reverse();
-    for (proj of projectsMinecraftServerList) {
-        fuc();
+    if (reverse) projectsMinecraftServerList.reverse()
+    for (let proj of projectsMinecraftServerList) {
+        await fuc(proj)
     }
-    if (reverse) projectsMinecraftServerList.reverse();
+    if (reverse) projectsMinecraftServerList.reverse()
 
-    if (reverse) projectsServerPact.reverse();
-    for (proj of projectsServerPact) {
-        fuc();
+    if (reverse) projectsServerPact.reverse()
+    for (let proj of projectsServerPact) {
+        await fuc(proj)
     }
-    if (reverse) projectsServerPact.reverse();
+    if (reverse) projectsServerPact.reverse()
 
-    if (reverse) projectsMinecraftIpList.reverse();
-    for (proj of projectsMinecraftIpList) {
-        fuc();
+    if (reverse) projectsMinecraftIpList.reverse()
+    for (let proj of projectsMinecraftIpList) {
+        await fuc(proj)
     }
-    if (reverse) projectsMinecraftIpList.reverse();
+    if (reverse) projectsMinecraftIpList.reverse()
 
-    if (reverse) projectsTopMinecraftServers.reverse();
-    for (proj of projectsTopMinecraftServers) {
-        fuc();
+    if (reverse) projectsTopMinecraftServers.reverse()
+    for (let proj of projectsTopMinecraftServers) {
+        await fuc(proj)
     }
-    if (reverse) projectsTopMinecraftServers.reverse();
+    if (reverse) projectsTopMinecraftServers.reverse()
 
-    if (reverse) projectsMinecraftServersBiz.reverse();
-    for (proj of projectsMinecraftServersBiz) {
-        fuc();
+    if (reverse) projectsMinecraftServersBiz.reverse()
+    for (let proj of projectsMinecraftServersBiz) {
+        await fuc(proj)
     }
-    if (reverse) projectsMinecraftServersBiz.reverse();
+    if (reverse) projectsMinecraftServersBiz.reverse()
 
-    if (reverse) projectsHotMC.reverse();
-    for (proj of projectsHotMC) {
-        fuc();
+    if (reverse) projectsHotMC.reverse()
+    for (let proj of projectsHotMC) {
+        await fuc(proj)
     }
-    if (reverse) projectsHotMC.reverse();
+    if (reverse) projectsHotMC.reverse()
 
-    if (reverse) projectsMinecraftServerNet.reverse();
-    for (proj of projectsMinecraftServerNet) {
-        fuc();
+    if (reverse) projectsMinecraftServerNet.reverse()
+    for (let proj of projectsMinecraftServerNet) {
+        await fuc(proj)
     }
-    if (reverse) projectsMinecraftServerNet.reverse();
+    if (reverse) projectsMinecraftServerNet.reverse()
 
-    if (reverse) projectsTopGames.reverse();
-    for (proj of projectsTopGames) {
-        fuc();
+    if (reverse) projectsTopGames.reverse()
+    for (let proj of projectsTopGames) {
+        await fuc(proj)
     }
-    if (reverse) projectsTopGames.reverse();
+    if (reverse) projectsTopGames.reverse()
 
-    if (reverse) projectsCustom.reverse();
-    for (proj of projectsCustom) {
-        fuc();
+    if (reverse) projectsCustom.reverse()
+    for (let proj of projectsCustom) {
+        await fuc(proj)
     }
-    if (reverse) projectsCustom.reverse();
+    if (reverse) projectsCustom.reverse()
 }
 
 //Слушатель на экпорт настроек
@@ -1885,9 +1885,9 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     //Если пользователь обновился с версии 3.3.1
                     if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
                         projectsTopGames = [];
-                        forLoopAllProjects(async function (proj) {
+                        await forLoopAllProjects(function (proj) {
                             proj.stats = {}
-                        })
+                        }, false)
                     }
 
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);

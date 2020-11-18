@@ -45,12 +45,13 @@ var currentProxy;
 //Прерывает выполнение fetch запросов на случай ошибки в режиме MultiVote
 var controller = new AbortController();
 
-var check = true
-
 var debug = true;
 
 //Токен TunnelBear
 let tunnelBear = {}
+
+//Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
+var check = true
 
 //Инициализация настроек расширения
 initializeConfig();
@@ -168,8 +169,8 @@ async function initializeConfig() {
     
     //Проверка на голосование
     setInterval(async ()=> {
-    	await checkVote();
-    }, cooldown);
+    	await checkVote()
+    }, cooldown)
 }
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
@@ -188,7 +189,7 @@ async function checkVote() {
     		return;
     	}
     }
-    
+
     if (check) {
     	check = false
     } else {
@@ -197,13 +198,13 @@ async function checkVote() {
     
 //     if (debug) console.log('Проверка')
 
-	await forLoopAllProjects(await async function (proj) {
+	await forLoopAllProjects(async function (proj) {
 		if (proj.time == null || proj.time < Date.now()) {
-            await checkOpen(proj);
+            await checkOpen(proj)
 		}
-	});
-	
-    check = true
+	})
+
+	check = true
 }
 
 async function checkOpen(project) {
