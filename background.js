@@ -37,6 +37,9 @@ var online = true;
 
 var secondVoteMinecraftIpList = false;
 
+//Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
+var check = true
+
 //Инициализация настроек расширения
 initializeConfig();
 async function initializeConfig() {
@@ -119,11 +122,13 @@ async function initializeConfig() {
     if (settings && !settings.disabledCheckTime) checkTime();
     
     //Проверка на голосование
-    setInterval(function() {checkVote()}, cooldown);
+    setInterval(async ()=> {
+    	await checkVote()
+    }, cooldown)
 }
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
-function checkVote() {
+async function checkVote() {
 // 	return
     if (!settings || projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) return;
 
@@ -136,12 +141,20 @@ function checkVote() {
     		return;
     	}
     }
+
+    if (check) {
+    	check = false
+    } else {
+    	return
+    }
     
-	forLoopAllProjects(async function (proj) {
+	await forLoopAllProjects(async function (proj) {
 		if (proj.time == null || proj.time < Date.now()) {
-            await checkOpen(proj);
+            await checkOpen(proj)
 		}
-	});
+	})
+
+	check = true
 }
 
 async function checkOpen(project) {
