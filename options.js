@@ -226,6 +226,7 @@ async function restoreOptions() {
         proxies = [];
         await setValue('AVMRVKs', VKs, false);
         await setValue('AVMRproxies', proxies, false);
+        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false)
     }
     
     //Если пользователь обновился с версии 3.2.2
@@ -329,6 +330,22 @@ async function restoreOptions() {
             settings.stopVote = Date.now() + 86400000
             document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
             document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
+
+			await clearProxy();
+			chrome.extension.getBackgroundPage().currentVK = null;
+			chrome.extension.getBackgroundPage().currentProxy = null;
+            chrome.extension.getBackgroundPage().queueProjects.clear();
+			for (let [key, value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
+				chrome.tabs.remove(key, function() {
+					if (chrome.runtime.lastError) {
+						console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
+						if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
+					}
+				});
+			}
+			chrome.extension.getBackgroundPage().controller.abort();
+            chrome.extension.getBackgroundPage().openedProjects.clear();
+            
             updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('voteSuspended') + '</div>', false)
         }
         await setValue('AVMRsettings', settings, false)
