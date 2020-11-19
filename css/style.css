@@ -115,7 +115,7 @@ button[type="submit"], .retryFastAdd, #generalStats {
   border: none;
 }
 
-button[type="submit"]:hover, #generalStats:hover, .closeSettings:hover {
+#authvk:hover, button[type="submit"]:hover, #generalStats:hover, .tablinks:hover, .selectsite:hover, .listcontent button:hover, .closeSettings:hover {
   opacity: 0.85;
 }
 
@@ -186,10 +186,6 @@ p, form, label, details {
   background: #1565C0;
 }
 
-.listcontent button:hover {
-  opacity: 0.85;
-}
-
 .listcontent button:focus {
   outline: 0;
   opacity: 0.55;
@@ -245,10 +241,6 @@ p, form, label, details {
 
 .tablinks:focus, .selectsite:focus, .closeSettings:focus, .retryFastAdd:focus {
   outline: 0;
-}
-
-.tablinks:hover, .selectsite:hover {
-  opacity: 0.85;
 }
 
 .active {
@@ -586,15 +578,7 @@ figure svg {
   background: none;
   box-shadow: none;
   padding: 0;
-}
-
-#authvk:hover {
-  opacity: 0.85;
-  outline: none;
-}
-
-#authvk:focus {
-  outline: 0;
+  outline: 0 !important;
 }
 
 .tooltip1 {
@@ -738,7 +722,7 @@ ul li:hover {
   background: #d32f2f !important;
 }
 
-.statsProject:hover {
+.statsProject:hover, .stats td {
   background: #1A7BEE;
 }
 
@@ -759,10 +743,6 @@ ul li:hover {
 
 .listcontent li:nth-of-type(odd) {
   background: rgba(42, 42, 47, 0.6);
-}
-
-.stats td {
-  color: #1A7BEE;
 }
 
 .stats th {
