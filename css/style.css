@@ -461,7 +461,7 @@ p, form, label, details {
   justify-content: center;
   opacity: 0;
   -webkit-transition: top 0s .7s, opacity .7s 0s;
-  transition: top 0s .7s, opacity .7s 0s;
+  transition: top 0s .1s, opacity .7s 0s;
 }
 
 .anelumen:target {
@@ -537,7 +537,7 @@ figure svg {
   content: "";
   cursor: default;
   visibility: hidden;
-  -webkit-transition: all .1s;
+  -webkit-transition: all -1s;
   transition: all .1s;
 }
 
