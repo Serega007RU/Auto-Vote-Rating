@@ -1,4 +1,14 @@
-//vote();
+//Совместимость с Rocket Loader
+document.addEventListener('DOMContentLoaded', (event) => {
+	this.check2 = setInterval(()=>{
+		//Ожидаем загрузки reCAPTCHA
+		if (document.querySelector("#g-recaptcha-response").value && document.querySelector("#g-recaptcha-response").value != '') {
+			vote()
+			clearInterval(this.check2)
+		}
+	}, 1000)
+})
+
 function vote () {
 	chrome.storage.local.get('AVMRprojectsMinecraftServerList', function(result) {
 		try {
@@ -6,19 +16,10 @@ function vote () {
 			if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
 				return;
 			}
-			if (document.querySelector("#voteerror > font") != null && document.querySelector("#voteerror > font").textContent.includes('Thanks, Vote Registered')) {
-                sendMessage('successfully');
-                return;
-			} else if (document.querySelector("#voteerror > font") != null && document.querySelector("#voteerror > font").textContent.includes('Username already voted today!')) {
-				sendMessage('later');
-				return;
-			}
 			let nick = getNickName(result.AVMRprojectsMinecraftServerList);
 	        if (nick == null || nick == "") return;
-	        document.querySelector("#ignn").click();
             document.querySelector("#ignn").value = nick;
-            document.querySelector("#ignn").click();
-            setTimeout(() => document.querySelector("#voteform > input.buttonsmall.pointer.green.size10").click(), 3000);
+            document.querySelector("#voteform > input.buttonsmall.pointer.green.size10").click();
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
 				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
@@ -50,9 +51,16 @@ function sendMessage(message) {
 
 //Ждёт готовности recaptcha (Anti Spam check) и проверяет что с голосованием и пытается вновь нажать vote();
 this.check = setInterval(()=>{
-    if (document.querySelector("#voteerror > font") != null && (!document.querySelector("#voteerror > font").textContent.includes('Error with the Anti Spam check')) && !document.querySelector("#voteerror > font").textContent.includes('Thanks, Vote Registered') && !document.querySelector("#voteerror > font").textContent.includes('Username already voted today!') && !document.querySelector("#voteerror > font").textContent.includes('Please Wait...')) {
-        clearInterval(this.check);
-        sendMessage(document.querySelector("#voteerror > font").textContent);
+    if (document.querySelector("#voteerror > font") != null) {
+    	if (document.querySelector("#voteerror > font").textContent.includes('Vote Registered')) {
+    		sendMessage('successfully')
+    	} else if (document.querySelector("#voteerror > font").textContent.includes('already voted')) {
+    		sendMessage('later')
+    	} else if (document.querySelector("#voteerror > font").textContent.includes('Please Wait')) {
+    		return
+    	} else {
+    		sendMessage(document.querySelector("#voteerror > font").textContent)
+    	}
+    	clearInterval(this.check)
     }
-    vote();
-}, 7000);
+}, 1000)
