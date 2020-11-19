@@ -669,7 +669,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             }
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProjectRedirect') + response.url + '</div>', true, element);
             return;
-        } else if (project.ServeurPrive && response.status == 503) {
+        } else if (response.status == 503) {
             //None
         } else if (!response.ok) {
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status + '</div>', true, element);
@@ -1717,67 +1717,39 @@ selectedTop.addEventListener("change", function() {
 
         idSelector.removeAttribute('style');
 
-        if (document.getElementById('customBody') != null) document.getElementById('customBody').remove()
-        if (document.getElementById('label1') != null) document.getElementById('label1').remove()
-        if (document.getElementById('label2') != null) document.getElementById('label2').remove()
-        if (document.getElementById('label3') != null) document.getElementById('label3').remove()
-        if (document.getElementById('responseURL') != null) document.getElementById('responseURL').remove()
-        if (document.getElementById('time') != null) document.getElementById('time').remove()
-        if (document.getElementById('countVote') != null) document.getElementById('countVote').remove()
-        if (document.getElementById('selectLang') != null) document.getElementById('selectLang').remove()
-        if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
-        if (document.getElementById('chooseGame') != null) document.getElementById('chooseGame').remove()
-        if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
-        if (document.getElementById('idGame') != null) document.getElementById('idGame').remove()
+        document.getElementById('customBody').style.display = 'none'
+        document.getElementById('label1').style.display = 'none'
+        document.getElementById('label2').style.display = 'none'
+        document.getElementById('label3').style.display = 'none'
+        document.getElementById('label4').style.display = 'none'
+        document.getElementById('label5').style.display = 'none'
+        document.getElementById('responseURL').style.display = 'none'
+        document.getElementById('time').style.display = 'none'
+        document.getElementById('countVote').style.display = 'none'
+        document.getElementById('countVote').required = false
+        document.getElementById('selectLang1').style.display = 'none'
+        document.getElementById('selectLang1').required = false
+        document.getElementById('selectLang2').style.display = 'none'
+        document.getElementById('selectLang2').required = false
+        document.getElementById('gameList1').style.display = 'none'
+        document.getElementById('gameList2').style.display = 'none'
+        document.getElementById('chooseGame1').style.display = 'none'
+        document.getElementById('chooseGame1').required = false
+        document.getElementById('chooseGame2').style.display = 'none'
+        document.getElementById('chooseGame2').required = false
+        document.getElementById('idGame').style.display = 'none'
 
         if (selectedTop.value == 'Custom') {
             idSelector.innerHTML = '';
             idSelector.setAttribute('style', 'height: 0px;')
-
-            let customBody = document.createElement('textarea');
-            customBody.required = true;
-            customBody.setAttribute("id", 'customBody');
-            customBody.setAttribute("name", 'customBody');
-            customBody.setAttribute('placeholder', chrome.i18n.getMessage('bodyFetch'));
-            selectedTop.after(customBody);
-
-            let labelBody = document.createElement('div');
-            labelBody.setAttribute('class', 'form-group mb-1');
-            labelBody.setAttribute('id', 'label1')
-            labelBody.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('bodyFetch') + '</label>'
-            selectedTop.after(labelBody);
-
-            let customURL = document.createElement('input');
-            customURL.required = true;
-            customURL.setAttribute("id", 'responseURL');
-            customURL.setAttribute("name", 'customURL');
-            customURL.setAttribute('placeholder', chrome.i18n.getMessage('urlFetch'));
-            customURL.setAttribute('type', 'text');
-            customURL.setAttribute('class', 'mb-2');
-            selectedTop.after(customURL);
-
-            let labelURL = document.createElement('div');
-            labelURL.setAttribute('class', 'form-group mb-1');
-            labelURL.setAttribute('id', 'label2')
-            labelURL.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('urlFetch') + '</label>'
-            selectedTop.after(labelURL);
-
-            let customTime = document.createElement('input');
-            customTime.required = true;
-            customTime.setAttribute("id", 'time');
-            customTime.setAttribute("name", 'customTime');
-            customTime.setAttribute('placeholder', chrome.i18n.getMessage('delayFetch'));
-            customTime.setAttribute('type', 'number');
-            customTime.setAttribute('min', '10000');
-            customTime.setAttribute('class', 'mb-2');
-            selectedTop.after(customTime);
-
-            let labelTime = document.createElement('div');
-            labelTime.setAttribute('class', 'form-group mb-1');
-            labelTime.setAttribute('id', 'label3')
-            labelTime.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('delayFetch') + '</label>'
-            selectedTop.after(labelTime);
-
+            
+            document.getElementById('customBody').removeAttribute('style')
+            document.getElementById('label1').removeAttribute('style')
+            document.getElementById('label2').removeAttribute('style')
+            document.getElementById('label3').removeAttribute('style')
+            document.getElementById('responseURL').removeAttribute('style')
+            document.getElementById('time').removeAttribute('style')
+            
             document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
             document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterName');
 //             document.querySelector("#nick").required = true
@@ -1786,214 +1758,30 @@ selectedTop.addEventListener("change", function() {
         } else if (selectedTop.value == 'TopGames' || selectedTop.value == 'ServeurPrive') {
 //             document.querySelector("#nick").required = false
 
-            let countVote = document.createElement('input');
-            countVote.required = true;
-            countVote.id = 'countVote'
-            countVote.name = 'countVote'
-            countVote.type = 'number'
-            countVote.min = 1
-            countVote.max = 16
-            countVote.placeholder = chrome.i18n.getMessage('countVote')
-            countVote.value = 5;
-            selectedTop.nextElementSibling.after(countVote);
-
-            let labelCountVote = document.createElement('div');
-            labelCountVote.className = 'form-group mb-1'
-            labelCountVote.id = 'label1'
-            labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
-            selectedTop.nextElementSibling.after(labelCountVote);
-
-            let selectLang = document.createElement('select')
-            selectLang.required = true
-            selectLang.id = 'selectLang'
-            selectLang.className = 'mb-2'
-            for (var i = 0; i < 6; i++) {
-                let option = document.createElement('option')
-                if (selectedTop.value == 'ServeurPrive') {
-                    switch (i) {
-                      case 1:
-                        option.value = 'en'
-                        option.innerHTML = 'English'
-                        selectLang.appendChild(option)
-                        break;
-                      case 3:
-                        option.value = 'fr'
-                        option.innerHTML = 'Français'
-                        selectLang.appendChild(option)
-                        break;
-                      default:
-
-                    }
-                    selectLang.selectedIndex = 1
-                } else {
-                    switch (i) {
-                      case 0:
-                        option.value = 'de'
-                        option.innerHTML = 'Deutsch'
-                        selectLang.appendChild(option)
-                        break;
-                      case 1:
-                        option.value = 'en'
-                        option.innerHTML = 'English'
-                        selectLang.appendChild(option)
-                        break;
-                      case 2:
-                        option.value = 'es'
-                        option.innerHTML = 'Español'
-                        selectLang.appendChild(option)
-                        break;
-                      case 3:
-                        option.value = 'fr'
-                        option.innerHTML = 'Français'
-                        selectLang.appendChild(option)
-                        break;
-                      case 4:
-                        option.value = 'pt'
-                        option.innerHTML = 'Português'
-                        selectLang.appendChild(option)
-                        break;
-                      case 5:
-                        option.value = 'ru'
-                        option.innerHTML = 'Русский'
-                        selectLang.appendChild(option)
-                        break;
-                      default:
-
-                    }
-                    selectLang.selectedIndex = 3
-                }
-            }
-            selectedTop.nextElementSibling.after(selectLang)
-
-            let labelLang = document.createElement('div')
-            labelLang.className = 'form-group mb-1'
-            labelLang.id = 'label2'
-            labelLang.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('chooseLang') + '</label>'
-            selectedTop.nextElementSibling.after(labelLang)
-
-            let chooseGame = document.createElement('input')
-            chooseGame.className = 'mb-2'
-            chooseGame.name = 'chooseGame'
-            chooseGame.required = true
-            chooseGame.type = 'text'
-            chooseGame.id = 'chooseGame'
-            chooseGame.placeholder = chrome.i18n.getMessage('chooseGame')
-            chooseGame.value = 'minecraft'
-            chooseGame.setAttribute('list', 'gameList')
-            selectedTop.nextElementSibling.after(chooseGame)
-
-            let gameList = document.createElement('datalist')
-            gameList.id = 'gameList'
-            let option = document.createElement('option')
+            document.getElementById('countVote').removeAttribute('style')
+            document.getElementById('countVote').required = true
+            document.getElementById('label5').removeAttribute('style')
             if (selectedTop.value == 'ServeurPrive') {
-                option.value = 'minecraft'
-                option.innerHTML = 'Minecraft'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'discord'
-                option.innerHTML = 'Discord'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'grand-theft-auto'
-                option.innerHTML = 'Grand Theft Auto V'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'ark-survival-evolved'
-                option.innerHTML = 'Ark : Survival Evolved'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'rust'
-                option.innerHTML = 'Rust'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'hytale'
-                option.innerHTML = 'Hytale'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'minecraft-bedrock'
-                option.innerHTML = 'Minecraft Bedrock'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'ark'
-                option.innerHTML = 'ARK'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'garrys-mod'
-                option.innerHTML = "Garry's Mod"
-                gameList.appendChild(option)
-
+                document.getElementById('selectLang2').removeAttribute('style')
+                document.getElementById('selectLang2').required = true
+                document.getElementById('gameList2').removeAttribute('style')
+                document.getElementById('chooseGame2').removeAttribute('style')
+                document.getElementById('chooseGame2').required = true
             } else {
-                option.value = 'minecraft'
-                option.innerHTML = 'Minecraft'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'garrys-mod'
-                option.innerHTML = "Garry's mod"
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'discord'
-                option.innerHTML = 'Discord'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'roblox'
-                option.innerHTML = 'Roblox'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'rdr'
-                option.innerHTML = 'Red Dead Redemption 2'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'hytale'
-                option.innerHTML = 'Hytale'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'terraria'
-                option.innerHTML = 'Terraria'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'ark'
-                option.innerHTML = 'ARK'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'dayz'
-                option.innerHTML = 'Dayz'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'l4d2'
-                option.innerHTML = 'Left 4 Dead 2'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'rust'
-                option.innerHTML = 'Rust'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'gta'
-                option.innerHTML = 'GTA 5'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'discord'
-                option.innerHTML = 'Discord'
-                gameList.appendChild(option)
+                document.getElementById('selectLang1').removeAttribute('style')
+                document.getElementById('selectLang1').required = true
+                document.getElementById('gameList1').removeAttribute('style')
+                document.getElementById('chooseGame1').removeAttribute('style')
+                document.getElementById('chooseGame1').required = true
             }
-            selectedTop.nextElementSibling.after(gameList)
-
-            let divGame = document.createElement('div')
-            divGame.id = 'idGame'
-            divGame.className = 'form-group mb-1'
-            let labelGame = document.createElement('label')
-            labelGame.setAttribute('for', 'idGame')
-            labelGame.innerHTML = chrome.i18n.getMessage('idGame')
-            let spanGame = document.createElement('span')
-            spanGame.className = 'tooltip1'
+            document.getElementById('label4').removeAttribute('style')
+            document.getElementById('idGame').removeAttribute('style')
+            let spanGame = document.getElementById('spanGame')
             if (selectedTop.value == 'ServeurPrive') {
                 spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip', 'https://serveur-prive.net/<span style="color:#d32f2f;">minecraft</span>/gommehd-net-4932') + ' </span>'
             } else {
                 spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip', 'https://top-serveurs.net/<span style="color:#d32f2f;">minecraft</span>/hailcraft') + ' </span>'
             }
-            divGame.appendChild(labelGame)
-            divGame.innerHTML = divGame.innerHTML + ' '
-            divGame.appendChild(spanGame)
-            selectedTop.nextElementSibling.after(divGame)
         }
     }
     laterChoose = selectedTop.value
@@ -2003,6 +1791,9 @@ selectedTop.addEventListener("change", function() {
 let elements = document.querySelectorAll('[data-resource]')
 elements.forEach(function(el) {
     el.innerHTML = el.innerHTML + chrome.i18n.getMessage(el.getAttribute('data-resource'))
+})
+document.querySelectorAll('[placeholder]').forEach(function(el) {
+    el.placeholder = chrome.i18n.getMessage(el.placeholder)
 })
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'));
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
