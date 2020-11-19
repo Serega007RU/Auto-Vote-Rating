@@ -8,59 +8,7 @@
 	<link rel="stylesheet" href="css/bootstrap.css"> 
 </head>
 <body>
-	<div class="anelumen lowingnuska" id="addFastProject">
-		<a href="" class="nedismiseg"></a>
-		<figure>
-			<h2 data-resource="fastAdd"><a href="" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
-			<div class="modalContent">
-				<div data-resource="load" id=modaltext></div>
-			</div>
-		</figure>
-	</div>
-	<div class="anelumen lowingnuska" id="stats">
-	    <a href="#/" class="nedismiseg" id="closeStats"></a>
-		<a id="modalStats" href="#stats"></a>
-		<figure>
-			<h2>
-			    <span data-resource="stats"></span>
-			    <div id="statsSubtitle">&nbsp;</div>
-			    <a href="#/" class="compatibg-ukastywise" id="closeStats2" aria-label="Close Modal Box">×</a>
-			</h2>
 
-            <div class="modalContent stats">
-                <table>
-                    <tr>
-                        <td data-resource="statsSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsMonthSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastMonthSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLaterVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsErrorVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastSuccessVote"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastAttemptVote"></td>
-                        <th></th>
-                    </tr>
-                </table>
-            </div>
-		</figure>
-	</div>
 
 	<input type="checkbox" id="hmt" class="hidden-menu-ticker">
 	<span class="btn-menu-back"></span>
@@ -173,7 +121,7 @@
 							<div class="form-group mb-1">
 								<label data-resource="yourNick" for="nick"></label>
 							</div>
-							<input name="nick" id="nick" required placeholder="Введите никнейм" type="text" class="mb-2">
+							<input name="nick" id="nick" required placeholder="enterNick" type="text" class="mb-2">
 							<div class="form-group mb-1">
 								<label data-resource="siteTop" for="project"></label>
 							</div>
@@ -200,6 +148,69 @@
 								<option value="MinecraftServerNet">Minecraft-Server.net</option>
 								<option value="TopGames">Top-Games.net or Top-Serveurs.net</option>
 							</select>
+                            <!--Custom-->
+							<div style="display: none;" id="label6" class="form-group mb-1">
+							    <label data-resource="selectTime"></label>
+							</div>
+                            <select style="display: none;" required id="selectTime" class="mb-2">
+                                <option value="ms" data-resource="timeoutMS"></option>
+                                <option value="hour" data-resource="timeoutHour"></option>
+                            </select>
+							<div style="display: none;" id="label3" class="form-group mb-1">
+							    <label for="nick" data-resource="delayFetch"></label>
+							</div>
+                            <input style="display: none;" id="time" name="customTime" placeholder="delayFetch" type="number" min="10000" class="mb-2" style="display: none;"></input>
+							<div style="display: none;" id="label7" class="form-group mb-1">
+							    <label for="nick" data-resource="chooseHour"></label>
+							</div>
+                            <select style="display: none;" required id="hour" class="mb-2">
+                                <option value="0">00</option>
+                                <option value="1">01</option>
+                                <option value="2">02</option>
+                                <option value="3">03</option>
+                                <option value="4">04</option>
+                                <option value="5">05</option>
+                                <option value="6">06</option>
+                                <option value="7">07</option>
+                                <option value="8">08</option>
+                                <option value="9">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                            </select>
+							<div style="display: none;" id="label2" class="form-group mb-1">
+							    <label for="nick" data-resource="urlFetch"></label>
+							</div>
+							<input style="display: none;" id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="mb-2"></input>
+							<div style="display: none;" id="label1" class="form-group mb-1">
+							    <label for="nick" data-resource="bodyFetch"></label>
+							</div>
+							<textarea style="display: none;" id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="mb-2"></textarea>
+
+							<!--ServeurPrive and TopGames-->
+							<div style="display: none;" id="idGame" class="form-group mb-1"><label for="idGame" data-resource="idGame"></label> <span class="tooltip1"><span class="tooltip1text" id="spanGame"></span></div>
+							<datalist style="display: none;" id="gameList1"><option value="minecraft">Minecraft</option><option value="garrys-mod">Garry's mod</option><option value="discord">Discord</option><option value="roblox">Roblox</option><option value="rdr">Red Dead Redemption 2</option><option value="hytale">Hytale</option><option value="terraria">Terraria</option><option value="ark">ARK</option><option value="dayz">Dayz</option><option value="l4d2">Left 4 Dead 2</option><option value="rust">Rust</option><option value="gta">GTA 5</option><option value="discord">Discord</option></datalist>
+							<datalist style="display: none;" id="gameList2"><option value="minecraft">Minecraft</option><option value="discord">Discord</option><option value="grand-theft-auto">Grand Theft Auto V</option><option value="ark-survival-evolved">Ark : Survival Evolved</option><option value="rust">Rust</option><option value="hytale">Hytale</option><option value="minecraft-bedrock">Minecraft Bedrock</option><option value="ark">ARK</option><option value="garrys-mod">Garry's Mod</option></datalist>
+							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGame1" placeholder="chooseGame" list="gameList1" value="minecraft">
+							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGame2" placeholder="chooseGame" list="gameList2" value="minecraft">
+							<div style="display: none;" class="form-group mb-1" id="label4"><label for="nick" data-resource="chooseLang"></label></div>
+							<select style="display: none;" id="selectLang1" class="mb-2"><option value="de">Deutsch</option><option value="en">English</option><option value="es">Español</option><option value="fr" selected>Français</option><option value="pt">Português</option><option value="ru">Русский</option></select>
+							<select style="display: none;" id="selectLang2" class="mb-2"><option value="en">English</option><option value="fr" selected>Français</option></select>
+							<div style="display: none;" class="form-group mb-1" id="label5"><label for="nick" data-resource="countVote"></label></div>
+							<input style="display: none;" id="countVote" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="mb-2" value="5">
+
+
 							<div id="idSelector"></div>
 							<div id="submit" class="mt-3">
 								<button data-resource="addButton" id="submitAddProject" type="submit"></button>
@@ -259,7 +270,7 @@
 							<label data-resource="cooldown" for="cooldown"></label>
 						</div>
 						<form id="timeout">
-							<input name="cooldown" id="cooldown" required type="number" min="1000" class="mb-2">
+							<input name="cooldown" id="cooldown" required type="number" min="1000" max="43200000" class="mb-2">
 							<div id="submit2" class="mt-3 mb-2">
 								<button data-resource="setCooldown" type="submit" class="w-50" style="display: inline;"></button>
 							</div>
@@ -453,15 +464,69 @@
 				</div>
 			</div>
 			<a id="donate" data-resource="supportDev" target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
-		    <audio id="sound-link" preload="auto">
+		    <audio id="sound-link2" preload="auto">
 			    <source src="audio/2_-_mp3_.mp3" type="audio/mpeg">
 		    </audio>
-		    <audio id="sound-link2" preload="auto">
+		    <audio id="sound-link" preload="auto">
 			    <source src="audio/c3a54b52a16b1307.mp3" type="audio/mpeg">
 		    </audio>
 			<div id="save">&nbsp;</div>
 		</div>
-	</div>	
+	</div>
+
+	<div class="anelumen lowingnuska" id="addFastProject">
+		<a href="" class="nedismiseg"></a>
+		<figure>
+			<h2 data-resource="fastAdd"><a href="" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
+			<div class="modalContent">
+				<div data-resource="load" id=modaltext></div>
+			</div>
+		</figure>
+	</div>
+	<div class="anelumen lowingnuska" id="stats">
+	    <a href="#/" class="nedismiseg" id="closeStats"></a>
+		<a id="modalStats" href="#stats"></a>
+		<figure>
+			<h2>
+			    <span data-resource="stats"></span>
+			    <div id="statsSubtitle">&nbsp;</div>
+			    <a href="#/" class="compatibg-ukastywise" id="closeStats2" aria-label="Close Modal Box">×</a>
+			</h2>
+
+            <div class="modalContent stats">
+                <table>
+                    <tr>
+                        <td data-resource="statsSuccessVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsMonthSuccessVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLastMonthSuccessVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLaterVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsErrorVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLastSuccessVote"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLastAttemptVote"></td>
+                        <th></th>
+                    </tr>
+                </table>
+            </div>
+		</figure>
+	</div>
 
 	<script src="options.js"></script>
 </body>

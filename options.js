@@ -36,7 +36,7 @@ var randomizeOption = false;
 var returnAdd;
 
 //Конструктор проекта
-function Project(top, nick, id, time, responseURL, priority) {
+function Project(top, nick, id, time, responseURL, hour, priority) {
     if (top == "TopCraft") this.TopCraft = true;
     if (top == "McTOP") this.McTOP = true;
     if (top == "MCRate") this.MCRate = true;
@@ -59,7 +59,11 @@ function Project(top, nick, id, time, responseURL, priority) {
     if (top == "TopGames") this.TopGames = true;
     if (top == "Custom") {
         this.Custom = true;
-        this.timeout = parseInt(time);
+        if (time) {
+            this.timeout = parseInt(time)
+        } else {
+            this.timeoutHour = parseInt(hour)
+        }
         this.time = null;
         this.nick = nick;
         this.id = id;
@@ -636,9 +640,9 @@ function updateProjectList() {
 document.getElementById('addProject').addEventListener('submit', () => {
     event.preventDefault();
     if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, document.getElementById('time').value, document.getElementById('responseURL').value, priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('selectTime').value == 'ms' ? document.getElementById('time').value : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? null : document.getElementById('hour').value), priorityOption, null);
     } else {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, null, priorityOption, null);
     }
 });
 
@@ -942,7 +946,7 @@ document.getElementById('timeout').addEventListener('submit', () => {
     setCoolDown();
 });
 
-async function addProject(choice, nick, id, time, response, priorityOpt, element) {
+async function addProject(choice, nick, id, time, response, hour, priorityOpt, element) {
     updateStatusAdd('<div>' + chrome.i18n.getMessage('adding') + '</div>', true, element);
     let project;
     if (choice == 'Custom') {
@@ -953,9 +957,9 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element);
             return;
         }
-        project = new Project(choice, nick, body, time, response, priorityOpt);
+        project = new Project(choice, nick, body, time, response, hour, priorityOpt);
     } else {
-        project = new Project(choice, nick, id, null, null, priorityOpt);
+        project = new Project(choice, nick, id, null, null, null, priorityOpt);
     }
 
     if (randomizeOption) {
@@ -1076,7 +1080,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         }
         if (project.PlanetMinecraft) {
             url = 'https://www.planetminecraft.com/server/' + project.id + '/';
-            jsPath = "#resource_object > div.server > table > tbody > tr:nth-child(5) > td:nth-child(2) > form > input";
+            jsPath = "#resource-title-text";
         }
         if (project.TopG) {
             url = 'https://topg.org/ru/Minecraft/server-' + project.id;
@@ -1150,7 +1154,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             }
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProjectRedirect') + response.url + '</div>', true, element);
             return;
-        } else if (project.ServeurPrive && response.status == 503) {
+        } else if (response.status == 503) {
             //None
         } else if (!response.ok) {
             updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status + '</div>', true, element);
@@ -1234,7 +1238,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                         });
                     } else {
                         openPoput(url2, function () {
-                            addProject(choice, nick, id, time, response, priorityOpt, element);
+                            addProject(choice, nick, id, time, response, hour, priorityOpt, element);
                         });
                     }
                 });
@@ -1285,18 +1289,18 @@ function addProjectsBonus(project) {
                 updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('redirectedSecondBonus', response.url) +'</div>', true, element);
                 return;
             }
-            await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus2Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=2&item=2","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus3Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=3&item=4","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus4Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=4&item=7","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus5Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=5&item=9","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus6Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=6&item=11","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonusMith', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"type=1&bonus=1&value=5","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus2Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=2&item=2","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus3Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=3&item=4","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus4Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=4&item=7","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus5Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=5&item=9","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus6Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=6&item=11","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonusMith', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"type=1&bonus=1&value=5","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
         });
     } else if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async () => {
-            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/","referrerPolicy":"no-referrer-when-downgrade","body":"give_daily_posted=1&token=%7Btoken%7D&return=%252F","method":"POST","mode":"cors"}', 86400000, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', priorityOption, null);
-            //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', 604800000, 'https://victorycraft.ru/?do=cabinet&loc=vote', priorityOption, null);
+            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/","referrerPolicy":"no-referrer-when-downgrade","body":"give_daily_posted=1&token=%7Btoken%7D&return=%252F","method":"POST","mode":"cors"}', 86400000, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', null, priorityOption, null);
+            //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', 604800000, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null);
         });
     }
 }
@@ -2000,7 +2004,7 @@ function getUrlProjects() {
             element[key] = value;
             i++;
             if (i == 3) {
-                vars.push(new Project(element.top, element.nick, element.id, null, null, false));
+                vars.push(new Project(element.top, element.nick, element.id, null, null, null, false));
                 i = 0;
                 element = {};
             }
@@ -2031,7 +2035,7 @@ async function fastAdd() {
             html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id);
             html.innerHTML = '<span style="color:#f44336;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>'+getProjectName(fastProj) + " – " + fastProj.nick + " – " + fastProj.id;
             listFastAdd.before(html);
-            await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, false, html);
+            await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, null, false, html);
         }
         if (vars['disableNotifInfo'] != null) {
             if (settings.disabledNotifInfo != Boolean(vars['disableNotifInfo'])) {
@@ -2319,72 +2323,63 @@ selectedTop.addEventListener("change", function() {
     }
     
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames') {
-            document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('yourNick');
-            document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterNick');
+        document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('yourNick');
+        document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterNick');
 
-            idSelector.removeAttribute('style');
+        idSelector.removeAttribute('style');
 
-            if (document.getElementById('customBody') != null) document.getElementById('customBody').remove()
-            if (document.getElementById('label1') != null) document.getElementById('label1').remove()
-            if (document.getElementById('label2') != null) document.getElementById('label2').remove()
-            if (document.getElementById('label3') != null) document.getElementById('label3').remove()
-            if (document.getElementById('responseURL') != null) document.getElementById('responseURL').remove()
-            if (document.getElementById('time') != null) document.getElementById('time').remove()
-            if (document.getElementById('countVote') != null) document.getElementById('countVote').remove()
-            if (document.getElementById('selectLang') != null) document.getElementById('selectLang').remove()
-            if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
-            if (document.getElementById('chooseGame') != null) document.getElementById('chooseGame').remove()
-            if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
-            if (document.getElementById('idGame') != null) document.getElementById('idGame').remove()
+        document.getElementById('customBody').style.display = 'none'
+        document.getElementById('label1').style.display = 'none'
+        document.getElementById('label2').style.display = 'none'
+        document.getElementById('label3').style.display = 'none'
+        document.getElementById('label4').style.display = 'none'
+        document.getElementById('label5').style.display = 'none'
+        document.getElementById('label6').style.display = 'none'
+        document.getElementById('responseURL').style.display = 'none'
+        document.getElementById('time').style.display = 'none'
+        document.getElementById('time').required = false
+        document.getElementById('countVote').style.display = 'none'
+        document.getElementById('countVote').required = false
+        document.getElementById('selectLang1').style.display = 'none'
+        document.getElementById('selectLang1').required = false
+        document.getElementById('selectLang2').style.display = 'none'
+        document.getElementById('selectLang2').required = false
+        document.getElementById('gameList1').style.display = 'none'
+        document.getElementById('gameList2').style.display = 'none'
+        document.getElementById('chooseGame1').style.display = 'none'
+        document.getElementById('chooseGame1').required = false
+        document.getElementById('chooseGame2').style.display = 'none'
+        document.getElementById('chooseGame2').required = false
+        document.getElementById('idGame').style.display = 'none'
+        document.getElementById('selectTime').style.display = 'none'
+        document.getElementById('label7').style.display = 'none'
+        document.getElementById('hour').style.display = 'none'
 
         if (selectedTop.value == 'Custom') {
             idSelector.innerHTML = '';
             idSelector.setAttribute('style', 'height: 0px;')
+            
+            document.getElementById('label6').removeAttribute('style')
+            document.getElementById('selectTime').removeAttribute('style')
+            document.getElementById('customBody').removeAttribute('style')
+            document.getElementById('label1').removeAttribute('style')
+            document.getElementById('label2').removeAttribute('style')
+            document.getElementById('responseURL').removeAttribute('style')
+            if (document.getElementById('selectTime').value == 'ms') {
+                document.getElementById('label3').removeAttribute('style')
+                document.getElementById('time').removeAttribute('style')
+                document.getElementById('time').required = true
+                document.getElementById('label7').style.display = 'none'
+                document.getElementById('hour').style.display = 'none'
+            } else {
+                document.getElementById('label7').removeAttribute('style')
+                document.getElementById('hour').removeAttribute('style')
+                document.getElementById('label3').style.display = 'none'
+                document.getElementById('time').style.display = 'none'
+                document.getElementById('time').required = false
 
-            let customBody = document.createElement('textarea');
-            customBody.required = true;
-            customBody.setAttribute("id", 'customBody');
-            customBody.setAttribute("name", 'customBody');
-            customBody.setAttribute('placeholder', chrome.i18n.getMessage('bodyFetch'));
-            selectedTop.after(customBody);
-
-            let labelBody = document.createElement('div');
-            labelBody.setAttribute('class', 'form-group mb-1');
-            labelBody.setAttribute('id', 'label1')
-            labelBody.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('bodyFetch') + '</label>'
-            selectedTop.after(labelBody);
-
-            let customURL = document.createElement('input');
-            customURL.required = true;
-            customURL.setAttribute("id", 'responseURL');
-            customURL.setAttribute("name", 'customURL');
-            customURL.setAttribute('placeholder', chrome.i18n.getMessage('urlFetch'));
-            customURL.setAttribute('type', 'text');
-            customURL.setAttribute('class', 'mb-2');
-            selectedTop.after(customURL);
-
-            let labelURL = document.createElement('div');
-            labelURL.setAttribute('class', 'form-group mb-1');
-            labelURL.setAttribute('id', 'label2')
-            labelURL.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('urlFetch') + '</label>'
-            selectedTop.after(labelURL);
-
-            let customTime = document.createElement('input');
-            customTime.required = true;
-            customTime.setAttribute("id", 'time');
-            customTime.setAttribute("name", 'customTime');
-            customTime.setAttribute('placeholder', chrome.i18n.getMessage('delayFetch'));
-            customTime.setAttribute('type', 'number');
-            customTime.setAttribute('min', '10000');
-            customTime.setAttribute('class', 'mb-2');
-            selectedTop.after(customTime);
-
-            let labelTime = document.createElement('div');
-            labelTime.setAttribute('class', 'form-group mb-1');
-            labelTime.setAttribute('id', 'label3')
-            labelTime.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('delayFetch') + '</label>'
-            selectedTop.after(labelTime);
-
+            }
+            
             document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
             document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterName');
 //             document.querySelector("#nick").required = true
@@ -2393,218 +2388,52 @@ selectedTop.addEventListener("change", function() {
         } else if (selectedTop.value == 'TopGames' || selectedTop.value == 'ServeurPrive') {
 //             document.querySelector("#nick").required = false
 
-            let countVote = document.createElement('input');
-            countVote.required = true;
-            countVote.id = 'countVote'
-            countVote.name = 'countVote'
-            countVote.type = 'number'
-            countVote.min = 1
-            countVote.max = 16
-            countVote.placeholder = chrome.i18n.getMessage('countVote')
-            countVote.value = 5;
-            selectedTop.nextElementSibling.after(countVote);
-
-            let labelCountVote = document.createElement('div');
-            labelCountVote.className = 'form-group mb-1'
-            labelCountVote.id = 'label1'
-            labelCountVote.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('countVote') + '</label>'
-            selectedTop.nextElementSibling.after(labelCountVote);
-
-            let selectLang = document.createElement('select')
-            selectLang.required = true
-            selectLang.id = 'selectLang'
-            selectLang.className = 'mb-2'
-            for (var i = 0; i < 6; i++) {
-                let option = document.createElement('option')
-                if (selectedTop.value == 'ServeurPrive') {
-                    switch (i) {
-                      case 1:
-                        option.value = 'en'
-                        option.innerHTML = 'English'
-                        selectLang.appendChild(option)
-                        break;
-                      case 3:
-                        option.value = 'fr'
-                        option.innerHTML = 'Français'
-                        selectLang.appendChild(option)
-                        break;
-                      default:
-
-                    }
-                    selectLang.selectedIndex = 1
-                } else {
-                    switch (i) {
-                      case 0:
-                        option.value = 'de'
-                        option.innerHTML = 'Deutsch'
-                        selectLang.appendChild(option)
-                        break;
-                      case 1:
-                        option.value = 'en'
-                        option.innerHTML = 'English'
-                        selectLang.appendChild(option)
-                        break;
-                      case 2:
-                        option.value = 'es'
-                        option.innerHTML = 'Español'
-                        selectLang.appendChild(option)
-                        break;
-                      case 3:
-                        option.value = 'fr'
-                        option.innerHTML = 'Français'
-                        selectLang.appendChild(option)
-                        break;
-                      case 4:
-                        option.value = 'pt'
-                        option.innerHTML = 'Português'
-                        selectLang.appendChild(option)
-                        break;
-                      case 5:
-                        option.value = 'ru'
-                        option.innerHTML = 'Русский'
-                        selectLang.appendChild(option)
-                        break;
-                      default:
-
-                    }
-                    selectLang.selectedIndex = 3
-                }
-            }
-            selectedTop.nextElementSibling.after(selectLang)
-
-            let labelLang = document.createElement('div')
-            labelLang.className = 'form-group mb-1'
-            labelLang.id = 'label2'
-            labelLang.innerHTML = '<label for="nick">' + chrome.i18n.getMessage('chooseLang') + '</label>'
-            selectedTop.nextElementSibling.after(labelLang)
-
-            let chooseGame = document.createElement('input')
-            chooseGame.className = 'mb-2'
-            chooseGame.name = 'chooseGame'
-            chooseGame.required = true
-            chooseGame.type = 'text'
-            chooseGame.id = 'chooseGame'
-            chooseGame.placeholder = chrome.i18n.getMessage('chooseGame')
-            chooseGame.value = 'minecraft'
-            chooseGame.setAttribute('list', 'gameList')
-            selectedTop.nextElementSibling.after(chooseGame)
-
-            let gameList = document.createElement('datalist')
-            gameList.id = 'gameList'
-            let option = document.createElement('option')
+            document.getElementById('countVote').removeAttribute('style')
+            document.getElementById('countVote').required = true
+            document.getElementById('label5').removeAttribute('style')
             if (selectedTop.value == 'ServeurPrive') {
-                option.value = 'minecraft'
-                option.innerHTML = 'Minecraft'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'discord'
-                option.innerHTML = 'Discord'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'grand-theft-auto'
-                option.innerHTML = 'Grand Theft Auto V'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'ark-survival-evolved'
-                option.innerHTML = 'Ark : Survival Evolved'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'rust'
-                option.innerHTML = 'Rust'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'hytale'
-                option.innerHTML = 'Hytale'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'minecraft-bedrock'
-                option.innerHTML = 'Minecraft Bedrock'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'ark'
-                option.innerHTML = 'ARK'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'garrys-mod'
-                option.innerHTML = "Garry's Mod"
-                gameList.appendChild(option)
-
+                document.getElementById('selectLang2').removeAttribute('style')
+                document.getElementById('selectLang2').required = true
+                document.getElementById('gameList2').removeAttribute('style')
+                document.getElementById('chooseGame2').removeAttribute('style')
+                document.getElementById('chooseGame2').required = true
             } else {
-                option.value = 'minecraft'
-                option.innerHTML = 'Minecraft'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'garrys-mod'
-                option.innerHTML = "Garry's mod"
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'discord'
-                option.innerHTML = 'Discord'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'roblox'
-                option.innerHTML = 'Roblox'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'rdr'
-                option.innerHTML = 'Red Dead Redemption 2'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'hytale'
-                option.innerHTML = 'Hytale'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'terraria'
-                option.innerHTML = 'Terraria'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'ark'
-                option.innerHTML = 'ARK'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'dayz'
-                option.innerHTML = 'Dayz'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'l4d2'
-                option.innerHTML = 'Left 4 Dead 2'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'rust'
-                option.innerHTML = 'Rust'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'gta'
-                option.innerHTML = 'GTA 5'
-                gameList.appendChild(option)
-                option = document.createElement('option')
-                option.value = 'discord'
-                option.innerHTML = 'Discord'
-                gameList.appendChild(option)
+                document.getElementById('selectLang1').removeAttribute('style')
+                document.getElementById('selectLang1').required = true
+                document.getElementById('gameList1').removeAttribute('style')
+                document.getElementById('chooseGame1').removeAttribute('style')
+                document.getElementById('chooseGame1').required = true
             }
-            selectedTop.nextElementSibling.after(gameList)
-
-            let divGame = document.createElement('div')
-            divGame.id = 'idGame'
-            divGame.className = 'form-group mb-1'
-            let labelGame = document.createElement('label')
-            labelGame.setAttribute('for', 'idGame')
-            labelGame.innerHTML = chrome.i18n.getMessage('idGame')
-            let spanGame = document.createElement('span')
-            spanGame.className = 'tooltip1'
+            document.getElementById('label4').removeAttribute('style')
+            document.getElementById('idGame').removeAttribute('style')
+            let spanGame = document.getElementById('spanGame')
             if (selectedTop.value == 'ServeurPrive') {
                 spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip', 'https://serveur-prive.net/<span style="color:#d32f2f;">minecraft</span>/gommehd-net-4932') + ' </span>'
             } else {
                 spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip', 'https://top-serveurs.net/<span style="color:#d32f2f;">minecraft</span>/hailcraft') + ' </span>'
             }
-            divGame.appendChild(labelGame)
-            divGame.innerHTML = divGame.innerHTML + ' '
-            divGame.appendChild(spanGame)
-            selectedTop.nextElementSibling.after(divGame)
         }
     }
     laterChoose = selectedTop.value
-});
+})
+
+//Слушатель на выбор типа timeout для Custom
+document.getElementById('selectTime').addEventListener('change', function() {
+    if (this.value == 'ms') {
+        document.getElementById('label3').removeAttribute('style')
+        document.getElementById('time').removeAttribute('style')
+        document.getElementById('time').required = true
+        document.getElementById('label7').style.display = 'none'
+        document.getElementById('hour').style.display = 'none'
+    } else {
+        document.getElementById('label7').removeAttribute('style')
+        document.getElementById('hour').removeAttribute('style')
+        document.getElementById('label3').style.display = 'none'
+        document.getElementById('time').style.display = 'none'
+        document.getElementById('time').required = false
+
+    }
+})
 
 async function removeCookie(url, name) {
 	return new Promise(resolve => {
@@ -2618,6 +2447,9 @@ async function removeCookie(url, name) {
 let elements = document.querySelectorAll('[data-resource]')
 elements.forEach(function(el) {
     el.innerHTML = el.innerHTML + chrome.i18n.getMessage(el.getAttribute('data-resource'))
+})
+document.querySelectorAll('[placeholder]').forEach(function(el) {
+    el.placeholder = chrome.i18n.getMessage(el.placeholder)
 })
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'));
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
