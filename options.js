@@ -1745,6 +1745,8 @@ selectedTop.addEventListener("change", function() {
         document.getElementById('chooseGame2').required = false
         document.getElementById('idGame').style.display = 'none'
         document.getElementById('selectTime').style.display = 'none'
+        document.getElementById('label7').style.display = 'none'
+        document.getElementById('hour').style.display = 'none'
 
         if (selectedTop.value == 'Custom') {
             idSelector.innerHTML = '';
