@@ -323,7 +323,7 @@ async function addProjectList(project, visually) {
     //Слушатель кнопки Статистики и вывод её в модалку
     document.getElementById('stats┄' + id).addEventListener('click', function() {
         document.getElementById('modalStats').click()
-        document.getElementById('statsSubtitle').textContent = getProjectName(project) + ' – ' + project.nick + ' – ' + (project.Custom ? '' : (project.name != null ? project.name : project.id))
+        document.getElementById('statsSubtitle').textContent = getProjectName(project) + ' – ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + (project.name != null ? project.name : project.id))
         document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes ? project.stats.successVotes : 0
         document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes ? project.stats.monthSuccessVotes : 0
         document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.lastMonthSuccessVotes ? project.stats.lastMonthSuccessVotes : 0
