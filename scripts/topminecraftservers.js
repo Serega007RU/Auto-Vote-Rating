@@ -1,4 +1,4 @@
-vote();
+vote()
 function vote () {
 	chrome.storage.local.get('AVMRprojectsTopMinecraftServers', function(result) {
 		try {
@@ -19,10 +19,16 @@ function vote () {
 		            sendMessage(document.querySelector("body > div.container > div > div > div > div.col-md-4 > button").textContent);
 		        }
 		    } else {
-	            let nick = getNickName(result.AVMRprojectsTopMinecraftServers);
-	            if (nick == null || nick == "") return;
-	            document.querySelector("#username").value = nick;
-	            setTimeout(() => document.querySelector("#voteButton").click(), 10000);
+				//Ожидание загрузки reCATPCHA
+				this.check = setTimeout(()=> {
+					if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
+						clearInterval(this.check)
+						let nick = getNickName(result.AVMRprojectsTopMinecraftServers);
+	                    if (nick == null || nick == "") return;
+	                    document.querySelector("#username").value = nick;
+	                    document.querySelector("#voteButton").click()
+					}
+				}, 1000)
 		    }
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
