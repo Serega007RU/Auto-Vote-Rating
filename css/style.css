@@ -684,7 +684,7 @@ ul li:hover {
   background: #d32f2f;
 }
 
-.statsProject:hover, .stats td {
+.statsProject:hover {
   background: #1A7BEE;
 }
 
@@ -706,6 +706,11 @@ ul li:hover {
 .listcontent li:nth-of-type(odd) {
   background: rgba(42, 42, 47, 0.6);
 }
+
+.stats td {
+  color: #1A7BEE;
+}
+
 
 .stats th {
   text-align: right;
