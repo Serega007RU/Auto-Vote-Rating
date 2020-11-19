@@ -590,5 +590,17 @@
   },
   "generalStats": {
     "message": "General statistics"
+  },
+  "selectTime": {
+    "message": "Choose which timeout to use"
+  },
+  "timeoutMS": {
+    "message": "In MS since the last vote"
+  },
+  "timeoutHour": {
+    "message": "Every day after the specified hour"
+  },
+  "chooseHour": {
+    "message": "Choose after what hour"
   }
 }

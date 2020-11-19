@@ -127,10 +127,46 @@
 								<option value="TopGames">Top-Games.net or Top-Serveurs.net</option>
 							</select>
                             <!--Custom-->
+							<div style="display: none;" id="label6" class="form-group mb-1">
+							    <label data-resource="selectTime"></label>
+							</div>
+                            <select style="display: none;" required id="selectTime" class="mb-2">
+                                <option value="ms" data-resource="timeoutMS"></option>
+                                <option value="hour" data-resource="timeoutHour"></option>
+                            </select>
 							<div style="display: none;" id="label3" class="form-group mb-1">
 							    <label for="nick" data-resource="delayFetch"></label>
 							</div>
                             <input style="display: none;" id="time" name="customTime" placeholder="delayFetch" type="number" min="10000" class="mb-2" style="display: none;"></input>
+							<div style="display: none;" id="label7" class="form-group mb-1">
+							    <label for="nick" data-resource="chooseHour"></label>
+							</div>
+                            <select style="display: none;" required id="hour" class="mb-2">
+                                <option value="0">00</option>
+                                <option value="1">01</option>
+                                <option value="2">02</option>
+                                <option value="3">03</option>
+                                <option value="4">04</option>
+                                <option value="5">05</option>
+                                <option value="6">06</option>
+                                <option value="7">07</option>
+                                <option value="8">08</option>
+                                <option value="9">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                            </select>
 							<div style="display: none;" id="label2" class="form-group mb-1">
 							    <label for="nick" data-resource="urlFetch"></label>
 							</div>

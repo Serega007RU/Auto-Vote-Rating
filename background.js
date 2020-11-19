@@ -1192,11 +1192,11 @@ async function endVote(message, sender, project) {
 				time.setUTCHours(time.getUTCHours() + 11);
 				time.setUTCMinutes(time.getUTCMinutes() + 7);
 			} else if (project.Custom) {
-				if (project.nick.includes('DiscordOrganicaDaily')) {
-					if (time.getUTCHours() > 0 || (time.getUTCHours() == 0 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
-						time.setUTCDate(time.getUTCDate() + 1)
+				if (project.timeoutHour) {
+					if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= (project.priority ? 0 : 10))) {
+						time.setDate(time.getDate() + 1)
 					}
-					time.setUTCHours(0, (project.priority ? 0 : 10), 0, 0)
+					time.setHours(project.timeoutHour, (project.priority ? 0 : 10), 0, 0)
 				} else {
 					time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
 				}

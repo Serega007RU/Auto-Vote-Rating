@@ -34,7 +34,7 @@ var randomizeOption = false;
 var returnAdd;
 
 //Конструктор проекта
-function Project(top, nick, id, time, responseURL, priority) {
+function Project(top, nick, id, time, responseURL, hour, priority) {
     if (top == "TopCraft") this.TopCraft = true;
     if (top == "McTOP") this.McTOP = true;
     if (top == "MCRate") this.MCRate = true;
@@ -57,7 +57,11 @@ function Project(top, nick, id, time, responseURL, priority) {
     if (top == "TopGames") this.TopGames = true;
     if (top == "Custom") {
         this.Custom = true;
-        this.timeout = parseInt(time);
+        if (time) {
+            this.timeout = parseInt(time)
+        } else {
+            this.timeoutHour = parseInt(hour)
+        }
         this.time = null;
         this.nick = nick;
         this.id = id;
@@ -467,9 +471,9 @@ function updateProjectList() {
 document.getElementById('addProject').addEventListener('submit', () => {
     event.preventDefault();
     if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, document.getElementById('time').value, document.getElementById('responseURL').value, priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('selectTime').value == 'ms' ? document.getElementById('time').value : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? null : document.getElementById('hour').value), priorityOption, null);
     } else {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, null, priorityOption, null);
     }
 });
 
@@ -479,7 +483,7 @@ document.getElementById('timeout').addEventListener('submit', () => {
     setCoolDown();
 });
 
-async function addProject(choice, nick, id, time, response, priorityOpt, element) {
+async function addProject(choice, nick, id, time, response, hour, priorityOpt, element) {
     updateStatusAdd('<div>' + chrome.i18n.getMessage('adding') + '</div>', true, element);
     let project;
     if (choice == 'Custom') {
@@ -490,9 +494,9 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
             updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element);
             return;
         }
-        project = new Project(choice, nick, body, time, response, priorityOpt);
+        project = new Project(choice, nick, body, time, response, hour, priorityOpt);
     } else {
-        project = new Project(choice, nick, id, null, null, priorityOpt);
+        project = new Project(choice, nick, id, null, null, null, priorityOpt);
     }
 
     if (randomizeOption) {
@@ -753,7 +757,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
                         });
                     } else {
                         openPoput(url2, function () {
-                            addProject(choice, nick, id, time, response, priorityOpt, element);
+                            addProject(choice, nick, id, time, response, hour, priorityOpt, element);
                         });
                     }
                 });
@@ -804,18 +808,18 @@ function addProjectsBonus(project) {
                 updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('redirectedSecondBonus', response.url) +'</div>', true, element);
                 return;
             }
-            await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus2Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=2&item=2","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus3Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=3&item=4","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus4Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=4&item=7","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus5Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=5&item=9","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus6Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=6&item=11","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonusMith', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"type=1&bonus=1&value=5","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus2Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=2&item=2","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus3Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=3&item=4","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus4Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=4&item=7","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus5Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=5&item=9","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus6Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=6&item=11","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonusMith', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"type=1&bonus=1&value=5","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
         });
     } else if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async () => {
-            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/","referrerPolicy":"no-referrer-when-downgrade","body":"give_daily_posted=1&token=%7Btoken%7D&return=%252F","method":"POST","mode":"cors"}', 86400000, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', priorityOption, null);
-            //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', 604800000, 'https://victorycraft.ru/?do=cabinet&loc=vote', priorityOption, null);
+            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/","referrerPolicy":"no-referrer-when-downgrade","body":"give_daily_posted=1&token=%7Btoken%7D&return=%252F","method":"POST","mode":"cors"}', 86400000, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', null, priorityOption, null);
+            //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', 604800000, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null);
         });
     }
 }
@@ -1406,7 +1410,7 @@ function getUrlProjects() {
             element[key] = value;
             i++;
             if (i == 3) {
-                vars.push(new Project(element.top, element.nick, element.id, null, null, false));
+                vars.push(new Project(element.top, element.nick, element.id, null, null, null, false));
                 i = 0;
                 element = {};
             }
@@ -1437,7 +1441,7 @@ async function fastAdd() {
             html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id);
             html.innerHTML = '<span style="color:#f44336;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>'+getProjectName(fastProj) + " – " + fastProj.nick + " – " + fastProj.id;
             listFastAdd.before(html);
-            await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, false, html);
+            await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, null, false, html);
         }
         if (vars['disableNotifInfo'] != null) {
             if (settings.disabledNotifInfo != Boolean(vars['disableNotifInfo'])) {
@@ -1723,8 +1727,10 @@ selectedTop.addEventListener("change", function() {
         document.getElementById('label3').style.display = 'none'
         document.getElementById('label4').style.display = 'none'
         document.getElementById('label5').style.display = 'none'
+        document.getElementById('label6').style.display = 'none'
         document.getElementById('responseURL').style.display = 'none'
         document.getElementById('time').style.display = 'none'
+        document.getElementById('time').required = false
         document.getElementById('countVote').style.display = 'none'
         document.getElementById('countVote').required = false
         document.getElementById('selectLang1').style.display = 'none'
@@ -1738,17 +1744,32 @@ selectedTop.addEventListener("change", function() {
         document.getElementById('chooseGame2').style.display = 'none'
         document.getElementById('chooseGame2').required = false
         document.getElementById('idGame').style.display = 'none'
+        document.getElementById('selectTime').style.display = 'none'
 
         if (selectedTop.value == 'Custom') {
             idSelector.innerHTML = '';
             idSelector.setAttribute('style', 'height: 0px;')
             
+            document.getElementById('label6').removeAttribute('style')
+            document.getElementById('selectTime').removeAttribute('style')
             document.getElementById('customBody').removeAttribute('style')
             document.getElementById('label1').removeAttribute('style')
             document.getElementById('label2').removeAttribute('style')
-            document.getElementById('label3').removeAttribute('style')
             document.getElementById('responseURL').removeAttribute('style')
-            document.getElementById('time').removeAttribute('style')
+            if (document.getElementById('selectTime').value == 'ms') {
+                document.getElementById('label3').removeAttribute('style')
+                document.getElementById('time').removeAttribute('style')
+                document.getElementById('time').required = true
+                document.getElementById('label7').style.display = 'none'
+                document.getElementById('hour').style.display = 'none'
+            } else {
+                document.getElementById('label7').removeAttribute('style')
+                document.getElementById('hour').removeAttribute('style')
+                document.getElementById('label3').style.display = 'none'
+                document.getElementById('time').style.display = 'none'
+                document.getElementById('time').required = false
+
+            }
             
             document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
             document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterName');
@@ -1785,7 +1806,25 @@ selectedTop.addEventListener("change", function() {
         }
     }
     laterChoose = selectedTop.value
-});
+})
+
+//Слушатель на выбор типа timeout для Custom
+document.getElementById('selectTime').addEventListener('change', function() {
+    if (this.value == 'ms') {
+        document.getElementById('label3').removeAttribute('style')
+        document.getElementById('time').removeAttribute('style')
+        document.getElementById('time').required = true
+        document.getElementById('label7').style.display = 'none'
+        document.getElementById('hour').style.display = 'none'
+    } else {
+        document.getElementById('label7').removeAttribute('style')
+        document.getElementById('hour').removeAttribute('style')
+        document.getElementById('label3').style.display = 'none'
+        document.getElementById('time').style.display = 'none'
+        document.getElementById('time').required = false
+
+    }
+})
 
 //Локализация
 let elements = document.querySelectorAll('[data-resource]')
