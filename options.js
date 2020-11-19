@@ -506,8 +506,13 @@ async function addProject(choice, nick, id, time, response, hour, priorityOpt, e
     if (project.TopGames || project.ServeurPrive) {
         project.maxCountVote = document.querySelector("#countVote").valueAsNumber
         project.countVote = 0;
-        project.lang = document.querySelector("#selectLang").value
-        project.game = document.querySelector("#chooseGame").value
+        if (project.ServeurPrive) {
+            project.lang = document.querySelector("#selectLang2").value
+            project.game = document.querySelector("#chooseGame2").value
+        } else {
+            project.lang = document.querySelector("#selectLang1").value
+            project.game = document.querySelector("#chooseGame1").value
+        }
     }
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
