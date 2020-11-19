@@ -2201,6 +2201,9 @@ document.getElementById('addedTab2').addEventListener('click', function() {
 document.getElementById('multivoteTab2').addEventListener('click', function() {
     tabSelect(event, 'multivote');
 });
+document.getElementById('helpTab2').addEventListener('click', function() {
+    tabSelect(event, 'help');
+})
 
 
 //Переключение между списками добавленных проектов
