@@ -595,7 +595,7 @@ async function addProject(choice, nick, id, time, response, priorityOpt, element
         }
         if (project.PlanetMinecraft) {
             url = 'https://www.planetminecraft.com/server/' + project.id + '/';
-            jsPath = "#resource_object > div.server > table > tbody > tr:nth-child(5) > td:nth-child(2) > form > input";
+            jsPath = "#resource-title-text";
         }
         if (project.TopG) {
             url = 'https://topg.org/ru/Minecraft/server-' + project.id;
