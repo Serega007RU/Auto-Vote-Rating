@@ -8,59 +8,7 @@
 	<link rel="stylesheet" href="css/bootstrap.css"> 
 </head>
 <body>
-	<div class="anelumen lowingnuska" id="addFastProject">
-		<a href="" class="nedismiseg"></a>
-		<figure>
-			<h2 data-resource="fastAdd"><a href="" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
-			<div class="modalContent">
-				<div data-resource="load" id=modaltext></div>
-			</div>
-		</figure>
-	</div>
-	<div class="anelumen lowingnuska" id="stats">
-	    <a href="#/" class="nedismiseg" id="closeStats"></a>
-		<a id="modalStats" href="#stats"></a>
-		<figure>
-			<h2>
-			    <span data-resource="stats"></span>
-			    <div id="statsSubtitle">&nbsp;</div>
-			    <a href="#/" class="compatibg-ukastywise" id="closeStats2" aria-label="Close Modal Box">×</a>
-			</h2>
 
-            <div class="modalContent stats">
-                <table>
-                    <tr>
-                        <td data-resource="statsSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsMonthSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastMonthSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLaterVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsErrorVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastSuccessVote"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastAttemptVote"></td>
-                        <th></th>
-                    </tr>
-                </table>
-            </div>
-		</figure>
-	</div>
 
 	<input type="checkbox" id="hmt" class="hidden-menu-ticker">
 	<span class="btn-menu-back"></span>
@@ -237,7 +185,7 @@
 							<label data-resource="cooldown" for="cooldown"></label>
 						</div>
 						<form id="timeout">
-							<input name="cooldown" id="cooldown" required type="number" min="1000" class="mb-2">
+							<input name="cooldown" id="cooldown" required type="number" min="1000" max="43200000" class="mb-2">
 							<div id="submit2" class="mt-3 mb-2">
 								<button data-resource="setCooldown" type="submit" class="w-50" style="display: inline;"></button>
 							</div>
@@ -371,7 +319,61 @@
 		    </audio>
 			<div id="save">&nbsp;</div>
 		</div>
-	</div>	
+	</div>
+
+	<div class="anelumen lowingnuska" id="addFastProject">
+		<a href="" class="nedismiseg"></a>
+		<figure>
+			<h2 data-resource="fastAdd"><a href="" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
+			<div class="modalContent">
+				<div data-resource="load" id=modaltext></div>
+			</div>
+		</figure>
+	</div>
+	<div class="anelumen lowingnuska" id="stats">
+	    <a href="#/" class="nedismiseg" id="closeStats"></a>
+		<a id="modalStats" href="#stats"></a>
+		<figure>
+			<h2>
+			    <span data-resource="stats"></span>
+			    <div id="statsSubtitle">&nbsp;</div>
+			    <a href="#/" class="compatibg-ukastywise" id="closeStats2" aria-label="Close Modal Box">×</a>
+			</h2>
+
+            <div class="modalContent stats">
+                <table>
+                    <tr>
+                        <td data-resource="statsSuccessVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsMonthSuccessVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLastMonthSuccessVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLaterVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsErrorVotes"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLastSuccessVote"></td>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td data-resource="statsLastAttemptVote"></td>
+                        <th></th>
+                    </tr>
+                </table>
+            </div>
+		</figure>
+	</div>
 
 	<script src="options.js"></script>
 </body>

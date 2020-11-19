@@ -1712,23 +1712,23 @@ selectedTop.addEventListener("change", function() {
     }
     
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames') {
-            document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('yourNick');
-            document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterNick');
+        document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('yourNick');
+        document.querySelector("#nick").placeholder = chrome.i18n.getMessage('enterNick');
 
-            idSelector.removeAttribute('style');
+        idSelector.removeAttribute('style');
 
-            if (document.getElementById('customBody') != null) document.getElementById('customBody').remove()
-            if (document.getElementById('label1') != null) document.getElementById('label1').remove()
-            if (document.getElementById('label2') != null) document.getElementById('label2').remove()
-            if (document.getElementById('label3') != null) document.getElementById('label3').remove()
-            if (document.getElementById('responseURL') != null) document.getElementById('responseURL').remove()
-            if (document.getElementById('time') != null) document.getElementById('time').remove()
-            if (document.getElementById('countVote') != null) document.getElementById('countVote').remove()
-            if (document.getElementById('selectLang') != null) document.getElementById('selectLang').remove()
-            if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
-            if (document.getElementById('chooseGame') != null) document.getElementById('chooseGame').remove()
-            if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
-            if (document.getElementById('idGame') != null) document.getElementById('idGame').remove()
+        if (document.getElementById('customBody') != null) document.getElementById('customBody').remove()
+        if (document.getElementById('label1') != null) document.getElementById('label1').remove()
+        if (document.getElementById('label2') != null) document.getElementById('label2').remove()
+        if (document.getElementById('label3') != null) document.getElementById('label3').remove()
+        if (document.getElementById('responseURL') != null) document.getElementById('responseURL').remove()
+        if (document.getElementById('time') != null) document.getElementById('time').remove()
+        if (document.getElementById('countVote') != null) document.getElementById('countVote').remove()
+        if (document.getElementById('selectLang') != null) document.getElementById('selectLang').remove()
+        if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
+        if (document.getElementById('chooseGame') != null) document.getElementById('chooseGame').remove()
+        if (document.getElementById('gameList') != null) document.getElementById('gameList').remove()
+        if (document.getElementById('idGame') != null) document.getElementById('idGame').remove()
 
         if (selectedTop.value == 'Custom') {
             idSelector.innerHTML = '';
