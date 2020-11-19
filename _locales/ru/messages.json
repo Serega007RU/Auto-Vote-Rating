@@ -546,7 +546,7 @@
     "message": "Установите расширение <a target='blank_' href='https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'>Privacy Pass</a> что б при первом прохождении капчи получить 5 бесплатных прохождении капч для hCaptcha"
   },
   "deleteAll": {
-    "message": "Удалить всё"
+    "message": "Удалить все прокси"
   },
   "clearCookies": {
     "message": "Удалить куки"
@@ -660,5 +660,32 @@
   },
   "chooseHour": {
     "message": "Выберите после какого часа"
+  },
+  "ip": {
+    "message": "IP"
+  },
+  "port": {
+    "message": "Порт"
+  },
+  "login": {
+    "message": "Логин"
+  },
+  "password": {
+    "message": "Пароль"
+  },
+  "ipLabel": {
+    "message": "Укажите адрес"
+  },
+  "portLabel": {
+    "message": "Укажите порт"
+  },
+  "loginLabel": {
+    "message": "Логин прокси (Не обязательно)"
+  },
+  "passwordLabel": {
+    "message": "Пароль прокси (Не обязательно)"
+  },
+  "typeLabel": {
+    "message": "Выберите протокол"
   }
 }

@@ -401,14 +401,16 @@
 			<div id="multivote" class="tabcontent" style="display: none;">
 				<h4 data-resource="multivote" align="center"></h4>
 				<hr color="#5A5A5C">
-
-				<input class="checkbox" id="useMultiVote" type="checkbox" name="checkbox" />
-				<label data-resource="useMultiVote" for="useMultiVote"></label>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				<input class="checkbox" id="repeatAttemptLater" type="checkbox" name="checkbox" />
-				<label data-resource="repeatAttemptLater" for="repeatAttemptLater"></label>
-				<br>
-				
+				<div class="row">
+					<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
+						<input class="checkbox" id="useMultiVote" type="checkbox" name="checkbox" />
+						<label data-resource="useMultiVote" for="useMultiVote"></label>
+					</div>
+					<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
+						<input class="checkbox" id="repeatAttemptLater" type="checkbox" name="checkbox" />
+						<label data-resource="repeatAttemptLater" for="repeatAttemptLater"></label>
+					</div>
+				</div>
 				<div class="row">
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
 						<button data-resource="VK" class="selectsite" id="VKButton"></button>
@@ -423,39 +425,69 @@
 					    
 					</div>
 					<div class="col-xl-12 mb-3">
-						<ul class="listcontent"id="VKTab" style="display: none;">
+						<ul class="listcontent" id="VKTab" style="display: none;">
 							<button class="addButton mt-0 mb-1" data-resource="addButton" id="AddVK"></button>
 							<button id="deleteAllVKCookies" data-resource="clearCookies" class="float-right"></button>
 							<span class="d-block" id="addVKdiv">&nbsp;</span>
 							<div id="VKList"></div>
 						</ul>
 						<ul class="listcontent" id="ProxyTab" style="display: none;">
-                            <form id="addProxy">
-                                <input name="ip" id="ip" required placeholder="ip">
-                                <input type="number" name="port" id="port" required placeholder="port">
-								<select id="proxyType" required>
-									<option data-resource="type" value="" selected disabled></option>
-									<option value="http">http</option>
-									<option value="https">https</option>
-									<option value="quic">quic</option>
-									<option value="socks4">socks4</option>
-									<option value="socks5">socks5</option>
-								</select>
-								<input type="text" name="login" id="login" placeholder="login">
-								<input type="password" name="password" id="password" placeholder="password">
-                                <button class="addButton" data-resource="addButton" id="submitAddProxy" type="submit"></button>
+                            <form id="addProxy" class="row">
+                            	<div class="col-xl-4 col-lg-6 col-md-12">
+                            		<div class="form-group mb-1">
+                            			<label data-resource="ipLabel" for="ip"></label>
+                            		</div>
+                            		<input name="ip" id="ip" class="mb-2" required placeholder="ip">
+                            	</div>
+                            	<div class="col-xl-4 col-lg-6 col-md-12">
+                            		<div class="form-group mb-1">
+                            			<label data-resource="portLabel" for="port"></label>
+                            		</div>
+                            		<input type="number" name="port" id="port" class="mb-2" required placeholder="port">
+                            	</div>
+                            	<div class="col-xl-4 col-lg-6 col-md-12">
+                            		<div class="form-group mb-1">
+                            			<label data-resource="typeLabel" for="proxyType"></label>
+                            		</div>
+                            		<select id="proxyType" class="mb-2" required>
+                            			<option data-resource="type" value="" selected disabled></option>
+                            			<option value="http">http</option>
+                            			<option value="https">https</option>
+                            			<option value="quic">quic</option>
+                            			<option value="socks4">socks4</option>
+                            			<option value="socks5">socks5</option>
+                            		</select>
+                            	</div>
+                            	<div class="col-xl-4 col-lg-6 col-md-12">
+                            		<div class="form-group mb-1">
+                            			<label data-resource="loginLabel" for="login"></label>
+                            		</div>
+                            		<input type="text" name="login" id="login" class="mb-2" placeholder="login">
+                            	</div>
+                            	<div class="col-xl-4 col-lg-6 col-md-12">
+                            		<div class="form-group mb-1">
+                            			<label data-resource="passwordLabel" for="password"></label>
+                            		</div>
+                            		<input type="password" name="password" id="password" class="mb-2" placeholder="password">
+                            	</div>
+                            	<div class="col-xl-4 col-lg-6 col-md-12 addProxyDiv">
+                            		<button class="addButton w-100" data-resource="addButton" id="submitAddProxy" type="submit"></button>
+                            	</div>
+                            	<div class="col-xl-4 col-lg-6 col-md-12">
+                            		<label class="addButton mutiVoteButton mb-2" data-resource="importProxy" for="importProxy"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /></svg></label>
+                            	<input id="importProxy" type="file" accept=".txt">
+                            	</div>
+                            	<div class="col-xl-4 col-lg-6 col-md-12">
+                            		<button class="mutiVoteButton mb-2" id="importTunnelBear" data-resource="importTunnelBear"></button>
+                            	</div>
+                            	<div class="col-xl-4 col-lg-6 col-md-12">
+                            		<button class="mutiVoteButton mb-2" id="importWindscribe" data-resource="importWindscribe"></button>
+                            	</div>
+                            	<div class="col-xl-4 col-lg-6 col-md-12">
+                            		<button class="mutiVoteButton mb-2" id="deleteAllProxies" data-resource="deleteAll"></button>
+                            	</div>
                             </form>
-                            <span class="d-block">
-                            	<label class="addButton mt-0" data-resource="importProxy" for="importProxy">
-                            		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-									<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /> </svg>
-                            	</label>
-                            	<button style="background: #1A7BEE !important;" id="importTunnelBear" data-resource="importTunnelBear"></button>
-                            	<button style="background: #1A7BEE !important;" id="importWindscribe" data-resource="importWindscribe"></button>
-                            	<input id="importProxy" type="file" accept=".txt"/>
-                            	<button id="deleteAllProxies" data-resource="deleteAll" class="float-right" style="margin-top: -9px;"></button>
-							</span>	
-                            <span class="d-block mt-3" id="addProxydiv">&nbsp;</span>
+                            <div class="mt-3" id="addProxydiv">&nbsp;</div>
                             <div id="ProxyList"></div>
                         </ul>
 						<!--<ul class="listcontent" id="IonMcTab" style="display: none;">

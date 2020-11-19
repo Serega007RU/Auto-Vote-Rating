@@ -81,7 +81,6 @@ select {
 
 select, input, textarea {
   width: 100%;
-  /* display: block; */
   background-color: #2A2A2F;
   border: none;
   border-radius: 3px;
@@ -116,7 +115,7 @@ button[type="submit"], .retryFastAdd, #generalStats {
   border: none;
 }
 
-button[type="submit"]:hover, #generalStats:hover {
+button[type="submit"]:hover, #generalStats:hover, .closeSettings:hover {
   opacity: 0.85;
 }
 
@@ -151,18 +150,6 @@ button[type="submit"]:focus, #generalStats:focus {
   opacity: 0.85;
 }
 
-#ip, #login, #password {
-  width: 20%;
-}
-
-#port {
-  width: 10%;
-}
-
-#proxyType {
-  width: 15%;
-}
-
 select:focus, input:focus {
   border-bottom: solid 2px #1A7BEE;
   outline: 0;
@@ -195,10 +182,6 @@ p, form, label, details {
   border-radius: 3px;
 }
 
-.closeSettings:hover {
-  background: #d32f2f;
-}
-
 .retryFastAdd:hover {
   background: #1565C0;
 }
@@ -206,7 +189,6 @@ p, form, label, details {
 .listcontent button:hover {
   opacity: 0.85;
 }
-
 
 .listcontent button:focus {
   outline: 0;
@@ -427,10 +409,26 @@ p, form, label, details {
   .tablinks {
     font-size: 19px;
     width: 100%;
-    border-radius: 3  px;
+    border-radius: 3px;
   }
   .btn-menu-back {
     display: block;
+  }
+}
+
+#submitAddProxy {
+  margin: 40px 0 0 0 !important;
+  display: block !important;
+}
+
+@media (max-width: 991px) {
+  #submitAddProxy {
+    margin: 1rem 0 !important;
+    padding-bottom: 10px;
+  }
+
+  .addProxyDiv {
+    border-bottom: 1px solid rgb(171, 164, 164);
   }
 }
 
@@ -702,7 +700,7 @@ figure svg {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: transparent transparent black transparent;
+  border-color: transparent transparent #000 transparent;
 }
 
 .tooltip2:hover .tooltip2text {
@@ -736,8 +734,8 @@ ul li:hover {
   cursor: pointer;
 }
 
-.deleteProject:hover {
-  background: #d32f2f;
+.deleteProject:hover, #deleteAllProxies {
+  background: #d32f2f !important;
 }
 
 .statsProject:hover {
@@ -806,4 +804,12 @@ ul li:hover {
 
 .multiVoteList {
   min-height: 78px;
+}
+
+.mutiVoteButton {
+  background: #1A7BEE !important;
+  display: block !important;
+  margin: 1rem 0 !important;
+  width: 100%;
+  text-align: center !important;
 }

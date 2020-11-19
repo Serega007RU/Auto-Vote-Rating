@@ -686,5 +686,32 @@
   },
   "chooseHour": {
     "message": "Choose after what hour"
+  },
+  "ip": {
+    "message": "IP"
+  },
+  "port": {
+    "message": "Port"
+  },
+  "login": {
+    "message": "Login"
+  },
+  "password": {
+    "message": "Password"
+  },
+  "ipLabel": {
+    "message": "Specify the IP"
+  },
+  "portLabel": {
+    "message": "Specified port"
+  },
+  "loginLabel": {
+    "message": "Proxy login (Optional)"
+  },
+  "passwordLabel": {
+    "message": "Proxy password (Optional)"
+  },
+  "typeLabel": {
+    "message": "Selected protocol"
   }
 }
