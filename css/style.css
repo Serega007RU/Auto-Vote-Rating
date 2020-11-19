@@ -667,7 +667,7 @@ figure svg {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border: transparent transparent #000 transparent;
+  border-color: transparent transparent black transparent;
 }
 
 .tooltip2:hover .tooltip2text {

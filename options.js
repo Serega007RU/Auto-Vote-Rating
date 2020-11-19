@@ -1806,9 +1806,9 @@ selectedTop.addEventListener("change", function() {
             document.getElementById('idGame').removeAttribute('style')
             let spanGame = document.getElementById('spanGame')
             if (selectedTop.value == 'ServeurPrive') {
-                spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip', 'https://serveur-prive.net/<span style="color:#d32f2f;">minecraft</span>/gommehd-net-4932') + ' </span>'
+                spanGame.innerHTML = '<span ' + chrome.i18n.getMessage('gameIDTooltip', 'https://serveur-prive.net/<span style="color:#d32f2f;">minecraft</span>/gommehd-net-4932') + ' </span>'
             } else {
-                spanGame.innerHTML = '<span class="tooltip1text"> ' + chrome.i18n.getMessage('gameIDTooltip', 'https://top-serveurs.net/<span style="color:#d32f2f;">minecraft</span>/hailcraft') + ' </span>'
+                spanGame.innerHTML = '<span ' + chrome.i18n.getMessage('gameIDTooltip', 'https://top-serveurs.net/<span style="color:#d32f2f;">minecraft</span>/hailcraft') + ' </span>'
             }
         }
     }
