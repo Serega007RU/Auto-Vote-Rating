@@ -257,7 +257,7 @@ async function newWindow(project) {
     if (project.Custom) {
     	silentVoteMode = true;
     } else if (settings.enabledSilentVote) {
-    	if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
+    	if (project.TopCraft || project.McTOP || project.MCRate || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
     		silentVoteMode = true;
     	}
     }
