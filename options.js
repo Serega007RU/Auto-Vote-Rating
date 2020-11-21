@@ -88,7 +88,7 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
     this.cooldown = cooldown;
     this.useMultiVote = false;
     this.repeatAttemptLater = false
-    this.stopVote = 0
+    this.stopVote = 9000000000000000
 };
 
 // Restores select box and checkbox state using the preferences
@@ -264,7 +264,7 @@ async function restoreOptions() {
     //Если пользователь обновился с версии без MultiVote (special for settings)
     if (settings.stopVote == null) {
         updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
-        settings.stopVote = 0
+        settings.stopVote = 9000000000000000
         await setValue('AVMRsettings', settings, false)
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
         updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false)
@@ -331,7 +331,7 @@ async function restoreOptions() {
             document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#00d510')
             updateStatusSave('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('voteResumed') + '</div>', false)
         } else {
-            settings.stopVote = Date.now() + 86400000
+            settings.stopVote = 9000000000000000
             document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
             document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
 
@@ -1879,6 +1879,9 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     if (VKs == null || !(typeof VKs[Symbol.iterator] === 'function') || proxies == null || !(typeof proxies[Symbol.iterator] === 'function')) {
                         VKs = [];
                         proxies = [];
+                    }
+                    if (!settings.stopVote) {
+                        settings.stopVote = 9000000000000000
                     }
 
                     //Если пользователь обновился с версии 3.1.0
