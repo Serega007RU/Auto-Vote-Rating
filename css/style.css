@@ -653,10 +653,6 @@ figure svg {
   visibility: visible;
 }
 
-#idSelector {
-  height: 95px;
-}
-
 textarea {
   height: 250px;
 }
