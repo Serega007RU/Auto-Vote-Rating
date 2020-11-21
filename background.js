@@ -354,7 +354,8 @@ async function newWindow(project) {
 				console.error(chrome.i18n.getMessage('notFoundVK'));
 				if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('notFoundVKTitle'), chrome.i18n.getMessage('notFoundVK'));
 				await setValue('AVMRsettings', settings)
-				return;
+				await stopVote()
+				return
 			}
 		}
 
@@ -443,10 +444,11 @@ async function newWindow(project) {
 
 			//Если не удалось найти хотя бы одно свободное не заюзанное прокси то приостанавливает ВСЁ авто-голосование на 24 часа
 			if (!found) {
-				stopVote = Date.now() + 86400000
+				settings.stopVote = Date.now() + 86400000
 				console.error(chrome.i18n.getMessage('notFoundProxy'));
 				if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('notFoundProxyTitle'), chrome.i18n.getMessage('notFoundProxy'));
 				await setValue('AVMRsettings', settings)
+				await stopVote()
 				return;
 			}
         }
@@ -1582,21 +1584,7 @@ async function endVote(message, sender, project) {
 				currentProxy.notWorking = true;
 				await setValue('AVMRproxies', proxies);
 			}
-			if (debug) console.log('Произошла ошибка, отмена и очистка всего');
-			await clearProxy();
-			currentVK = null;
-			currentProxy = null;
-            queueProjects.clear();
-			for (let [key, value] of openedProjects.entries()) {
-				chrome.tabs.remove(key, function() {
-					if (chrome.runtime.lastError) {
-						console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
-						if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
-					}
-				});
-			}
-			controller.abort();
-            openedProjects.clear();
+            await stopVote()
 		} else if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
 			retryCoolDown = 300000;
 			sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
@@ -2144,12 +2132,30 @@ handler = function(n) {
 };
 chrome.webRequest.onBeforeSendHeaders.addListener(handler, {urls: ["*://www.serverpact.com/*", "*://www.minecraftiplist.com/*"]}, ["blocking", "requestHeaders"]);
 
+async function stopVote() {
+	if (debug) console.log('Отмена всех голосований и очистка всего');
+	await clearProxy();
+	currentVK = null;
+	currentProxy = null;
+    queueProjects.clear();
+	for (let [key, value] of openedProjects.entries()) {
+		chrome.tabs.remove(key, function() {
+			if (chrome.runtime.lastError) {
+				console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
+				if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
+			}
+		});
+	}
+	controller.abort();
+    openedProjects.clear();
+}
+
 //Если требуется авторизация для Прокси
 let errorProxy = {
 	ip: "",
 	count: 0
 }
-chrome.webRequest.onAuthRequired.addListener(function (details) {
+chrome.webRequest.onAuthRequired.addListener(async function (details) {
 	if (details.isProxy && currentProxy && currentProxy != null) {
 		if (errorProxy.ip != currentProxy.ip) {
 			errorProxy.count = 0
@@ -2178,10 +2184,11 @@ chrome.webRequest.onAuthRequired.addListener(function (details) {
 					}
 				})
 			} else {
-				stopVote = Date.now() + 86400000
+				settings.stopVote = Date.now() + 86400000
 				console.error('Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
 				if (!settings.disabledNotifError) sendNotification('Ошибка авторизации прокси', 'Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
-			    setValue('AVMRsettings', settings)
+			    await setValue('AVMRsettings', settings)
+			    await stopVote()
 			}
 		} else if (currentProxy.Windscribe) {
             console.log('Прокси Windscribe требует авторизацию, авторизовываюсь...')

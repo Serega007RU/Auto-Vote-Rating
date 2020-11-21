@@ -335,20 +335,7 @@ async function restoreOptions() {
             document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
             document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
 
-			await clearProxy();
-			chrome.extension.getBackgroundPage().currentVK = null;
-			chrome.extension.getBackgroundPage().currentProxy = null;
-            chrome.extension.getBackgroundPage().queueProjects.clear();
-			for (let [key, value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-				chrome.tabs.remove(key, function() {
-					if (chrome.runtime.lastError) {
-						console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
-						if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
-					}
-				});
-			}
-			chrome.extension.getBackgroundPage().controller.abort();
-            chrome.extension.getBackgroundPage().openedProjects.clear();
+            await chrome.extension.getBackgroundPage().stopVote()
             
             updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('voteSuspended') + '</div>', false)
         }
