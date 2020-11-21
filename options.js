@@ -1743,7 +1743,8 @@ document.getElementById('file-download').addEventListener('click', () => {
         projectsCustom,
         VKs,
         proxies,
-        settings
+        settings,
+        generalStats
     }
     var text = JSON.stringify(allSetting);
         blob = new Blob([text], { type: 'text/plain' }),
@@ -1851,6 +1852,7 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                     VKs = allSetting.VKs;
                     proxies = allSetting.proxies;
                     settings = allSetting.settings;
+                    generalStats = allSetting.generalStats
 
                     //Если пользователь обновился с версии 2.2.0
                     if (projectsPlanetMinecraft == null || !(typeof projectsPlanetMinecraft[Symbol.iterator] === 'function')) {
@@ -1915,9 +1917,13 @@ document.getElementById('file-upload').addEventListener('change', (evt) => {
                             proj.stats = {}
                         }, false)
                     }
+                    if (generalStats == null) {
+                        generalStats = {}
+                    }
 
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true);
                     await setValue('AVMRsettings', settings, false);
+                    await setValue('generalStats', generalStats, false)
                     await setValue('AVMRprojectsTopCraft', projectsTopCraft, false);
                     await setValue('AVMRprojectsMcTOP', projectsMcTOP, false);
                     await setValue('AVMRprojectsMCRate', projectsMCRate, false);
