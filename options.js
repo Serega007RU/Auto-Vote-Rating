@@ -1568,6 +1568,10 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             generalStats = storageChange.newValue
             return
         }
+        if (key == 'AVMRproxies' || key == 'AVMRVKs') {
+            updateProjectList(storageChange.newValue)
+            return
+        }
         if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function')) return;
         if (storageChange.oldValue.length == storageChange.newValue.length) {
             updateProjectList(storageChange.newValue);
