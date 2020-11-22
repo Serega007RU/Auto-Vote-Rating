@@ -396,15 +396,15 @@ async function silentVote(project) {
 			let response = await fetch("https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/")
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
+				endVote({errorAuthVK: true}, null, project);
 				return;
 			}
 			if (!host.includes('topcraft.')) {
-                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
                 return;
 			}
             let html = await response.text()
@@ -412,20 +412,20 @@ async function silentVote(project) {
 			let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
 			response = await fetch("https://topcraft.ru/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + csrftoken + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 			if (!extractHostname(response.url).includes('topcraft.')) {
-				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+				endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
 				return;
 			}
 			if (response.status == 400) {
 				html = await response.text()
 				doc = new DOMParser().parseFromString(html, "text/html")
 				console.warn('Текст ошибки 400: ' + doc.body.innerText)
-				endVote('later', null, project);
+				endVote({later: true}, null, project);
 				return;
 			} else if (!response.ok) {
-				endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+				endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
 				return;
 			}
-			endVote('successfully', null, project);
+			endVote({successfully: true}, null, project);
 			return
 	    }
 
@@ -433,15 +433,15 @@ async function silentVote(project) {
 			let response = await fetch("https://mctop.su/accounts/vk/login/?process=login&next=/servers/" + project.id + "/?voting=" + project.id + "/")
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
+				endVote({errorAuthVK: true}, null, project);
 				return;
 			}
 			if (!host.includes('mctop.')) {
-                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
                 return;
 			}
             let html = await response.text()
@@ -449,20 +449,20 @@ async function silentVote(project) {
 			let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
 			response = await fetch("https://mctop.su/projects/vote/", {credentials: 'include',"headers":{"content-type":"application/x-www-form-urlencoded; charset=UTF-8"},"body":"csrfmiddlewaretoken=" + csrftoken + "&project_id=" + project.id + "&nick=" + project.nick,"method":"POST"});
 			if (!extractHostname(response.url).includes('mctop.')) {
-				endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+				endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
 				return;
 			}
 			if (response.status == 400) {
 				html = await response.text()
 				doc = new DOMParser().parseFromString(html, "text/html")
 				console.warn('Текст ошибки 400: ' + doc.body.innerText)
-				endVote('later', null, project);
+				endVote({later: true}, null, project);
 				return;
 			} else if (!response.ok) {
-				endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+				endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
 				return;
 			}
-			endVote('successfully', null, project);
+			endVote({successfully: true}, null, project);
 			return
 	    }
 
@@ -470,15 +470,15 @@ async function silentVote(project) {
 			let response = await fetch("https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=" + project.id + "&response_type=code");
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
+				endVote({errorAuthVK: true}, null, project);
 				return;
 			}
 			if (!host.includes('mcrate.')) {
-                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
                 return;
 			}
             let html = await response.text()
@@ -492,22 +492,20 @@ async function silentVote(project) {
                 }));
 			    host = extractHostname(response.url);
 			    if (!host.includes('mcrate.')) {
-                    endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+                    endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
                     return;
 			    }
 			    if (!response.ok) {
-                    endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                    endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
                     return;
 			    }
             }
             if (doc.querySelector('div[class=report]') != null) {
-				let message;
 				if (doc.querySelector('div[class=report]').textContent.includes('Ваш голос засчитан')) {
-				    message = 'successfully';
+					endVote({successfully: true}, null, project)
 				} else {
-				    message = doc.querySelector('div[class=report]').textContent;
+				    endVote({message: doc.querySelector('div[class=report]').textContent}, null, project)
 				}
-				endVote(message, null, project);
 				return
 			} else if (doc.querySelector('span[class=count_hour]') != null) {//Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
                 //Берёт из скрипта переменную в которой хранится сколько осталось до следующего голосования
@@ -519,10 +517,10 @@ async function silentVote(project) {
 //				let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
 				//if (milliseconds == 0) return;
 //				let later = Date.now() - (86400000 - milliseconds);
-				endVote('later', null, project);
+				endVote({later: true}, null, project);
 				return
 			} else {
-			    endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project);
+			    endVote({errorVoteNoElement: true}, null, project);
 			    return
 			}
 	    }
@@ -531,15 +529,15 @@ async function silentVote(project) {
 			let response = await fetch("https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/" + project.id + "/&state=" + project.nick + "&response_type=code&v=5.45");
 			let host = extractHostname(response.url);
 			if (host.includes('vk.')) {
-				endVote(chrome.i18n.getMessage('errorAuthVK'), null, project);
+				endVote({errorAuthVK: true}, null, project);
 				return;
 			}
 			if (!host.includes('minecraftrating.')) {
-                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
                 return;
 			}
 			let html = await response.text();
@@ -571,22 +569,22 @@ async function silentVote(project) {
 //						count++;
 //					}
 //					let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000;
-					endVote('later', null, project);
+					endVote({later: true}, null, project);
 					return
 				} else {
-					endVote(doc.querySelector('div.alert.alert-danger').textContent, null, project);
+					endVote({message: doc.querySelector('div.alert.alert-danger').textContent}, null, project);
 					return
 				}
 			} else if (doc.querySelector('div.alert.alert-success') != null) {
 				if (doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
-					endVote('successfully', null, project);
+					endVote({successfully: true}, null, project);
 					return
 				} else {
-					endVote(doc.querySelector('div.alert.alert-success').textContent, null, project);
+					endVote({message: doc.querySelector('div.alert.alert-success').textContent}, null, project);
 					return
 				}
 			} else {
-                endVote('Ошибка! div.alert.alert-success или div.alert.alert-danger является null', null, project);
+                endVote({message: 'Ошибка! div.alert.alert-success или div.alert.alert-danger является null'}, null, project);
                 return
 			}
 	    }
@@ -598,23 +596,23 @@ async function silentVote(project) {
 				let response = await fetch("http://monitoringminecraft.ru/top/" + project.id + "/vote", {"headers":{"content-type":"application/x-www-form-urlencoded"},"body":"player=" + project.nick + "","method":"POST"})
 				let host = extractHostname(response.url)
 				if (host.includes('vk.')) {
-					endVote(chrome.i18n.getMessage('errorAuthVK'), null, project)
+					endVote({errorAuthVK: true}, null, project)
 					return
 				}
 				if (!host.includes('monitoringminecraft.')) {
-					endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project)
+					endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
 					return
 				}
 				if (!response.ok) {
 					if (response.status == 503) {
 						if (i == 3) {
-							endVote("Превышено максимально кол-во попыток голосования, код ошибки HTTP: " + response.status, null, project)
+							endVote({message: "Превышено максимально кол-во попыток голосования, код ошибки HTTP: " + response.status}, null, project)
 							return
 						}
 						await wait(3000)
 						continue
 					} else {
-						endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project)
+						endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
 					}
 				}
 
@@ -622,14 +620,14 @@ async function silentVote(project) {
 				let doc = new DOMParser().parseFromString(html, "text/html")
 				if (doc.querySelector("body") != null && doc.querySelector("body").textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
 					if (i == 3) {
-						endVote("Превышено максимально кол-во попыток голосования, " + doc.querySelector("body").textContent, null, project)
+						endVote({message: "Превышено максимально кол-во попыток голосования, " + doc.querySelector("body").textContent}, null, project)
 						return
 					}
 					continue
 				}
 				if (doc.querySelector("input[name=player]") != null) {
 					if (i == 3) {
-						endVote("Превышено максимально кол-во попыток голосования, input[name=player] является " + doc.querySelector("input[name=player]"), null, project)
+						endVote({message: "Превышено максимально кол-во попыток голосования, input[name=player] является " + doc.querySelector("input[name=player]")}, null, project)
 						return
 					}
                     continue
@@ -655,13 +653,13 @@ async function silentVote(project) {
 					}
 					let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
 					let later = Date.now() + milliseconds
-					endVote('later ' + later, null, project)
+					endVote({later: later}, null, project)
 					return
 				} else if (doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
-					endVote('successfully', null, project)
+					endVote({successfully: true}, null, project)
 					return
 				} else {
-					endVote(chrome.i18n.getMessage('errorVoteNoElement'), null, project)
+					endVote({errorVoteNoElement: true}, null, project)
 					return
 				}
 	    	}
@@ -688,11 +686,11 @@ async function silentVote(project) {
 			});
 			let host = extractHostname(response.url);
 			if (!host.includes('serverpact.')) {
-                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
                 return;
 			}
             let html = await response.text();
@@ -727,7 +725,7 @@ async function silentVote(project) {
 			});
 			let json = captcha.json();
 			if (json.error) {
-				endVote('Error in captcha', null, project);
+				endVote({message: 'Error in captcha'}, null, project);
 				return;
 			}
 
@@ -751,22 +749,22 @@ async function silentVote(project) {
 			    "credentials": "include"
 			});
 			if (!response2.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
                 return;
 			}
             html = await response2.text();
             doc = new DOMParser().parseFromString(html, "text/html");
 			if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)") != null && doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)").textContent.includes('You have successfully voted')) {
-			    endVote('successfully', null, project);
+			    endVote({successfully: true}, null, project);
 			    return
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null && (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('You can only vote once') || doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning").textContent.includes('already voted'))) {
-			    endVote('later ' + (Date.now() + 43200000), null, project);
+			    endVote({later: Date.now() + 43200000}, null, project);
 			    return
 			} else if (doc.querySelector("body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning") != null) {
-			    endVote(doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.substring(0, doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.indexOf('\n')), null, project);
+			    endVote({message: doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.substring(0, doc.querySelector("body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning").textContent.indexOf('\n'))}, null, project);
 			    return
 			} else {
-			   	endVote(chrome.i18n.getMessage('errorVoteUnknown2'), null, project)
+			   	endVote({errorVoteUnknown2: true}, null, project)
 			    return
 			}
 	    }
@@ -792,11 +790,11 @@ async function silentVote(project) {
 			});
 			let host = extractHostname(response.url);
 			if (!host.includes('minecraftiplist.')) {
-                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
                 return;
 			}
             let html = await response.text();
@@ -833,7 +831,7 @@ async function silentVote(project) {
 
             if (doc.querySelector("#Content > div.Error") != null) {
 				if (doc.querySelector("#Content > div.Error").textContent.includes('You did not complete the crafting table correctly')) {
-					endVote('Не удалось пройти капчу', null, project);
+					endVote({message: doc.querySelector("#Content > div.Error").textContent}, null, project);
 					return;
 				}
 			    if (doc.querySelector("#Content > div.Error").textContent.includes('last voted for this server') || doc.querySelector("#Content > div.Error").textContent.includes('has no votes')) {
@@ -851,15 +849,15 @@ async function silentVote(project) {
 						count++;
 					}
 					let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-					endVote('later ' + (Date.now() + (86400000 - milliseconds)), null, project);
+					endVote({later: Date.now() + (86400000 - milliseconds)}, null, project);
 					return;
 			    }
-				endVote(doc.querySelector("#Content > div.Error").textContent, null, project);
+				endVote({message: doc.querySelector("#Content > div.Error").textContent}, null, project);
 				return;
 			}
             
             if (!await getRecipe(doc.querySelector("table[class='CraftingTarget']").firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com'))) {
-               	endVote('Не удалось найти рецепт: ' + doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com'), null, project);
+               	endVote({message: 'Не удалось найти рецепт: ' + doc.querySelector("#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img").src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')}, null, project);
                	return;
             }
             await craft(doc.querySelector("#Content > form > table > tbody > tr:nth-child(2) > td > table").getElementsByTagName('img'));
@@ -897,11 +895,11 @@ async function silentVote(project) {
 			});
 			host = extractHostname(response.url);
 			if (!host.includes('minecraftiplist.')) {
-                endVote(chrome.i18n.getMessage('errorRedirected', response.url), null, project);
+                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
                 return;
 			}
 			if (!response.ok) {
-                endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
                 return;
 			}
             html = await response.text();
@@ -909,7 +907,7 @@ async function silentVote(project) {
             
             if (doc.querySelector("#Content > div.Error") != null) {
 				if (doc.querySelector("#Content > div.Error").textContent.includes('You did not complete the crafting table correctly')) {
-					endVote('Не удалось пройти капчу', null, project);
+					endVote({message: doc.querySelector("#Content > div.Error").textContent}, null, project);
 					return;
 				}
 			    if (doc.querySelector("#Content > div.Error").textContent.includes('last voted for this server')) {
@@ -927,14 +925,14 @@ async function silentVote(project) {
 						count++;
 					}
 					let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-					endVote('later ' + (Date.now() + (86400000 - milliseconds)), null, project);
+					endVote({later: Date.now() + (86400000 - milliseconds)}, null, project);
 					return;
 			    }
-				endVote(doc.querySelector("#Content > div.Error").textContent, null, project);
+				endVote({message: doc.querySelector("#Content > div.Error").textContent}, null, project);
 				return;
 			}
 			if (doc.querySelector("#Content > div.Good") != null && doc.querySelector("#Content > div.Good").textContent.includes('You voted for this server!')) {
-                endVote('successfully', null, project);
+                endVote({successfully: true}, null, project);
                 return;
 			}
 	    }
@@ -942,19 +940,19 @@ async function silentVote(project) {
 	    if (project.Custom) {
 	    	let response = await fetch(project.responseURL, project.id);
 	    	if (response.ok) {
-	    		endVote('successfully', null, project);
+	    		endVote({successfully: true}, null, project);
 	    		return
 	    	} else {
-	    		endVote(chrome.i18n.getMessage('errorVote') + response.status, null, project);
+	    		endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project);
 	    		return
 	    	}
 	    }
     } catch (e) {
         if (e == 'TypeError: Failed to fetch') {
-          	endVote(chrome.i18n.getMessage('notConnectInternet'), null, project);
+          	endVote({notConnectInternet: true}, null, project);
         } else {
         	console.error(e);
-           	endVote(chrome.i18n.getMessage('errorVoteUnknown') + e, null, project);
+           	endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + e}, null, project);
         }
     }
 }
@@ -1049,7 +1047,7 @@ chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 	let sender = {};
 	sender.tab = {};
 	sender.tab.id = details.tabId;
-	endVote(chrome.i18n.getMessage('errorVoteUnknown') + details.error, sender, project);
+	endVote({message: chrome.i18n.getMessage('errorVoteUnknown')} + details.error, sender, project);
 }, {url: [{hostSuffix: 'topcraft.ru'},
           {hostSuffix: 'mctop.su'},
           {hostSuffix: 'mcrate.su'},
@@ -1077,26 +1075,29 @@ chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
 	//Если требует ручное прохождение капчи
-	if (request.message == "Requires manually passing the captcha" && sender && openedProjects.has(sender.tab.id)) {
+	if (request.captcha && sender && openedProjects.has(sender.tab.id)) {
 		let project = openedProjects.get(sender.tab.id);
 		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('requiresCaptcha'));
         if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('requiresCaptcha'));
 	} else {
-		endVote(request.message, sender, null);
+		endVote(request, sender, null);
 	}
 });
 
 //Завершает голосование, если есть ошибка то обрабатывает её
-async function endVote(message, sender, project) {
+async function endVote(request, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
-		chrome.tabs.remove(sender.tab.id, function() {
-			if (chrome.runtime.lastError) {
-				console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message);
-				if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message);
-			}
-		});
-        project = openedProjects.get(sender.tab.id);
-        openedProjects.delete(sender.tab.id);
+        project = openedProjects.get(sender.tab.id)
+        //ToDo <Serega007> временно добавлено условие для диагностирования ошибки null на MinecraftMp
+        if (request.successfully || request.later) {
+			chrome.tabs.remove(sender.tab.id, function() {
+				if (chrome.runtime.lastError) {
+					console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message)
+					if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message)
+				}
+			})
+        }
+        openedProjects.delete(sender.tab.id)
 	} else if (!project) return;//Что?
 	if (settings.cooldown < 10000) {
 		setTimeout(() => {
@@ -1130,7 +1131,7 @@ async function endVote(message, sender, project) {
 
 	//Если усё успешно
 	let sendMessage = '';
-	if (message == "successfully" || message.includes("later")) {
+	if (request.successfully || request.later) {
         let time = new Date();
         if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.IonMc) {//Топы на которых время сбрасывается в 00:00 по МСК
             if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
@@ -1158,8 +1159,8 @@ async function endVote(message, sender, project) {
             }
             time.setUTCHours(4, (project.priority ? 0 : 10), 0, 0);
         }
-		if (message.startsWith('later ')) {
-			time = parseInt(message.replace('later ', ''));
+		if (request.later) {
+			time = request.later
 			if (project.ServeurPrive || project.TopGames) {
 				project.countVote = project.countVote + 1;
 				if (project.countVote >= project.maxCountVote) {
@@ -1209,7 +1210,7 @@ async function endVote(message, sender, project) {
             project.time = project.time + Math.floor(Math.random() * 43200000);
 		}
 
-        if (message == "successfully") {
+        if (request.successfully) {
             sendMessage = chrome.i18n.getMessage('successAutoVote');
             if (!settings.disabledNotifInfo) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
             
@@ -1237,19 +1238,25 @@ async function endVote(message, sender, project) {
         console.log('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 	//Если ошибка
 	} else {
+		let message
+		if (!request.message) {
+            message = chrome.i18n.getMessage(Object.keys(request)[0])
+		} else {
+			message = request.message
+		}
 		let retryCoolDown
 		if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
 			retryCoolDown = 300000;
-			sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
+			sendMessage = request.message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
 		} else {
 			retryCoolDown = 900000;
-			sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "15");
+			sendMessage = request.message + '. ' + chrome.i18n.getMessage('errorNextVote', "15");
 		}
         if (project.randomize) {
         	retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)
         }
         project.time = Date.now() + retryCoolDown
-        project.error = message
+        project.error = request.message
         console.error('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time);
 	    if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), sendMessage);
         
@@ -1267,12 +1274,6 @@ async function endVote(message, sender, project) {
 	}
 	await setValue('generalStats', generalStats)
 	await setValue('AVMRprojects' + getProjectName(project), getProjectList(project));
-	// else {
-	//	//Если прям совсем всё плохо
-	//	let message = 'Произошло что-то не понятное. Вот что известно: request.message: ' + request.message + ' sender.tab.id: ' + sender.tab.id + ' в openedProjects этой вкладки нет';
-	//	console.error(message);
-    //    if (!settings.disabledNotifError) sendNotification('Непредвиденная ошибка', message);
-	//}
 }
 
 //Отправитель уведомлений
@@ -1784,6 +1785,8 @@ chrome.runtime.onInstalled.addListener(function (details) {
         });
 	}
 })
+
+const varToString = varObj => Object.keys(varObj)[0]
 
 /*
 Открытый репозиторий:

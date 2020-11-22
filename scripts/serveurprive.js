@@ -20,7 +20,7 @@ function vote(first) {
             if (document.querySelector("#c > div > div > div.bvt > p.alert.alert-danger") != null) {
             	//Если не удалось пройти капчу
             	if (document.querySelector("#c > div > div > div.bvt > p.alert.alert-danger").textContent.includes('captcha')) {
-            		sendMessage('Не удалось пройти капчу, попробуйте пройти её вручную');
+            		chrome.runtime.sendMessage({message: document.querySelector("#c > div > div > div.bvt > p.alert.alert-danger").textContent})
             	//Если вы уже голосовали
             	} else if (document.querySelector("#c > div > div > div.bvt > p.alert.alert-danger").textContent.includes('Vous avez déjà voté pour ce serveur')) {
                     let numbers = document.querySelector("#c > div > div > div.bvt > p.alert.alert-danger").textContent.match(/\d+/g).map(Number);
@@ -40,16 +40,16 @@ function vote(first) {
 					}
 					var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
 					var later = Date.now() + milliseconds;
-					sendMessage('later ' + later);
+					chrome.runtime.sendMessage({later: later})
             	//Что?
             	} else {
-            		sendMessage(document.querySelector("#c > div > div > div.bvt > p.alert.alert-danger").textContent);
+            		chrome.runtime.sendMessage({message: document.querySelector("#c > div > div > div.bvt > p.alert.alert-danger").textContent})
             	}
             	return;
             }
             //Если успешное автоголосование
             if (document.querySelector("#c > div > div > div.bvt > p.alert.alert-success") != null) {
-            	sendMessage('successfully');
+            	chrome.runtime.sendMessage({successfully: true})
             	return;
             }
             if (first) {
@@ -61,9 +61,9 @@ function vote(first) {
 			document.querySelector("#c > div > div > div.bvt > form > button").click();
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
-				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
+				chrome.runtime.sendMessage({message: 'Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent})
 			} else {
-				sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
+				chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack})
 			}
 		}
 	});
@@ -76,11 +76,5 @@ function getNickName(projects) {
         }
     }
 
-    sendMessage('Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL);
-}
-
-function sendMessage(message) {
-    chrome.runtime.sendMessage({
-         message: message
-    }, function(response) {});
+    chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
 }

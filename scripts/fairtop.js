@@ -13,9 +13,9 @@ function vote () {
 			}
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
-				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
+				chrome.runtime.sendMessage({message: 'Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent})
 			} else {
-				sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
+				chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack})
 			}
 		}
 	});
@@ -28,16 +28,10 @@ function getNickName(projects) {
         }
     }
     if (!document.URL.startsWith('https://fairtop.in/project/') && !document.URL.startsWith('https://fairtop.in/vote/')) {
-    	sendMessage('Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL');
+    	chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
     } else {
-        sendMessage('Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL);
+        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
     }
-}
-
-function sendMessage(message) {
-    chrome.runtime.sendMessage({
-         message: message
-    }, function(response) {});
 }
 
 this.check = setInterval(()=>{
@@ -46,22 +40,20 @@ this.check = setInterval(()=>{
 	}
     //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
     if (document.readyState == 'complete' && (document.querySelector("#result > div") != null || document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div") != null)) {
-        var message;
-        if (document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div") != null && (document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div").textContent.includes('Сегодня Вы уже голосовали') || document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div").textContent.includes('Сегодня уже был голос'))) {
-            message = 'later';
-        } else if (document.querySelector("#result > div") != null && document.querySelector("#result > div").textContent.includes('Ваш голос учтён! Спасибо')) {
-            message = 'successfully';
+        if (document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div") != null && (document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div").textContent.includes('уже голосовали') || document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div").textContent.includes('уже был голос'))) {
+            chrome.runtime.sendMessage({later: true})
+        } else if (document.querySelector("#result > div") != null && document.querySelector("#result > div").textContent.includes('Ваш голос учтён')) {
+            chrome.runtime.sendMessage({successfully: true})
         } else {
         	if (document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div") != null && document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div").textContent != "") {
-        		message = document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div").textContent;
+        		chrome.runtime.sendMessage({message: document.querySelector("body > div.container > div > div > div > div.page-data.div-50.block-center > div").textContent})
         	} else if (document.querySelector("#result > div") != null && document.querySelector("#result > div").textContent != "") {
-        		message = document.querySelector("#result > div").textContent;
+        		chrome.runtime.sendMessage({message: document.querySelector("#result > div").textContent})
         	} else {
         		return;
         	}
         }
         clearInterval(this.check);
-        sendMessage(message);
     }
 }, 1000);
 //document.querySelectorAll("span[aria-hidden=true]").item(1).click();
