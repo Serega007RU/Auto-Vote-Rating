@@ -7,9 +7,10 @@ function vote () {
 				return;
 			}
 			if ((document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong") != null && document.querySelector("body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong").textContent.includes('Thank you for your vote'))
-                || (document.querySelector("strong") != null && document.querySelector("strong").textContent.includes('Thank you for your vote'))) {
+                || (document.querySelector("strong") != null && document.querySelector("strong").textContent.includes('Thank you for your vote'))
+                || (document.querySelector("h1") != null && document.querySelector("h1").nextElementSibling != null && document.querySelector("h1").nextElementSibling.nextElementSibling != null && document.querySelector("h1").nextElementSibling.nextElementSibling.textContent.includes('Thank you for your vote'))) {
                 chrome.runtime.sendMessage({successfully: true})
-                return;
+                return
 			} else if (document.querySelector("#vote_form > div.alert.alert-danger") != null) {
 				if (document.querySelector("#vote_form > div.alert.alert-danger").textContent.includes('already voted')) {
 					chrome.runtime.sendMessage({later: true})

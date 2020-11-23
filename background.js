@@ -1159,7 +1159,7 @@ async function endVote(request, sender, project) {
             }
             time.setUTCHours(4, (project.priority ? 0 : 10), 0, 0);
         }
-		if (request.later) {
+		if (request.later && request.later != true) {
 			time = request.later
 			if (project.ServeurPrive || project.TopGames) {
 				project.countVote = project.countVote + 1;
