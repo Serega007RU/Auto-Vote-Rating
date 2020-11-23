@@ -400,6 +400,8 @@ p, form, label, details {
   -ms-user-select: none;
 }
 
+
+
 .checkbox + label:last-child { margin-bottom: 0; }
 
 .checkbox + label:before {

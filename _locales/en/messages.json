@@ -605,5 +605,11 @@
   },
   "chooseMinute": {
     "message": "Set a minute"
+  },
+  "advSettings": {
+    "message": "Advanced setting:"
+  },
+  "customTimeOut": {
+    "message": "Customize the time of the next vote"
   }
 }

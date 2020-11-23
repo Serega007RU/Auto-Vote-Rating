@@ -565,5 +565,11 @@
   },
   "chooseMinute": {
     "message": "Задайте минуту"
+  },
+  "advSettings": {
+    "message": "Дополнительные параметры:"
+  },
+  "customTimeOut": {
+    "message": "Кастомизировать время след голосования"
   }
 }

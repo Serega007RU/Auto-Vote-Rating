@@ -284,6 +284,10 @@ async function restoreOptions() {
                 randomizeOption = this.checked;
                 return;
             }
+            if (this.id == 'customTimeOut') {
+                
+                return
+            }
             await setValue('AVMRsettings', settings, true);
         });
     }
