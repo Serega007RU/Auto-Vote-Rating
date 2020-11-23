@@ -34,7 +34,7 @@ var randomizeOption = false;
 var returnAdd;
 
 //Конструктор проекта
-function Project(top, nick, id, time, responseURL, hour, priority) {
+function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
     if (top == "TopCraft") this.TopCraft = true;
     if (top == "McTOP") this.McTOP = true;
     if (top == "MCRate") this.MCRate = true;
@@ -60,7 +60,8 @@ function Project(top, nick, id, time, responseURL, hour, priority) {
         if (time) {
             this.timeout = parseInt(time)
         } else {
-            this.timeoutHour = parseInt(hour)
+            this.timeoutHour = customTimeOut.hour
+            this.timeoutMinute = customTimeOut.minute
         }
         this.time = null;
         this.nick = nick;
@@ -471,7 +472,7 @@ function updateProjectList() {
 document.getElementById('addProject').addEventListener('submit', () => {
     event.preventDefault();
     if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('selectTime').value == 'ms' ? document.getElementById('time').value : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? null : document.getElementById('hour').value), priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('selectTime').value == 'ms' ? document.getElementById('time').value : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? null : {hour: parseInt(document.getElementById('hour').value), minute: parseInt(document.getElementById('minute').value)}), priorityOption, null);
     } else {
         addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, null, priorityOption, null);
     }
@@ -483,7 +484,7 @@ document.getElementById('timeout').addEventListener('submit', () => {
     setCoolDown();
 });
 
-async function addProject(choice, nick, id, time, response, hour, priorityOpt, element) {
+async function addProject(choice, nick, id, time, response, customTimeOut, priorityOpt, element) {
     updateStatusAdd('<div>' + chrome.i18n.getMessage('adding') + '</div>', true, element);
     let project;
     if (choice == 'Custom') {
@@ -494,7 +495,7 @@ async function addProject(choice, nick, id, time, response, hour, priorityOpt, e
             updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element);
             return;
         }
-        project = new Project(choice, nick, body, time, response, hour, priorityOpt);
+        project = new Project(choice, nick, body, time, response, customTimeOut, priorityOpt);
     } else {
         project = new Project(choice, nick, id, null, null, null, priorityOpt);
     }
@@ -762,7 +763,7 @@ async function addProject(choice, nick, id, time, response, hour, priorityOpt, e
                         });
                     } else {
                         openPoput(url2, function () {
-                            addProject(choice, nick, id, time, response, hour, priorityOpt, element);
+                            addProject(choice, nick, id, time, response, customTimeOut, priorityOpt, element);
                         });
                     }
                 });
@@ -775,17 +776,17 @@ async function addProject(choice, nick, id, time, response, hour, priorityOpt, e
         }
     }
     
-    let random = false;
-    if (projectURL.toLowerCase().includes('pandamium')) {
-        project.randomize = true;
-        random = true;
-    }
+//     let random = false;
+//     if (projectURL.toLowerCase().includes('pandamium')) {
+//         project.randomize = true;
+//         random = true;
+//     }
 
     await addProjectList(project, false);
     
-    if (random) {
+    /*f (random) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
-    } else if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames) && settings.enabledSilentVote) {
+    } else*/ if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames) && settings.enabledSilentVote) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span>', true, element);
     } else if (project.MinecraftServersOrg) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center">' + chrome.i18n.getMessage('privacyPass') +'</div>', true, element);
@@ -1757,7 +1758,9 @@ selectedTop.addEventListener("change", function() {
         document.getElementById('idGame').style.display = 'none'
         document.getElementById('selectTime').style.display = 'none'
         document.getElementById('label7').style.display = 'none'
+        document.getElementById('label8').style.display = 'none'
         document.getElementById('hour').style.display = 'none'
+        document.getElementById('minute').style.display = 'none'
 
         if (selectedTop.value == 'Custom') {
             idSelector.innerHTML = '';
@@ -1774,10 +1777,18 @@ selectedTop.addEventListener("change", function() {
                 document.getElementById('time').removeAttribute('style')
                 document.getElementById('time').required = true
                 document.getElementById('label7').style.display = 'none'
+                document.getElementById('label8').style.display = 'none'
                 document.getElementById('hour').style.display = 'none'
+                document.getElementById('hour').required = false
+                document.getElementById('minute').style.display = 'none'
+                document.getElementById('minute').required = false
             } else {
                 document.getElementById('label7').removeAttribute('style')
+                document.getElementById('label8').removeAttribute('style')
                 document.getElementById('hour').removeAttribute('style')
+                document.getElementById('hour').required = true
+                document.getElementById('minute').removeAttribute('style')
+                document.getElementById('minute').required = true
                 document.getElementById('label3').style.display = 'none'
                 document.getElementById('time').style.display = 'none'
                 document.getElementById('time').required = false
@@ -1828,10 +1839,18 @@ document.getElementById('selectTime').addEventListener('change', function() {
         document.getElementById('time').removeAttribute('style')
         document.getElementById('time').required = true
         document.getElementById('label7').style.display = 'none'
+        document.getElementById('label8').style.display = 'none'
         document.getElementById('hour').style.display = 'none'
+        document.getElementById('hour').required = false
+        document.getElementById('minute').style.display = 'none'
+        document.getElementById('minute').required = false
     } else {
         document.getElementById('label7').removeAttribute('style')
+        document.getElementById('label8').removeAttribute('style')
         document.getElementById('hour').removeAttribute('style')
+        document.getElementById('hour').required = true
+        document.getElementById('minute').removeAttribute('style')
+        document.getElementById('minute').required = true
         document.getElementById('label3').style.display = 'none'
         document.getElementById('time').style.display = 'none'
         document.getElementById('time').required = false

@@ -128,64 +128,43 @@
 							</select>
                             <!--Custom-->
 							<div style="display: none;" id="label6" class="form-group mb-1">
-							    <label data-resource="selectTime"></label>
+							    <label for="selectTime" data-resource="selectTime"></label>
 							</div>
                             <select style="display: none;" required id="selectTime" class="mb-2">
                                 <option value="ms" data-resource="timeoutMS"></option>
                                 <option value="hour" data-resource="timeoutHour"></option>
                             </select>
 							<div style="display: none;" id="label3" class="form-group mb-1">
-							    <label for="nick" data-resource="delayFetch"></label>
+							    <label for="time" data-resource="delayFetch"></label>
 							</div>
                             <input style="display: none;" id="time" name="customTime" placeholder="delayFetch" type="number" min="10000" class="mb-2" style="display: none;"></input>
 							<div style="display: none;" id="label7" class="form-group mb-1">
-							    <label for="nick" data-resource="chooseHour"></label>
+							    <label for="hour" data-resource="chooseHour"></label>
 							</div>
-                            <select style="display: none;" required id="hour" class="mb-2">
-                                <option value="0">00</option>
-                                <option value="1">01</option>
-                                <option value="2">02</option>
-                                <option value="3">03</option>
-                                <option value="4">04</option>
-                                <option value="5">05</option>
-                                <option value="6">06</option>
-                                <option value="7">07</option>
-                                <option value="8">08</option>
-                                <option value="9">09</option>
-                                <option value="10">10</option>
-                                <option value="11">11</option>
-                                <option value="12">12</option>
-                                <option value="13">13</option>
-                                <option value="14">14</option>
-                                <option value="15">15</option>
-                                <option value="16">16</option>
-                                <option value="17">17</option>
-                                <option value="18">18</option>
-                                <option value="19">19</option>
-                                <option value="20">20</option>
-                                <option value="21">21</option>
-                                <option value="22">22</option>
-                                <option value="23">23</option>
-                            </select>
+                            <input style="display: none;" id="hour" name="chooseHour" placeholder="chooseHour" type="number" class="mb-2" min="0" max="23"></input>
+							<div style="display: none;" id="label8" class="form-group mb-1">
+							    <label for="minute" data-resource="chooseMinute"></label>
+							</div>
+                            <input style="display: none;" id="minute" name="chooseMinute" placeholder="chooseMinute" type="number" class="mb-2" min="0" max="59"></input>
 							<div style="display: none;" id="label2" class="form-group mb-1">
-							    <label for="nick" data-resource="urlFetch"></label>
+							    <label for="responseURL" data-resource="urlFetch"></label>
 							</div>
 							<input style="display: none;" id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="mb-2"></input>
 							<div style="display: none;" id="label1" class="form-group mb-1">
-							    <label for="nick" data-resource="bodyFetch"></label>
+							    <label for="customBody" data-resource="bodyFetch"></label>
 							</div>
 							<textarea style="display: none;" id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="mb-2"></textarea>
 
 							<!--ServeurPrive and TopGames-->
-							<div style="display: none;" id="idGame" class="form-group mb-1"><label for="idGame" data-resource="idGame"></label> <span class="tooltip1"><span class="tooltip1text" id="spanGame"></span></div>
+							<div style="display: none;" id="idGame" class="form-group mb-1"><label for="chooseGame2" data-resource="idGame"></label> <span class="tooltip1"><span class="tooltip1text" id="spanGame"></span></div>
 							<datalist style="display: none;" id="gameList1"><option value="minecraft">Minecraft</option><option value="garrys-mod">Garry's mod</option><option value="discord">Discord</option><option value="roblox">Roblox</option><option value="rdr">Red Dead Redemption 2</option><option value="hytale">Hytale</option><option value="terraria">Terraria</option><option value="ark">ARK</option><option value="dayz">Dayz</option><option value="l4d2">Left 4 Dead 2</option><option value="rust">Rust</option><option value="gta">GTA 5</option><option value="discord">Discord</option></datalist>
 							<datalist style="display: none;" id="gameList2"><option value="minecraft">Minecraft</option><option value="discord">Discord</option><option value="grand-theft-auto">Grand Theft Auto V</option><option value="ark-survival-evolved">Ark : Survival Evolved</option><option value="rust">Rust</option><option value="hytale">Hytale</option><option value="minecraft-bedrock">Minecraft Bedrock</option><option value="ark">ARK</option><option value="garrys-mod">Garry's Mod</option></datalist>
 							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGame1" placeholder="chooseGame" list="gameList1" value="minecraft">
 							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGame2" placeholder="chooseGame" list="gameList2" value="minecraft">
-							<div style="display: none;" class="form-group mb-1" id="label4"><label for="nick" data-resource="chooseLang"></label></div>
+							<div style="display: none;" class="form-group mb-1" id="label4"><label for="selectLang2" data-resource="chooseLang"></label></div>
 							<select style="display: none;" id="selectLang1" class="mb-2"><option value="de">Deutsch</option><option value="en">English</option><option value="es">Español</option><option value="fr" selected>Français</option><option value="pt">Português</option><option value="ru">Русский</option></select>
 							<select style="display: none;" id="selectLang2" class="mb-2"><option value="en">English</option><option value="fr" selected>Français</option></select>
-							<div style="display: none;" class="form-group mb-1" id="label5"><label for="nick" data-resource="countVote"></label></div>
+							<div style="display: none;" class="form-group mb-1" id="label5"><label for="countVote" data-resource="countVote"></label></div>
 							<input style="display: none;" id="countVote" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="mb-2" value="5">
 
 							<div id="idSelector"></div>

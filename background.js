@@ -1194,10 +1194,10 @@ async function endVote(request, sender, project) {
 				time.setUTCMinutes(time.getUTCMinutes() + 7);
 			} else if (project.Custom) {
 				if (project.timeoutHour) {
-					if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= (project.priority ? 0 : 10))) {
+					if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
 						time.setDate(time.getDate() + 1)
 					}
-					time.setHours(project.timeoutHour, (project.priority ? 0 : 10), 0, 0)
+					time.setHours(project.timeoutHour, project.timeoutMinute, 0, 0)
 				} else {
 					time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
 				}

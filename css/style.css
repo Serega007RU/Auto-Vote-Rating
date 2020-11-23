@@ -743,4 +743,8 @@ ul li:hover {
 
 .fw600 {
   font-weight: 600;
-} 
+}
+
+#idSelector {
+  height: 95px;
+}

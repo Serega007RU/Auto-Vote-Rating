@@ -598,9 +598,12 @@
     "message": "In MS since the last vote"
   },
   "timeoutHour": {
-    "message": "Every day after the specified hour"
+    "message": "Every day after the specified hour and minute"
   },
   "chooseHour": {
-    "message": "Choose after what hour"
+    "message": "Set the hour"
+  },
+  "chooseMinute": {
+    "message": "Set a minute"
   }
 }
