@@ -1138,12 +1138,17 @@ async function endVote(request, sender, project) {
             	time.setUTCDate(time.getUTCDate() + 1);
             }
             time.setUTCHours(21, (project.priority ? 0 : 10), 0, 0);
-        } else if (project.MCRate || project.MinecraftServerList) {
+        } else if (project.MCRate) {
             if (time.getUTCHours() > 22 || (time.getUTCHours() == 22 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
             	time.setUTCDate(time.getUTCDate() + 1);
             }
             time.setUTCHours(22, (project.priority ? 0 : 10), 0, 0);
-        } else if (project.MinecraftMp || project.PlanetMinecraft) {
+        } else if (project.MinecraftServerList) {
+            if (time.getUTCHours() > 23 || (time.getUTCHours() == 23 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+            	time.setUTCDate(time.getUTCDate() + 1);
+            }
+            time.setUTCHours(23, (project.priority ? 0 : 10), 0, 0);
+        } else if (project.PlanetMinecraft) {
             if (time.getUTCHours() > 5 || (time.getUTCHours() == 5 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
             	time.setUTCDate(time.getUTCDate() + 1);
             }
@@ -1153,7 +1158,7 @@ async function endVote(request, sender, project) {
             	time.setUTCDate(time.getUTCDate() + 1);
             }
             time.setUTCHours(0, (project.priority ? 0 : 10), 0, 0);
-        } else if (project.TopMinecraftServers) {
+        } else if (project.TopMinecraftServers || project.MinecraftMp) {
             if (time.getUTCHours() > 4 || (time.getUTCHours() == 4 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
             	time.setUTCDate(time.getUTCDate() + 1);
             }

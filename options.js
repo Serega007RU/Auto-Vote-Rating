@@ -70,6 +70,10 @@ function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
     } else {
         this.nick = nick;
         this.id = id;
+        if (customTimeOut) {
+            this.timeoutHour = customTimeOut.hour
+            this.timeoutMinute = customTimeOut.minute
+        }
         this.time = time;
     }
     if (priority) this.priority = true;
@@ -285,7 +289,43 @@ async function restoreOptions() {
                 return;
             }
             if (this.id == 'customTimeOut') {
-                
+                if (this.checked) {
+                    document.getElementById('label6').removeAttribute('style')
+                    document.getElementById('selectTime').removeAttribute('style')
+                    if (document.getElementById('selectTime').value == 'ms') {
+                        document.getElementById('label3').removeAttribute('style')
+                        document.getElementById('time').removeAttribute('style')
+                        document.getElementById('time').required = true
+                        document.getElementById('label7').style.display = 'none'
+                        document.getElementById('label8').style.display = 'none'
+                        document.getElementById('hour').style.display = 'none'
+                        document.getElementById('hour').required = false
+                        document.getElementById('minute').style.display = 'none'
+                        document.getElementById('minute').required = false
+                    } else {
+                        document.getElementById('label7').removeAttribute('style')
+                        document.getElementById('label8').removeAttribute('style')
+                        document.getElementById('hour').removeAttribute('style')
+                        document.getElementById('hour').required = true
+                        document.getElementById('minute').removeAttribute('style')
+                        document.getElementById('minute').required = true
+                        document.getElementById('label3').style.display = 'none'
+                        document.getElementById('time').style.display = 'none'
+                        document.getElementById('time').required = false
+                    }
+                } else {
+                    document.getElementById('label6').style.display = 'none'
+                    document.getElementById('selectTime').style.display = 'none'
+                    document.getElementById('label3').style.display = 'none'
+                    document.getElementById('time').style.display = 'none'
+                    document.getElementById('time').required = false
+                    document.getElementById('label7').style.display = 'none'
+                    document.getElementById('label8').style.display = 'none'
+                    document.getElementById('hour').style.display = 'none'
+                    document.getElementById('hour').required = false
+                    document.getElementById('minute').style.display = 'none'
+                    document.getElementById('minute').required = false
+                }
                 return
             }
             await setValue('AVMRsettings', settings, true);
@@ -501,7 +541,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         }
         project = new Project(choice, nick, body, time, response, customTimeOut, priorityOpt);
     } else {
-        project = new Project(choice, nick, id, null, null, null, priorityOpt);
+        project = new Project(choice, nick, id, null, null, customTimeOut, priorityOpt);
     }
 
     if (randomizeOption) {
@@ -1740,13 +1780,9 @@ selectedTop.addEventListener("change", function() {
         document.getElementById('customBody').style.display = 'none'
         document.getElementById('label1').style.display = 'none'
         document.getElementById('label2').style.display = 'none'
-        document.getElementById('label3').style.display = 'none'
         document.getElementById('label4').style.display = 'none'
         document.getElementById('label5').style.display = 'none'
-        document.getElementById('label6').style.display = 'none'
         document.getElementById('responseURL').style.display = 'none'
-        document.getElementById('time').style.display = 'none'
-        document.getElementById('time').required = false
         document.getElementById('countVote').style.display = 'none'
         document.getElementById('countVote').required = false
         document.getElementById('selectLang1').style.display = 'none'
@@ -1760,13 +1796,25 @@ selectedTop.addEventListener("change", function() {
         document.getElementById('chooseGame2').style.display = 'none'
         document.getElementById('chooseGame2').required = false
         document.getElementById('idGame').style.display = 'none'
-        document.getElementById('selectTime').style.display = 'none'
-        document.getElementById('label7').style.display = 'none'
-        document.getElementById('label8').style.display = 'none'
-        document.getElementById('hour').style.display = 'none'
-        document.getElementById('minute').style.display = 'none'
+        document.getElementById('customTimeOut').disabled = false
+        if (!document.getElementById('customTimeOut').checked) {
+            document.getElementById('label6').style.display = 'none'
+            document.getElementById('selectTime').style.display = 'none'
+            document.getElementById('label3').style.display = 'none'
+            document.getElementById('time').style.display = 'none'
+            document.getElementById('time').required = false
+            document.getElementById('label7').style.display = 'none'
+            document.getElementById('label8').style.display = 'none'
+            document.getElementById('hour').style.display = 'none'
+            document.getElementById('hour').required = false
+            document.getElementById('minute').style.display = 'none'
+            document.getElementById('minute').required = false
+        }
 
         if (selectedTop.value == 'Custom') {
+            document.getElementById('customTimeOut').disabled = true
+            document.getElementById('customTimeOut').checked = false
+
             idSelector.innerHTML = '';
             idSelector.setAttribute('style', 'height: 0px;')
             
@@ -1796,7 +1844,6 @@ selectedTop.addEventListener("change", function() {
                 document.getElementById('label3').style.display = 'none'
                 document.getElementById('time').style.display = 'none'
                 document.getElementById('time').required = false
-
             }
             
             document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
