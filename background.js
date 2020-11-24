@@ -1132,7 +1132,17 @@ async function endVote(request, sender, project) {
 	//Если усё успешно
 	let sendMessage = '';
 	if (request.successfully || request.later) {
-        let time = new Date();
+        let time = new Date()
+        if (!project.Custom && (project.timeout || project.timeoutHour)) {
+			if (project.timeoutHour) {
+				if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
+					time.setDate(time.getDate() + 1)
+				}
+				time.setHours(project.timeoutHour, project.timeoutMinute, 0, 0)
+			} else {
+				time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
+			}
+        } else 
         if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.IonMc) {//Топы на которых время сбрасывается в 00:00 по МСК
             if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
             	time.setUTCDate(time.getUTCDate() + 1);
