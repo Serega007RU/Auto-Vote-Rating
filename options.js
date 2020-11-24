@@ -1251,7 +1251,7 @@ async function forLoopAllProjects (fuc, reverse) {
     if (reverse) projectsCustom.reverse()
 }
 
-//Слушатель на экпорт настроек
+//Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', () => {
     updateStatusFile('<div>' + chrome.i18n.getMessage('exporting') + '</div>', true);
     var allSetting = {
@@ -1279,7 +1279,7 @@ document.getElementById('file-download').addEventListener('click', () => {
         settings,
         generalStats
     }
-    var text = JSON.stringify(allSetting);
+    var text = JSON.stringify(allSetting, null, '\t')
         blob = new Blob([text], { type: 'text/plain' }),
         anchor = document.createElement('a');
 
