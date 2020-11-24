@@ -614,5 +614,11 @@
   },
   "lastDayMonth": {
     "message": "Применять кастомный timeout только последнего числа месяца"
+  },
+  "customTimeOut2": {
+    "message": "Custom timeout"
+  },
+  "lastDayMonth2": {
+    "message": "on the last day of the month"
   }
 }
