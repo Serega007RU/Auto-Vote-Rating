@@ -2169,7 +2169,7 @@ let errorProxy = {
 	ip: "",
 	count: 0
 }
-chrome.webRequest.onAuthRequired.addListener(async function (details) {
+chrome.webRequest.onAuthRequired.addListener(async function (details, callbackFn) {
 	if (details.isProxy && currentProxy && currentProxy != null) {
 		if (errorProxy.ip != currentProxy.ip) {
 			errorProxy.count = 0
@@ -2182,7 +2182,7 @@ chrome.webRequest.onAuthRequired.addListener(async function (details) {
 		}
 		if (currentProxy.login) {
 			console.log('Прокси требует авторизацию, авторизовываюсь...')
-			return({
+			callbackFn({
 				authCredentials : {
 					'username' : currentProxy.login,
 					'password' : currentProxy.password
@@ -2191,7 +2191,7 @@ chrome.webRequest.onAuthRequired.addListener(async function (details) {
 		} else if (currentProxy.TunnelBear) {
 			console.log('Прокси TunnelBear требует авторизацию, авторизовываюсь...')
 			if (tunnelBear.token != null && tunnelBear.expires > Date.now()) {
-				return({
+				callbackFn({
 					authCredentials : {
 						'username' : tunnelBear.token,
 						'password' : tunnelBear.token
@@ -2206,7 +2206,7 @@ chrome.webRequest.onAuthRequired.addListener(async function (details) {
 			}
 		} else if (currentProxy.Windscribe) {
             console.log('Прокси Windscribe требует авторизацию, авторизовываюсь...')
-			return({
+			callbackFn({
 				authCredentials : {
 					'username' : "mdib1352-t94rvyq",
 					'password' : "uem29h65n8"
@@ -2219,7 +2219,7 @@ chrome.webRequest.onAuthRequired.addListener(async function (details) {
 		}
 	}
 }, 	{urls: ["<all_urls>"]}, 
-	["blocking"])
+	["asyncBlocking"])
 
 chrome.runtime.onInstalled.addListener(function (details) {
 	if (details.reason == "install") {
