@@ -412,7 +412,7 @@
     "message": "Error opening the tab: "
   },
   "errorAuthVK": {
-    "message": "VK authorization Error! Vote manually for this project so that next time there is no error with VK authorization"
+    "message": "VK authorization Error!"
   },
   "errorRedirected": {
     "message": "voting Error! Redirection to an unknown site occurred: $url$ Check this URL",
@@ -557,10 +557,10 @@
     "message": "Choose type"
   },
   "notFoundProxy": {
-    "message": "There is no free proxy, auto-voting is completely suspended for 24 hours. Restart the extension to reset the 24-hour break"
+    "message": "There is no free proxy, auto-voting is completely suspended for 24 hours"
   },
   "notFoundVK": {
-    "message": "There is no free VKontakte account, auto-voting is completely suspended for 24 hours. Restart the extension to reset the 24-hour break"
+    "message": "There is no free VKontakte account, auto-voting is completely suspended for 24 hours"
   },
   "notFoundProxyTitle": {
     "message": "No free proxy available"
