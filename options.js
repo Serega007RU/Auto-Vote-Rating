@@ -71,6 +71,7 @@ function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
         this.nick = nick;
         this.id = id;
         if (customTimeOut) {
+            if (document.getElementById('lastDayMonth').checked) this.lastDayMonth = true
             if (customTimeOut.ms) {
                 this.timeout = customTimeOut.ms
             } else {
@@ -335,11 +336,6 @@ async function restoreOptions() {
                 return
             }
             if (this.id == 'lastDayMonth') {
-                if (this.checked) {
-                    
-                } else {
-
-                }
                 return
             }
             await setValue('AVMRsettings', settings, true);
@@ -1828,6 +1824,8 @@ selectedTop.addEventListener("change", function() {
         if (selectedTop.value == 'Custom') {
             document.getElementById('customTimeOut').disabled = true
             document.getElementById('customTimeOut').checked = false
+            document.getElementById('lastDayMonth').disabled = true
+            document.getElementById('lastDayMonth').checked = false
 
             idSelector.innerHTML = '';
             idSelector.setAttribute('style', 'height: 0px;')

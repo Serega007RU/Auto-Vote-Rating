@@ -400,7 +400,7 @@ p, form, label, details {
   -ms-user-select: none;
 }
 
-input.checkbox:disabled ~ label:first-of-type {
+input.checkbox:disabled + label {
   opacity: .5;
 }
 

@@ -1133,7 +1133,7 @@ async function endVote(request, sender, project) {
 	let sendMessage = '';
 	if (request.successfully || request.later) {
         let time = new Date()
-        if (!project.Custom && (project.timeout || project.timeoutHour)) {
+        if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(), time.getMonth() +1, 0).getDate() != time.getDate())) {
 			if (project.timeoutHour) {
 				if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
 					time.setDate(time.getDate() + 1)
