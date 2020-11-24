@@ -37,12 +37,6 @@ this.check3 = setInterval(()=>{
    	}
    	if (document.querySelector("#solver-button") == null && !notified && document.querySelector("#recaptcha-verify-button") != null && !document.querySelector("#recaptcha-verify-button").disabled) {
    	    notified = true;
-        sendMessage("Requires manually passing the captcha");
+        chrome.runtime.sendMessage({captcha: true})
    	}
 }, 1000);
-
-function sendMessage(message) {
-    chrome.runtime.sendMessage({
-         message: message
-    }, function(response) {});
-}

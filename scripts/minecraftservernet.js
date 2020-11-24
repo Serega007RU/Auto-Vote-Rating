@@ -15,16 +15,16 @@ function vote(first) {
             //Если есть сообщение
             if (document.querySelector('h4[class="alert-heading text-center"]') != null) {
             	if (document.querySelector('h4[class="alert-heading text-center"]').textContent.includes('Vote Successful')) {
-					sendMessage('successfully');
+					chrome.runtime.sendMessage({successfully: true})
 					return;
             	}
             	if (document.querySelector('h4[class="alert-heading text-center"]').textContent.includes('Vote Un-successful')) {
             		if (document.querySelector('h4[class="alert-heading text-center"]').nextElementSibling.textContent.includes('already voting')) {
-            			sendMessage('later ' + (Date.now() + 86400000));//+ 24 часа
+            			chrome.runtime.sendMessage({later: Date.now() + 86400000})//+ 24 часа
             			return;
             		}
             	}
-            	sendMessage(document.querySelector('h4[class="alert-heading text-center"]').nextElementSibling.textContent);
+            	chrome.runtime.sendMessage({message: document.querySelector('h4[class="alert-heading text-center"]').nextElementSibling.textContent})
             	return;
             }
             if (first) {
@@ -37,9 +37,9 @@ function vote(first) {
 			document.querySelector('input[value="Confirm Vote"]').click();
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
-				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
+				chrome.runtime.sendMessage({message: 'Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent})
 			} else {
-				sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
+				chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack})
 			}
 		}
 	});
@@ -52,14 +52,8 @@ function getNickName(projects) {
         }
     }
     if (!document.URL.startsWith('https://minecraft-server.net/vote/')) {
-    	sendMessage('Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL');
+    	chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
     } else {
-        sendMessage('Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL);
+        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
     }
-}
-
-function sendMessage(message) {
-    chrome.runtime.sendMessage({
-         message: message
-    }, function(response) {});
 }

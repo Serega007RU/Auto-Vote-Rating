@@ -95,7 +95,7 @@
     "message": "Disable Internet connection verification"
   },
   "disableCheckProjects": {
-    "message": "When you add a project: to Disable the check",
+    "message": "To Disable the check",
     "description": "Checkbox. Disable check when adding a project"
   },
   "disableCheckProjectsTooltip": {
@@ -103,7 +103,7 @@
     "description": "Tooltip. Disable check when adding a project"
   },
   "priority": {
-    "message": "When adding a project: Add in priority",
+    "message": "Add in priority",
     "description": "Checkbox. Priority"
   },
   "priorityTooltip": {
@@ -608,7 +608,7 @@
     "message": "Import from TunnelBear completed successfully"
   },
   "randomize": {
-    "message": "When adding a project: Randomize the next vote"
+    "message": "Randomize the next vote"
   },
   "randomizeTooltip": {
     "message": "The time of the next vote will be randomized within 0-12 hours, this is mainly necessary to make it harder for server administrators to guess that you are using auto-voting"
@@ -682,10 +682,10 @@
     "message": "In MS since the last vote"
   },
   "timeoutHour": {
-    "message": "Every day after the specified hour"
+    "message": "Every day after the specified hour and minute"
   },
   "chooseHour": {
-    "message": "Choose after what hour"
+    "message": "Set the hour"
   },
   "ip": {
     "message": "IP"
@@ -713,5 +713,23 @@
   },
   "typeLabel": {
     "message": "Selected protocol"
+  },
+  "chooseMinute": {
+    "message": "Set a minute"
+  },
+  "advSettings": {
+    "message": "Advanced setting:"
+  },
+  "customTimeOut": {
+    "message": "Customize the time of the next vote (timeout)"
+  },
+  "lastDayMonth": {
+    "message": "Применять кастомный timeout только последнего числа месяца"
+  },
+  "customTimeOut2": {
+    "message": "Custom timeout"
+  },
+  "lastDayMonth2": {
+    "message": "on the last day of the month"
   }
 }

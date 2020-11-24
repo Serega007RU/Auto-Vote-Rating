@@ -7,10 +7,10 @@ function vote () {
 				return;
 			}
 			if (document.querySelector("#center > div > h1") != null && document.querySelector("#center > div > h1").textContent.includes('Successfully voted')) {
-				sendMessage('successfully');
+				chrome.runtime.sendMessage({successfully: true})
 				return;
 			} else if (document.querySelector("#center > div > h1") != null && document.querySelector("#center > div > h1").textContent.includes('You already voted')) {
-                sendMessage('later');
+                chrome.runtime.sendMessage({later: true})
                 return;
 			}
 			let nick = getNickName(result.AVMRprojectsPlanetMinecraft);
@@ -19,9 +19,9 @@ function vote () {
             document.querySelector("#submit_vote_form > input.r3submit").click()
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
-				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
+				chrome.runtime.sendMessage({message: 'Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent})
 			} else {
-				sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
+				chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack})
 			}
 		}
 	});
@@ -34,14 +34,8 @@ function getNickName(projects) {
         }
     }
     if (!document.URL.startsWith('https://www.planetminecraft.com/server/')) {
-    	sendMessage('Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL');
+    	chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
     } else {
-        sendMessage('Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL);
+        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
     }
-}
-
-function sendMessage(message) {
-    chrome.runtime.sendMessage({
-         message: message
-    }, function(response) {});
 }

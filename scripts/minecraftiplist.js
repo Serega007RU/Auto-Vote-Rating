@@ -8,7 +8,7 @@ function vote () {
 			}
 			if (document.querySelector("#Content > div.Error") != null) {
                 if (document.querySelector("#Content > div.Error").textContent.includes('You did not complete the crafting table correctly')) {
-				    sendMessage('Не удалось пройти капчу');
+				    chrome.runtime.sendMessage({message: document.querySelector("#Content > div.Error").textContent})
 				    return;
 			    }
 			    if (document.querySelector("#Content > div.Error").textContent.includes('last voted for this server')) {
@@ -26,19 +26,19 @@ function vote () {
 						count++;
 					}
 					var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000);
-                    sendMessage('later ' + (Date.now() + (86400000 - milliseconds)));
+                    chrome.runtime.sendMessage({later: Date.now() + (86400000 - milliseconds)})
                     return;
 			    }
-			    sendMessage(document.querySelector("#Content > div.Error").textContent);
+			    chrome.runtime.sendMessage({message: document.querySelector("#Content > div.Error").textContent})
 			    return;
 			}
 			if (document.querySelector("#Content > div.Good") != null && document.querySelector("#Content > div.Good").textContent.includes('You voted for this server!')) {
-                sendMessage('successfully');
+                chrome.runtime.sendMessage({successfully: true})
                 return;
 			}
 			if (document.querySelector("#InnerWrapper").innerText.includes('";')) return;
             if (!await getRecipe()) {
-               	sendMessage('Не удалось найти рецепт: ' + document.querySelector("table[class='CraftingTarget']").firstElementChild.firstElementChild.firstElementChild.firstElementChild.src);
+               	chrome.runtime.sendMessage({message: 'Не удалось найти рецепт: ' + document.querySelector("table[class='CraftingTarget']").firstElementChild.firstElementChild.firstElementChild.firstElementChild.src})
                	return;
             }
             await craft();
@@ -48,9 +48,9 @@ function vote () {
             document.querySelector("#votebutton").click();
 		} catch (e) {
 			if (document.URL.startsWith('chrome-error') || document.querySelector("#error-information-popup-content > div.error-code") != null) {
-				sendMessage('Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent)
+				chrome.runtime.sendMessage({message: 'Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector("#error-information-popup-content > div.error-code").textContent})
 			} else {
-				sendMessage('Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack);
+				chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ": " + e.message + "\n" + e.stack})
 			}
 		}
 	});
@@ -63,16 +63,10 @@ function getNickName(projects) {
         }
     }
     if (!document.URL.startsWith('https://www.minecraftiplist.com/index.php?action=vote&listingID=')) {
-    	sendMessage('Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL');
+    	chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
     } else {
-        sendMessage('Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL);
+        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
     }
-}
-
-function sendMessage(message) {
-    chrome.runtime.sendMessage({
-         message: message
-    }, function(response) {});
 }
 
 var content = [0,0,0,0,0,0,0,0,0];

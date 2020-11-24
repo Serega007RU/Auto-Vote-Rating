@@ -438,6 +438,10 @@ p, form, label, details {
   -ms-user-select: none;
 }
 
+input.checkbox:disabled + label {
+  opacity: .5;
+}
+
 .checkbox + label:last-child { margin-bottom: 0; }
 
 .checkbox + label:before {
@@ -691,10 +695,6 @@ figure svg {
   visibility: visible;
 }
 
-#idSelector {
-  height: 95px;
-}
-
 textarea {
   height: 250px;
 }
@@ -797,4 +797,7 @@ ul li:hover {
   margin: 1rem 0 !important;
   width: 100%;
   text-align: center !important;
+
+#idSelector {
+  height: 95px;
 }

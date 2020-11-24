@@ -36,7 +36,7 @@ var randomizeOption = false;
 var returnAdd;
 
 //Конструктор проекта
-function Project(top, nick, id, time, responseURL, hour, priority) {
+function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
     if (top == "TopCraft") this.TopCraft = true;
     if (top == "McTOP") this.McTOP = true;
     if (top == "MCRate") this.MCRate = true;
@@ -59,10 +59,11 @@ function Project(top, nick, id, time, responseURL, hour, priority) {
     if (top == "TopGames") this.TopGames = true;
     if (top == "Custom") {
         this.Custom = true;
-        if (time) {
-            this.timeout = parseInt(time)
+        if (customTimeOut.ms) {
+            this.timeout = customTimeOut.ms
         } else {
-            this.timeoutHour = parseInt(hour)
+            this.timeoutHour = customTimeOut.hour
+            this.timeoutMinute = customTimeOut.minute
         }
         this.time = null;
         this.nick = nick;
@@ -71,6 +72,15 @@ function Project(top, nick, id, time, responseURL, hour, priority) {
     } else {
         this.nick = nick;
         this.id = id;
+        if (customTimeOut) {
+            if (document.getElementById('lastDayMonth').checked) this.lastDayMonth = true
+            if (customTimeOut.ms) {
+                this.timeout = customTimeOut.ms
+            } else {
+                this.timeoutHour = customTimeOut.hour
+                this.timeoutMinute = customTimeOut.minute
+            }
+        }
         this.time = time;
     }
     if (priority) this.priority = true;
@@ -321,6 +331,51 @@ async function restoreOptions() {
                 randomizeOption = this.checked;
                 return;
             }
+            if (this.id == 'customTimeOut') {
+                if (this.checked) {
+                    document.getElementById('lastDayMonth').disabled = false
+                    document.getElementById('label6').removeAttribute('style')
+                    document.getElementById('selectTime').removeAttribute('style')
+                    if (document.getElementById('selectTime').value == 'ms') {
+                        document.getElementById('label3').removeAttribute('style')
+                        document.getElementById('time').removeAttribute('style')
+                        document.getElementById('time').required = true
+                        document.getElementById('label7').style.display = 'none'
+                        document.getElementById('label8').style.display = 'none'
+                        document.getElementById('hour').style.display = 'none'
+                        document.getElementById('hour').required = false
+                        document.getElementById('minute').style.display = 'none'
+                        document.getElementById('minute').required = false
+                    } else {
+                        document.getElementById('label7').removeAttribute('style')
+                        document.getElementById('label8').removeAttribute('style')
+                        document.getElementById('hour').removeAttribute('style')
+                        document.getElementById('hour').required = true
+                        document.getElementById('minute').removeAttribute('style')
+                        document.getElementById('minute').required = true
+                        document.getElementById('label3').style.display = 'none'
+                        document.getElementById('time').style.display = 'none'
+                        document.getElementById('time').required = false
+                    }
+                } else {
+                    document.getElementById('lastDayMonth').disabled = true
+                    document.getElementById('label6').style.display = 'none'
+                    document.getElementById('selectTime').style.display = 'none'
+                    document.getElementById('label3').style.display = 'none'
+                    document.getElementById('time').style.display = 'none'
+                    document.getElementById('time').required = false
+                    document.getElementById('label7').style.display = 'none'
+                    document.getElementById('label8').style.display = 'none'
+                    document.getElementById('hour').style.display = 'none'
+                    document.getElementById('hour').required = false
+                    document.getElementById('minute').style.display = 'none'
+                    document.getElementById('minute').required = false
+                }
+                return
+            }
+            if (this.id == 'lastDayMonth') {
+                return
+            }
             await setValue('AVMRsettings', settings, true);
         });
     }
@@ -378,7 +433,7 @@ async function addProjectList(project, visually) {
     if (!(project.time == null || project.time == "")) {
         if (Date.now() < project.time) text = new Date(project.time).toLocaleString().replace(',', '')
     }
-    html.innerHTML = '<div> <span id="stats┄' + id + '" class="statsProject"> <svg width="24" height="24" viewBox="0 2 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7"/><path d="M15 7h6v6"/></svg> </span><span id="' + id + '" class="deleteProject"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="4" x2="6" y2="16"></line><line x1="6" y1="4" x2="18" y2="16"></line></svg></div>' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + '<br>' + (project.error ? '<span style="color:#f44336;">' + project.error + '</span><br>' : '') + chrome.i18n.getMessage('nextVote') + ' ' + text;
+    html.innerHTML = '<div> <span id="stats┄' + id + '" class="statsProject"> <svg width="24" height="24" viewBox="0 2 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7"/><path d="M15 7h6v6"/></svg> </span><span id="' + id + '" class="deleteProject"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="4" x2="6" y2="16"></line><line x1="6" y1="4" x2="18" y2="16"></line></svg></div>' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + '<br>' + (project.error ? '<span style="color:#f44336;">' + project.error + '</span><br>' : '') + chrome.i18n.getMessage('nextVote') + ' ' + text;
     listProject.after(html)
     //Слушатель кнопки Удалить на проект
     document.getElementById(id).addEventListener('click', function() {
@@ -627,9 +682,9 @@ function updateProjectList() {
 document.getElementById('addProject').addEventListener('submit', () => {
     event.preventDefault();
     if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('selectTime').value == 'ms' ? document.getElementById('time').value : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? null : document.getElementById('hour').value), priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, null, document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? {ms: parseInt(document.getElementById('time').value)} : {hour: parseInt(document.getElementById('hour').value), minute: parseInt(document.getElementById('minute').value)}), priorityOption, null);
     } else {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, null, priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, (document.getElementById('customTimeOut').checked ? (document.getElementById('selectTime').value == 'ms' ? {ms: parseInt(document.getElementById('time').value)} : {hour: parseInt(document.getElementById('hour').value), minute: parseInt(document.getElementById('minute').value)}) : null), priorityOption, null);
     }
 });
 
@@ -933,7 +988,7 @@ document.getElementById('timeout').addEventListener('submit', () => {
     setCoolDown();
 });
 
-async function addProject(choice, nick, id, time, response, hour, priorityOpt, element) {
+async function addProject(choice, nick, id, time, response, customTimeOut, priorityOpt, element) {
     updateStatusAdd('<div>' + chrome.i18n.getMessage('adding') + '</div>', true, element);
     let project;
     if (choice == 'Custom') {
@@ -944,9 +999,9 @@ async function addProject(choice, nick, id, time, response, hour, priorityOpt, e
             updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element);
             return;
         }
-        project = new Project(choice, nick, body, time, response, hour, priorityOpt);
+        project = new Project(choice, nick, body, time, response, customTimeOut, priorityOpt);
     } else {
-        project = new Project(choice, nick, id, null, null, null, priorityOpt);
+        project = new Project(choice, nick, id, time, null, customTimeOut, priorityOpt);
     }
 
     if (randomizeOption) {
@@ -1230,7 +1285,7 @@ async function addProject(choice, nick, id, time, response, hour, priorityOpt, e
                         });
                     } else {
                         openPoput(url2, function () {
-                            addProject(choice, nick, id, time, response, hour, priorityOpt, element);
+                            addProject(choice, nick, id, time, response, customTimeOut, priorityOpt, element);
                         });
                     }
                 });
@@ -1243,17 +1298,17 @@ async function addProject(choice, nick, id, time, response, hour, priorityOpt, e
         }
     }
     
-    let random = false;
-    if (projectURL.toLowerCase().includes('pandamium')) {
-        project.randomize = true;
-        random = true;
-    }
+//     let random = false;
+//     if (projectURL.toLowerCase().includes('pandamium')) {
+//         project.randomize = true;
+//         random = true;
+//     }
 
     await addProjectList(project, false);
     
-    if (random) {
+    /*f (random) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
-    } else if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames) && settings.enabledSilentVote) {
+    } else*/ if ((project.FairTop || project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames) && settings.enabledSilentVote) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span>', true, element);
     } else if (project.MinecraftServersOrg) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center">' + chrome.i18n.getMessage('privacyPass') +'</div>', true, element);
@@ -1281,18 +1336,18 @@ function addProjectsBonus(project) {
                 updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('redirectedSecondBonus', response.url) +'</div>', true, element);
                 return;
             }
-            await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus2Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=2&item=2","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus3Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=3&item=4","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus4Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=4&item=7","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus5Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=5&item=9","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonus6Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=6&item=11","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
-            await addProject('Custom', 'MythicalWorldBonusMith', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"type=1&bonus=1&value=5","method":"POST","mode":"cors"}', 86400000, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus2Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=2&item=2","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus3Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=3&item=4","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus4Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=4&item=7","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus5Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=5&item=9","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonus6Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=6&item=11","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://mythicalworld.su/bonus', null, priorityOption, null);
+            await addProject('Custom', 'MythicalWorldBonusMith', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"type=1&bonus=1&value=5","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://mythicalworld.su/bonus', null, priorityOption, null);
         });
     } else if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async () => {
-            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/","referrerPolicy":"no-referrer-when-downgrade","body":"give_daily_posted=1&token=%7Btoken%7D&return=%252F","method":"POST","mode":"cors"}', 86400000, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', null, priorityOption, null);
-            //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', 604800000, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null);
+            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/","referrerPolicy":"no-referrer-when-downgrade","body":"give_daily_posted=1&token=%7Btoken%7D&return=%252F","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', null, priorityOption, null);
+            //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null);
         });
     }
 }
@@ -2339,13 +2394,9 @@ selectedTop.addEventListener("change", function() {
         document.getElementById('customBody').style.display = 'none'
         document.getElementById('label1').style.display = 'none'
         document.getElementById('label2').style.display = 'none'
-        document.getElementById('label3').style.display = 'none'
         document.getElementById('label4').style.display = 'none'
         document.getElementById('label5').style.display = 'none'
-        document.getElementById('label6').style.display = 'none'
         document.getElementById('responseURL').style.display = 'none'
-        document.getElementById('time').style.display = 'none'
-        document.getElementById('time').required = false
         document.getElementById('countVote').style.display = 'none'
         document.getElementById('countVote').required = false
         document.getElementById('selectLang1').style.display = 'none'
@@ -2359,11 +2410,27 @@ selectedTop.addEventListener("change", function() {
         document.getElementById('chooseGame2').style.display = 'none'
         document.getElementById('chooseGame2').required = false
         document.getElementById('idGame').style.display = 'none'
-        document.getElementById('selectTime').style.display = 'none'
-        document.getElementById('label7').style.display = 'none'
-        document.getElementById('hour').style.display = 'none'
+        document.getElementById('customTimeOut').disabled = false
+        if (!document.getElementById('customTimeOut').checked) {
+            document.getElementById('label6').style.display = 'none'
+            document.getElementById('selectTime').style.display = 'none'
+            document.getElementById('label3').style.display = 'none'
+            document.getElementById('time').style.display = 'none'
+            document.getElementById('time').required = false
+            document.getElementById('label7').style.display = 'none'
+            document.getElementById('label8').style.display = 'none'
+            document.getElementById('hour').style.display = 'none'
+            document.getElementById('hour').required = false
+            document.getElementById('minute').style.display = 'none'
+            document.getElementById('minute').required = false
+        }
 
         if (selectedTop.value == 'Custom') {
+            document.getElementById('customTimeOut').disabled = true
+            document.getElementById('customTimeOut').checked = false
+            document.getElementById('lastDayMonth').disabled = true
+            document.getElementById('lastDayMonth').checked = false
+
             idSelector.innerHTML = '';
             idSelector.setAttribute('style', 'height: 0px;')
             
@@ -2378,14 +2445,21 @@ selectedTop.addEventListener("change", function() {
                 document.getElementById('time').removeAttribute('style')
                 document.getElementById('time').required = true
                 document.getElementById('label7').style.display = 'none'
+                document.getElementById('label8').style.display = 'none'
                 document.getElementById('hour').style.display = 'none'
+                document.getElementById('hour').required = false
+                document.getElementById('minute').style.display = 'none'
+                document.getElementById('minute').required = false
             } else {
                 document.getElementById('label7').removeAttribute('style')
+                document.getElementById('label8').removeAttribute('style')
                 document.getElementById('hour').removeAttribute('style')
+                document.getElementById('hour').required = true
+                document.getElementById('minute').removeAttribute('style')
+                document.getElementById('minute').required = true
                 document.getElementById('label3').style.display = 'none'
                 document.getElementById('time').style.display = 'none'
                 document.getElementById('time').required = false
-
             }
             
             document.querySelector("#addProject > div:nth-child(2) > div:nth-child(1) > label").textContent = chrome.i18n.getMessage('name');
@@ -2432,10 +2506,18 @@ document.getElementById('selectTime').addEventListener('change', function() {
         document.getElementById('time').removeAttribute('style')
         document.getElementById('time').required = true
         document.getElementById('label7').style.display = 'none'
+        document.getElementById('label8').style.display = 'none'
         document.getElementById('hour').style.display = 'none'
+        document.getElementById('hour').required = false
+        document.getElementById('minute').style.display = 'none'
+        document.getElementById('minute').required = false
     } else {
         document.getElementById('label7').removeAttribute('style')
+        document.getElementById('label8').removeAttribute('style')
         document.getElementById('hour').removeAttribute('style')
+        document.getElementById('hour').required = true
+        document.getElementById('minute').removeAttribute('style')
+        document.getElementById('minute').required = true
         document.getElementById('label3').style.display = 'none'
         document.getElementById('time').style.display = 'none'
         document.getElementById('time').required = false
