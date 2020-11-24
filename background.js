@@ -415,10 +415,9 @@ async function silentVote(project) {
 				endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
 				return;
 			}
-			if (response.status == 400) {
-				html = await response.text()
-				doc = new DOMParser().parseFromString(html, "text/html")
-				console.warn('Текст ошибки 400: ' + doc.body.innerText)
+			html = await response.text()
+			if (response.status == 400 && html.length != 0) {
+				console.warn('Текст ошибки 400:', html)
 				endVote({later: true}, null, project);
 				return;
 			} else if (!response.ok) {
@@ -452,10 +451,9 @@ async function silentVote(project) {
 				endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project);
 				return;
 			}
-			if (response.status == 400) {
-				html = await response.text()
-				doc = new DOMParser().parseFromString(html, "text/html")
-				console.warn('Текст ошибки 400: ' + doc.body.innerText)
+			html = await response.text()
+			if (response.status == 400 && html.length != 0) {
+				console.warn('Текст ошибки 400:', html)
 				endVote({later: true}, null, project);
 				return;
 			} else if (!response.ok) {
