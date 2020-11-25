@@ -35,6 +35,14 @@ var randomizeOption = false;
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd;
 
+var authVKUrls = new Map([
+    ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
+    ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
+    ['MCRate', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
+    ['MinecraftRating', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
+    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html']
+])
+
 //Конструктор проекта
 function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
     if (top == "TopCraft") this.TopCraft = true;
@@ -690,80 +698,165 @@ document.getElementById('addProject').addEventListener('submit', () => {
 
 //Слушатель кнопки "Добавить" на MultiVote VKontakte
 document.getElementById('AddVK').addEventListener('click', async () => {
-    event.preventDefault();
-    updateStatusVK(chrome.i18n.getMessage('adding'), true);
-    let response;
-    try {
-        response = await fetch('https://vk.com/');
-    } catch (e) {
-        if (e == 'TypeError: Failed to fetch') {
-            updateStatusVK('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnectInternet') + '</span>', true, element);
-            return;
-        } else {
-            updateStatusVK('<span style="color:#f44336;">' + e + '</span>', true, element);
-            return;
+    event.preventDefault()
+    if (confirm('Все куки и вкладки ВКонтакте будут удалены, вы согласны?')) {
+        //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
+        updateStatusVK(chrome.i18n.getMessage('deletingAllVK'), true)
+
+        await new Promise(resolve => {
+            chrome.tabs.query({url: '*://*.vk.com/*'}, function(tabs) {
+                for (tab of tabs) {
+                    chrome.tabs.remove(tab.id)
+                }
+                resolve()
+            })
+        })
+
+        let cookies = await new Promise(resolve => {
+            chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+                resolve(cookies)
+            })
+        })
+        for(let i=0; i<cookies.length;i++) {
+            await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+        }
+
+        updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('deletedAllVK') + '</span>', false)
+        updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('openPopupVK') + '</span>', true)
+        
+        //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
+        await new Promise(resolve => {
+            openPoput('https://oauth.vk.com/authorize?client_id=-1&display=widget&redirect_uri=close.html&widget=4', function () {
+                resolve()
+            })
+        })
+
+        //После закрытия окна авторизации попытка добавить аккаунт ВКонтакте
+        updateStatusVK(chrome.i18n.getMessage('adding'), true)
+        let response
+        try {
+            response = await fetch('https://vk.com/')
+        } catch (e) {
+            if (e == 'TypeError: Failed to fetch') {
+                updateStatusVK('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnectInternet') + '</span>', true, element)
+                return
+            } else {
+                updateStatusVK('<span style="color:#f44336;">' + e + '</span>', true, element)
+                return
+            }
+        }
+        if (!response.ok) {
+            updateStatusVK('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status + '</span>', true)
+            return
+        }
+        //Почему не UTF-8?
+        response = await new Response(new TextDecoder("windows-1251").decode(await response.arrayBuffer()))
+        let html = await response.text()
+        let doc = new DOMParser().parseFromString(html, "text/html")
+        if (doc.querySelector("#index_login_button") != null) {
+            updateStatusVK('<span style="color:#f44336;">' + chrome.i18n.getMessage('notAuthVK') + '</span>', true)
+            return
+        }
+        let VK = {}
+        try {
+            VK.name = doc.querySelector("#top_vkconnect_link > div > div.top_profile_vkconnect_name").textContent
+            VK.id = doc.querySelector("#l_pr > a").href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
+        } catch(e) {
+            updateStatusVK('<span style="color:#f44336;">' + e + '</span>', true, element)
+            return
+        }
+
+        for (let vkontakte of VKs) {
+            if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
+                updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('added') + '</span>', false)
+                await wait(1500)
+                await checkAuthVK()
+                return
+            }
+        }
+        
+        //Достаём все куки ВКонтакте и запоминаем их
+        VK.cookies = await new Promise(resolve => {
+            chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+                resolve(cookies)
+            })
+        })
+
+        let i = 0
+        for (let cookie of VK.cookies) {
+            if (cookie.name == "tmr_detect") {
+                VK.cookies.splice(i, 1)
+                break
+            }
+            i++
+        }
+
+        await addVKList(VK, false)
+        
+        updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + VK.name + '</span>', false)
+
+        await wait(1500)
+        await checkAuthVK()
+    }
+})
+
+//Проверяем авторизацию на всех Майнкрафт рейтингах где есть авторизация ВКонтакте и если пользователь не авторизован - предлагаем ему авторизоваться
+async function checkAuthVK() {
+    updateStatusVK(chrome.i18n.getMessage('checkAuthVK'), true)
+    let authStatus = '<div style="display: inline; color:#f44336;">' + chrome.i18n.getMessage('notAuthVKTop')
+    let needReturn = false
+    for (let [key, value] of authVKUrls) {
+        let response2
+        try {
+            response2 = await fetch(value, {redirect: 'manual'})
+        } catch (e) {
+            if (e == 'TypeError: Failed to fetch') {
+                updateStatusVK('<div style="color:#f44336;">' + chrome.i18n.getMessage('notConnectInternetVPN') + '</div>', true)
+            } else {
+                updateStatusVK('<div style="color:#f44336;">' + e + '</div>', true)
+            }
+            needReturn = true
+        }
+
+        if (response2.ok) {
+            authStatus += ' <a href="#" id="authvk' + key + '">' + key + '</a>, '
+//             updateStatusVK(authStatus, true)
+            needReturn = true
+        } else if (response2.status != 0) {
+            updateStatusVK('<div style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status + '</div>', true);
+            needReturn = true
         }
     }
-    if (!response.ok) {
-        updateStatusVK('<span style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status + '</span>', true);
-        return;
-    }
-    //Почему не UTF-8?
-    response = await new Response(new TextDecoder("windows-1251").decode(await response.arrayBuffer()));
-    let html = await response.text();
-    let doc = new DOMParser().parseFromString(html, "text/html");
-    if (doc.querySelector("#index_login_button") != null) {
-        updateStatusVK('<span style="color:#f44336;">' + chrome.i18n.getMessage('notAuthVK') + '</span>', true);
-        return;
-    }
-
-    let VK = {};
-    VK.cookies = await new Promise(resolve => {
-        chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
-            resolve(cookies);
-        });
-    });
-    
-    let i = 0;
-    for (let cookie of VK.cookies) {
-        if (cookie.name == "tmr_detect") {
-            VK.cookies.splice(i, 1);
+    if (needReturn) {
+        authStatus += chrome.i18n.getMessage('notAcceptAuth') + '</div>'
+        updateStatusVK(authStatus, true)
+        for (let [key, value] of authVKUrls) {
+            if (document.getElementById('authvk' + key) != null) {
+                document.getElementById('authvk' + key).addEventListener('click', function() {
+                    openPoput(value, function () {
+                        checkAuthVK()
+                    })
+                })
+            }
         }
-        i++;
+        return
     }
+    updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('authOK') + '</span>', false)
+}
 
-    try {
-        VK.name = doc.querySelector("#top_vkconnect_link > div > div.top_profile_vkconnect_name").textContent;
-        VK.id = doc.querySelector("#l_pr > a").href.replace('chrome-extension://' + chrome.runtime.id + '/', '');
-    } catch(e) {
-        updateStatusVK('<span style="color:#f44336;">' + e + '</span>', true, element);
-        return;
-    }
-
-    for (let vkontakte of VKs) {
-        if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
-            updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('added') + '</span>', false);
-            return;
-        }
-    }
-
-    await addVKList(VK, false);
-    updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + VK.name + '</span>', false);
-});
-
-//Слушатель кнопки "Удалить куки" на MultiVote VKontakte
-document.getElementById('deleteAllVKCookies').addEventListener('click', async () => {
-    updateStatusVK(chrome.i18n.getMessage('deletingAllVKCookies'), true);
-    let cookies = await new Promise(resolve => {
-        chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
-            resolve(cookies);
-        });
-    });
-    for(let i=0; i<cookies.length;i++) {
-        await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
-    }
-    updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('deletedAllVKCookies') + '</span>', false);
-});
+// //Слушатель кнопки "Удалить куки" на MultiVote VKontakte
+// document.getElementById('deleteAllVKCookies').addEventListener('click', async () => {
+//     updateStatusVK(chrome.i18n.getMessage('deletingAllVKCookies'), true);
+//     let cookies = await new Promise(resolve => {
+//         chrome.cookies.getAll({domain: ".vk.com"}, function(cookies) {
+//             resolve(cookies);
+//         });
+//     });
+//     for(let i=0; i<cookies.length;i++) {
+//         await removeCookie("https://" + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name);
+//     }
+//     updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('deletedAllVKCookies') + '</span>', false);
+// });
 
 //Слушатель кнопки "Удалить всё" на Прокси
 document.getElementById('deleteAllProxies').addEventListener('click', async () => {
@@ -1258,12 +1351,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         //Проверка авторизации ВКонтакте
         if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && !settings.useMultiVote) {
             updateStatusAdd('<div>' + chrome.i18n.getMessage('checkAuthVK') + '</div>', true, element);
-            let url2;
-            if (project.TopCraft) url2 = "https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email";
-            if (project.McTOP) url2 = "https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email";
-            if (project.MCRate) url2 = "https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a";
-            if (project.MinecraftRating) url2 = "https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45";
-            if (project.MonitoringMinecraft) url2 = "https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html";
+            let url2 = authVKUrls.get(getProjectName(project))
             let response2;
             try {
                 response2 = await fetch(url2, {redirect: 'manual'});
@@ -1581,6 +1669,14 @@ async function clearProxy() {
 			resolve();
 		});
 	});
+}
+
+async function wait(ms) {
+    return new Promise(resolve => {
+		setTimeout(() => {
+			resolve()
+		}, ms)
+	})
 }
 
 //Слушатель на изменение настроек
