@@ -40,6 +40,9 @@ var secondVoteMinecraftIpList = false;
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 var check = true
 
+//ToDo <Serega007> временно
+let captchaRequired = false
+
 //Инициализация настроек расширения
 initializeConfig();
 async function initializeConfig() {
@@ -1074,6 +1077,7 @@ chrome.webNavigation.onErrorOccurred.addListener(function (details) {
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
 	//Если требует ручное прохождение капчи
 	if (request.captcha && sender && openedProjects.has(sender.tab.id)) {
+		captchaRequired = true
 		let project = openedProjects.get(sender.tab.id);
 		console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.i18n.getMessage('requiresCaptcha'));
         if (!settings.disabledNotifWarn) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.i18n.getMessage('requiresCaptcha'));
@@ -1086,8 +1090,9 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
 async function endVote(request, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         project = openedProjects.get(sender.tab.id)
-        //ToDo <Serega007> временно добавлено условие для диагностирования ошибки null на MinecraftMp
-        if (request.successfully || request.later) {
+        //ToDo <Serega007> это написано временно для диагностирования фантомной ошибки "Требуется ручное прохождение капчи"
+        if (!captchaRequired) {
+//         if (request.successfully || request.later) {
 			chrome.tabs.remove(sender.tab.id, function() {
 				if (chrome.runtime.lastError) {
 					console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message)
@@ -1131,16 +1136,6 @@ async function endVote(request, sender, project) {
 	let sendMessage = '';
 	if (request.successfully || request.later) {
         let time = new Date()
-        if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(), time.getMonth() +1, 0).getDate() != time.getDate())) {
-			if (project.timeoutHour) {
-				if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
-					time.setDate(time.getDate() + 1)
-				}
-				time.setHours(project.timeoutHour, project.timeoutMinute, 0, 0)
-			} else {
-				time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
-			}
-        } else 
         if (project.TopCraft || project.McTOP || project.FairTop || project.MinecraftRating || project.IonMc) {//Топы на которых время сбрасывается в 00:00 по МСК
             if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
             	time.setUTCDate(time.getUTCDate() + 1);
@@ -1156,7 +1151,7 @@ async function endVote(request, sender, project) {
             	time.setUTCDate(time.getUTCDate() + 1);
             }
             time.setUTCHours(23, (project.priority ? 0 : 10), 0, 0);
-        } else if (project.PlanetMinecraft) {
+        } else if (project.PlanetMinecraft || project.MinecraftMp) {
             if (time.getUTCHours() > 5 || (time.getUTCHours() == 5 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
             	time.setUTCDate(time.getUTCDate() + 1);
             }
@@ -1166,24 +1161,22 @@ async function endVote(request, sender, project) {
             	time.setUTCDate(time.getUTCDate() + 1);
             }
             time.setUTCHours(0, (project.priority ? 0 : 10), 0, 0);
-        } else if (project.TopMinecraftServers || project.MinecraftMp) {
+        } else if (project.TopMinecraftServers) {
             if (time.getUTCHours() > 4 || (time.getUTCHours() == 4 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
             	time.setUTCDate(time.getUTCDate() + 1);
             }
             time.setUTCHours(4, (project.priority ? 0 : 10), 0, 0);
         }
 		if (request.later && request.later != true) {
-			time = request.later
+			time = new Date(request.later)
 			if (project.ServeurPrive || project.TopGames) {
 				project.countVote = project.countVote + 1;
 				if (project.countVote >= project.maxCountVote) {
 					time = new Date();
 					time.setDate(time.getDate() + 1);
 					time.setHours(0, (project.priority ? 0 : 10), 0, 0);
-					time = time.getTime();
 				}
 			}
-			project.time = time;
 		} else {
 			if (project.TopG || project.MinecraftServersBiz) {
 				time.setUTCHours(time.getUTCHours() + 12);
@@ -1216,9 +1209,21 @@ async function endVote(request, sender, project) {
 					time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
 				}
 			}
-			project.time = time.getTime();
-			time = time.getTime();
 		}
+
+        if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(), time.getMonth() +1, 0).getDate() != new Date().getDate())) {
+			if (project.timeoutHour) {
+				if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
+					time.setDate(time.getDate() + 1)
+				}
+				time.setHours(project.timeoutHour, project.timeoutMinute, 0, 0)
+			} else {
+				time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
+			}
+        }
+        
+        time = time.getTime()
+        project.time = time
 		
 		if (project.randomize) {
             project.time = project.time + Math.floor(Math.random() * 43200000);
@@ -1261,10 +1266,10 @@ async function endVote(request, sender, project) {
 		let retryCoolDown
 		if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
 			retryCoolDown = 300000;
-			sendMessage = request.message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
+			sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "5");
 		} else {
 			retryCoolDown = 900000;
-			sendMessage = request.message + '. ' + chrome.i18n.getMessage('errorNextVote', "15");
+			sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', "15");
 		}
         if (project.randomize) {
         	retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)
