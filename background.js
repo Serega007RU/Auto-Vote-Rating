@@ -40,9 +40,6 @@ var secondVoteMinecraftIpList = false;
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 var check = true
 
-//ToDo <Serega007> временно
-let captchaRequired = false
-
 //Инициализация настроек расширения
 initializeConfig();
 async function initializeConfig() {
@@ -1090,16 +1087,12 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
 async function endVote(request, sender, project) {
 	if (sender && openedProjects.has(sender.tab.id)) {//Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         project = openedProjects.get(sender.tab.id)
-        //ToDo <Serega007> это написано временно для диагностирования фантомной ошибки "Требуется ручное прохождение капчи"
-        if (!captchaRequired) {
-//         if (request.successfully || request.later) {
 			chrome.tabs.remove(sender.tab.id, function() {
 				if (chrome.runtime.lastError) {
 					console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message)
 					if (!settings.disabledNotifError) sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message)
 				}
 			})
-        }
         openedProjects.delete(sender.tab.id)
 	} else if (!project) return;//Что?
 	if (settings.cooldown < 10000) {

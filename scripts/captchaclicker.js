@@ -29,11 +29,12 @@ this.check2 = setInterval(()=>{
 //Проверяет прошла ли проверка ReCaptcha или hCaptcha
 let notified = false;
 this.check3 = setInterval(()=>{
-   	if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || document.getElementsByClassName('checkbox checked').length >= 1) {
+   	if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || document.getElementsByClassName('checkbox checked').length >= 1 || document.getElementById("g-recaptcha-response").value.length > 0) {
    		window.top.postMessage('vote', '*');
    		clearInterval(this.check);
    		clearInterval(this.check2);
    		clearInterval(this.check3);
+   		return
    	}
    	if (document.querySelector("#solver-button") == null && !notified && document.querySelector("#recaptcha-verify-button") != null && !document.querySelector("#recaptcha-verify-button").disabled) {
    	    notified = true;
