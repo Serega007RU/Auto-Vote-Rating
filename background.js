@@ -1538,18 +1538,28 @@ async function endVote(request, sender, project) {
 
 		if (settings.useMultiVote && !(settings.repeatAttemptLater && project.later && project.later >= 1 && request.later))  {
             if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
-				let usedProject = {};
-				usedProject.id = project.id;
-				usedProject.nextFreeVote = time;
+				let usedProject = {
+					id: project.id,
+					nextFreeVote: time
+				}
+                const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id == usedProject.id})
+				if (index > -1) {
+				    getTopFromList(currentVK, project).splice(index, 1);
+				}
 				getTopFromList(currentVK, project).push(usedProject);
                 VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK;
 				await setValue('AVMRVKs', VKs);
             }
             
 			if (currentProxy != null && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
-				let usedProject = {};
-				usedProject.id = project.id;
-				usedProject.nextFreeVote = time;
+				let usedProject = {
+					id: project.id,
+					nextFreeVote: time
+				}
+                const index = getTopFromList(currentProxy, project).findIndex(function(el) {return el.id == usedProject.id})
+				if (index > -1) {
+				    getTopFromList(currentProxy, project).splice(index, 1);
+				}
 				getTopFromList(currentProxy, project).push(usedProject);
                 proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy;
                 await setValue('AVMRproxies', proxies);
