@@ -611,6 +611,7 @@ async function silentVote(project) {
 						continue
 					} else {
 						endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
+						return
 					}
 				}
 
