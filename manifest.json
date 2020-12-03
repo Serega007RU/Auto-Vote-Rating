@@ -22,7 +22,7 @@
    },
    "permissions": [ "cookies", "storage", "notifications", "background", "\u003Call_urls>", "webRequest", "webRequestBlocking", "webNavigation" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "3.4.0",
+   "version": "3.4.1",
    "default_locale": "en",
    "web_accessible_resources": [
       "options.html"
