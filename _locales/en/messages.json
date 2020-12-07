@@ -724,7 +724,7 @@
     "message": "Customize the time of the next vote (timeout)"
   },
   "lastDayMonth": {
-    "message": "Применять кастомный timeout только последнего числа месяца"
+    "message": "Apply custom timeout only on the last day of the month"
   },
   "customTimeOut2": {
     "message": "Custom timeout"
@@ -743,5 +743,8 @@
   },
   "notAcceptAuth": {
     "message": "click to log in. If you are not going to vote on the listed ratings then just ignore this message"
+  },
+  "sheldTime": {
+    "message": "Schedule a vote"
   }
 }
