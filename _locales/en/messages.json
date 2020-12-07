@@ -613,12 +613,15 @@
     "message": "Customize the time of the next vote (timeout)"
   },
   "lastDayMonth": {
-    "message": "Применять кастомный timeout только последнего числа месяца"
+    "message": "Apply custom timeout only on the last day of the month"
   },
   "customTimeOut2": {
     "message": "Custom timeout"
   },
   "lastDayMonth2": {
     "message": "on the last day of the month"
+  },
+  "sheldTime": {
+    "message": "Schedule a vote"
   }
 }

@@ -338,6 +338,18 @@ async function restoreOptions() {
             if (this.id == 'lastDayMonth') {
                 return
             }
+            if (this.id == 'sheldTimeCheckbox') {
+                if (this.checked) {
+                    document.getElementById('label9').removeAttribute('style')
+                    document.getElementById('sheldTime').removeAttribute('style')
+                    document.getElementById('sheldTime').required = true
+                } else {
+                    document.getElementById('label9').style.display = 'none'
+                    document.getElementById('sheldTime').style.display = 'none'
+                    document.getElementById('sheldTime').required = false
+                }
+                return
+            }
             await setValue('AVMRsettings', settings, true);
         });
     }
@@ -526,9 +538,9 @@ function updateProjectList() {
 document.getElementById('addProject').addEventListener('submit', () => {
     event.preventDefault();
     if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, null, document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? {ms: parseInt(document.getElementById('time').value)} : {hour: parseInt(document.getElementById('hour').value), minute: parseInt(document.getElementById('minute').value)}), priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? {ms: parseInt(document.getElementById('time').value)} : {hour: parseInt(document.getElementById('hour').value), minute: parseInt(document.getElementById('minute').value)}), priorityOption, null);
     } else {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, null, null, (document.getElementById('customTimeOut').checked ? (document.getElementById('selectTime').value == 'ms' ? {ms: parseInt(document.getElementById('time').value)} : {hour: parseInt(document.getElementById('hour').value), minute: parseInt(document.getElementById('minute').value)}) : null), priorityOption, null);
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), null, (document.getElementById('customTimeOut').checked ? (document.getElementById('selectTime').value == 'ms' ? {ms: parseInt(document.getElementById('time').value)} : {hour: parseInt(document.getElementById('hour').value), minute: parseInt(document.getElementById('minute').value)}) : null), priorityOption, null);
     }
 });
 

@@ -146,6 +146,12 @@
 							    <label for="minute" data-resource="chooseMinute"></label>
 							</div>
                             <input style="display: none;" id="minute" name="chooseMinute" placeholder="chooseMinute" type="number" class="mb-2" min="0" max="59"></input>
+							
+							<div style="display: none;" id="label9" class="form-group mb-1">
+							    <label for="sheldTime" data-resource="sheldTime"></label>
+							</div>
+							<input style="display: none;" id="sheldTime" type="datetime-local" class="mb-2">
+
 							<div style="display: none;" id="label2" class="form-group mb-1">
 							    <label for="responseURL" data-resource="urlFetch"></label>
 							</div>
@@ -179,6 +185,9 @@
 							<br>
 							<input class="checkbox" id="lastDayMonth" type="checkbox" name="checkbox" disabled />
 							<label data-resource="lastDayMonth" for="lastDayMonth"></label> 
+							<br>
+							<input class="checkbox" id="sheldTimeCheckbox" type="checkbox" name="checkbox" />
+							<label data-resource="sheldTime" for="sheldTimeCheckbox"></label> 
 							<br>
 							<input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox" />
 							<label data-resource="disableCheckProjects" for="disableCheckProjects"></label> 
