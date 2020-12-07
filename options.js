@@ -1084,20 +1084,20 @@ async function addProxy(proxy) {
 
 async function checkProxy(proxy, scheme) {
     var config = {
-	    mode: 'fixed_servers',
-	    rules: {
-		    singleProxy: {
-			    scheme: scheme,
-				host: proxy.ip,
-				port: proxy.port
-		    }
-		}
-	}
-	await new Promise(resolve => {
-	    chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
-		    resolve()
-		})
-	})
+        mode: 'fixed_servers',
+        rules: {
+            singleProxy: {
+                scheme: scheme,
+                host: proxy.ip,
+                port: proxy.port
+            }
+        }
+    }
+    await new Promise(resolve => {
+        chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
+            resolve()
+        })
+    })
     let error = false
     try {
         let response = await fetch('http://example.com/')
@@ -1747,19 +1747,19 @@ async function setSyncValue(key, value) {
 }
 
 async function clearProxy() {
-	return new Promise(resolve => {
-		chrome.proxy.settings.clear({scope: 'regular'},function() {
-			resolve()
-		})
-	})
+    return new Promise(resolve => {
+        chrome.proxy.settings.clear({scope: 'regular'},function() {
+            resolve()
+        })
+    })
 }
 
 async function wait(ms) {
     return new Promise(resolve => {
-		setTimeout(() => {
-			resolve()
-		}, ms)
-	})
+        setTimeout(() => {
+            resolve()
+        }, ms)
+    })
 }
 
 //Слушатель на изменение настроек
@@ -2716,11 +2716,11 @@ document.getElementById('selectTime').addEventListener('change', function() {
 })
 
 async function removeCookie(url, name) {
-	return new Promise(resolve => {
-		chrome.cookies.remove({'url': url, 'name': name}, function(details) {
-			resolve(details)
-		})
-	})
+    return new Promise(resolve => {
+        chrome.cookies.remove({'url': url, 'name': name}, function(details) {
+            resolve(details)
+        })
+    })
 }
 
 //Локализация

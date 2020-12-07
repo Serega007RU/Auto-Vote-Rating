@@ -157,18 +157,18 @@ async function initializeConfig() {
             }
         })
 
-// 		if (chrome.privacy.network.webRTCMultipleRoutesEnabled !== undefined) {
-// 			await new Promise(resolve => { chrome.privacy.network.webRTCMultipleRoutesEnabled.set({ value: false }, function() {resolve()}) })
-// 		}
-// 		if (chrome.privacy.network.webRTCNonProxiedUdpEnabled !== undefined) {
-// 			await new Promise(resolve => { chrome.privacy.network.webRTCNonProxiedUdpEnabled.set({ value: false }, function() {resolve()}) })
-// 		}
-// 		if (chrome.privacy.network.webRTCIPHandlingPolicy !== undefined) {
-// 			await new Promise(resolve => { chrome.privacy.network.webRTCIPHandlingPolicy.set({ value: 'disable_non_proxied_udp' }, function() {resolve()}) })
-// 		}
-// 		if (chrome.privacy.network.networkPredictionEnabled !== undefined) {
-// 			await new Promise(resolve => { chrome.privacy.network.networkPredictionEnabled.set({ value: false }, function() {resolve()}) })
-// 		}
+//         if (chrome.privacy.network.webRTCMultipleRoutesEnabled !== undefined) {
+//             await new Promise(resolve => { chrome.privacy.network.webRTCMultipleRoutesEnabled.set({ value: false }, function() {resolve()}) })
+//         }
+//         if (chrome.privacy.network.webRTCNonProxiedUdpEnabled !== undefined) {
+//             await new Promise(resolve => { chrome.privacy.network.webRTCNonProxiedUdpEnabled.set({ value: false }, function() {resolve()}) })
+//         }
+//         if (chrome.privacy.network.webRTCIPHandlingPolicy !== undefined) {
+//             await new Promise(resolve => { chrome.privacy.network.webRTCIPHandlingPolicy.set({ value: 'disable_non_proxied_udp' }, function() {resolve()}) })
+//         }
+//         if (chrome.privacy.network.networkPredictionEnabled !== undefined) {
+//             await new Promise(resolve => { chrome.privacy.network.networkPredictionEnabled.set({ value: false }, function() {resolve()}) })
+//         }
     }
     
     //Проверка на голосование
@@ -452,10 +452,10 @@ async function newWindow(project) {
                     await setProxy(config)
 
 //                     if (chrome.benchmarking) {
-// 						await chrome.benchmarking.closeConnections()
-// 						await chrome.benchmarking.clearCache()
-// 						await chrome.benchmarking.clearHostResolverCache()
-// 						await chrome.benchmarking.clearPredictorCache()
+//                         await chrome.benchmarking.closeConnections()
+//                         await chrome.benchmarking.clearCache()
+//                         await chrome.benchmarking.clearHostResolverCache()
+//                         await chrome.benchmarking.clearPredictorCache()
 //                     }
 
                     currentProxy = proxy
@@ -1567,37 +1567,37 @@ async function endVote(request, sender, project) {
             project.time = project.time + Math.floor(Math.random() * 43200000)
         }
 
-		if (settings.useMultiVote && !(settings.repeatAttemptLater && project.later && project.later >= 1 && request.later))  {
+        if (settings.useMultiVote && !(settings.repeatAttemptLater && project.later && project.later >= 1 && request.later))  {
             if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
-				let usedProject = {
-					id: project.id,
-					nextFreeVote: time
-				}
+                let usedProject = {
+                    id: project.id,
+                    nextFreeVote: time
+                }
                 const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id == usedProject.id})
-				if (index > -1) {
-				    getTopFromList(currentVK, project).splice(index, 1)
-				}
-				getTopFromList(currentVK, project).push(usedProject)
+                if (index > -1) {
+                    getTopFromList(currentVK, project).splice(index, 1)
+                }
+                getTopFromList(currentVK, project).push(usedProject)
                 VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK
-				await setValue('AVMRVKs', VKs)
+                await setValue('AVMRVKs', VKs)
             }
             
-			if (currentProxy != null && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
-				let usedProject = {
-					id: project.id,
-					nextFreeVote: time
-				}
+            if (currentProxy != null && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
+                let usedProject = {
+                    id: project.id,
+                    nextFreeVote: time
+                }
                 const index = getTopFromList(currentProxy, project).findIndex(function(el) {return el.id == usedProject.id})
-				if (index > -1) {
-				    getTopFromList(currentProxy, project).splice(index, 1)
-				}
-				getTopFromList(currentProxy, project).push(usedProject)
+                if (index > -1) {
+                    getTopFromList(currentProxy, project).splice(index, 1)
+                }
+                getTopFromList(currentProxy, project).push(usedProject)
                 proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy
                 await setValue('AVMRproxies', proxies)
-			} else {
-				console.warn('currentProxy является null либо не найден')
-			}
-		}
+            } else {
+                console.warn('currentProxy является null либо не найден')
+            }
+        }
 
         if (request.successfully) {
             sendMessage = chrome.i18n.getMessage('successAutoVote')
@@ -1888,20 +1888,20 @@ async function setValue(key, value) {
 }
 
 async function clearProxy() {
-	if (debug) console.log('Удаляю прокси')
-	return new Promise(resolve => {
-		chrome.proxy.settings.clear({scope: 'regular'},function() {
-			resolve()
-		})
-	})
+    if (debug) console.log('Удаляю прокси')
+    return new Promise(resolve => {
+        chrome.proxy.settings.clear({scope: 'regular'},function() {
+            resolve()
+        })
+    })
 }
 
 async function setProxy(config) {
     return new Promise(resolve => {
         chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
             resolve()
-		})
-	})
+        })
+    })
 }
 async function wait(ms) {
     return new Promise(resolve=>{
