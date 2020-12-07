@@ -639,11 +639,11 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             url = 'https://minecraftservers.org/server/' + project.id;
             jsPath = "#left > div > h1";
         } else if (project.ServeurPrive) {
-			if (project.lang == 'en') {
-				url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
-			} else {
-				url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
-			}
+            if (project.lang == 'en') {
+                url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
+            } else {
+                url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
+            }
             jsPath = "#t > div > div > h2";
         } else if (project.PlanetMinecraft) {
             url = 'https://www.planetminecraft.com/server/' + project.id + '/';
@@ -909,26 +909,26 @@ function updateStatusAdd(text, disableTimer, element) {
 }
 
 function getProjectName(project) {
-	if (project.TopCraft) return 'TopCraft'
-	else if (project.McTOP) return 'McTOP'
-	else if (project.MCRate) return 'MCRate'
-	else if (project.MinecraftRating) return 'MinecraftRating'
-	else if (project.MonitoringMinecraft) return 'MonitoringMinecraft'
-	else if (project.IonMc) return 'IonMc'
-	else if (project.MinecraftServersOrg) return 'MinecraftServersOrg'
-	else if (project.ServeurPrive) return 'ServeurPrive'
-	else if (project.PlanetMinecraft) return 'PlanetMinecraft'
-	else if (project.TopG) return 'TopG'
-	else if (project.MinecraftMp) return 'MinecraftMp'
-	else if (project.MinecraftServerList) return 'MinecraftServerList'
-	else if (project.ServerPact) return 'ServerPact'
-	else if (project.MinecraftIpList) return 'MinecraftIpList'
-	else if (project.TopMinecraftServers) return 'TopMinecraftServers'
-	else if (project.MinecraftServersBiz) return 'MinecraftServersBiz'
-	else if (project.HotMC) return 'HotMC'
-	else if (project.MinecraftServerNet) return 'MinecraftServerNet'
-	else if (project.TopGames) return 'TopGames'
-	else if (project.Custom) return 'Custom'
+    if (project.TopCraft) return 'TopCraft'
+    else if (project.McTOP) return 'McTOP'
+    else if (project.MCRate) return 'MCRate'
+    else if (project.MinecraftRating) return 'MinecraftRating'
+    else if (project.MonitoringMinecraft) return 'MonitoringMinecraft'
+    else if (project.IonMc) return 'IonMc'
+    else if (project.MinecraftServersOrg) return 'MinecraftServersOrg'
+    else if (project.ServeurPrive) return 'ServeurPrive'
+    else if (project.PlanetMinecraft) return 'PlanetMinecraft'
+    else if (project.TopG) return 'TopG'
+    else if (project.MinecraftMp) return 'MinecraftMp'
+    else if (project.MinecraftServerList) return 'MinecraftServerList'
+    else if (project.ServerPact) return 'ServerPact'
+    else if (project.MinecraftIpList) return 'MinecraftIpList'
+    else if (project.TopMinecraftServers) return 'TopMinecraftServers'
+    else if (project.MinecraftServersBiz) return 'MinecraftServersBiz'
+    else if (project.HotMC) return 'HotMC'
+    else if (project.MinecraftServerNet) return 'MinecraftServerNet'
+    else if (project.TopGames) return 'TopGames'
+    else if (project.Custom) return 'Custom'
 }
 
 function getFullProjectName(project) {
@@ -1599,9 +1599,9 @@ function tabSelect(evt, tabs) {
     document.getElementById(tabs).style.display = "block";
     evt.currentTarget.className += " active";
     if (tabs == 'added') {
-    	document.getElementById('donate').style.display = 'none'
+        document.getElementById('donate').style.display = 'none'
     } else {
-    	document.getElementById('donate').style.display = 'inline'
+        document.getElementById('donate').style.display = 'inline'
     }
 }
 
