@@ -63,10 +63,11 @@ this.check = setInterval(()=>{
             var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
             var later = Date.now() + milliseconds
             chrome.runtime.sendMessage({later: later})
-        } else if (document.querySelector('div[class="message error"]').textContent.includes('успешн')) {
-            chrome.runtime.sendMessage({successfully: true})
         } else {
             chrome.runtime.sendMessage({message: document.querySelector('div[class="message error"]').textContent})
         }
+    } else if (document.querySelector('div[class="message success"]') != null) {
+        clearInterval(this.check)
+        chrome.runtime.sendMessage({successfully: true})
     }
 }, 1000)
