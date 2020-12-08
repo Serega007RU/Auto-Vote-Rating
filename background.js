@@ -18,6 +18,7 @@ var projectsMinecraftServersBiz = []
 var projectsHotMC = []
 var projectsMinecraftServerNet = []
 var projectsTopGames = []
+var projectsTMonitoring = []
 var projectsCustom = []
 
 var allProjects = [
@@ -40,6 +41,7 @@ var allProjects = [
     "HotMC",
     "MinecraftServerNet",
     "TopGames",
+    "TMonitoring",
     "Custom"
 ]
 
@@ -118,6 +120,11 @@ async function initializeConfig() {
                 proj.stats = {}
                 await changeProject(proj)
             })
+        }
+
+        //Если пользователь обновился с версии 3.4.1
+        if (projectsTMonitoring == null || !(typeof projectsTMonitoring[Symbol.iterator] === 'function')) {
+            projectsTMonitoring = []
         }
     }
 
@@ -338,7 +345,8 @@ async function newWindow(project) {
                 } else {
                     url = 'https://' + project.lang + '.top-games.net/' + project.game + '/vote/' + project.id
                 }
-            }
+            } else if (project.TMonitoring)
+                url = 'https://tmonitoring.com/server/' + project.id + '/'
             chrome.tabs.create({'url': url, 'selected': false}, function(tab) {
                 openedProjects.set(tab.id, project)
             })
@@ -969,7 +977,8 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     {hostSuffix: 'hotmc.ru'},
     {hostSuffix: 'minecraft-server.net'},
     {hostSuffix: 'top-games.net'},
-    {hostSuffix: 'top-serveurs.net'}
+    {hostSuffix: 'top-serveurs.net'},
+    {hostSuffix: 'tmonitoring.com'}
 ]})
 
 
@@ -1023,6 +1032,7 @@ chrome.webNavigation.onErrorOccurred.addListener(function(details) {
     {hostSuffix: 'minecraft-server.net'},
     {hostSuffix: 'top-games.net'},
     {hostSuffix: 'top-serveurs.net'},
+    {hostSuffix: 'tmonitoring.com'},
     {hostSuffix: 'vk.com'}
 ]})
 
@@ -1135,7 +1145,7 @@ async function endVote(request, sender, project) {
         } else {
             if (project.TopG || project.MinecraftServersBiz) {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet) {
+            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring) {
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (project.ServeurPrive || project.TopGames) {
                 project.countVote = project.countVote + 1

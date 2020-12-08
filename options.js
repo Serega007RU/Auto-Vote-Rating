@@ -18,6 +18,7 @@ var projectsHotMC = []
 var projectsMinecraftServerNet = []
 var projectsMinecraftServerNet = []
 var projectsTopGames = []
+var projectsTMonitoring = []
 var projectsCustom = []
 
 var allProjects = [
@@ -40,6 +41,7 @@ var allProjects = [
     "HotMC",
     "MinecraftServerNet",
     "TopGames",
+    "TMonitoring",
     "Custom"
 ]
 
@@ -531,6 +533,9 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 url = 'https://' + project.lang + '.top-games.net/' + project.game + '/' + project.id
             }
             jsPath = 'body > div.game-jumbotron > div > div > h1'
+        } else if (project.TMonitoring) {
+            url = 'https://tmonitoring.com/server/' + project.id + '/'
+            jsPath = 'div[class="info clearfix"] > div.pull-left > h1'
         }
         let response
         try {
@@ -663,7 +668,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     /*f (random) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
     } else*/
-    if ((project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames) && settings.enabledSilentVote) {
+    if ((project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring) && settings.enabledSilentVote) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span>', true, element)
     } else if (project.MinecraftServersOrg) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center">' + chrome.i18n.getMessage('privacyPass') + '</div>', true, element)
@@ -800,6 +805,8 @@ function getFullProjectName(project) {
         return 'Minecraft-Server.net'
     else if (project.TopGames)
         return 'Top-Games.net'
+    else if (project.TMonitoring)
+        return 'TMonitoring.com'
     else if (project.Custom)
         return chrome.i18n.getMessage('Custom')
 }
@@ -944,6 +951,7 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         projectsHotMC,
         projectsMinecraftServerNet,
         projectsTopGames,
+        projectsTMonitoring,
         projectsCustom,
         settings,
         generalStats
@@ -1381,6 +1389,8 @@ selectedTop.addEventListener('change', function() {
         idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraft-server.net/vote/<span style="color:#d32f2f;">TitanicFreak</span>/') + '</span></span></div>' + input
     } else if (selectedTop.value == 'TopGames') {
         idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://top-serveurs.net/minecraft/<span style="color:#d32f2f;">icesword-pvpfaction-depuis-2014-crack-on</span>') + '</span></span></div>' + input
+    } else if (selectedTop.value == 'TMonitoring') {
+        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://tmonitoring.com/server/<span style="color:#d32f2f;">qoobworldru</span>/') + '</span></span></div>' + input
     } else {
         idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip') + '</span></span></div>' + input
     }
