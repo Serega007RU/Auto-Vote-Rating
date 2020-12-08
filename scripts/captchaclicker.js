@@ -7,11 +7,15 @@ this.check = setInterval(()=>{
         clearInterval(this.check3)
         return
     }
-    if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null) {
+    if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null
+        && isScrolledIntoView(document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border'))
+        && document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').style.display != 'none') {
         document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').click()
         clearInterval(this.check)
     }
-    if (document.getElementById('checkbox') != null) {
+    if (document.getElementById('checkbox') != null
+        && isScrolledIntoView(document.getElementById('checkbox'))
+        && document.getElementById('checkbox').style.display != 'none') {
         document.getElementById('checkbox').click()
         clearInterval(this.check)
     }

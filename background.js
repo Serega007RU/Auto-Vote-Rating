@@ -991,8 +991,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     }
 }, {url: [
     {hostSuffix: 'hcaptcha.com'},
-    {hostSuffix: 'recaptcha.net'},
-    {urlContains: '://www.google.com/recaptcha/'}
+    {urlMatches: 'https://www.google.com/recaptcha/api./anchor*'}
 ]})
 
 //Слушатель ошибок net::ERR для вкладок
