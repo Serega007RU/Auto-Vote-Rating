@@ -146,7 +146,7 @@ async function restoreOptions() {
         alert(chrome.i18n.getMessage('firstInstall'))
     }
 
-    await checkUpdateConflicts()
+    await checkUpdateConflicts(true)
 
     //Если пользователь обновился с версии без MultiVote (special for settings)
     if (settings.stopVote == null) {
@@ -1640,7 +1640,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
                     VKs = allSetting.VKs
                     proxies = allSetting.proxies
 
-                    await checkUpdateConflicts()
+                    await checkUpdateConflicts(false)
 
                     updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true)
                     for (const item of allProjects) {
@@ -1686,14 +1686,17 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
     }
 }, false)
 
-async function checkUpdateConflicts() {
+async function checkUpdateConflicts(save) {
     let updated = false
     //Если пользователь обновился с версии 3.3.1
     if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
         updated = true
         updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
-        await forLoopAllProjects(function(proj) {
+        await forLoopAllProjects(async function(proj) {
             proj.stats = {}
+            //Да, это весьма не оптимизированно
+            if (save)
+                await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj), false)
         }, false)
     }
 
@@ -1717,7 +1720,8 @@ async function checkUpdateConflicts() {
         updated = true
         updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
         generalStats = {}
-        await setValue('generalStats', generalStats, false)
+        if (save)
+            await setValue('generalStats', generalStats, false)
     }
 
     for (const item of allProjects) {
@@ -1727,7 +1731,8 @@ async function checkUpdateConflicts() {
                 updated = true
             }
             this['projects' + item] = []
-            await setValue('AVMRprojects' + item, this['projects' + item], false)
+            if (save)
+                await setValue('AVMRprojects' + item, this['projects' + item], false)
         }
     }
 
