@@ -7,11 +7,15 @@ this.check = setInterval(()=>{
         clearInterval(this.check3)
         return
     }
-    if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null) {
+    if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null
+        && isScrolledIntoView(document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border'))
+        && document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').style.display != 'none') {
         document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').click()
         clearInterval(this.check)
     }
-    if (document.getElementById('checkbox') != null) {
+    if (document.getElementById('checkbox') != null
+        && isScrolledIntoView(document.getElementById('checkbox'))
+        && document.getElementById('checkbox').style.display != 'none') {
         document.getElementById('checkbox').click()
         clearInterval(this.check)
     }
@@ -41,3 +45,15 @@ this.check3 = setInterval(()=>{
         chrome.runtime.sendMessage({captcha: true})
     }
 }, 1000)
+
+function isScrolledIntoView(el) {
+    var rect = el.getBoundingClientRect();
+    var elemTop = rect.top;
+    var elemBottom = rect.bottom;
+
+    // Only completely visible elements return true:
+    var isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+    // Partially visible elements return true:
+    isVisible = elemTop < window.innerHeight && elemBottom >= 0;
+    return isVisible;
+}

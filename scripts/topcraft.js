@@ -1,52 +1,51 @@
 vote()
-function vote() {
-    chrome.storage.local.get('AVMRprojectsTopCraft', function(result) {
-        if (document.URL.includes('.vk')) {
-            chrome.runtime.sendMessage({errorAuthVK: true})
+async function vote() {
+    if (document.URL.includes('.vk')) {
+        chrome.runtime.sendMessage({errorAuthVK: true})
+        return
+    }
+    try {
+        //Если мы находимся на странице проверки CloudFlare
+        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
-        try {
-            //Если мы находимся на странице проверки CloudFlare
-            if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+        //Если погльзователь уже авторизован в вк, сразу голосует
+        if (document.querySelector('button[data-type=vote]') == null) {
+            //Клик 'Голосовать'
+            document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
+            //Вводит никнейм
+            let nick = await getNickName()
+            if (nick == null || nick == '')
                 return
-            }
-            //Если погльзователь уже авторизован в вк, сразу голосует
-            if (document.querySelector('button[data-type=vote]') == null) {
-                //Клик 'Голосовать'
-                document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
-                //Вводит никнейм
-                let nick = getNickName(result.AVMRprojectsTopCraft)
+            document.querySelector('input[name=nick]').value = nick
+            //Клик 'Голосовать' в окне голосования
+            document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
+        } else {
+            document.querySelector('button[data-type=vote]').click()
+            //Надо ли авторизовываться в вк, если не надо то сразу голосует
+            if (document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i') != null) {
+                //Клик VK
+                document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i').click()
+                clearInterval(this.check)
+            } else {
+                let nick = await getNickName()
                 if (nick == null || nick == '')
                     return
                 document.querySelector('input[name=nick]').value = nick
-                //Клик 'Голосовать' в окне голосования
                 document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
-            } else {
-                document.querySelector('button[data-type=vote]').click()
-                //Надо ли авторизовываться в вк, если не надо то сразу голосует
-                if (document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i') != null) {
-                    //Клик VK
-                    document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i').click()
-                    clearInterval(this.check)
-                } else {
-                    let nick = getNickName(result.AVMRprojectsTopCraft)
-                    if (nick == null || nick == '')
-                        return
-                    document.querySelector('input[name=nick]').value = nick
-                    document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
-                }
-            }
-        } catch (e) {
-            if (document.URL.startsWith('chrome-error') || document.querySelector('#error-information-popup-content > div.error-code') != null) {
-                chrome.runtime.sendMessage({message: 'Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector('#error-information-popup-content > div.error-code').textContent})
-            } else {
-                chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
             }
         }
-    })
+    } catch (e) {
+        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+    }
 }
 
-function getNickName(projects) {
+async function getNickName() {
+    let projects = await new Promise(resolve=>{
+        chrome.storage.local.get('AVMRprojectsTopCraft', data=>{
+            resolve(data['AVMRprojectsTopCraft'])
+        })
+    })
     for (project of projects) {
         if (project.TopCraft && document.URL.startsWith('https://topcraft.ru/servers/' + project.id + '/')) {
             return project.nick

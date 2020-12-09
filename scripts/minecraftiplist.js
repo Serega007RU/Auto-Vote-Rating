@@ -1,64 +1,63 @@
 vote()
-function vote() {
-    chrome.storage.local.get('AVMRprojectsMinecraftIpList', async function(result) {
-        try {
-            //Если мы находимся на странице проверки CloudFlare
-            if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-                return
-            }
-            if (document.querySelector('#Content > div.Error') != null) {
-                if (document.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
-                    chrome.runtime.sendMessage({message: document.querySelector('#Content > div.Error').textContent})
-                    return
-                }
-                if (document.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
-                    let numbers = document.querySelector('#Content > div.Error').textContent.substring(document.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
-                    let count = 0
-                    let hour = 0
-                    let min = 0
-                    let sec = 0
-                    for (var i in numbers) {
-                        if (count == 0) {
-                            hour = numbers[i]
-                        } else if (count == 1) {
-                            min = numbers[i]
-                        }
-                        count++
-                    }
-                    var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-                    chrome.runtime.sendMessage({later: Date.now() + (86400000 - milliseconds)})
-                    return
-                }
+async function vote() {
+    try {
+        //Если мы находимся на странице проверки CloudFlare
+        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+            return
+        }
+        if (document.querySelector('#Content > div.Error') != null) {
+            if (document.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
                 chrome.runtime.sendMessage({message: document.querySelector('#Content > div.Error').textContent})
                 return
             }
-            if (document.querySelector('#Content > div.Good') != null && document.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
-                chrome.runtime.sendMessage({successfully: true})
+            if (document.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
+                let numbers = document.querySelector('#Content > div.Error').textContent.substring(document.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
+                let count = 0
+                let hour = 0
+                let min = 0
+                let sec = 0
+                for (var i in numbers) {
+                    if (count == 0) {
+                        hour = numbers[i]
+                    } else if (count == 1) {
+                        min = numbers[i]
+                    }
+                    count++
+                }
+                var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                chrome.runtime.sendMessage({later: Date.now() + (86400000 - milliseconds)})
                 return
             }
-            if (document.querySelector('#InnerWrapper').innerText.includes('";'))
-                return
-            if (!await getRecipe()) {
-                chrome.runtime.sendMessage({message: 'Не удалось найти рецепт: ' + document.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src})
-                return
-            }
-            await craft()
-            let nick = getNickName(result.AVMRprojectsMinecraftIpList)
-            if (nick == null || nick == '')
-                return
-            document.querySelector('#Content > form > input[type=text]').value = nick
-            document.getElementById('votebutton').click()
-        } catch (e) {
-            if (document.URL.startsWith('chrome-error') || document.querySelector('#error-information-popup-content > div.error-code') != null) {
-                chrome.runtime.sendMessage({message: 'Ошибка! Похоже браузер не может связаться с сайтом, вот что известно: ' + document.querySelector('#error-information-popup-content > div.error-code').textContent})
-            } else {
-                chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
-            }
+            chrome.runtime.sendMessage({message: document.querySelector('#Content > div.Error').textContent})
+            return
         }
-    })
+        if (document.querySelector('#Content > div.Good') != null && document.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
+            chrome.runtime.sendMessage({successfully: true})
+            return
+        }
+        if (document.getElementById('InnerWrapper').innerText.includes('";'))
+            return
+        if (!await getRecipe()) {
+            chrome.runtime.sendMessage({message: 'Не удалось найти рецепт: ' + document.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src})
+            return
+        }
+        await craft()
+        let nick = await getNickName()
+        if (nick == null || nick == '')
+            return
+        document.querySelector('#Content > form > input[type=text]').value = nick
+        document.getElementById('votebutton').click()
+    } catch (e) {
+        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+    }
 }
 
-function getNickName(projects) {
+async function getNickName() {
+    let projects = await new Promise(resolve=>{
+        chrome.storage.local.get('AVMRprojectsMinecraftIpList', data=>{
+            resolve(data['AVMRprojectsMinecraftIpList'])
+        })
+    })
     for (project of projects) {
         if (project.MinecraftIpList && (document.URL.startsWith('https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id))) {
             return project.nick
