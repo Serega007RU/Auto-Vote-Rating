@@ -239,13 +239,10 @@ async function checkOpen(project) {
             url = '.monitoringminecraft.ru'
         }
         let cookies = await new Promise(resolve=>{
-            chrome.cookies.getAll({
-                domain: url
-            }, function(cookies) {
+            chrome.cookies.getAll({domain: url}, function(cookies) {
                 resolve(cookies)
             })
-        }
-        )
+        })
         for (let i = 0; i < cookies.length; i++) {
             if (cookies[i].domain.charAt(0) == '.') {
                 await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
