@@ -59,11 +59,11 @@ async function getNickName() {
         })
     })
     for (project of projects) {
-        if (project.MinecraftIpList && (document.URL.startsWith('https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id))) {
+        if (project.MinecraftIpList && (document.URL.startsWith('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id))) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://www.minecraftiplist.com/index.php?action=vote&listingID=')) {
+    if (!document.URL.startsWith('https://minecraftiplist.com/index.php?action=vote&listingID=')) {
         chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
     } else {
         chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})

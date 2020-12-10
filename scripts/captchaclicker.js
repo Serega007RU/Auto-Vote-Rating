@@ -40,20 +40,20 @@ this.check3 = setInterval(()=>{
         clearInterval(this.check3)
         return
     }
-    if (document.getElementById('solver-button') == null && !notified && document.getElementById('recaptcha-verify-button') != null && !document.getElementById('recaptcha-verify-button').disabled) {
+    if (document.getElementById('solver-button') == null && !notified && document.getElementById('recaptcha-anchor').ariaDisabled == 'false' && document.getElementById('recaptcha-anchor').ariaChecked == 'false') {
         notified = true
         chrome.runtime.sendMessage({captcha: true})
     }
 }, 1000)
 
 function isScrolledIntoView(el) {
-    var rect = el.getBoundingClientRect();
-    var elemTop = rect.top;
-    var elemBottom = rect.bottom;
+    var rect = el.getBoundingClientRect()
+    var elemTop = rect.top
+    var elemBottom = rect.bottom
 
     // Only completely visible elements return true:
-    var isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+    var isVisible// = (elemTop >= 0) && (elemBottom <= window.innerHeight);
     // Partially visible elements return true:
-    isVisible = elemTop < window.innerHeight && elemBottom >= 0;
-    return isVisible;
+    isVisible = elemTop < window.innerHeight && elemBottom >= 0
+    return isVisible
 }
