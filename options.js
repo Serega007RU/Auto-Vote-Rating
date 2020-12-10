@@ -510,7 +510,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             url = 'https://www.serverpact.com/vote-' + project.id + '/'
             jsPath = 'body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(2) > div > div.panel-body > table > tbody > tr:nth-child(6) > td:nth-child(2) > a'
         } else if (project.MinecraftIpList) {
-            url = 'https://www.minecraftiplist.com/server/-' + project.id + '/'
+            url = 'https://minecraftiplist.com/server/-' + project.id + '/'
             jsPath = '#addr > span:nth-child(3)'
         } else if (project.TopMinecraftServers) {
             url = 'https://topminecraftservers.org/server/' + project.id
@@ -784,7 +784,7 @@ function getFullProjectName(project) {
     else if (project.ServeurPrive)
         return 'Serveur-Prive.net'
     else if (project.PlanetMinecraft)
-        return 'PlanetMinecraft.com'
+        return 'www.PlanetMinecraft.com'
     else if (project.TopG)
         return 'TopG.org'
     else if (project.MinecraftMp)
@@ -792,7 +792,7 @@ function getFullProjectName(project) {
     else if (project.MinecraftServerList)
         return 'Minecraft-Server-List.com'
     else if (project.ServerPact)
-        return 'ServerPact.com'
+        return 'www.ServerPact.com'
     else if (project.MinecraftIpList)
         return 'MinecraftIpList.com'
     else if (project.TopMinecraftServers)
@@ -1384,7 +1384,7 @@ selectedTop.addEventListener('change', function() {
     } else if (selectedTop.value == 'ServerPact') {
         idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://www.serverpact.com/vote-<span style="color:#d32f2f;">26492123</span>') + '</span></span></div>' + dataInput + '<option value="24604">Hypixel</option></datalist>'
     } else if (selectedTop.value == 'MinecraftIpList') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://www.minecraftiplist.com/index.php?action=vote&listingID=<span style="color:#d32f2f;">2576</span>') + '</span></span></div>' + dataInput + '<option value="2576">Hypixel</option></datalist>'
+        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraftiplist.com/index.php?action=vote&listingID=<span style="color:#d32f2f;">2576</span>') + '</span></span></div>' + dataInput + '<option value="2576">Hypixel</option></datalist>'
     } else if (selectedTop.value == 'TopMinecraftServers') {
         idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://topminecraftservers.org/vote/<span style="color:#d32f2f;">9126</span>') + '</span></span></div>' + input
     } else if (selectedTop.value == 'MinecraftServersBiz') {

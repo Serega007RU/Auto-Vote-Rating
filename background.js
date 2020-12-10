@@ -218,7 +218,7 @@ async function checkOpen(project) {
             chrome.tabs.remove(key, function() {
                 if (chrome.runtime.lastError) {
                     console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                    if (!settings.disabledNotifError)
+                    if (!settings.disabledNotifError && !chrome.runtime.lastError.message.includes('No tab with id'))
                         sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                 }
             })
@@ -295,7 +295,7 @@ async function newWindow(project) {
             if (project.TopCraft)
                 url = 'https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
             else if (project.McTOP)
-                url = 'https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
+                url = 'https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
             else if (project.MCRate)
                 url = 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code'
             else if (project.MinecraftRating)
@@ -325,7 +325,7 @@ async function newWindow(project) {
             else if (project.ServerPact)
                 url = 'https://www.serverpact.com/vote-' + project.id
             else if (project.MinecraftIpList)
-                url = 'https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id
+                url = 'https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id
             else if (project.TopMinecraftServers)
                 url = 'https://topminecraftservers.org/vote/' + project.id
             else if (project.MinecraftServersBiz)
@@ -762,7 +762,7 @@ async function silentVote(project) {
         } else
 
         if (project.MinecraftIpList) {
-            let response = await fetch('https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
+            let response = await fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -798,7 +798,7 @@ async function silentVote(project) {
                     endVote('Error time zone', null, project)
                     return
                 }
-                await fetch('https://www.minecraftiplist.com/timezone.php?timezone=Europe/Moscow', {
+                await fetch('https://minecraftiplist.com/timezone.php?timezone=Europe/Moscow', {
                     'headers': {
                         'accept': '*/*',
                         'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -849,8 +849,8 @@ async function silentVote(project) {
                 return
             }
 
-            if (!await getRecipe(doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com'))) {
-                endVote({message: 'Не удалось найти рецепт: ' + doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://www.minecraftiplist.com')}, null, project)
+            if (!await getRecipe(doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://minecraftiplist.com'))) {
+                endVote({message: 'Не удалось найти рецепт: ' + doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://minecraftiplist.com')}, null, project)
                 return
             }
             await craft(doc.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
@@ -865,7 +865,7 @@ async function silentVote(project) {
                 code2 += content[i] << ((i - 6) * 5)
             }
 
-            response = await fetch('https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
+            response = await fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -953,7 +953,15 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null)
         return
-    chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'})
+    chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'}, function() {
+        if (chrome.runtime.lastError) {
+            console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+            if (!settings.disabledNotifError)
+                sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+            project.error = chrome.runtime.lastError.message
+            changeProject(project)
+        }
+    })
 }, {url: [
     {hostSuffix: 'topcraft.ru'},
     {hostSuffix: 'mctop.su'},
@@ -984,7 +992,17 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
         let project = openedProjects.get(details.tabId)
         if (project == null)
             return
-        chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId})
+        chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
+            if (chrome.runtime.lastError) {
+                console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                if (!chrome.runtime.lastError.message.includes('The frame was removed')) {
+                    if (!settings.disabledNotifError)
+                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                    project.error = chrome.runtime.lastError.message
+                    changeProject(project)
+                }
+            }
+        })
     }
 }, {url: [
     {hostSuffix: 'hcaptcha.com'},
@@ -1054,7 +1072,7 @@ async function endVote(request, sender, project) {
         chrome.tabs.remove(sender.tab.id, function() {
             if (chrome.runtime.lastError) {
                 console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                if (!settings.disabledNotifError)
+                if (!settings.disabledNotifError && !chrome.runtime.lastError.message.includes('No tab with id'))
                     sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
             }
         })
@@ -1463,7 +1481,7 @@ async function craft(inv) {
         for (let element of inventory) {
             inventoryCount++
             //Если это дубовая доска
-            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://www.minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==') {
+            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==') {
                 countRecept++
                 if (countRecept == 1) {
                     content[0] = inventoryCount
@@ -1484,7 +1502,7 @@ async function craft(inv) {
                     content[5] = inventoryCount
                 }
                 //Если это палка
-            } else if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://www.minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=') {
+            } else if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=') {
                 countRecept2++
                 if (countRecept2 == 1) {
                     content[7] = inventoryCount
@@ -1499,7 +1517,7 @@ async function craft(inv) {
         for (let element of inventory) {
             inventoryCount++
             //Если это железный слиток
-            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://www.minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAIVBMVEUAAADY2NhERESWlpY1NTVycnJoaGioqKj///+CgoJ/f3/RLsQ9AAAAAXRSTlMAQObYZgAAAGRJREFUeF6tyjERADEIRNFYwAIWsICFWIgFLGAhFlB5yXAMBZTZ7r/Z8XaILWShCDaQpQAgWCHqpksFJI1cZ9yAUhSdtQAURXN2ACD21+xhbzHPxcyjwhW7Z68CLhZVICQr4ek+KDhG7bVD+wwAAAAASUVORK5CYII=') {
+            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAIVBMVEUAAADY2NhERESWlpY1NTVycnJoaGioqKj///+CgoJ/f3/RLsQ9AAAAAXRSTlMAQObYZgAAAGRJREFUeF6tyjERADEIRNFYwAIWsICFWIgFLGAhFlB5yXAMBZTZ7r/Z8XaILWShCDaQpQAgWCHqpksFJI1cZ9yAUhSdtQAURXN2ACD21+xhbzHPxcyjwhW7Z68CLhZVICQr4ek+KDhG7bVD+wwAAAAASUVORK5CYII=') {
                 countRecept++
                 if (countRecept == 1) {
                     content[1] = inventoryCount
@@ -1508,7 +1526,7 @@ async function craft(inv) {
                     content[4] = inventoryCount
                 }
                 //Если это палка
-            } else if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://www.minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=') {
+            } else if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=') {
                 countRecept2++
                 if (countRecept2 == 1) {
                     content[7] = inventoryCount
@@ -1523,7 +1541,7 @@ async function craft(inv) {
         for (let element of inventory) {
             inventoryCount++
             //Если это палка
-            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://www.minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=') {
+            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=') {
                 countRecept++
                 if (countRecept == 1) {
                     content[4] = inventoryCount
@@ -1532,7 +1550,7 @@ async function craft(inv) {
                     content[7] = inventoryCount
                 }
                 //Если это алмаз
-            } else if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://www.minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIVBMVEUAAAAw270be2vR+vOi9udK7dEglYGM9OL///8szbEMNzBqdBtcAAAAAXRSTlMAQObYZgAAAHJJREFUeNrNzUEOAjEMQ1FaE0/D/Q9MM4pkduCu+KtIflIe/9arc4Hm1RVxgObnHTCGyHegGah5rdidgRpxF6EnvwDNV0dGnABAoJ9YAMgUmDsXxI5d7kgHFImYM7u6avbAGJ+AtEATMjvNBiiiNBvguDejWQ0NckD8GAAAAABJRU5ErkJggg==') {
+            } else if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAIVBMVEUAAAAw270be2vR+vOi9udK7dEglYGM9OL///8szbEMNzBqdBtcAAAAAXRSTlMAQObYZgAAAHJJREFUeNrNzUEOAjEMQ1FaE0/D/Q9MM4pkduCu+KtIflIe/9arc4Hm1RVxgObnHTCGyHegGah5rdidgRpxF6EnvwDNV0dGnABAoJ9YAMgUmDsXxI5d7kgHFImYM7u6avbAGJ+AtEATMjvNBiiiNBvguDejWQ0NckD8GAAAAABJRU5ErkJggg==') {
                 countRecept2++
                 if (countRecept2 == 1) {
                     content[0] = inventoryCount
@@ -1552,7 +1570,7 @@ async function craft(inv) {
         for (let element of inventory) {
             inventoryCount++
             //Если это дубовая доска
-            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://www.minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==') {
+            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==') {
                 countRecept++
                 if (countRecept == 1) {
                     content[0] = inventoryCount
@@ -1588,13 +1606,13 @@ async function craft(inv) {
         for (let element of inventory) {
             inventoryCount++
             //Если это золотой слиток
-            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://www.minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAJFBMVEUAAAD//4tQUADe3gA8PADcdhOGhgD//wv////bohOurgC3YRCwQZoNAAAAAXRSTlMAQObYZgAAAGdJREFUeF6tykERwDAIRNFYwAIWsICFWKgFLMRCLMRCzZVCGQ5w7N7+mx3/DrGFLBTBBrIWAAhWiHrTpQLSirx03MCiKNK1ABRFc3YAIMdLd3ewt4EV8yhgcqbOq4DL+c4VQrISft0DreJJLwFPy8oAAAAASUVORK5CYII=') {
+            if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAJFBMVEUAAAD//4tQUADe3gA8PADcdhOGhgD//wv////bohOurgC3YRCwQZoNAAAAAXRSTlMAQObYZgAAAGdJREFUeF6tykERwDAIRNFYwAIWsICFWKgFLMRCLMRCzZVCGQ5w7N7+mx3/DrGFLBTBBrIWAAhWiHrTpQLSirx03MCiKNK1ABRFc3YAIMdLd3ewt4EV8yhgcqbOq4DL+c4VQrISft0DreJJLwFPy8oAAAAASUVORK5CYII=') {
                 countRecept++
                 if (countRecept == 1) {
                     content[1] = inventoryCount
                 }
                 //Если это палка
-            } else if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://www.minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=') {
+            } else if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=') {
                 countRecept2++
                 if (countRecept2 == 1) {
                     content[4] = inventoryCount
@@ -1652,7 +1670,7 @@ handler = function(n) {
 }
 
 chrome.webRequest.onBeforeSendHeaders.addListener(handler, {
-    urls: ['*://www.serverpact.com/*', '*://www.minecraftiplist.com/*']
+    urls: ['*://www.serverpact.com/*', '*://minecraftiplist.com/*']
 }, ['blocking', 'requestHeaders'])
 
 chrome.runtime.onInstalled.addListener(function(details) {
