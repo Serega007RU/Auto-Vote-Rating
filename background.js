@@ -252,7 +252,7 @@ async function checkOpen(project) {
         }
     }
 
-    newWindow(project)
+    await newWindow(project)
 }
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
@@ -282,72 +282,83 @@ async function newWindow(project) {
     if (silentVoteMode) {
         silentVote(project)
     } else {
-        chrome.windows.getCurrent(function(win) {
-            if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {
-                console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError)
-            }
-            if (win == null) {
-                chrome.windows.create({focused: false}, function(win) {
-                    chrome.windows.update(win.id, {focused: false})
-                })
-            }
-            let url
-            if (project.TopCraft)
-                url = 'https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
-            else if (project.McTOP)
-                url = 'https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
-            else if (project.MCRate)
-                url = 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code'
-            else if (project.MinecraftRating)
-                url = 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45'
-            else if (project.MonitoringMinecraft)
-                url = 'http://monitoringminecraft.ru/top/' + project.id + '/vote'
-            else if (project.IonMc)
-                url = 'https://ionmc.top/vote/' + project.id
-            else if (project.MinecraftServersOrg)
-                url = 'https://minecraftservers.org/vote/' + project.id
-            else if (project.ServeurPrive) {
-                if (project.game == null)
-                    project.game = 'minecraft'
-                if (project.lang == 'en') {
-                    url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
-                } else {
-                    url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
+        let window = await new Promise(resolve=>{
+            chrome.windows.getCurrent(function(win) {
+                if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {
+                    console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError)
                 }
-            } else if (project.PlanetMinecraft)
-                url = 'https://www.planetminecraft.com/server/' + project.id + '/vote/'
-            else if (project.TopG)
-                url = 'https://topg.org/Minecraft/in-' + project.id
-            else if (project.MinecraftMp)
-                url = 'https://minecraft-mp.com/server/' + project.id + '/vote/'
-            else if (project.MinecraftServerList)
-                url = 'https://minecraft-server-list.com/server/' + project.id + '/vote/'
-            else if (project.ServerPact)
-                url = 'https://www.serverpact.com/vote-' + project.id
-            else if (project.MinecraftIpList)
-                url = 'https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id
-            else if (project.TopMinecraftServers)
-                url = 'https://topminecraftservers.org/vote/' + project.id
-            else if (project.MinecraftServersBiz)
-                url = 'https://minecraftservers.biz/' + project.id + '/'
-            else if (project.HotMC)
-                url = 'https://hotmc.ru/vote-' + project.id
-            else if (project.MinecraftServerNet)
-                url = 'https://minecraft-server.net/vote/' + project.id + '/'
-            else if (project.TopGames) {
-                if (project.lang == 'fr') {
-                    url = 'https://top-serveurs.net/' + project.game + '/vote/' + project.id
-                } else if (project.lang == 'en') {
-                    url = 'https://top-games.net/' + project.game + '/vote/' + project.id
-                } else {
-                    url = 'https://' + project.lang + '.top-games.net/' + project.game + '/vote/' + project.id
-                }
-            } else if (project.TMonitoring)
-                url = 'https://tmonitoring.com/server/' + project.id + '/'
-            chrome.tabs.create({'url': url, 'selected': false}, function(tab) {
-                openedProjects.set(tab.id, project)
+                resolve(win)
             })
         })
+        if (window == null) {
+            window = await new Promise(resolve=>{
+                chrome.windows.create({focused: false}, function(win) {
+                    resolve(win)
+                })
+            })
+            chrome.windows.update(window.id, {focused: false})
+        }
+
+        let url
+        if (project.TopCraft)
+            url = 'https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
+        else if (project.McTOP)
+            url = 'https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
+        else if (project.MCRate)
+            url = 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code'
+        else if (project.MinecraftRating)
+            url = 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45'
+        else if (project.MonitoringMinecraft)
+            url = 'http://monitoringminecraft.ru/top/' + project.id + '/vote'
+        else if (project.IonMc)
+            url = 'https://ionmc.top/vote/' + project.id
+        else if (project.MinecraftServersOrg)
+            url = 'https://minecraftservers.org/vote/' + project.id
+        else if (project.ServeurPrive) {
+            if (project.game == null)
+                project.game = 'minecraft'
+            if (project.lang == 'en') {
+                url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
+            } else {
+                url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
+            }
+        } else if (project.PlanetMinecraft)
+            url = 'https://www.planetminecraft.com/server/' + project.id + '/vote/'
+        else if (project.TopG)
+            url = 'https://topg.org/Minecraft/in-' + project.id
+        else if (project.MinecraftMp)
+            url = 'https://minecraft-mp.com/server/' + project.id + '/vote/'
+        else if (project.MinecraftServerList)
+            url = 'https://minecraft-server-list.com/server/' + project.id + '/vote/'
+        else if (project.ServerPact)
+            url = 'https://www.serverpact.com/vote-' + project.id
+        else if (project.MinecraftIpList)
+            url = 'https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id
+        else if (project.TopMinecraftServers)
+            url = 'https://topminecraftservers.org/vote/' + project.id
+        else if (project.MinecraftServersBiz)
+            url = 'https://minecraftservers.biz/' + project.id + '/'
+        else if (project.HotMC)
+            url = 'https://hotmc.ru/vote-' + project.id
+        else if (project.MinecraftServerNet)
+            url = 'https://minecraft-server.net/vote/' + project.id + '/'
+        else if (project.TopGames) {
+            if (project.lang == 'fr') {
+                url = 'https://top-serveurs.net/' + project.game + '/vote/' + project.id
+            } else if (project.lang == 'en') {
+                url = 'https://top-games.net/' + project.game + '/vote/' + project.id
+            } else {
+                url = 'https://' + project.lang + '.top-games.net/' + project.game + '/vote/' + project.id
+            }
+        } else if (project.TMonitoring)
+            url = 'https://tmonitoring.com/server/' + project.id + '/'
+        
+        let tab = await new Promise(resolve=>{
+            chrome.tabs.create({'url': url, 'selected': false}, function(tab_) {
+                resolve(tab_)
+            })
+        })
+        openedProjects.set(tab.id, project)
     }
 }
 
