@@ -1508,7 +1508,7 @@ async function endVote(request, sender, project) {
         }
 
         if (settings.useMultiVote)  {
-            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && !(settings.repeatAttemptLater && project.later && project.later >= 2 && request.later && request.message && request.message == 'vk_error') && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && !(settings.repeatAttemptLater && project.later && project.later >= 2 && request.later && (request.message && request.message != 'vk_error')) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
                 let usedProject = {
                     id: project.id,
                     nextFreeVote: time
