@@ -33,6 +33,7 @@ this.check2 = setInterval(()=>{
 //Проверяет прошла ли проверка ReCaptcha или hCaptcha
 let notified = false
 this.check3 = setInterval(()=>{
+    //Если капча пройдена
     if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || document.getElementsByClassName('checkbox checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0)) {
         window.top.postMessage('vote', '*')
         clearInterval(this.check)
@@ -40,7 +41,8 @@ this.check3 = setInterval(()=>{
         clearInterval(this.check3)
         return
     }
-    if (document.getElementById('solver-button') == null && !notified && document.getElementById('recaptcha-anchor').ariaDisabled == 'false' && document.getElementById('recaptcha-anchor').ariaChecked == 'false') {
+    //Если требуется ручное прохождение капчи
+    if (document.getElementById('solver-button') == null && !notified && document.getElementById('recaptcha-anchor') != null && document.getElementById('recaptcha-anchor').ariaDisabled == 'false' && document.getElementById('recaptcha-anchor').ariaChecked == 'false' && document.querySelector('div[class="recaptcha-checkbox-spinner"]') != null && document.querySelector('div[class="recaptcha-checkbox-spinner"]').style.opacity == '0' && document.querySelector('div[class="recaptcha-checkbox-spinner"]').style.transform == 'scale(0)') {
         notified = true
         chrome.runtime.sendMessage({captcha: true})
     }
