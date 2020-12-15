@@ -76,6 +76,7 @@ let tunnelBear = {}
 
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 var check = true
+var break_ = false
 
 //Инициализация настроек расширения
 initializeConfig()
@@ -221,6 +222,7 @@ async function checkVote() {
     })
 
     check = true
+    break_ = false
 }
 
 async function checkOpen(project) {
@@ -685,7 +687,7 @@ async function silentVote(project) {
             html = await response.text()
             if (response.status == 400 && html.length != 0) {
                 console.warn('Текст ошибки 400:', html)
-                endVote({later: true}, null, project)
+                endVote({later: true, message: html}, null, project)
                 return
             } else if (!response.ok) {
                 endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
@@ -728,7 +730,7 @@ async function silentVote(project) {
             html = await response.text()
             if (response.status == 400 && html.length != 0) {
                 console.warn('Текст ошибки 400:', html)
-                endVote({later: true}, null, project)
+                endVote({later: true, message: html}, null, project)
                 return
             } else if (!response.ok) {
                 endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
@@ -1380,35 +1382,6 @@ async function endVote(request, sender, project) {
     } else if (!project)
         return
     //Что?
-    if (settings.cooldown < 10000) {
-        setTimeout(async ()=>{
-            for (let value of queueProjects) {
-                if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
-                    queueProjects.delete(value)
-                }
-            }
-            if (settings.useMultiVote && queueProjects.size == 0) {
-                if (debug)
-                    console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
-                await clearProxy()
-                currentProxy = null
-                currentVK = null
-            }
-        }, settings.useMultiVote ? 3000 : 10000)
-    } else {
-        for (let value of queueProjects) {
-            if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
-                queueProjects.delete(value)
-            }
-        }
-        if (settings.useMultiVote && queueProjects.size == 0) {
-            if (debug)
-                console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
-            await clearProxy()
-            currentProxy = null
-            currentVK = null
-        }
-    }
     delete project.nextAttempt
 
     let deleted = true
@@ -1534,8 +1507,8 @@ async function endVote(request, sender, project) {
             project.time = project.time + Math.floor(Math.random() * 43200000)
         }
 
-        if (settings.useMultiVote && !(settings.repeatAttemptLater && project.later && project.later >= 1 && request.later))  {
-            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+        if (settings.useMultiVote)  {
+            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && !(settings.repeatAttemptLater && project.later && project.later >= 2 && request.later && request.message && request.message == 'vk_error') && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
                 let usedProject = {
                     id: project.id,
                     nextFreeVote: time
@@ -1659,6 +1632,21 @@ async function endVote(request, sender, project) {
     }
     await setValue('generalStats', generalStats)
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
+
+    setTimeout(async ()=>{
+        for (let value of queueProjects) {
+            if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+                queueProjects.delete(value)
+            }
+        }
+        if (settings.useMultiVote && queueProjects.size == 0) {
+            if (debug)
+                console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
+            await clearProxy()
+            currentProxy = null
+            currentVK = null
+        }
+    }, settings.useMultiVote || settings.cooldown < 10000 ? 0 : 10000)
 }
 
 //Отправитель уведомлений
@@ -1822,7 +1810,9 @@ async function changeProject(project) {
 
 async function forLoopAllProjects(fuc) {
     for (const item of allProjects) {
+        if (break_) break
         for (let proj of this['projects' + item]) {
+            if (break_) break
             await fuc(proj)
         }
     }
@@ -2085,6 +2075,7 @@ async function stopVote() {
     }
     controller.abort()
     openedProjects.clear()
+    break_ = true
 }
 
 //Если требуется авторизация для Прокси

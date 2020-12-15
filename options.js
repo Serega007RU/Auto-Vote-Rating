@@ -1904,7 +1904,7 @@ function openPoput(url, reload) {
       , top = Math.max(0, (screen.height - popupBoxWidth) / 2) + (screen.availTop | 0)
     poput = window.open(url, 'vk_openapi', 'width=' + popupBoxWidth + ',height=' + popupBoxHeight + ',left=' + left + ',top=' + top + ',menubar=0,toolbar=0,location=0,status=0')
     if (poput) {
-        poput.focus()
+//         poput.focus()
         (function check() {
             !poput || poput.closed ? reload() : setTimeout(check, 500)
         })()
