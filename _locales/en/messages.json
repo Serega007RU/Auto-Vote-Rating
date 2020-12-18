@@ -567,6 +567,9 @@
       }
     }
   },
+  "stats2": {
+    "message": "Stats"
+  },
   "statsSuccessVotes": {
     "message": "Successful votes"
   },
