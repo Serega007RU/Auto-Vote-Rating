@@ -370,8 +370,8 @@ function updateProjectList() {
     forLoopAllProjects(async function(proj) {
         await addProjectList(proj, true)
     }, true)
-    if (document.getElementById('addedProjectsTable1').childElementCount == 0) {
-        document.getElementById('addedProjectsTable1').innerText = chrome.i18n.getMessage('notAddedAll')
+    if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
+        document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
 }
 
