@@ -354,7 +354,7 @@ async function newWindow(project) {
             url = 'https://tmonitoring.com/server/' + project.id + '/'
         
         let tab = await new Promise(resolve=>{
-            chrome.tabs.create({'url': url, 'selected': false}, function(tab_) {
+            chrome.tabs.create({'url': url, 'active': false}, function(tab_) {
                 resolve(tab_)
             })
         })
