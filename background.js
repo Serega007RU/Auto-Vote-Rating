@@ -2090,6 +2090,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             console.error('Ошибка авторизации прокси! Превышено максимальное кол-во попыток авторизации, скорее всего логин или пароль не правильные')
             if (!settings.disabledNotifError)
                 sendNotification('Ошибка авторизации прокси', 'Превышено максимальное кол-во попыток авторизации, скорее всего логин или пароль не правильные')
+            callbackFn()
             return
         }
         if (currentProxy.login) {
@@ -2100,6 +2101,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                     'password': currentProxy.password
                 }
             })
+            return
         } else if (currentProxy.TunnelBear) {
             console.log('Прокси TunnelBear требует авторизацию, авторизовываюсь...')
             if (tunnelBear.token != null && tunnelBear.expires > Date.now()) {
@@ -2109,6 +2111,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                         'password': tunnelBear.token
                     }
                 })
+                return
             } else {
                 settings.stopVote = Date.now() + 86400000
                 console.error('Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
@@ -2125,6 +2128,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                     'password': 'uem29h65n8'
                 }
             })
+            return
         } else {
             currentProxy.notWorking = true
             console.error('Ошибка авторизации прокси! Данный прокси требует авторизацию по логину и паролю но вы его не задали в прокси')
@@ -2132,6 +2136,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 sendNotification('Ошибка авторизации прокси', 'Данный прокси требует авторизацию по логину и паролю но вы его не задали в прокси')
         }
     }
+    callbackFn()
 }, {urls: ['<all_urls>']}, ['asyncBlocking'])
 
 chrome.runtime.onInstalled.addListener(function(details) {

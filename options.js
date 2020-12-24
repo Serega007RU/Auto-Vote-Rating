@@ -550,7 +550,7 @@ document.getElementById('AddVK').addEventListener('click', async () => {
             })
         })
         for(let i=0; i<cookies.length;i++) {
-            await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+//             await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
         }
 
         updateStatusVK('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('deletedAllVK') + '</span>', false)
