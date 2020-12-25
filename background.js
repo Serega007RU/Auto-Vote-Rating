@@ -311,7 +311,7 @@ async function newWindow(project) {
         else if (project.MonitoringMinecraft)
             url = 'http://monitoringminecraft.ru/top/' + project.id + '/vote'
         else if (project.IonMc)
-            url = 'https://ionmc.top/vote/' + project.id
+            url = 'https://ionmc.top/projects/' + project.id + '/vote'
         else if (project.MinecraftServersOrg)
             url = 'https://minecraftservers.org/vote/' + project.id
         else if (project.ServeurPrive) {
