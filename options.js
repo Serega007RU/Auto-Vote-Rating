@@ -64,6 +64,57 @@ var authVKUrls = new Map([
     ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html']
 ])
 
+const svgDelete = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+svgDelete.setAttribute('width', 24)
+svgDelete.setAttribute('height', 24)
+svgDelete.setAttribute('viewBox', '0 0 24 24')
+svgDelete.setAttribute('fill', 'none')
+svgDelete.setAttribute('stroke', 'currentColor')
+svgDelete.setAttribute('stroke-width', 2)
+svgDelete.setAttribute('stroke-linecap', 'round')
+svgDelete.setAttribute('stroke-linejoin', 'round')
+const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+line1.setAttribute('x1', 18)
+line1.setAttribute('y1', 4)
+line1.setAttribute('x2', 6)
+line1.setAttribute('y2', 16)
+line2.setAttribute('x1', 6)
+line2.setAttribute('y1', 4)
+line2.setAttribute('x2', 18)
+line2.setAttribute('y2', 16)
+svgDelete.appendChild(line1)
+svgDelete.appendChild(line2)
+
+const svgStats = svgDelete.cloneNode()
+svgStats.setAttribute('viewBox', '0 2 24 24')
+const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+path1.setAttribute('d', 'M20.2 7.8l-7.7 7.7-4-4-5.7 5.7')
+path2.setAttribute('d', 'M15 7h6v6')
+svgStats.appendChild(path1)
+svgStats.appendChild(path2)
+
+const svgFail = svgDelete.cloneNode()
+svgFail.setAttribute('stroke', '#f44336')
+svgFail.setAttribute('stroke-width', 3)
+svgFail.setAttribute('stroke-linejoin', 'bevel')
+const line3 = line1.cloneNode(true)
+const line4 = line2.cloneNode(true)
+line3.setAttribute('y2', 18)
+line4.setAttribute('y2', 18)
+svgFail.appendChild(line3)
+svgFail.appendChild(line4)
+
+const svgSuccess = svgDelete.cloneNode()
+svgSuccess.setAttribute('stroke', '#4CAF50')
+svgSuccess.setAttribute('stroke-width', 3)
+svgSuccess.setAttribute('stroke-linejoin', 'bevel')
+const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
+polyline.setAttribute('points', '20 6 9 17 4 12')
+svgSuccess.appendChild(polyline)
+
+
 //Конструктор проекта
 function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
     this[top] = true
@@ -120,7 +171,7 @@ async function restoreOptions() {
     if (generalStats == null)
         generalStats = {}
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
-        updateStatusSave('<div>' + chrome.i18n.getMessage('firstSettings') + '</div>', true)
+        updateStatusSave(createMessage(chrome.i18n.getMessage('firstSettings')), true)
         
         for (const item of allProjects) {
             this['projects' + item] = []
@@ -131,7 +182,7 @@ async function restoreOptions() {
         await setValue('AVMRsettings', settings, false)
 
         console.log(chrome.i18n.getMessage('settingsGen'))
-        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('firstSettingsSave') + '</div>', false)
+        updateStatusSave(createMessage(chrome.i18n.getMessage('firstSettingsSave'), {success: true}), false)
         alert(chrome.i18n.getMessage('firstInstall'))
     }
 
@@ -261,19 +312,50 @@ async function restoreOptions() {
 //Добавить проект в список проекта
 async function addProjectList(project, visually) {
     let listProject = document.getElementById(getProjectName(project) + 'List')
-    if (listProject.innerHTML.includes(chrome.i18n.getMessage('notAdded')))
-        listProject.innerHTML = ''
-    let html = document.createElement('li')
+    if (listProject.textContent == chrome.i18n.getMessage('notAdded'))
+        listProject.textContent = ''
+    let li = document.createElement('li')
     let id = getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)
-    html.id = 'div┄' + id
+    li.id = 'div┄' + id
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon')
     if (!(project.time == null || project.time == '')) {
         if (Date.now() < project.time)
             text = new Date(project.time).toLocaleString().replace(',', '')
     }
-    html.innerHTML = '<div> <span id="stats┄' + id + '" class="statsProject"> <svg width="24" height="24" viewBox="0 2 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 7.8l-7.7 7.7-4-4-5.7 5.7"/><path d="M15 7h6v6"/></svg> </span><span id="' + id + '" class="deleteProject"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="4" x2="6" y2="16"></line><line x1="6" y1="4" x2="18" y2="16"></line></svg></div>' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + '<br>' + (project.error ? '<span style="color:#f44336;">' + project.error + '</span><br>' : '') + chrome.i18n.getMessage('nextVote') + ' ' + text;
-    listProject.after(html)
+
+    const div = document.createElement('div')
+
+    const span1 = document.createElement('span')
+    span1.id = 'stats┄' + id
+    span1.className = 'statsProject'
+    span1.appendChild(svgStats.cloneNode(true))
+
+    const span2 = document.createElement('span')
+    span2.id = id
+    span2.className = 'deleteProject'
+    span2.appendChild(svgDelete.cloneNode(true))
+
+    div.appendChild(span1)
+    div.appendChild(span2)
+
+    li.appendChild(div)
+
+    li.append(project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : ''))
+
+    li.appendChild(document.createElement('br'))
+
+    if (project.error) {
+        const span3 = document.createElement('span')
+        span3.style = 'color:#f44336;'
+        span3.append(project.error)
+        li.appendChild(span3)
+        li.appendChild(document.createElement('br'))
+    }
+
+    li.append(chrome.i18n.getMessage('nextVote') + ' ' + text)
+
+    listProject.after(li)
     //Слушатель кнопки Удалить на проект
     document.getElementById(id).addEventListener('click', function() {
         removeProjectList(project, false)
@@ -298,7 +380,7 @@ async function addProjectList(project, visually) {
         let button = document.createElement('button')
         button.setAttribute('class', 'selectsite')
         button.setAttribute('id', getProjectName(project) + 'Button')
-        button.innerHTML = getFullProjectName(project)
+        button.textContent = getFullProjectName(project)
 
         if (document.getElementById('addedProjectsTable1').childElementCount > document.getElementById('addedProjectsTable2').childElementCount) {
             document.getElementById('addedProjectsTable2').insertBefore(button, document.getElementById('addedProjectsTable2').firstElementChild)
@@ -335,7 +417,7 @@ async function removeProjectList(project, visually) {
         return
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).removeEventListener('click', function() {})
     document.getElementById('div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).remove()
-    if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'List').innerHTML = (chrome.i18n.getMessage('notAdded'))
+    if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'List').textContent = (chrome.i18n.getMessage('notAdded'))
     if (visually)
         return
     for (let i = getProjectList(project).length; i--; ) {
@@ -392,14 +474,14 @@ document.getElementById('timeout').addEventListener('submit', ()=>{
 })
 
 async function addProject(choice, nick, id, time, response, customTimeOut, priorityOpt, element) {
-    updateStatusAdd('<div>' + chrome.i18n.getMessage('adding') + '</div>', true, element)
+    updateStatusAdd(chrome.i18n.getMessage('adding'), true, element)
     let project
     if (choice == 'Custom') {
         let body
         try {
             body = JSON.parse(id)
         } catch (e) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element)
+            updateStatusAdd(createMessage(e, {error: true}), true, element)
             return
         }
         project = new Project(choice, nick, body, time, response, customTimeOut, priorityOpt)
@@ -424,34 +506,38 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     }
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
-    let secondBonus = ''
+    let secondBonusText
+    let secondBonusButton = document.createElement('button')
+    secondBonusButton.type = 'button'
+    secondBonusButton.textContent = chrome.i18n.getMessage('lets')
     if (project.id == 'mythicalworld' || project.id == 5323 || project.id == 1654 || project.id == 6099) {
-        secondBonus = chrome.i18n.getMessage('secondBonus', 'MythicalWorld') + ' <button type="button" id="secondBonusMythicalWorld">' + chrome.i18n.getMessage('lets') + '</button>'
+        secondBonusText = chrome.i18n.getMessage('secondBonus', 'MythicalWorld')
+        secondBonusButton.id = 'secondBonusMythicalWorld'
     } else if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
-        secondBonus = chrome.i18n.getMessage('secondBonus', 'VictoryCraft') + ' <button type="button" id="secondBonusVictoryCraft">' + chrome.i18n.getMessage('lets') + '</button>'
+        secondBonusText = chrome.i18n.getMessage('secondBonus', 'VictoryCraft')
+        secondBonusButton.id = 'secondBonusVictoryCraft'
     }
 
     await forLoopAllProjects(function(proj) {
         if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
-            if (secondBonus === '') {
-                updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element)
-            } else if (element != null) {
-                updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div> ' + secondBonus, false, element)
+            const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), {success: true})
+            if (!secondBonusText) {
+                updateStatusAdd(message, false, element)
             } else {
-                updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div> ' + secondBonus, true, element)
+                updateStatusAdd([message, document.createElement('br'), secondBonusText, secondBonusButton], Boolean(!element), element)
             }
             returnAdd = true
             return
         } else if (((proj.MCRate && choice == 'MCRate') || (proj.ServerPact && choice == 'ServerPact') || (proj.MinecraftServersOrg && choice == 'MinecraftServersOrg') || (proj.HotMC && choice == 'HotMC')) && proj.nick && project.nick && !disableCheckProjects) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProject', getProjectName(proj)) + '</div>', false, element)
+            updateStatusAdd(createMessage(chrome.i18n.getMessage('oneProject', getProjectName(proj)), {error: true}), false, element)
             returnAdd = true
             return
         } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('oneProjectMinecraftIpList') + '</div>', true, element)
+            updateStatusAdd(createMessage(chrome.i18n.getMessage('oneProjectMinecraftIpList'), {error: true}), false, element)
             returnAdd = true
             return
         } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
-            updateStatusAdd('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('alreadyAdded') + '</div>', false, element)
+            updateStatusAdd(createMessage(chrome.i18n.getMessage('alreadyAdded'), {success: true}), false, element)
             returnAdd = true
             return
         }
@@ -463,7 +549,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     }
     let projectURL = ''
     if (!(disableCheckProjects || project.Custom)) {
-        updateStatusAdd('<div>' + chrome.i18n.getMessage('checkHasProject') + '</div>', true, element)
+        updateStatusAdd(chrome.i18n.getMessage('checkHasProject'), true, element)
         let url
         let jsPath
         if (project.TopCraft) {
@@ -546,26 +632,26 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             }
         } catch (e) {
             if (e == 'TypeError: Failed to fetch') {
-                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnectInternet') + '</div>', true, element)
+                updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnectInternet'), {error: true}), true, element)
                 return
             } else {
-                updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element)
+                updateStatusAdd(createMessage(e, {error: true}), true, element)
             }
         }
 
         if (response.status == 404) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status + '</div>', true, element)
+            updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, {error: true}), true, element)
             return
         } else if (response.redirected) {
             if (project.ServerPact || project.TopMinecraftServers) {
-                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProject') + '</div>', true, element)
+                updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProject'), {error: true}), true, element)
                 return
             }
-            updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProjectRedirect') + response.url + '</div>', true, element)
+            updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, {error: true}), true, element)
             return
         } else if (response.status == 503) {//None
         } else if (!response.ok) {
-            updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status + '</div>', true, element)
+            updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status, {error: true}), true, element)
             return
         }
         try {
@@ -575,22 +661,22 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 if (project.MCRate) {
                     //А зачем 404 отдавать в status код? Мы лучше отошлём 200 и только потом на странице напишем что не найдено 404
                     if (doc.querySelector('div[class=error]') != null) {
-                        updateStatusAdd('<div align="center" style="color:#f44336;">' + doc.querySelector('div[class=error]').textContent + '</div>', true, element)
+                        updateStatusAdd(createMessage(doc.querySelector('div[class=error]').textContent, {error: true}), true, element)
                         error = true
                     }
                 } else if (project.ServerPact) {
                     if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center') != null && doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center').textContent.includes('This server does not exist')) {
-                        updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProject') + '</div>', true, element)
+                        updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProject'), {error: true}), true, element)
                         error = true
                     }
                 } else if (project.MinecraftIpList) {
                     if (doc.querySelector(jsPath) == null) {
-                        updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notFoundProject') + '</div>', true, element)
+                        updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProject'), {error: true}), true, element)
                         error = true
                     }
                 } else if (project.IonMc) {
                     if (doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div') != null) {
-                        updateStatusAdd('<div align="center" style="color:#f44336;">' + doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText + '</div>', true, element)
+                        updateStatusAdd(createMessage(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, {error: true}), true, element)
                         error = true
                     }
                 }
@@ -617,26 +703,43 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         } catch (e) {
             console.error(e)
         }
-        updateStatusAdd('<div>' + chrome.i18n.getMessage('checkHasProjectSuccess') + '</div>', true, element)
+        updateStatusAdd(chrome.i18n.getMessage('checkHasProjectSuccess'), true, element)
 
         //Проверка авторизации ВКонтакте
         if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
-            updateStatusAdd('<div>' + chrome.i18n.getMessage('checkAuthVK') + '</div>', true, element)
+            updateStatusAdd(chrome.i18n.getMessage('checkAuthVK'), true, element)
             let url2 = authVKUrls.get(getProjectName(project))
             let response2
             try {
                 response2 = await fetch(url2, {redirect: 'manual'})
             } catch (e) {
                 if (e == 'TypeError: Failed to fetch') {
-                    updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnectInternetVPN') + '</div>', true, element)
+                    updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnectInternetVPN'), {error: true}), true, element)
                     return
                 } else {
-                    updateStatusAdd('<div align="center" style="color:#f44336;">' + e + '</div>', true, element)
+                    updateStatusAdd(createMessage(e, {error: true}), true, element)
                 }
             }
 
             if (response2.ok) {
-                updateStatusAdd('<div style="color:#f44336;">' + chrome.i18n.getMessage('authVK', getProjectName(project)) + '</div> <button id="authvk"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><path d="M5 12h13M12 5l7 7-7 7"/></svg>' + chrome.i18n.getMessage('authButton') + '</button>', true, element)
+                const message = createMessage(chrome.i18n.getMessage('authVK', getProjectName(project)), {error: true})
+                const button = document.createElement('button')
+                button.id = 'authvk'
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+                svg.setAttribute('width', 24)
+                svg.setAttribute('height', 24)
+                svg.setAttribute('viewBox', '0 0 24 24')
+                svg.setAttribute('fill', 'none')
+                svg.setAttribute('stroke', 'currentColor')
+                svg.setAttribute('stroke-width', 2)
+                svg.setAttribute('stroke-linecap', 'round')
+                svg.setAttribute('stroke-linejoin', 'bevel')
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+                path.setAttribute('d', 'M5 12h13M12 5l7 7-7 7')
+                svg.append(path)
+                button.append(svg)
+                button.append(chrome.i18n.getMessage('authButton'))
+                updateStatusAdd([message, document.createElement('br'), button], true, element)
                 document.getElementById('authvk').addEventListener('click', function() {
                     if (element != null) {
                         openPoput(url2, function() {
@@ -650,10 +753,10 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 })
                 return
             } else if (response2.status != 0) {
-                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status + '</div>', true, element)
+                updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, {error: true}), true, element)
                 return
             }
-            updateStatusAdd('<div>' + chrome.i18n.getMessage('checkAuthVKSuccess') + '</div>', true, element)
+            updateStatusAdd(chrome.i18n.getMessage('checkAuthVKSuccess'), true, element)
         }
     }
 
@@ -668,17 +771,36 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     /*f (random) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
     } else*/
-    if ((project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring) && settings.enabledSilentVote) {
-        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span>', true, element)
-    } else if (project.MinecraftServersOrg) {
-        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center">' + chrome.i18n.getMessage('privacyPass') + '</div>', true, element)
-    } else {
-        if (secondBonus === '') {
-            updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div>', false, element)
-        } else if (element != null) {
-            updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> ' + secondBonus, false, element)
+    if ((project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring) && settings.enabledSilentVote) {
+        const message = createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, {success: true})
+        const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', {error: true})
+        const span = document.createElement('span')
+        span.className = 'tooltip2'
+        span.style = 'color: white;'
+        const span2 = document.createElement('span')
+        span2.className = 'tooltip2text'
+        span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
+        span.appendChild(span2)
+        messageWSV.appendChild(span)
+
+        if (project.MinecraftServersOrg) {
+            const a = document.createElement('a')
+            a.target = 'blank_'
+            a.href = 'https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'
+            a.textContent = 'Privacy Pass'
+
+            updateStatusAdd([message, messageWSV, document.createElement('br'), chrome.i18n.getMessage('privacyPass'), a, chrome.i18n.getMessage('privacyPass2')], true, element)
         } else {
-            updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> ' + secondBonus, true, element)
+            updateStatusAdd([message, messageWSV], true, element)
+        }
+
+        
+    } else {
+        const message = createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, {success: true})
+        if (!secondBonusText) {
+            updateStatusAdd(message, false, element)
+        } else {
+            updateStatusAdd([message, document.createElement('br'), secondBonusText, secondBonusButton], Boolean(!element), element)
         }
     }
 
@@ -690,10 +812,10 @@ function addProjectsBonus(project) {
         document.getElementById('secondBonusMythicalWorld').addEventListener('click', async()=>{
             let response = await fetch('https://mythicalworld.su/bonus')
             if (!response.ok) {
-                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('notConnect', response.url) + response.status + '</div>', true, element)
+                updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnect', response.url) + response.status, {error: true}), true, element)
                 return
             } else if (response.redirected) {
-                updateStatusAdd('<div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('redirectedSecondBonus', response.url) + '</div>', true, element)
+                updateStatusAdd(createMessage(chrome.i18n.getMessage('redirectedSecondBonus', response.url), {error: true}), true, element)
                 return
             }
             await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://mythicalworld.su/bonus', null, priorityOption, null)
@@ -722,43 +844,70 @@ async function setCoolDown() {
     }
 }
 
+function createMessage(text, level) {
+    const span = document.createElement('span')
+    if (level) {
+        if (level.success) {
+            span.style = 'color:#4CAF50;'
+        } else if (level.error) {
+            span.style = 'color:#f44336;'
+        } /* else if (level.warn) {
+            span.style = 'color:#??????;'
+        } */
+    }
+    span.textContent = text
+    return span
+}
+
 //Статус сохранения настроек
 var timeoutSave
-function updateStatusSave(text, disableTimer) {
+function updateStatusSave(message, disableTimer) {
     let status = document.getElementById('save')
     clearInterval(timeoutSave)
-    status.innerHTML = text
+    status.firstChild.remove()
+    status.append(message)
     if (disableTimer)
         return
     timeoutSave = setTimeout(function() {
-        status.innerHTML = '&nbsp;'
+        status.firstChild.remove()
+        status.append('\u00A0')
     }, 3000)
 }
 
 //Статус возле кнопки "Добавить"
 var timeoutAdd
-function updateStatusAdd(text, disableTimer, element) {
+function updateStatusAdd(message, disableTimer, element) {
+    let status
     if (element != null) {
-        //Статус добавления проекта при быстрой настройки расширении
-        if (element.innerHTML.includes(': ')) {
-            element.innerHTML = element.innerHTML.substring(0, element.innerHTML.indexOf(': ') + 4)
-            if (disableTimer) {
-                element.innerHTML = element.innerHTML + text
-            } else {
-                element.innerHTML = element.innerHTML.replace('<span style="color:#f44336;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>', '<span style="color:#4CAF50;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><polyline points="20 6 9 17 4 12"></polyline></svg></span>') + text
-            }
-        } else {
-            element.innerHTML = element.innerHTML + ': ' + text
+        status = element
+        if (message.style && message.style.color == 'rgb(76, 175, 80)') {
+            const svg = element.parentElement.firstElementChild
+            svg.setAttribute('stroke', '#4CAF50')
+            svg.firstElementChild.remove()
+            svg.firstElementChild.remove()
+            const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
+            polyline.setAttribute('points', '20 6 9 17 4 12')
+            svg.append(polyline)
         }
-        return
+    } else {
+        status = document.getElementById('addProjectDiv')
     }
-    let status = document.getElementById('addProjectDiv')
     clearInterval(timeoutAdd)
-    status.innerHTML = text
-    if (disableTimer)
+    while (status.firstChild)
+       status.firstChild.remove()
+    if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
+        for (m of message) {
+            status.append(m)
+        }
+    } else {
+        status.append(message)
+    }
+    if (disableTimer || element != null)
         return
     timeoutAdd = setTimeout(function() {
-        status.innerHTML = '&nbsp;'
+        while (status.firstChild)
+            status.firstChild.remove()
+        status.append('\u00A0')
     }, 3000)
 }
 
@@ -848,7 +997,7 @@ async function getValue(name) {
     return new Promise(resolve=>{
         chrome.storage.local.get(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('storageError') + '</div>', false)
+                updateStatusSave(createMessage(chrome.i18n.getMessage('storageError'), {error: true}), false)
                 reject(chrome.runtime.lastError)
             } else {
                 resolve(data[name])
@@ -858,39 +1007,15 @@ async function getValue(name) {
 }
 async function setValue(key, value, updateStatus) {
     if (updateStatus)
-        updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true)
+        updateStatusSave(createMessage(chrome.i18n.getMessage('saving')), true)
     return new Promise(resolve=>{
         chrome.storage.local.set({[key]: value}, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('storageErrorSave') + '</div>', false)
+                updateStatusSave(createMessage(chrome.i18n.getMessage('storageErrorSave'), {error: true}), false)
                 reject(chrome.runtime.lastError)
             } else {
                 if (updateStatus)
-                    updateStatusSave('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('successSave') + '</div>', false)
-                resolve(data)
-            }
-        })
-    })
-}
-async function getSyncValue(name) {
-    return new Promise(resolve=>{
-        chrome.storage.sync.get(name, data=>{
-            if (chrome.runtime.lastError) {
-                updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('storageError') + '</div>', false)
-                reject(chrome.runtime.lastError)
-            } else {
-                resolve(data)
-            }
-        })
-    })
-}
-async function setSyncValue(key, value) {
-    return new Promise(resolve=>{
-        chrome.storage.sync.set({[key]: value}, data=>{
-            if (chrome.runtime.lastError) {
-                updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('storageErrorSave') + '</div>', false)
-                reject(chrome.runtime.lastError)
-            } else {
+                    updateStatusSave(createMessage(chrome.i18n.getMessage('successSave'), {success: true}), false)
                 resolve(data)
             }
         })
@@ -930,7 +1055,7 @@ async function forLoopAllProjects(fuc, reverse) {
 
 //Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', ()=>{
-    updateStatusFile('<div>' + chrome.i18n.getMessage('exporting') + '</div>', true)
+    updateStatusFile(chrome.i18n.getMessage('exporting'), true)
     var allSetting = {
         projectsTopCraft,
         projectsMcTOP,
@@ -963,12 +1088,12 @@ document.getElementById('file-download').addEventListener('click', ()=>{
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
     anchor.dataset.downloadurl = ['text/plain', anchor.download, anchor.href].join(':')
     anchor.click()
-    updateStatusFile('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('exportingEnd') + '</div>', false)
+    updateStatusFile(createMessage(chrome.i18n.getMessage('exportingEnd'), {success: true}), false)
 })
 
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', (evt)=>{
-    updateStatusFile('<div>' + chrome.i18n.getMessage('importing') + '</div>', true)
+    updateStatusFile(chrome.i18n.getMessage('importing'), true)
     try {
         if (evt.target.files.length == 0)return
         let file = evt.target.files[0]
@@ -985,13 +1110,13 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     await checkUpdateConflicts(false)
 
-                    updateStatusSave('<div>' + chrome.i18n.getMessage('saving') + '</div>', true)
+                    updateStatusSave(createMessage(chrome.i18n.getMessage('saving')), true)
                     for (const item of allProjects) {
                         await setValue('AVMRprojects' + item, this['projects' + item], false)
                     }
                     await setValue('AVMRsettings', settings, false)
                     await setValue('generalStats', generalStats, false)
-                    updateStatusSave('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('successSave') + '</div>', false)
+                    updateStatusSave(createMessage(chrome.i18n.getMessage('successSave'), {success: true}), false)
 
                     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
                     document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
@@ -1009,10 +1134,10 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     await updateProjectList()
 
-                    updateStatusFile('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('importingEnd') + '</div>', false)
+                    updateStatusFile(createMessage(chrome.i18n.getMessage('importingEnd'), {success: true}), false)
                 } catch (e) {
                     console.error(e)
-                    updateStatusFile('<div align="center" style="color:#f44336;">' + e + '</div>', true)
+                    updateStatusFile(createMessage(e, {error: true}), true)
                 }
             }
         })(file)
@@ -1020,7 +1145,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
         document.getElementById('file-upload').value = ''
     } catch (e) {
         console.error(e)
-        updateStatusFile('<div align="center" style="color:#f44336;">' + e + '</div>', true)
+        updateStatusFile(createMessage(e, {error: true}), true)
     }
 }, false)
 
@@ -1029,7 +1154,7 @@ async function checkUpdateConflicts(save) {
     //Если пользователь обновился с версии 3.3.1
     if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
         updated = true
-        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
+        updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdate')), true)
         await forLoopAllProjects(async function(proj) {
             proj.stats = {}
             //Да, это весьма не оптимизированно
@@ -1039,7 +1164,7 @@ async function checkUpdateConflicts(save) {
     }
     if (generalStats == null) {
         updated = true
-        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
+        updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdate')), true)
         generalStats = {}
         if (save)
             await setValue('generalStats', generalStats, false)
@@ -1048,7 +1173,7 @@ async function checkUpdateConflicts(save) {
     for (const item of allProjects) {
         if (this['projects' + item] == null || !(typeof this['projects' + item][Symbol.iterator] === 'function')) {
             if (!updated) {
-                updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
+                updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdate')), true)
                 updated = true
             }
             this['projects' + item] = []
@@ -1059,19 +1184,21 @@ async function checkUpdateConflicts(save) {
 
     if (updated) {
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
-        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false)
+        updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdateEnd2'), {success: true}), false)
     }
 }
 
 //Статус импорта/экпорта настроек
 var timeoutFile
-function updateStatusFile(text, disableTimer) {
+function updateStatusFile(message, disableTimer) {
     let status = document.getElementById('file')
     clearInterval(timeoutFile)
-    status.innerHTML = text
+    status.firstChild.remove()
+    status.append(message)
     if (disableTimer) return
     timeoutFile = setTimeout(function() {
-        status.innerHTML = '&nbsp;'
+        status.firstChild.remove()
+        status.append('\u00A0')
     }, 3000)
 }
 
@@ -1120,15 +1247,20 @@ async function fastAdd() {
     if (window.location.href.includes('addFastProject')) {
         var vars = getUrlVars()
         if (vars['name'] != null)
-            document.getElementById('addFastProject h2').innerHTML = document.getElementById('addFastProject h2').innerHTML.replace(chrome.i18n.getMessage('fastAdd'), getUrlVars()['name'])
+            document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
         let listFastAdd = document.getElementById('modaltext')
-        listFastAdd.innerHTML = ''
+        listFastAdd.textContent = ''
         for (fastProj of getUrlProjects()) {
             let html = document.createElement('div')
             html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id)
-            html.innerHTML = '<span style="color:#f44336;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>' + getProjectName(fastProj) + ' – ' + fastProj.nick + ' – ' + fastProj.id
+            html.appendChild(svgFail.cloneNode(true))
+            html.append(getProjectName(fastProj) + ' – ' + fastProj.nick + ' – ' + fastProj.id + ': ')
+
+            const status = document.createElement('span')
+            html.append(status)
+
             listFastAdd.before(html)
-            await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, null, false, html)
+            await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, null, false, status)
         }
         if (vars['disableNotifInfo'] != null) {
             if (settings.disabledNotifInfo != Boolean(vars['disableNotifInfo'])) {
@@ -1137,7 +1269,9 @@ async function fastAdd() {
             }
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             let html = document.createElement('div')
-            html.innerHTML = '<br><span style="color:#4CAF50;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><polyline points="20 6 9 17 4 12"></polyline></svg></span>' + chrome.i18n.getMessage('disableNotifInfo')
+            html.append(document.createElement('br'))
+            html.append(svgSuccess.cloneNode(true))
+            html.append(chrome.i18n.getMessage('disableNotifInfo'))
             listFastAdd.before(html)
         }
         if (vars['disableNotifWarn'] != null) {
@@ -1147,7 +1281,8 @@ async function fastAdd() {
             }
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             let html = document.createElement('div')
-            html.innerHTML = '<span style="color:#4CAF50;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><polyline points="20 6 9 17 4 12"></polyline></svg></span>' + chrome.i18n.getMessage('disableNotifWarn')
+            html.append(svgSuccess.cloneNode(true))
+            html.append(chrome.i18n.getMessage('disableNotifWarn'))
             listFastAdd.before(html)
         }
         if (vars['disableNotifStart'] != null) {
@@ -1157,14 +1292,15 @@ async function fastAdd() {
             }
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             let html = document.createElement('div')
-            html.innerHTML = '<span style="color:#4CAF50;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><polyline points="20 6 9 17 4 12"></polyline></svg></span>' + chrome.i18n.getMessage('disableNotifStart')
+            html.append(svgSuccess.cloneNode(true))
+            html.append(chrome.i18n.getMessage('disableNotifStart'))
             listFastAdd.before(html)
         }
 
-        if (document.getElementById('addFastProject').innerHTML.includes('<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>')) {
+        if (document.querySelector('div[class="modalContent"] > div > svg[stroke="#f44336"]') != null) {
             let buttonRetry = document.createElement('button')
             buttonRetry.setAttribute('class', 'col-xl-6 retryFastAdd col-lg-6')
-            buttonRetry.innerHTML = chrome.i18n.getMessage('retry')
+            buttonRetry.textContent = chrome.i18n.getMessage('retry')
             listFastAdd.before(buttonRetry)
             buttonRetry.addEventListener('click', ()=>{
                 document.location.reload(true)
@@ -1172,13 +1308,16 @@ async function fastAdd() {
         } else {
             let successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
-            successFastAdd.innerHTML = '<br>' + chrome.i18n.getMessage('successFastAdd') + '<br>' + chrome.i18n.getMessage('closeTab')
+            successFastAdd.append(document.createElement('br'))
+            successFastAdd.append(chrome.i18n.getMessage('successFastAdd'))
+            successFastAdd.append(document.createElement('br'))
+            successFastAdd.append(chrome.i18n.getMessage('closeTab'))
             listFastAdd.before(successFastAdd)
         }
 
         let buttonClose = document.createElement('button')
         buttonClose.setAttribute('class', 'col-xl-6 closeSettings col-lg-6')
-        buttonClose.innerHTML = chrome.i18n.getMessage('closeTabButton')
+        buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
 
         listFastAdd.before(buttonClose)
         buttonClose.addEventListener('click', ()=>{
@@ -1193,7 +1332,7 @@ function addCustom() {
     if (document.getElementById('project').children[21] == null) {
         let option = document.createElement('option')
         option.setAttribute('value', 'Custom')
-        option.innerHTML = chrome.i18n.getMessage('Custom')
+        option.textContent = chrome.i18n.getMessage('Custom')
         document.getElementById('project').insertBefore(option, document.getElementById('project').children[21])
     }
 
@@ -1202,7 +1341,7 @@ function addCustom() {
 //         buttonMS.setAttribute('class', 'selectsite')
 //         buttonMS.setAttribute('id', 'CustomButton')
 //         buttonMS.setAttribute('hidden', false)
-//         buttonMS.innerHTML = chrome.i18n.getMessage('Custom')
+//         buttonMS.textContent = chrome.i18n.getMessage('Custom')
 //         document.querySelector('#added > div > div:nth-child(4)').insertBefore(buttonMS, document.querySelector('#added > div > div:nth-child(4)').children[4])
 
 //         document.getElementById('CustomButton').addEventListener('click', function() {
@@ -1316,7 +1455,8 @@ document.getElementById('closeStats').addEventListener('click', resetStats)
 document.getElementById('closeStats2').addEventListener('click', resetStats)
 function resetStats() {
     if (document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent != '') {
-        document.getElementById('statsSubtitle').innerHTML = '&nbsp;'
+        document.getElementById('statsSubtitle').firstChild.remove()
+        document.getElementById('statsSubtitle').append('\u00A0')
         document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = ''
@@ -1352,53 +1492,114 @@ selectedTop.addEventListener('click', function() {
 
 var laterChoose
 selectedTop.addEventListener('change', function() {
-    let label = '<div class="form-group mb-1"><label for="id">' + chrome.i18n.getMessage('projectID') + '</label> <span class="tooltip1"><span class="tooltip1text">'
-    let input = '<input class="mb-2" name="id" id="id" required placeholder="' + chrome.i18n.getMessage('inputProjectID') + '" type="text">'
-    let dataInput = '<input class="mb-2" name="id" id="id" required placeholder="' + chrome.i18n.getMessage('inputProjectIDOrList') + '" list="idlist"><datalist id="idlist">'
-    if (selectedTop.value == 'TopCraft') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://topcraft.ru/servers/<span style="color:#d32f2f;">10496</span>/') + '</span></span></div>' + dataInput + '<option value="10340">Cifrazia</option><option value="6711">WarMine</option><option value="7666">Arago.Games</option><option value="7126">Borealis</option><option value="7411">CenturyMine</option><option value="6482">CubixWorld</option><option value="8732">DiverseMine</option><option value="308">Excalibur-Craft</option><option value="3254">FineMine</option><option value="7125">FrostLand</option><option value="628">Gamai</option><option value="7863">GamePoint</option><option value="9536">GrandGear</option><option value="1041">Grand-Mine</option><option value="5966">HunterCraft</option><option value="216">IPlayCraft</option><option value="2762">LavaCraft</option><option value="5835">Letragon</option><option value="218">McSKill</option><option value="304">MinecraftOnly</option><option value="6287">MythicalPlanet</option><option value="5323">MythicalWorld</option><option value="9598">OneLand</option><option value="9311">OrangeCraft</option><option value="5451">PentaCraft</option><option value="6031">Pixelmon.PRO</option><option value="318">qoobworld</option><option value="9597">ShadowCraft</option><option value="9867">SideMC</option><option value="1283">SimpleMinecraft</option><option value="9584">skolot.fun</option><option value="600">SMARTYcraft</option><option value="8179">VictoryCraft</option><option value="8992">ShowyCraft</option><option value="7755">HillMine</option></datalist>'
-    } else if (selectedTop.value == 'McTOP') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://mctop.su/servers/<span style="color:#d32f2f;">5231</span>/') + '</span></span></div>' + dataInput + '<option value="4975">WarMine</option><option value="4561">Arago.Games</option><option value="2241">Borealis</option><option value="4888">CenturyMine</option><option value="5089">DiverseMine</option><option value="1088">Excalibur-Craft</option><option value="3337">FineMine</option><option value="4580">FrostLand</option><option value="1765">Gamai</option><option value="4763">GamePoint</option><option value="5516">GrandGear</option><option value="3050">HunterCraft</option><option value="5864">IPlayCraft</option><option value="45">LavaCraft</option><option value="397">Letragon</option><option value="54">MinecraftOnly</option><option value="4483">MythicalPlanet</option><option value="1654">MythicalWorld</option><option value="2474">PentaCraft</option><option value="4585">Pixelmon.PRO</option><option value="1142">qoobworld</option><option value="1">SimpleMinecraft</option><option value="5685">skolot.fun</option><option value="317">SMARTYcraft</option><option value="4729">VictoryCraft</option><option value="5231">ShowyCraft</option><option value="4709">HillMine</option></datalist>'
-    } else if (selectedTop.value == 'MCRate') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://mcrate.su/rate/<span style="color:#d32f2f;">4396</span>') + '</span></span></div>' + dataInput + '<option value="8935">Cifrazia</option><option value="7003">CubixWorld</option><option value="4396">Excalibur-Craft</option><option value="4703">FineMine</option><option value="7450">FrostLand</option><option value="8428">Gamai</option><option value="8493">GrandGear</option><option value="10">LavaCraft</option><option value="4852">Letragon</option><option value="5154">MinecraftOnly</option><option value="6099">MythicalWorld</option><option value="6071">PentaCraft</option><option value="6434">Pixelmon.PRO</option><option value="1762">qoobworld</option><option value="4692">SimpleMinecraft</option><option value="4427">HillMine</option></datalist>'
-    } else if (selectedTop.value == 'MinecraftRating') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://minecraftrating.ru/projects/<span style="color:#d32f2f;">cubixworld</span>/') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="diversemine">DiverseMine</option><option value="excalibur-craft">Excalibur-Craft</option><option value="borealis">Borealis</option><option value="gamepoint">GamePoint</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="oneland">OneLand</option><option value="orangecraft">OrangeCraft</option><option value="pixelmon">Pixelmon.PRO</option><option value="shadowcraft">ShadowCraft</option><option value="sidemc">SideMC</option><option value="smc">SimpleMinecraft</option><option value="victorycraft">VictoryCraft</option><option value="hillmine">HillMine</option></datalist>'
-    } else if (selectedTop.value == 'MonitoringMinecraft') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'http://monitoringminecraft.ru/top/<span style="color:#d32f2f;">gg</span>/vote') + '</span></span></div>' + dataInput + '<option value="cubixworld">CubixWorld</option><option value="gg">GrandGear</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="orangecraft">OrangeCraft</option><option value="pixelmonpro">Pixelmon.PRO</option><option value="skolotfun">skolot.fun</option><option value="smc">SimpleMinecraft</option></datalist>'
-    } else if (selectedTop.value == 'IonMc') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://ionmc.top/vote/<span style="color:#d32f2f;">80</span>') + '</span></span></div>' + dataInput + '<option value="80">Pixelmon.PRO 1.12.2</option><option value="83">FineMine.RU</option></datalist>'
-    } else if (selectedTop.value == 'MinecraftServersOrg') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraftservers.org/vote/<span style="color:#d32f2f;">25531</span>') + '</span></span></div>' + dataInput + '<option value="564053">Legends Evolved</option></datalist>'
-    } else if (selectedTop.value == 'ServeurPrive') {
-        //ToDo <Serega007> не нашёл в лобби где получить награду за голосование соответсвенно считаю что на gommehd больше не дают награду за голосование
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://serveur-prive.net/minecraft/<span style="color:#d32f2f;">gommehd-net-4932</span>/vote') + '</span></span></div>' + input
-        /* dataInput + '<option value="gommehd-net-4932">GommeHD.net</option></datalist>'*/
-    } else if (selectedTop.value == 'PlanetMinecraft') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://www.planetminecraft.com/server/<span style="color:#d32f2f;">legends-evolved</span>/vote/') + '</span></span></div>' + dataInput + '<option value="legends-evolved">Legends Evolved</option></datalist>'
-    } else if (selectedTop.value == 'TopG') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://topg.org/Minecraft/in-<span style="color:#d32f2f;">405637</span>') + '</span></span></div>' + dataInput + '<option value="405637">Hypixel</option><option value="414300">Mineplex</option><option value="512397">Legends Evolved</option></datalist>'
-    } else if (selectedTop.value == 'MinecraftMp') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraft-mp.com/server/<span style="color:#d32f2f;">81821</span>/vote/') + '</span></span></div>' + dataInput + '<option value="81821">Hypixel</option><option value="234147">Legends Evolved</option></datalist>'
-    } else if (selectedTop.value == 'MinecraftServerList') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraft-server-list.com/server/<span style="color:#d32f2f;">292028</span>/vote/') + '</span></span></div>' + dataInput + '<option value="292028">Hypixel</option><option value="218820">Mineplex</option></datalist>'
-    } else if (selectedTop.value == 'ServerPact') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://www.serverpact.com/vote-<span style="color:#d32f2f;">26492123</span>') + '</span></span></div>' + dataInput + '<option value="24604">Hypixel</option></datalist>'
-    } else if (selectedTop.value == 'MinecraftIpList') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraftiplist.com/index.php?action=vote&listingID=<span style="color:#d32f2f;">2576</span>') + '</span></span></div>' + dataInput + '<option value="2576">Hypixel</option></datalist>'
-    } else if (selectedTop.value == 'TopMinecraftServers') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://topminecraftservers.org/vote/<span style="color:#d32f2f;">9126</span>') + '</span></span></div>' + input
-    } else if (selectedTop.value == 'MinecraftServersBiz') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraftservers.biz/<span style="color:#d32f2f;">servers/145999</span>/ or https://minecraftservers.biz/<span style="color:#d32f2f;">universemc</span>/') + '</span></span></div>' + input
-    } else if (selectedTop.value == 'HotMC') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://hotmc.ru/vote-<span style="color:#d32f2f;">195633</span>') + '</span></span></div>' + input
-    } else if (selectedTop.value == 'MinecraftServerNet') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://minecraft-server.net/vote/<span style="color:#d32f2f;">TitanicFreak</span>/') + '</span></span></div>' + input
-    } else if (selectedTop.value == 'TopGames') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://top-serveurs.net/minecraft/<span style="color:#d32f2f;">icesword-pvpfaction-depuis-2014-crack-on</span>') + '</span></span></div>' + input
-    } else if (selectedTop.value == 'TMonitoring') {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip', 'https://tmonitoring.com/server/<span style="color:#d32f2f;">qoobworldru</span>/') + '</span></span></div>' + input
+    document.getElementById('idSelector').removeAttribute('style')
+
+    if (document.getElementById(selectedTop.value + 'IDList') != null) {
+        document.getElementById('id').setAttribute('list', selectedTop.value + 'IDList')
     } else {
-        idSelector.innerHTML = label + chrome.i18n.getMessage('projectIDTooltip') + '</span></span></div>' + input
+        document.getElementById('id').removeAttribute('list')
+    }
+    
+    if (selectedTop.value == 'TopCraft') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://topcraft.ru/servers/'
+        document.getElementById('projectIDTooltip2').textContent = '10496'
+        document.getElementById('projectIDTooltip3').textContent = '/'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'McTOP') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://mctop.su/servers/'
+        document.getElementById('projectIDTooltip2').textContent = '5231'
+        document.getElementById('projectIDTooltip3').textContent = '/'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'MCRate') {
+        document.getElementById('projectIDTooltip1').textContent = 'http://mcrate.su/rate/'
+        document.getElementById('projectIDTooltip2').textContent = '4396'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'MinecraftRating') {
+        document.getElementById('projectIDTooltip1').textContent = 'http://minecraftrating.ru/projects/'
+        document.getElementById('projectIDTooltip2').textContent = 'cubixworld'
+        document.getElementById('projectIDTooltip3').textContent = '/'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'MonitoringMinecraft') {
+        document.getElementById('projectIDTooltip1').textContent = 'http://monitoringminecraft.ru/top/'
+        document.getElementById('projectIDTooltip2').textContent = 'gg'
+        document.getElementById('projectIDTooltip3').textContent = '/vote'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'IonMc') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://ionmc.top/vote/'
+        document.getElementById('projectIDTooltip2').textContent = '80'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'MinecraftServersOrg') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftservers.org/vote/'
+        document.getElementById('projectIDTooltip2').textContent = '25531'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'ServeurPrive') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://serveur-prive.net/minecraft/'
+        document.getElementById('projectIDTooltip2').textContent = 'gommehd-net-4932'
+        document.getElementById('projectIDTooltip3').textContent = '/vote'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'PlanetMinecraft') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://www.planetminecraft.com/server/'
+        document.getElementById('projectIDTooltip2').textContent = 'legends-evolved'
+        document.getElementById('projectIDTooltip3').textContent = '/vote/'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'TopG') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://topg.org/Minecraft/in-'
+        document.getElementById('projectIDTooltip2').textContent = '405637'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'MinecraftMp') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-mp.com/server/'
+        document.getElementById('projectIDTooltip2').textContent = '81821'
+        document.getElementById('projectIDTooltip3').textContent = '/vote/'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'MinecraftServerList') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-server-list.com/server/'
+        document.getElementById('projectIDTooltip2').textContent = '292028'
+        document.getElementById('projectIDTooltip3').textContent = '/vote/'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'ServerPact') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://www.serverpact.com/vote-'
+        document.getElementById('projectIDTooltip2').textContent = '26492123'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'MinecraftIpList') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftiplist.com/index.php?action=vote&listingID='
+        document.getElementById('projectIDTooltip2').textContent = '2576'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
+    } else if (selectedTop.value == 'TopMinecraftServers') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://topminecraftservers.org/vote/'
+        document.getElementById('projectIDTooltip2').textContent = '9126'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
+    } else if (selectedTop.value == 'MinecraftServersBiz') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftservers.biz/'
+        document.getElementById('projectIDTooltip2').textContent = 'servers/145999'
+        document.getElementById('projectIDTooltip3').textContent = '/'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
+    } else if (selectedTop.value == 'HotMC') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://hotmc.ru/vote-'
+        document.getElementById('projectIDTooltip2').textContent = '195633'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
+    } else if (selectedTop.value == 'MinecraftServerNet') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-server.net/vote/'
+        document.getElementById('projectIDTooltip2').textContent = 'TitanicFreak'
+        document.getElementById('projectIDTooltip3').textContent = '/'
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
+    } else if (selectedTop.value == 'TopGames') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://top-serveurs.net/minecraft/'
+        document.getElementById('projectIDTooltip2').textContent = 'icesword-pvpfaction-depuis-2014-crack-on'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
+    } else if (selectedTop.value == 'TMonitoring') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://tmonitoring.com/server/'
+        document.getElementById('projectIDTooltip2').textContent = 'qoobworldru'
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
     }
 
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames') {
@@ -1447,7 +1648,8 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('lastDayMonth').disabled = true
             document.getElementById('lastDayMonth').checked = false
 
-            idSelector.innerHTML = '';
+            while (idSelector.firstChild)
+                idSelector.firstChild.remove()
             idSelector.setAttribute('style', 'height: 0px;')
 
             document.getElementById('label6').removeAttribute('style')
@@ -1504,11 +1706,13 @@ selectedTop.addEventListener('change', function() {
             }
             document.getElementById('label4').removeAttribute('style')
             document.getElementById('idGame').removeAttribute('style')
-            let spanGame = document.getElementById('spanGame')
+            document.getElementById('gameIDTooltip2').textContent = 'minecraft'
             if (selectedTop.value == 'ServeurPrive') {
-                spanGame.innerHTML = '<span ' + chrome.i18n.getMessage('gameIDTooltip', 'https://serveur-prive.net/<span style="color:#d32f2f;">minecraft</span>/gommehd-net-4932') + ' </span>'
+                document.getElementById('gameIDTooltip1').textContent = 'https://serveur-prive.net/'
+                document.getElementById('gameIDTooltip3').textContent = '/gommehd-net-4932'
             } else {
-                spanGame.innerHTML = '<span ' + chrome.i18n.getMessage('gameIDTooltip', 'https://top-serveurs.net/<span style="color:#d32f2f;">minecraft</span>/hailcraft') + ' </span>'
+                document.getElementById('gameIDTooltip1').textContent = 'https://top-serveurs.net/'
+                document.getElementById('gameIDTooltip3').textContent = '/hailcraft'
             }
         }
     }
@@ -1544,7 +1748,7 @@ document.getElementById('selectTime').addEventListener('change', function() {
 //Локализация
 let elements = document.querySelectorAll('[data-resource]')
 elements.forEach(function(el) {
-    el.innerHTML = el.innerHTML + chrome.i18n.getMessage(el.getAttribute('data-resource'))
+    el.append(chrome.i18n.getMessage(el.getAttribute('data-resource')))
 })
 document.querySelectorAll('[placeholder]').forEach(function(el) {
     el.placeholder = chrome.i18n.getMessage(el.placeholder)

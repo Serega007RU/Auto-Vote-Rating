@@ -1405,13 +1405,6 @@ async function getValue(name) {
         })
     })
 }
-async function getSyncValue(name) {
-    return new Promise(resolve=>{
-        chrome.storage.sync.get(name, data=>{
-            resolve(data)
-        })
-    })
-}
 async function setValue(key, value) {
     return new Promise(resolve=>{
         chrome.storage.local.set({[key]: value}, data=>{
