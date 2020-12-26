@@ -513,9 +513,11 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     if (project.id == 'mythicalworld' || project.id == 5323 || project.id == 1654 || project.id == 6099) {
         secondBonusText = chrome.i18n.getMessage('secondBonus', 'MythicalWorld')
         secondBonusButton.id = 'secondBonusMythicalWorld'
+        secondBonusButton.className = 'secondBonus'
     } else if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         secondBonusText = chrome.i18n.getMessage('secondBonus', 'VictoryCraft')
         secondBonusButton.id = 'secondBonusVictoryCraft'
+        secondBonusButton.className = 'secondBonus'
     }
 
     await forLoopAllProjects(function(proj) {
@@ -543,7 +545,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         }
     }, false)
     if (returnAdd) {
-        addProjectsBonus(project)
+        addProjectsBonus(project, element)
         returnAdd = false
         return
     }
@@ -804,10 +806,10 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         }
     }
 
-    addProjectsBonus(project)
+    addProjectsBonus(project, element)
 }
 //Получение бонусов на проектах где требуется подтвердить получение бонуса
-function addProjectsBonus(project) {
+function addProjectsBonus(project, element) {
     if (project.id == 'mythicalworld' || project.id == 5323 || project.id == 1654 || project.id == 6099) {
         document.getElementById('secondBonusMythicalWorld').addEventListener('click', async()=>{
             let response = await fetch('https://mythicalworld.su/bonus')

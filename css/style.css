@@ -115,8 +115,12 @@ button[type="submit"], .retryFastAdd, #generalStats {
   border: none;
 }
 
-#authvk:hover, button[type="submit"]:hover, #generalStats:hover, .tablinks:hover, .selectsite:hover, .listcontent button:hover, .closeSettings:hover {
+#authvk:hover, .secondBonus:hover, button[type="submit"]:hover, #generalStats:hover, .tablinks:hover, .selectsite:hover, .listcontent button:hover, .closeSettings:hover {
   opacity: 0.85;
+}
+
+#authvk:hover, .secondBonus:hover {
+  text-decoration: underline;
 }
 
 button[type="submit"]:focus, #generalStats:focus {
@@ -542,11 +546,16 @@ figure svg {
   visibility: visible;
 }
 
-#authvk {
+.secondBonus {
+  margin-left: 5px;
+  position: relative;
+  top: 2px;
+}
+
+#authvk, .secondBonus {
   transform: translateY(-3px);
   border: none;
   color: #1A7BEE;
-  transition: 0.3s;
   background: none;
   box-shadow: none;
   padding: 0;
