@@ -568,7 +568,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             url = 'http://monitoringminecraft.ru/top/' + project.id + '/'
             jsPath = '#page > div.box.visible.main > div.left > table > tbody > tr:nth-child(1) > td.wid > noindex > a'
         } else if (project.IonMc) {
-            url = 'https://ionmc.top/vote/' + project.id
+            url = 'https://ionmc.top/projects/' + project.id + '/vote'
             jsPath = '#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.mx-2.-mt-1.mb-1.sm\\:mx-5.sm\\:my-2 > ul > li:nth-child(2) > a'
         } else if (project.MinecraftServersOrg) {
             url = 'https://minecraftservers.org/server/' + project.id
@@ -789,9 +789,9 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             a.href = 'https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'
             a.textContent = 'Privacy Pass'
 
-            updateStatusAdd([message, messageWSV, document.createElement('br'), chrome.i18n.getMessage('privacyPass'), a, chrome.i18n.getMessage('privacyPass2')], true, element)
+            updateStatusAdd([message, document.createElement('br'), messageWSV, document.createElement('br'), chrome.i18n.getMessage('privacyPass'), a, chrome.i18n.getMessage('privacyPass2')], true, element)
         } else {
-            updateStatusAdd([message, messageWSV], true, element)
+            updateStatusAdd([message, document.createElement('br'), messageWSV], true, element)
         }
 
         
@@ -1526,9 +1526,9 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip3').textContent = '/vote'
         document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'IonMc') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://ionmc.top/vote/'
+        document.getElementById('projectIDTooltip1').textContent = 'https://ionmc.top/projects/'
         document.getElementById('projectIDTooltip2').textContent = '80'
-        document.getElementById('projectIDTooltip3').textContent = ''
+        document.getElementById('projectIDTooltip3').textContent = '/vote'
         document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MinecraftServersOrg') {
         document.getElementById('projectIDTooltip1').textContent = 'https://minecraftservers.org/vote/'
