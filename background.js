@@ -515,6 +515,9 @@ async function silentVote(project) {
 //                let later = Date.now() - (86400000 - milliseconds)
                 endVote({later: true}, null, project)
                 return
+            } else if (doc.querySelector('div[class="error"]') != null) {
+                endVote({message: doc.querySelector('div[class="error"]').textContent}, null, project)
+                return
             } else {
                 endVote({errorVoteNoElement: true}, null, project)
                 return
@@ -964,6 +967,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null)
         return
+    console.log('Executed script', details)
     chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'}, function() {
         if (chrome.runtime.lastError) {
             console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
