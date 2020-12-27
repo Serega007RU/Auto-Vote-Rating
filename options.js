@@ -201,11 +201,11 @@ async function restoreOptions() {
 
     //Если пользователь обновился с версии без MultiVote (special for settings)
     if (settings.stopVote == null) {
-        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
+        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
         settings.stopVote = 9000000000000000
         await setValue('AVMRsettings', settings, false)
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
-        updateStatusSave('<div align="center" style="color:#4CAF50;">' + chrome.i18n.getMessage('settingsUpdateEnd2') + '</div>', false)
+        updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdateEnd2'), {success: true}), false)
     }
 
     updateProjectList()
@@ -322,7 +322,7 @@ async function restoreOptions() {
             settings.stopVote = 0
             document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#00d510')
             document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#00d510')
-            updateStatusSave('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('voteResumed') + '</div>', false)
+            updateStatusSave(createMessage(chrome.i18n.getMessage('voteResumed'), {success: true}), false)
         } else {
             settings.stopVote = 9000000000000000
             document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
@@ -330,7 +330,7 @@ async function restoreOptions() {
 
             await chrome.extension.getBackgroundPage().stopVote()
             
-            updateStatusSave('<div style="color:#f44336;">' + chrome.i18n.getMessage('voteSuspended') + '</div>', false)
+            updateStatusSave(createMessage(chrome.i18n.getMessage('voteSuspended'), {error: true}), false)
         }
         await setValue('AVMRsettings', settings, false)
     }
