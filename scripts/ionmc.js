@@ -51,7 +51,7 @@ async function getNickName() {
         })
     })
     for (project of projects) {
-        if (project.IonMc && document.URL.startsWith('https://ionmc.top/vote/' + project.id)) {
+        if (project.IonMc && document.URL.startsWith('https://ionmc.top/projects/' + project.id)) {
             return project.nick
         }
     }

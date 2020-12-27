@@ -308,20 +308,10 @@
     "message": "Закрыть вкладку"
   },
   "projectIDTooltip": {
-    "message": "<span style='color:red;'>ID</span> проекта можно получить из адресной строки находясь на странице проекта, например: <br> $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
+    "message": " проекта можно получить из адресной строки находясь на странице проекта, например: "
   },
   "gameIDTooltip": {
-    "message": "<span style='color:red;'>ID</span> игры можно получить из адресной строки находясь на странице проекта, например: <br> $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
+    "message": " игры можно получить из адресной строки находясь на странице проекта, например: "
   },
   "inputProjectID": {
     "message": "Введите ID"
@@ -543,7 +533,10 @@
     "message": "Не удалось определить тип прокси, возможно данный прокси сдох."
   },
   "privacyPass": {
-    "message": "Установите расширение <a target='blank_' href='https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'>Privacy Pass</a> что б при первом прохождении капчи получить 5 бесплатных прохождении капч для hCaptcha"
+    "message": "Установите расширение "
+  },
+  "privacyPass2": {
+    "message": " что б при первом прохождении капчи получить 5 бесплатных прохождении капч для hCaptcha"
   },
   "deleteAll": {
     "message": "Удалить все прокси"
@@ -624,6 +617,9 @@
         "content": "$1"
       }
     }
+  },
+  "stats2": {
+    "message": "Статистика"
   },
   "statsSuccessVotes": {
     "message": "Успешных голосов"

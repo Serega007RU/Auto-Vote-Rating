@@ -185,18 +185,122 @@
 							<textarea style="display: none;" id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="mb-2"></textarea>
 
 							<!--ServeurPrive and TopGames-->
-							<div style="display: none;" id="idGame" class="form-group mb-1"><label for="chooseGame2" data-resource="idGame"></label> <span class="tooltip1"><span class="tooltip1text" id="spanGame"></span></div>
-							<datalist style="display: none;" id="gameList1"><option value="minecraft">Minecraft</option><option value="garrys-mod">Garry's mod</option><option value="discord">Discord</option><option value="roblox">Roblox</option><option value="rdr">Red Dead Redemption 2</option><option value="hytale">Hytale</option><option value="terraria">Terraria</option><option value="ark">ARK</option><option value="dayz">Dayz</option><option value="l4d2">Left 4 Dead 2</option><option value="rust">Rust</option><option value="gta">GTA 5</option><option value="discord">Discord</option></datalist>
-							<datalist style="display: none;" id="gameList2"><option value="minecraft">Minecraft</option><option value="discord">Discord</option><option value="grand-theft-auto">Grand Theft Auto V</option><option value="ark-survival-evolved">Ark : Survival Evolved</option><option value="rust">Rust</option><option value="hytale">Hytale</option><option value="minecraft-bedrock">Minecraft Bedrock</option><option value="ark">ARK</option><option value="garrys-mod">Garry's Mod</option></datalist>
+							<div style="display: none;" id="idGame" class="form-group mb-1">
+								<label for="chooseGame2" data-resource="idGame"></label>
+								<span class="tooltip1">
+									<span class="tooltip1text" id="spanGame">
+									    <span style="color:red;">ID</span>
+									    <span data-resource="gameIDTooltip"></span>
+									    <br>
+									    <span id="gameIDTooltip1"></span><span id="gameIDTooltip2" style="color:#d32f2f;"></span><span id="gameIDTooltip3"></span>
+									</span>
+								</span>
+							</div>
+							<datalist style="display: none;" id="gameList1">
+								<option value="minecraft">Minecraft</option>
+								<option value="garrys-mod">Garry's mod</option>
+								<option value="discord">Discord</option>
+								<option value="roblox">Roblox</option>
+								<option value="rdr">Red Dead Redemption 2</option>
+								<option value="hytale">Hytale</option>
+								<option value="terraria">Terraria</option>
+								<option value="ark">ARK</option>
+								<option value="dayz">Dayz</option>
+								<option value="l4d2">Left 4 Dead 2</option>
+								<option value="rust">Rust</option>
+								<option value="gta">GTA 5</option>
+								<option value="discord">Discord</option>
+							</datalist>
+							<datalist style="display: none;" id="gameList2">
+								<option value="minecraft">Minecraft</option>
+								<option value="discord">Discord</option>
+								<option value="grand-theft-auto">Grand Theft Auto V</option>
+								<option value="ark-survival-evolved">Ark : Survival Evolved</option>
+								<option value="rust">Rust</option>
+								<option value="hytale">Hytale</option>
+								<option value="minecraft-bedrock">Minecraft Bedrock</option>
+								<option value="ark">ARK</option>
+								<option value="garrys-mod">Garry's Mod</option>
+							</datalist>
 							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGame1" placeholder="chooseGame" list="gameList1" value="minecraft">
 							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGame2" placeholder="chooseGame" list="gameList2" value="minecraft">
-							<div style="display: none;" class="form-group mb-1" id="label4"><label for="selectLang2" data-resource="chooseLang"></label></div>
-							<select style="display: none;" id="selectLang1" class="mb-2"><option value="de">Deutsch</option><option value="en">English</option><option value="es">Español</option><option value="fr" selected>Français</option><option value="pt">Português</option><option value="ru">Русский</option></select>
-							<select style="display: none;" id="selectLang2" class="mb-2"><option value="en">English</option><option value="fr" selected>Français</option></select>
-							<div style="display: none;" class="form-group mb-1" id="label5"><label for="countVote" data-resource="countVote"></label></div>
+							<div style="display: none;" class="form-group mb-1" id="label4">
+								<label for="selectLang2" data-resource="chooseLang"></label>
+							</div>
+							<select style="display: none;" id="selectLang1" class="mb-2">
+								<option value="de">Deutsch</option>
+								<option value="en">English</option>
+								<option value="es">Español</option>
+								<option value="fr" selected>Français</option>
+								<option value="pt">Português</option>
+								<option value="ru">Русский</option>
+							</select>
+							<select style="display: none;" id="selectLang2" class="mb-2">
+								<option value="en">English</option>
+								<option value="fr" selected>Français</option>
+							</select>
+							<div style="display: none;" class="form-group mb-1" id="label5">
+								<label for="countVote" data-resource="countVote"></label>
+							</div>
 							<input style="display: none;" id="countVote" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="mb-2" value="5">
 
-							<div id="idSelector"></div>
+							<div id="idSelector" style="display: none;">
+							    <div class="form-group mb-1">
+									<label for="id" data-resource="projectID"></label>
+									<span class="tooltip1">
+										<span class="tooltip1text">
+											<span style="color:#d32f2f;">ID</span>
+											<span data-resource="projectIDTooltip"></span>
+											<br>
+											<span id="projectIDTooltip1"></span><span id="projectIDTooltip2" style="color:#d32f2f;"></span><span id="projectIDTooltip3"></span>
+										</span>
+									</span>
+							    </div>
+
+							    <input class="mb-2" name="id" id="id" required>
+							    <datalist id="TopCraftIDList">
+                                    <option value="10340">Cifrazia</option><option value="6711">WarMine</option><option value="7666">Arago.Games</option><option value="7126">Borealis</option><option value="7411">CenturyMine</option><option value="6482">CubixWorld</option><option value="8732">DiverseMine</option><option value="308">Excalibur-Craft</option><option value="3254">FineMine</option><option value="7125">FrostLand</option><option value="628">Gamai</option><option value="7863">GamePoint</option><option value="9536">GrandGear</option><option value="1041">Grand-Mine</option><option value="5966">HunterCraft</option><option value="216">IPlayCraft</option><option value="2762">LavaCraft</option><option value="5835">Letragon</option><option value="218">McSKill</option><option value="304">MinecraftOnly</option><option value="6287">MythicalPlanet</option><option value="5323">MythicalWorld</option><option value="9598">OneLand</option><option value="9311">OrangeCraft</option><option value="5451">PentaCraft</option><option value="6031">Pixelmon.PRO</option><option value="318">qoobworld</option><option value="9597">ShadowCraft</option><option value="9867">SideMC</option><option value="1283">SimpleMinecraft</option><option value="9584">skolot.fun</option><option value="600">SMARTYcraft</option><option value="8179">VictoryCraft</option><option value="8992">ShowyCraft</option><option value="7755">HillMine</option>
+							    </datalist>
+							    <datalist id="McTOPIDList">
+							        <option value="4975">WarMine</option><option value="4561">Arago.Games</option><option value="2241">Borealis</option><option value="4888">CenturyMine</option><option value="5089">DiverseMine</option><option value="1088">Excalibur-Craft</option><option value="3337">FineMine</option><option value="4580">FrostLand</option><option value="1765">Gamai</option><option value="4763">GamePoint</option><option value="5516">GrandGear</option><option value="3050">HunterCraft</option><option value="5864">IPlayCraft</option><option value="45">LavaCraft</option><option value="397">Letragon</option><option value="54">MinecraftOnly</option><option value="4483">MythicalPlanet</option><option value="1654">MythicalWorld</option><option value="2474">PentaCraft</option><option value="4585">Pixelmon.PRO</option><option value="1142">qoobworld</option><option value="1">SimpleMinecraft</option><option value="5685">skolot.fun</option><option value="317">SMARTYcraft</option><option value="4729">VictoryCraft</option><option value="5231">ShowyCraft</option><option value="4709">HillMine</option>
+							    </datalist>
+							    <datalist id="MCRateIDList">
+							        <option value="8935">Cifrazia</option><option value="7003">CubixWorld</option><option value="4396">Excalibur-Craft</option><option value="4703">FineMine</option><option value="7450">FrostLand</option><option value="8428">Gamai</option><option value="8493">GrandGear</option><option value="10">LavaCraft</option><option value="4852">Letragon</option><option value="5154">MinecraftOnly</option><option value="6099">MythicalWorld</option><option value="6071">PentaCraft</option><option value="6434">Pixelmon.PRO</option><option value="1762">qoobworld</option><option value="4692">SimpleMinecraft</option><option value="4427">HillMine</option>
+							    </datalist>
+							    <datalist id="MinecraftRatingIDList">
+							        <option value="cubixworld">CubixWorld</option><option value="diversemine">DiverseMine</option><option value="excalibur-craft">Excalibur-Craft</option><option value="borealis">Borealis</option><option value="gamepoint">GamePoint</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="oneland">OneLand</option><option value="orangecraft">OrangeCraft</option><option value="pixelmon">Pixelmon.PRO</option><option value="shadowcraft">ShadowCraft</option><option value="sidemc">SideMC</option><option value="smc">SimpleMinecraft</option><option value="victorycraft">VictoryCraft</option><option value="hillmine">HillMine</option>
+							    </datalist>
+							    <datalist id="MonitoringMinecraftIDList">
+							        <option value="cubixworld">CubixWorld</option><option value="gg">GrandGear</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="orangecraft">OrangeCraft</option><option value="pixelmonpro">Pixelmon.PRO</option><option value="skolotfun">skolot.fun</option><option value="smc">SimpleMinecraft</option>
+							    </datalist>
+							    <datalist id="IonMcIDList">
+							        <option value="80">Pixelmon.PRO 1.12.2</option><option value="83">FineMine.RU</option>
+							    </datalist>
+							    <datalist id="MinecraftServersOrgIDList">
+							        <option value="564053">Legends Evolved</option>
+							    </datalist>
+							    <datalist id="ServeurPriveIDList">
+                                    <option value="gommehd-net-4932">GommeHD.net</option>
+							    </datalist>
+							    <datalist id="PlanetMinecraftIDList">
+							        <option value="legends-evolved">Legends Evolved</option>
+							    </datalist>
+							    <datalist id="TopGIDList">
+							        <option value="405637">Hypixel</option><option value="414300">Mineplex</option><option value="512397">Legends Evolved</option>
+							    </datalist>
+							    <datalist id="MinecraftMpIDList">
+							        <option value="81821">Hypixel</option><option value="234147">Legends Evolved</option>
+							    </datalist>
+							    <datalist id="MinecraftServerListIDList">
+							        <option value="292028">Hypixel</option><option value="218820">Mineplex</option>
+							    </datalist>
+							    <datalist id="ServerPactIDList">
+							        <option value="24604">Hypixel</option>
+							    </datalist>
+							    <datalist id="MinecraftIpListIDList">
+							        <option value="2576">Hypixel</option>
+							    </datalist>
+							</div>
 						</div>
 						<div class="col-xl-2 col-lg-1 col-md-0"></div>
 						<div class="col-xl-4 col-lg-5 col-md-8 mb-3"> 
@@ -296,6 +400,7 @@
 			<div id="added" class="tabcontent" style="display: none;">
 				<h4 data-resource="addedProjects" align="center"></h4>
 				<hr color="#5A5A5C">
+				<p class="ml-4" data-resource="notAddedAll"></p>
 				<div class="row">
 					<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable1">
 					</div>
@@ -501,10 +606,10 @@
 			</div>
 			<a id="donate" data-resource="supportDev" target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
 		    <audio id="sound-link2" preload="auto">
-			    <source src="audio/2_-_mp3_.mp3" type="audio/mpeg">
+			    <source src="audio/coins1.mp3" type="audio/mpeg">
 		    </audio>
 		    <audio id="sound-link" preload="auto">
-			    <source src="audio/c3a54b52a16b1307.mp3" type="audio/mpeg">
+			    <source src="audio/coins2.mp3" type="audio/mpeg">
 		    </audio>
 			<div id="save">&nbsp;</div>
 		</div>
@@ -513,7 +618,7 @@
 	<div class="anelumen lowingnuska" id="addFastProject">
 		<a href="" class="nedismiseg"></a>
 		<figure>
-			<h2 data-resource="fastAdd"><a href="" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
+			<h2 data-resource="fastAdd"><a href="#/" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
 			<div class="modalContent">
 				<div data-resource="load" id=modaltext></div>
 			</div>
@@ -524,7 +629,7 @@
 		<a id="modalStats" href="#stats"></a>
 		<figure>
 			<h2>
-			    <span data-resource="stats"></span>
+			    <span data-resource="stats2"></span>
 			    <div id="statsSubtitle">&nbsp;</div>
 			    <a href="#/" class="compatibg-ukastywise" id="closeStats2" aria-label="Close Modal Box">×</a>
 			</h2>

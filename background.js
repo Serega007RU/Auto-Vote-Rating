@@ -601,7 +601,7 @@ async function newWindow(project) {
         else if (project.MonitoringMinecraft)
             url = 'http://monitoringminecraft.ru/top/' + project.id + '/vote'
         else if (project.IonMc)
-            url = 'https://ionmc.top/vote/' + project.id
+            url = 'https://ionmc.top/projects/' + project.id + '/vote'
         else if (project.MinecraftServersOrg)
             url = 'https://minecraftservers.org/vote/' + project.id
         else if (project.ServeurPrive) {
@@ -644,7 +644,7 @@ async function newWindow(project) {
             url = 'https://tmonitoring.com/server/' + project.id + '/'
         
         let tab = await new Promise(resolve=>{
-            chrome.tabs.create({'url': url, 'selected': false}, function(tab_) {
+            chrome.tabs.create({'url': url, 'active': false}, function(tab_) {
                 resolve(tab_)
             })
         })
@@ -804,6 +804,9 @@ async function silentVote(project) {
 //                if (milliseconds == 0) return
 //                let later = Date.now() - (86400000 - milliseconds)
                 endVote({later: true}, null, project)
+                return
+            } else if (doc.querySelector('div[class="error"]') != null) {
+                endVote({message: doc.querySelector('div[class="error"]').textContent}, null, project)
                 return
             } else {
                 endVote({errorVoteNoElement: true}, null, project)
@@ -1255,6 +1258,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null)
         return
+    console.log('Executed script', details)
     chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'}, function() {
         if (chrome.runtime.lastError) {
             console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
@@ -1758,13 +1762,6 @@ async function getValue(name) {
     return new Promise(resolve=>{
         chrome.storage.local.get(name, data=>{
             resolve(data[name])
-        })
-    })
-}
-async function getSyncValue(name) {
-    return new Promise(resolve=>{
-        chrome.storage.sync.get(name, data=>{
-            resolve(data)
         })
     })
 }

@@ -38,6 +38,8 @@ async function vote() {
 //                    chrome.runtime.sendMessage({later: later})
 //                }, 2000)
             chrome.runtime.sendMessage({later: true})
+        } else if (document.querySelector('div[class="error"]') != null) {
+            chrome.runtime.sendMessage({message: document.querySelector('div[class="error"]').textContent})
         } else {
             chrome.runtime.sendMessage({errorVoteNoElement: true})
         }
