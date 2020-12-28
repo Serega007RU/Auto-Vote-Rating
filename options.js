@@ -57,6 +57,8 @@ var priorityOption = false
 var randomizeOption = false
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd
+//Удалять ли куки ВКонтакте?
+var deleteCookies = true
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -178,7 +180,7 @@ async function restoreOptions() {
     if (generalStats == null)
         generalStats = {}
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
-        updateStatusSave(createMessage(chrome.i18n.getMessage('firstSettings')), true)
+        updateStatusSave(chrome.i18n.getMessage('firstSettings'), true)
         
         for (const item of allProjects) {
             this['projects' + item] = []
@@ -193,7 +195,7 @@ async function restoreOptions() {
         await setValue('AVMRproxies', proxies, false)
 
         console.log(chrome.i18n.getMessage('settingsGen'))
-        updateStatusSave(createMessage(chrome.i18n.getMessage('firstSettingsSave'), {success: true}), false)
+        updateStatusSave(chrome.i18n.getMessage('firstSettingsSave'), 'success')
         alert(chrome.i18n.getMessage('firstInstall'))
     }
 
@@ -654,7 +656,7 @@ document.getElementById('AddVK').addEventListener('click', async () => {
             })
         })
         for(let i=0; i<cookies.length;i++) {
-            if (true) await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+            if (deleteCookies) await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
         }
 
         updateStatusVK(createMessage(chrome.i18n.getMessage('deletedAllVK'), {success: true}), false)
@@ -1033,7 +1035,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         try {
             body = JSON.parse(id)
         } catch (e) {
-            updateStatusAdd(createMessage(e, {error: true}), true, element)
+            updateStatusAdd(e, true, element, 'error')
             return
         }
         project = new Project(choice, nick, body, time, response, customTimeOut, priorityOpt)
@@ -1075,7 +1077,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     await forLoopAllProjects(function(proj) {
         if (settings.useMultiVote) {
             if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick && !project.Custom) {
-                const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), {success: true})
+                const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), 'success')
                 if (!secondBonusText) {
                     updateStatusAdd(message, false, element)
                 } else {
@@ -1084,13 +1086,13 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 returnAdd = true
                 return
             } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
-                updateStatusAdd(createMessage(chrome.i18n.getMessage('alreadyAdded'), {success: true}), false, element)
+                updateStatusAdd(chrome.i18n.getMessage('alreadyAdded'), false, element, 'success')
                 returnAdd = true
                 return
             }
         } else {
             if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
-                const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), {success: true})
+                const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), 'success')
                 if (!secondBonusText) {
                     updateStatusAdd(message, false, element)
                 } else {
@@ -1099,15 +1101,15 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 returnAdd = true
                 return
             } else if (((proj.MCRate && choice == 'MCRate') || (proj.ServerPact && choice == 'ServerPact') || (proj.MinecraftServersOrg && choice == 'MinecraftServersOrg') || (proj.HotMC && choice == 'HotMC')) && proj.nick && project.nick && !disableCheckProjects) {
-                updateStatusAdd(createMessage(chrome.i18n.getMessage('oneProject', getProjectName(proj)), {error: true}), false, element)
+                updateStatusAdd(chrome.i18n.getMessage('oneProject', getProjectName(proj)), false, element, 'error')
                 returnAdd = true
                 return
             } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
-                updateStatusAdd(createMessage(chrome.i18n.getMessage('oneProjectMinecraftIpList'), {error: true}), false, element)
+                updateStatusAdd(chrome.i18n.getMessage('oneProjectMinecraftIpList'), false, element, 'error')
                 returnAdd = true
                 return
             } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
-                updateStatusAdd(createMessage(chrome.i18n.getMessage('alreadyAdded'), {success: true}), false, element)
+                updateStatusAdd(chrome.i18n.getMessage('alreadyAdded'), false, element, 'success')
                 returnAdd = true
                 return
             }
@@ -1203,26 +1205,26 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             }
         } catch (e) {
             if (e == 'TypeError: Failed to fetch') {
-                updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnectInternet'), {error: true}), true, element)
+                updateStatusAdd(chrome.i18n.getMessage('notConnectInternet'), true, element, 'error')
                 return
             } else {
-                updateStatusAdd(createMessage(e, {error: true}), true, element)
+                updateStatusAdd(e, true, element, 'error')
             }
         }
 
         if (response.status == 404) {
-            updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, {error: true}), true, element)
+            updateStatusAdd(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, true, element, 'error')
             return
         } else if (response.redirected) {
             if (project.ServerPact || project.TopMinecraftServers) {
-                updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProject'), {error: true}), true, element)
+                updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
                 return
             }
-            updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, {error: true}), true, element)
+            updateStatusAdd(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, true, element, 'error')
             return
         } else if (response.status == 503) {//None
         } else if (!response.ok) {
-            updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status, {error: true}), true, element)
+            updateStatusAdd(chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status, true, element, 'error')
             return
         }
         try {
@@ -1232,22 +1234,22 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 if (project.MCRate) {
                     //А зачем 404 отдавать в status код? Мы лучше отошлём 200 и только потом на странице напишем что не найдено 404
                     if (doc.querySelector('div[class=error]') != null) {
-                        updateStatusAdd(createMessage(doc.querySelector('div[class=error]').textContent, {error: true}), true, element)
+                        updateStatusAdd(doc.querySelector('div[class=error]').textContent, true, element, 'error')
                         error = true
                     }
                 } else if (project.ServerPact) {
                     if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center') != null && doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center').textContent.includes('This server does not exist')) {
-                        updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProject'), {error: true}), true, element)
+                        updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
                         error = true
                     }
                 } else if (project.MinecraftIpList) {
                     if (doc.querySelector(jsPath) == null) {
-                        updateStatusAdd(createMessage(chrome.i18n.getMessage('notFoundProject'), {error: true}), true, element)
+                        updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
                         error = true
                     }
                 } else if (project.IonMc) {
                     if (doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div') != null) {
-                        updateStatusAdd(createMessage(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, {error: true}), true, element)
+                        updateStatusAdd(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, true, element, 'error')
                         error = true
                     }
                 }
@@ -1285,15 +1287,15 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 response2 = await fetch(url2, {redirect: 'manual'})
             } catch (e) {
                 if (e == 'TypeError: Failed to fetch') {
-                    updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnectInternetVPN'), {error: true}), true, element)
+                    updateStatusAdd(chrome.i18n.getMessage('notConnectInternetVPN'), true, element, 'error')
                     return
                 } else {
-                    updateStatusAdd(createMessage(e, {error: true}), true, element)
+                    updateStatusAdd(e, true, element, 'error')
                 }
             }
 
             if (response2.ok) {
-                const message = createMessage(chrome.i18n.getMessage('authVK', getProjectName(project)), {error: true})
+                const message = createMessage(chrome.i18n.getMessage('authVK', getProjectName(project)), 'error')
                 const button = document.createElement('button')
                 button.id = 'authvk'
                 const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
@@ -1324,7 +1326,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 })
                 return
             } else if (response2.status != 0) {
-                updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, {error: true}), true, element)
+                updateStatusAdd(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, true, element, 'error')
                 return
             }
             updateStatusAdd(chrome.i18n.getMessage('checkAuthVKSuccess'), true, element)
@@ -1343,8 +1345,8 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element)
     } else*/
     if ((project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring) && settings.enabledSilentVote) {
-        const message = createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, {success: true})
-        const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', {error: true})
+        const message = createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success')
+        const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
         const span = document.createElement('span')
         span.className = 'tooltip2'
         span.style = 'color: white;'
@@ -1367,7 +1369,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
 
         
     } else {
-        const message = createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, {success: true})
+        const message = createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success')
         if (!secondBonusText) {
             updateStatusAdd(message, false, element)
         } else {
@@ -1383,10 +1385,10 @@ function addProjectsBonus(project, element) {
         document.getElementById('secondBonusMythicalWorld').addEventListener('click', async()=>{
             let response = await fetch('https://mythicalworld.su/bonus')
             if (!response.ok) {
-                updateStatusAdd(createMessage(chrome.i18n.getMessage('notConnect', response.url) + response.status, {error: true}), true, element)
+                updateStatusAdd(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, element, 'error')
                 return
             } else if (response.redirected) {
-                updateStatusAdd(createMessage(chrome.i18n.getMessage('redirectedSecondBonus', response.url), {error: true}), true, element)
+                updateStatusAdd(chrome.i18n.getMessage('redirectedSecondBonus', response.url), true, element, 'error')
                 return
             }
             await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', {ms: 86400000}, 'https://mythicalworld.su/bonus', null, priorityOption, null)
@@ -1418,11 +1420,11 @@ async function setCoolDown() {
 function createMessage(text, level) {
     const span = document.createElement('span')
     if (level) {
-        if (level.success) {
+        if (level == 'success') {
             span.style = 'color:#4CAF50;'
-        } else if (level.error) {
+        } else if (level == 'error') {
             span.style = 'color:#f44336;'
-        } /* else if (level.warn) {
+        } /* else if (level == 'warn') {
             span.style = 'color:#??????;'
         } */
     }
@@ -1430,62 +1432,38 @@ function createMessage(text, level) {
     return span
 }
 
-//Статус сохранения настроек
-var timeoutSave
-function updateStatusSave(message, disableTimer) {
-    let status = document.getElementById('save')
-    clearInterval(timeoutSave)
-    status.firstChild.remove()
-    status.append(message)
-    if (disableTimer)
-        return
-    timeoutSave = setTimeout(function() {
-        status.firstChild.remove()
-        status.append('\u00A0')
-    }, 3000)
+function updateStatusProxy(message, disableTimer, level) {
+    updateStatus(message, 'proxy', disableTimer, level)
 }
-
-//Статус добавления аккаунта ВКонтакте
-var timeoutVK
-function updateStatusVK(message, disableTimer) {
-    let status = document.getElementById('addVKdiv')
-    clearInterval(timeoutVK)
-    status.firstChild.remove()
-    status.append(message)
-    if (disableTimer)
-        return
-    timeoutVK = setTimeout(function() {
-        status.firstChild.remove()
-        status.append('\u00A0')
-    }, 3000)
+function updateStatusVK(message, disableTimer, level) {
+    updateStatus(message, 'vk', disableTimer, level)
 }
-
-//Статус добавления прокси
-var timeoutProxy
-function updateStatusProxy(message, disableTimer) {
-    let status = document.getElementById('addProxydiv')
-    clearInterval(timeoutProxy)
-    while (status.firstChild)
-       status.firstChild.remove()
-    if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-        for (m of message) {
-            status.append(m)
+function updateStatusAdd(message, disableTimer, element, level) {
+    updateStatus(message, 'add', disableTimer, level, element)
+}
+function updateStatusSave(message, disableTimer, level) {
+    updateStatus(message, 'save', disableTimer, level)
+}
+function updateStatusFile(message, disableTimer, level) {
+    updateStatus(message, 'file', disableTimer, level)
+}
+var addTimeout
+var saveTimeout
+var fileTimeout
+var proxyTimeout
+var vkTimeout
+function updateStatus(message, type, disableTimer, level, element) {
+    if (level) {
+        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
+            for (m in message) {
+                if (typeof message[m] === 'string') {
+                    message[m] = createMessage(message[m], level)
+                }
+            }
+        } else {
+            message = createMessage(message, level)
         }
-    } else {
-        status.append(message)
     }
-    if (disableTimer)
-        return
-    timeoutProxy = setTimeout(function() {
-        while (status.firstChild)
-            status.firstChild.remove()
-        status.append('\u00A0')
-    }, 3000)
-}
-
-//Статус возле кнопки 'Добавить'
-var timeoutAdd
-function updateStatusAdd(message, disableTimer, element) {
     let status
     if (element != null) {
         status = element
@@ -1499,9 +1477,9 @@ function updateStatusAdd(message, disableTimer, element) {
             svg.append(polyline)
         }
     } else {
-        status = document.getElementById('addProjectDiv')
+        status = document.getElementById(type)
     }
-    clearInterval(timeoutAdd)
+    clearInterval(this[type + 'Timeout'])
     while (status.firstChild)
        status.firstChild.remove()
     if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
@@ -1513,7 +1491,7 @@ function updateStatusAdd(message, disableTimer, element) {
     }
     if (disableTimer || element != null)
         return
-    timeoutAdd = setTimeout(function() {
+    this[type + 'Timeout'] = setTimeout(function() {
         while (status.firstChild)
             status.firstChild.remove()
         status.append('\u00A0')
@@ -1606,7 +1584,7 @@ async function getValue(name) {
     return new Promise(resolve=>{
         chrome.storage.local.get(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(createMessage(chrome.i18n.getMessage('storageError'), {error: true}), false)
+                updateStatusSave(chrome.i18n.getMessage('storageError'), false, 'error')
                 reject(chrome.runtime.lastError)
             } else {
                 resolve(data[name])
@@ -1616,15 +1594,15 @@ async function getValue(name) {
 }
 async function setValue(key, value, updateStatus) {
     if (updateStatus)
-        updateStatusSave(createMessage(chrome.i18n.getMessage('saving')), true)
+        updateStatusSave(chrome.i18n.getMessage('saving'), true)
     return new Promise(resolve=>{
         chrome.storage.local.set({[key]: value}, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(createMessage(chrome.i18n.getMessage('storageErrorSave'), {error: true}), false)
+                updateStatusSave(chrome.i18n.getMessage('storageErrorSave'), false, 'error')
                 reject(chrome.runtime.lastError)
             } else {
                 if (updateStatus)
-                    updateStatusSave(createMessage(chrome.i18n.getMessage('successSave'), {success: true}), false)
+                    updateStatusSave(chrome.i18n.getMessage('successSave'), false, 'success')
                 resolve(data)
             }
         })
@@ -1728,7 +1706,7 @@ document.getElementById('file-download').addEventListener('click', ()=>{
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
     anchor.dataset.downloadurl = ['text/plain', anchor.download, anchor.href].join(':')
     anchor.click()
-    updateStatusFile(createMessage(chrome.i18n.getMessage('exportingEnd'), {success: true}), false)
+    updateStatusFile(chrome.i18n.getMessage('exportingEnd'), false, 'success')
 })
 
 //Слушатель на импорт прокси листа
@@ -1812,7 +1790,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     await checkUpdateConflicts(false)
 
-                    updateStatusSave(createMessage(chrome.i18n.getMessage('saving')), true)
+                    updateStatusSave(chrome.i18n.getMessage('saving'), true)
                     for (const item of allProjects) {
                         await setValue('AVMRprojects' + item, this['projects' + item], false)
                     }
@@ -1821,7 +1799,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
                     await setValue('AVMRVKs', VKs, false)
                     await setValue('AVMRproxies', proxies, false)
 
-                    updateStatusSave(createMessage(chrome.i18n.getMessage('successSave'), {success: true}), false)
+                    updateStatusSave(chrome.i18n.getMessage('successSave'), false, 'success')
 
                     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
                     document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
@@ -1841,10 +1819,10 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     await updateProjectList()
 
-                    updateStatusFile(createMessage(chrome.i18n.getMessage('importingEnd'), {success: true}), false)
+                    updateStatusFile(chrome.i18n.getMessage('importingEnd'), false, 'success')
                 } catch (e) {
                     console.error(e)
-                    updateStatusFile(createMessage(e, {error: true}), true)
+                    updateStatusFile(e, true, 'error')
                 }
             }
         })(file)
@@ -1852,7 +1830,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
         document.getElementById('file-upload').value = ''
     } catch (e) {
         console.error(e)
-        updateStatusFile(createMessage(e, {error: true}), true)
+        updateStatusFile(e, true, 'error')
     }
 }, false)
 
@@ -1861,7 +1839,7 @@ async function checkUpdateConflicts(save) {
     //Если пользователь обновился с версии 3.3.1
     if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
         updated = true
-        updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdate')), true)
+        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
         await forLoopAllProjects(async function(proj) {
             proj.stats = {}
             //Да, это весьма не оптимизированно
@@ -1888,7 +1866,7 @@ async function checkUpdateConflicts(save) {
 
     if (generalStats == null) {
         updated = true
-        updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdate')), true)
+        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
         generalStats = {}
         if (save)
             await setValue('generalStats', generalStats, false)
@@ -1897,7 +1875,7 @@ async function checkUpdateConflicts(save) {
     for (const item of allProjects) {
         if (this['projects' + item] == null || !(typeof this['projects' + item][Symbol.iterator] === 'function')) {
             if (!updated) {
-                updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdate')), true)
+                updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
                 updated = true
             }
             this['projects' + item] = []
@@ -1908,22 +1886,8 @@ async function checkUpdateConflicts(save) {
 
     if (updated) {
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
-        updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdateEnd2'), {success: true}), false)
+        updateStatusSave(chrome.i18n.getMessage('settingsUpdateEnd2'), false, 'success')
     }
-}
-
-//Статус импорта/экпорта настроек
-var timeoutFile
-function updateStatusFile(message, disableTimer) {
-    let status = document.getElementById('file')
-    clearInterval(timeoutFile)
-    status.firstChild.remove()
-    status.append(message)
-    if (disableTimer) return
-    timeoutFile = setTimeout(function() {
-        status.firstChild.remove()
-        status.append('\u00A0')
-    }, 3000)
 }
 
 //Слушатель переключателя режима голосования
@@ -2125,7 +2089,7 @@ function tabSelect(evt, tabs) {
 
 //Слушателей кнопок для переключения вкладок
 document.getElementById('addTab').addEventListener('click', function() {
-    tabSelect(event, 'add')
+    tabSelect(event, 'append')
 })
 document.getElementById('settingsTab').addEventListener('click', function() {
     tabSelect(event, 'settings')
