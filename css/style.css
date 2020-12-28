@@ -128,7 +128,7 @@ button[type="submit"]:focus, #generalStats:focus {
   opacity: 0.5;
 }
 
-#addProjectDiv div:not(:first-of-type) {
+#add div:not(:first-of-type) {
   display: inline;
 }
 
@@ -618,7 +618,7 @@ figure svg {
   display: inline;
 }
 
-#addProjectDiv {
+#add {
   text-align: center;
   font-size: 15px;
   margin-top: 10px;
