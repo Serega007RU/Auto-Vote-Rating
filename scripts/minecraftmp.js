@@ -5,6 +5,10 @@ async function vote() {
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
+        //Если мы находимся на странице проверки ReCaptcha
+        if (document.querySelector("body > iframe") != null && document.querySelector("body > iframe").src.startsWith('https://geo.captcha-delivery.com/captcha/')) {
+            return
+        }
         if ((document.querySelector('body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong') != null && document.querySelector('body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong').textContent.includes('Thank you for your vote')) || (document.querySelector('strong') != null && document.querySelector('strong').textContent.includes('Thank you for your vote')) || (document.querySelector('h1') != null && document.querySelector('h1').nextElementSibling != null && document.querySelector('h1').nextElementSibling.nextElementSibling != null && document.querySelector('h1').nextElementSibling.nextElementSibling.textContent.includes('Thank you for your vote'))) {
             chrome.runtime.sendMessage({successfully: true})
             return
