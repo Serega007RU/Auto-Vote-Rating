@@ -1021,7 +1021,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
         })
     }
 }, {url: [
-    {hostSuffix: 'hcaptcha.com'},
+    {urlMatches: 'hcaptcha.com/captcha/*'},
     {urlMatches: 'https://www.google.com/recaptcha/api./anchor*'},
     {urlMatches: 'https://www.google.com/recaptcha/api./bframe*'}
 ]})

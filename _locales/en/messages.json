@@ -224,7 +224,7 @@
     "message": "On MinecraftIpList, you can only vote for 5 projects at a time."
   },
   "oneProject": {
-    "message": "On $project$, you can only vote for 1 project at a time</div>",
+    "message": "On $project$, you can only vote for 1 project at a time",
     "placeholders": {
       "project": {
         "content": "$1"
@@ -352,20 +352,10 @@
     "message": "Close tab"
   },
   "projectIDTooltip": {
-    "message": "Project <span style='color:red;'>ID</span> can be obtained from the address bar while on the project page, for example: <br> $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
+    "message": " of the project can be obtained from the address bar while on the project page, for example: "
   },
   "gameIDTooltip": {
-    "message": "Game <span style='color:red;'>ID</span> can be obtained from the address bar while on the project page, for example: <br> $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
+    "message": " of the game can be obtained from the address bar while on the project page, for example: "
   },
   "inputProjectID": {
     "message": "Enter ID"

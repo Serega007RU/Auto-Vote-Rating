@@ -608,7 +608,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             jsPath = 'table[class="table table-hover table-striped"] > tbody > tr:nth-child(4) > td:nth-child(2)'
         } else if (project.HotMC) {
             url = 'https://hotmc.ru/minecraft-server-' + project.id
-            jsPath = '#copy-ip'
+            jsPath = 'div[class="text-server"] > h1'
         } else if (project.MinecraftServerNet) {
             url = 'https://minecraft-server.net/details/' + project.id + '/'
             jsPath = 'h1[class="text-break col-xl"]'
@@ -686,18 +686,21 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                     return
                 if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).text)
-                    project.name = projectURL
                 } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).textContent)
-                    project.name = projectURL
                 } else if (doc.querySelector(jsPath).value != null && doc.querySelector(jsPath).value != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).value)
-                    project.name = projectURL
                 } else if (doc.querySelector(jsPath).href != null && doc.querySelector(jsPath).href != '') {
                     projectURL = extractHostname(doc.querySelector(jsPath).href)
-                    project.name = projectURL
                 } else {
                     projectURL = ''
+                }
+
+                if (projectURL != '') {
+                    if (project.HotMC) {
+                        projectURL = projectURL.replace('серверМайнкрафт', '')
+                    }
+                    project.name = projectURL
                 }
             })
             if (error)
@@ -1598,9 +1601,9 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
     } else if (selectedTop.value == 'HotMC') {
         document.getElementById('projectIDTooltip1').textContent = 'https://hotmc.ru/vote-'
-        document.getElementById('projectIDTooltip2').textContent = '195633'
+        document.getElementById('projectIDTooltip2').textContent = '199493'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MinecraftServerNet') {
         document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-server.net/vote/'
         document.getElementById('projectIDTooltip2').textContent = 'TitanicFreak'
@@ -1615,7 +1618,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip1').textContent = 'https://tmonitoring.com/server/'
         document.getElementById('projectIDTooltip2').textContent = 'qoobworldru'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     }
 
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames') {
