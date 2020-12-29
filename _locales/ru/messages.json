@@ -1,9 +1,9 @@
 {
   "appName": {
-    "message": "Auto Vote Minecraft Rating"
+    "message": "Auto Vote Rating"
   },
   "appDesc": {
-    "message": "Автоматическое голосование на майнкрафт рейтингах за проекты или сервера"
+    "message": "Автоматическое голосование на рейтингах за проекты или сервера"
   },
   "addButton": {
     "message": "Добавить"

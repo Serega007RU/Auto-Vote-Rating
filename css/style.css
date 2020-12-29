@@ -259,7 +259,6 @@ p, form, label, details {
   left: 0;
   height: 100%;
   width: 101px;
-  transition: 0.5s;
 }
 
 .nav-panel > div {

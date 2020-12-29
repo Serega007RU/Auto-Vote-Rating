@@ -24,27 +24,27 @@ var VKs = []
 var proxies = []
 
 var allProjects = [
-    "TopCraft",
-    "McTOP",
-    "MCRate",
-    "MinecraftRating",
-    "MonitoringMinecraft",
-    "IonMc",
-    "MinecraftServersOrg",
-    "ServeurPrive",
-    "PlanetMinecraft",
-    "TopG",
-    "MinecraftMp",
-    "MinecraftServerList",
-    "ServerPact",
-    "MinecraftIpList",
-    "TopMinecraftServers",
-    "MinecraftServersBiz",
-    "HotMC",
-    "MinecraftServerNet",
-    "TopGames",
-    "TMonitoring",
-    "Custom"
+    'TopCraft',
+    'McTOP',
+    'MCRate',
+    'MinecraftRating',
+    'MonitoringMinecraft',
+    'IonMc',
+    'MinecraftServersOrg',
+    'ServeurPrive',
+    'PlanetMinecraft',
+    'TopG',
+    'MinecraftMp',
+    'MinecraftServerList',
+    'ServerPact',
+    'MinecraftIpList',
+    'TopMinecraftServers',
+    'MinecraftServersBiz',
+    'HotMC',
+    'MinecraftServerNet',
+    'TopGames',
+    'TMonitoring',
+    'Custom'
 ]
 
 var settings
@@ -195,7 +195,7 @@ async function restoreOptions() {
         await setValue('AVMRproxies', proxies, false)
 
         console.log(chrome.i18n.getMessage('settingsGen'))
-        updateStatusSave(chrome.i18n.getMessage('firstSettingsSave'), 'success')
+        updateStatusSave(chrome.i18n.getMessage('firstSettingsSave'), false, 'success')
         alert(chrome.i18n.getMessage('firstInstall'))
     }
 
