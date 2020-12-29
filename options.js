@@ -207,7 +207,7 @@ async function restoreOptions() {
         settings.stopVote = 9000000000000000
         await setValue('AVMRsettings', settings, false)
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
-        updateStatusSave(createMessage(chrome.i18n.getMessage('settingsUpdateEnd2'), {success: true}), false)
+        updateStatusSave(chrome.i18n.getMessage('settingsUpdateEnd2'), false, 'success')
     }
 
     updateProjectList()
@@ -324,7 +324,7 @@ async function restoreOptions() {
             settings.stopVote = 0
             document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#00d510')
             document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#00d510')
-            updateStatusSave(createMessage(chrome.i18n.getMessage('voteResumed'), {success: true}), false)
+            updateStatusSave(chrome.i18n.getMessage('voteResumed'), false, 'success')
         } else {
             settings.stopVote = 9000000000000000
             document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
@@ -332,7 +332,7 @@ async function restoreOptions() {
 
             await chrome.extension.getBackgroundPage().stopVote()
             
-            updateStatusSave(createMessage(chrome.i18n.getMessage('voteSuspended'), {error: true}), false)
+            updateStatusSave(chrome.i18n.getMessage('voteSuspended'), false, 'error')
         }
         await setValue('AVMRsettings', settings, false)
     }
@@ -659,7 +659,7 @@ document.getElementById('AddVK').addEventListener('click', async () => {
             if (deleteCookies) await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
         }
 
-        updateStatusVK(createMessage(chrome.i18n.getMessage('deletedAllVK'), {success: true}), false)
+        updateStatusVK(chrome.i18n.getMessage('deletedAllVK'), false, 'success')
         updateStatusVK(chrome.i18n.getMessage('openPopupVK'), true)
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
@@ -676,15 +676,15 @@ document.getElementById('AddVK').addEventListener('click', async () => {
             response = await fetch('https://vk.com/')
         } catch (e) {
             if (e == 'TypeError: Failed to fetch') {
-                updateStatusVK(createMessage(chrome.i18n.getMessage('notConnectInternet'), {error: true}), true, element)
+                updateStatusVK(chrome.i18n.getMessage('notConnectInternet'), true, 'error')
                 return
             } else {
-                updateStatusVK(createMessage(e, {error: true}), true, element)
+                updateStatusVK(e, true, 'error')
                 return
             }
         }
         if (!response.ok) {
-            updateStatusVK(createMessage(chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status, {error: true}), true)
+            updateStatusVK(chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status, true, 'error')
             return
         }
         //Почему не UTF-8?
@@ -692,7 +692,7 @@ document.getElementById('AddVK').addEventListener('click', async () => {
         let html = await response.text()
         let doc = new DOMParser().parseFromString(html, 'text/html')
         if (doc.querySelector('#index_login_button') != null) {
-            updateStatusVK(createMessage(chrome.i18n.getMessage('notAuthVK'), {error: true}), true)
+            updateStatusVK(chrome.i18n.getMessage('notAuthVK'), true, 'error')
             return
         }
         let VK = {}
@@ -700,13 +700,13 @@ document.getElementById('AddVK').addEventListener('click', async () => {
             VK.name = doc.querySelector('#top_vkconnect_link > div > div.top_profile_vkconnect_name').textContent
             VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
         } catch(e) {
-            updateStatusVK(createMessage(e, {error: true}), element)
+            updateStatusVK(e, true, 'error')
             return
         }
 
         for (let vkontakte of VKs) {
             if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
-                updateStatusVK(createMessage(chrome.i18n.getMessage('added'), {success: true}), false)
+                updateStatusVK(chrome.i18n.getMessage('added'), false, 'success')
                 await wait(1500)
                 await checkAuthVK()
                 return
@@ -731,7 +731,7 @@ document.getElementById('AddVK').addEventListener('click', async () => {
 
         await addVKList(VK, false)
         
-        updateStatusVK(createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, {success: true}), false)
+        updateStatusVK(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, false, 'success')
 
         await wait(1500)
         await checkAuthVK()
@@ -741,7 +741,7 @@ document.getElementById('AddVK').addEventListener('click', async () => {
 //Проверяем авторизацию на всех Майнкрафт рейтингах где есть авторизация ВКонтакте и если пользователь не авторизован - предлагаем ему авторизоваться
 async function checkAuthVK() {
     updateStatusVK(chrome.i18n.getMessage('checkAuthVK'), true)
-    let authStatus = '<div style="display: inline; color:#f44336;">' + chrome.i18n.getMessage('notAuthVKTop')
+    let authStatus = createMessage(chrome.i18n.getMessage('notAuthVKTop'), 'error')
     let needReturn = false
     for (let [key, value] of authVKUrls) {
         let response2
@@ -749,24 +749,28 @@ async function checkAuthVK() {
             response2 = await fetch(value, {redirect: 'manual'})
         } catch (e) {
             if (e == 'TypeError: Failed to fetch') {
-                updateStatusVK(createMessage(chrome.i18n.getMessage('notConnectInternetVPN'), {error: true}), true)
+                updateStatusVK(chrome.i18n.getMessage('notConnectInternetVPN'), true, 'error')
             } else {
-                updateStatusVK(createMessage(e, {error: true}), true)
+                updateStatusVK(e, true, 'error')
             }
             needReturn = true
         }
 
         if (response2.ok) {
-            authStatus += ' <a href="#" id="authvk' + key + '">' + key + '</a>, '
-//             updateStatusVK(authStatus, true)
+            let a = document.createElement('a')
+            a.href = '#'
+            a.id = 'authvk' + key
+            a.textContent = key
+            authStatus.append(a)
+            updateStatusVK(authStatus, true)
             needReturn = true
         } else if (response2.status != 0) {
-            updateStatusVK(createMessage(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, {error: true}), true)
+            updateStatusVK(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, true, 'error')
             needReturn = true
         }
     }
     if (needReturn) {
-        authStatus += chrome.i18n.getMessage('notAcceptAuth') + '</div>'
+        authStatus.append(createMessage(chrome.i18n.getMessage('notAcceptAuth')), 'error')
         updateStatusVK(authStatus, true)
         for (let [key, value] of authVKUrls) {
             if (document.getElementById('authvk' + key) != null) {
@@ -779,7 +783,7 @@ async function checkAuthVK() {
         }
         return
     }
-    updateStatusVK(createMessage(chrome.i18n.getMessage('authOK'), {success: true}), false)
+    updateStatusVK(chrome.i18n.getMessage('authOK'), false, 'success')
 }
 
 // //Слушатель кнопки 'Удалить куки' на MultiVote VKontakte
@@ -793,7 +797,7 @@ async function checkAuthVK() {
 //     for(let i=0; i<cookies.length;i++) {
 //         await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
 //     }
-//     updateStatusVK(createMessage(chrome.i18n.getMessage('deletedAllVKCookies'), {success: true}), false)
+//     updateStatusVK(createMessage(chrome.i18n.getMessage('deletedAllVKCookies'), false, 'success')
 // })
 
 //Слушатель кнопки 'Удалить всё' на Прокси
@@ -803,7 +807,7 @@ document.getElementById('deleteAllProxies').addEventListener('click', async () =
     for (let prox of proxiesCopy) {
         await removeProxyList(prox, false)
     }
-    updateStatusProxy(createMessage(chrome.i18n.getMessage('deletedAllProxies'), {success: true}), false)
+    updateStatusProxy(chrome.i18n.getMessage('deletedAllProxies'), false, 'success')
 })
 
 //Слушатель кнопки 'Добавить' на Прокси
@@ -848,7 +852,7 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
 //         }
 
 //         if (error) {
-//             updateStatusProxy(createMessage(chrome.i18n.getMessage('errorCheckSchemeProxy'), {error: true}), true)
+//             updateStatusProxy(chrome.i18n.getMessage('errorCheckSchemeProxy'), true, 'error')
 //             return
 //         }
     }
@@ -894,10 +898,10 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     a.target = 'blank_'
                     a.href = 'https://www.tunnelbear.com/account/login'
                     a.textContent = chrome.i18n.getMessage('authButton')
-                    updateStatusProxy([createMessage('Что бы сделать импорт прокси с TunnelBear необходима авторизация, ', {error: true}), a], true)
+                    updateStatusProxy([createMessage('Что бы сделать импорт прокси с TunnelBear необходима авторизация, ', 'error'), a], true)
                     return
                 }
-                updateStatusProxy(createMessage(chrome.i18n.getMessage('notConnect', response.url) + response.status, {error: true}), true)
+                updateStatusProxy(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, 'error')
                 return
             }
             let json = await response.json()
@@ -908,13 +912,13 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
         for (let country of countries) {
             response = await fetch('https://api.polargrizzly.com/vpns/countries/' + country, {'headers': {'authorization': token}})
             if (!response.ok) {
-                updateStatusProxy(createMessage(chrome.i18n.getMessage('notConnect', response.url) + response.status, {error: true}), true)
+                updateStatusProxy(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, 'error')
                 if (response.status == 401) {
                     let a = document.createElement('a')
                     a.target = 'blank_'
                     a.href = 'https://www.tunnelbear.com/account/login'
                     a.textContent = chrome.i18n.getMessage('authButton')
-                    updateStatusProxy([createMessage('Что бы сделать импорт прокси с TunnelBear необходима авторизация, ', {error: true}), a], true)
+                    updateStatusProxy([createMessage('Что бы сделать импорт прокси с TunnelBear необходима авторизация, ', 'error'), a], true)
                     return
                 } else {
                     continue
@@ -932,11 +936,11 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
             }
         }
     } catch (e) {
-        updateStatusProxy(createMessage(e, {error: true}), true)
+        updateStatusProxy(e, true, 'error')
         console.error(e)
         return
     }
-    updateStatusProxy(createMessage(chrome.i18n.getMessage('importTunnelBearEnd'), {success: true}), false)
+    updateStatusProxy(chrome.i18n.getMessage('importTunnelBearEnd'), false, 'success')
 })
 
 //Слушатель на импорт с Windscribe
@@ -953,7 +957,7 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
                 response = await fetch('https://assets.windscribe.com/serverlist/openvpn/1/ef53494bc440751713a7ad93e939aa190cee7458')
             }
             if (!response.ok) {
-                updateStatusProxy(createMessage(chrome.i18n.getMessage('notConnect', response.url) + response.status, {error: true}), true)
+                updateStatusProxy(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, 'error')
                 return
             }
             const json = await response.json()
@@ -973,25 +977,25 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
                 }
             }
         } catch (e) {
-            updateStatusProxy(createMessage(e, {error: true}), true)
+            updateStatusProxy(e, true, 'error')
             console.error(e)
             return
         }
     }
-    updateStatusProxy(createMessage(chrome.i18n.getMessage('importWindscribeEnd'), {success: true}), false)
+    updateStatusProxy(chrome.i18n.getMessage('importWindscribeEnd'), false, 'success')
 })
 
 async function addProxy(proxy) {
     updateStatusProxy(chrome.i18n.getMessage('adding'), true)
     for (let prox of proxies) {
         if (proxy.ip == prox.ip && proxy.port == prox.port) {
-            updateStatusProxy(createMessage(chrome.i18n.getMessage('added'), {success: true}), false)
+            updateStatusProxy(chrome.i18n.getMessage('added'), false, 'success')
             return
         }
     }
 
     await addProxyList(proxy, false)
-    updateStatusProxy(createMessage(chrome.i18n.getMessage('addSuccess'), {success: true}), false)
+    updateStatusProxy(chrome.i18n.getMessage('addSuccess'), false, 'success')
 }
 
 async function checkProxy(proxy, scheme) {
@@ -1754,10 +1758,10 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
 
                     await updateProjectList()
 
-                    updateStatusProxy('<span style="color:#4CAF50;">' + chrome.i18n.getMessage('importingEnd') + '</span>', false)
+                    updateStatusProxy(chrome.i18n.getMessage('importingEnd'), false, 'success')
                 } catch (e) {
                     console.error(e)
-                    updateStatusProxy('<span style="color:#f44336;">' + e + '</span>', true)
+                    updateStatusProxy(e, true, 'error')
                 }
             }
         })(file)
@@ -1765,7 +1769,7 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
         document.getElementById('file-upload').value = ''
     } catch (e) {
         console.error(e)
-        updateStatusProxy('<span style="color:#f44336;">' + e + '</span>', true)
+        updateStatusProxy(e, true, 'error')
     }
 }, false)
 
@@ -1851,15 +1855,15 @@ async function checkUpdateConflicts(save) {
     //Если пользователь обновился с версии без MultiVote
     if (VKs == null || !(typeof VKs[Symbol.iterator] === 'function') || proxies == null || !(typeof proxies[Symbol.iterator] === 'function')) {
         updated = true
-        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
+        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
         VKs = []
         proxies = []
         await setValue('AVMRVKs', VKs, false)
         await setValue('AVMRproxies', proxies, false)
     }
-    if (!settings.stopVote) {
+    if (settings.stopVote == null) {
         updated = true
-        updateStatusSave('<div>' + chrome.i18n.getMessage('settingsUpdate') + '</div>', true)
+        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
         settings.stopVote = 9000000000000000
         await setValue('AVMRsettings', settings, false)
     }
