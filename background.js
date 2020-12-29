@@ -218,7 +218,7 @@ async function checkOpen(project) {
             chrome.tabs.remove(key, function() {
                 if (chrome.runtime.lastError) {
                     console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                    if (!settings.disabledNotifError && !chrome.runtime.lastError.message.includes('No tab with id'))
+                    if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
                         sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                 }
             })
@@ -967,14 +967,15 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null)
         return
-    console.log('Executed script', details)
     chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'}, function() {
         if (chrome.runtime.lastError) {
             console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-            if (!settings.disabledNotifError)
-                sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-            project.error = chrome.runtime.lastError.message
-            changeProject(project)
+            if (chrome.runtime.lastError.message != 'The tab was closed.') {
+                if (!settings.disabledNotifError)
+                    sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                project.error = chrome.runtime.lastError.message
+                changeProject(project)
+            }
         }
     })
 }, {url: [
@@ -1010,7 +1011,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                if (!chrome.runtime.lastError.message.includes('The frame was removed')) {
+                if (chrome.runtime.lastError.message != 'The frame was removed.') {
                     if (!settings.disabledNotifError)
                         sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
@@ -1087,7 +1088,7 @@ async function endVote(request, sender, project) {
         chrome.tabs.remove(sender.tab.id, function() {
             if (chrome.runtime.lastError) {
                 console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                if (!settings.disabledNotifError && !chrome.runtime.lastError.message.includes('No tab with id'))
+                if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
                     sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
             }
         })
