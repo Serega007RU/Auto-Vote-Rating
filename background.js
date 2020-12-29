@@ -22,27 +22,27 @@ var projectsTMonitoring = []
 var projectsCustom = []
 
 var allProjects = [
-    "TopCraft",
-    "McTOP",
-    "MCRate",
-    "MinecraftRating",
-    "MonitoringMinecraft",
-    "IonMc",
-    "MinecraftServersOrg",
-    "ServeurPrive",
-    "PlanetMinecraft",
-    "TopG",
-    "MinecraftMp",
-    "MinecraftServerList",
-    "ServerPact",
-    "MinecraftIpList",
-    "TopMinecraftServers",
-    "MinecraftServersBiz",
-    "HotMC",
-    "MinecraftServerNet",
-    "TopGames",
-    "TMonitoring",
-    "Custom"
+    'TopCraft',
+    'McTOP',
+    'MCRate',
+    'MinecraftRating',
+    'MonitoringMinecraft',
+    'IonMc',
+    'MinecraftServersOrg',
+    'ServeurPrive',
+    'PlanetMinecraft',
+    'TopG',
+    'MinecraftMp',
+    'MinecraftServerList',
+    'ServerPact',
+    'MinecraftIpList',
+    'TopMinecraftServers',
+    'MinecraftServersBiz',
+    'HotMC',
+    'MinecraftServerNet',
+    'TopGames',
+    'TMonitoring',
+    'Custom'
 ]
 
 //Настройки
