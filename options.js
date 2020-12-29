@@ -1090,12 +1090,26 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         generalStats
     }
     var text = JSON.stringify(allSetting, null, '\t')
-    blob = new Blob([text],{type: 'text/plain'}), anchor = document.createElement('a')
+    blob = new Blob([text],{type: 'text/json;charset=UTF-8;'}), anchor = document.createElement('a')
 
     anchor.download = 'AVMR.json'
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
-    anchor.dataset.downloadurl = ['text/plain', anchor.download, anchor.href].join(':')
+    anchor.dataset.downloadurl = ['text/json;charset=UTF-8;', anchor.download, anchor.href].join(':')
     anchor.click()
+    updateStatusFile(chrome.i18n.getMessage('exportingEnd'), false, 'success')
+})
+
+document.getElementById('logs-download').addEventListener('click', ()=>{
+    updateStatusFile(chrome.i18n.getMessage('exporting'), true)
+
+    blob = new Blob([localStorage.consoleHistory],{type: 'text/plain;charset=UTF-8;'}), anchor = document.createElement('a')
+
+    anchor.download = 'console_history.txt'
+    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
+    anchor.dataset.downloadurl = ['text/plain;charset=UTF-8;', anchor.download, anchor.href].join(':')
+    
+    openPoput(anchor.href)
+
     updateStatusFile(chrome.i18n.getMessage('exportingEnd'), false, 'success')
 })
 
@@ -1359,9 +1373,11 @@ function openPoput(url, reload) {
     poput = window.open(url, 'vk_openapi', 'width=' + popupBoxWidth + ',height=' + popupBoxHeight + ',left=' + left + ',top=' + top + ',menubar=0,toolbar=0,location=0,status=0')
     if (poput) {
 //         poput.focus()
-        (function check() {
-            !poput || poput.closed ? reload() : setTimeout(check, 500)
-        })()
+        if (reload) {
+            (function check() {
+                !poput || poput.closed ? reload() : setTimeout(check, 500)
+            })()
+        }
     }
 }
 

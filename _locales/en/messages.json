@@ -146,6 +146,10 @@
     "message": "Export settings",
     "description": "Button. Export"
   },
+  "exportLogs": {
+    "message": "Export logs",
+    "description": "Button. Export"
+  },
   "addedProjects": {
     "message": "List of projects you have already added",
     "description": "Header. Added projects"
@@ -315,10 +319,10 @@
     "message": "Come up with a name"
   },
   "exporting": {
-    "message": "Exporting settings..."
+    "message": "Exporting..."
   },
   "exportingEnd": {
-    "message": "Export of settings completed successfully"
+    "message": "Export completed successfully"
   },
   "importing": {
     "message": "Importing settings..."
