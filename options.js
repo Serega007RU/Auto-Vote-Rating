@@ -1513,6 +1513,8 @@ selectedTop.addEventListener('change', function() {
     } else {
         document.getElementById('id').removeAttribute('list')
     }
+
+    document.getElementById('id').required = true
     
     if (selectedTop.value == 'TopCraft') {
         document.getElementById('projectIDTooltip1').textContent = 'https://topcraft.ru/servers/'
