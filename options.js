@@ -1092,7 +1092,7 @@ document.getElementById('file-download').addEventListener('click', ()=>{
     var text = JSON.stringify(allSetting, null, '\t')
     blob = new Blob([text],{type: 'text/json;charset=UTF-8;'}), anchor = document.createElement('a')
 
-    anchor.download = 'AVMR.json'
+    anchor.download = 'AVR.json'
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
     anchor.dataset.downloadurl = ['text/json;charset=UTF-8;', anchor.download, anchor.href].join(':')
     anchor.click()
@@ -1423,16 +1423,20 @@ document.getElementById('helpTab').addEventListener('click', function() {
     tabSelect(event, 'help')
 })
 document.getElementById('addTab2').addEventListener('click', function() {
-    tabSelect(event, 'add')
+    tabSelect(event, 'append')
+    document.getElementById('hmt').click()
 })
 document.getElementById('settingsTab2').addEventListener('click', function() {
     tabSelect(event, 'settings')
+    document.getElementById('hmt').click()
 })
 document.getElementById('addedTab2').addEventListener('click', function() {
     tabSelect(event, 'added')
+    document.getElementById('hmt').click()
 })
 document.getElementById('helpTab2').addEventListener('click', function() {
     tabSelect(event, 'help')
+    document.getElementById('hmt').click()
 })
 
 //Переключение между списками добавленных проектов
