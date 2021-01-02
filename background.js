@@ -19,6 +19,10 @@ var projectsHotMC = []
 var projectsMinecraftServerNet = []
 var projectsTopGames = []
 var projectsTMonitoring = []
+var projectsTopGG = []
+var projectsDiscordBotList = []
+var projectsBotsForDiscord = []
+var projectsMMoTopRU = []
 var projectsCustom = []
 
 var allProjects = [
@@ -42,6 +46,10 @@ var allProjects = [
     'MinecraftServerNet',
     'TopGames',
     'TMonitoring',
+    'TopGG',
+    'DiscordBotList',
+    'BotsForDiscord',
+    'MMoTopRU',
     'Custom'
 ]
 
@@ -64,6 +72,9 @@ var secondVoteMinecraftIpList = false
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 var check = true
 
+//Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
+var closeTabs = true
+
 //Инициализация настроек расширения
 initializeConfig()
 async function initializeConfig() {
@@ -75,57 +86,8 @@ async function initializeConfig() {
     if (generalStats == null)
         generalStats = {}
 
-    if (!(projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function'))) {
-        //Если пользователь обновился с версии 2.2.0
-        if (projectsPlanetMinecraft == null || !(typeof projectsPlanetMinecraft[Symbol.iterator] === 'function')) {
-            projectsPlanetMinecraft = []
-            projectsTopG = []
-            projectsMinecraftMp = []
-            projectsMinecraftServerList = []
-            projectsServerPact = []
-            projectsMinecraftIpList = []
-        }
-
-        //Если пользователь обновился с версии 3.0.1
-        if (projectsTopMinecraftServers == null || !(typeof projectsTopMinecraftServers[Symbol.iterator] === 'function')) {
-            projectsIonMc = []
-            projectsMinecraftServersOrg = []
-            projectsServeurPrive = []
-            projectsTopMinecraftServers = []
-        }
-
-        //Если пользователь обновился с версии 3.1.0
-        if (projectsMinecraftServersBiz == null || !(typeof projectsMinecraftServersBiz[Symbol.iterator] === 'function')) {
-            projectsMinecraftServersBiz = []
-            projectsMinecraftServersOrg = []
-            //Сброс time для проектов где использовался String
-            await forLoopAllProjects(async function(proj) {
-                if (proj.TopCraft || proj.McTOP || proj.MinecraftRating || proj.MCRate || proj.IonMc || proj.MinecraftMp || proj.PlanetMinecraft || proj.MinecraftServerList || proj.MinecraftServersOrg || proj.TopMinecraftServers) {
-                    proj.time = null
-                    await changeProject(proj)
-                }
-            })
-        }
-
-        //Если пользователь обновился с версии 3.2.2
-        if (projectsHotMC == null || !(typeof projectsHotMC[Symbol.iterator] === 'function')) {
-            projectsHotMC = []
-            projectsMinecraftServerNet = []
-        }
-
-        //Если пользователь обновился с версии 3.3.1
-        if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
-            projectsTopGames = []
-            await forLoopAllProjects(async function(proj) {
-                proj.stats = {}
-                await changeProject(proj)
-            })
-        }
-
-        //Если пользователь обновился с версии 3.4.1
-        if (projectsTMonitoring == null || !(typeof projectsTMonitoring[Symbol.iterator] === 'function')) {
-            projectsTMonitoring = []
-        }
+    for (const item of allProjects) {
+        if (this['projects' + item] == null || !(typeof this['projects' + item][Symbol.iterator] === 'function')) this['projects' + item] = []
     }
 
     let cooldown = 1000
@@ -143,7 +105,7 @@ async function initializeConfig() {
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
-    //     return
+//  return
     if (!settings || projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function'))
         return
 
@@ -215,13 +177,15 @@ async function checkOpen(project) {
     for (let[key,value] of openedProjects.entries()) {
         if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
             openedProjects.delete(key)
-            chrome.tabs.remove(key, function() {
-                if (chrome.runtime.lastError) {
-                    console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                    if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
-                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                }
-            })
+            if (closeTabs) {
+                chrome.tabs.remove(key, function() {
+                    if (chrome.runtime.lastError) {
+                        console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                        if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
+                            sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                    }
+                })
+            }
         }
     }
 
@@ -352,9 +316,22 @@ async function newWindow(project) {
             }
         } else if (project.TMonitoring)
             url = 'https://tmonitoring.com/server/' + project.id + '/'
+        else if (project.TopGG)
+            url = 'https://top.gg/bot/' + project.id + '/vote'
+        else if (project.DiscordBotList)
+            url = 'https://discordbotlist.com/bots/' + project.id + '/upvote'
+        else if (project.BotsForDiscord)
+            url = 'https://botsfordiscord.com/bot/' + project.id + '/vote'
+        else if (project.MMoTopRU) {
+            if (project.lang == 'ru') {
+                url = 'https://' + project.game + '.mmotop.ru/servers/' + project.id + '/votes/new'
+            } else {
+                url = 'https://' + project.game + '.mmotop.ru/' + project.lang + '/' + 'servers/' + project.id + '/votes/new'
+            }
+        }
         
         let tab = await new Promise(resolve=>{
-            chrome.tabs.create({'url': url, 'active': false}, function(tab_) {
+            chrome.tabs.create({url: url, active: false}, function(tab_) {
                 resolve(tab_)
             })
         })
@@ -503,16 +480,16 @@ async function silentVote(project) {
                 }
                 return
             } else if (doc.querySelector('span[class=count_hour]') != null) {
-//                Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
-//                Берёт из скрипта переменную в которой хранится сколько осталось до следующего голосования
-//                let count2 = doc.querySelector('#center-main > div.center_panel > script:nth-child(2)').text.substring(30, 45)
-//                let count = count2.match(/\d+/g).map(Number)
-//                let hour = parseInt(count / 3600)
-//                let min = parseInt((count - hour * 3600) / 60)
-//                let sec = parseInt(count - (hour * 3600 + min * 60))
-//                let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-//                if (milliseconds == 0) return
-//                let later = Date.now() - (86400000 - milliseconds)
+//              Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
+//              Берёт из скрипта переменную в которой хранится сколько осталось до следующего голосования
+//              let count2 = doc.querySelector('#center-main > div.center_panel > script:nth-child(2)').text.substring(30, 45)
+//              let count = count2.match(/\d+/g).map(Number)
+//              let hour = parseInt(count / 3600)
+//              let min = parseInt((count - hour * 3600) / 60)
+//              let sec = parseInt(count - (hour * 3600 + min * 60))
+//              let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+//              if (milliseconds == 0) return
+//              let later = Date.now() - (86400000 - milliseconds)
                 endVote({later: true}, null, project)
                 return
             } else if (doc.querySelector('div[class="error"]') != null) {
@@ -543,31 +520,31 @@ async function silentVote(project) {
             let doc = new DOMParser().parseFromString(html, 'text/html')
             if (doc.querySelector('div.alert.alert-danger') != null) {
                 if (doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
-//                    let numbers = doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number)
-//                    let count = 0
-//                    let year = 0
-//                    let month = 0
-//                    let day = 0
-//                    let hour = 0
-//                    let min = 0
-//                    let sec = 0
-//                    for (let i in numbers) {
-//                        if (count == 0) {
-//                            hour = numbers[i]
-//                        } else if (count == 1) {
-//                            min = numbers[i]
-//                        } else if (count == 2) {
-//                            sec = numbers[i]
-//                        } else if (count == 3) {
-//                            day = numbers[i]
-//                        } else if (count == 4) {
-//                            month = numbers[i]
-//                        } else if (count == 5) {
-//                            year = numbers[i]
-//                        }
-//                        count++
-//                    }
-//                    let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000
+//                  let numbers = doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number)
+//                  let count = 0
+//                  let year = 0
+//                  let month = 0
+//                  let day = 0
+//                  let hour = 0
+//                  let min = 0
+//                  let sec = 0
+//                  for (let i in numbers) {
+//                      if (count == 0) {
+//                          hour = numbers[i]
+//                      } else if (count == 1) {
+//                          min = numbers[i]
+//                      } else if (count == 2) {
+//                          sec = numbers[i]
+//                      } else if (count == 3) {
+//                          day = numbers[i]
+//                      } else if (count == 4) {
+//                          month = numbers[i]
+//                      } else if (count == 5) {
+//                          year = numbers[i]
+//                      }
+//                      count++
+//                  }
+//                  let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000
                     endVote({later: true}, null, project)
                     return
                 } else {
@@ -749,7 +726,7 @@ async function silentVote(project) {
                     'upgrade-insecure-requests': '1'
                 },
                 'referrerPolicy': 'no-referrer-when-downgrade',
-                'body': doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(2)').name + '=' + doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(2)').value + '&' + captchaPass + '=&minecraftusername=' + project.nick + '&voten=Send+your+vote',
+                'body': doc.querySelector('div.QapTcha > input[type=hidden]').name + '=' + doc.querySelector('div.QapTcha > input[type=hidden]').value + '&' + captchaPass + '=&minecraftusername=' + project.nick + '&voten=Send+your+vote',
                 'method': 'POST',
                 'mode': 'cors',
                 'credentials': 'include'
@@ -863,8 +840,8 @@ async function silentVote(project) {
                 return
             }
 
-            if (!await getRecipe(doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://minecraftiplist.com'))) {
-                endVote({message: 'Не удалось найти рецепт: ' + doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace('chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd', 'https://minecraftiplist.com')}, null, project)
+            if (!await getRecipe(doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com'))) {
+                endVote({message: 'Не удалось найти рецепт: ' + doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')}, null, project)
                 return
             }
             await craft(doc.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
@@ -999,7 +976,11 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     {hostSuffix: 'minecraft-server.net'},
     {hostSuffix: 'top-games.net'},
     {hostSuffix: 'top-serveurs.net'},
-    {hostSuffix: 'tmonitoring.com'}
+    {hostSuffix: 'tmonitoring.com'},
+    {hostSuffix: 'top.gg'},
+    {hostSuffix: 'discordbotlist.com'},
+    {hostSuffix: 'botsfordiscord.com'},
+    {hostSuffix: 'mmotop.ru'}
 ]})
 
 
@@ -1064,6 +1045,10 @@ chrome.webNavigation.onErrorOccurred.addListener(function(details) {
     {hostSuffix: 'top-games.net'},
     {hostSuffix: 'top-serveurs.net'},
     {hostSuffix: 'tmonitoring.com'},
+    {hostSuffix: 'top.gg'},
+    {hostSuffix: 'discordbotlist.com'},
+    {hostSuffix: 'botsfordiscord.com'},
+    {hostSuffix: 'mmotop.ru'},
     {hostSuffix: 'vk.com'}
 ]})
 
@@ -1086,13 +1071,15 @@ async function endVote(request, sender, project) {
     if (sender && openedProjects.has(sender.tab.id)) {
         //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         project = openedProjects.get(sender.tab.id)
-        chrome.tabs.remove(sender.tab.id, function() {
-            if (chrome.runtime.lastError) {
-                console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
-                    sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-            }
-        })
+        if (closeTabs) {
+            chrome.tabs.remove(sender.tab.id, function() {
+                if (chrome.runtime.lastError) {
+                    console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                    if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
+                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                }
+            })
+        }
         openedProjects.delete(sender.tab.id)
     } else if (!project)
         return
@@ -1162,6 +1149,11 @@ async function endVote(request, sender, project) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
             time.setUTCHours(4, (project.priority ? 0 : 10), 0, 0)
+        } else if (project.MMoTopRU) {
+            if (time.getUTCHours() > 20 || (time.getUTCHours() == 20 && time.getUTCMinutes() >= (project.priority ? 1 : 10))) {
+                time.setUTCDate(time.getUTCDate() + 1)
+            }
+            time.setUTCHours(20, (project.priority ? 1 : 10), 0, 0)
         }
         if (request.later && request.later != true) {
             time = new Date(request.later)
@@ -1174,7 +1166,7 @@ async function endVote(request, sender, project) {
                 }
             }
         } else {
-            if (project.TopG || project.MinecraftServersBiz) {
+            if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList || project.BotsForDiscord) {
                 time.setUTCHours(time.getUTCHours() + 12)
             } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring) {
                 time.setUTCDate(time.getUTCDate() + 1)

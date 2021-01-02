@@ -9,6 +9,12 @@ async function vote() {
         if (document.querySelector("body > iframe") != null && document.querySelector("body > iframe").src.startsWith('https://geo.captcha-delivery.com/captcha/')) {
             return
         }
+        //Пилюля от жадности
+        if (document.getElementById('adblock-notice') != null) document.getElementById('adblock-notice').style.display = 'none'
+        if (document.getElementById('vote-loading-block') != null) document.getElementById('vote-loading-block').style.display = 'none'
+        if (document.getElementById('vote-form-block') != null) document.getElementById('vote-form-block').removeAttribute('style')
+        if (document.getElementById('blocked-notice') != null) document.getElementById('blocked-notice').style.display = 'none'
+        
         if ((document.querySelector('body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong') != null && document.querySelector('body > div.content > div > div.row > div.col-xs-7 > p:nth-child(4) > strong').textContent.includes('Thank you for your vote')) || (document.querySelector('strong') != null && document.querySelector('strong').textContent.includes('Thank you for your vote')) || (document.querySelector('h1') != null && document.querySelector('h1').nextElementSibling != null && document.querySelector('h1').nextElementSibling.nextElementSibling != null && document.querySelector('h1').nextElementSibling.nextElementSibling.textContent.includes('Thank you for your vote'))) {
             chrome.runtime.sendMessage({successfully: true})
             return

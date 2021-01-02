@@ -29,7 +29,7 @@ if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anch
     
     this.check3 = setInterval(()=>{
         //Если требуется ручное прохождение капчи
-        if (document.querySelector("#solver-button") == null && document.querySelector("#recaptcha-verify-button") != null && !document.querySelector("#recaptcha-verify-button").disabled) {
+        if (document.getElementById("solver-button") == null && document.getElementById("rc-imageselect") != null && isScrolledIntoView(document.getElementById("rc-imageselect"))) {
             chrome.runtime.sendMessage({captcha: true})
             clearInterval(this.check3)
         }
@@ -55,7 +55,6 @@ if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anch
     //Если требуется ручное прохождение капчи
     this.check6 = setInterval(()=>{
         if (document.querySelector('body[class="no-selection"]') != null && document.querySelector('body[class="no-selection"]').ariaHidden == null && document.querySelector('body[class="no-selection"]').style.display == '') {
-         console.log()
             chrome.runtime.sendMessage({captcha: true})
             clearInterval(this.check6)
         }

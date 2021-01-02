@@ -581,6 +581,7 @@ figure svg {
 
 .tooltip1 .tooltip1text {
   visibility: hidden;
+  overflow-wrap: anywhere;
   width: 350px;
   background-color: #000;
   color: #fff;

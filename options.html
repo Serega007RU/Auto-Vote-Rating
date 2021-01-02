@@ -127,6 +127,10 @@
 								<option value="MinecraftServerNet">Minecraft-Server.net</option>
 								<option value="TopGames">Top-Games.net or Top-Serveurs.net</option>
 								<option value="TMonitoring">TMonitoring.com</option>
+								<option value="TopGG">Top.gg</option>
+								<option value="DiscordBotList">DiscordBotList.com</option>
+								<option value="BotsForDiscord">BotsForDiscord.com</option>
+								<option value="MMoTopRU">MMoTop.ru</option>
 							</select>
                             <!--Custom-->
 							<div style="display: none;" id="label6" class="form-group mb-1">
@@ -163,9 +167,9 @@
 							</div>
 							<textarea style="display: none;" id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="mb-2"></textarea>
 
-							<!--ServeurPrive and TopGames-->
+							<!--ServeurPrive, TopGames and MMoTopRU-->
 							<div style="display: none;" id="idGame" class="form-group mb-1">
-								<label for="chooseGame2" data-resource="idGame"></label>
+								<label data-resource="idGame"></label>
 								<span class="tooltip1">
 									<span class="tooltip1text" id="spanGame">
 									    <span style="color:red;">ID</span>
@@ -175,7 +179,7 @@
 									</span>
 								</span>
 							</div>
-							<datalist style="display: none;" id="gameList1">
+							<datalist style="display: none;" id="gameListTopGames">
 								<option value="minecraft">Minecraft</option>
 								<option value="garrys-mod">Garry's mod</option>
 								<option value="discord">Discord</option>
@@ -190,7 +194,7 @@
 								<option value="gta">GTA 5</option>
 								<option value="discord">Discord</option>
 							</datalist>
-							<datalist style="display: none;" id="gameList2">
+							<datalist style="display: none;" id="gameListServeurPrive">
 								<option value="minecraft">Minecraft</option>
 								<option value="discord">Discord</option>
 								<option value="grand-theft-auto">Grand Theft Auto V</option>
@@ -201,12 +205,23 @@
 								<option value="ark">ARK</option>
 								<option value="garrys-mod">Garry's Mod</option>
 							</datalist>
-							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGame1" placeholder="chooseGame" list="gameList1" value="minecraft">
-							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGame2" placeholder="chooseGame" list="gameList2" value="minecraft">
+							<datalist style="display: none;" id="gameListMMoTopRU">
+								<option value="wow">World War Craft</option>
+								<option value="la2">Lineage 2</option>
+								<option value="pw">Perfect World</option>
+								<option value="mu">Global FIU Online</option>
+								<option value="aion">Aion</option>
+								<option value="rf">RF Online</option>
+								<option value="all">Online Games (All)</option>
+								<option value="jd">Jade Dynasty</option>
+							</datalist>
+							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGameTopGames" placeholder="chooseGame" list="gameListTopGames" value="minecraft">
+							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGameServeurPrive" placeholder="chooseGame" list="gameListServeurPrive" value="minecraft">
+							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGameMMoTopRU" placeholder="chooseGame" list="gameListMMoTopRU">
 							<div style="display: none;" class="form-group mb-1" id="label4">
-								<label for="selectLang2" data-resource="chooseLang"></label>
+								<label for="selectLang" data-resource="chooseLang"></label>
 							</div>
-							<select style="display: none;" id="selectLang1" class="mb-2">
+							<select style="display: none;" id="selectLangTopGames" class="mb-2">
 								<option value="de">Deutsch</option>
 								<option value="en">English</option>
 								<option value="es">Español</option>
@@ -214,14 +229,27 @@
 								<option value="pt">Português</option>
 								<option value="ru">Русский</option>
 							</select>
-							<select style="display: none;" id="selectLang2" class="mb-2">
+							<select style="display: none;" id="selectLangServeurPrive" class="mb-2">
 								<option value="en">English</option>
 								<option value="fr" selected>Français</option>
+							</select>
+							<select style="display: none;" id="selectLangMMoTopRU" class="mb-2">
+								<option value="en">English</option>
+								<option value="ru" selected>Русский</option>
 							</select>
 							<div style="display: none;" class="form-group mb-1" id="label5">
 								<label for="countVote" data-resource="countVote"></label>
 							</div>
 							<input style="display: none;" id="countVote" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="mb-2" value="5">
+							<div style="display: none;" class="form-group mb-1" id="label10">
+								<label for="ordinalWorld" data-resource="ordinalWorld"></label>
+								<span class="tooltip1">
+									<span class="tooltip1text" id="spanOrdinalWorld">
+									    <span data-resource="ordinalWorldTooltip"></span>
+									</span>
+								</span>
+							</div>
+							<input style="display: none;" id="ordinalWorld" name="ordinalWorld" type="number" min="1" max="16" placeholder="ordinalWorld" class="mb-2">
 
 							<div id="idSelector" style="display: none;">
 							    <div class="form-group mb-1">
@@ -284,6 +312,19 @@
 							    </datalist>
 							    <datalist id="TMonitoringIDList">
 							        <option value="qoobworldru">qoobworld</option>
+							    </datalist>
+							    <datalist id="TopGGIDList">
+							        <option value="memes">Dank Memer</option>
+							        <option value="172002275412279296">Tatsumaki</option>
+							        <option value="zerotwo">Zero Two</option>
+							    </datalist>
+							    <datalist id="DiscordBotListIDList">
+							        <option value="dank-memer">Dank Memer</option>
+							        <option value="tatsu">Tatsumaki</option>
+							        <option value="zerotwo">Zero Two</option>
+							    </datalist>
+							    <datalist id="BotsForDiscordIDList">
+							        <option value="469610550159212554">Zero Two</option>
 							    </datalist>
 							</div>
 						</div>
@@ -469,6 +510,22 @@
 					    <ul class="listcontent" id="TMonitoringTab" style="display: none;">
 					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
 					        <div data-resource="notAdded" id="TMonitoringList"></div>
+					    </ul>
+					    <ul class="listcontent" id="TopGGTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="TopGGList"></div>
+					    </ul>
+					    <ul class="listcontent" id="DiscordBotListTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="DiscordBotListList"></div>
+					    </ul>
+					    <ul class="listcontent" id="BotsForDiscordTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="BotsForDiscordList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MMoTopRUTab" style="display: none;">
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div data-resource="notAdded" id="MMoTopRUList"></div>
 					    </ul>
 					    <ul class="listcontent" id="CustomTab" style="display: none;">
 					        <div data-resource="notAdded" id="CustomList"></div>

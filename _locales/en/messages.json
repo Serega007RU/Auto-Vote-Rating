@@ -551,7 +551,7 @@
     "message": "Choose language/region"
   },
   "chooseGame": {
-    "message": "Enter a game or select from the list"
+    "message": "Enter the game ID or select from the list"
   },
   "idGame": {
     "message": "Game ID"
@@ -623,5 +623,20 @@
   },
   "sheldTime": {
     "message": "Schedule a vote"
+  },
+  "discordLogIn": {
+    "message": "You must be logged in to upvote bots!"
+  },
+  "auth": {
+    "message": "Only registered users can vote on this rating. Please log in or register."
+  },
+  "emptySite": {
+    "message": "It seems that this rating gave out an empty page, try to go to the site of this rating and then try again to add"
+  },
+  "ordinalWorld": {
+    "message": "Ordinal number of world"
+  },
+  "ordinalWorldTooltip": {
+    "message": "Ordinal number of world is the number in order that is located in the list of selected worlds when voting"
   }
 }
