@@ -38,12 +38,8 @@ async function vote(first) {
         //Делаем форму голосования видимой
         document.querySelector('div.vote-fields').removeAttribute('style')
 
-        if (document.querySelector("div.g-recaptcha > div > div > iframe") != null) {
-            if (first) {
-                return
-            } else {
-                console.warn('reCaptcha не пройдена?')
-            }
+        if (document.querySelector("div.g-recaptcha > div > div > iframe") != null && first) {
+            return
         }
         
         let project = await getProject()

@@ -47,6 +47,9 @@
     "message": "Enter your nickname",
     "description": "Input. Enter your nick"
   },
+  "enterNickOptional": {
+    "message": "Enter your nickname (optional)"
+  },
   "siteTop": {
     "message": "Ranking site",
     "description": "Label. Ranking site"
@@ -526,6 +529,9 @@
   "requiresCaptcha": {
     "message": "Requires manually passing the captcha"
   },
+  "authSteam": {
+    "message": "Requires auth Steam"
+  },
   "privacyPass": {
     "message": "Install the "
   },
@@ -553,8 +559,14 @@
   "chooseGame": {
     "message": "Enter the game ID or select from the list"
   },
+  "chooseGameURL": {
+    "message": "Enter the game URL or select from the list"
+  },
   "idGame": {
     "message": "Game ID"
+  },
+  "urlGame": {
+    "message": "Game URL"
   },
   "stats": {
     "message": "Stats $project$",
@@ -638,5 +650,8 @@
   },
   "ordinalWorldTooltip": {
     "message": "Ordinal number of world is the number in order that is located in the list of selected worlds when voting"
+  },
+  "requiredNick": {
+    "message": "Where's the nickname? There is no steam authorization button so i need a nickname and in this case it is mandatory"
   }
 }

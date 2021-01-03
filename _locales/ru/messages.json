@@ -35,6 +35,9 @@
   "enterNick": {
     "message": "Введите никнейм"
   },
+  "enterNickOptional": {
+    "message": "Введите никнейм (необязательно)"
+  },
   "siteTop": {
     "message": "Сайт рейтинга"
   },
@@ -485,6 +488,9 @@
   "requiresCaptcha": {
     "message": "Требуется ручное прохождение капчи"
   },
+  "authSteam": {
+    "message": "Steam login required"
+  },
   "privacyPass": {
     "message": "Установите расширение "
   },
@@ -512,8 +518,14 @@
   "chooseGame": {
     "message": "Введите ID игры или выберите из списка"
   },
+  "chooseGameURL": {
+    "message": "Введите URL игры или выберите из списка"
+  },
   "idGame": {
     "message": "ID игры"
+  },
+  "urlGame": {
+    "message": "URL игры"
   },
   "stats": {
     "message": "Статистика $project$",
@@ -597,5 +609,8 @@
   },
   "ordinalWorldTooltip": {
     "message": "Порядковый номер мира это номер по порядку который расположен в списке выбора миров при голосовании"
+  },
+  "requiredNick": {
+    "message": "А где никнейм? Тут нет кнопки авторизации steam а значит нужен никнейм и в данном случае он обязателен"
   }
 }

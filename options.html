@@ -117,7 +117,7 @@
 								<option value="ServeurPrive">Serveur-Prive.net</option>
 								<option value="PlanetMinecraft">PlanetMinecraft.com</option>
 								<option value="TopG">TopG.org</option>
-								<option value="MinecraftMp">Minecraft-Mp.com</option>
+								<option value="ListForge">ListForge.net</option>
 								<option value="MinecraftServerList">Minecraft-Server-List.com</option>
 								<option value="ServerPact">ServerPact.com</option>
 								<option value="MinecraftIpList">MinecraftIpList.com</option>
@@ -166,6 +166,48 @@
 							    <label for="customBody" data-resource="bodyFetch"></label>
 							</div>
 							<textarea style="display: none;" id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="mb-2"></textarea>
+
+							<div style="display: none;" id="urlGame" class="form-group mb-1">
+								<label data-resource="urlGame"></label>
+								<span class="tooltip1">
+									<span class="tooltip1text" id="spanGame">
+									    <span style="color:red;">URL</span>
+									    <span data-resource="gameIDTooltip"></span>
+									    <br>
+									    <span>https://</span><span style="color:#d32f2f;">minecraft-mp.com</span><span>/server/207380/vote/</span>
+									</span>
+								</span>
+							</div>
+							<datalist style="display: none;" id="gameListListForge">
+								<option value="7daystodie-servers.com">7 Days To Die</option>
+								<option value="ark-servers.net">ARK : Survival Evolved</option>
+								<option value="arma3-servers.net">Arma3</option>
+								<option value="atlas-servers.io">Atlas</option>
+								<option value="conan-exiles.com">Conan Exiles</option>
+								<option value="counter-strike-servers.net">Counter Strike : Global Offensive</option>
+								<option value="cubeworld-servers.com">Cube World</option>
+								<option value="dayz-servers.org">DayZ</option>
+								<option value="ecoservers.io">ECO</option>
+								<option value="empyrion-servers.com">Empyrion</option>
+								<option value="gmod-servers.com">Garry's Mod</option>
+								<option value="hurtworld-servers.net">Hurtworld</option>
+								<option value="hytale-servers.io">Hytale</option>
+								<option value="life-is-feudal.org">Life is Feudal</option>
+								<option value="minecraft-mp.com">Minecraft</option>
+								<option value="minecraftpocket-servers.com">Minecraft Pocket</option>
+								<option value="miscreated-servers.com">Miscreated</option>
+								<option value="reign-of-kings.net">Reign of Kings</option>
+								<option value="rust-servers.net">Rust</option>
+								<option value="space-engineers.com">Space Engineers</option>
+								<option value="squad-servers.com">Squad</option>
+								<option value="starbound-servers.net">Starbound</option>
+								<option value="tf2-servers.com">Team Fortress 2</option>
+								<option value="teamspeak-servers.org">Teamspeak</option>
+								<option value="terraria-servers.com">Terraria</option>
+								<option value="unturned-servers.net">Unturned</option>
+								<option value="wurm-unlimited.com">Wurm Unlimited</option>
+							</datalist>
+							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGameListForge" placeholder="chooseGameURL" list="gameListListForge">
 
 							<!--ServeurPrive, TopGames and MMoTopRU-->
 							<div style="display: none;" id="idGame" class="form-group mb-1">
@@ -294,9 +336,6 @@
 							    </datalist>
 							    <datalist id="TopGIDList">
 							        <option value="405637">Hypixel</option><option value="414300">Mineplex</option><option value="512397">Legends Evolved</option>
-							    </datalist>
-							    <datalist id="MinecraftMpIDList">
-							        <option value="81821">Hypixel</option><option value="234147">Legends Evolved</option>
 							    </datalist>
 							    <datalist id="MinecraftServerListIDList">
 							        <option value="292028">Hypixel</option><option value="218820">Mineplex</option>
@@ -473,9 +512,9 @@
 					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
 					        <div data-resource="notAdded" id="TopGList"></div>
 					    </ul>
-					    <ul class="listcontent" id="MinecraftMpTab" style="display: none;">
+					    <ul class="listcontent" id="ListForgeTab" style="display: none;">
 					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div data-resource="notAdded" id="MinecraftMpList"></div>
+					        <div data-resource="notAdded" id="ListForgeList"></div>
 					    </ul>
 					    <ul class="listcontent" id="MinecraftServerListTab" style="display: none;">
 					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>

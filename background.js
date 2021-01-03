@@ -9,7 +9,7 @@ var projectsMinecraftServersOrg = []
 var projectsServeurPrive = []
 var projectsPlanetMinecraft = []
 var projectsTopG = []
-var projectsMinecraftMp = []
+var projectsListForge = []
 var projectsMinecraftServerList = []
 var projectsServerPact = []
 var projectsMinecraftIpList = []
@@ -36,7 +36,7 @@ var allProjects = [
     'ServeurPrive',
     'PlanetMinecraft',
     'TopG',
-    'MinecraftMp',
+    'ListForge',
     'MinecraftServerList',
     'ServerPact',
     'MinecraftIpList',
@@ -290,8 +290,8 @@ async function newWindow(project) {
             url = 'https://www.planetminecraft.com/server/' + project.id + '/vote/'
         else if (project.TopG)
             url = 'https://topg.org/Minecraft/in-' + project.id
-        else if (project.MinecraftMp)
-            url = 'https://minecraft-mp.com/server/' + project.id + '/vote/'
+        else if (project.ListForge)
+            url = 'https://' + project.game + '/server/' + project.id + '/vote/'
         else if (project.MinecraftServerList)
             url = 'https://minecraft-server-list.com/server/' + project.id + '/vote/'
         else if (project.ServerPact)
@@ -944,51 +944,19 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null)
         return
-    chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'}, function() {
-        if (chrome.runtime.lastError) {
-            console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-            if (chrome.runtime.lastError.message != 'The tab was closed.') {
-                if (!settings.disabledNotifError)
-                    sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                project.error = chrome.runtime.lastError.message
-                changeProject(project)
+    if (details.frameId == 0) {
+        chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'}, function() {
+            if (chrome.runtime.lastError) {
+                console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                if (chrome.runtime.lastError.message != 'The tab was closed.') {
+                    if (!settings.disabledNotifError)
+                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                    project.error = chrome.runtime.lastError.message
+                    changeProject(project)
+                }
             }
-        }
-    })
-}, {url: [
-    {hostSuffix: 'topcraft.ru'},
-    {hostSuffix: 'mctop.su'},
-    {hostSuffix: 'mcrate.su'},
-    {hostSuffix: 'minecraftrating.ru'},
-    {hostSuffix: 'monitoringminecraft.ru'},
-    {hostSuffix: 'ionmc.top'},
-    {hostSuffix: 'minecraftservers.org'},
-    {hostSuffix: 'serveur-prive.net'},
-    {hostSuffix: 'planetminecraft.com'},
-    {hostSuffix: 'topg.org'},
-    {hostSuffix: 'minecraft-mp.com'},
-    {hostSuffix: 'minecraft-server-list.com'},
-    {hostSuffix: 'serverpact.com'},
-    {hostSuffix: 'minecraftiplist.com'},
-    {hostSuffix: 'topminecraftservers.org'},
-    {hostSuffix: 'minecraftservers.biz'},
-    {hostSuffix: 'hotmc.ru'},
-    {hostSuffix: 'minecraft-server.net'},
-    {hostSuffix: 'top-games.net'},
-    {hostSuffix: 'top-serveurs.net'},
-    {hostSuffix: 'tmonitoring.com'},
-    {hostSuffix: 'top.gg'},
-    {hostSuffix: 'discordbotlist.com'},
-    {hostSuffix: 'botsfordiscord.com'},
-    {hostSuffix: 'mmotop.ru'}
-]})
-
-
-chrome.webNavigation.onCompleted.addListener(function(details) {
-    if (details.frameId != 0) {
-        let project = openedProjects.get(details.tabId)
-        if (project == null)
-            return
+        })
+    } else if (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/)) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
@@ -1001,11 +969,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             }
         })
     }
-}, {url: [
-    {urlMatches: 'hcaptcha.com/captcha/*'},
-    {urlMatches: 'https://www.google.com/recaptcha/api./anchor*'},
-    {urlMatches: 'https://www.google.com/recaptcha/api./bframe*'}
-]})
+}, {urls: ["<all_urls>"]})
 
 //Слушатель ошибок net::ERR для вкладок
 chrome.webNavigation.onErrorOccurred.addListener(function(details) {
@@ -1023,44 +987,17 @@ chrome.webNavigation.onErrorOccurred.addListener(function(details) {
         }
     }
     endVote({message: chrome.i18n.getMessage('errorVoteUnknown')} + details.error, sender, project)
-}, {url: [
-    {hostSuffix: 'topcraft.ru'},
-    {hostSuffix: 'mctop.su'},
-    {hostSuffix: 'mcrate.su'},
-    {hostSuffix: 'minecraftrating.ru'},
-    {hostSuffix: 'monitoringminecraft.ru'},
-    {hostSuffix: 'ionmc.top'},
-    {hostSuffix: 'minecraftservers.org'},
-    {hostSuffix: 'serveur-prive.net'},
-    {hostSuffix: 'planetminecraft.com'},
-    {hostSuffix: 'topg.org'},
-    {hostSuffix: 'minecraft-mp.com'},
-    {hostSuffix: 'minecraft-server-list.com'},
-    {hostSuffix: 'serverpact.com'},
-    {hostSuffix: 'minecraftiplist.com'},
-    {hostSuffix: 'topminecraftservers.org'},
-    {hostSuffix: 'minecraftservers.biz'},
-    {hostSuffix: 'hotmc.ru'},
-    {hostSuffix: 'minecraft-server.net'},
-    {hostSuffix: 'top-games.net'},
-    {hostSuffix: 'top-serveurs.net'},
-    {hostSuffix: 'tmonitoring.com'},
-    {hostSuffix: 'top.gg'},
-    {hostSuffix: 'discordbotlist.com'},
-    {hostSuffix: 'botsfordiscord.com'},
-    {hostSuffix: 'mmotop.ru'},
-    {hostSuffix: 'vk.com'}
-]})
+}, {urls: ["<all_urls>"]})
 
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
     //Если требует ручное прохождение капчи
-    if (request.captcha && sender && openedProjects.has(sender.tab.id)) {
-        captchaRequired = true
+    if ((request.captcha || request.authSteam) && sender && openedProjects.has(sender.tab.id)) {
         let project = openedProjects.get(sender.tab.id)
-        console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('requiresCaptcha'))
+        let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage('authSteam')
+        console.warn(getProjectPrefix(project, true) + message)
         if (!settings.disabledNotifWarn)
-            sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('requiresCaptcha'))
+            sendNotification(getProjectPrefix(project, false), message)
     } else {
         endVote(request, sender, null)
     }
@@ -1134,7 +1071,7 @@ async function endVote(request, sender, project) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
             time.setUTCHours(23, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.PlanetMinecraft || project.MinecraftMp) {
+        } else if (project.PlanetMinecraft || project.ListForge) {
             if (time.getUTCHours() > 5 || (time.getUTCHours() == 5 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
@@ -1272,7 +1209,7 @@ async function endVote(request, sender, project) {
             retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)
         }
         project.time = Date.now() + retryCoolDown
-        project.error = request.message
+        project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
         if (!settings.disabledNotifError)
             sendNotification(getProjectPrefix(project, false), sendMessage)
@@ -1312,9 +1249,9 @@ function getProjectName(project) {
 
 function getProjectPrefix(project, detailed) {
     if (detailed) {
-        return '[' + getProjectName(project) + '] ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' '
+        return '[' + getProjectName(project) + '] ' + (project.nick != null && project.nick != '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + ' '
     } else {
-        return '[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id)
+        return '[' + getProjectName(project) + '] ' + (project.nick != null && project.nick != '' ? project.nick : project.game != null ? project.game : project.name) + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id)
     }
 }
 
@@ -1675,21 +1612,26 @@ chrome.webRequest.onBeforeSendHeaders.addListener(handler, {
     urls: ['*://www.serverpact.com/*', '*://minecraftiplist.com/*']
 }, ['blocking', 'requestHeaders'])
 
-chrome.runtime.onInstalled.addListener(function(details) {
+chrome.runtime.onInstalled.addListener(async function(details) {
     if (details.reason == 'install') {
         chrome.runtime.openOptionsPage()
-    }
-    //HotFix для пользователей обновившихся с версии 3.2.0
-    if (details.reason == 'update' && details.previousVersion && details.previousVersion == '3.2.0') {
-        //Сброс time для проектов где использовался String
-        forLoopAllProjects(async function(proj) {
-            if (proj.TopCraft || proj.McTOP || proj.MinecraftRating || proj.MCRate || proj.IonMc || proj.MinecraftMp || proj.PlanetMinecraft || proj.MinecraftServerList || proj.MinecraftServersOrg || proj.TopMinecraftServers) {
-                if (typeof proj.time === 'string' || proj.time instanceof String) {
-                    proj.time = null
-                    await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj))
-                }
+    } else if (details.reason == 'update' && details.previousVersion && details.previousVersion.charAt(0) <= 3 && details.previousVersion.charAt(2) <= 4) {
+        let oldMinecraftMp = await getValue('AVMRprojectsMinecraftMp')
+        if (oldMinecraftMp != null && oldMinecraftMp.length > 0) {
+            for (old of oldMinecraftMp) {
+                let newListForge = {}
+                newListForge.ListForge = true
+                newListForge.game = 'minecraft-mp.com'
+                newListForge.id = old.id
+                newListForge.name = old.name
+                newListForge.stats = old.stats
+                newListForge.nick = old.nick
+                newListForge.time = old.time
+                projectsListForge.push(newListForge)
             }
-        })
+            await setValue('AVMRprojectsListForge', projectsListForge)
+            await setValue('AVMRprojectsMinecraftMP', null)
+        }
     }
 })
 

@@ -8,7 +8,7 @@ var projectsMinecraftServersOrg = []
 var projectsServeurPrive = []
 var projectsPlanetMinecraft = []
 var projectsTopG = []
-var projectsMinecraftMp = []
+var projectsListForge = []
 var projectsMinecraftServerList = []
 var projectsServerPact = []
 var projectsMinecraftIpList = []
@@ -36,7 +36,7 @@ var allProjects = [
     'ServeurPrive',
     'PlanetMinecraft',
     'TopG',
-    'MinecraftMp',
+    'ListForge',
     'MinecraftServerList',
     'ServerPact',
     'MinecraftIpList',
@@ -349,7 +349,7 @@ async function addProjectList(project, visually) {
 
     li.appendChild(div)
 
-    li.append(project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : ''))
+    li.append((project.nick != null && project.nick != '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : ''))
 
     li.appendChild(document.createElement('br'))
 
@@ -451,15 +451,25 @@ async function removeProjectList(project, visually) {
 }
 
 //Перезагрузка списка проектов
-function updateProjectList() {
-    for (const item of allProjects) {
-        while (document.getElementById(item + 'List').nextElementSibling != null) {
-            document.getElementById(item + 'List').nextElementSibling.remove()
+function updateProjectList(projects) {
+    if (projects != null) {
+        const projectName = getProjectName(projects[0])
+        while (document.getElementById(projectName + 'List').nextElementSibling != null) {
+            document.getElementById(projectName + 'List').nextElementSibling.remove()
         }
+        for (project of projects) {
+            addProjectList(project, true)
+        }
+    } else {
+        for (const item of allProjects) {
+            while (document.getElementById(item + 'List').nextElementSibling != null) {
+                document.getElementById(item + 'List').nextElementSibling.remove()
+            }
+        }
+        forLoopAllProjects(async function(proj) {
+            await addProjectList(proj, true)
+        }, true)
     }
-    forLoopAllProjects(async function(proj) {
-        await addProjectList(proj, true)
-    }, true)
     if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
@@ -501,7 +511,9 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         project.randomize = true
     }
 
-    if (project.TopGames) {
+    if (project.ListForge) {
+        project.game = document.getElementById('chooseGameListForge').value
+    } else if (project.TopGames) {
         project.game = document.getElementById('chooseGameTopGames').value
         project.lang = document.getElementById('selectLangTopGames').value
         project.maxCountVote = document.getElementById('countVote').valueAsNumber
@@ -600,9 +612,9 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         } else if (project.TopG) {
             url = 'https://topg.org/ru/Minecraft/server-' + project.id
             jsPath = 'body > main > site > div.main > div > div > div.col-lg-4 > div.widget.stacked.widget-table.action-table.nom > div.widget-content > table > tbody > tr:nth-child(7) > td:nth-child(2) > div'
-        } else if (project.MinecraftMp) {
-            url = 'https://minecraft-mp.com/server-s' + project.id
-            jsPath = 'table[class="table table-bordered"] > tbody > tr:nth-child(1) > td:nth-child(2) > strong'
+        } else if (project.ListForge) {
+            url = 'https://' + project.game + '/server/' + project.id + '/vote/'
+            jsPath = 'head > title'
         } else if (project.MinecraftServerList) {
             url = 'https://minecraft-server-list.com/server/' + project.id + '/'
             jsPath = '#site-wrapper > section > div.hfeed > span > div.serverdatadiv > table > tbody > tr:nth-child(5) > td > a'
@@ -686,6 +698,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             updateStatusAdd(chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status, true, element, 'error')
             return
         }
+
         try {
             let html = await response.text()
             let doc = new DOMParser().parseFromString(html, 'text/html')
@@ -698,6 +711,11 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             } else if (project.ServerPact) {
                 if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center') != null && doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center').textContent.includes('This server does not exist')) {
                     updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
+                    return
+                }
+            } else if (project.ListForge) {
+                if (doc.querySelector('a[href="https://listforge.net/"]') == null && doc.querySelector('a[href="http://listforge.net/"]') == null) {
+                    updateStatusAdd()
                     return
                 }
             } else if (project.MinecraftIpList) {
@@ -751,19 +769,21 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
 
             if (projectURL != '') {
                 if (project.HotMC) {
-                    projectURL = projectURL.replace('серверМайнкрафт', '')
+                    projectURL = projectURL.replace(' сервер Майнкрафт', '')
+                } else if (project.ListForge) {
+                    projectURL = projectURL.substring(9, projectURL.length)
                 }
                 project.name = projectURL
             }
 
-            if (project.TopGG || project.DiscordBotList || project.BotsForDiscord) {
-                if (projectURL != '') {
-                    delete project.name
-                    project.nick = projectURL
-                } else {
-                    project.nick = project.id
-                }
-            }
+//             if (project.nick == '') {
+//                 if (projectURL != '') {
+//                     delete project.name
+//                     project.nick = projectURL
+//                 } else {
+//                     project.nick = project.id
+//                 }
+//             }
         } catch (e) {
             console.error(e)
         }
@@ -836,7 +856,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     /*f (random) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
     } else*/
-    if ((project.PlanetMinecraft || project.TopG || project.MinecraftMp || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU) && settings.enabledSilentVote) {
+    if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU) && settings.enabledSilentVote) {
         const message = createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success')
         const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
         const span = document.createElement('span')
@@ -1010,7 +1030,7 @@ function extractHostname(url) {
     hostname = hostname.split('?')[0]
 
     hostname = hostname.replace(/\r?\n/g, '')
-    hostname = hostname.replace(/\s+/g, '')
+//  hostname = hostname.replace(/\s+/g, '')
 
     return hostname
 }
@@ -1097,7 +1117,7 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         projectsServeurPrive,
         projectsPlanetMinecraft,
         projectsTopG,
-        projectsMinecraftMp,
+        projectsListForge,
         projectsMinecraftServerList,
         projectsServerPact,
         projectsMinecraftIpList,
@@ -1398,7 +1418,7 @@ function openPoput(url, reload) {
       , top = Math.max(0, (screen.height - popupBoxWidth) / 2) + (screen.availTop | 0)
     poput = window.open(url, 'vk_openapi', 'width=' + popupBoxWidth + ',height=' + popupBoxHeight + ',left=' + left + ',top=' + top + ',menubar=0,toolbar=0,location=0,status=0')
     if (poput) {
-//         poput.focus()
+//      poput.focus()
         if (reload) {
             (function check() {
                 !poput || poput.closed ? reload() : setTimeout(check, 500)
@@ -1540,8 +1560,10 @@ selectedTop.addEventListener('change', function() {
 
     if (document.getElementById(selectedTop.value + 'IDList') != null) {
         document.getElementById('id').setAttribute('list', selectedTop.value + 'IDList')
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else {
         document.getElementById('id').removeAttribute('list')
+        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
     }
 
     document.getElementById('id').required = true
@@ -1550,122 +1572,98 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip1').textContent = 'https://topcraft.ru/servers/'
         document.getElementById('projectIDTooltip2').textContent = '10496'
         document.getElementById('projectIDTooltip3').textContent = '/'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'McTOP') {
         document.getElementById('projectIDTooltip1').textContent = 'https://mctop.su/servers/'
         document.getElementById('projectIDTooltip2').textContent = '5231'
         document.getElementById('projectIDTooltip3').textContent = '/'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MCRate') {
         document.getElementById('projectIDTooltip1').textContent = 'http://mcrate.su/rate/'
         document.getElementById('projectIDTooltip2').textContent = '4396'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MinecraftRating') {
         document.getElementById('projectIDTooltip1').textContent = 'http://minecraftrating.ru/projects/'
         document.getElementById('projectIDTooltip2').textContent = 'cubixworld'
         document.getElementById('projectIDTooltip3').textContent = '/'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MonitoringMinecraft') {
         document.getElementById('projectIDTooltip1').textContent = 'http://monitoringminecraft.ru/top/'
         document.getElementById('projectIDTooltip2').textContent = 'gg'
         document.getElementById('projectIDTooltip3').textContent = '/vote'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'IonMc') {
         document.getElementById('projectIDTooltip1').textContent = 'https://ionmc.top/projects/'
         document.getElementById('projectIDTooltip2').textContent = '80'
         document.getElementById('projectIDTooltip3').textContent = '/vote'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MinecraftServersOrg') {
         document.getElementById('projectIDTooltip1').textContent = 'https://minecraftservers.org/vote/'
         document.getElementById('projectIDTooltip2').textContent = '25531'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'ServeurPrive') {
         document.getElementById('projectIDTooltip1').textContent = 'https://serveur-prive.net/minecraft/'
         document.getElementById('projectIDTooltip2').textContent = 'gommehd-net-4932'
         document.getElementById('projectIDTooltip3').textContent = '/vote'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'PlanetMinecraft') {
         document.getElementById('projectIDTooltip1').textContent = 'https://www.planetminecraft.com/server/'
         document.getElementById('projectIDTooltip2').textContent = 'legends-evolved'
         document.getElementById('projectIDTooltip3').textContent = '/vote/'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'TopG') {
         document.getElementById('projectIDTooltip1').textContent = 'https://topg.org/Minecraft/in-'
         document.getElementById('projectIDTooltip2').textContent = '405637'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
-    } else if (selectedTop.value == 'MinecraftMp') {
+    } else if (selectedTop.value == 'ListForge') {
         document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-mp.com/server/'
         document.getElementById('projectIDTooltip2').textContent = '81821'
         document.getElementById('projectIDTooltip3').textContent = '/vote/'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MinecraftServerList') {
         document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-server-list.com/server/'
         document.getElementById('projectIDTooltip2').textContent = '292028'
         document.getElementById('projectIDTooltip3').textContent = '/vote/'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'ServerPact') {
         document.getElementById('projectIDTooltip1').textContent = 'https://www.serverpact.com/vote-'
         document.getElementById('projectIDTooltip2').textContent = '26492123'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MinecraftIpList') {
         document.getElementById('projectIDTooltip1').textContent = 'https://minecraftiplist.com/index.php?action=vote&listingID='
         document.getElementById('projectIDTooltip2').textContent = '2576'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'TopMinecraftServers') {
         document.getElementById('projectIDTooltip1').textContent = 'https://topminecraftservers.org/vote/'
         document.getElementById('projectIDTooltip2').textContent = '9126'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
     } else if (selectedTop.value == 'MinecraftServersBiz') {
         document.getElementById('projectIDTooltip1').textContent = 'https://minecraftservers.biz/'
         document.getElementById('projectIDTooltip2').textContent = 'servers/145999'
         document.getElementById('projectIDTooltip3').textContent = '/'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
     } else if (selectedTop.value == 'HotMC') {
         document.getElementById('projectIDTooltip1').textContent = 'https://hotmc.ru/vote-'
         document.getElementById('projectIDTooltip2').textContent = '199493'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MinecraftServerNet') {
         document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-server.net/vote/'
         document.getElementById('projectIDTooltip2').textContent = 'TitanicFreak'
         document.getElementById('projectIDTooltip3').textContent = '/'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
     } else if (selectedTop.value == 'TopGames') {
         document.getElementById('projectIDTooltip1').textContent = 'https://top-serveurs.net/minecraft/'
         document.getElementById('projectIDTooltip2').textContent = 'icesword-pvpfaction-depuis-2014-crack-on'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
     } else if (selectedTop.value == 'TMonitoring') {
         document.getElementById('projectIDTooltip1').textContent = 'https://tmonitoring.com/server/'
         document.getElementById('projectIDTooltip2').textContent = 'qoobworldru'
         document.getElementById('projectIDTooltip3').textContent = ''
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'TopGG') {
         document.getElementById('projectIDTooltip1').textContent = 'https://top.gg/bot/'
         document.getElementById('projectIDTooltip2').textContent = '270904126974590976'
         document.getElementById('projectIDTooltip3').textContent = '/vote'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'DiscordBotList') {
         document.getElementById('projectIDTooltip1').textContent = 'https://discordbotlist.com/bots/'
         document.getElementById('projectIDTooltip2').textContent = 'dank-memer'
         document.getElementById('projectIDTooltip3').textContent = '/upvote'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'BotsForDiscord') {
         document.getElementById('projectIDTooltip1').textContent = 'https://botsfordiscord.com/bot/'
         document.getElementById('projectIDTooltip2').textContent = '469610550159212554'
         document.getElementById('projectIDTooltip3').textContent = '/vote'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
     } else if (selectedTop.value == 'MMoTopRU') {
         document.getElementById('projectIDTooltip1').textContent = 'https://pw.mmotop.ru/servers/'
         document.getElementById('projectIDTooltip2').textContent = '25895'
         document.getElementById('projectIDTooltip3').textContent = '/votes/new'
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
     }
 
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || selectedTop.value == 'MMoTopRU' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU') {
@@ -1716,6 +1714,8 @@ selectedTop.addEventListener('change', function() {
 
             idSelector.setAttribute('style', 'height: 0px;')
             idSelector.style.display = 'none'
+
+            document.getElementById('id').required = false
 
             document.getElementById('label6').removeAttribute('style')
             document.getElementById('selectTime').removeAttribute('style')
@@ -1786,6 +1786,7 @@ selectedTop.addEventListener('change', function() {
             }
         }
     }
+
     if (selectedTop.value == 'TopGG' || selectedTop.value == 'DiscordBotList' || selectedTop.value == 'BotsForDiscord') {
         document.getElementById('nick').required = false
         document.getElementById('nick').style.display = 'none'
@@ -1795,6 +1796,23 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('nick').removeAttribute('style')
         document.getElementById('nick').previousElementSibling.removeAttribute('style')
     }
+    
+    if (selectedTop.value == 'ListForge') {
+        document.getElementById('nick').required = false
+        document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
+        document.getElementById('urlGame').removeAttribute('style')
+        document.getElementById('gameListListForge').removeAttribute('style')
+        document.getElementById('chooseGameListForge').required = true
+        document.getElementById('chooseGameListForge').removeAttribute('style')
+    } else if (laterChoose == 'ListForge') {
+        document.getElementById('nick').required = true
+        if (selectedTop.value != 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
+        document.getElementById('urlGame').style.display = 'none'
+        document.getElementById('gameListListForge').style.display = 'none'
+        document.getElementById('chooseGameListForge').required = false
+        document.getElementById('chooseGameListForge').style.display = 'none'
+    }
+
     laterChoose = selectedTop.value
 })
 
