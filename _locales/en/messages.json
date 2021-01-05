@@ -653,5 +653,8 @@
   },
   "requiredNick": {
     "message": "Where's the nickname? There is no steam authorization button so i need a nickname and in this case it is mandatory"
+  },
+  "alertCaptcha": {
+    "message": "On this rating, there is a captcha that the extension cannot pass, you will need to manually pass it, the extension will notify you in notifications about the need to pass the captcha."
   }
 }

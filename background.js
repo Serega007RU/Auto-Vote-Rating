@@ -23,6 +23,10 @@ var projectsTopGG = []
 var projectsDiscordBotList = []
 var projectsBotsForDiscord = []
 var projectsMMoTopRU = []
+var projectsMCServers = []
+var projectsMinecraftList = []
+var projectsMinecraftIndex = []
+var projectsServerList101 = []
 var projectsCustom = []
 
 var allProjects = [
@@ -50,6 +54,10 @@ var allProjects = [
     'DiscordBotList',
     'BotsForDiscord',
     'MMoTopRU',
+    'MCServers',
+    'MinecraftList',
+    'MinecraftIndex',
+    'ServerList101',
     'Custom'
 ]
 
@@ -328,7 +336,14 @@ async function newWindow(project) {
             } else {
                 url = 'https://' + project.game + '.mmotop.ru/' + project.lang + '/' + 'servers/' + project.id + '/votes/new'
             }
-        }
+        } else if (project.MCServers)
+            url = 'https://mc-servers.com/mcvote/' + project.id + '/'
+        else if (project.MinecraftList)
+            url = 'https://minecraftlist.org/vote/' + project.id
+        else if (project.MinecraftIndex)
+            url = 'https://www.minecraft-index.com/' + project.id + '/vote'
+        else if (project.ServerList101)
+            url = 'https://serverlist101.com/server/' + project.id + '/vote/'
         
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url: url, active: false}, function(tab_) {
@@ -1066,17 +1081,17 @@ async function endVote(request, sender, project) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
             time.setUTCHours(22, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.MinecraftServerList) {
+        } else if (project.MinecraftServerList || project.ServerList101) {
             if (time.getUTCHours() > 23 || (time.getUTCHours() == 23 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
             time.setUTCHours(23, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.PlanetMinecraft || project.ListForge) {
+        } else if (project.PlanetMinecraft || project.ListForge || project.MinecraftList) {
             if (time.getUTCHours() > 5 || (time.getUTCHours() == 5 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
             time.setUTCHours(5, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.MinecraftServersOrg) {
+        } else if (project.MinecraftServersOrg || project.MinecraftIndex) {
             if (time.getUTCHours() > 0 || (time.getUTCHours() == 0 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
@@ -1105,7 +1120,7 @@ async function endVote(request, sender, project) {
         } else {
             if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList || project.BotsForDiscord) {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring) {
+            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers) {
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (project.ServeurPrive || project.TopGames) {
                 project.countVote = project.countVote + 1
@@ -1617,7 +1632,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         chrome.runtime.openOptionsPage()
     } else if (details.reason == 'update' && details.previousVersion && details.previousVersion.charAt(0) <= 3 && details.previousVersion.charAt(2) <= 4) {
         let oldMinecraftMp = await getValue('AVMRprojectsMinecraftMp')
-        if (oldMinecraftMp != null && oldMinecraftMp.length > 0) {
+        if (oldMinecraftMp != null && typeof oldMinecraftMp === 'function' && oldMinecraftMp.length > 0) {
             for (old of oldMinecraftMp) {
                 let newListForge = {}
                 newListForge.ListForge = true
@@ -1630,7 +1645,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                 projectsListForge.push(newListForge)
             }
             await setValue('AVMRprojectsListForge', projectsListForge)
-            await setValue('AVMRprojectsMinecraftMP', null)
+            await setValue('AVMRprojectsMinecraftMp', null)
         }
     }
 })
@@ -1733,14 +1748,21 @@ console._collect = function (type, args) {
 
   // Add the log to our history.
 //   console.history.push({ type: type, timestamp: time, arguments: args/*, stack: stack*/ })
-
-  if (localStorage.consoleHistory.length) localStorage.consoleHistory += '\n'
-  localStorage.consoleHistory += '[' + time + ' ' + type.toUpperCase() + ']:'
-  for (i in args) {
-      let arg = args[i]
-      if (typeof arg != 'string')
-          arg = JSON.stringify(arg)
-      localStorage.consoleHistory += ' ' + arg
+  try {
+      if (localStorage.consoleHistory.length) localStorage.consoleHistory += '\n'
+      localStorage.consoleHistory += '[' + time + ' ' + type.toUpperCase() + ']:'
+      for (i in args) {
+          let arg = args[i]
+          if (typeof arg != 'string')
+              arg = JSON.stringify(arg)
+           localStorage.consoleHistory += ' ' + arg
+      }
+  } catch (e) {
+      if (e.message.includes('exceeded the quota')) {//В случае если в логах стало не хватать места (ограничение в 5 МегаБайт)
+          localStorage.consoleHistory = localStorage.consoleHistory.substr(localStorage.consoleHistory.length / 3, localStorage.consoleHistory.length)
+      } else {
+          console._error(e)
+      }
   }
 }
 

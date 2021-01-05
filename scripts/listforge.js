@@ -1,4 +1,3 @@
-console.log('executed')
 //Если мы находимся на странице авторизации Steam
 if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
     document.getElementById('imageLogin').click()
@@ -33,7 +32,6 @@ if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
 }
 
 async function vote(first) {
-    console.log('vote')
     try {
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
@@ -46,7 +44,6 @@ async function vote(first) {
 
         //Пилюля от жадности
         if (document.getElementById('adblock-notice') != null) document.getElementById('adblock-notice').style.display = 'none'
-        if (document.getElementById('vote-loading-block') != null) document.getElementById('vote-loading-block').style.display = 'none'
         if (document.getElementById('vote-form-block') != null) document.getElementById('vote-form-block').removeAttribute('style')
         if (document.getElementById('blocked-notice') != null) document.getElementById('blocked-notice').style.display = 'none'
         
