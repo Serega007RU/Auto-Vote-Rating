@@ -1630,9 +1630,10 @@ chrome.webRequest.onBeforeSendHeaders.addListener(handler, {
 chrome.runtime.onInstalled.addListener(async function(details) {
     if (details.reason == 'install') {
         chrome.runtime.openOptionsPage()
-    } else if (details.reason == 'update' && details.previousVersion && details.previousVersion.charAt(0) <= 3 && details.previousVersion.charAt(2) <= 4) {
+    } else if (details.reason == 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('4.0.0')) == -1) {
+        console.log('Перенос MinecraftMp в ListForge')
         let oldMinecraftMp = await getValue('AVMRprojectsMinecraftMp')
-        if (oldMinecraftMp != null && typeof oldMinecraftMp === 'function' && oldMinecraftMp.length > 0) {
+        if (oldMinecraftMp != null && typeof oldMinecraftMp != 'function' && oldMinecraftMp.length > 0) {
             for (old of oldMinecraftMp) {
                 let newListForge = {}
                 newListForge.ListForge = true
@@ -1649,6 +1650,18 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         }
     }
 })
+
+function Version(s){
+  this.arr = s.split('.').map(Number);
+}
+Version.prototype.compareTo = function(v){
+  for (var i=0; ;i++) {
+    if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1;
+    if (i>=this.arr.length) return -1;
+    var diff = this.arr[i]-v.arr[i]
+    if (diff) return diff>0 ? 1 : -1;
+  }
+}
 
 const varToString = varObj=>Object.keys(varObj)[0]
 
