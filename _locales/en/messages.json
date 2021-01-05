@@ -4,7 +4,7 @@
     "description": "The title of the application, displayed in the web store."
   },
   "appDesc": {
-    "message": "Automatic voting on ratings for projects or servers",
+    "message": "Automatic voting on ratings for projects or servers (gaming)",
     "description": "The description of the application, displayed in the web store."
   },
   "addButton": {
@@ -46,6 +46,9 @@
   "enterNick": {
     "message": "Enter your nickname",
     "description": "Input. Enter your nick"
+  },
+  "enterNickOptional": {
+    "message": "Enter your nickname (optional)"
   },
   "siteTop": {
     "message": "Ranking site",
@@ -146,6 +149,10 @@
     "message": "Export settings",
     "description": "Button. Export"
   },
+  "exportLogs": {
+    "message": "Export logs",
+    "description": "Button. Export"
+  },
   "addedProjects": {
     "message": "List of projects you have already added",
     "description": "Header. Added projects"
@@ -220,7 +227,7 @@
     "message": "On MinecraftIpList, you can only vote for 5 projects at a time."
   },
   "oneProject": {
-    "message": "On $project$, you can only vote for 1 project at a time</div>",
+    "message": "On $project$, you can only vote for 1 project at a time",
     "placeholders": {
       "project": {
         "content": "$1"
@@ -315,10 +322,10 @@
     "message": "Come up with a name"
   },
   "exporting": {
-    "message": "Exporting settings..."
+    "message": "Exporting..."
   },
   "exportingEnd": {
-    "message": "Export of settings completed successfully"
+    "message": "Export completed successfully"
   },
   "importing": {
     "message": "Importing settings..."
@@ -348,20 +355,10 @@
     "message": "Close tab"
   },
   "projectIDTooltip": {
-    "message": "Project <span style='color:red;'>ID</span> can be obtained from the address bar while on the project page, for example: <br> $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
+    "message": " of the project can be obtained from the address bar while on the project page, for example: "
   },
   "gameIDTooltip": {
-    "message": "Game <span style='color:red;'>ID</span> can be obtained from the address bar while on the project page, for example: <br> $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
+    "message": " of the game can be obtained from the address bar while on the project page, for example: "
   },
   "inputProjectID": {
     "message": "Enter ID"
@@ -577,6 +574,9 @@
   "errorCheckSchemeProxy": {
     "message": "Unable to determine the type of proxy, this proxy is probably dead."
   },
+  "authSteam": {
+    "message": "Requires auth Steam"
+  },
   "privacyPass": {
     "message": "Install the "
   },
@@ -632,7 +632,10 @@
     "message": "Choose language/region"
   },
   "chooseGame": {
-    "message": "Enter a game or select from the list"
+    "message": "Enter the game ID or select from the list"
+  },
+  "chooseGameURL": {
+    "message": "Enter the game URL or select from the list"
   },
   "idGame": {
     "message": "Game ID"
@@ -645,6 +648,9 @@
   },
   "voteResumed": {
     "message": "Auto-voting resumed"
+  },
+  "urlGame": {
+    "message": "Game URL"
   },
   "stats": {
     "message": "Stats $project$",
@@ -752,5 +758,26 @@
   },
   "sheldTime": {
     "message": "Schedule a vote"
+  },
+  "discordLogIn": {
+    "message": "You must be logged in to upvote bots!"
+  },
+  "auth": {
+    "message": "Only registered users can vote on this rating. Please log in or register."
+  },
+  "emptySite": {
+    "message": "It seems that this rating gave out an empty page, try to go to the site of this rating and then try again to add"
+  },
+  "ordinalWorld": {
+    "message": "Ordinal number of world"
+  },
+  "ordinalWorldTooltip": {
+    "message": "Ordinal number of world is the number in order that is located in the list of selected worlds when voting"
+  },
+  "requiredNick": {
+    "message": "Where's the nickname? There is no steam authorization button so i need a nickname and in this case it is mandatory"
+  },
+  "alertCaptcha": {
+    "message": "On this rating, there is a captcha that the extension cannot pass, you will need to manually pass it, the extension will notify you in notifications about the need to pass the captcha."
   }
 }
