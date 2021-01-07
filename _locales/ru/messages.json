@@ -550,6 +550,9 @@
   "deleteAll": {
     "message": "Удалить все прокси"
   },
+  "deleteNotWorking": {
+    "message": "Удалить нерабочие прокси"
+  },
   "clearCookies": {
     "message": "Удалить куки"
   },
@@ -558,6 +561,12 @@
   },
   "deletedAllProxies": {
     "message": "Все прокси успешно удалены!"
+  },
+  "deletingNotWorkingProxies": {
+    "message": "Удаляю нерабочие прокси..."
+  },
+  "deletedNotWorkingProxies": {
+    "message": "Все нерабочие прокси успешно удалены!"
   },
   "deletingAllVK": {
     "message": "Удаляю все куки и вкладки ВКонтакте..."

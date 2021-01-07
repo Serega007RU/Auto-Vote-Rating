@@ -586,6 +586,9 @@
   "deleteAll": {
     "message": "Delete all"
   },
+  "deleteNotWorking": {
+    "message": "Remove non-working proxies"
+  },
   "clearCookies": {
     "message": "Clear cookies"
   },
@@ -594,6 +597,12 @@
   },
   "deletedAllProxies": {
     "message": "All proxies were successfully deleted!"
+  },
+  "deletingNotWokingProxies": {
+    "message": "I delete non-working proxies..."
+  },
+  "deletedNotWokingProxies": {
+    "message": "All non-working proxies have been successfully removed!"
   },
   "deletingAllVKCookies": {
     "message": "I delete all Vkontakte cookies..."

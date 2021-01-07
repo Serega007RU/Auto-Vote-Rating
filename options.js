@@ -832,6 +832,18 @@ async function checkAuthVK() {
 //     updateStatusVK(createMessage(chrome.i18n.getMessage('deletedAllVKCookies'), false, 'success')
 // })
 
+//Слушатель кнопки 'Удалить нерабочие' прокси
+document.getElementById('deleteNotWorkingProxies').addEventListener('click', async () => {
+    updateStatusProxy(chrome.i18n.getMessage('deletingNotWorkingProxies'), true)
+    let proxiesCopy = [...proxies]
+    for (let prox of proxiesCopy) {
+        if (prox.notWorking) {
+            await removeProxyList(prox, false)
+        }
+    }
+    updateStatusProxy(chrome.i18n.getMessage('deletedNotWorkingProxies'), false, 'success')
+})
+
 //Слушатель кнопки 'Удалить всё' на Прокси
 document.getElementById('deleteAllProxies').addEventListener('click', async () => {
     updateStatusProxy(chrome.i18n.getMessage('deletingAllProxies'), true)

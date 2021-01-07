@@ -737,6 +737,10 @@ ul li:hover {
   background: #d32f2f !important;
 }
 
+.deleteProject:hover, #deleteNotWorkingProxies {
+  background: #d32f2f !important;
+}
+
 .statsProject:hover {
   background: #1A7BEE;
 }
