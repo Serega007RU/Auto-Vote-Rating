@@ -984,7 +984,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             }
         })
     }
-}, {urls: ["<all_urls>"]})
+})
 
 //Слушатель ошибок net::ERR для вкладок
 chrome.webNavigation.onErrorOccurred.addListener(function(details) {
@@ -1002,7 +1002,7 @@ chrome.webNavigation.onErrorOccurred.addListener(function(details) {
         }
     }
     endVote({message: chrome.i18n.getMessage('errorVoteUnknown')} + details.error, sender, project)
-}, {urls: ["<all_urls>"]})
+})
 
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
