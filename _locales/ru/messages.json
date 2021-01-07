@@ -583,6 +583,15 @@
   "importWindscribeEnd": {
     "message": "Импорт с Windscribe успешно завершён"
   },
+  "importHolaVPN": {
+    "message": "Импорт прокси с HolaVPN"
+  },
+  "importHolaVPNStart": {
+    "message": "Начинаю импорт с HolaVPN"
+  },
+  "importHolaVPNEnd": {
+    "message": "Импорт с HolaVPN успешно завершён"
+  },
   "randomize": {
     "message": "Рандомизировать следующее голосование"
   },

@@ -610,6 +610,24 @@
   "importTunnelBearEnd": {
     "message": "Import from TunnelBear completed successfully"
   },
+  "importWindscribe": {
+    "message": "Importing proxies from Windscribe"
+  },
+  "importWindscribeStart": {
+    "message": "Starting import from Windscribe"
+  },
+  "importWindscribeEnd": {
+    "message": "Import from Windscribe completed successfully"
+  },
+  "importHolaVPN": {
+    "message": "Importing proxies from HolaVPN"
+  },
+  "importHolaVPNStart": {
+    "message": "Starting import from HolaVPN"
+  },
+  "importHolaVPNEnd": {
+    "message": "Import from HolaVPN completed successfully"
+  },
   "randomize": {
     "message": "Randomize the next vote"
   },

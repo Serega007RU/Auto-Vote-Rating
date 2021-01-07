@@ -1011,6 +1011,33 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
     updateStatusProxy(chrome.i18n.getMessage('importWindscribeEnd'), false, 'success')
 })
 
+//Слушатель на импорт с HolaVPN
+document.getElementById('importHolaVPN').addEventListener('click', async () => {
+    updateStatusProxy(chrome.i18n.getMessage('importHolaVPNStart'), true)
+    let response = await fetch('https://client.hola.org/client_cgi/vpn_countries.json')
+    const countries = await response.json()
+    for (country of countries) {
+        response = await fetch('https://client.hola.org/client_cgi/zgettunnels?country=' + country + '&limit=999&is_premium=1', {
+            "headers": {
+                "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            },
+            "body": "uuid=9cbc8085ce543d2ae846e8283e765ba9&session_key=2831647035",
+            "method": "POST"
+        })
+        const vpns = await response.json()
+        for (vpn of vpns.ztun[country]) {
+            const proxy = {
+                ip: vpn.replace('HTTP ', '').replace(':22222', ''),
+                port: 22223,
+                scheme: 'https',
+                HolaVPN: true
+            }
+            await addProxy(proxy)
+        }
+    }
+    updateStatusProxy(chrome.i18n.getMessage('importHolaVPNEnd'), false, 'success')
+})
+
 async function addProxy(proxy) {
     updateStatusProxy(chrome.i18n.getMessage('adding'), true)
     for (let prox of proxies) {

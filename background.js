@@ -2076,6 +2076,15 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 }
             })
             return
+        } else if (currentProxy.HolaVPN) {
+            console.log('Прокси HolaVPN требует авторизацию, авторизовываюсь...')
+            callbackFn({
+                authCredentials: {
+                    'username': 'user-uuid-c1b9e2c1bbab1664da384d748ef3899c',
+                    'password': '6e07f7fa2eda'
+                }
+            })
+            return
         } else {
             currentProxy.notWorking = true
             console.error('Ошибка авторизации прокси! Данный прокси требует авторизацию по логину и паролю но вы его не задали в прокси')
