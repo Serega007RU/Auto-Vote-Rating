@@ -610,14 +610,16 @@ async function removeProxyList(proxy, visually) {
 }
 
 //Перезагрузка списка проектов
-function updateProjectList(projects) {
+function updateProjectList(projects, key) {
     if (projects != null) {
-        const projectName = getProjectName(projects[0])
-        while (document.getElementById(projectName + 'List').nextElementSibling != null) {
-            document.getElementById(projectName + 'List').nextElementSibling.remove()
-        }
-        for (project of projects) {
-            addProjectList(project, true)
+        if (key.includes('AVMRprojects')) {
+            const projectName = getProjectName(projects[0])
+            while (document.getElementById(projectName + 'List').nextElementSibling != null) {
+                document.getElementById(projectName + 'List').nextElementSibling.remove()
+            }
+            for (project of projects) {
+                addProjectList(project, true)
+            }
         }
     } else {
         for (const item of allProjects) {
@@ -634,19 +636,23 @@ function updateProjectList(projects) {
     }
 
     //Список ВКонтакте
-    while (document.getElementById('VKList').nextElementSibling != null) {
-        document.getElementById('VKList').nextElementSibling.remove()
-    }
-    for (let vkontakte of VKs) {
-        addVKList(vkontakte, true)
+    if (projects == null || key == 'AVMRVKs') {
+        while (document.getElementById('VKList').nextElementSibling != null) {
+            document.getElementById('VKList').nextElementSibling.remove()
+        }
+        for (let vkontakte of VKs) {
+            addVKList(vkontakte, true)
+        }
     }
 
     //Список прокси
-    while (document.getElementById('ProxyList').nextElementSibling != null) {
-        document.getElementById('ProxyList').nextElementSibling.remove()
-    }
-    for (let proxy of proxies) {
-        addProxyList(proxy, true)
+    if (projects == null || key == 'AVMRproxies') {
+        while (document.getElementById('ProxyList').nextElementSibling != null) {
+            document.getElementById('ProxyList').nextElementSibling.remove()
+        }
+        for (let proxy of proxies) {
+            addProxyList(proxy, true)
+        }
     }
 }
 
@@ -1744,17 +1750,18 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         } else if (key == 'generalStats') {
             generalStats = storageChange.newValue
             return
-        }
-        else if (key == 'AVMRproxies' || key == 'AVMRVKs') {
+        } else if (key == 'AVMRproxies' || key == 'AVMRVKs') {
             if (key == 'AVMRproxies') proxies = storageChange.newValue
             if (key == 'AVMRVKs') VKs = storageChange.newValue
-            updateProjectList(storageChange.newValue)
+            if (storageChange.oldValue.length == storageChange.newValue.length) {
+                updateProjectList(storageChange.newValue, key)
+            }
             return
         }
         if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function'))
             return
         if (storageChange.oldValue.length == storageChange.newValue.length) {
-            updateProjectList(storageChange.newValue)
+            updateProjectList(storageChange.newValue, key)
         }
     }
 })
