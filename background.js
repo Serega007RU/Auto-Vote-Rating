@@ -324,9 +324,12 @@ async function newWindow(project) {
             }
         } else if (project.TMonitoring)
             url = 'https://tmonitoring.com/server/' + project.id + '/'
-        else if (project.TopGG)
-            url = 'https://top.gg/bot/' + project.id + '/vote'
-        else if (project.DiscordBotList)
+        else if (project.TopGG) {
+            if (!project.game) {
+                project.game = 'bot'
+            }
+            url = 'https://top.gg/' + project.game + '/' + project.id + '/vote'
+        } else if (project.DiscordBotList)
             url = 'https://discordbotlist.com/bots/' + project.id + '/upvote'
         else if (project.BotsForDiscord)
             url = 'https://botsfordiscord.com/bot/' + project.id + '/vote'
