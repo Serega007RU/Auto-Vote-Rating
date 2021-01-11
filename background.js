@@ -1004,7 +1004,7 @@ chrome.webNavigation.onErrorOccurred.addListener(function(details) {
             id: details.tabId
         }
     }
-    endVote({message: chrome.i18n.getMessage('errorVoteUnknown')} + details.error, sender, project)
+    endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + details.error}, sender, project)
 })
 
 //Слушатель сообщений и ошибок
