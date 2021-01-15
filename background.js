@@ -1109,6 +1109,11 @@ async function endVote(request, sender, project) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
             time.setUTCHours(20, (project.priority ? 1 : 10), 0, 0)
+        } else if (project.BotsForDiscord) {
+            if (time.getUTCHours() > 12 || (time.getUTCHours() == 12 && time.getUTCMinutes() >= (project.priority ? 1 : 10))) {
+                time.setUTCDate(time.getUTCDate() + 1)
+            }
+            time.setUTCHours(12, (project.priority ? 1 : 10), 0, 0)
         }
         if (request.later && request.later != true) {
             time = new Date(request.later)
@@ -1121,7 +1126,7 @@ async function endVote(request, sender, project) {
                 }
             }
         } else {
-            if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList || project.BotsForDiscord) {
+            if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList) {
                 time.setUTCHours(time.getUTCHours() + 12)
             } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers) {
                 time.setUTCDate(time.getUTCDate() + 1)
