@@ -423,6 +423,9 @@ async function addProjectList(project, visually) {
         addCustom()
     //projects.push(project)
     //await setValue('AVMRprojects', projects, true)
+    if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
+        document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
+    }
 }
 
 //Удалить проект из списка проекта
