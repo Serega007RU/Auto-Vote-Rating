@@ -1420,25 +1420,22 @@ async function fastAdd() {
 }
 
 function addCustom() {
-    if (document.getElementById('project').children[29] == null) {
-        let option = document.createElement('option')
-        option.setAttribute('value', 'Custom')
-        option.textContent = chrome.i18n.getMessage('Custom')
-        document.getElementById('project').insertBefore(option, document.getElementById('project').children[29])
+    if (document.querySelector('option[value="Custom"]').hidden) {
+        document.querySelector('option[value="Custom"]').hidden = false
     }
 
-//     if (document.getElementById('CustomButton') == null) {
-//         let buttonMS = document.createElement('button')
-//         buttonMS.setAttribute('class', 'selectsite')
-//         buttonMS.setAttribute('id', 'CustomButton')
-//         buttonMS.setAttribute('hidden', false)
-//         buttonMS.textContent = chrome.i18n.getMessage('Custom')
-//         document.querySelector('#added > div > div:nth-child(4)').insertBefore(buttonMS, document.querySelector('#added > div > div:nth-child(4)').children[4])
+//  if (document.getElementById('CustomButton') == null) {
+//      let buttonMS = document.createElement('button')
+//      buttonMS.setAttribute('class', 'selectsite')
+//      buttonMS.setAttribute('id', 'CustomButton')
+//      buttonMS.setAttribute('hidden', false)
+//      buttonMS.textContent = chrome.i18n.getMessage('Custom')
+//      document.querySelector('#added > div > div:nth-child(4)').insertBefore(buttonMS, document.querySelector('#added > div > div:nth-child(4)').children[4])
 
-//         document.getElementById('CustomButton').addEventListener('click', function() {
-//             listSelect(event, 'CustomTab')
-//         })
-//     }
+//      document.getElementById('CustomButton').addEventListener('click', function() {
+//          listSelect(event, 'CustomTab')
+//      })
+//  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
         setValue('AVMRsettings', settings, false)
