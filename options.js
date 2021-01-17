@@ -476,6 +476,9 @@ async function addProjectList(project, visually) {
         addCustom()
     //projects.push(project)
     //await setValue('AVMRprojects', projects, true)
+    if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
+        document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
+    }
 }
 
 //Добавить аккаунт ВКонтакте в список
@@ -1138,6 +1141,8 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         project.game = document.getElementById('chooseGameMMoTopRU').value
         project.lang = document.getElementById('selectLangMMoTopRU').value
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
+    } else if (project.TopGG) {
+        project.game = document.getElementById('chooseTopGG').value
     }
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
@@ -1277,7 +1282,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             url = 'https://tmonitoring.com/server/' + project.id + '/'
             jsPath = 'div[class="info clearfix"] > div.pull-left > h1'
         } else if (project.TopGG) {
-            url = 'https://top.gg/bot/' + project.id + '/vote'
+            url = 'https://top.gg/' + project.game + '/' + project.id + '/vote'
             jsPath = '#entity-title'
         } else if (project.DiscordBotList) {
             url = 'https://discordbotlist.com/bots/' + project.id
@@ -1408,6 +1413,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             }
 
             if (projectURL != '') {
+                projectURL = projectURL.trim()
                 if (project.HotMC) {
                     projectURL = projectURL.replace(' сервер Майнкрафт', '')
                 } else if (project.ListForge) {
@@ -1418,14 +1424,14 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 project.name = projectURL
             }
 
-//             if (project.nick == '') {
-//                 if (projectURL != '') {
-//                     delete project.name
-//                     project.nick = projectURL
-//                 } else {
-//                     project.nick = project.id
-//                 }
-//             }
+//          if (project.nick == '') {
+//              if (projectURL != '') {
+//                  delete project.name
+//                  project.nick = projectURL
+//              } else {
+//                  project.nick = project.id
+//              }
+//          }
         } catch (e) {
             console.error(e)
         }
@@ -2158,25 +2164,22 @@ async function fastAdd() {
 }
 
 function addCustom() {
-    if (document.getElementById('project').children[29] == null) {
-        let option = document.createElement('option')
-        option.setAttribute('value', 'Custom')
-        option.textContent = chrome.i18n.getMessage('Custom')
-        document.getElementById('project').insertBefore(option, document.getElementById('project').children[29])
+    if (document.querySelector('option[value="Custom"]').hidden) {
+        document.querySelector('option[value="Custom"]').hidden = false
     }
 
-//     if (document.getElementById('CustomButton') == null) {
-//         let buttonMS = document.createElement('button')
-//         buttonMS.setAttribute('class', 'selectsite')
-//         buttonMS.setAttribute('id', 'CustomButton')
-//         buttonMS.setAttribute('hidden', false)
-//         buttonMS.textContent = chrome.i18n.getMessage('Custom')
-//         document.querySelector('#added > div > div:nth-child(4)').insertBefore(buttonMS, document.querySelector('#added > div > div:nth-child(4)').children[4])
+//  if (document.getElementById('CustomButton') == null) {
+//      let buttonMS = document.createElement('button')
+//      buttonMS.setAttribute('class', 'selectsite')
+//      buttonMS.setAttribute('id', 'CustomButton')
+//      buttonMS.setAttribute('hidden', false)
+//      buttonMS.textContent = chrome.i18n.getMessage('Custom')
+//      document.querySelector('#added > div > div:nth-child(4)').insertBefore(buttonMS, document.querySelector('#added > div > div:nth-child(4)').children[4])
 
-//         document.getElementById('CustomButton').addEventListener('click', function() {
-//             listSelect(event, 'CustomTab')
-//         })
-//     }
+//      document.getElementById('CustomButton').addEventListener('click', function() {
+//          listSelect(event, 'CustomTab')
+//      })
+//  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
         setValue('AVMRsettings', settings, false)
@@ -2618,6 +2621,14 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('gameListListForge').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
         document.getElementById('chooseGameListForge').style.display = 'none'
+    }
+
+    if (selectedTop.value == 'TopGG') {
+        document.getElementById('chooseTopGG1').removeAttribute('style')
+        document.getElementById('chooseTopGG').removeAttribute('style')
+    } else if (laterChoose == 'TopGG') {
+        document.getElementById('chooseTopGG1').style.display = 'none'
+        document.getElementById('chooseTopGG').style.display = 'none'
     }
 
     laterChoose = selectedTop.value

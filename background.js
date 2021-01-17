@@ -614,9 +614,12 @@ async function newWindow(project) {
             }
         } else if (project.TMonitoring)
             url = 'https://tmonitoring.com/server/' + project.id + '/'
-        else if (project.TopGG)
-            url = 'https://top.gg/bot/' + project.id + '/vote'
-        else if (project.DiscordBotList)
+        else if (project.TopGG) {
+            if (!project.game) {
+                project.game = 'bot'
+            }
+            url = 'https://top.gg/' + project.game + '/' + project.id + '/vote'
+        } else if (project.DiscordBotList)
             url = 'https://discordbotlist.com/bots/' + project.id + '/upvote'
         else if (project.BotsForDiscord)
             url = 'https://botsfordiscord.com/bot/' + project.id + '/vote'
@@ -1292,7 +1295,7 @@ chrome.webNavigation.onErrorOccurred.addListener(function(details) {
             id: details.tabId
         }
     }
-    endVote({message: chrome.i18n.getMessage('errorVoteUnknown')} + details.error, sender, project)
+    endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + details.error}, sender, project)
 })
 
 //Слушатель сообщений и ошибок
@@ -1393,6 +1396,11 @@ async function endVote(request, sender, project) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
             time.setUTCHours(20, (project.priority ? 1 : 10), 0, 0)
+        } else if (project.BotsForDiscord) {
+            if (time.getUTCHours() > 12 || (time.getUTCHours() == 12 && time.getUTCMinutes() >= (project.priority ? 1 : 10))) {
+                time.setUTCDate(time.getUTCDate() + 1)
+            }
+            time.setUTCHours(12, (project.priority ? 1 : 10), 0, 0)
         }
         if (request.later && request.later != true) {
             time = new Date(request.later)
@@ -1405,7 +1413,7 @@ async function endVote(request, sender, project) {
                 }
             }
         } else {
-            if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList || project.BotsForDiscord) {
+            if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList) {
                 time.setUTCHours(time.getUTCHours() + 12)
             } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers) {
                 time.setUTCDate(time.getUTCDate() + 1)

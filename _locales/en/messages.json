@@ -806,5 +806,14 @@
   },
   "alertCaptcha": {
     "message": "On this rating, there is a captcha that the extension cannot pass, you will need to manually pass it, the extension will notify you in notifications about the need to pass the captcha."
+  },
+  "chooseTopGG": {
+    "message": "What do we vote for?"
+  },
+  "bots": {
+    "message": "Bots"
+  },
+  "servers": {
+    "message": "Guilds"
   }
 }
