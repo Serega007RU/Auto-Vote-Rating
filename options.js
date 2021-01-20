@@ -208,7 +208,7 @@ async function restoreOptions() {
 
     //Слушатель дополнительных настроек
     let checkbox = document.querySelectorAll('input[name=checkbox]')
-    for (check of checkbox) {
+    for (const check of checkbox) {
         check.addEventListener('change', async function() {
             if (this.id == 'disabledNotifStart')
                 settings.disabledNotifStart = this.checked
@@ -468,7 +468,7 @@ function updateProjectList(projects) {
         while (document.getElementById(projectName + 'List').nextElementSibling != null) {
             document.getElementById(projectName + 'List').nextElementSibling.remove()
         }
-        for (project of projects) {
+        for (const project of projects) {
             addProjectList(project, true)
         }
     } else {
@@ -992,7 +992,7 @@ var fileTimeout
 function updateStatus(message, type, disableTimer, level, element) {
     if (level) {
         if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-            for (m in message) {
+            for (const m in message) {
                 if (typeof message[m] === 'string') {
                     message[m] = createMessage(message[m], level)
                 }
@@ -1020,7 +1020,7 @@ function updateStatus(message, type, disableTimer, level, element) {
     while (status.firstChild)
        status.firstChild.remove()
     if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-        for (m of message) {
+        for (const m of message) {
             status.append(m)
         }
     } else {
@@ -1107,7 +1107,7 @@ async function setValue(key, value, updateStatus) {
 
 //Слушатель на изменение настроек
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-    for (var key in changes) {
+    for (const key in changes) {
         var storageChange = changes[key]
         if (key.startsWith('AVMRprojects'))
             this['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
@@ -1341,7 +1341,7 @@ async function fastAdd() {
             document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
         let listFastAdd = document.getElementById('modaltext')
         listFastAdd.textContent = ''
-        for (fastProj of getUrlProjects()) {
+        for (const fastProj of getUrlProjects()) {
             let html = document.createElement('div')
             html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id)
             html.appendChild(svgFail.cloneNode(true))
@@ -1475,12 +1475,12 @@ function tabSelect(evt, tabs) {
     var i, tabcontent, tablinks
 
     tabcontent = document.getElementsByClassName('tabcontent')
-    for (i = 0; i < tabcontent.length; i++) {
+    for (let i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = 'none'
     }
 
     tablinks = document.getElementsByClassName('tablinks')
-    for (i = 0; i < tablinks.length; i++) {
+    for (let i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(' active', '')
     }
 
@@ -1528,12 +1528,12 @@ function listSelect(evt, tabs) {
     var x, listcontent, selectsite
 
     listcontent = document.getElementsByClassName('listcontent')
-    for (x = 0; x < listcontent.length; x++) {
+    for (let x = 0; x < listcontent.length; x++) {
         listcontent[x].style.display = 'none'
     }
 
     selectsite = document.getElementsByClassName('selectsite')
-    for (x = 0; x < selectsite.length; x++) {
+    for (let x = 0; x < selectsite.length; x++) {
         selectsite[x].className = selectsite[x].className.replace(' activeList', '')
     }
 
