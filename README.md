@@ -5,7 +5,7 @@ Auto Vote Rating - Chrome Extension
 Ссылки на рассширение от куда его можно поставить:   
 [Chrome Web Store](https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd)   
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/auto-vote-rating/)   
-[Opera Addons]()   
+[Opera Addons](https://addons.opera.com/ru/extensions/details/auto-vote-minecraft-rating/)   
 [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/auto-vote-rating/ecoifpgiojfhmihcfomafdcmkphafpba)   
 
 Проверено на следующих браузерах:
