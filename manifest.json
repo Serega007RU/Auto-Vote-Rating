@@ -3,7 +3,7 @@
    "short_name": "AVR",
    "author": "Serega007",
    "background": {
-      "scripts": [ "background.js" ],
+      "scripts": [ "background.js", "scripts/minecraftiplist.js" ],
       "persistent": true
    },
    "description": "__MSG_appDesc__",
