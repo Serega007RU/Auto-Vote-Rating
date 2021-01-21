@@ -328,8 +328,7 @@ async function restoreOptions() {
 //Добавить проект в список проекта
 async function addProjectList(project, visually) {
     let listProject = document.getElementById(getProjectName(project) + 'List')
-    if (listProject.textContent == chrome.i18n.getMessage('notAdded'))
-        listProject.textContent = ''
+    listProject.parentElement.firstElementChild.style.display = 'none'
     let li = document.createElement('li')
     let id = getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)
     li.id = 'div┄' + id
@@ -371,7 +370,7 @@ async function addProjectList(project, visually) {
 
     li.append(chrome.i18n.getMessage('nextVote') + ' ' + text)
 
-    listProject.after(li)
+    listProject.append(li)
     //Слушатель кнопки Удалить на проект
     document.getElementById(id).addEventListener('click', function() {
         removeProjectList(project, false)
@@ -436,7 +435,7 @@ async function removeProjectList(project, visually) {
         return
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).removeEventListener('click', function() {})
     document.getElementById('div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).remove()
-    if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'List').textContent = (chrome.i18n.getMessage('notAdded'))
+    if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'Tab').firstElementChild.removeAttribute('style')
     if (visually)
         return
     for (let i = getProjectList(project).length; i--; ) {
@@ -465,17 +464,13 @@ async function removeProjectList(project, visually) {
 function updateProjectList(projects) {
     if (projects != null) {
         const projectName = getProjectName(projects[0])
-        while (document.getElementById(projectName + 'List').nextElementSibling != null) {
-            document.getElementById(projectName + 'List').nextElementSibling.remove()
-        }
+        document.getElementById(projectName + 'List').parentNode.replaceChild(document.getElementById(projectName + 'List').cloneNode(false), document.getElementById(projectName + 'List'))
         for (project of projects) {
             addProjectList(project, true)
         }
     } else {
         for (const item of allProjects) {
-            while (document.getElementById(item + 'List').nextElementSibling != null) {
-                document.getElementById(item + 'List').nextElementSibling.remove()
-            }
+            document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
         }
         forLoopAllProjects(async function(proj) {
             await addProjectList(proj, true)

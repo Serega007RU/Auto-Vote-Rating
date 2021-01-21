@@ -713,7 +713,7 @@ ul li:hover {
   margin-right: 0.25rem;
 }
 
-.listcontent > li > div {
+.listcontent li > div {
   float: right;
   margin-top: 14px;
 }
