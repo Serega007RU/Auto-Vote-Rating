@@ -27,6 +27,9 @@ var projectsMCServers = []
 var projectsMinecraftList = []
 var projectsMinecraftIndex = []
 var projectsServerList101 = []
+var projectsMCServerList = []
+var projectsCraftList = []
+var projectsCzechCraft = []
 var projectsCustom = []
 
 var allProjects = [
@@ -58,6 +61,9 @@ var allProjects = [
     'MinecraftList',
     'MinecraftIndex',
     'ServerList101',
+    'MCServerList',
+    'CraftList',
+    'CzechCraft',
     'Custom'
 ]
 
@@ -684,6 +690,15 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         } else if (project.ServerList101) {
             url = 'https://serverlist101.com/server/' + project.id + '/'
             jsPath = 'li > h1'
+        } else if (project.MCServerList) {
+            url = 'https://mcserver-list.eu/server/?id=' + project.id
+            jsPath = 'p.title'
+        } else if (project.CraftList) {
+            url = 'https://craftlist.org/' + project.id
+            jsPath = 'main h1'
+        } else if (project.CzechCraft) {
+            url = 'https://czech-craft.eu/server/' + project.id + '/'
+            jsPath = 'a.server-name'
         }
 
         let response
@@ -707,7 +722,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             updateStatusAdd(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, true, element, 'error')
             return
         } else if (response.redirected) {
-            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) {
+            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.MCServerList || project.CraftList) {
                 updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
                 return
             }
@@ -1177,6 +1192,9 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         projectsMinecraftList,
         projectsMinecraftIndex,
         projectsServerList101,
+        projectsMCServerList,
+        projectsCraftList,
+        projectsCzechCraft,
         projectsCustom,
         settings,
         generalStats
@@ -1722,6 +1740,18 @@ selectedTop.addEventListener('change', function() {
     } else if (selectedTop.value == 'ServerList101') {
         document.getElementById('projectIDTooltip1').textContent = 'https://serverlist101.com/server/'
         document.getElementById('projectIDTooltip2').textContent = '1547'
+        document.getElementById('projectIDTooltip3').textContent = '/vote/'
+    } else if (selectedTop.value == 'MCServerList') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://mcserver-list.eu/hlasovat/?id='
+        document.getElementById('projectIDTooltip2').textContent = '307'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'CraftList') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://craftlist.org/'
+        document.getElementById('projectIDTooltip2').textContent = 'basicland'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'CzechCraft') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://czech-craft.eu/server/'
+        document.getElementById('projectIDTooltip2').textContent = 'trenend'
         document.getElementById('projectIDTooltip3').textContent = '/vote/'
     }
 

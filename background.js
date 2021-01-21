@@ -27,6 +27,9 @@ var projectsMCServers = []
 var projectsMinecraftList = []
 var projectsMinecraftIndex = []
 var projectsServerList101 = []
+var projectsMCServerList = []
+var projectsCraftList = []
+var projectsCzechCraft = []
 var projectsCustom = []
 
 var allProjects = [
@@ -350,6 +353,12 @@ async function newWindow(project) {
             url = 'https://www.minecraft-index.com/' + project.id + '/vote'
         else if (project.ServerList101)
             url = 'https://serverlist101.com/server/' + project.id + '/vote/'
+        else if (project.MCServerList)
+            url = 'https://mcserver-list.eu/hlasovat/?id=' + project.id
+        else if (project.CraftList)
+            url = 'https://craftlist.org/' + project.id
+        else if (project.CzechCraft)
+            url = 'https://czech-craft.eu/server/' + project.id + '/vote/'
         
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url: url, active: false}, function(tab_) {
@@ -1041,7 +1050,7 @@ async function endVote(request, sender, project) {
         openedProjects.delete(sender.tab.id)
     } else if (!project)
         return
-    //Что?
+
     if (settings.cooldown < 10000) {
         setTimeout(()=>{
             for (let value of queueProjects) {
@@ -1131,7 +1140,7 @@ async function endVote(request, sender, project) {
         } else {
             if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList) {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers) {
+            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList) {
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (project.ServeurPrive || project.TopGames) {
                 project.countVote = project.countVote + 1
@@ -1160,6 +1169,10 @@ async function endVote(request, sender, project) {
                 } else {
                     time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
                 }
+            } else if (project.MCServerList) {
+                time.setUTCHours(time.getUTCHours() + 2)
+            } else if (project.CraftList) {
+                time = new Date(request.successfully)
             }
         }
 
