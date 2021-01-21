@@ -989,7 +989,7 @@ async function silentVote(project) {
             function generatePass(nb) {
                 let chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@'
                 let pass = ''
-                for (i = 0; i < nb; i++) {
+                for (let i = 0; i < nb; i++) {
                     let wpos = Math.round(Math.random() * chars.length)
                     pass += chars.substring(wpos, wpos + 1)
                 }
@@ -1158,10 +1158,10 @@ async function silentVote(project) {
             code = 0
             code2 = 0
 
-            for (i = 0; i < 6; i++) {
+            for (let i = 0; i < 6; i++) {
                 code += content[i] << (i * 5)
             }
-            for (i = 6; i < 9; i++) {
+            for (let i = 6; i < 9; i++) {
                 code2 += content[i] << ((i - 6) * 5)
             }
 
@@ -2110,7 +2110,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         console.log('Перенос MinecraftMp в ListForge')
         let oldMinecraftMp = await getValue('AVMRprojectsMinecraftMp')
         if (oldMinecraftMp != null && typeof oldMinecraftMp != 'function' && oldMinecraftMp.length > 0) {
-            for (old of oldMinecraftMp) {
+            for (const old of oldMinecraftMp) {
                 let newListForge = {}
                 newListForge.ListForge = true
                 newListForge.game = 'minecraft-mp.com'
@@ -2203,7 +2203,7 @@ function Version(s){
   this.arr = s.split('.').map(Number);
 }
 Version.prototype.compareTo = function(v){
-  for (var i=0; ;i++) {
+  for (let i=0; ;i++) {
     if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1;
     if (i>=this.arr.length) return -1;
     var diff = this.arr[i]-v.arr[i]
@@ -2312,7 +2312,7 @@ console._collect = function (type, args) {
   try {
       if (localStorage.consoleHistory.length) localStorage.consoleHistory += '\n'
       localStorage.consoleHistory += '[' + time + ' ' + type.toUpperCase() + ']:'
-      for (i in args) {
+      for (let i in args) {
           let arg = args[i]
           if (typeof arg != 'string')
               arg = JSON.stringify(arg)

@@ -230,7 +230,7 @@ async function restoreOptions() {
 
     //Слушатель дополнительных настроек
     let checkbox = document.querySelectorAll('input[name=checkbox]')
-    for (check of checkbox) {
+    for (const check of checkbox) {
         check.addEventListener('change', async function() {
             if (this.id == 'disabledNotifStart')
                 settings.disabledNotifStart = this.checked
@@ -381,8 +381,7 @@ async function restoreOptions() {
 //Добавить проект в список проекта
 async function addProjectList(project, visually) {
     let listProject = document.getElementById(getProjectName(project) + 'List')
-    if (listProject.textContent == chrome.i18n.getMessage('notAdded'))
-        listProject.textContent = ''
+    listProject.parentElement.firstElementChild.style.display = 'none'
     let li = document.createElement('li')
     let id = getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)
     li.id = 'div┄' + id
@@ -424,7 +423,7 @@ async function addProjectList(project, visually) {
 
     li.append(chrome.i18n.getMessage('nextVote') + ' ' + text)
 
-    listProject.after(li)
+    listProject.append(li)
     //Слушатель кнопки Удалить на проект
     document.getElementById(id).addEventListener('click', function() {
         removeProjectList(project, false)
@@ -500,7 +499,7 @@ async function addVKList(VK, visually) {
         html.append(document.createElement('br'))
         html.append(createMessage(chrome.i18n.getMessage('notWork'), {error: true}))
     }
-    listVK.after(html)
+    listVK.append(html)
     document.getElementById(VK.name + '┄' + VK.id).addEventListener('click', function() {
         removeVKList(VK, false)
     })
@@ -528,7 +527,7 @@ async function addProxyList(proxy, visually) {
         html.append(document.createElement('br'))
         html.append(createMessage(chrome.i18n.getMessage('notWork'), {error: true}))
     }
-    listProxy.after(html)
+    listProxy.append(html)
     document.getElementById(proxy.ip + '┄' + proxy.port).addEventListener('click', function() {
         removeProxyList(proxy, false)
     })
@@ -545,7 +544,7 @@ async function removeProjectList(project, visually) {
         return
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).removeEventListener('click', function() {})
     document.getElementById('div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).remove()
-    if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'List').textContent = (chrome.i18n.getMessage('notAdded'))
+    if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'Tab').firstElementChild.removeAttribute('style')
     if (visually)
         return
     for (let i = getProjectList(project).length; i--; ) {
@@ -617,18 +616,14 @@ function updateProjectList(projects, key) {
     if (projects != null) {
         if (key.includes('AVMRprojects')) {
             const projectName = getProjectName(projects[0])
-            while (document.getElementById(projectName + 'List').nextElementSibling != null) {
-                document.getElementById(projectName + 'List').nextElementSibling.remove()
-            }
-            for (project of projects) {
+            document.getElementById(projectName + 'List').parentNode.replaceChild(document.getElementById(projectName + 'List').cloneNode(false), document.getElementById(projectName + 'List'))
+            for (const project of projects) {
                 addProjectList(project, true)
             }
         }
     } else {
         for (const item of allProjects) {
-            while (document.getElementById(item + 'List').nextElementSibling != null) {
-                document.getElementById(item + 'List').nextElementSibling.remove()
-            }
+            document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
         }
         forLoopAllProjects(async function(proj) {
             await addProjectList(proj, true)
@@ -640,9 +635,7 @@ function updateProjectList(projects, key) {
 
     //Список ВКонтакте
     if (projects == null || key == 'AVMRVKs') {
-        while (document.getElementById('VKList').nextElementSibling != null) {
-            document.getElementById('VKList').nextElementSibling.remove()
-        }
+        document.getElementById('VKList').parentNode.replaceChild(document.getElementById('VKList').cloneNode(false), document.getElementById('VKList'))
         for (let vkontakte of VKs) {
             addVKList(vkontakte, true)
         }
@@ -650,9 +643,7 @@ function updateProjectList(projects, key) {
 
     //Список прокси
     if (projects == null || key == 'AVMRproxies') {
-        while (document.getElementById('ProxyList').nextElementSibling != null) {
-            document.getElementById('ProxyList').nextElementSibling.remove()
-        }
+        document.getElementById('ProxyList').parentNode.replaceChild(document.getElementById('ProxyList').cloneNode(false), document.getElementById('ProxyList'))
         for (let proxy of proxies) {
             addProxyList(proxy, true)
         }
@@ -1620,7 +1611,7 @@ var vkTimeout
 function updateStatus(message, type, disableTimer, level, element) {
     if (level) {
         if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-            for (m in message) {
+            for (const m in message) {
                 if (typeof message[m] === 'string') {
                     message[m] = createMessage(message[m], level)
                 }
@@ -1632,15 +1623,29 @@ function updateStatus(message, type, disableTimer, level, element) {
     let status
     if (element != null) {
         status = element
-        if (message.style && message.style.color == 'rgb(76, 175, 80)') {
-            const svg = element.parentElement.firstElementChild
-            svg.setAttribute('stroke', '#4CAF50')
-            svg.firstElementChild.remove()
-            svg.firstElementChild.remove()
-            const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
-            polyline.setAttribute('points', '20 6 9 17 4 12')
-            svg.append(polyline)
-        }
+        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
+            for (const m of message) {
+                if (m.style && m.style.color == 'rgb(76, 175, 80)') {
+                    const svg = element.parentElement.firstElementChild
+                    svg.setAttribute('stroke', '#4CAF50')
+                    svg.firstElementChild.remove()
+                    svg.firstElementChild.remove()
+                    const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
+                    polyline.setAttribute('points', '20 6 9 17 4 12')
+                    svg.append(polyline)
+                }
+            }
+        } else {
+            if (message.style && message.style.color == 'rgb(76, 175, 80)') {
+                const svg = element.parentElement.firstElementChild
+                svg.setAttribute('stroke', '#4CAF50')
+                svg.firstElementChild.remove()
+                svg.firstElementChild.remove()
+                const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
+                polyline.setAttribute('points', '20 6 9 17 4 12')
+                svg.append(polyline)
+            }
+            }
     } else {
         status = document.getElementById(type)
     }
@@ -1648,7 +1653,7 @@ function updateStatus(message, type, disableTimer, level, element) {
     while (status.firstChild)
        status.firstChild.remove()
     if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-        for (m of message) {
+        for (const m of message) {
             status.append(m)
         }
     } else {
@@ -1751,7 +1756,7 @@ async function wait(ms) {
 
 //Слушатель на изменение настроек
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-    for (var key in changes) {
+    for (const key in changes) {
         var storageChange = changes[key]
         if (key.startsWith('AVMRprojects'))
             this['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
@@ -2085,7 +2090,7 @@ async function fastAdd() {
             document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
         let listFastAdd = document.getElementById('modaltext')
         listFastAdd.textContent = ''
-        for (fastProj of getUrlProjects()) {
+        for (const fastProj of getUrlProjects()) {
             let html = document.createElement('div')
             html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id)
             html.appendChild(svgFail.cloneNode(true))
@@ -2219,12 +2224,12 @@ function tabSelect(evt, tabs) {
     var i, tabcontent, tablinks
 
     tabcontent = document.getElementsByClassName('tabcontent')
-    for (i = 0; i < tabcontent.length; i++) {
+    for (let i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = 'none'
     }
 
     tablinks = document.getElementsByClassName('tablinks')
-    for (i = 0; i < tablinks.length; i++) {
+    for (let i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(' active', '')
     }
 
@@ -2278,12 +2283,12 @@ function listSelect(evt, tabs) {
     var x, listcontent, selectsite
 
     listcontent = document.getElementsByClassName('listcontent')
-    for (x = 0; x < listcontent.length; x++) {
+    for (let x = 0; x < listcontent.length; x++) {
         listcontent[x].style.display = 'none'
     }
 
     selectsite = document.getElementsByClassName('selectsite')
-    for (x = 0; x < selectsite.length; x++) {
+    for (let x = 0; x < selectsite.length; x++) {
         selectsite[x].className = selectsite[x].className.replace(' activeList', '')
     }
 
