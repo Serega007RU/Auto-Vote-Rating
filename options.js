@@ -841,10 +841,9 @@ document.getElementById('deleteNotWorkingProxies').addEventListener('click', asy
 //Слушатель кнопки 'Удалить всё' на Прокси
 document.getElementById('deleteAllProxies').addEventListener('click', async () => {
     updateStatusProxy(chrome.i18n.getMessage('deletingAllProxies'), true)
-    let proxiesCopy = [...proxies]
-    for (let prox of proxiesCopy) {
-        await removeProxyList(prox, false)
-    }
+    document.getElementById('ProxyList').parentNode.replaceChild(document.getElementById('ProxyList').cloneNode(false), document.getElementById('ProxyList'))
+    proxies = []
+    await setValue('AVMRproxies', proxies, true)
     updateStatusProxy(chrome.i18n.getMessage('deletedAllProxies'), false, 'success')
 })
 
@@ -970,7 +969,8 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     scheme: 'https',
                     TunnelBear: true
                 }
-                await addProxy(proxy)
+                await addProxy(proxy, true)
+                proxies.push(proxy)
             }
         }
     } catch (e) {
@@ -978,6 +978,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
         console.error(e)
         return
     }
+    await setValue('AVMRproxies', proxies, true)
     updateStatusProxy(chrome.i18n.getMessage('importTunnelBearEnd'), false, 'success')
 })
 
@@ -1009,7 +1010,8 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
                                 scheme: 'https',
                                 Windscribe: true
                             }
-                            await addProxy(proxy)
+                            await addProxy(proxy, true)
+                            proxies.push(proxy)
                         }
                     }
                 }
@@ -1019,6 +1021,7 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
             console.error(e)
             return
         }
+        await setValue('AVMRproxies', proxies, true)
     }
     updateStatusProxy(chrome.i18n.getMessage('importWindscribeEnd'), false, 'success')
 })
@@ -1044,13 +1047,15 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
                 scheme: 'https',
                 HolaVPN: true
             }
-            await addProxy(proxy)
+            await addProxy(proxy, true)
+            proxies.push(proxy)
         }
     }
+    await setValue('AVMRproxies', proxies, true)
     updateStatusProxy(chrome.i18n.getMessage('importHolaVPNEnd'), false, 'success')
 })
 
-async function addProxy(proxy) {
+async function addProxy(proxy, visually) {
     updateStatusProxy(chrome.i18n.getMessage('adding'), true)
     for (let prox of proxies) {
         if (proxy.ip == prox.ip && proxy.port == prox.port) {
@@ -1059,7 +1064,7 @@ async function addProxy(proxy) {
         }
     }
 
-    await addProxyList(proxy, false)
+    await addProxyList(proxy, visually)
     updateStatusProxy(chrome.i18n.getMessage('addSuccess'), false, 'success')
 }
 
