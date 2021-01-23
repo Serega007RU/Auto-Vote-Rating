@@ -5,8 +5,12 @@ function vote() {
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
-        if (document.getElementById("upvotenologin").className == 'modal is-active') {
-            chrome.runtime.sendMessage({discordLogIn: true})
+        if (document.querySelector('div.modal.is-active') != null) {
+            if (document.querySelector('div.modal.is-active > div.modal-content.content').textContent.includes('You must be logged')) {
+                chrome.runtime.sendMessage({discordLogIn: true})
+            } else {
+                chrome.runtime.sendMessage({message: document.querySelector('div.modal.is-active > div.modal-content.content').textContent.trim()})
+            }
             return
         }
         
