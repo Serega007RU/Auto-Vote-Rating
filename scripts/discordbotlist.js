@@ -28,14 +28,17 @@ function vote() {
             } else if (document.querySelector('div[class="col-12 col-md-6 text-center"] > h1').textContent == 'Thank you for voting!') {
                 chrome.runtime.sendMessage({successfully: true})
                 clearInterval(this.check)
-            } else if (document.querySelector('link[href="/_nuxt/pages/bots/_id/upvote/thanks.d767193.css"]') != null) {
-                //Да это костыль но разбирать обфуцированный код я не хочу
-                //ToDo <Serega007> сообщение Thank you for voting! не высвечивается если вкладка не сфокусирована, не понятно из-за чего это хрень, это костыль
-                chrome.runtime.sendMessage({successfully: true})
-                clearInterval(this.check)
             } else if (document.querySelector('div[role="status"][aria-live="polite"]').textContent != '') {
                 chrome.runtime.sendMessage({message: document.querySelector('div[role="status"][aria-live="polite"]').textContent})
                 clearInterval(this.check)
+            } else {
+                for (const el of document.querySelectorAll('link')) {
+                    if (el.href.includes('thanks')) {
+                        chrome.runtime.sendMessage({successfully: true})
+                        clearInterval(this.check)
+                        break
+                    }
+                }
             }
         }, 1000)
 

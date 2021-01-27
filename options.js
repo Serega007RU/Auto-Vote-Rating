@@ -667,7 +667,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             jsPath = '#entity-title'
         } else if (project.DiscordBotList) {
             url = 'https://discordbotlist.com/bots/' + project.id
-            jsPath = 'h1[class="bot-title"]'
+            jsPath = 'h1[class="bot-name"]'
         } else if (project.BotsForDiscord) {
             url = 'https://botsfordiscord.com/bot/' + project.id + '/vote'
             jsPath = 'h2[class="subtitle"] > b'
@@ -788,9 +788,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 }
             }
 
-            if (project.DiscordBotList) {//Мы же не умеем адекватно title бота выставлять, раз сделано через жопу то и у меня будут костыли через жопу
-                projectURL = doc.querySelector('h1[class="bot-title"]').firstChild.textContent.trim()
-            } else if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
+            if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).text)
             } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent != '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).textContent)
