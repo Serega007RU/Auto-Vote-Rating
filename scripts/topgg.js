@@ -8,10 +8,13 @@ function vote() {
         if (document.querySelector('div.modal.is-active') != null) {
             if (document.querySelector('div.modal.is-active > div.modal-content.content').textContent.includes('You must be logged')) {
                 chrome.runtime.sendMessage({discordLogIn: true})
+                return
+            } else if (document.querySelector('div.modal.is-active a[class="btn"]') != null) {
+                document.querySelector('div.modal.is-active a[class="btn"]').click()
             } else {
                 chrome.runtime.sendMessage({message: document.querySelector('div.modal.is-active > div.modal-content.content').textContent.trim()})
+                return
             }
-            return
         }
         
         this.check = setInterval(()=>{
