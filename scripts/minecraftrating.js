@@ -37,7 +37,7 @@ async function vote() {
         } else if (document.querySelector('div.alert.alert-success') != null && document.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
             chrome.runtime.sendMessage({successfully: true})
         } else if (document.querySelector('input[name=nick]') != null) {
-            let nick = await getNickName()
+            const nick = await getNickName()
             if (nick == null || nick == '')
                 return
             document.querySelector('input[name=nick]').value = nick
@@ -51,12 +51,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMinecraftRating', data=>{
             resolve(data['AVMRprojectsMinecraftRating'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.MinecraftRating && document.URL.startsWith('http://minecraftrating.ru/projects/' + project.id)) {
             return project.nick
         }

@@ -1,22 +1,32 @@
-vote()
-async function vote() {
+window.onmessage = function(e) {
+    if (e.data == 'vote') {
+        vote(false)
+    }
+}
+vote(true)
+
+async function vote(first) {
     try {
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
+        if (document.querySelector('div.alert.alert-danger') != null) {
+            if (document.querySelector('div.alert.alert-danger').textContent.includes('Již jsi hlasoval vrať se znovu za 2 hodiny')) {
+                chrome.runtime.sendMessage({later: true})
+                return
+            }
+            chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
             return
         }
-        if (document.querySelector('#center > div > h1') != null && document.querySelector('#center > div > h1').textContent.includes('Successfully voted')) {
+        if (document.querySelector('div.alert.alert-success') != null) {
             chrome.runtime.sendMessage({successfully: true})
             return
-        } else if (document.querySelector('#center > div > h1') != null && document.querySelector('#center > div > h1').textContent.includes('You already voted')) {
-            chrome.runtime.sendMessage({later: true})
+        }
+
+        if (first) {
             return
         }
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
-        document.querySelector('#submit_vote_form > input[type=text]:nth-child(1)').value = nick
-        document.querySelector('#submit_vote_form > input.r3submit').click()
+        if (nick == null || nick == '') return
+        document.querySelector('input[name="username"]').value = nick
+        document.querySelector('form[method="post"] > button[type="submit"]').click()
     } catch (e) {
         chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
     }
@@ -24,16 +34,16 @@ async function vote() {
 
 async function getNickName() {
     const projects = await new Promise(resolve=>{
-        chrome.storage.local.get('AVMRprojectsPlanetMinecraft', data=>{
-            resolve(data['AVMRprojectsPlanetMinecraft'])
+        chrome.storage.local.get('AVMRprojectsMCServerList', data=>{
+            resolve(data['AVMRprojectsMCServerList'])
         })
     })
     for (const project of projects) {
-        if (project.PlanetMinecraft && (document.URL.startsWith('https://www.planetminecraft.com/server/' + project.id))) {
+        if (project.MCServerList && document.URL.includes('id=' + project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://www.planetminecraft.com/server/')) {
+    if (!document.URL.startsWith('https://mcserver-list.eu/')) {
         chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
     } else {
         chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})

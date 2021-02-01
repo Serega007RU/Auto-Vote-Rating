@@ -14,7 +14,7 @@ async function vote() {
             document.querySelector('a[class=vk_authorization]').click()
         } else if (document.querySelector('input[name=login_player]') != null) {
             //Ввод ника и голосование
-            let nick = await getNickName()
+            const nick = await getNickName()
             if (nick == null || nick == '')
                 return
             document.querySelector('input[name=login_player]').value = nick
@@ -49,12 +49,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMCRate', data=>{
             resolve(data['AVMRprojectsMCRate'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.MCRate && (document.URL.startsWith('http://mcrate.su/rate/' + project.id) || document.URL.startsWith('http://mcrate.su/add/rate?idp=' + project.id + '&code='))) {
             return project.nick
         }

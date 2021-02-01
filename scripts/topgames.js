@@ -20,19 +20,19 @@ async function vote() {
         if (document.querySelector('div[class="alert alert-warning"]') != null) {
             //Если вы уже голосовали
             if (document.getElementById('voteTimer') != null) {
-                let numbers = document.getElementById('voteTimer').textContent.match(/\d+/g).map(Number)
+                const numbers = document.getElementById('voteTimer').textContent.match(/\d+/g).map(Number)
                 let count = 0
                 let hour = 0
                 let min = 0
                 let sec = 0
-                for (let i in numbers) {
+                for (const i in numbers) {
                     if (count == 0) {
                         min = numbers[i]
                     }
                     count++
                 }
-                let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-                let later = Date.now() + milliseconds
+                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                const later = Date.now() + milliseconds
                 chrome.runtime.sendMessage({
                     later: later
                 })
@@ -52,13 +52,13 @@ async function vote() {
         }
 
         if (document.getElementById('playername') != null) {
-            let nick = await getNickName()
+            const nick = await getNickName()
             if (nick == null)
                 return
             document.getElementById('playername').value = nick
         }
 
-        let check = setInterval(function() {
+        const check = setInterval(function() {
             if (document.querySelector('#captcha-content > div > div.grecaptcha-logo > iframe') != null) {
                 //Ждёт загрузки reCaptcha
                 document.querySelector('button[type="submit"').click()
@@ -71,12 +71,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsTopGames', data=>{
             resolve(data['AVMRprojectsTopGames'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.TopGames && document.URL.includes(project.game) && document.URL.includes(project.id)) {
             return project.nick
         }

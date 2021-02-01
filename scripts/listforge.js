@@ -46,15 +46,22 @@ async function vote(first) {
         if (document.getElementById('adblock-notice') != null) document.getElementById('adblock-notice').style.display = 'none'
         if (document.getElementById('vote-form-block') != null) document.getElementById('vote-form-block').removeAttribute('style')
         if (document.getElementById('blocked-notice') != null) document.getElementById('blocked-notice').style.display = 'none'
+
+        for (const el of document.querySelectorAll('div.alert.alert-info')) {
+            if (el.textContent.includes('server has been removed')) {
+                chrome.runtime.sendMessage({message: el.textContent.trim()})
+                return
+            }
+        }
         
-        for (el of document.querySelectorAll('strong')) {
+        for (const el of document.querySelectorAll('strong')) {
             if (el.textContent.includes('Thank you for your vote')) {
                 chrome.runtime.sendMessage({successfully: true})
                 return
             }
         }
 
-        for (el of document.querySelectorAll('div.alert.alert-danger')) {
+        for (const el of document.querySelectorAll('div.alert.alert-danger')) {
             if (el.offsetParent != null) {
                 if (el.textContent.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
@@ -65,7 +72,7 @@ async function vote(first) {
             }
         }
 
-        let project = await getProject()
+        const project = await getProject()
         if (project == null || project == '')
             return
         
@@ -103,12 +110,12 @@ async function vote(first) {
 }
 
 async function getProject() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsListForge', data=>{
             resolve(data['AVMRprojectsListForge'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.ListForge && document.URL.includes(project.game) && document.URL.includes(project.id)) {
             return project
         }

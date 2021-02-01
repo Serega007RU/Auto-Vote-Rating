@@ -14,7 +14,7 @@ async function vote() {
             //Клик 'Голосовать'
             document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
             //Вводит никнейм
-            let nick = await getNickName()
+            const nick = await getNickName()
             if (nick == null || nick == '')
                 return
             document.querySelector('input[name=nick]').value = nick
@@ -28,7 +28,7 @@ async function vote() {
                 document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i').click()
                 clearInterval(this.check)
             } else {
-                let nick = await getNickName()
+                const nick = await getNickName()
                 if (nick == null || nick == '')
                     return
                 document.querySelector('input[name=nick]').value = nick
@@ -41,12 +41,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsTopCraft', data=>{
             resolve(data['AVMRprojectsTopCraft'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.TopCraft && document.URL.startsWith('https://topcraft.ru/servers/' + project.id + '/')) {
             return project.nick
         }
@@ -61,7 +61,7 @@ async function getNickName() {
 this.check = setInterval(()=>{
     //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
     if (document.readyState == 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
-        var textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
+        const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
         if (textContent.includes('Сегодня Вы уже голосовали')) {
             chrome.runtime.sendMessage({later: true})
         } else if (textContent.includes('Спасибо за Ваш голос, Вы сможете повторно проголосовать завтра.')) {

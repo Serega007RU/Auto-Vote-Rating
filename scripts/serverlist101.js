@@ -41,7 +41,7 @@ async function vote(first) {
             return
         }
         if (document.querySelector('form[method="POST"] > input[name="username"]') != null) {
-            let nick = await getNickName()
+            const nick = await getNickName()
             if (nick == null) return
             document.querySelector('form[method="POST"] > input[name="username"]').value = nick
         }
@@ -52,12 +52,12 @@ async function vote(first) {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsServerList101', data=>{
             resolve(data['AVMRprojectsServerList101'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.ServerList101 && document.URL.startsWith('https://serverlist101.com/server/' + project.id)) {
             return project.nick
         }

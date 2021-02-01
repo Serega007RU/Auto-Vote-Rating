@@ -2,15 +2,35 @@
 document.addEventListener('DOMContentLoaded', (event)=>{
     vote()
 })
+if (document.URL.startsWith('https://discord.com/')) {
+    vote()
+}
 
 function vote() {
     try {
+        if (document.URL.startsWith('https://discord.com/')) {
+            const timer = setTimeout(()=>{//Да это костыль, а есть варинт по лучше?
+                chrome.runtime.sendMessage({discordLogIn: true})
+            }, 10000)
+            window.onbeforeunload = function(e) {
+                clearTimeout(timer)
+            }
+            window.onunload = function(e) {
+                clearTimeout(timer)
+            }
+            return
+        }
+
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
-        if (document.querySelector("#nav-collapse > ul.navbar-nav.ml-auto > li > a").firstElementChild.textContent.includes('Log in')) {
-            chrome.runtime.sendMessage({discordLogIn: true})
+//      if (document.querySelector("#nav-collapse > ul.navbar-nav.ml-auto > li > a").firstElementChild.textContent.includes('Log in')) {
+//          chrome.runtime.sendMessage({discordLogIn: true})
+//          return
+//      }
+
+        if (document.querySelector('div.main-content') != null && document.querySelector('div.main-content').textContent == 'Logging you in...') {
             return
         }
 
@@ -28,14 +48,17 @@ function vote() {
             } else if (document.querySelector('div[class="col-12 col-md-6 text-center"] > h1').textContent == 'Thank you for voting!') {
                 chrome.runtime.sendMessage({successfully: true})
                 clearInterval(this.check)
-            } else if (document.querySelector('link[href="/_nuxt/pages/bots/_id/upvote/thanks.d767193.css"]') != null) {
-                //Да это костыль но разбирать обфуцированный код я не хочу
-                //ToDo <Serega007> сообщение Thank you for voting! не высвечивается если вкладка не сфокусирована, не понятно из-за чего это хрень, это костыль
-                chrome.runtime.sendMessage({successfully: true})
-                clearInterval(this.check)
             } else if (document.querySelector('div[role="status"][aria-live="polite"]').textContent != '') {
                 chrome.runtime.sendMessage({message: document.querySelector('div[role="status"][aria-live="polite"]').textContent})
                 clearInterval(this.check)
+            } else {
+                for (const el of document.querySelectorAll('link')) {
+                    if (el.href.includes('thanks')) {
+                        chrome.runtime.sendMessage({successfully: true})
+                        clearInterval(this.check)
+                        break
+                    }
+                }
             }
         }, 1000)
 

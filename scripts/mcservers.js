@@ -35,7 +35,7 @@ async function vote(first) {
         if (first) {
             return
         }
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '') return
         document.getElementById('username').value = nick
         document.querySelector('form[method="POST"] > button[type="submit"]').click()
@@ -45,12 +45,12 @@ async function vote(first) {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMCServers', data=>{
             resolve(data['AVMRprojectsMCServers'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.MCServers && document.URL.startsWith('https://mc-servers.com/mcvote/' + project.id)) {
             return project.nick
         }

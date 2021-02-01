@@ -13,7 +13,7 @@ async function vote() {
         //document.cookie.split(';').forEach(function(c) { document.cookie = c.replace(/^ +/,"").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");})
         //Проверяет есть ли кнопка 'голосовать', если есть то голосует, если нет, ждёт когда страница полностью загрузица иначе отправляет ошибку
         if (document.querySelector('input[name=player]') != null) {
-            let nick = await getNickName()
+            const nick = await getNickName()
             if (nick == null || nick == '')
                 return
             document.querySelector('input[name=player]').value = nick
@@ -21,14 +21,14 @@ async function vote() {
         } else if (document.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
             //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
             //Берёт последние 30 символов
-            let string = document.querySelector('center').textContent.substring(document.querySelector('center').textContent.length - 30)
+            const string = document.querySelector('center').textContent.substring(document.querySelector('center').textContent.length - 30)
             //Из полученного текста достаёт все цифры в Array List
-            let numbers = string.match(/\d+/g).map(Number)
+            const numbers = string.match(/\d+/g).map(Number)
             let count = 0
             let hour = 0
             let min = 0
             let sec = 0
-            for (var i in numbers) {
+            for (const i in numbers) {
                 if (count == 0) {
                     hour = numbers[i]
                 } else if (count == 1) {
@@ -36,8 +36,8 @@ async function vote() {
                 }
                 count++
             }
-            var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-            var later = Date.now() + milliseconds
+            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+            const later = Date.now() + milliseconds
             chrome.runtime.sendMessage({later: later})
         } else if (document.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
             chrome.runtime.sendMessage({successfully: true})
@@ -50,12 +50,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMonitoringMinecraft', data=>{
             resolve(data['AVMRprojectsMonitoringMinecraft'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.MonitoringMinecraft && document.URL.startsWith('http://monitoringminecraft.ru/top/' + project.id)) {
             return project.nick
         }

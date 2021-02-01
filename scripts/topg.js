@@ -8,12 +8,12 @@ async function vote() {
         if (document.querySelector('body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong') != null && document.querySelector('body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong').textContent.includes('You have voted successfully!')) {
             chrome.runtime.sendMessage({successfully: true})
         } else if (document.querySelector('#voting > div > div > div:nth-child(3) > p') != null && document.querySelector('#voting > div > div > div:nth-child(3) > p').textContent.includes('You have already voted!')) {
-            let numbers = document.querySelector('#voting > div > div > div:nth-child(3) > p').textContent.match(/\d+/g).map(Number)
+            const numbers = document.querySelector('#voting > div > div > div:nth-child(3) > p').textContent.match(/\d+/g).map(Number)
             let count = 0
             let hour = 0
             let min = 0
             let sec = 0
-            for (var i in numbers) {
+            for (const i in numbers) {
                 if (count == 0) {
                     hour = numbers[i]
                 } else if (count == 1) {
@@ -21,16 +21,16 @@ async function vote() {
                 }
                 count++
             }
-            var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-            var later = Date.now() + milliseconds
+            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+            const later = Date.now() + milliseconds
             chrome.runtime.sendMessage({later: later})
-        } else if (document.getElementById('v') != null && document.getElementById('v').textContent.includes('Submit your vote') && document.getElementById('username').value.length == 0) {
+        } else if (document.getElementById('vtx') != null && document.getElementById('vtx').textContent.includes('Submit your vote') && document.getElementById('game_user').value.length == 0) {
             clearInterval(this.check)
-            let nick = await getNickName()
+            const nick = await getNickName()
             if (nick == null || nick == '')
                 return
-            document.getElementById('username').value = nick
-            document.getElementById('v').click()
+            document.getElementById('game_user').value = nick
+            document.getElementById('vtx').click()
         }
     } catch (e) {
         chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
@@ -38,12 +38,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsTopG', data=>{
             resolve(data['AVMRprojectsTopG'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.TopG && (document.URL.startsWith('https://topg.org/Minecraft/in-' + project.id))) {
             return project.nick
         }
@@ -57,7 +57,7 @@ async function getNickName() {
 
 this.check = setInterval(()=>{
     //Ждёт готовности кнопки 'Submit your vote'
-    if (document.readyState == 'complete' && document.getElementById('v') != null && document.getElementById('v').textContent.includes('Submit your vote')) {
+    if (document.readyState == 'complete' && document.getElementById('vtx') != null && document.getElementById('vtx').textContent.includes('Submit your vote')) {
         clearInterval(this.check)
         vote()
     }

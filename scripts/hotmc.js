@@ -36,7 +36,7 @@ async function vote(first) {
         if (first) {
             return
         }
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '')
             return
         document.querySelector('#playercollector-nickname').value = nick
@@ -47,12 +47,12 @@ async function vote(first) {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsHotMC', data=>{
             resolve(data['AVMRprojectsHotMC'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.HotMC && document.URL.startsWith('https://hotmc.ru/vote-' + project.id)) {
             return project.nick
         }

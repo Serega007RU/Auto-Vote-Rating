@@ -22,12 +22,12 @@ async function vote(first) {
                 chrome.runtime.sendMessage({message: document.querySelector('#c > div > div > div.bvt > p.alert.alert-danger').textContent})
                 //Если вы уже голосовали
             } else if (document.querySelector('#c > div > div > div.bvt > p.alert.alert-danger').textContent.includes('Vous avez déjà voté pour ce serveur')) {
-                let numbers = document.querySelector('#c > div > div > div.bvt > p.alert.alert-danger').textContent.match(/\d+/g).map(Number)
+                const numbers = document.querySelector('#c > div > div > div.bvt > p.alert.alert-danger').textContent.match(/\d+/g).map(Number)
                 let count = 0
                 let hour = 0
                 let min = 0
                 let sec = 0
-                for (var i in numbers) {
+                for (const i in numbers) {
                     if (count == 0) {
                         hour = numbers[i]
                     } else if (count == 1) {
@@ -37,8 +37,8 @@ async function vote(first) {
                     }
                     count++
                 }
-                var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-                var later = Date.now() + milliseconds
+                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                const later = Date.now() + milliseconds
                 chrome.runtime.sendMessage({later: later})
                 //Что?
             } else {
@@ -54,7 +54,7 @@ async function vote(first) {
         if (first) {
             return
         }
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null)
             return
         document.querySelector('#c > div > div > div.bvt > form > input.pseudov').value = nick
@@ -65,12 +65,12 @@ async function vote(first) {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsServeurPrive', data=>{
             resolve(data['AVMRprojectsServeurPrive'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.ServeurPrive && document.URL.includes((project.game == null ? 'minecraft' : project.game)) && document.URL.includes(project.id)) {
             return project.nick
         }

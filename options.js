@@ -27,6 +27,9 @@ var projectsMCServers = []
 var projectsMinecraftList = []
 var projectsMinecraftIndex = []
 var projectsServerList101 = []
+var projectsMCServerList = []
+var projectsCraftList = []
+var projectsCzechCraft = []
 var projectsCustom = []
 var VKs = []
 var proxies = []
@@ -60,6 +63,9 @@ var allProjects = [
     'MinecraftList',
     'MinecraftIndex',
     'ServerList101',
+    'MCServerList',
+    'CraftList',
+    'CzechCraft',
     'Custom'
 ]
 
@@ -1282,7 +1288,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             jsPath = '#entity-title'
         } else if (project.DiscordBotList) {
             url = 'https://discordbotlist.com/bots/' + project.id
-            jsPath = 'h1[class="bot-title"]'
+            jsPath = 'h1[class="bot-name"]'
         } else if (project.BotsForDiscord) {
             url = 'https://botsfordiscord.com/bot/' + project.id + '/vote'
             jsPath = 'h2[class="subtitle"] > b'
@@ -1305,6 +1311,15 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         } else if (project.ServerList101) {
             url = 'https://serverlist101.com/server/' + project.id + '/'
             jsPath = 'li > h1'
+        } else if (project.MCServerList) {
+            url = 'https://mcserver-list.eu/server/?id=' + project.id
+            jsPath = 'p.title'
+        } else if (project.CraftList) {
+            url = 'https://craftlist.org/' + project.id
+            jsPath = 'main h1'
+        } else if (project.CzechCraft) {
+            url = 'https://czech-craft.eu/server/' + project.id + '/'
+            jsPath = 'a.server-name'
         }
 
         let response
@@ -1328,7 +1343,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             updateStatusAdd(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, true, element, 'error')
             return
         } else if (response.redirected) {
-            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) {
+            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.MCServerList || project.CraftList) {
                 updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
                 return
             }
@@ -1369,11 +1384,11 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                     updateStatusAdd(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, true, element, 'error')
                     return
                 }
-            } else if (project.TopGG) {
-                if (doc.getElementById('upvotenologin').className == 'modal is-active') {
-                    updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
-                    return
-                }
+//          } else if (project.TopGG) {
+//              if (doc.querySelector('a.btn.primary') != null && doc.querySelector('a.btn.primary').textContent.includes('Login')) {
+//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  return
+//              }
             } else if (project.DiscordBotList) {
                 if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
                     updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
@@ -1394,9 +1409,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 }
             }
 
-            if (project.DiscordBotList) {//Мы же не умеем адекватно title бота выставлять, раз сделано через жопу то и у меня будут костыли через жопу
-                projectURL = doc.querySelector('h1[class="bot-title"]').firstChild.textContent.trim()
-            } else if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
+            if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).text)
             } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent != '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).textContent)
@@ -1836,6 +1849,9 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         projectsMinecraftList,
         projectsMinecraftIndex,
         projectsServerList101,
+        projectsMCServerList,
+        projectsCraftList,
+        projectsCzechCraft,
         projectsCustom,
         VKs,
         proxies,
@@ -2483,6 +2499,18 @@ selectedTop.addEventListener('change', function() {
     } else if (selectedTop.value == 'ServerList101') {
         document.getElementById('projectIDTooltip1').textContent = 'https://serverlist101.com/server/'
         document.getElementById('projectIDTooltip2').textContent = '1547'
+        document.getElementById('projectIDTooltip3').textContent = '/vote/'
+    } else if (selectedTop.value == 'MCServerList') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://mcserver-list.eu/hlasovat/?id='
+        document.getElementById('projectIDTooltip2').textContent = '307'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'CraftList') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://craftlist.org/'
+        document.getElementById('projectIDTooltip2').textContent = 'basicland'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'CzechCraft') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://czech-craft.eu/server/'
+        document.getElementById('projectIDTooltip2').textContent = 'trenend'
         document.getElementById('projectIDTooltip3').textContent = '/vote/'
     }
 
