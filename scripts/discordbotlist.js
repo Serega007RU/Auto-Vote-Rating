@@ -2,15 +2,35 @@
 document.addEventListener('DOMContentLoaded', (event)=>{
     vote()
 })
+if (document.URL.startsWith('https://discord.com/')) {
+    vote()
+}
 
 function vote() {
     try {
+        if (document.URL.startsWith('https://discord.com/')) {
+            const timer = setTimeout(()=>{//Да это костыль, а есть варинт по лучше?
+                chrome.runtime.sendMessage({discordLogIn: true})
+            }, 10000)
+            window.onbeforeunload = function(e) {
+                clearTimeout(timer)
+            }
+            window.onunload = function(e) {
+                clearTimeout(timer)
+            }
+            return
+        }
+
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
-        if (document.querySelector("#nav-collapse > ul.navbar-nav.ml-auto > li > a").firstElementChild.textContent.includes('Log in')) {
-            chrome.runtime.sendMessage({discordLogIn: true})
+//      if (document.querySelector("#nav-collapse > ul.navbar-nav.ml-auto > li > a").firstElementChild.textContent.includes('Log in')) {
+//          chrome.runtime.sendMessage({discordLogIn: true})
+//          return
+//      }
+
+        if (document.querySelector('div.main-content') != null && document.querySelector('div.main-content').textContent == 'Logging you in...') {
             return
         }
 

@@ -1022,9 +1022,9 @@ chrome.webNavigation.onErrorOccurred.addListener(function(details) {
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
     //Если требует ручное прохождение капчи
-    if ((request.captcha || request.authSteam) && sender && openedProjects.has(sender.tab.id)) {
+    if ((request.captcha || request.authSteam || request.discordLogIn) && sender && openedProjects.has(sender.tab.id)) {
         let project = openedProjects.get(sender.tab.id)
-        let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage('authSteam')
+        let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage(Object.keys(request)[0])
         console.warn(getProjectPrefix(project, true) + message)
         if (!settings.disabledNotifWarn)
             sendNotification(getProjectPrefix(project, false), message)

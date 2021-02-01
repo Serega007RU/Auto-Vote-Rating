@@ -1,13 +1,33 @@
 vote()
 function vote() {
     try {
+        if (document.URL.startsWith('https://discord.com/')) {
+            if (!document.URL.includes('prompt=none')) {
+                //Заставляем авторизацию авторизоваться не беспокоя пользователя если права уже были предоставлены
+                document.location.replace(document.URL.concat('&prompt=none'))
+            } else {
+                const timer = setTimeout(()=>{//Да это костыль, а есть варинт по лучше?
+                    chrome.runtime.sendMessage({discordLogIn: true})
+                }, 10000)
+                window.onbeforeunload = function(e) {
+                    clearTimeout(timer)
+                }
+                window.onunload = function(e) {
+                    clearTimeout(timer)
+                }
+            }
+            return
+        }
+
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
+
         if (document.querySelector('div.modal.is-active') != null) {
             if (document.querySelector('div.modal.is-active > div.modal-content.content').textContent.includes('You must be logged')) {
-                chrome.runtime.sendMessage({discordLogIn: true})
+                document.querySelector('div.modal.is-active > div.modal-content.content a.btn.primary').click()
+//              chrome.runtime.sendMessage({discordLogIn: true})
                 return
             } else if (document.querySelector('div.modal.is-active a[class="btn"]') != null) {
                 document.querySelector('div.modal.is-active a[class="btn"]').click()
