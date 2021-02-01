@@ -46,6 +46,13 @@ async function vote(first) {
         if (document.getElementById('adblock-notice') != null) document.getElementById('adblock-notice').style.display = 'none'
         if (document.getElementById('vote-form-block') != null) document.getElementById('vote-form-block').removeAttribute('style')
         if (document.getElementById('blocked-notice') != null) document.getElementById('blocked-notice').style.display = 'none'
+
+        for (const el of document.querySelectorAll('div.alert.alert-info')) {
+            if (el.textContent.includes('server has been removed')) {
+                chrome.runtime.sendMessage({message: el.textContent.trim()})
+                return
+            }
+        }
         
         for (const el of document.querySelectorAll('strong')) {
             if (el.textContent.includes('Thank you for your vote')) {
