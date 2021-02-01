@@ -1140,7 +1140,7 @@ async function endVote(request, sender, project) {
         } else {
             if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList) {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList) {
+            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList || project.CzechCraft) {
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (project.ServeurPrive || project.TopGames) {
                 project.countVote = project.countVote + 1
