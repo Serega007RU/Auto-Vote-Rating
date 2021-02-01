@@ -43,7 +43,7 @@ async function getNickName() {
             return project.nick
         }
     }
-    if (!document.URL.includes('id=' + project.id)) {
+    if (!document.URL.startsWith('https://mcserver-list.eu/')) {
         chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
     } else {
         chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
