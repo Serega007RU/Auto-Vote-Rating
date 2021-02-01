@@ -17,7 +17,7 @@ async function vote(first) {
         }
         if (document.querySelector('div.alert.alert-info') != null) {
             if (document.querySelector('div.alert.alert-info').textContent.includes('next vote')) {
-                let numbers = document.querySelector('div.alert.alert-info').textContent.match(/\d+/g).map(Number)
+                const numbers = document.querySelector('div.alert.alert-info').textContent.match(/\d+/g).map(Number)
                 let count = 0
                 let day = 0
                 let month = 0
@@ -25,7 +25,7 @@ async function vote(first) {
                 let hour = 0
                 let min = 0
                 let sec = 0
-                for (let i in numbers) {
+                for (const i in numbers) {
                     if (count == 0) {
                         day = numbers[i]
                     } else if (count == 1) {
@@ -41,7 +41,7 @@ async function vote(first) {
                     }
                     count++
                 }
-                let later = Date.UTC(year, month, day, hour, min, sec) + 3600000
+                const later = Date.UTC(year, month, day, hour, min, sec) + 3600000
                 chrome.runtime.sendMessage({later: later})
             } else {
                 chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-info').textContent})
@@ -50,12 +50,12 @@ async function vote(first) {
         }
         if (document.querySelector('a.btn-vote').textContent.includes('Next possible vote')) {
             //Из текста достаёт все цифры в Array List
-            let numbers = document.querySelector('a.btn-vote').textContent.match(/\d+/g).map(Number)
+            const numbers = document.querySelector('a.btn-vote').textContent.match(/\d+/g).map(Number)
             let count = 0
             let hour = 0
             let min = 0
             let sec = 0
-            for (let i in numbers) {
+            for (const i in numbers) {
                 if (count == 0) {
                     hour = numbers[i]
                 } else if (count == 1) {
@@ -65,8 +65,8 @@ async function vote(first) {
                 }
                 count++
             }
-            let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-            let later = Date.now() + milliseconds
+            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+            const later = Date.now() + milliseconds
             chrome.runtime.sendMessage({later: later})
             return
         } else {
@@ -77,7 +77,7 @@ async function vote(first) {
             return
         }
         
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '') return
         document.querySelector('input[name="nickName"]').value = nick
         document.querySelector('button.btn.btn-vote').click()
@@ -87,12 +87,12 @@ async function vote(first) {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsCraftList', data=>{
             resolve(data['AVMRprojectsCraftList'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.CraftList && document.URL.startsWith('https://craftlist.org/' + project.id)) {
             return project.nick
         }

@@ -12,7 +12,7 @@ async function vote() {
             chrome.runtime.sendMessage({later: true})
             return
         }
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '')
             return
         document.querySelector('#submit_vote_form > input[type=text]:nth-child(1)').value = nick
@@ -23,12 +23,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsPlanetMinecraft', data=>{
             resolve(data['AVMRprojectsPlanetMinecraft'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.PlanetMinecraft && (document.URL.startsWith('https://www.planetminecraft.com/server/' + project.id))) {
             return project.nick
         }

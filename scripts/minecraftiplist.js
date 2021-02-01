@@ -20,7 +20,7 @@ async function vote() {
                 return
             }
             if (document.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
-                let numbers = document.querySelector('#Content > div.Error').textContent.substring(document.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
+                const numbers = document.querySelector('#Content > div.Error').textContent.substring(document.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
                 let count = 0
                 let hour = 0
                 let min = 0
@@ -33,7 +33,7 @@ async function vote() {
                     }
                     count++
                 }
-                var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
                 chrome.runtime.sendMessage({later: Date.now() + (86400000 - milliseconds)})
                 return
             }
@@ -51,7 +51,7 @@ async function vote() {
             return
         }
         await craft(document.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '')
             return
         document.querySelector('#Content > form > input[type=text]').value = nick
@@ -62,7 +62,7 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMinecraftIpList', data=>{
             resolve(data['AVMRprojectsMinecraftIpList'])
         })
@@ -79,11 +79,11 @@ async function getNickName() {
     }
 }
 
-var content = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+let content = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 function recalculate() {
-    code = 0
-    code2 = 0
+    let code = 0
+    let code2 = 0
 
     for (let i = 0; i < 6; i++) {
         code += content[i] << (i * 5)
@@ -103,7 +103,7 @@ async function craft(inv) {
     if (currentRecept.sign) {
         let countRecept = 0
         let countRecept2 = 0
-        for (let element of inventory) {
+        for (const element of inventory) {
             inventoryCount++
             //Если это дубовая доска
             if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==') {
@@ -139,7 +139,7 @@ async function craft(inv) {
     if (currentRecept.ironSword) {
         let countRecept = 0
         let countRecept2 = 0
-        for (let element of inventory) {
+        for (const element of inventory) {
             inventoryCount++
             //Если это железный слиток
             if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAIVBMVEUAAADY2NhERESWlpY1NTVycnJoaGioqKj///+CgoJ/f3/RLsQ9AAAAAXRSTlMAQObYZgAAAGRJREFUeF6tyjERADEIRNFYwAIWsICFWIgFLGAhFlB5yXAMBZTZ7r/Z8XaILWShCDaQpQAgWCHqpksFJI1cZ9yAUhSdtQAURXN2ACD21+xhbzHPxcyjwhW7Z68CLhZVICQr4ek+KDhG7bVD+wwAAAAASUVORK5CYII=') {
@@ -163,7 +163,7 @@ async function craft(inv) {
     if (currentRecept.diamondPickaxe) {
         let countRecept = 0
         let countRecept2 = 0
-        for (let element of inventory) {
+        for (const element of inventory) {
             inventoryCount++
             //Если это палка
             if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAAAoHgtJNhWJZydoTh6sX77EAAAAAXRSTlMAQObYZgAAADFJREFUeF7ljDENAAAIw2ZhFmYBC/jXxA8HWcJHz6YpzhEXoZjCDLIH+eRgBiAxhEUBBakJ98ESqgkAAAAASUVORK5CYII=') {
@@ -192,7 +192,7 @@ async function craft(inv) {
     }
     if (currentRecept.chest) {
         let countRecept = 0
-        for (let element of inventory) {
+        for (const element of inventory) {
             inventoryCount++
             //Если это дубовая доска
             if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEX///9RQSpIOyRkUzB2Xz26lmGdgkwxKBhNPidyXThEOSFxWjiyjllCNSBoUzItJBY1Kht7YT0wJhhLPCZOPSek/k6aAAAAAXRSTlMAQObYZgAAAXFJREFUeF6VkYmOwkAMQ0nmvvf6/29dOzPArkBIhNJWssd5SS9vVgghvpJjDKGU8ELuc3a6nssllBk75FkeGsWOQjhvc8KMl79yKRF/APLRY+kdrtDv5IGW3nc4jsO1W5nBuzAnT+FBAWZzf0+p2+CdIzlS9wN3TityM7TmfSmGtuVIOedjGMO5hh+3UMgT5meutWZJ6TAMhe6833N8TmRXkbWymMGhVJvSwt44W3NKK+V8GJxCUgVs804gUq8V105Qo3Reh4eH8ZDhyyKb4SgYdgwaVhLKCS+7BfKptIZLdS0CYoi1bntwjAcjHR4aF5CIWI8BZ4mgSiu0zC653qbQ0QyzAcE7W0C1nLwOJCkdqvmhXtISi8942WM2o6TDw8sRpF5HvSYYAhBhgmiMCaaToLZkWzcs1nsZgpDhYHpmYFHNSbZwNFrrcq/x4zAIKYkGlZ/6f2EAwxQBJsMfa39P7m99XJ7X17CEZ/K9EXq/V7+8vxIydl/EGwAAAABJRU5ErkJggg==') {
@@ -228,7 +228,7 @@ async function craft(inv) {
     if (currentRecept.goldShover) {
         let countRecept = 0
         let countRecept2 = 0
-        for (let element of inventory) {
+        for (const element of inventory) {
             inventoryCount++
             //Если это золотой слиток
             if (await toDataURL(element.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')) === 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAJFBMVEUAAAD//4tQUADe3gA8PADcdhOGhgD//wv////bohOurgC3YRCwQZoNAAAAAXRSTlMAQObYZgAAAGdJREFUeF6tykERwDAIRNFYwAIWsICFWKgFLMRCLMRCzZVCGQ5w7N7+mx3/DrGFLBTBBrIWAAhWiHrTpQLSirx03MCiKNK1ABRFc3YAIMdLd3ewt4EV8yhgcqbOq4DL+c4VQrISft0DreJJLwFPy8oAAAAASUVORK5CYII=') {
@@ -252,7 +252,7 @@ async function craft(inv) {
 }
 
 //Текущий рецепт
-var currentRecept = {}
+let currentRecept = {}
 
 //Узнаёт какой щас рецепт
 async function getRecipe(img) {

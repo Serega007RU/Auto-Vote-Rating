@@ -18,7 +18,7 @@ async function vote() {
             //Клик 'Голосовать'
             document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
             //Вводит никнейм
-            let nick = await getNickName()
+            const nick = await getNickName()
             if (nick == null || nick == '')
                 return
             document.querySelector('input[name=nick]').value = nick
@@ -33,7 +33,7 @@ async function vote() {
                 clearInterval(this.check)
                 clearInterval(this.check2)
             } else {
-                let nick = await getNickName()
+                const nick = await getNickName()
                 if (nick == null || nick == '')
                     return
                 document.querySelector('input[name=nick]').value = nick
@@ -46,12 +46,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMcTOP', data=>{
             resolve(data['AVMRprojectsMcTOP'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.McTOP && document.URL.startsWith('https://mctop.su/servers/' + project.id + '/')) {
             return project.nick
         }
@@ -66,7 +66,7 @@ async function getNickName() {
 this.check = setInterval(()=>{
     //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
     if (document.readyState == 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
-        var textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
+        const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
         if (textContent.includes('Сегодня Вы уже голосовали')) {
             chrome.runtime.sendMessage({later: true})
         } else if (textContent.includes('Спасибо за Ваш голос, Вы сможете повторно проголосовать завтра.')) {

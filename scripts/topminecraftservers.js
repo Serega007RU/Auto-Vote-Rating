@@ -22,7 +22,7 @@ async function vote() {
             this.check = setTimeout(async ()=>{
                 if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
                     clearInterval(this.check)
-                    let nick = await getNickName()
+                    const nick = await getNickName()
                     if (nick == null || nick == '')
                         return
                     document.getElementById('username').value = nick
@@ -36,12 +36,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsTopMinecraftServers', data=>{
             resolve(data['AVMRprojectsTopMinecraftServers'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.TopMinecraftServers && (document.URL.startsWith('https://topminecraftservers.org/vote/' + project.id))) {
             return project.nick
         }

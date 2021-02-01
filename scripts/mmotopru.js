@@ -42,7 +42,7 @@ async function vote(first) {
             return
         }
         
-        let project = await getProject()
+        const project = await getProject()
         if (project == null || project == '')
             return
         
@@ -75,7 +75,7 @@ async function vote(first) {
         //Вписываем никнейм
         document.getElementById('charname').firstElementChild.value = project.nick
         //Выбираем нужный мир
-        let ordinalWorld = project.ordinalWorld - 1
+        const ordinalWorld = project.ordinalWorld - 1
         document.querySelectorAll('#world > div > table > tbody > tr')[ordinalWorld].click()
         //Кликает голосовать
         document.getElementById('check_vote_form').click()
@@ -86,12 +86,12 @@ async function vote(first) {
 }
 
 async function getProject() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMMoTopRU', data=>{
             resolve(data['AVMRprojectsMMoTopRU'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.MMoTopRU && document.URL.includes(project.game) && document.URL.includes(project.id)) {
             return project
         }

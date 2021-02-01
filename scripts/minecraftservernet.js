@@ -30,7 +30,7 @@ async function vote(first) {
         if (first) {
             return
         }
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '')
             return
         document.getElementById('mc_user').value = nick
@@ -42,12 +42,12 @@ async function vote(first) {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMinecraftServerNet', data=>{
             resolve(data['AVMRprojectsMinecraftServerNet'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.MinecraftServerNet && document.URL.startsWith('https://minecraft-server.net/vote/' + project.id)) {
             return project.nick
         }

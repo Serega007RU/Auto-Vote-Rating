@@ -15,7 +15,7 @@ async function vote() {
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '')
             return
         document.getElementById('ignn').value = nick
@@ -26,12 +26,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMinecraftServerList', data=>{
             resolve(data['AVMRprojectsMinecraftServerList'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.MinecraftServerList && (document.URL.startsWith('https://minecraft-server-list.com/server/' + project.id))) {
             return project.nick
         }

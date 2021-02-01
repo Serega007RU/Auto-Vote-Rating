@@ -11,7 +11,7 @@ async function vote(first) {
             document.querySelector('span[data-target="#voteModal"]').click()
             return
         }
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '')
             return
         if (document.getElementById("nickname") != null) {
@@ -26,12 +26,12 @@ async function vote(first) {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsTMonitoring', data=>{
             resolve(data['AVMRprojectsTMonitoring'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.TMonitoring && document.URL.startsWith('https://tmonitoring.com/server/' + project.id)) {
             return project.nick
         }
@@ -47,12 +47,12 @@ this.check = setInterval(()=>{
     if (document.querySelector('div[class="message error"]') != null) {
         clearInterval(this.check)
         if (document.querySelector('div[class="message error"]').textContent.includes('уже голосовали')) {
-            let numbers = document.querySelector('div[class="message error"]').textContent.match(/\d+/g).map(Number)
+            const numbers = document.querySelector('div[class="message error"]').textContent.match(/\d+/g).map(Number)
             let count = 0
             let hour = 0
             let min = 0
             let sec = 0
-            for (var i in numbers) {
+            for (const i in numbers) {
                 if (count == 0) {
                     hour = numbers[i]
                 } else if (count == 1) {
@@ -60,8 +60,8 @@ this.check = setInterval(()=>{
                 }
                 count++
             }
-            var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-            var later = Date.now() + milliseconds
+            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+            const later = Date.now() + milliseconds
             chrome.runtime.sendMessage({later: later})
         } else {
             chrome.runtime.sendMessage({message: document.querySelector('div[class="message error"]').textContent})

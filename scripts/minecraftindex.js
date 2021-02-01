@@ -12,12 +12,12 @@ async function vote() {
         if (document.querySelector('div.alert.alert-error.centered') != null) {
             if (document.querySelector('div.alert.alert-error.centered').textContent.includes('already voted')) {
                 //Из полученного текста достаёт все цифры в Array List
-                let numbers = document.querySelector('div.alert.alert-error.centered').textContent.match(/\d+/g).map(Number)
+                const numbers = document.querySelector('div.alert.alert-error.centered').textContent.match(/\d+/g).map(Number)
                 let count = 0
                 let hour = 0
                 let min = 0
                 let sec = 0
-                for (var i in numbers) {
+                for (const i in numbers) {
                     if (count == 0) {
                         hour = numbers[i]
                     } else if (count == 1) {
@@ -25,8 +25,8 @@ async function vote() {
                     }
                     count++
                 }
-                var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-                var later = Date.now() + milliseconds
+                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                const later = Date.now() + milliseconds
                 chrome.runtime.sendMessage({later: later})
             } else {
                 chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-error.centered').textContent})
@@ -38,7 +38,7 @@ async function vote() {
             return
         }
 
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '') return
         triggerFocus(document.querySelector('#ign'))
         document.getElementById('ign').value = nick
@@ -50,12 +50,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMinecraftIndex', data=>{
             resolve(data['AVMRprojectsMinecraftIndex'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.MinecraftIndex && document.URL.startsWith('https://www.minecraft-index.com/' + project.id)) {
             return project.nick
         }
@@ -68,7 +68,7 @@ async function getNickName() {
 }
 
 function triggerFocus(element) {
-    var eventType = 'onfocusin' in element ? 'focusin' : 'focus',
+    let eventType = 'onfocusin' in element ? 'focusin' : 'focus',
         bubbles = 'onfocusin' in element,
         event;
 
@@ -122,7 +122,7 @@ function triggerFocus(element) {
 
 'use strict';
 
-var PHRASES = [
+const PHRASES = [
   "1.21 gigawatts",
   "5 dollar shake",
   "6 feet of snow",
@@ -1836,10 +1836,10 @@ var PHRASES = [
 ];
 
 function setup(input) {
-  var datalist = document.createElement('datalist');
+  let datalist = document.createElement('datalist');
   datalist.setAttribute('id', 'adcopy_phrases');
 
-  for (var i = 0; i < PHRASES.length; ++i) {
+  for (let i = 0; i < PHRASES.length; ++i) {
     datalist.appendChild(document.createElement('option')).appendChild(document.createTextNode(PHRASES[i]));
   }
 
@@ -1847,15 +1847,15 @@ function setup(input) {
   input.setAttribute('list', datalist.id);
 }
 
-var scripts = document.getElementsByTagName('script');
+let scripts = document.getElementsByTagName('script');
 
-for (var i = 0; i < scripts.length; ++i) {
+for (let i = 0; i < scripts.length; ++i) {
   if (scripts[i].src.indexOf('solvemedia.com') > -1) {
     document.body.addEventListener('keydown', function handler(event) {
       if (event.target.id.indexOf('adcopy_response') == 0) {
         this.removeEventListener(event.type, handler);
 
-        var input = event.target;
+        let input = event.target;
 
         setup(input);
 

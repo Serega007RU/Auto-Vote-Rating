@@ -36,7 +36,7 @@ async function vote() {
             document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(6)').value = ''
             //Включаем кнопку отправки голоса
             document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > span > input').removeAttribute('disabled')
-            let nick = await getNickName()
+            const nick = await getNickName()
             if (nick == null || nick == '')
                 return
             //Вписываем ник в поле ввода
@@ -50,12 +50,12 @@ async function vote() {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsServerPact', data=>{
             resolve(data['AVMRprojectsServerPact'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.ServerPact && (document.URL.startsWith('https://www.serverpact.com/vote-' + project.id))) {
             return project.nick
         }

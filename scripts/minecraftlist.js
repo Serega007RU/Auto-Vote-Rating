@@ -10,12 +10,12 @@ async function vote(first) {
         if (document.querySelector('p.notification.errormsg') != null) {
             if (document.querySelector('p.notification.errormsg').textContent.includes('You can vote after')) {
                 //Из полученного текста достаёт все цифры в Array List
-                let numbers = document.querySelector('p.notification.errormsg').textContent.match(/\d+/g).map(Number)
+                const numbers = document.querySelector('p.notification.errormsg').textContent.match(/\d+/g).map(Number)
                 let count = 0
                 let hour = 0
                 let min = 0
                 let sec = 0
-                for (var i in numbers) {
+                for (const i in numbers) {
                     if (count == 0) {
                         hour = numbers[i]
                     } else if (count == 1) {
@@ -23,8 +23,8 @@ async function vote(first) {
                     }
                     count++
                 }
-                var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-                var later = Date.now() + milliseconds
+                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                const later = Date.now() + milliseconds
                 chrome.runtime.sendMessage({later: later})
             } else {
                 chrome.runtime.sendMessage({message: document.querySelector('p.notification.errormsg').textContent})
@@ -39,7 +39,7 @@ async function vote(first) {
         if (first) {
             return
         }
-        let nick = await getNickName()
+        const nick = await getNickName()
         if (nick == null || nick == '') return
         document.getElementById('voteusername').value = nick
         document.querySelector('form[method="POST"] > input[type="submit"]').click()
@@ -49,12 +49,12 @@ async function vote(first) {
 }
 
 async function getNickName() {
-    let projects = await new Promise(resolve=>{
+    const projects = await new Promise(resolve=>{
         chrome.storage.local.get('AVMRprojectsMinecraftList', data=>{
             resolve(data['AVMRprojectsMinecraftList'])
         })
     })
-    for (project of projects) {
+    for (const project of projects) {
         if (project.MinecraftList && document.URL.startsWith('https://minecraftlist.org/vote/' + project.id)) {
             return project.nick
         }
