@@ -24,13 +24,13 @@ async function vote() {
             const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
             const later = Date.now() + milliseconds
             chrome.runtime.sendMessage({later: later})
-        } else if (document.getElementById('v') != null && document.getElementById('v').textContent.includes('Submit your vote') && document.getElementById('username').value.length == 0) {
+        } else if (document.getElementById('vtx') != null && document.getElementById('vtx').textContent.includes('Submit your vote') && document.getElementById('game_user').value.length == 0) {
             clearInterval(this.check)
             const nick = await getNickName()
             if (nick == null || nick == '')
                 return
-            document.getElementById('username').value = nick
-            document.getElementById('v').click()
+            document.getElementById('game_user').value = nick
+            document.getElementById('vtx').click()
         }
     } catch (e) {
         chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
@@ -57,7 +57,7 @@ async function getNickName() {
 
 this.check = setInterval(()=>{
     //Ждёт готовности кнопки 'Submit your vote'
-    if (document.readyState == 'complete' && document.getElementById('v') != null && document.getElementById('v').textContent.includes('Submit your vote')) {
+    if (document.readyState == 'complete' && document.getElementById('vtx') != null && document.getElementById('vtx').textContent.includes('Submit your vote')) {
         clearInterval(this.check)
         vote()
     }
