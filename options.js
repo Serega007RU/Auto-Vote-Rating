@@ -763,11 +763,11 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                     updateStatusAdd(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, true, element, 'error')
                     return
                 }
-            } else if (project.TopGG) {
-                if (doc.getElementById('upvotenologin').className == 'modal is-active') {
-                    updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
-                    return
-                }
+//          } else if (project.TopGG) {
+//              if (doc.querySelector('a.btn.primary') != null && doc.querySelector('a.btn.primary').textContent.includes('Login')) {
+//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  return
+//              }
             } else if (project.DiscordBotList) {
                 if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
                     updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
