@@ -384,11 +384,17 @@
   "feedback2": {
     "message": "or support in "
   },
+  "feedback3": {
+    "message": "or contact me by "
+  },
   "dmDiscord": {
     "message": "discord"
   },
   "dmChromeWebStore": {
     "message": "Chrome Web Store"
+  },
+  "email": {
+    "message": "Email"
   },
   "internetRestored": {
     "message": "Internet Connection restored"

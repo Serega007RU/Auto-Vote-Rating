@@ -343,11 +343,17 @@
   "feedback2": {
     "message": "или в поддержку в "
   },
+  "feedback3": {
+    "message": "или ко мне на "
+  },
   "dmDiscord": {
     "message": "дискорд"
   },
   "dmChromeWebStore": {
     "message": "интернет-магазине chrome"
+  },
+  "email": {
+    "message": "Электронную почту"
   },
   "internetRestored": {
     "message": "Подключение к интернету восстановлено"
