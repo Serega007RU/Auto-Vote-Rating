@@ -1794,7 +1794,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         } else if (key == 'AVMRproxies' || key == 'AVMRVKs') {
             if (key == 'AVMRproxies') proxies = storageChange.newValue
             if (key == 'AVMRVKs') VKs = storageChange.newValue
-            if (storageChange.oldValue.length == storageChange.newValue.length) {
+            if (storageChange.oldValue && storageChange.oldValue.length == storageChange.newValue.length) {
                 updateProjectList(storageChange.newValue, key)
             }
             return
