@@ -1954,75 +1954,8 @@ chrome.runtime.onInstalled.addListener(async function(details) {
 })
 
 function getTopFromList(list, project) {
-    if (project.TopCraft) {
-        if (!list.TopCraft)
-            list.TopCraft = []
-        return list.TopCraft
-    } else if (project.McTOP) {
-        if (!list.McTOP)
-            list.McTOP = []
-        return list.McTOP
-    } else if (project.MCRate) {
-        if (!list.MCRate)
-            list.MCRate = []
-        return list.MCRate
-    } else if (project.MinecraftRating) {
-        if (!list.MinecraftRating)
-            list.MinecraftRating = []
-        return list.MinecraftRating
-    } else if (project.MonitoringMinecraft) {
-        if (!list.MonitoringMinecraft)
-            list.MonitoringMinecraft = []
-        return list.MonitoringMinecraft
-    } else if (project.FairTop) {
-        if (!list.FairTop)
-            list.FairTop = []
-        return list.FairTop
-    } else if (project.IonMc) {
-        if (!list.IonMc)
-            list.IonMc = []
-        return list.IonMc
-    } else if (project.ServeurPrive) {
-        if (!list.ServeurPrive)
-            list.ServeurPrive = []
-        return list.ServeurPrive
-    } else if (project.MinecraftServersOrg) {
-        if (!list.MinecraftServersOrg)
-            list.MinecraftServersOrg = []
-        return list.MinecraftServersOrg
-    } else if (project.PlanetMinecraft) {
-        if (!list.PlanetMinecraft)
-            list.PlanetMinecraft = []
-        return list.PlanetMinecraft
-    } else if (project.TopG) {
-        if (!list.TopG)
-            list.TopG = []
-        return list.TopG
-    } else if (project.MinecraftMp) {
-        if (!list.MinecraftMp)
-            list.MinecraftMp = []
-        return list.MinecraftMp
-    } else if (project.MinecraftServerList) {
-        if (!list.MinecraftServerList)
-            list.MinecraftServerList = []
-        return list.MinecraftServerList
-    } else if (project.ServerPact) {
-        if (!list.ServerPact)
-            list.ServerPact = []
-        return list.ServerPact
-    } else if (project.MinecraftIpList) {
-        if (!list.MinecraftIpList)
-            list.MinecraftIpList = []
-        return list.MinecraftIpList
-    } else if (project.TopMinecraftServers) {
-        if (!list.TopMinecraftServers)
-            list.TopMinecraftServers = []
-        return list.TopMinecraftServers
-    } else if (project.MinecraftServersBiz) {
-        if (!list.MinecraftServersBiz)
-            list.MinecraftServersBiz = []
-        return list.MinecraftServersBiz
-    }
+    if (!list[getProjectName(project)]) list[getProjectName(project)] = []
+    return list[getProjectName(project)]
 }
 
 function Version(s){
