@@ -238,7 +238,7 @@
     "message": "Checking whether such a project exists..."
   },
   "notConnectInternet": {
-    "message": "it Seems you don't have an Internet connection, see the details in the console"
+    "message": "it Seems you don't have an Internet connection or the site doesn't work, see the details in the console"
   },
   "notFoundProjectCode": {
     "message": "There is no such project! HTTP status code: "
@@ -250,7 +250,7 @@
     "message": "There was a redirect, most likely there is no such project! Check the URL:"
   },
   "notConnectInternetVPN": {
-    "message": "Tou don't Seem to have an Internet connection (are You from Ukraine? Enable the VPN and keep it enabled at the time of auto-voting), see the details in the console"
+    "message": "Tou don't Seem to have an Internet connection or the site doesn't work (are You from Ukraine? Enable the VPN and keep it enabled at the time of auto-voting), see the details in the console"
   },
   "authButton": {
     "message": "Log In"
