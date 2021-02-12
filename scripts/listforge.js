@@ -65,10 +65,11 @@ async function vote(first) {
             if (el.offsetParent != null) {
                 if (el.textContent.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
-                } else {
+                    return
+                } else if (el.parentElement.href == null) {
                     chrome.runtime.sendMessage({message: el.textContent.trim()})
+                    return
                 }
-                return
             }
         }
 
