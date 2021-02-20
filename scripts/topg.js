@@ -1,10 +1,17 @@
-vote()
-async function vote() {
+window.onmessage = function(e) {
+    if (e.data == 'vote') {
+        vote(false)
+    }
+}
+vote(true)
+
+async function vote(first) {
     try {
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
+
         if (document.querySelector('body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong') != null && document.querySelector('body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong').textContent.includes('You have voted successfully!')) {
             chrome.runtime.sendMessage({successfully: true})
         } else if (document.querySelector('#voting > div > div > div:nth-child(3) > p') != null && document.querySelector('#voting > div > div > div:nth-child(3) > p').textContent.includes('You have already voted!')) {
@@ -24,14 +31,15 @@ async function vote() {
             const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
             const later = Date.now() + milliseconds
             chrome.runtime.sendMessage({later: later})
-        } else if (document.getElementById('vtx') != null && document.getElementById('vtx').textContent.includes('Submit your vote') && document.getElementById('game_user').value.length == 0) {
-            clearInterval(this.check)
-            const nick = await getNickName()
-            if (nick == null || nick == '')
-                return
-            document.getElementById('game_user').value = nick
-            document.getElementById('vtx').click()
         }
+        if (first) return
+
+        const nick = await getNickName()
+        if (nick == null || nick == '')
+            return
+        document.getElementById('game_user').value = nick
+        document.querySelector('#vote button[type="submit"]').click()
+
     } catch (e) {
         chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
     }
@@ -54,11 +62,3 @@ async function getNickName() {
         chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
     }
 }
-
-this.check = setInterval(()=>{
-    //Ждёт готовности кнопки 'Submit your vote'
-    if (document.readyState == 'complete' && document.getElementById('vtx') != null && document.getElementById('vtx').textContent.includes('Submit your vote')) {
-        clearInterval(this.check)
-        vote()
-    }
-}, 1000)
