@@ -429,7 +429,31 @@
     "message": "Voting error! HTTP status code: "
   },
   "errorVoteNoElement": {
-    "message": "Voting error, it seems some necessary element/button is missing"
+    "message": "Voting error, it seems some necessary element/button is missing. Report this error to the extension developer"
+  },
+  "errorVoteNoElement2": {
+    "message": "Error! It seems that some necessary element (button or input field) is missing. Here's what we know: $error$. Report this error to the extension developer",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorVoteNoNick": {
+    "message": "Voting error! A redirect/redirection to an unknown site occurred: $url$ Check this URL",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorVoteNoNick2": {
+    "message": "Unexpected error, the nickname could not be found. URL: $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
   "errorVoteUnknown": {
     "message": "Error when voting! Here's what we know:"

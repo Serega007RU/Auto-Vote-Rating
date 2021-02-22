@@ -44,7 +44,7 @@ async function vote(first) {
         document.getElementById('voteusername').value = nick
         document.querySelector('form[method="POST"] > input[type="submit"]').click()
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -60,8 +60,8 @@ async function getNickName() {
         }
     }
     if (!document.URL.startsWith('https://minecraftlist.org/vote/')) {
-        chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
+        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
     } else {
-        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
+        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
     }
 }

@@ -42,10 +42,10 @@ async function vote() {
         } else if (document.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
-            chrome.runtime.sendMessage({message: 'Ошибка голосования, кажется какой-то нужный элемент отсутствует'})
+            chrome.runtime.sendMessage({errorVoteNoElement: true})
         }
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -61,8 +61,8 @@ async function getNickName() {
         }
     }
     if (!document.URL.startsWith('http://monitoringminecraft.ru/top/')) {
-        chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
+        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
     } else {
-        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
+        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
     }
 }

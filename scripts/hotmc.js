@@ -42,7 +42,7 @@ async function vote(first) {
         document.querySelector('#playercollector-nickname').value = nick
         document.querySelector('#w0 > div:nth-child(4) > button').click()
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -58,8 +58,8 @@ async function getNickName() {
         }
     }
     if (!document.URL.startsWith('https://hotmc.ru/vote-')) {
-        chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
+        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
     } else {
-        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
+        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
     }
 }

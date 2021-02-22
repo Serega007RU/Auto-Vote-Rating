@@ -1199,7 +1199,11 @@ async function endVote(request, sender, project) {
     } else {
         let message
         if (!request.message) {
-            message = chrome.i18n.getMessage(Object.keys(request)[0])
+            if (Object.values(request)[0] == true) {
+                message = chrome.i18n.getMessage(Object.keys(request)[0])
+            } else {
+                message = chrome.i18n.getMessage(Object.keys(request)[0], Object.values(request)[0])
+            }
         } else {
             message = request.message
         }

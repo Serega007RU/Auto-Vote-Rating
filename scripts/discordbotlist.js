@@ -41,7 +41,7 @@ function vote() {
                     clearInterval(this.check2)
                 }
             } catch (e) {
-                chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
             }
         }, 1000)
         
@@ -66,11 +66,11 @@ function vote() {
                     }
                 }
             } catch (e) {
-                chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
             }
         }, 1000)
 
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }

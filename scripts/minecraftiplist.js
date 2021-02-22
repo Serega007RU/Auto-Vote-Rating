@@ -47,7 +47,7 @@ async function vote() {
         if (document.getElementById('InnerWrapper').innerText.includes('";'))
             return
         if (!await getRecipe(document.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src)) {
-            chrome.runtime.sendMessage({message: 'Не удалось найти рецепт: ' + document.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src})
+            chrome.runtime.sendMessage({message: 'Could not find the recipe: ' + document.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src})
             return
         }
         await craft(document.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
@@ -57,7 +57,7 @@ async function vote() {
         document.querySelector('#Content > form > input[type=text]').value = nick
         document.getElementById('votebutton').click()
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -73,9 +73,9 @@ async function getNickName() {
         }
     }
     if (!document.URL.startsWith('https://minecraftiplist.com/index.php?action=vote&listingID=')) {
-        chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
+        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
     } else {
-        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
+        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
     }
 }
 
