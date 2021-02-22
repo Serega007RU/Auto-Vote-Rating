@@ -735,16 +735,16 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
 //                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
 //                  return
 //              }
-            } else if (project.DiscordBotList) {
-                if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
-                    updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
-                    return
-                }
-            } else if (project.BotsForDiscord) {
-                if (doc.getElementById("sign-in") != null) {
-                    updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
-                    return
-                }
+//          } else if (project.DiscordBotList) {
+//              if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
+//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  return
+//              }
+//          } else if (project.BotsForDiscord) {
+//              if (doc.getElementById("sign-in") != null) {
+//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  return
+//              }
             } else if (project.MMoTopRU) {
                 if (doc.querySelector('body > div') == null && doc.querySelectorAll('body > script[type="text/javascript"]').length == 1) {
                     updateStatusAdd(chrome.i18n.getMessage('emptySite'), true, element, 'error')
