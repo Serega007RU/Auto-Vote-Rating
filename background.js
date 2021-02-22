@@ -1127,12 +1127,12 @@ async function endVote(request, sender, project) {
                 time.setUTCMinutes(time.getUTCMinutes() + 7)
             } else if (project.Custom) {
                 if (project.timeoutHour) {
-                    if (!project.timeoutMinute)
-                        project.timeoutMinute = 0
+                    if (!project.timeoutMinute) project.timeoutMinute = 0
+                    if (!project.timeoutSecond) project.timeoutSecond = 0
                     if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                         time.setDate(time.getDate() + 1)
                     }
-                    time.setHours(project.timeoutHour, project.timeoutMinute, 0, 0)
+                    time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
                 } else {
                     time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
                 }
@@ -1145,10 +1145,12 @@ async function endVote(request, sender, project) {
 
         if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(),time.getMonth() + 1,0).getDate() != new Date().getDate())) {
             if (project.timeoutHour) {
+                if (!project.timeoutMinute) project.timeoutMinute = 0
+                if (!project.timeoutSecond) project.timeoutSecond = 0
                 if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                     time.setDate(time.getDate() + 1)
                 }
-                time.setHours(project.timeoutHour, project.timeoutMinute, 0, 0)
+                time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
             } else {
                 time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
             }

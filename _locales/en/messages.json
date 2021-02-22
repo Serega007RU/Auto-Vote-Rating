@@ -640,13 +640,10 @@
     "message": "In MS since the last vote"
   },
   "timeoutHour": {
-    "message": "After the specified hour and minute"
+    "message": "After the specified time (once a day)"
   },
   "chooseHour": {
-    "message": "Set the hour"
-  },
-  "chooseMinute": {
-    "message": "Set a minute"
+    "message": "Set the time"
   },
   "advSettings": {
     "message": "Advanced setting:"

@@ -113,6 +113,7 @@ function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
         } else {
             this.timeoutHour = customTimeOut.hour
             this.timeoutMinute = customTimeOut.minute
+            this.timeoutSecond = customTimeOut.second
         }
         this.time = null
         this.nick = nick
@@ -129,6 +130,7 @@ function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
             } else {
                 this.timeoutHour = customTimeOut.hour
                 this.timeoutMinute = customTimeOut.minute
+                this.timeoutSecond = customTimeOut.second
             }
         }
         this.time = time
@@ -233,18 +235,12 @@ async function restoreOptions() {
                         document.getElementById('time').removeAttribute('style')
                         document.getElementById('time').required = true
                         document.getElementById('label7').style.display = 'none'
-                        document.getElementById('label8').style.display = 'none'
                         document.getElementById('hour').style.display = 'none'
                         document.getElementById('hour').required = false
-                        document.getElementById('minute').style.display = 'none'
-                        document.getElementById('minute').required = false
                     } else {
                         document.getElementById('label7').removeAttribute('style')
-                        document.getElementById('label8').removeAttribute('style')
                         document.getElementById('hour').removeAttribute('style')
                         document.getElementById('hour').required = true
-                        document.getElementById('minute').removeAttribute('style')
-                        document.getElementById('minute').required = true
                         document.getElementById('label3').style.display = 'none'
                         document.getElementById('time').style.display = 'none'
                         document.getElementById('time').required = false
@@ -257,11 +253,8 @@ async function restoreOptions() {
                     document.getElementById('time').style.display = 'none'
                     document.getElementById('time').required = false
                     document.getElementById('label7').style.display = 'none'
-                    document.getElementById('label8').style.display = 'none'
                     document.getElementById('hour').style.display = 'none'
                     document.getElementById('hour').required = false
-                    document.getElementById('minute').style.display = 'none'
-                    document.getElementById('minute').required = false
                 }
                 return
             } else if (this.id == 'lastDayMonth') {
@@ -458,9 +451,9 @@ function updateProjectList(projects) {
 document.getElementById('addProject').addEventListener('submit', ()=>{
     event.preventDefault()
     if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: document.getElementById('hour').valueAsNumber, minute: document.getElementById('minute').valueAsNumber}), priorityOption, null)
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: Number(document.getElementById('hour').value.split(':')[0]), minute: Number(document.getElementById('hour').value.split(':')[1]), second: Number(document.getElementById('hour').value.split(':')[2])}), priorityOption, null)
     } else {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), null, (document.getElementById('customTimeOut').checked ? (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: document.getElementById('hour').valueAsNumber, minute: document.getElementById('minute').valueAsNumber}) : null), priorityOption, null)
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), null, (document.getElementById('customTimeOut').checked ? (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: Number(document.getElementById('hour').value.split(':')[0]), minute: Number(document.getElementById('hour').value.split(':')[1]), second: Number(document.getElementById('hour').value.split(':')[2])}) : null), priorityOption, null)
     }
 })
 
@@ -1753,11 +1746,8 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('time').style.display = 'none'
             document.getElementById('time').required = false
             document.getElementById('label7').style.display = 'none'
-            document.getElementById('label8').style.display = 'none'
             document.getElementById('hour').style.display = 'none'
             document.getElementById('hour').required = false
-            document.getElementById('minute').style.display = 'none'
-            document.getElementById('minute').required = false
         }
 
         if (selectedTop.value == 'Custom') {
@@ -1782,18 +1772,12 @@ selectedTop.addEventListener('change', function() {
                 document.getElementById('time').removeAttribute('style')
                 document.getElementById('time').required = true
                 document.getElementById('label7').style.display = 'none'
-                document.getElementById('label8').style.display = 'none'
                 document.getElementById('hour').style.display = 'none'
                 document.getElementById('hour').required = false
-                document.getElementById('minute').style.display = 'none'
-                document.getElementById('minute').required = false
             } else {
                 document.getElementById('label7').removeAttribute('style')
-                document.getElementById('label8').removeAttribute('style')
                 document.getElementById('hour').removeAttribute('style')
                 document.getElementById('hour').required = true
-                document.getElementById('minute').removeAttribute('style')
-                document.getElementById('minute').required = true
                 document.getElementById('label3').style.display = 'none'
                 document.getElementById('time').style.display = 'none'
                 document.getElementById('time').required = false
@@ -1885,18 +1869,12 @@ document.getElementById('selectTime').addEventListener('change', function() {
         document.getElementById('time').removeAttribute('style')
         document.getElementById('time').required = true
         document.getElementById('label7').style.display = 'none'
-        document.getElementById('label8').style.display = 'none'
         document.getElementById('hour').style.display = 'none'
         document.getElementById('hour').required = false
-        document.getElementById('minute').style.display = 'none'
-        document.getElementById('minute').required = false
     } else {
         document.getElementById('label7').removeAttribute('style')
-        document.getElementById('label8').removeAttribute('style')
         document.getElementById('hour').removeAttribute('style')
         document.getElementById('hour').required = true
-        document.getElementById('minute').removeAttribute('style')
-        document.getElementById('minute').required = true
         document.getElementById('label3').style.display = 'none'
         document.getElementById('time').style.display = 'none'
         document.getElementById('time').required = false
