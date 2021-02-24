@@ -12,26 +12,36 @@ async function vote(first) {
             return
         }
 
-        if (document.querySelector('body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong') != null && document.querySelector('body > main > div.main > div > div > div:nth-child(2) > div.alert.alert-success.fade.in > strong').textContent.includes('You have voted successfully!')) {
-            chrome.runtime.sendMessage({successfully: true})
-        } else if (document.querySelector('#voting > div > div > div:nth-child(3) > p') != null && document.querySelector('#voting > div > div > div:nth-child(3) > p').textContent.includes('You have already voted!')) {
-            const numbers = document.querySelector('#voting > div > div > div:nth-child(3) > p').textContent.match(/\d+/g).map(Number)
-            let count = 0
-            let hour = 0
-            let min = 0
-            let sec = 0
-            for (const i in numbers) {
-                if (count == 0) {
-                    hour = numbers[i]
-                } else if (count == 1) {
-                    min = numbers[i]
+        if (document.querySelector('.alert.alert-danger') != null) {
+            chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-danger').textContent.trim()})
+            return
+        } else if (document.querySelector('.alert.alert-warning') != null) {
+            if (document.querySelector('.alert.alert-warning').textContent.includes('already voted')) {
+                const numbers = document.querySelector('.alert.alert-warning').textContent.match(/\d+/g).map(Number)
+                let count = 0
+                let hour = 0
+                let min = 0
+                let sec = 0
+                for (const i in numbers) {
+                    if (count == 0) {
+                        hour = numbers[i]
+                    } else if (count == 1) {
+                        min = numbers[i]
+                    }
+                    count++
                 }
-                count++
+                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                const later = Date.now() + milliseconds
+                chrome.runtime.sendMessage({later: later})
+            } else {
+                chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-warning').textContent.trim()})
             }
-            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-            const later = Date.now() + milliseconds
-            chrome.runtime.sendMessage({later: later})
+            return
+        } else if (document.querySelector('.alert.success') != null && document.querySelector('.alert.success').textContent.includes('voted successfully')) {
+            chrome.runtime.sendMessage({successfully: true})
+            return
         }
+        
         if (first) return
 
         const nick = await getNickName()
