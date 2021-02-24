@@ -1209,6 +1209,7 @@ async function endVote(request, sender, project) {
         } else {
             message = request.message
         }
+        if (message.length == 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
         if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
             retryCoolDown = 300000

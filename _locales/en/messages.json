@@ -692,5 +692,8 @@
   },
   "servers": {
     "message": "Guilds"
+  },
+  "emptyError": {
+    "message": "Empty error"
   }
 }
