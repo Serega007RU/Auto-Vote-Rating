@@ -1,10 +1,4 @@
-//Совместимость с Rocket Loader
-document.addEventListener('DOMContentLoaded', (event)=>{
-    vote()
-})
-if (document.URL.startsWith('https://discord.com/')) {
-    vote()
-}
+vote()
 
 function vote() {
     try {
