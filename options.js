@@ -31,6 +31,9 @@ var allProjects = [
     'MCServerList',
     'CraftList',
     'CzechCraft',
+    'PixelmonServers',
+    'QTop',
+    'MinecraftBuzz',
     'Custom'
 ]
 
@@ -50,7 +53,8 @@ var authVKUrls = new Map([
     ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
     ['MCRate', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
     ['MinecraftRating', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
-    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html']
+    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
+    ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&redirect_uri=close.html']
 ])
 
 const svgDelete = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
@@ -659,6 +663,15 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         } else if (project.CzechCraft) {
             url = 'https://czech-craft.eu/server/' + project.id + '/'
             jsPath = 'a.server-name'
+        } else if (project.PixelmonServers) {
+            url = 'https://pixelmonservers.com/server/' + project.id + '/vote'
+            jsPath = '#title'
+        } else if (project.QTop) {
+            url = 'http://q-top.ru/vote' + project.id
+            jsPath = 'a[href="profile' + project.id + '"]'
+        } else if (project.MinecraftBuzz) {
+            url = 'https://minecraft.buzz/server/' + project.id
+            jsPath = '[href="server/' + project.id + '"]'
         }
 
         let response
@@ -682,7 +695,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             updateStatusAdd(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, true, element, 'error')
             return
         } else if (response.redirected) {
-            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.MCServerList || project.CraftList) {
+            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.MCServerList || project.CraftList || project.MinecraftBuzz) {
                 updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
                 return
             }
@@ -786,7 +799,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         updateStatusAdd(chrome.i18n.getMessage('checkHasProjectSuccess'), true, element)
 
         //Проверка авторизации ВКонтакте
-        if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) {
+        if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
             updateStatusAdd(chrome.i18n.getMessage('checkAuthVK'), true, element)
             let url2 = authVKUrls.get(getProjectName(project))
             let response2
@@ -886,7 +899,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     
     updateStatusAdd(array, true, element)
 
-    if (project.MinecraftIndex) {
+    if (project.MinecraftIndex || project.PixelmonServers) {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 
@@ -1153,6 +1166,9 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         projectsMCServerList,
         projectsCraftList,
         projectsCzechCraft,
+        projectsPixelmonServers,
+        projectsQTop,
+        projectsMinecraftBuzz,
         projectsCustom,
         settings,
         generalStats
@@ -1711,6 +1727,18 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip1').textContent = 'https://czech-craft.eu/server/'
         document.getElementById('projectIDTooltip2').textContent = 'trenend'
         document.getElementById('projectIDTooltip3').textContent = '/vote/'
+    } else if (selectedTop.value == 'PixelmonServers') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://pixelmonservers.com/server/'
+        document.getElementById('projectIDTooltip2').textContent = '8IO9idMv'
+        document.getElementById('projectIDTooltip3').textContent = '/vote'
+    } else if (selectedTop.value == 'QTop') {
+        document.getElementById('projectIDTooltip1').textContent = 'http://q-top.ru/vote'
+        document.getElementById('projectIDTooltip2').textContent = '1549'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'MinecraftBuzz') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft.buzz/server/'
+        document.getElementById('projectIDTooltip2').textContent = '306'
+        document.getElementById('projectIDTooltip3').textContent = '&tab=vote'
     }
 
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || selectedTop.value == 'MMoTopRU' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU') {

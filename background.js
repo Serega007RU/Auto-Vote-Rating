@@ -31,6 +31,9 @@ var allProjects = [
     'MCServerList',
     'CraftList',
     'CzechCraft',
+    'PixelmonServers',
+    'QTop',
+    'MinecraftBuzz',
     'Custom'
 ]
 
@@ -326,6 +329,12 @@ async function newWindow(project) {
             url = 'https://craftlist.org/' + project.id
         else if (project.CzechCraft)
             url = 'https://czech-craft.eu/server/' + project.id + '/vote/'
+        else if (project.PixelmonServers)
+            url = 'https://pixelmonservers.com/server/' + project.id + '/vote'
+        else if (project.QTop)
+            url = 'http://q-top.ru/vote' + project.id
+        else if (project.MinecraftBuzz)
+            url = 'https://minecraft.buzz/server/' + project.id + '&tab=vote'
         
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url: url, active: false}, function(tab_) {
@@ -1052,7 +1061,7 @@ async function endVote(request, sender, project) {
     let sendMessage = ''
     if (request.successfully || request.later) {
         let time = new Date()
-        if (project.TopCraft || project.McTOP || project.MinecraftRating || project.IonMc) {
+        if (project.TopCraft || project.McTOP || project.MinecraftRating || project.IonMc || project.QTop) {
             //Топы на которых время сбрасывается в 00:00 по МСК
             if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
@@ -1073,7 +1082,7 @@ async function endVote(request, sender, project) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
             time.setUTCHours(5, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.MinecraftServersOrg || project.MinecraftIndex) {
+        } else if (project.MinecraftServersOrg || project.MinecraftIndex || project.MinecraftBuzz || project.PixelmonServers) {
             if (time.getUTCHours() > 0 || (time.getUTCHours() == 0 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }

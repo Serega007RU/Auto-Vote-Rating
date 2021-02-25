@@ -37,7 +37,7 @@ async function vote(first) {
                 chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-warning').textContent.trim()})
             }
             return
-        } else if (document.querySelector('.alert.success') != null && document.querySelector('.alert.success').textContent.includes('voted successfully')) {
+        } else if (document.querySelector('.alert.alert-success') != null && document.querySelector('.alert.alert-success').textContent.includes('voted successfully')) {
             chrome.runtime.sendMessage({successfully: true})
             return
         }
