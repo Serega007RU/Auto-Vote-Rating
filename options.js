@@ -363,9 +363,13 @@ async function addProjectList(project, visually) {
         }
 
         let button = document.createElement('button')
-        button.setAttribute('class', 'selectsite')
+        button.setAttribute('class', 'selectsite projectListButtons')
         button.setAttribute('id', getProjectName(project) + 'Button')
         button.textContent = getFullProjectName(project)
+
+        let count = document.createElement('span')
+        count.textContent = getProjectList(project).length
+        button.append(count)
 
         if (document.getElementById('addedProjectsTable1').childElementCount > document.getElementById('addedProjectsTable2').childElementCount) {
             document.getElementById('addedProjectsTable2').insertBefore(button, document.getElementById('addedProjectsTable2').firstElementChild)
@@ -380,21 +384,20 @@ async function addProjectList(project, visually) {
             listSelect(event, getProjectName(project) + 'Tab')
         })
     }
-    if (visually)
-        return
+    if (visually) return
     if (project.priority) {
         getProjectList(project).unshift(project)
     } else {
         getProjectList(project).push(project)
     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true)
-    if (project.Custom && !settings.enableCustom)
-        addCustom()
+    if (project.Custom && !settings.enableCustom) addCustom()
     //projects.push(project)
     //await setValue('AVMRprojects', projects, true)
     if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
+    document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
 }
 
 //Удалить проект из списка проекта
@@ -406,8 +409,7 @@ async function removeProjectList(project, visually) {
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).removeEventListener('click', function() {})
     document.getElementById('div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).remove()
     if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'Tab').firstElementChild.removeAttribute('style')
-    if (visually)
-        return
+    if (visually) return
     for (let i = getProjectList(project).length; i--; ) {
         let temp = getProjectList(project)[i]
         if (temp.nick == project.nick && JSON.stringify(temp.id) == JSON.stringify(project.id) && getProjectName(temp) == getProjectName(project))
@@ -416,6 +418,7 @@ async function removeProjectList(project, visually) {
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true)
     //projects.splice(deleteCount, 1)
     //await setValue('AVMRprojects', projects, true)
+    document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
     for (let value of chrome.extension.getBackgroundPage().queueProjects) {
         if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
