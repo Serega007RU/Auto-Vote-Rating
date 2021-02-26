@@ -1,34 +1,48 @@
-//Если мы находимся на странице авторизации Steam
-if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
-    document.getElementById('imageLogin').click()
-    const timer2 = setInterval(()=>{
-        if (document.getElementById('error_display').style.display != 'none') {
-            chrome.runtime.sendMessage({message: document.getElementById('error_display').textContent})
-            clearInterval(timer2)
-        } else if ((document.querySelector('div.newmodal') != null && document.querySelector('div.newmodal').style.display != 'none')
-            || (document.querySelector('div.login_modal.loginAuthCodeModal') != null && document.querySelector('div.login_modal.loginAuthCodeModal').style.display != 'none')
-            || (document.querySelector('div.login_modal.loginTwoFactorCodeModal') != null && document.querySelector('div.login_modal.loginTwoFactorCodeModal').style.display != 'none')
-            || (document.querySelector('div.login_modal.loginIPTModal') != null && document.querySelector('div.login_modal.loginIPTModal').style.display != 'none')) {
-                chrome.runtime.sendMessage({authSteam: true})
+try {
+    //Если мы находимся на странице авторизации Steam
+    if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
+        document.getElementById('imageLogin').click()
+        const timer2 = setInterval(()=>{
+            try {
+                if (document.getElementById('error_display').style.display != 'none') {
+                    chrome.runtime.sendMessage({message: document.getElementById('error_display').textContent})
+                    clearInterval(timer2)
+                } else if ((document.querySelector('div.newmodal') != null && document.querySelector('div.newmodal').style.display != 'none')
+                    || (document.querySelector('div.login_modal.loginAuthCodeModal') != null && document.querySelector('div.login_modal.loginAuthCodeModal').style.display != 'none')
+                    || (document.querySelector('div.login_modal.loginTwoFactorCodeModal') != null && document.querySelector('div.login_modal.loginTwoFactorCodeModal').style.display != 'none')
+                    || (document.querySelector('div.login_modal.loginIPTModal') != null && document.querySelector('div.login_modal.loginIPTModal').style.display != 'none')) {
+                        chrome.runtime.sendMessage({authSteam: true})
+                        clearInterval(timer2)
+                }
+            } catch (e) {
+                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
                 clearInterval(timer2)
-        }
-    }, 1000)
-} else {
-    window.onmessage = function(e) {
-        if (e.data == 'vote') {
-            vote(false)
-        }
-    }
-    if (document.getElementById('vote-loading-block') != null) {
-        const timer1 = setInterval(()=>{
-            if (document.getElementById('vote-loading-block').style.display == 'none') {
-                vote(true)
-                clearInterval(timer1)
             }
         }, 1000)
     } else {
-        vote(true)
+        window.onmessage = function(e) {
+            if (e.data == 'vote') {
+                vote(false)
+            }
+        }
+        if (document.getElementById('vote-loading-block') != null) {
+            const timer1 = setInterval(()=>{
+                try {
+                    if (document.getElementById('vote-loading-block').style.display == 'none') {
+                        vote(true)
+                        clearInterval(timer1)
+                    }
+                } catch (e) {
+                    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                    clearInterval(timer1)
+                }
+            }, 1000)
+        } else {
+            vote(true)
+        }
     }
+} catch (e) {
+    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
 }
 
 async function vote(first) {
@@ -65,10 +79,11 @@ async function vote(first) {
             if (el.offsetParent != null) {
                 if (el.textContent.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
-                } else {
+                    return
+                } else if (el.parentElement.href == null) {
                     chrome.runtime.sendMessage({message: el.textContent.trim()})
+                    return
                 }
-                return
             }
         }
 
@@ -105,7 +120,7 @@ async function vote(first) {
         }
         
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -116,10 +131,10 @@ async function getProject() {
         })
     })
     for (const project of projects) {
-        if (project.ListForge && document.URL.includes(project.game) && document.URL.includes(project.id)) {
+        if (document.URL.includes(project.game) && document.URL.includes(project.id)) {
             return project
         }
     }
 
-    chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

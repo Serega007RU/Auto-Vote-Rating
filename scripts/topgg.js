@@ -36,25 +36,34 @@ function vote() {
                 return
             }
         }
+
+        document.getElementById('votingvoted').click()
         
-        this.check = setInterval(()=>{
-            if (document.getElementById('votingvoted').textContent.includes('already voted')) {
-                chrome.runtime.sendMessage({later: true})
-                clearInterval(this.check)
-            } else if (document.getElementById('votingvoted').textContent.trim() == 'Vote') {
-                document.getElementById('votingvoted').click()
-            } else if (document.getElementById("reminder").style.display != 'none' || document.getElementById("successful-reminder").style.display != 'none' || document.getElementById("failure-reminder").style.display != 'none') {
-                chrome.runtime.sendMessage({successfully: true})
-                clearInterval(this.check)
-            } else if (document.getElementById('votingvoted').textContent == 'Voting...') {
-                //None
-            } else {
-                chrome.runtime.sendMessage({message: document.getElementById('votingvoted').textContent.trim()})
-                clearInterval(this.check)
+        const timer2 = setInterval(()=>{
+            try {
+                if (document.getElementById('votingvoted').textContent.includes('already voted') || document.getElementById('votingvoted').value.includes('already voted')) {
+                    chrome.runtime.sendMessage({later: true})
+                    clearInterval(timer2)
+                } else if (document.getElementById("reminder").style.display != 'none' || document.getElementById("successful-reminder").style.display != 'none' || document.getElementById("failure-reminder").style.display != 'none') {
+                    chrome.runtime.sendMessage({successfully: true})
+                    clearInterval(timer2)
+                } else if (document.getElementById('votingvoted').textContent == 'Voting...' || document.getElementById('votingvoted').value == 'Voting...' || document.getElementById('votingvoted').textContent == 'Vote' || document.getElementById('votingvoted').value == 'Vote') {
+                    //None
+                } else if (document.getElementById('votingvoted').textContent != '' || document.getElementById('votingvoted').value != '') {
+                    if (document.getElementById('votingvoted').textContent != '') {
+                        chrome.runtime.sendMessage({message: document.getElementById('votingvoted').textContent.trim()})
+                    } else {
+                        chrome.runtime.sendMessage({message: document.getElementById('votingvoted').value})
+                    }
+                    clearInterval(timer2)
+                }
+            } catch (e) {
+                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                clearInterval(timer2)
             }
         }, 1000)
 
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }

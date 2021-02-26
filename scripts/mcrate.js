@@ -26,17 +26,22 @@ async function vote() {
                 chrome.runtime.sendMessage({message: document.querySelector('div[class=report]').textContent})
             }
         } else if (document.querySelector('span[class=count_hour]') != null) {
-//                this.check = setInterval(()=>{
-//                    //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
-//                    var hour = parseInt(document.querySelector('span[class=count_hour]').textContent)
-//                    var min = parseInt(document.querySelector('span[class=count_min]').textContent)
-//                    var sec = parseInt(document.querySelector('span[class=count_sec]').textContent)
-//                    var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-//                    if (milliseconds == 0) return
-//                    var later = Date.now() - (86400000 - milliseconds)
-//                    clearInterval(this.check)
-//                    chrome.runtime.sendMessage({later: later})
-//                }, 2000)
+//          const timer = setInterval(()=>{
+//              try {
+//                  //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
+//                  let hour = parseInt(document.querySelector('span[class=count_hour]').textContent)
+//                  let min = parseInt(document.querySelector('span[class=count_min]').textContent)
+//                  let sec = parseInt(document.querySelector('span[class=count_sec]').textContent)
+//                  let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+//                  if (milliseconds == 0) return
+//                  let later = Date.now() - (86400000 - milliseconds)
+//                  chrome.runtime.sendMessage({later: later})
+//                  clearInterval(timer)
+//              } catch (e) {
+//                  chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+//                  clearInterval(timer)
+//              }
+//          }, 2000)
             chrome.runtime.sendMessage({later: true})
         } else if (document.querySelector('div[class="error"]') != null) {
             chrome.runtime.sendMessage({message: document.querySelector('div[class="error"]').textContent})
@@ -44,7 +49,7 @@ async function vote() {
             chrome.runtime.sendMessage({errorVoteNoElement: true})
         }
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -55,13 +60,10 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.MCRate && (document.URL.startsWith('http://mcrate.su/rate/' + project.id) || document.URL.startsWith('http://mcrate.su/add/rate?idp=' + project.id + '&code='))) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('http://mcrate.su/rate/') && !document.URL.startsWith('http://mcrate.su/add/rate?idp=')) {
-        chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
-    } else {
-        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

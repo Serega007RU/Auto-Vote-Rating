@@ -238,7 +238,7 @@
     "message": "Checking whether such a project exists..."
   },
   "notConnectInternet": {
-    "message": "it Seems you don't have an Internet connection, see the details in the console"
+    "message": "it Seems you don't have an Internet connection or the site doesn't work, see the details in the console"
   },
   "notFoundProjectCode": {
     "message": "There is no such project! HTTP status code: "
@@ -250,7 +250,7 @@
     "message": "There was a redirect, most likely there is no such project! Check the URL:"
   },
   "notConnectInternetVPN": {
-    "message": "Tou don't Seem to have an Internet connection (are You from Ukraine? Enable the VPN and keep it enabled at the time of auto-voting), see the details in the console"
+    "message": "Tou don't Seem to have an Internet connection or the site doesn't work (are You from Ukraine? Enable the VPN and keep it enabled at the time of auto-voting), see the details in the console"
   },
   "authButton": {
     "message": "Log In"
@@ -429,7 +429,31 @@
     "message": "Voting error! HTTP status code: "
   },
   "errorVoteNoElement": {
-    "message": "Voting error, it seems some necessary element/button is missing"
+    "message": "Voting error, it seems some necessary element/button is missing. Report this error to the extension developer"
+  },
+  "errorVoteNoElement2": {
+    "message": "Error! It seems that some necessary element (button or input field) is missing. Here's what we know: $error$. Report this error to the extension developer",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorVoteNoNick": {
+    "message": "Voting error! A redirect/redirection to an unknown site occurred: $url$ Check this URL",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorVoteNoNick2": {
+    "message": "Unexpected error, the nickname could not be found. URL: $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
   "errorVoteUnknown": {
     "message": "Error when voting! Here's what we know:"
@@ -727,9 +751,10 @@
     "message": "In MS since the last vote"
   },
   "timeoutHour": {
-    "message": "After the specified hour and minute"
+    "message": "After the specified time (once a day)"
   },
   "chooseHour": {
+<<<<<<< HEAD
     "message": "Set the hour"
   },
   "ip": {
@@ -760,7 +785,7 @@
     "message": "Selected protocol"
   },
   "chooseMinute": {
-    "message": "Set a minute"
+    "message": "Set the time"
   },
   "advSettings": {
     "message": "Advanced setting:"
@@ -821,5 +846,8 @@
   },
   "servers": {
     "message": "Guilds"
+  },
+  "emptyError": {
+    "message": "Empty error"
   }
 }

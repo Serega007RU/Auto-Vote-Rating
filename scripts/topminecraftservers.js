@@ -19,19 +19,24 @@ async function vote() {
             }
         } else {
             //Ожидание загрузки reCATPCHA
-            this.check = setTimeout(async ()=>{
-                if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
-                    clearInterval(this.check)
-                    const nick = await getNickName()
-                    if (nick == null || nick == '')
-                        return
-                    document.getElementById('username').value = nick
-                    document.getElementById('voteButton').click()
+            const timer = setTimeout(async ()=>{
+                try {
+                    if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
+                        clearInterval(timer)
+                        const nick = await getNickName()
+                        if (nick == null || nick == '')
+                            return
+                        document.getElementById('username').value = nick
+                        document.getElementById('voteButton').click()
+                    }
+                } catch (e) {
+                    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                    clearInterval(timer)
                 }
             }, 1000)
         }
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -42,13 +47,10 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.TopMinecraftServers && (document.URL.startsWith('https://topminecraftservers.org/vote/' + project.id))) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://topminecraftservers.org/vote/')) {
-        chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL. Либо данного проекта больше не существует'})
-    } else {
-        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

@@ -820,3 +820,25 @@ ul li:hover {
 #idSelector {
   height: 95px;
 }
+
+/*Кол-во какого-либо списка*/
+.projectListButtons > span {
+    top: -10px;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 2;
+    line-height: 28px;
+    border-radius: 100%;
+    height: 30px;
+    justify-content: center;
+    display: flex;
+    width: 30px;
+    position: absolute;
+    color: #000;
+    right: -10px;
+    background: #ccc;
+}
+
+.projectListButtons {
+    position: relative;
+}

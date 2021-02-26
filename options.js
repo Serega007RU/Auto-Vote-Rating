@@ -1,39 +1,3 @@
-var projectsTopCraft = []
-var projectsMcTOP = []
-var projectsMCRate = []
-var projectsMinecraftRating = []
-var projectsMonitoringMinecraft = []
-var projectsIonMc = []
-var projectsMinecraftServersOrg = []
-var projectsServeurPrive = []
-var projectsPlanetMinecraft = []
-var projectsTopG = []
-var projectsListForge = []
-var projectsMinecraftServerList = []
-var projectsServerPact = []
-var projectsMinecraftIpList = []
-var projectsTopMinecraftServers = []
-var projectsMinecraftServersBiz = []
-var projectsHotMC = []
-var projectsMinecraftServerNet = []
-var projectsMinecraftServerNet = []
-var projectsTopGames = []
-var projectsTMonitoring = []
-var projectsTopGG = []
-var projectsDiscordBotList = []
-var projectsBotsForDiscord = []
-var projectsMMoTopRU = []
-var projectsMCServers = []
-var projectsMinecraftList = []
-var projectsMinecraftIndex = []
-var projectsServerList101 = []
-var projectsMCServerList = []
-var projectsCraftList = []
-var projectsCzechCraft = []
-var projectsCustom = []
-var VKs = []
-var proxies = []
-
 var allProjects = [
     'TopCraft',
     'McTOP',
@@ -66,6 +30,9 @@ var allProjects = [
     'MCServerList',
     'CraftList',
     'CzechCraft',
+    'PixelmonServers',
+    'QTop',
+    'MinecraftBuzz',
     'Custom'
 ]
 
@@ -87,7 +54,8 @@ var authVKUrls = new Map([
     ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
     ['MCRate', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
     ['MinecraftRating', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
-    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html']
+    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
+    ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&redirect_uri=close.html']
 ])
 
 const svgDelete = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
@@ -150,6 +118,7 @@ function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
         } else {
             this.timeoutHour = customTimeOut.hour
             this.timeoutMinute = customTimeOut.minute
+            this.timeoutSecond = customTimeOut.second
         }
         this.time = null
         this.nick = nick
@@ -166,6 +135,7 @@ function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
             } else {
                 this.timeoutHour = customTimeOut.hour
                 this.timeoutMinute = customTimeOut.minute
+                this.timeoutSecond = customTimeOut.second
             }
         }
         this.time = time
@@ -293,18 +263,12 @@ async function restoreOptions() {
                         document.getElementById('time').removeAttribute('style')
                         document.getElementById('time').required = true
                         document.getElementById('label7').style.display = 'none'
-                        document.getElementById('label8').style.display = 'none'
                         document.getElementById('hour').style.display = 'none'
                         document.getElementById('hour').required = false
-                        document.getElementById('minute').style.display = 'none'
-                        document.getElementById('minute').required = false
                     } else {
                         document.getElementById('label7').removeAttribute('style')
-                        document.getElementById('label8').removeAttribute('style')
                         document.getElementById('hour').removeAttribute('style')
                         document.getElementById('hour').required = true
-                        document.getElementById('minute').removeAttribute('style')
-                        document.getElementById('minute').required = true
                         document.getElementById('label3').style.display = 'none'
                         document.getElementById('time').style.display = 'none'
                         document.getElementById('time').required = false
@@ -317,11 +281,8 @@ async function restoreOptions() {
                     document.getElementById('time').style.display = 'none'
                     document.getElementById('time').required = false
                     document.getElementById('label7').style.display = 'none'
-                    document.getElementById('label8').style.display = 'none'
                     document.getElementById('hour').style.display = 'none'
                     document.getElementById('hour').required = false
-                    document.getElementById('minute').style.display = 'none'
-                    document.getElementById('minute').required = false
                 }
                 return
             } else if (this.id == 'lastDayMonth') {
@@ -452,9 +413,13 @@ async function addProjectList(project, visually) {
         }
 
         let button = document.createElement('button')
-        button.setAttribute('class', 'selectsite')
+        button.setAttribute('class', 'selectsite projectListButtons')
         button.setAttribute('id', getProjectName(project) + 'Button')
         button.textContent = getFullProjectName(project)
+
+        let count = document.createElement('span')
+        count.textContent = getProjectList(project).length
+        button.append(count)
 
         if (document.getElementById('addedProjectsTable1').childElementCount > document.getElementById('addedProjectsTable2').childElementCount) {
             document.getElementById('addedProjectsTable2').insertBefore(button, document.getElementById('addedProjectsTable2').firstElementChild)
@@ -469,21 +434,20 @@ async function addProjectList(project, visually) {
             listSelect(event, getProjectName(project) + 'Tab')
         })
     }
-    if (visually)
-        return
+    if (visually) return
     if (project.priority) {
         getProjectList(project).unshift(project)
     } else {
         getProjectList(project).push(project)
     }
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true)
-    if (project.Custom && !settings.enableCustom)
-        addCustom()
+    if (project.Custom && !settings.enableCustom) addCustom()
     //projects.push(project)
     //await setValue('AVMRprojects', projects, true)
     if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
+    document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
 }
 
 //Добавить аккаунт ВКонтакте в список
@@ -551,8 +515,7 @@ async function removeProjectList(project, visually) {
     document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).removeEventListener('click', function() {})
     document.getElementById('div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).remove()
     if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'Tab').firstElementChild.removeAttribute('style')
-    if (visually)
-        return
+    if (visually) return
     for (let i = getProjectList(project).length; i--; ) {
         let temp = getProjectList(project)[i]
         if (temp.nick == project.nick && JSON.stringify(temp.id) == JSON.stringify(project.id) && getProjectName(temp) == getProjectName(project))
@@ -561,6 +524,7 @@ async function removeProjectList(project, visually) {
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true)
     //projects.splice(deleteCount, 1)
     //await setValue('AVMRprojects', projects, true)
+    document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
     for (let value of chrome.extension.getBackgroundPage().queueProjects) {
         if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
@@ -660,9 +624,9 @@ function updateProjectList(projects, key) {
 document.getElementById('addProject').addEventListener('submit', ()=>{
     event.preventDefault()
     if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: document.getElementById('hour').valueAsNumber, minute: document.getElementById('minute').valueAsNumber}), priorityOption, null)
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: Number(document.getElementById('hour').value.split(':')[0]), minute: Number(document.getElementById('hour').value.split(':')[1]), second: Number(document.getElementById('hour').value.split(':')[2])}), priorityOption, null)
     } else {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), null, (document.getElementById('customTimeOut').checked ? (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: document.getElementById('hour').valueAsNumber, minute: document.getElementById('minute').valueAsNumber}) : null), priorityOption, null)
+        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), null, (document.getElementById('customTimeOut').checked ? (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: Number(document.getElementById('hour').value.split(':')[0]), minute: Number(document.getElementById('hour').value.split(':')[1]), second: Number(document.getElementById('hour').value.split(':')[2])}) : null), priorityOption, null)
     }
 })
 
@@ -1226,7 +1190,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             url = 'http://minecraftrating.ru/projects/' + project.id + '/'
             jsPath = 'table[class="table server-table"] > tbody > tr:nth-child(2) > td:nth-child(2) > a'
         } else if (project.MonitoringMinecraft) {
-            url = 'http://monitoringminecraft.ru/top/' + project.id + '/'
+            url = 'https://monitoringminecraft.ru/top/' + project.id + '/'
             jsPath = '#page > div.box.visible.main > div.left > table > tbody > tr:nth-child(1) > td.wid > noindex > a'
         } else if (project.IonMc) {
             url = 'https://ionmc.top/projects/' + project.id + '/vote'
@@ -1301,7 +1265,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             jsPath = '#site-link'
         } else if (project.MCServers) {
             url = 'https://mc-servers.com/details/' + project.id + '/'
-            jsPath = 'div.main-panel > div.center > div.col.s12.m12.l5 > strong'
+            jsPath = 'a[href="/details/' + project.id + '"]'
         } else if (project.MinecraftList) {
             url = 'https://minecraftlist.org/server/' + project.id
             jsPath = 'h1'
@@ -1312,14 +1276,23 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             url = 'https://serverlist101.com/server/' + project.id + '/'
             jsPath = 'li > h1'
         } else if (project.MCServerList) {
-            url = 'https://mcserver-list.eu/server/?id=' + project.id
-            jsPath = 'p.title'
+            url = 'https://api.mcserver-list.eu/server/?id=' + project.id
+
         } else if (project.CraftList) {
             url = 'https://craftlist.org/' + project.id
             jsPath = 'main h1'
         } else if (project.CzechCraft) {
             url = 'https://czech-craft.eu/server/' + project.id + '/'
             jsPath = 'a.server-name'
+        } else if (project.PixelmonServers) {
+            url = 'https://pixelmonservers.com/server/' + project.id + '/vote'
+            jsPath = '#title'
+        } else if (project.QTop) {
+            url = 'http://q-top.ru/vote' + project.id
+            jsPath = 'a[href="profile' + project.id + '"]'
+        } else if (project.MinecraftBuzz) {
+            url = 'https://minecraft.buzz/server/' + project.id
+            jsPath = '[href="server/' + project.id + '"]'
         }
 
         let response
@@ -1343,7 +1316,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             updateStatusAdd(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, true, element, 'error')
             return
         } else if (response.redirected) {
-            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.MCServerList || project.CraftList) {
+            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.CraftList || project.MinecraftBuzz) {
                 updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
                 return
             }
@@ -1389,16 +1362,16 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
 //                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
 //                  return
 //              }
-            } else if (project.DiscordBotList) {
-                if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
-                    updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
-                    return
-                }
-            } else if (project.BotsForDiscord) {
-                if (doc.getElementById("sign-in") != null) {
-                    updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
-                    return
-                }
+//          } else if (project.DiscordBotList) {
+//              if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
+//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  return
+//              }
+//          } else if (project.BotsForDiscord) {
+//              if (doc.getElementById("sign-in") != null) {
+//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  return
+//              }
             } else if (project.MMoTopRU) {
                 if (doc.querySelector('body > div') == null && doc.querySelectorAll('body > script[type="text/javascript"]').length == 1) {
                     updateStatusAdd(chrome.i18n.getMessage('emptySite'), true, element, 'error')
@@ -1408,7 +1381,10 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                     return
                 }
             }
-
+            
+            if (project.MCServerList) {
+                projectURL = JSON.parse(html)[0].name
+            } else
             if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).text)
             } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent != '') {
@@ -1447,7 +1423,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
         updateStatusAdd(chrome.i18n.getMessage('checkHasProjectSuccess'), true, element)
 
         //Проверка авторизации ВКонтакте
-        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && !settings.useMultiVote) {
+        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && !settings.useMultiVote) {
             updateStatusAdd(chrome.i18n.getMessage('checkAuthVK'), true, element)
             let url2 = authVKUrls.get(getProjectName(project))
             let response2
@@ -1547,7 +1523,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     
     updateStatusAdd(array, true, element)
 
-    if (project.MinecraftIndex) {
+    if (project.MinecraftIndex || project.PixelmonServers) {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 
@@ -1575,7 +1551,7 @@ function addProjectsBonus(project, element) {
 //      })
 /*  } else */if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async()=>{
-            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/","referrerPolicy":"no-referrer-when-downgrade","body":"give_daily_posted=1&token=%7Btoken%7D&return=%252F","method":"POST","mode":"cors"}', null, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', {ms: 86400000}, priorityOption, null)
+            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"headers": {"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language": "ru,en-US;q=0.9,en;q=0.8","content-type": "application/x-www-form-urlencoded","sec-fetch-dest": "document","sec-fetch-mode": "navigate","sec-fetch-site": "same-origin","sec-fetch-user": "?1","upgrade-insecure-requests": "1"},"body": "give_daily_posted=1&token=%7Btoken%7D&return=%252F","method": "POST"}', null, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', {ms: 86400000}, priorityOption, null)
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null)
         })
     }
@@ -1852,6 +1828,9 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         projectsMCServerList,
         projectsCraftList,
         projectsCzechCraft,
+        projectsPixelmonServers,
+        projectsQTop,
+        projectsMinecraftBuzz,
         projectsCustom,
         VKs,
         proxies,
@@ -2405,7 +2384,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip2').textContent = 'cubixworld'
         document.getElementById('projectIDTooltip3').textContent = '/'
     } else if (selectedTop.value == 'MonitoringMinecraft') {
-        document.getElementById('projectIDTooltip1').textContent = 'http://monitoringminecraft.ru/top/'
+        document.getElementById('projectIDTooltip1').textContent = 'https://monitoringminecraft.ru/top/'
         document.getElementById('projectIDTooltip2').textContent = 'gg'
         document.getElementById('projectIDTooltip3').textContent = '/vote'
     } else if (selectedTop.value == 'IonMc') {
@@ -2512,6 +2491,18 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip1').textContent = 'https://czech-craft.eu/server/'
         document.getElementById('projectIDTooltip2').textContent = 'trenend'
         document.getElementById('projectIDTooltip3').textContent = '/vote/'
+    } else if (selectedTop.value == 'PixelmonServers') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://pixelmonservers.com/server/'
+        document.getElementById('projectIDTooltip2').textContent = '8IO9idMv'
+        document.getElementById('projectIDTooltip3').textContent = '/vote'
+    } else if (selectedTop.value == 'QTop') {
+        document.getElementById('projectIDTooltip1').textContent = 'http://q-top.ru/vote'
+        document.getElementById('projectIDTooltip2').textContent = '1549'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'MinecraftBuzz') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft.buzz/server/'
+        document.getElementById('projectIDTooltip2').textContent = '306'
+        document.getElementById('projectIDTooltip3').textContent = '&tab=vote'
     }
 
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || selectedTop.value == 'MMoTopRU' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU') {
@@ -2547,11 +2538,8 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('time').style.display = 'none'
             document.getElementById('time').required = false
             document.getElementById('label7').style.display = 'none'
-            document.getElementById('label8').style.display = 'none'
             document.getElementById('hour').style.display = 'none'
             document.getElementById('hour').required = false
-            document.getElementById('minute').style.display = 'none'
-            document.getElementById('minute').required = false
         }
 
         if (selectedTop.value == 'Custom') {
@@ -2576,18 +2564,12 @@ selectedTop.addEventListener('change', function() {
                 document.getElementById('time').removeAttribute('style')
                 document.getElementById('time').required = true
                 document.getElementById('label7').style.display = 'none'
-                document.getElementById('label8').style.display = 'none'
                 document.getElementById('hour').style.display = 'none'
                 document.getElementById('hour').required = false
-                document.getElementById('minute').style.display = 'none'
-                document.getElementById('minute').required = false
             } else {
                 document.getElementById('label7').removeAttribute('style')
-                document.getElementById('label8').removeAttribute('style')
                 document.getElementById('hour').removeAttribute('style')
                 document.getElementById('hour').required = true
-                document.getElementById('minute').removeAttribute('style')
-                document.getElementById('minute').required = true
                 document.getElementById('label3').style.display = 'none'
                 document.getElementById('time').style.display = 'none'
                 document.getElementById('time').required = false
@@ -2679,18 +2661,12 @@ document.getElementById('selectTime').addEventListener('change', function() {
         document.getElementById('time').removeAttribute('style')
         document.getElementById('time').required = true
         document.getElementById('label7').style.display = 'none'
-        document.getElementById('label8').style.display = 'none'
         document.getElementById('hour').style.display = 'none'
         document.getElementById('hour').required = false
-        document.getElementById('minute').style.display = 'none'
-        document.getElementById('minute').required = false
     } else {
         document.getElementById('label7').removeAttribute('style')
-        document.getElementById('label8').removeAttribute('style')
         document.getElementById('hour').removeAttribute('style')
         document.getElementById('hour').required = true
-        document.getElementById('minute').removeAttribute('style')
-        document.getElementById('minute').required = true
         document.getElementById('label3').style.display = 'none'
         document.getElementById('time').style.display = 'none'
         document.getElementById('time').required = false

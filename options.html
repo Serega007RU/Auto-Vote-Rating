@@ -153,13 +153,16 @@
 								<option value="DiscordBotList">DiscordBotList.com</option>
 								<option value="BotsForDiscord">BotsForDiscord.com</option>
 								<option value="MMoTopRU">MMoTop.ru</option>
-								<option value="MCServers">MC-Servers.com/</option>
+								<option value="MCServers">MC-Servers.com</option>
 								<option value="MinecraftList">MinecraftList.org</option>
 								<option value="MinecraftIndex">Minecraft-Index.com</option>
 								<option value="ServerList101">ServerList101.com</option>
 								<option value="MCServerList">MCServer-List.eu</option>
 								<option hidden value="CraftList">CraftList.org</option>
 								<option value="CzechCraft">Czech-Craft.eu</option>
+								<option value="PixelmonServers">PixelmonServers.com</option>
+								<option value="QTop">Q-Top.ru</option>
+								<option value="MinecraftBuzz">Minecraft.Buzz</option>
 								<option hidden value="Custom" data-resource="Custom"></option>
 							</select>
                             <!--Custom-->
@@ -177,11 +180,7 @@
 							<div style="display: none;" id="label7" class="form-group mb-1">
 							    <label for="hour" data-resource="chooseHour"></label>
 							</div>
-                            <input style="display: none;" id="hour" name="chooseHour" placeholder="chooseHour" type="number" class="mb-2" min="0" max="23"></input>
-							<div style="display: none;" id="label8" class="form-group mb-1">
-							    <label for="minute" data-resource="chooseMinute"></label>
-							</div>
-                            <input style="display: none;" id="minute" name="chooseMinute" placeholder="chooseMinute" type="number" class="mb-2" min="0" max="59"></input>
+                            <input style="display: none;" id="hour" name="chooseHour" placeholder="chooseHour" type="time" step="1" class="mb-2" min="0" max="23"></input>
 							
 							<div style="display: none;" id="label9" class="form-group mb-1">
 							    <label for="sheldTime" data-resource="sheldTime"></label>
@@ -362,7 +361,7 @@
 							        <option value="8935">Cifrazia</option><option value="7003">CubixWorld</option><option value="4396">Excalibur-Craft</option><option value="4703">FineMine</option><option value="7450">FrostLand</option><option value="8428">Gamai</option><option value="8493">GrandGear</option><option value="10">LavaCraft</option><option value="4852">Letragon</option><option value="5154">MinecraftOnly</option><option value="6099">MythicalWorld</option><option value="6071">PentaCraft</option><option value="6434">Pixelmon.PRO</option><option value="1762">qoobworld</option><option value="4692">SimpleMinecraft</option><option value="4427">HillMine</option>
 							    </datalist>
 							    <datalist id="MinecraftRatingIDList">
-							        <option value="cubixworld">CubixWorld</option><option value="diversemine">DiverseMine</option><option value="excalibur-craft">Excalibur-Craft</option><option value="borealis">Borealis</option><option value="gamepoint">GamePoint</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="oneland">OneLand</option><option value="orangecraft">OrangeCraft</option><option value="pixelmon">Pixelmon.PRO</option><option value="shadowcraft">ShadowCraft</option><option value="sidemc">SideMC</option><option value="smc">SimpleMinecraft</option><option value="victorycraft">VictoryCraft</option><option value="hillmine">HillMine</option><option value="loliland">LoliLand</option>
+							        <option value="cubixworld">CubixWorld</option><option value="grandgear">GrandGear</option><option value="diversemine">DiverseMine</option><option value="excalibur-craft">Excalibur-Craft</option><option value="borealis">Borealis</option><option value="gamepoint">GamePoint</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="penta-craft">PentaCraft</option><option value="oneland">OneLand</option><option value="orangecraft">OrangeCraft</option><option value="pixelmon">Pixelmon.PRO</option><option value="shadowcraft">ShadowCraft</option><option value="sidemc">SideMC</option><option value="smc">SimpleMinecraft</option><option value="victorycraft">VictoryCraft</option><option value="hillmine">HillMine</option><option value="loliland">LoliLand</option>
 							    </datalist>
 							    <datalist id="MonitoringMinecraftIDList">
 							        <option value="cubixworld">CubixWorld</option><option value="gg">GrandGear</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="orangecraft">OrangeCraft</option><option value="pixelmonpro">Pixelmon.PRO</option><option value="skolotfun">skolot.fun</option><option value="smc">SimpleMinecraft</option><option value="loliland">LoliLand</option>
@@ -658,7 +657,6 @@
 					    </ul>
 					    <ul class="listcontent" id="MCServerListTab" style="display: none;">
 					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
 					        <div id="MCServerListList"></div>
 					    </ul>
 					    <ul class="listcontent" id="CraftListTab" style="display: none;">
@@ -670,6 +668,21 @@
 					        <div data-resource="notAdded"></div>
 					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
 					        <div id="CzechCraftList"></div>
+					    </ul>
+					    <ul class="listcontent" id="PixelmonServersTab" style="display: none;">
+					        <div data-resource="notAdded"></div>
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div id="PixelmonServersList"></div>
+					    </ul>
+					    <ul class="listcontent" id="QTopTab" style="display: none;">
+					        <div data-resource="notAdded"></div>
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div id="QTopList"></div>
+					    </ul>
+					    <ul class="listcontent" id="MinecraftBuzzTab" style="display: none;">
+					        <div data-resource="notAdded"></div>
+					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+					        <div id="MinecraftBuzzList"></div>
 					    </ul>
 					    <ul class="listcontent" id="CustomTab" style="display: none;">
 					        <div data-resource="notAdded"></div>

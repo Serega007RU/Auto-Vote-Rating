@@ -60,7 +60,7 @@ async function vote(first) {
         document.querySelector('#c > div > div > div.bvt > form > input.pseudov').value = nick
         document.querySelector('#c > div > div > div.bvt > form > button').click()
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -71,10 +71,10 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.ServeurPrive && document.URL.includes((project.game == null ? 'minecraft' : project.game)) && document.URL.includes(project.id)) {
+        if (document.URL.includes((project.game == null ? 'minecraft' : project.game)) && document.URL.includes(project.id)) {
             return project.nick
         }
     }
 
-    chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

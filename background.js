@@ -1,39 +1,3 @@
-//Список проектов
-var projectsTopCraft = []
-var projectsMcTOP = []
-var projectsMCRate = []
-var projectsMinecraftRating = []
-var projectsMonitoringMinecraft = []
-var projectsIonMc = []
-var projectsMinecraftServersOrg = []
-var projectsServeurPrive = []
-var projectsPlanetMinecraft = []
-var projectsTopG = []
-var projectsListForge = []
-var projectsMinecraftServerList = []
-var projectsServerPact = []
-var projectsMinecraftIpList = []
-var projectsTopMinecraftServers = []
-var projectsMinecraftServersBiz = []
-var projectsHotMC = []
-var projectsMinecraftServerNet = []
-var projectsTopGames = []
-var projectsTMonitoring = []
-var projectsTopGG = []
-var projectsDiscordBotList = []
-var projectsBotsForDiscord = []
-var projectsMMoTopRU = []
-var projectsMCServers = []
-var projectsMinecraftList = []
-var projectsMinecraftIndex = []
-var projectsServerList101 = []
-var projectsMCServerList = []
-var projectsCraftList = []
-var projectsCzechCraft = []
-var projectsCustom = []
-var VKs = []
-var proxies = []
-
 var allProjects = [
     'TopCraft',
     'McTOP',
@@ -66,6 +30,9 @@ var allProjects = [
     'MCServerList',
     'CraftList',
     'CzechCraft',
+    'PixelmonServers',
+    'QTop',
+    'MinecraftBuzz',
     'Custom'
 ]
 
@@ -250,7 +217,7 @@ async function checkOpen(project) {
     }
 
     let retryCoolDown
-    if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
+    if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList) {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -542,7 +509,7 @@ async function newWindow(project) {
     if (project.Custom) {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList)) {
+        if (!project.emulateMode && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList)) {
             silentVoteMode = true
         }
     }
@@ -577,7 +544,7 @@ async function newWindow(project) {
         else if (project.MinecraftRating)
             url = 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45'
         else if (project.MonitoringMinecraft)
-            url = 'http://monitoringminecraft.ru/top/' + project.id + '/vote'
+            url = 'https://monitoringminecraft.ru/top/' + project.id + '/vote'
         else if (project.IonMc)
             url = 'https://ionmc.top/projects/' + project.id + '/vote'
         else if (project.MinecraftServersOrg)
@@ -649,6 +616,12 @@ async function newWindow(project) {
             url = 'https://craftlist.org/' + project.id
         else if (project.CzechCraft)
             url = 'https://czech-craft.eu/server/' + project.id + '/vote/'
+        else if (project.PixelmonServers)
+            url = 'https://pixelmonservers.com/server/' + project.id + '/vote'
+        else if (project.QTop)
+            url = 'http://q-top.ru/vote' + project.id
+        else if (project.MinecraftBuzz)
+            url = 'https://minecraft.buzz/server/' + project.id + '&tab=vote'
         
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url: url, active: false}, function(tab_) {
@@ -889,7 +862,7 @@ async function silentVote(project) {
             let i = 0
             while (i <= 3) {
                 i++
-                let response = await fetch('http://monitoringminecraft.ru/top/' + project.id + '/vote', {
+                let response = await fetch('https://monitoringminecraft.ru/top/' + project.id + '/vote', {
                     'headers': {
                         'content-type': 'application/x-www-form-urlencoded'
                     },
@@ -930,7 +903,7 @@ async function silentVote(project) {
                 }
                 if (doc.querySelector('input[name=player]') != null) {
                     if (i == 3) {
-                        endVote({message: 'Превышено максимально кол-во попыток голосования, input[name=player] является ' + doc.querySelector('input[name=player]')}, null, project)
+                        endVote({message: 'Превышено максимально кол-во попыток голосования, input[name=player] является ' + JSON.stringify(doc.querySelector('input[name=player]'))}, null, project)
                         return
                     }
                     continue
@@ -1240,6 +1213,28 @@ async function silentVote(project) {
             }
         } else
 
+        if (project.MCServerList) {
+            let response = await fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'})
+            if (response.ok) {
+                let json = await response.json()
+                if (json[0].success == "false") {
+                    if (json[0].error == 'username_voted') {
+                        endVote({later: true}, null, project)
+                        return
+                    } else {
+                        endVote({message: json[0].error}, null, project)
+                        return
+                    }
+                } else {
+                    endVote({successfully: true}, null, project)
+                    return
+                }
+            } else {
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
+                return
+            }
+        } else
+
         if (project.Custom) {
             let response = await fetch(project.responseURL, project.id)
             if (response.ok) {
@@ -1372,7 +1367,7 @@ async function endVote(request, sender, project) {
             }
         }
         let time = new Date()
-        if (project.TopCraft || project.McTOP || project.MinecraftRating || project.IonMc) {
+        if (project.TopCraft || project.McTOP || project.MinecraftRating || project.IonMc || project.QTop) {
             //Топы на которых время сбрасывается в 00:00 по МСК
             if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
@@ -1393,7 +1388,7 @@ async function endVote(request, sender, project) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
             time.setUTCHours(5, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.MinecraftServersOrg || project.MinecraftIndex) {
+        } else if (project.MinecraftServersOrg || project.MinecraftIndex || project.MinecraftBuzz || project.PixelmonServers) {
             if (time.getUTCHours() > 0 || (time.getUTCHours() == 0 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
@@ -1447,12 +1442,12 @@ async function endVote(request, sender, project) {
                 time.setUTCMinutes(time.getUTCMinutes() + 7)
             } else if (project.Custom) {
                 if (project.timeoutHour) {
-                    if (!project.timeoutMinute)
-                        project.timeoutMinute = 0
+                    if (!project.timeoutMinute) project.timeoutMinute = 0
+                    if (!project.timeoutSecond) project.timeoutSecond = 0
                     if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                         time.setDate(time.getDate() + 1)
                     }
-                    time.setHours(project.timeoutHour, project.timeoutMinute, 0, 0)
+                    time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
                 } else {
                     time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
                 }
@@ -1465,10 +1460,12 @@ async function endVote(request, sender, project) {
 
         if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(),time.getMonth() + 1,0).getDate() != new Date().getDate())) {
             if (project.timeoutHour) {
+                if (!project.timeoutMinute) project.timeoutMinute = 0
+                if (!project.timeoutSecond) project.timeoutSecond = 0
                 if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                     time.setDate(time.getDate() + 1)
                 }
-                time.setHours(project.timeoutHour, project.timeoutMinute, 0, 0)
+                time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
             } else {
                 time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
             }
@@ -1559,10 +1556,15 @@ async function endVote(request, sender, project) {
     } else {
         let message
         if (!request.message) {
-            message = chrome.i18n.getMessage(Object.keys(request)[0])
+            if (Object.values(request)[0] == true) {
+                message = chrome.i18n.getMessage(Object.keys(request)[0])
+            } else {
+                message = chrome.i18n.getMessage(Object.keys(request)[0], Object.values(request)[0])
+            }
         } else {
             message = request.message
         }
+        if (message.length == 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
         if (settings.useMultiVote) {
             sendMessage = message

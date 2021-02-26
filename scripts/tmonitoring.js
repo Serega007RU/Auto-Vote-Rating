@@ -21,7 +21,7 @@ async function vote(first) {
         }
         document.querySelector("#voteModal > div.modal-dialog > div > div.modal-footer.clearfix > div.pull-right > a").click()
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -32,42 +32,44 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.TMonitoring && document.URL.startsWith('https://tmonitoring.com/server/' + project.id)) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://tmonitoring.com/server/')) {
-        chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
-    } else {
-        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
 
-this.check = setInterval(()=>{
-    if (document.querySelector('div[class="message error"]') != null) {
-        clearInterval(this.check)
-        if (document.querySelector('div[class="message error"]').textContent.includes('уже голосовали')) {
-            const numbers = document.querySelector('div[class="message error"]').textContent.match(/\d+/g).map(Number)
-            let count = 0
-            let hour = 0
-            let min = 0
-            let sec = 0
-            for (const i in numbers) {
-                if (count == 0) {
-                    hour = numbers[i]
-                } else if (count == 1) {
-                    min = numbers[i]
+const timer = setInterval(()=>{
+    try {
+        if (document.querySelector('div[class="message error"]') != null) {
+            clearInterval(timer)
+            if (document.querySelector('div[class="message error"]').textContent.includes('уже голосовали')) {
+                const numbers = document.querySelector('div[class="message error"]').textContent.match(/\d+/g).map(Number)
+                let count = 0
+                let hour = 0
+                let min = 0
+                let sec = 0
+                for (const i in numbers) {
+                    if (count == 0) {
+                        hour = numbers[i]
+                    } else if (count == 1) {
+                        min = numbers[i]
+                    }
+                    count++
                 }
-                count++
+                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                const later = Date.now() + milliseconds
+                chrome.runtime.sendMessage({later: later})
+            } else {
+                chrome.runtime.sendMessage({message: document.querySelector('div[class="message error"]').textContent})
             }
-            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-            const later = Date.now() + milliseconds
-            chrome.runtime.sendMessage({later: later})
-        } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div[class="message error"]').textContent})
+        } else if (document.querySelector('div[class="message success"]') != null) {
+            chrome.runtime.sendMessage({successfully: true})
+            clearInterval(timer)
         }
-    } else if (document.querySelector('div[class="message success"]') != null) {
-        clearInterval(this.check)
-        chrome.runtime.sendMessage({successfully: true})
+    } catch (e) {
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        clearInterval(timer)
     }
 }, 1000)

@@ -41,7 +41,7 @@ async function vote() {
             }
         }
     } catch (e) {
-        chrome.runtime.sendMessage({message: 'Ошибка! Кажется какой-то нужный элемент (кнопка или поле ввода) отсутствует. Вот что известно: ' + e.name + ': ' + e.message + '\n' + e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
 }
 
@@ -52,29 +52,30 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.McTOP && document.URL.startsWith('https://mctop.su/servers/' + project.id + '/')) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://mctop.su/servers/')) {
-        chrome.runtime.sendMessage({message: 'Ошибка голосования! Произошло перенаправление/переадресация на неизвестный сайт: ' + document.URL + ' Проверьте данный URL'})
-    } else {
-        chrome.runtime.sendMessage({message: 'Непредвиденная ошибка, не удалось найти никнейм, сообщите об этом разработчику расширения URL: ' + document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
 
-this.check = setInterval(()=>{
-    //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
-    if (document.readyState == 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
-        const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
-        if (textContent.includes('Сегодня Вы уже голосовали')) {
-            chrome.runtime.sendMessage({later: true})
-        } else if (textContent.includes('Спасибо за Ваш голос, Вы сможете повторно проголосовать завтра.')) {
-            chrome.runtime.sendMessage({successfully: true})
-        } else {
-            chrome.runtime.sendMessage({message: textContent})
+const timer = setInterval(()=>{
+    try {
+        //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
+        if (document.readyState == 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
+            const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
+            if (textContent.includes('Сегодня Вы уже голосовали')) {
+                chrome.runtime.sendMessage({later: true})
+            } else if (textContent.includes('Спасибо за Ваш голос, Вы сможете повторно проголосовать завтра.')) {
+                chrome.runtime.sendMessage({successfully: true})
+            } else {
+                chrome.runtime.sendMessage({message: textContent})
+            }
+            clearInterval(timer)
         }
-        clearInterval(this.check)
-        clearInterval(this.check2)
+    } catch (e) {
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        clearInterval(timer)
     }
 }, 1000)
