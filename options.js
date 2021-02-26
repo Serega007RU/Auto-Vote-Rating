@@ -473,10 +473,13 @@ async function addVKList(VK, visually) {
     document.getElementById(VK.name + '┄' + VK.id).addEventListener('click', function() {
         removeVKList(VK, false)
     })
-    if (visually) return
-    document.querySelector('#VKButton > span').textContent = VKs.length
+    if (visually) {
+        document.querySelector('#VKButton > span').textContent = VKs.length
+        return
+    }
     VKs.push(VK)
     await setValue('AVMRVKs', VKs, true)
+    document.querySelector('#VKButton > span').textContent = VKs.length
 }
 
 //Добавить прокси в список
@@ -502,10 +505,13 @@ async function addProxyList(proxy, visually) {
     document.getElementById(proxy.ip + '┄' + proxy.port).addEventListener('click', function() {
         removeProxyList(proxy, false)
     })
-    document.querySelector('#ProxyButton > span').textContent = proxies.length
-    if (visually) return
+    if (visually) {
+        document.querySelector('#ProxyButton > span').textContent = proxies.length
+        return
+    }
     proxies.push(proxy)
     await setValue('AVMRproxies', proxies, true)
+    document.querySelector('#ProxyButton > span').textContent = proxies.length
 }
 
 //Удалить проект из списка проекта
@@ -554,13 +560,16 @@ async function removeVKList(VK, visually) {
     if (document.getElementById('div' + '┄' + VK.name + '┄' + VK.id) == null) return
     document.getElementById(VK.name + '┄' + VK.id).removeEventListener('click', function() {})
     document.getElementById('div' + '┄' + VK.name + '┄' + VK.id).remove()
-    if (visually) return
-    document.querySelector('#VKButton > span').textContent = VKs.length
+    if (visually) {
+        document.querySelector('#VKButton > span').textContent = VKs.length
+        return
+    }
     for (let i = VKs.length; i--;) {
         let temp = VKs[i]
         if (temp.id == VK.id && temp.name == VK.name) VKs.splice(i, 1)
     }
     await setValue('AVMRVKs', VKs, true)
+    document.querySelector('#VKButton > span').textContent = VKs.length
 }
 
 async function removeProxyList(proxy, visually) {
@@ -568,13 +577,16 @@ async function removeProxyList(proxy, visually) {
     if (document.getElementById('div' + '┄' + proxy.ip + '┄' + proxy.port) == null) return
     document.getElementById(proxy.ip + '┄' + proxy.port).removeEventListener('click', function() {})
     document.getElementById('div' + '┄' + proxy.ip + '┄' + proxy.port).remove()
-    document.querySelector('#ProxyButton > span').textContent = proxies.length
-    if (visually) return
+    if (visually) {
+        document.querySelector('#ProxyButton > span').textContent = proxies.length
+        return
+    }
     for (let i = proxies.length; i--;) {
         let temp = proxies[i]
         if (temp.ip == proxy.ip && temp.port == proxy.port) proxies.splice(i, 1)
     }
     await setValue('AVMRproxies', proxies, true)
+    document.querySelector('#ProxyButton > span').textContent = proxies.length
     //Если в этот момент прокси использовался
     if (chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
         if (chrome.extension.getBackgroundPage().currentProxy.ip == proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port == proxy.port) {
