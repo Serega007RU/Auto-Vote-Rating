@@ -42,13 +42,10 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.MinecraftServersBiz && document.URL.startsWith('https://minecraftservers.biz/' + project.id)) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://minecraftservers.biz/')) {
-        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
-    } else {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

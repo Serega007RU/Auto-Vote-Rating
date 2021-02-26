@@ -56,15 +56,12 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.MinecraftIndex && document.URL.startsWith('https://www.minecraft-index.com/' + project.id)) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://www.minecraft-index.com/')) {
-        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
-    } else {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
 
 function triggerFocus(element) {

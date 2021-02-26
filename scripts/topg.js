@@ -62,13 +62,10 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.TopG && (document.URL.startsWith('https://topg.org/Minecraft/in-' + project.id))) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://topg.org/Minecraft/in-')) {
-        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
-    } else {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

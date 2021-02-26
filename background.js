@@ -616,7 +616,7 @@ async function silentVote(project) {
                 }
                 if (doc.querySelector('input[name=player]') != null) {
                     if (i == 3) {
-                        endVote({message: 'Превышено максимально кол-во попыток голосования, input[name=player] является ' + doc.querySelector('input[name=player]')}, null, project)
+                        endVote({message: 'Превышено максимально кол-во попыток голосования, input[name=player] является ' + JSON.stringify(doc.querySelector('input[name=player]'))}, null, project)
                         return
                     }
                     continue

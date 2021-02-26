@@ -52,15 +52,12 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.McTOP && document.URL.startsWith('https://mctop.su/servers/' + project.id + '/')) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://mctop.su/servers/')) {
-        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
-    } else {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
 
 this.check = setInterval(()=>{

@@ -77,7 +77,7 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.TopGames && document.URL.includes(project.game) && document.URL.includes(project.id)) {
+        if (document.URL.includes(project.game) && document.URL.includes(project.id)) {
             return project.nick
         }
     }

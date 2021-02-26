@@ -56,13 +56,10 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.MonitoringMinecraft && document.URL.startsWith('http://monitoringminecraft.ru/top/' + project.id)) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('http://monitoringminecraft.ru/top/')) {
-        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
-    } else {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-    }
+    
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

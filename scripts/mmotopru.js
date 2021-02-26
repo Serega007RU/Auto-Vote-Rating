@@ -92,7 +92,7 @@ async function getProject() {
         })
     })
     for (const project of projects) {
-        if (project.MMoTopRU && document.URL.includes(project.game) && document.URL.includes(project.id)) {
+        if (document.URL.includes(project.game) && document.URL.includes(project.id)) {
             return project
         }
     }

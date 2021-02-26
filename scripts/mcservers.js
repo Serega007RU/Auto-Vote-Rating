@@ -51,13 +51,10 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.MCServers && document.URL.startsWith('https://mc-servers.com/mcvote/' + project.id)) {
+        if (project.MCServers && document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://mc-servers.com/mcvote/')) {
-        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
-    } else {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

@@ -33,15 +33,12 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.MinecraftBuzz && document.URL.startsWith('https://minecraft.buzz/server/' + project.id)) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://minecraft.buzz/server/')) {
-        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
-    } else {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
 
 const timer = setInterval(()=>{

@@ -48,13 +48,10 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.MinecraftServerNet && document.URL.startsWith('https://minecraft-server.net/vote/' + project.id)) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('https://minecraft-server.net/vote/')) {
-        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
-    } else {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

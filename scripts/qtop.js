@@ -32,15 +32,12 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.QTop && document.URL.startsWith('http://q-top.ru/vote' + project.id)) {
+        if (document.URL.includes(project.id)) {
             return project.nick
         }
     }
-    if (!document.URL.startsWith('http://q-top.ru/vote')) {
-        chrome.runtime.sendMessage({errorVoteNoNick: document.URL})
-    } else {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-    }
+
+    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
 
 const timer = setInterval(()=> {

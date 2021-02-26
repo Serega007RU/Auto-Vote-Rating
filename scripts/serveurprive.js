@@ -71,7 +71,7 @@ async function getNickName() {
         })
     })
     for (const project of projects) {
-        if (project.ServeurPrive && document.URL.includes((project.game == null ? 'minecraft' : project.game)) && document.URL.includes(project.id)) {
+        if (document.URL.includes((project.game == null ? 'minecraft' : project.game)) && document.URL.includes(project.id)) {
             return project.nick
         }
     }
