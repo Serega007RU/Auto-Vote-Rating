@@ -5,6 +5,8 @@ const toDataURL = url=>fetch(url).then(response=>response.blob()).then(blob=>new
     reader.onerror = reject
     reader.readAsDataURL(blob)
 }))
+let currentRecept = {}
+let content = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 vote()
 async function vote() {
@@ -75,8 +77,6 @@ async function getNickName() {
 
     chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
-
-let content = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 function recalculate() {
     let code = 0
@@ -247,9 +247,6 @@ async function craft(inv) {
         return
     }
 }
-
-//Текущий рецепт
-let currentRecept = {}
 
 //Узнаёт какой щас рецепт
 async function getRecipe(img) {
