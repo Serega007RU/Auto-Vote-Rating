@@ -655,8 +655,8 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             url = 'https://serverlist101.com/server/' + project.id + '/'
             jsPath = 'li > h1'
         } else if (project.MCServerList) {
-            url = 'https://mcserver-list.eu/server/?id=' + project.id
-            jsPath = 'p.title'
+            url = 'https://api.mcserver-list.eu/server/?id=' + project.id
+
         } else if (project.CraftList) {
             url = 'https://craftlist.org/' + project.id
             jsPath = 'main h1'
@@ -695,7 +695,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             updateStatusAdd(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, true, element, 'error')
             return
         } else if (response.redirected) {
-            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.MCServerList || project.CraftList || project.MinecraftBuzz) {
+            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.CraftList || project.MinecraftBuzz) {
                 updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
                 return
             }
@@ -760,7 +760,10 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                     return
                 }
             }
-
+            
+            if (project.MCServerList) {
+                projectURL = JSON.parse(html)[0].name
+            } else
             if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).text)
             } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent != '') {

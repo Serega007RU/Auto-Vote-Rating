@@ -149,7 +149,7 @@ async function checkOpen(project) {
     }
 
     let retryCoolDown
-    if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
+    if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList) {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -223,7 +223,7 @@ async function newWindow(project) {
     if (project.Custom) {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList)) {
+        if (!project.emulateMode && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList)) {
             silentVoteMode = true
         }
     }
@@ -921,6 +921,28 @@ async function silentVote(project) {
             }
             if (doc.querySelector('#Content > div.Good') != null && doc.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
                 endVote({successfully: true}, null, project)
+                return
+            }
+        } else
+
+        if (project.MCServerList) {
+            let response = await fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'})
+            if (response.ok) {
+                let json = await response.json()
+                if (json[0].success == "false") {
+                    if (json[0].error == 'username_voted') {
+                        endVote({later: true}, null, project)
+                        return
+                    } else {
+                        endVote({message: json[0].error}, null, project)
+                        return
+                    }
+                } else {
+                    endVote({successfully: true}, null, project)
+                    return
+                }
+            } else {
+                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
                 return
             }
         } else
