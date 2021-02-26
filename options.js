@@ -569,7 +569,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             url = 'http://minecraftrating.ru/projects/' + project.id + '/'
             jsPath = 'table[class="table server-table"] > tbody > tr:nth-child(2) > td:nth-child(2) > a'
         } else if (project.MonitoringMinecraft) {
-            url = 'http://monitoringminecraft.ru/top/' + project.id + '/'
+            url = 'https://monitoringminecraft.ru/top/' + project.id + '/'
             jsPath = '#page > div.box.visible.main > div.left > table > tbody > tr:nth-child(1) > td.wid > noindex > a'
         } else if (project.IonMc) {
             url = 'https://ionmc.top/projects/' + project.id + '/vote'
@@ -1620,7 +1620,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip2').textContent = 'cubixworld'
         document.getElementById('projectIDTooltip3').textContent = '/'
     } else if (selectedTop.value == 'MonitoringMinecraft') {
-        document.getElementById('projectIDTooltip1').textContent = 'http://monitoringminecraft.ru/top/'
+        document.getElementById('projectIDTooltip1').textContent = 'https://monitoringminecraft.ru/top/'
         document.getElementById('projectIDTooltip2').textContent = 'gg'
         document.getElementById('projectIDTooltip3').textContent = '/vote'
     } else if (selectedTop.value == 'IonMc') {

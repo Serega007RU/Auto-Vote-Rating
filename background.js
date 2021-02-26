@@ -257,7 +257,7 @@ async function newWindow(project) {
         else if (project.MinecraftRating)
             url = 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45'
         else if (project.MonitoringMinecraft)
-            url = 'http://monitoringminecraft.ru/top/' + project.id + '/vote'
+            url = 'https://monitoringminecraft.ru/top/' + project.id + '/vote'
         else if (project.IonMc)
             url = 'https://ionmc.top/projects/' + project.id + '/vote'
         else if (project.MinecraftServersOrg)
@@ -575,7 +575,7 @@ async function silentVote(project) {
             let i = 0
             while (i <= 3) {
                 i++
-                let response = await fetch('http://monitoringminecraft.ru/top/' + project.id + '/vote', {
+                let response = await fetch('https://monitoringminecraft.ru/top/' + project.id + '/vote', {
                     'headers': {
                         'content-type': 'application/x-www-form-urlencoded'
                     },
