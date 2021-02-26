@@ -19,14 +19,19 @@ async function vote() {
             }
         } else {
             //Ожидание загрузки reCATPCHA
-            this.check = setTimeout(async ()=>{
-                if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
-                    clearInterval(this.check)
-                    const nick = await getNickName()
-                    if (nick == null || nick == '')
-                        return
-                    document.getElementById('username').value = nick
-                    document.getElementById('voteButton').click()
+            const timer = setTimeout(async ()=>{
+                try {
+                    if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
+                        clearInterval(timer)
+                        const nick = await getNickName()
+                        if (nick == null || nick == '')
+                            return
+                        document.getElementById('username').value = nick
+                        document.getElementById('voteButton').click()
+                    }
+                } catch (e) {
+                    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                    clearInterval(timer)
                 }
             }, 1000)
         }

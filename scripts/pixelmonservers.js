@@ -27,11 +27,12 @@ async function vote() {
         const timer = setInterval(()=>{
             try {
                 if (document.getElementById('captcha-input').style.display != 'none') {
-                    clearInterval(timer)
                     chrome.runtime.sendMessage({captcha: true})
+                    clearInterval(timer)
                 }
             } catch (e) {
                 chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                clearInterval(timer)
             }
         }, 1000)
     } catch (e) {

@@ -42,14 +42,19 @@ async function getNickName() {
 }
 
 const timer = setInterval(()=>{
-    if (document.getElementById('message') != null) {
-        if (document.getElementById('message').textContent.includes('Thank you for voting')) {
-            chrome.runtime.sendMessage({successfully: true})
-        } else if (document.getElementById('message').textContent.includes('already voted')) {
-            chrome.runtime.sendMessage({later: true})
-        } else {
-            chrome.runtime.sendMessage({message: document.getElementById('message').textContent.trim()})
+    try {
+        if (document.getElementById('message') != null) {
+            if (document.getElementById('message').textContent.includes('Thank you for voting')) {
+                chrome.runtime.sendMessage({successfully: true})
+            } else if (document.getElementById('message').textContent.includes('already voted')) {
+                chrome.runtime.sendMessage({later: true})
+            } else {
+                chrome.runtime.sendMessage({message: document.getElementById('message').textContent.trim()})
+            }
+            clearInterval(timer)
         }
+    } catch (e) {
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
         clearInterval(timer)
     }
 }, 1000)

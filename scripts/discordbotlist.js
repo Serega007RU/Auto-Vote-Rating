@@ -28,39 +28,41 @@ function vote() {
             return
         }
 
-        this.check2 = setInterval(()=>{
+        const timer2 = setInterval(()=>{
             try {
                 if (document.querySelector('button.btn.btn-blurple').disabled == false) {
                     document.querySelector('button.btn.btn-blurple').click()
-                    clearInterval(this.check2)
+                    clearInterval(timer2)
                 }
             } catch (e) {
                 chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                clearInterval(timer2)
             }
         }, 1000)
         
-        this.check = setInterval(()=>{
+        const timer3 = setInterval(()=>{
             try {
                 if (document.querySelector('div[role="status"][aria-live="polite"]').textContent == 'User has already voted.') {
                     chrome.runtime.sendMessage({later: true})
-                    clearInterval(this.check)
+                    clearInterval(timer3)
                 } else if (document.querySelector('div[class="col-12 col-md-6 text-center"] > h1').textContent == 'Thank you for voting!') {
                     chrome.runtime.sendMessage({successfully: true})
-                    clearInterval(this.check)
+                    clearInterval(timer3)
                 } else if (document.querySelector('div[role="status"][aria-live="polite"]').textContent != '') {
                     chrome.runtime.sendMessage({message: document.querySelector('div[role="status"][aria-live="polite"]').textContent})
-                    clearInterval(this.check)
+                    clearInterval(timer3)
                 } else {
                     for (const el of document.querySelectorAll('link')) {
                         if (el.href.includes('thanks')) {
                             chrome.runtime.sendMessage({successfully: true})
-                            clearInterval(this.check)
+                            clearInterval(timer3)
                             break
                         }
                     }
                 }
             } catch (e) {
                 chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                clearInterval(timer3)
             }
         }, 1000)
 

@@ -58,5 +58,6 @@ const timer = setInterval(()=> {
         }
     } catch (e) {
         chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        clearInterval(timer)
     }
 }, 1000)

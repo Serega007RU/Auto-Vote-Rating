@@ -26,7 +26,7 @@ async function vote() {
             if (document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i') != null) {
                 //Клик VK
                 document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i').click()
-                clearInterval(this.check)
+                clearInterval(timer)
             } else {
                 const nick = await getNickName()
                 if (nick == null || nick == '')
@@ -55,17 +55,22 @@ async function getNickName() {
     chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
 
-this.check = setInterval(()=>{
-    //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
-    if (document.readyState == 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
-        const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
-        if (textContent.includes('Сегодня Вы уже голосовали')) {
-            chrome.runtime.sendMessage({later: true})
-        } else if (textContent.includes('Спасибо за Ваш голос, Вы сможете повторно проголосовать завтра.')) {
-            chrome.runtime.sendMessage({successfully: true})
-        } else {
-            chrome.runtime.sendMessage({message: textContent})
+const timer = setInterval(()=>{
+    try {
+        //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
+        if (document.readyState == 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
+            const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
+            if (textContent.includes('Сегодня Вы уже голосовали')) {
+                chrome.runtime.sendMessage({later: true})
+            } else if (textContent.includes('Спасибо за Ваш голос, Вы сможете повторно проголосовать завтра.')) {
+                chrome.runtime.sendMessage({successfully: true})
+            } else {
+                chrome.runtime.sendMessage({message: textContent})
+            }
+            clearInterval(timer)
         }
-        clearInterval(this.check)
+    } catch (e) {
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        clearInterval(timer)
     }
 }, 1000)

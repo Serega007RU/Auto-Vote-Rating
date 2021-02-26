@@ -26,17 +26,22 @@ async function vote() {
                 chrome.runtime.sendMessage({message: document.querySelector('div[class=report]').textContent})
             }
         } else if (document.querySelector('span[class=count_hour]') != null) {
-//                this.check = setInterval(()=>{
-//                    //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
-//                    var hour = parseInt(document.querySelector('span[class=count_hour]').textContent)
-//                    var min = parseInt(document.querySelector('span[class=count_min]').textContent)
-//                    var sec = parseInt(document.querySelector('span[class=count_sec]').textContent)
-//                    var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-//                    if (milliseconds == 0) return
-//                    var later = Date.now() - (86400000 - milliseconds)
-//                    clearInterval(this.check)
-//                    chrome.runtime.sendMessage({later: later})
-//                }, 2000)
+//          const timer = setInterval(()=>{
+//              try {
+//                  //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
+//                  let hour = parseInt(document.querySelector('span[class=count_hour]').textContent)
+//                  let min = parseInt(document.querySelector('span[class=count_min]').textContent)
+//                  let sec = parseInt(document.querySelector('span[class=count_sec]').textContent)
+//                  let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+//                  if (milliseconds == 0) return
+//                  let later = Date.now() - (86400000 - milliseconds)
+//                  chrome.runtime.sendMessage({later: later})
+//                  clearInterval(timer)
+//              } catch (e) {
+//                  chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+//                  clearInterval(timer)
+//              }
+//          }, 2000)
             chrome.runtime.sendMessage({later: true})
         } else if (document.querySelector('div[class="error"]') != null) {
             chrome.runtime.sendMessage({message: document.querySelector('div[class="error"]').textContent})

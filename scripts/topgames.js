@@ -58,11 +58,16 @@ async function vote() {
             document.getElementById('playername').value = nick
         }
 
-        const check = setInterval(function() {
-            if (document.querySelector('#captcha-content > div > div.grecaptcha-logo > iframe') != null) {
-                //Ждёт загрузки reCaptcha
-                document.querySelector('button[type="submit"').click()
-                clearInterval(check)
+        const timer = setInterval(function() {
+            try {
+                if (document.querySelector('#captcha-content > div > div.grecaptcha-logo > iframe') != null) {
+                    //Ждёт загрузки reCaptcha
+                    document.querySelector('button[type="submit"').click()
+                    clearInterval(timer)
+                }
+            } catch (e) {
+                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                clearInterval(timer)
             }
         }, 1000)
     } catch (e) {
