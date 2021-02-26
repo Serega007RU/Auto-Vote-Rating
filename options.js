@@ -644,7 +644,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             jsPath = '#site-link'
         } else if (project.MCServers) {
             url = 'https://mc-servers.com/details/' + project.id + '/'
-            jsPath = 'div.main-panel > div.center > div.col.s12.m12.l5 > strong'
+            jsPath = 'a[href="/details/' + project.id + '"]'
         } else if (project.MinecraftList) {
             url = 'https://minecraftlist.org/server/' + project.id
             jsPath = 'h1'
