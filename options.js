@@ -474,6 +474,7 @@ async function addVKList(VK, visually) {
         removeVKList(VK, false)
     })
     if (visually) return
+    document.querySelector('#VKButton > span').textContent = VKs.length
     VKs.push(VK)
     await setValue('AVMRVKs', VKs, true)
 }
@@ -501,6 +502,7 @@ async function addProxyList(proxy, visually) {
     document.getElementById(proxy.ip + '┄' + proxy.port).addEventListener('click', function() {
         removeProxyList(proxy, false)
     })
+    document.querySelector('#ProxyButton > span').textContent = proxies.length
     if (visually) return
     proxies.push(proxy)
     await setValue('AVMRproxies', proxies, true)
@@ -553,6 +555,7 @@ async function removeVKList(VK, visually) {
     document.getElementById(VK.name + '┄' + VK.id).removeEventListener('click', function() {})
     document.getElementById('div' + '┄' + VK.name + '┄' + VK.id).remove()
     if (visually) return
+    document.querySelector('#VKButton > span').textContent = VKs.length
     for (let i = VKs.length; i--;) {
         let temp = VKs[i]
         if (temp.id == VK.id && temp.name == VK.name) VKs.splice(i, 1)
@@ -565,6 +568,7 @@ async function removeProxyList(proxy, visually) {
     if (document.getElementById('div' + '┄' + proxy.ip + '┄' + proxy.port) == null) return
     document.getElementById(proxy.ip + '┄' + proxy.port).removeEventListener('click', function() {})
     document.getElementById('div' + '┄' + proxy.ip + '┄' + proxy.port).remove()
+    document.querySelector('#ProxyButton > span').textContent = proxies.length
     if (visually) return
     for (let i = proxies.length; i--;) {
         let temp = proxies[i]
@@ -814,6 +818,7 @@ document.getElementById('deleteAllProxies').addEventListener('click', async () =
     document.getElementById('ProxyList').parentNode.replaceChild(document.getElementById('ProxyList').cloneNode(false), document.getElementById('ProxyList'))
     proxies = []
     await setValue('AVMRproxies', proxies, true)
+    document.querySelector('#ProxyButton > span').textContent = proxies.length
     updateStatusProxy(chrome.i18n.getMessage('deletedAllProxies'), false, 'success')
 })
 
