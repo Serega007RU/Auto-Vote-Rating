@@ -17,18 +17,17 @@ async function vote(first) {
             return
         } else if (document.querySelector('.alert.alert-warning') != null) {
             if (document.querySelector('.alert.alert-warning').textContent.includes('already voted')) {
-                const numbers = document.querySelector('.alert.alert-warning').textContent.match(/\d+/g).map(Number)
-                let count = 0
                 let hour = 0
                 let min = 0
                 let sec = 0
-                for (const i in numbers) {
-                    if (count == 0) {
-                        hour = numbers[i]
-                    } else if (count == 1) {
-                        min = numbers[i]
-                    }
-                    count++
+                if (document.querySelector('.alert.alert-warning').textContent.match(/\d+ hour/g) != null) {
+                    hour = Number(document.querySelector('.alert.alert-warning').textContent.match(/\d+ hour/g)[0].match(/\d+/g)[0])
+                }
+                if (document.querySelector('.alert.alert-warning').textContent.match(/\d+ min/g) != null) {
+                    min = Number(document.querySelector('.alert.alert-warning').textContent.match(/\d+ min/g)[0].match(/\d+/g)[0])
+                }
+                if (document.querySelector('.alert.alert-warning').textContent.match(/\d+ sec/g) != null) {
+                    sec = Number(document.querySelector('.alert.alert-warning').textContent.match(/\d+ sec/g)[0].match(/\d+/g)[0])
                 }
                 const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
                 const later = Date.now() + milliseconds
