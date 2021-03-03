@@ -1049,7 +1049,7 @@ function getProjectList(project) {
 }
 
 function extractHostname(url) {
-    var hostname
+    let hostname
     //find & remove protocol (http, ftp, etc.) and get hostname
 
     if (url.indexOf('//') > -1) {
@@ -1109,7 +1109,7 @@ async function setValue(key, value, updateStatus) {
 //Слушатель на изменение настроек
 chrome.storage.onChanged.addListener(function(changes, namespace) {
     for (const key in changes) {
-        var storageChange = changes[key]
+        let storageChange = changes[key]
         if (key.startsWith('AVMRprojects'))
             this['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
         else if (key == 'AVMRsettings') {
@@ -1140,7 +1140,7 @@ async function forLoopAllProjects(fuc, reverse) {
 //Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', ()=>{
     updateStatusFile(chrome.i18n.getMessage('exporting'), true)
-    var allSetting = {
+    let allSetting = {
         projectsTopCraft,
         projectsMcTOP,
         projectsMCRate,
@@ -1179,8 +1179,9 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         settings,
         generalStats
     }
-    var text = JSON.stringify(allSetting, null, '\t')
-    blob = new Blob([text],{type: 'text/json;charset=UTF-8;'}), anchor = document.createElement('a')
+    let text = JSON.stringify(allSetting, null, '\t')
+    let blob = new Blob([text],{type: 'text/json;charset=UTF-8;'})
+    let anchor = document.createElement('a')
 
     anchor.download = 'AVR.json'
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
@@ -1192,7 +1193,8 @@ document.getElementById('file-download').addEventListener('click', ()=>{
 document.getElementById('logs-download').addEventListener('click', ()=>{
     updateStatusFile(chrome.i18n.getMessage('exporting'), true)
 
-    blob = new Blob([localStorage.consoleHistory],{type: 'text/plain;charset=UTF-8;'}), anchor = document.createElement('a')
+    let blob = new Blob([localStorage.consoleHistory],{type: 'text/plain;charset=UTF-8;'})
+    let anchor = document.createElement('a')
 
     anchor.download = 'console_history.txt'
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
@@ -1207,9 +1209,9 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
 document.getElementById('file-upload').addEventListener('change', (evt)=>{
     updateStatusFile(chrome.i18n.getMessage('importing'), true)
     try {
-        if (evt.target.files.length == 0)return
+        if (evt.target.files.length == 0) return
         let file = evt.target.files[0]
-        var reader = new FileReader()
+        let reader = new FileReader()
         reader.onload = (function(theFile) {
             return async function(e) {
                 try {
@@ -1270,16 +1272,14 @@ async function checkUpdateConflicts(save) {
         await forLoopAllProjects(async function(proj) {
             proj.stats = {}
             //Да, это весьма не оптимизированно
-            if (save)
-                await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj), false)
+            if (save) await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj), false)
         }, false)
     }
     if (generalStats == null) {
         updated = true
         updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
         generalStats = {}
-        if (save)
-            await setValue('generalStats', generalStats, false)
+        if (save) await setValue('generalStats', generalStats, false)
     }
 
     for (const item of allProjects) {
@@ -1313,15 +1313,15 @@ modeVote.addEventListener('change', async function() {
 
 //Достаёт все проекты указанные в URL
 function getUrlProjects() {
-    var vars = []
-    var element = {}
-    var i = 0
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+    let vars = []
+    let element = {}
+    let i = 0
+    let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         if (key == 'top' || key == 'nick' || key == 'id') {
             element[key] = value
             i++
             if (i == 3) {
-                vars.push(new Project(element.top,element.nick,element.id,null,null,null,false))
+                vars.push(new Project(element.top, element.nick, element.id, null, null, null, false))
                 i = 0
                 element = {}
             }
@@ -1333,8 +1333,8 @@ function getUrlProjects() {
 
 //Достаёт все указанные аргументы из URL
 function getUrlVars() {
-    var vars = {}
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+    let vars = {}
+    let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         vars[key] = value
     })
     return vars
@@ -1343,7 +1343,7 @@ function getUrlVars() {
 //Если страница настроек была открыта сторонним проектом то расширение переходит к быстрому добавлению проектов
 async function fastAdd() {
     if (window.location.href.includes('addFastProject')) {
-        var vars = getUrlVars()
+        let vars = getUrlVars()
         if (vars['name'] != null)
             document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
         let listFastAdd = document.getElementById('modaltext')
@@ -1455,7 +1455,7 @@ function openPoput(url, reload) {
     let popupBoxHeight = 430
     let width, height
     //if (browser.safari) popupBoxHeight += 45;/* safari popup window panel height, hardcoded to avoid popup jump */
-    var left = Math.max(0, (screen.width - popupBoxWidth) / 2) + (screen.availLeft | 0)
+    let left = Math.max(0, (screen.width - popupBoxWidth) / 2) + (screen.availLeft | 0)
       , top = Math.max(0, (screen.height - popupBoxWidth) / 2) + (screen.availTop | 0)
     poput = window.open(url, 'vk_openapi', 'width=' + popupBoxWidth + ',height=' + popupBoxHeight + ',left=' + left + ',top=' + top + ',menubar=0,toolbar=0,location=0,status=0')
     if (poput) {
@@ -1479,7 +1479,7 @@ function tabSelect(evt, tabs) {
         return
     }
     
-    var i, tabcontent, tablinks
+    let i, tabcontent, tablinks
 
     tabcontent = document.getElementsByClassName('tabcontent')
     for (let i = 0; i < tabcontent.length; i++) {
@@ -1532,7 +1532,7 @@ document.getElementById('helpTab2').addEventListener('click', function() {
 
 //Переключение между списками добавленных проектов
 function listSelect(evt, tabs) {
-    var x, listcontent, selectsite
+    let x, listcontent, selectsite
 
     listcontent = document.getElementsByClassName('listcontent')
     for (let x = 0; x < listcontent.length; x++) {
@@ -1588,8 +1588,8 @@ document.getElementById('generalStats').addEventListener('click', function() {
 var selectedTop = document.getElementById('project')
 
 selectedTop.addEventListener('click', function() {
-    var options = selectedTop.querySelectorAll('option')
-    var count = options.length
+    let options = selectedTop.querySelectorAll('option')
+    let count = options.length
     if (typeof (count) === 'undefined' || count < 2) {
         addActivityItem()
     }
