@@ -59,6 +59,10 @@ function vote() {
                             break
                         }
                     }
+                    if (document.URL.includes('thanks')) {
+                        chrome.runtime.sendMessage({successfully: true})
+                        clearInterval(timer3)
+                    }
                 }
             } catch (e) {
                 chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
