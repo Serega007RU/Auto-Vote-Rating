@@ -139,8 +139,7 @@ function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
         }
         this.time = time
     }
-    if (priority)
-        this.priority = true
+    if (priority) this.priority = true
     this.stats = {}
 }
 
@@ -491,23 +490,23 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     }
 
     if (project.ListForge) {
-        project.game = document.getElementById('chooseGameListForge').value
+        if (!project.game) project.game = document.getElementById('chooseGameListForge').value
     } else if (project.TopGames) {
-        project.game = document.getElementById('chooseGameTopGames').value
-        project.lang = document.getElementById('selectLangTopGames').value
-        project.maxCountVote = document.getElementById('countVote').valueAsNumber
-        project.countVote = 0
+        if (!project.game) project.game = document.getElementById('chooseGameTopGames').value
+        if (!project.lang) project.lang = document.getElementById('selectLangTopGames').value
+        if (!project.maxCountVote) project.maxCountVote = document.getElementById('countVote').valueAsNumber
+        if (!project.countVote) project.countVote = 0
     } else if (project.ServeurPrive) {
-        project.game = document.getElementById('chooseGameServeurPrive').value
-        project.lang = document.getElementById('selectLangServeurPrive').value
-        project.maxCountVote = document.getElementById('countVote').valueAsNumber
-        project.countVote = 0
+        if (!project.game) project.game = document.getElementById('chooseGameServeurPrive').value
+        if (!project.lang) project.lang = document.getElementById('selectLangServeurPrive').value
+        if (!project.maxCountVote) project.maxCountVote = document.getElementById('countVote').valueAsNumber
+        if (!project.countVote) project.countVote = 0
     } else if (project.MMoTopRU) {
-        project.game = document.getElementById('chooseGameMMoTopRU').value
-        project.lang = document.getElementById('selectLangMMoTopRU').value
-        project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
+        if (!project.game) project.game = document.getElementById('chooseGameMMoTopRU').value
+        if (!project.lang) project.lang = document.getElementById('selectLangMMoTopRU').value
+        if (!project.ordinalWorld) project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
     } else if (project.TopGG) {
-        project.game = document.getElementById('chooseTopGG').value
+        if (!project.game) project.game = document.getElementById('chooseTopGG').value
     }
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
@@ -1313,22 +1312,29 @@ modeVote.addEventListener('change', async function() {
 
 //Достаёт все проекты указанные в URL
 function getUrlProjects() {
-    let vars = []
-    let element = {}
-    let i = 0
+    let projects = []
+    let project = {}
     let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        if (key == 'top' || key == 'nick' || key == 'id') {
-            element[key] = value
-            i++
-            if (i == 3) {
-                vars.push(new Project(element.top, element.nick, element.id, null, null, null, false))
-                i = 0
-                element = {}
+        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld') {
+            if (key == 'top' && Object.keys(project).length > 0) {
+                project.time = null
+                project.stats = {}
+                projects.push(project)
+                project = {}
+            }
+            if (key == 'top') {
+                project[value] = true
+            } else {
+                project[key] = value
             }
         }
     })
-    //vars.reverse()
-    return vars
+    project.time = null
+    project.stats = {}
+    projects.push(project)
+    console.log(projects)
+    //projects.reverse()
+    return projects
 }
 
 //Достаёт все указанные аргументы из URL
