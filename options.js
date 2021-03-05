@@ -1302,10 +1302,11 @@ function getUrlProjects() {
             }
         }
     })
-    project.time = null
-    project.stats = {}
-    projects.push(project)
-    console.log(projects)
+    if (Object.keys(project).length > 0) {
+        project.time = null
+        project.stats = {}
+        projects.push(project)
+    }
     //projects.reverse()
     return projects
 }
@@ -1384,7 +1385,7 @@ async function fastAdd() {
             buttonRetry.addEventListener('click', ()=>{
                 document.location.reload(true)
             })
-        } else {
+        } else if (document.querySelector('div[class="modalContent"]').childElementCount > 1) {
             let successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
             successFastAdd.append(document.createElement('br'))
@@ -1392,6 +1393,8 @@ async function fastAdd() {
             successFastAdd.append(document.createElement('br'))
             successFastAdd.append(chrome.i18n.getMessage('closeTab'))
             listFastAdd.before(successFastAdd)
+        } else {
+            return
         }
 
         let buttonClose = document.createElement('button')

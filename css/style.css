@@ -501,7 +501,7 @@ input.checkbox:disabled + label {
   border-bottom: 1px solid #aba4a4;
 }
 
-.anelumen.lowingnuska figure div {
+.anelumen.lowingnuska > figure > div {
   max-height: calc(100vh - 210px);
   overflow-y: auto;
 }
