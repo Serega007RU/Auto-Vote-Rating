@@ -845,7 +845,7 @@ async function addProject(project, element) {
     } else*/
     let array = []
     array.push(createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success'))
-    if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote) {
+    if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote && !element) {
         const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
         const span = document.createElement('span')
         span.className = 'tooltip2'
@@ -1336,7 +1336,6 @@ async function fastAdd() {
             }
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             let html = document.createElement('div')
-            html.append(document.createElement('br'))
             html.append(svgSuccess.cloneNode(true))
             html.append(chrome.i18n.getMessage('disableNotifInfo'))
             listFastAdd.before(html)
