@@ -107,42 +107,6 @@ const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polylin
 polyline.setAttribute('points', '20 6 9 17 4 12')
 svgSuccess.appendChild(polyline)
 
-
-//Конструктор проекта
-function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
-    this[top] = true
-    if (this.Custom) {
-        if (customTimeOut.ms) {
-            this.timeout = customTimeOut.ms
-        } else {
-            this.timeoutHour = customTimeOut.hour
-            this.timeoutMinute = customTimeOut.minute
-            this.timeoutSecond = customTimeOut.second
-        }
-        this.time = null
-        this.nick = nick
-        this.id = id
-        this.responseURL = responseURL
-    } else {
-        this.nick = nick
-        this.id = id
-        if (customTimeOut) {
-            if (document.getElementById('lastDayMonth').checked)
-                this.lastDayMonth = true
-            if (customTimeOut.ms) {
-                this.timeout = customTimeOut.ms
-            } else {
-                this.timeoutHour = customTimeOut.hour
-                this.timeoutMinute = customTimeOut.minute
-                this.timeoutSecond = customTimeOut.second
-            }
-        }
-        this.time = time
-    }
-    if (priority) this.priority = true
-    this.stats = {}
-}
-
 //Конструктор настроек
 function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disabledNotifError, enabledSilentVote, disabledCheckTime, cooldown) {
     this.disabledNotifStart = disabledNotifStart
@@ -456,10 +420,45 @@ function updateProjectList(projects) {
 //Слушатель кнопки "Добавить"
 document.getElementById('addProject').addEventListener('submit', ()=>{
     event.preventDefault()
-    if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: Number(document.getElementById('hour').value.split(':')[0]), minute: Number(document.getElementById('hour').value.split(':')[1]), second: Number(document.getElementById('hour').value.split(':')[2])}), priorityOption, null)
+    let project = {}
+    project[document.getElementById('project').value] = true
+    project.id = document.getElementById('id').value
+    project.nick = document.getElementById('nick').value
+    project.stats = {}
+    if (document.getElementById('sheldTimeCheckbox').checked && document.getElementById('sheldTime').value != '') {
+        project.time = new Date(document.getElementById('sheldTime').value).getTime()
     } else {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), null, (document.getElementById('customTimeOut').checked ? (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: Number(document.getElementById('hour').value.split(':')[0]), minute: Number(document.getElementById('hour').value.split(':')[1]), second: Number(document.getElementById('hour').value.split(':')[2])}) : null), priorityOption, null)
+        project.time = null
+    }
+    if (document.getElementById('customTimeOut').checked || project.Custom) {
+        if (document.getElementById('selectTime').value == 'ms') {
+            project.timeout = document.getElementById('time').valueAsNumber
+        } else {
+            project.timeoutHour = Number(document.getElementById('hour').value.split(':')[0])
+            project.timeoutMinute = Number(document.getElementById('hour').value.split(':')[1])
+            project.timeoutSecond = Number(document.getElementById('hour').value.split(':')[2])
+        }
+    }
+    if (document.getElementById('lastDayMonth').checked) {
+        project.lastDayMonth = true
+    }
+    if (document.getElementById('priority').checked) {
+        project.priority = true
+    }
+    
+    if (project.Custom) {
+        let body
+        try {
+            body = JSON.parse(document.getElementById('customBody').value)
+        } catch (e) {
+            updateStatusAdd(e, true, element, 'error')
+            return
+        }
+        project.id = body
+        project.responseURL = document.getElementById('responseURL').value
+        addProject(project, null)
+    } else {
+        addProject(project, null)
     }
 })
 
@@ -469,45 +468,8 @@ document.getElementById('timeout').addEventListener('submit', ()=>{
     setCoolDown()
 })
 
-async function addProject(choice, nick, id, time, response, customTimeOut, priorityOpt, element) {
+async function addProject(project, element) {
     updateStatusAdd(chrome.i18n.getMessage('adding'), true, element)
-    let project
-    if (choice == 'Custom') {
-        let body
-        try {
-            body = JSON.parse(id)
-        } catch (e) {
-            updateStatusAdd(e, true, element, 'error')
-            return
-        }
-        project = new Project(choice, nick, body, time, response, customTimeOut, priorityOpt)
-    } else {
-        project = new Project(choice, nick, id, time, null, customTimeOut, priorityOpt)
-    }
-
-    if (randomizeOption) {
-        project.randomize = true
-    }
-
-    if (project.ListForge) {
-        if (!project.game) project.game = document.getElementById('chooseGameListForge').value
-    } else if (project.TopGames) {
-        if (!project.game) project.game = document.getElementById('chooseGameTopGames').value
-        if (!project.lang) project.lang = document.getElementById('selectLangTopGames').value
-        if (!project.maxCountVote) project.maxCountVote = document.getElementById('countVote').valueAsNumber
-        if (!project.countVote) project.countVote = 0
-    } else if (project.ServeurPrive) {
-        if (!project.game) project.game = document.getElementById('chooseGameServeurPrive').value
-        if (!project.lang) project.lang = document.getElementById('selectLangServeurPrive').value
-        if (!project.maxCountVote) project.maxCountVote = document.getElementById('countVote').valueAsNumber
-        if (!project.countVote) project.countVote = 0
-    } else if (project.MMoTopRU) {
-        if (!project.game) project.game = document.getElementById('chooseGameMMoTopRU').value
-        if (!project.lang) project.lang = document.getElementById('selectLangMMoTopRU').value
-        if (!project.ordinalWorld) project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
-    } else if (project.TopGG) {
-        if (!project.game) project.game = document.getElementById('chooseTopGG').value
-    }
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
     let secondBonusText
@@ -525,7 +487,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     }
 
     await forLoopAllProjects(function(proj) {
-        if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
+        if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
             const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), 'success')
             if (!secondBonusText) {
                 updateStatusAdd(message, false, element)
@@ -534,15 +496,15 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
             }
             returnAdd = true
             return
-        } else if (((proj.MCRate && choice == 'MCRate') || (proj.ServerPact && choice == 'ServerPact') || (proj.MinecraftServersOrg && choice == 'MinecraftServersOrg') || (proj.HotMC && choice == 'HotMC') || (proj.MMoTopRU && choice == 'MMoTopRU' && proj.game == project.game)) && proj.nick == project.nick && !disableCheckProjects) {
+        } else if (((proj.MCRate && project.MCRate) || (proj.ServerPact && project.ServerPact) || (proj.MinecraftServersOrg && project.MinecraftServersOrg) || (proj.HotMC && project.HotMC) || (proj.MMoTopRU && project.MMoTopRU && proj.game == project.game)) && proj.nick == project.nick && !disableCheckProjects) {
             updateStatusAdd(chrome.i18n.getMessage('oneProject', getProjectName(proj)), false, element, 'error')
             returnAdd = true
             return
-        } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
+        } else if (proj.MinecraftIpList && project.MinecraftIpList && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
             updateStatusAdd(chrome.i18n.getMessage('oneProjectMinecraftIpList'), false, element, 'error')
             returnAdd = true
             return
-        } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
+        } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
             updateStatusAdd(chrome.i18n.getMessage('alreadyAdded'), false, element, 'success')
             returnAdd = true
             return
@@ -846,7 +808,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                         })
                     } else {
                         openPoput(url2, function() {
-                            addProject(choice, nick, id, time, response, customTimeOut, priorityOpt, element)
+                            addProject(project, element)
                         })
                     }
                 })
@@ -1354,18 +1316,7 @@ async function fastAdd() {
             document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
         let listFastAdd = document.getElementById('modaltext')
         listFastAdd.textContent = ''
-        for (const fastProj of getUrlProjects()) {
-            let html = document.createElement('div')
-            html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id)
-            html.appendChild(svgFail.cloneNode(true))
-            html.append(getProjectName(fastProj) + ' – ' + fastProj.nick + ' – ' + fastProj.id + ': ')
 
-            const status = document.createElement('span')
-            html.append(status)
-
-            listFastAdd.before(html)
-            await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, null, false, status)
-        }
         if (vars['disableNotifInfo'] != null) {
             if (settings.disabledNotifInfo != Boolean(vars['disableNotifInfo'])) {
                 settings.disabledNotifInfo = Boolean(vars['disableNotifInfo'])
@@ -1399,6 +1350,19 @@ async function fastAdd() {
             html.append(svgSuccess.cloneNode(true))
             html.append(chrome.i18n.getMessage('disableNotifStart'))
             listFastAdd.before(html)
+        }
+
+        for (const project of getUrlProjects()) {
+            let html = document.createElement('div')
+            html.setAttribute('div', getProjectName(project) + '┅' + project.nick + '┅' + project.id)
+            html.appendChild(svgFail.cloneNode(true))
+            html.append(getProjectName(project) + ' – ' + project.nick + ' – ' + project.id + ': ')
+
+            const status = document.createElement('span')
+            html.append(status)
+
+            listFastAdd.before(html)
+            await addProject(project, status)
         }
 
         if (document.querySelector('div[class="modalContent"] > div > svg[stroke="#f44336"]') != null) {
