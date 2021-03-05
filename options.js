@@ -41,10 +41,6 @@ var settings
 var generalStats = {}
 //Хранит значение отключения проверки на совпадение проектов
 var disableCheckProjects = false
-//Нужно ли добавлять проект с приоритетом
-var priorityOption = false
-//Нужно ли добавлять проект с рандомным временем голосованием
-var randomizeOption = false
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd
 
@@ -181,16 +177,9 @@ async function restoreOptions() {
                 }
                 return
             } else if (this.id == 'priority') {
-                if (this.checked && confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
-                    priorityOption = this.checked
-                } else if (this.checked) {
+                if (this.checked && !confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
                     this.checked = false
-                } else {
-                    priorityOption = this.checked
                 }
-                return
-            } else if (this.id == 'randomize') {
-                randomizeOption = this.checked
                 return
             } else if (this.id == 'customTimeOut') {
                 if (this.checked) {
@@ -444,6 +433,28 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
     }
     if (document.getElementById('priority').checked) {
         project.priority = true
+    }
+    if (document.getElementById('randomize').checked) {
+        project.randomize = true
+    }
+    if (project.ListForge) {
+        project.game = document.getElementById('chooseGameListForge').value
+    } else if (project.TopGames) {
+        project.game = document.getElementById('chooseGameTopGames').value
+        project.lang = document.getElementById('selectLangTopGames').value
+        project.maxCountVote = document.getElementById('countVote').valueAsNumber
+        project.countVote = 0
+    } else if (project.ServeurPrive) {
+        project.game = document.getElementById('chooseGameServeurPrive').value
+        project.lang = document.getElementById('selectLangServeurPrive').value
+        project.maxCountVote = document.getElementById('countVote').valueAsNumber
+        project.countVote = 0
+    } else if (project.MMoTopRU) {
+        project.game = document.getElementById('chooseGameMMoTopRU').value
+        project.lang = document.getElementById('selectLangMMoTopRU').value
+        project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
+    } else if (project.TopGG) {
+        project.game = document.getElementById('chooseTopGG').value
     }
     
     if (project.Custom) {
