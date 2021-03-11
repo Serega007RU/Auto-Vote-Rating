@@ -40,7 +40,7 @@ async function vote(first) {
         if (nick == null || nick == '')
             return
         document.querySelector('#playercollector-nickname').value = nick
-        document.querySelector('#w0 > div:nth-child(4) > button').click()
+        document.querySelector('#w0 button[type=submit]').click()
     } catch (e) {
         chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
     }
