@@ -19,7 +19,7 @@ async function vote() {
             }
         } else {
             //Ожидание загрузки reCATPCHA
-            const timer = setTimeout(async ()=>{
+            const timer = setInterval(async ()=>{
                 try {
                     if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
                         clearInterval(timer)
