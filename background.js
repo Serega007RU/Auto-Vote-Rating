@@ -1852,7 +1852,7 @@ async function stopVote() {
             if (chrome.runtime.lastError) {
                 console.warn(chrome.runtime.lastError.message)
                 if (!settings.disabledNotifError)
-                    sendNotification(chrome.runtime.lastError.message)
+                    sendNotification('Ошибка закрытия вкладки', chrome.runtime.lastError.message)
             }
         })
     }
