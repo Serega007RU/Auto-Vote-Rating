@@ -1850,9 +1850,9 @@ async function stopVote() {
     for (let[key,value] of openedProjects.entries()) {
         chrome.tabs.remove(key, function() {
             if (chrome.runtime.lastError) {
-                console.warn('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + ' ' + chrome.runtime.lastError.message)
+                console.warn(chrome.runtime.lastError.message)
                 if (!settings.disabledNotifError)
-                    sendNotification('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id), chrome.runtime.lastError.message)
+                    sendNotification(chrome.runtime.lastError.message)
             }
         })
     }
