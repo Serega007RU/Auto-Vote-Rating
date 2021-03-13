@@ -213,7 +213,7 @@ async function restoreOptions() {
                     document.getElementById('hour').required = false
                 }
                 return
-            } else if (this.id == 'lastDayMonth') {
+            } else if (this.id == 'lastDayMonth' || this.id == 'randomize') {
                 return
             } else if (this.id == 'sheldTimeCheckbox') {
                 if (this.checked) {
@@ -1298,14 +1298,14 @@ function getUrlProjects() {
     let projects = []
     let project = {}
     let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld') {
+        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize') {
             if (key == 'top' && Object.keys(project).length > 0) {
                 project.time = null
                 project.stats = {}
                 projects.push(project)
                 project = {}
             }
-            if (key == 'top') {
+            if (key == 'top' || key == 'randomize') {
                 project[value] = true
             } else {
                 project[key] = value
