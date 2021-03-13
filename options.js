@@ -412,7 +412,9 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
     let project = {}
     project[document.getElementById('project').value] = true
     project.id = document.getElementById('id').value
-    project.nick = document.getElementById('nick').value
+    if (!project.TopGG && !project.DiscordBotList && !project.BotsForDiscord && document.getElementById('nick').value != '') {
+        project.nick = document.getElementById('nick').value
+    }
     project.stats = {}
     if (document.getElementById('sheldTimeCheckbox').checked && document.getElementById('sheldTime').value != '') {
         project.time = new Date(document.getElementById('sheldTime').value).getTime()
