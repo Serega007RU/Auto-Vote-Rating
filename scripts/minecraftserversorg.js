@@ -47,7 +47,7 @@ async function vote(first) {
         document.querySelector('#field-container > form > ul > li > input').value = nick
         document.querySelector('#field-container > form > button').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 

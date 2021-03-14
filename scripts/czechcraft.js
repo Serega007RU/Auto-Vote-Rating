@@ -53,7 +53,7 @@ async function vote(first) {
         document.getElementById('privacy').checked = true
         document.querySelector('form[method="post"] > button.button').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 

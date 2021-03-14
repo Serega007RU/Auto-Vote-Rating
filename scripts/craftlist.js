@@ -82,7 +82,7 @@ async function vote(first) {
         document.querySelector('input[name="nickName"]').value = nick
         document.querySelector('button.btn.btn-vote').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 

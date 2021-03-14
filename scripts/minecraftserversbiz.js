@@ -31,7 +31,7 @@ async function vote(first) {
         document.getElementById('vote_username').value = nick
         document.querySelector('input[name="commit"]').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 

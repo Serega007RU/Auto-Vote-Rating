@@ -21,7 +21,7 @@ async function vote() {
         document.getElementById('ignn').value = nick
         document.querySelector('#voteform > input.buttonsmall.pointer.green.size10').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 
@@ -56,7 +56,7 @@ const timer2 = setInterval(()=>{
             clearInterval(timer2)
         }
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
         clearInterval(timer2)
     }
 }, 1000)

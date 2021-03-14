@@ -18,7 +18,7 @@ async function vote() {
         document.querySelector('#submit_vote_form > input[type=text]:nth-child(1)').value = nick
         document.querySelector('#submit_vote_form > input.r3submit').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 

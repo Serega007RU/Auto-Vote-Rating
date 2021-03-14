@@ -42,7 +42,7 @@ async function vote(first) {
         document.querySelector('#playercollector-nickname').value = nick
         document.querySelector('#w0 button[type=submit]').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 

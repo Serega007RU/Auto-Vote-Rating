@@ -15,7 +15,7 @@ try {
                         clearInterval(timer2)
                 }
             } catch (e) {
-                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
                 clearInterval(timer2)
             }
         }, 1000)
@@ -33,7 +33,7 @@ try {
                         clearInterval(timer1)
                     }
                 } catch (e) {
-                    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+                    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
                     clearInterval(timer1)
                 }
             }, 1000)
@@ -42,7 +42,7 @@ try {
         }
     }
 } catch (e) {
-    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
 }
 
 async function vote(first) {
@@ -120,7 +120,7 @@ async function vote(first) {
         }
         
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 
