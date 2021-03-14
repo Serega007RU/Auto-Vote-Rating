@@ -245,6 +245,11 @@ async function restoreOptions() {
     document.getElementById('cooldown').value = settings.cooldown
     if (settings.enableCustom || projectsCustom.length > 0)
         addCustom()
+    chrome.notifications.getPermissionLevel(function(callback){
+        if (callback != 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
+            updateStatusSave(chrome.i18n.getMessage('notificationsDisabled'), true, 'error')
+        }
+    })
 }
 
 //Добавить проект в список проекта
