@@ -847,19 +847,19 @@ async function addProject(project, element) {
     } else*/
     let array = []
     array.push(createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success'))
-    if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote && !element) {
-        const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
-        const span = document.createElement('span')
-        span.className = 'tooltip2'
-        span.style = 'color: white;'
-        const span2 = document.createElement('span')
-        span2.className = 'tooltip2text'
-        span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
-        span.appendChild(span2)
-        messageWSV.appendChild(span)
-        array.push(document.createElement('br'))
-        array.push(messageWSV)
-    }
+//  if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote && !element) {
+//      const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
+//      const span = document.createElement('span')
+//      span.className = 'tooltip2'
+//      span.style = 'color: white;'
+//      const span2 = document.createElement('span')
+//      span2.className = 'tooltip2text'
+//      span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
+//      span.appendChild(span2)
+//      messageWSV.appendChild(span)
+//      array.push(document.createElement('br'))
+//      array.push(messageWSV)
+//  }
     if (secondBonusText) {
         array.push(document.createElement('br'))
         array.push(secondBonusText)
