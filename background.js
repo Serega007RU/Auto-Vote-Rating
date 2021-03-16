@@ -1157,7 +1157,7 @@ async function endVote(request, sender, project) {
                 time.setUTCHours(time.getUTCHours() + 11)
                 time.setUTCMinutes(time.getUTCMinutes() + 7)
             } else if (project.Custom) {
-                if (project.timeoutHour) {
+                if (project.timeoutHour != null) {
                     if (!project.timeoutMinute) project.timeoutMinute = 0
                     if (!project.timeoutSecond) project.timeoutSecond = 0
                     if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
