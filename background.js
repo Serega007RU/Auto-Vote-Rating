@@ -636,6 +636,7 @@ async function silentVote(project) {
     try {
         if (project.TopCraft) {
             let response = await fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/')
+            let html = await response.text()
             let host = extractHostname(response.url)
             if (host.includes('vk.')) {
                 endVote({errorAuthVK: true}, null, project)
@@ -649,7 +650,6 @@ async function silentVote(project) {
                 endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
                 return
             }
-            let html = await response.text()
             let doc = new DOMParser().parseFromString(html, 'text/html')
             let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
             response = await fetch('https://topcraft.ru/projects/vote/', {
@@ -660,11 +660,11 @@ async function silentVote(project) {
                 'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
                 'method': 'POST'
             })
+            html = await response.text()
             if (!extractHostname(response.url).includes('topcraft.')) {
                 endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
                 return
             }
-            html = await response.text()
             if (response.status == 400 && html.length != 0) {
                 console.warn('Текст ошибки 400:', html)
                 endVote({later: true, message: html}, null, project)
@@ -679,6 +679,7 @@ async function silentVote(project) {
 
         if (project.McTOP) {
             let response = await fetch('https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/')
+            let html = await response.text()
             let host = extractHostname(response.url)
             if (host.includes('vk.')) {
                 endVote({errorAuthVK: true}, null, project)
@@ -692,7 +693,6 @@ async function silentVote(project) {
                 endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
                 return
             }
-            let html = await response.text()
             let doc = new DOMParser().parseFromString(html, 'text/html')
             let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
             response = await fetch('https://mctop.su/projects/vote/', {
@@ -703,11 +703,11 @@ async function silentVote(project) {
                 'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
                 'method': 'POST'
             })
+            html = await response.text()
             if (!extractHostname(response.url).includes('mctop.')) {
                 endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
                 return
             }
-            html = await response.text()
             if (response.status == 400 && html.length != 0) {
                 console.warn('Текст ошибки 400:', html)
                 endVote({later: true, message: html}, null, project)
@@ -722,6 +722,7 @@ async function silentVote(project) {
 
         if (project.MCRate) {
             let response = await fetch('https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code')
+            let html = await response.text()
             let host = extractHostname(response.url)
             if (host.includes('vk.')) {
                 endVote({errorAuthVK: true}, null, project)
@@ -735,7 +736,6 @@ async function silentVote(project) {
                 endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
                 return
             }
-            let html = await response.text()
             let doc = new DOMParser().parseFromString(html, 'text/html')
             let code = response.url.substring(response.url.length - 18)
             if (doc.querySelector('input[name=login_player]') != null) {
@@ -796,6 +796,7 @@ async function silentVote(project) {
 
         if (project.MinecraftRating) {
             let response = await fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45')
+            let html = await response.text()
             let host = extractHostname(response.url)
             if (host.includes('vk.')) {
                 endVote({errorAuthVK: true}, null, project)
@@ -809,7 +810,6 @@ async function silentVote(project) {
                 endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
                 return
             }
-            let html = await response.text()
             let doc = new DOMParser().parseFromString(html, 'text/html')
             if (doc.querySelector('div.alert.alert-danger') != null) {
                 if (doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
@@ -869,6 +869,7 @@ async function silentVote(project) {
                     'body': 'player=' + project.nick + '',
                     'method': 'POST'
                 })
+                let html = await response.text()
                 let host = extractHostname(response.url)
                 if (host.includes('vk.')) {
                     endVote({errorAuthVK: true}, null, project)
@@ -892,7 +893,6 @@ async function silentVote(project) {
                     }
                 }
 
-                let html = await response.text()
                 let doc = new DOMParser().parseFromString(html, 'text/html')
                 if (doc.querySelector('body') != null && doc.querySelector('body').textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
                     if (i == 3) {
@@ -960,6 +960,7 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
+            let html = await response.text()
             let host = extractHostname(response.url)
             if (!host.includes('serverpact.')) {
                 endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
@@ -969,7 +970,6 @@ async function silentVote(project) {
                 endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
                 return
             }
-            let html = await response.text()
             let doc = new DOMParser().parseFromString(html, 'text/html')
             function generatePass(nb) {
                 let chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@'
@@ -1064,6 +1064,7 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
+            let html = await response.text()
             let host = extractHostname(response.url)
             if (!host.includes('minecraftiplist.')) {
                 endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
@@ -1073,7 +1074,6 @@ async function silentVote(project) {
                 endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
                 return
             }
-            let html = await response.text()
             let doc = new DOMParser().parseFromString(html, 'text/html')
 
             if (doc.querySelector('#InnerWrapper > script:nth-child(10)') != null && doc.querySelector('table[class="CraftingTarget"]') == null) {
@@ -1169,6 +1169,7 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
+            html = await response.text()
             host = extractHostname(response.url)
             if (!host.includes('minecraftiplist.')) {
                 endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
@@ -1178,7 +1179,6 @@ async function silentVote(project) {
                 endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
                 return
             }
-            html = await response.text()
             doc = new DOMParser().parseFromString(html, 'text/html')
 
             if (doc.querySelector('#Content > div.Error') != null) {
@@ -1215,8 +1215,8 @@ async function silentVote(project) {
 
         if (project.MCServerList) {
             let response = await fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'})
+            let json = await response.json()
             if (response.ok) {
-                let json = await response.json()
                 if (json[0].success == "false") {
                     if (json[0].error == 'username_voted') {
                         endVote({later: true}, null, project)
@@ -1237,6 +1237,7 @@ async function silentVote(project) {
 
         if (project.Custom) {
             let response = await fetch(project.responseURL, project.id)
+            await response.text()
             if (response.ok) {
                 endVote({successfully: true}, null, project)
                 return
@@ -1441,7 +1442,7 @@ async function endVote(request, sender, project) {
                 time.setUTCHours(time.getUTCHours() + 11)
                 time.setUTCMinutes(time.getUTCMinutes() + 7)
             } else if (project.Custom) {
-                if (project.timeoutHour) {
+                if (project.timeoutHour != null) {
                     if (!project.timeoutMinute) project.timeoutMinute = 0
                     if (!project.timeoutSecond) project.timeoutSecond = 0
                     if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {

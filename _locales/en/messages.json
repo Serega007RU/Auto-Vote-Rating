@@ -848,5 +848,8 @@
   },
   "emptyError": {
     "message": "Empty error"
+  },
+  "notificationsDisabled": {
+    "message": "Notifications are disabled or the extension doesn't have access to them! You may miss important notifications from this extension about errors or warnings!"
   }
 }

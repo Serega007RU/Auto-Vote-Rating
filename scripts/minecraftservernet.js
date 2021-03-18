@@ -37,7 +37,7 @@ async function vote(first) {
         document.getElementById('rate-10').click()
         document.querySelector('input[value="Confirm Vote"]').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 

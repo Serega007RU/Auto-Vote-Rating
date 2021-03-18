@@ -13,6 +13,7 @@ function vote(first) {
                 //Пилюля от жадности в правах
                 document.location.replace(document.URL.replace('%20guilds.join', ''))
             } else {
+                
                 const timer = setTimeout(()=>{//Да это костыль, а есть варинт по лучше?
                     chrome.runtime.sendMessage({discordLogIn: true})
                 }, 10000)
@@ -61,6 +62,6 @@ function vote(first) {
         document.querySelector('button[type="submit"]').click()
 
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }

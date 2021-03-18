@@ -38,7 +38,7 @@ async function vote() {
 //                  chrome.runtime.sendMessage({later: later})
 //                  clearInterval(timer)
 //              } catch (e) {
-//                  chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+//                  chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
 //                  clearInterval(timer)
 //              }
 //          }, 2000)
@@ -49,7 +49,7 @@ async function vote() {
             chrome.runtime.sendMessage({errorVoteNoElement: true})
         }
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 

@@ -40,10 +40,6 @@ var settings
 var generalStats = {}
 //Хранит значение отключения проверки на совпадение проектов
 var disableCheckProjects = false
-//Нужно ли добавлять проект с приоритетом
-var priorityOption = false
-//Нужно ли добавлять проект с рандомным временем голосованием
-var randomizeOption = false
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd
 //Удалять ли куки ВКонтакте?
@@ -107,43 +103,6 @@ svgSuccess.setAttribute('stroke-linejoin', 'bevel')
 const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
 polyline.setAttribute('points', '20 6 9 17 4 12')
 svgSuccess.appendChild(polyline)
-
-
-//Конструктор проекта
-function Project(top, nick, id, time, responseURL, customTimeOut, priority) {
-    this[top] = true
-    if (this.Custom) {
-        if (customTimeOut.ms) {
-            this.timeout = customTimeOut.ms
-        } else {
-            this.timeoutHour = customTimeOut.hour
-            this.timeoutMinute = customTimeOut.minute
-            this.timeoutSecond = customTimeOut.second
-        }
-        this.time = null
-        this.nick = nick
-        this.id = id
-        this.responseURL = responseURL
-    } else {
-        this.nick = nick
-        this.id = id
-        if (customTimeOut) {
-            if (document.getElementById('lastDayMonth').checked)
-                this.lastDayMonth = true
-            if (customTimeOut.ms) {
-                this.timeout = customTimeOut.ms
-            } else {
-                this.timeoutHour = customTimeOut.hour
-                this.timeoutMinute = customTimeOut.minute
-                this.timeoutSecond = customTimeOut.second
-            }
-        }
-        this.time = time
-    }
-    if (priority)
-        this.priority = true
-    this.stats = {}
-}
 
 //Конструктор настроек
 function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disabledNotifError, enabledSilentVote, disabledCheckTime, cooldown) {
@@ -237,21 +196,15 @@ async function restoreOptions() {
                 }
                 return
             } else if (this.id == 'priority') {
-                if (this.checked && confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
-                    priorityOption = this.checked
-                } else if (this.checked) {
+                if (this.checked && !confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
                     this.checked = false
-                } else {
-                    priorityOption = this.checked
                 }
                 return
-            }
-            else if (this.id == 'useMultiVote')
+            } else if (this.id == 'useMultiVote') {
                 settings.useMultiVote = this.checked
-            else if (this.id == 'repeatAttemptLater')
+            } else if (this.id == 'repeatAttemptLater') {
                 settings.repeatAttemptLater = this.checked
-            else if (this.id == 'randomize') {
-                randomizeOption = this.checked
+            } else if (this.id == 'randomize') {
                 return
             } else if (this.id == 'customTimeOut') {
                 if (this.checked) {
@@ -285,7 +238,7 @@ async function restoreOptions() {
                     document.getElementById('hour').required = false
                 }
                 return
-            } else if (this.id == 'lastDayMonth') {
+            } else if (this.id == 'lastDayMonth' || this.id == 'randomize') {
                 return
             } else if (this.id == 'sheldTimeCheckbox') {
                 if (this.checked) {
@@ -343,6 +296,11 @@ async function restoreOptions() {
     }
     if (settings.enableCustom || projectsCustom.length > 0)
         addCustom()
+    chrome.notifications.getPermissionLevel(function(callback){
+        if (callback != 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
+            updateStatusSave(chrome.i18n.getMessage('notificationsDisabled'), true, 'error')
+        }
+    })
 }
 
 //Добавить проект в список проекта
@@ -635,16 +593,6 @@ function updateProjectList(projects, key) {
         }
     }
 }
-
-//Слушатель кнопки 'Добавить'
-document.getElementById('addProject').addEventListener('submit', ()=>{
-    event.preventDefault()
-    if (document.getElementById('project').value == 'Custom') {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('customBody').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), document.getElementById('responseURL').value, (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: Number(document.getElementById('hour').value.split(':')[0]), minute: Number(document.getElementById('hour').value.split(':')[1]), second: Number(document.getElementById('hour').value.split(':')[2])}), priorityOption, null)
-    } else {
-        addProject(document.getElementById('project').value, document.getElementById('nick').value, document.getElementById('id').value, (document.getElementById('sheldTimeCheckbox').checked ? new Date(document.getElementById('sheldTime').value).getTime() : null), null, (document.getElementById('customTimeOut').checked ? (document.getElementById('selectTime').value == 'ms' ? {ms: document.getElementById('time').valueAsNumber} : {hour: Number(document.getElementById('hour').value.split(':')[0]), minute: Number(document.getElementById('hour').value.split(':')[1]), second: Number(document.getElementById('hour').value.split(':')[2])}) : null), priorityOption, null)
-    }
-})
 
 //Слушатель кнопки 'Добавить' на MultiVote VKontakte
 document.getElementById('AddVK').addEventListener('click', async () => {
@@ -1082,32 +1030,39 @@ async function checkProxy(proxy, scheme) {
     return error
 }
 
-//Слушатель кнопки 'Установить' на кулдауне
-document.getElementById('timeout').addEventListener('submit', ()=>{
+//Слушатель кнопки "Добавить"
+document.getElementById('addProject').addEventListener('submit', ()=>{
     event.preventDefault()
-    setCoolDown()
-})
-
-async function addProject(choice, nick, id, time, response, customTimeOut, priorityOpt, element) {
-    updateStatusAdd(chrome.i18n.getMessage('adding'), true, element)
-    let project
-    if (choice == 'Custom') {
-        let body
-        try {
-            body = JSON.parse(id)
-        } catch (e) {
-            updateStatusAdd(e, true, element, 'error')
-            return
-        }
-        project = new Project(choice, nick, body, time, response, customTimeOut, priorityOpt)
-    } else {
-        project = new Project(choice, nick, id, time, null, customTimeOut, priorityOpt)
+    let project = {}
+    project[document.getElementById('project').value] = true
+    project.id = document.getElementById('id').value
+    if (!project.TopGG && !project.DiscordBotList && !project.BotsForDiscord && document.getElementById('nick').value != '') {
+        project.nick = document.getElementById('nick').value
     }
-
-    if (randomizeOption) {
+    project.stats = {}
+    if (document.getElementById('sheldTimeCheckbox').checked && document.getElementById('sheldTime').value != '') {
+        project.time = new Date(document.getElementById('sheldTime').value).getTime()
+    } else {
+        project.time = null
+    }
+    if (document.getElementById('customTimeOut').checked || project.Custom) {
+        if (document.getElementById('selectTime').value == 'ms') {
+            project.timeout = document.getElementById('time').valueAsNumber
+        } else {
+            project.timeoutHour = Number(document.getElementById('hour').value.split(':')[0])
+            project.timeoutMinute = Number(document.getElementById('hour').value.split(':')[1])
+            project.timeoutSecond = Number(document.getElementById('hour').value.split(':')[2])
+        }
+    }
+    if (document.getElementById('lastDayMonth').checked) {
+        project.lastDayMonth = true
+    }
+    if (document.getElementById('priority').checked) {
+        project.priority = true
+    }
+    if (document.getElementById('randomize').checked) {
         project.randomize = true
     }
-
     if (project.ListForge) {
         project.game = document.getElementById('chooseGameListForge').value
     } else if (project.TopGames) {
@@ -1127,6 +1082,31 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     } else if (project.TopGG) {
         project.game = document.getElementById('chooseTopGG').value
     }
+    
+    if (project.Custom) {
+        let body
+        try {
+            body = JSON.parse(document.getElementById('customBody').value)
+        } catch (e) {
+            updateStatusAdd(e, true, element, 'error')
+            return
+        }
+        project.id = body
+        project.responseURL = document.getElementById('responseURL').value
+        addProject(project, null)
+    } else {
+        addProject(project, null)
+    }
+})
+
+//Слушатель кнопки 'Установить' на кулдауне
+document.getElementById('timeout').addEventListener('submit', ()=>{
+    event.preventDefault()
+    setCoolDown()
+})
+
+async function addProject(project, element) {
+    updateStatusAdd(chrome.i18n.getMessage('adding'), true, element)
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
     let secondBonusText
@@ -1160,7 +1140,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 return
             }
         } else {
-            if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
+            if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
                 const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), 'success')
                 if (!secondBonusText) {
                     updateStatusAdd(message, false, element)
@@ -1169,15 +1149,15 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                 }
                 returnAdd = true
                 return
-            } else if (((proj.MCRate && choice == 'MCRate') || (proj.ServerPact && choice == 'ServerPact') || (proj.MinecraftServersOrg && choice == 'MinecraftServersOrg') || (proj.HotMC && choice == 'HotMC') || (proj.MMoTopRU && choice == 'MMoTopRU' && proj.game == project.game)) && proj.nick == project.nick && !disableCheckProjects) {
+            } else if (((proj.MCRate && project.MCRate) || (proj.ServerPact && project.ServerPact) || (proj.MinecraftServersOrg && project.MinecraftServersOrg) || (proj.HotMC && project.HotMC) || (proj.MMoTopRU && project.MMoTopRU && proj.game == project.game)) && proj.nick == project.nick && !disableCheckProjects) {
                 updateStatusAdd(chrome.i18n.getMessage('oneProject', getProjectName(proj)), false, element, 'error')
                 returnAdd = true
                 return
-            } else if (proj.MinecraftIpList && choice == "MinecraftIpList" && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
+            } else if (proj.MinecraftIpList && project.MinecraftIpList && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
                 updateStatusAdd(chrome.i18n.getMessage('oneProjectMinecraftIpList'), false, element, 'error')
                 returnAdd = true
                 return
-            } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
+            } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
                 updateStatusAdd(chrome.i18n.getMessage('alreadyAdded'), false, element, 'success')
                 returnAdd = true
                 return
@@ -1482,7 +1462,7 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
                         })
                     } else {
                         openPoput(url2, function() {
-                            addProject(choice, nick, id, time, response, customTimeOut, priorityOpt, element)
+                            addProject(project, element)
                         })
                     }
                 })
@@ -1508,19 +1488,19 @@ async function addProject(choice, nick, id, time, response, customTimeOut, prior
     } else*/
     let array = []
     array.push(createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success'))
-    if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote) {
-        const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
-        const span = document.createElement('span')
-        span.className = 'tooltip2'
-        span.style = 'color: white;'
-        const span2 = document.createElement('span')
-        span2.className = 'tooltip2text'
-        span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
-        span.appendChild(span2)
-        messageWSV.appendChild(span)
-        array.push(document.createElement('br'))
-        array.push(messageWSV)
-    }
+//  if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote && !element) {
+//      const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
+//      const span = document.createElement('span')
+//      span.className = 'tooltip2'
+//      span.style = 'color: white;'
+//      const span2 = document.createElement('span')
+//      span2.className = 'tooltip2text'
+//      span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
+//      span.appendChild(span2)
+//      messageWSV.appendChild(span)
+//      array.push(document.createElement('br'))
+//      array.push(messageWSV)
+//  }
     if (secondBonusText) {
         array.push(document.createElement('br'))
         array.push(secondBonusText)
@@ -1568,7 +1548,18 @@ function addProjectsBonus(project, element) {
 //      })
 /*  } else */if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async()=>{
-            await addProject('Custom', 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'), '{"headers": {"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language": "ru,en-US;q=0.9,en;q=0.8","content-type": "application/x-www-form-urlencoded","sec-fetch-dest": "document","sec-fetch-mode": "navigate","sec-fetch-site": "same-origin","sec-fetch-user": "?1","upgrade-insecure-requests": "1"},"body": "give_daily_posted=1&token=%7Btoken%7D&return=%252F","method": "POST"}', null, 'https://victorycraft.ru/?do=cabinet&loc=bonuses', {ms: 86400000}, priorityOption, null)
+            let vict = {
+                Custom: true,
+                nick: 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'),
+                id: JSON.parse('{"headers": {"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language": "ru,en-US;q=0.9,en;q=0.8","content-type": "application/x-www-form-urlencoded","sec-fetch-dest": "document","sec-fetch-mode": "navigate","sec-fetch-site": "same-origin","sec-fetch-user": "?1","upgrade-insecure-requests": "1"},"body": "give_daily_posted=1&token=%7Btoken%7D&return=%252F","method": "POST"}'),
+                time: null,
+                responseURL: 'https://victorycraft.ru/?do=cabinet&loc=bonuses',
+                timeoutHour: 0,
+                timeoutMinute: 10,
+                timeoutSecond: 0,
+                stats: {}
+            }
+            await addProject(vict, null)
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null)
         })
     }
@@ -1692,7 +1683,7 @@ function getProjectList(project) {
 }
 
 function extractHostname(url) {
-    var hostname
+    let hostname
     //find & remove protocol (http, ftp, etc.) and get hostname
 
     if (url.indexOf('//') > -1) {
@@ -1768,7 +1759,7 @@ async function wait(ms) {
 //Слушатель на изменение настроек
 chrome.storage.onChanged.addListener(function(changes, namespace) {
     for (const key in changes) {
-        var storageChange = changes[key]
+        let storageChange = changes[key]
         if (key.startsWith('AVMRprojects'))
             this['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
         else if (key == 'AVMRsettings') {
@@ -1813,7 +1804,7 @@ async function forLoopAllProjects(fuc, reverse) {
 //Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', ()=>{
     updateStatusFile(chrome.i18n.getMessage('exporting'), true)
-    var allSetting = {
+    let allSetting = {
         projectsTopCraft,
         projectsMcTOP,
         projectsMCRate,
@@ -1854,8 +1845,9 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         settings,
         generalStats
     }
-    var text = JSON.stringify(allSetting, null, '\t')
-    blob = new Blob([text],{type: 'text/json;charset=UTF-8;'}), anchor = document.createElement('a')
+    let text = JSON.stringify(allSetting, null, '\t')
+    let blob = new Blob([text],{type: 'text/json;charset=UTF-8;'})
+    let anchor = document.createElement('a')
 
     anchor.download = 'AVR.json'
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
@@ -1927,7 +1919,8 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
 document.getElementById('logs-download').addEventListener('click', ()=>{
     updateStatusFile(chrome.i18n.getMessage('exporting'), true)
 
-    blob = new Blob([localStorage.consoleHistory],{type: 'text/plain;charset=UTF-8;'}), anchor = document.createElement('a')
+    let blob = new Blob([localStorage.consoleHistory],{type: 'text/plain;charset=UTF-8;'})
+    let anchor = document.createElement('a')
 
     anchor.download = 'console_history.txt'
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
@@ -1942,9 +1935,9 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
 document.getElementById('file-upload').addEventListener('change', (evt)=>{
     updateStatusFile(chrome.i18n.getMessage('importing'), true)
     try {
-        if (evt.target.files.length == 0)return
+        if (evt.target.files.length == 0) return
         let file = evt.target.files[0]
-        var reader = new FileReader()
+        let reader = new FileReader()
         reader.onload = (function(theFile) {
             return async function(e) {
                 try {
@@ -2012,8 +2005,7 @@ async function checkUpdateConflicts(save) {
         await forLoopAllProjects(async function(proj) {
             proj.stats = {}
             //Да, это весьма не оптимизированно
-            if (save)
-                await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj), false)
+            if (save) await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj), false)
         }, false)
     }
 
@@ -2037,8 +2029,7 @@ async function checkUpdateConflicts(save) {
         updated = true
         updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
         generalStats = {}
-        if (save)
-            await setValue('generalStats', generalStats, false)
+        if (save) await setValue('generalStats', generalStats, false)
     }
 
     for (const item of allProjects) {
@@ -2072,28 +2063,36 @@ modeVote.addEventListener('change', async function() {
 
 //Достаёт все проекты указанные в URL
 function getUrlProjects() {
-    var vars = []
-    var element = {}
-    var i = 0
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        if (key == 'top' || key == 'nick' || key == 'id') {
-            element[key] = value
-            i++
-            if (i == 3) {
-                vars.push(new Project(element.top,element.nick,element.id,null,null,null,false))
-                i = 0
-                element = {}
+    let projects = []
+    let project = {}
+    let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize') {
+            if (key == 'top' && Object.keys(project).length > 0) {
+                project.time = null
+                project.stats = {}
+                projects.push(project)
+                project = {}
+            }
+            if (key == 'top' || key == 'randomize') {
+                project[value] = true
+            } else {
+                project[key] = value
             }
         }
     })
-    //vars.reverse()
-    return vars
+    if (Object.keys(project).length > 0) {
+        project.time = null
+        project.stats = {}
+        projects.push(project)
+    }
+    //projects.reverse()
+    return projects
 }
 
 //Достаёт все указанные аргументы из URL
 function getUrlVars() {
-    var vars = {}
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+    let vars = {}
+    let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         vars[key] = value
     })
     return vars
@@ -2102,23 +2101,12 @@ function getUrlVars() {
 //Если страница настроек была открыта сторонним проектом то расширение переходит к быстрому добавлению проектов
 async function fastAdd() {
     if (window.location.href.includes('addFastProject')) {
-        var vars = getUrlVars()
+        let vars = getUrlVars()
         if (vars['name'] != null)
             document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
         let listFastAdd = document.getElementById('modaltext')
         listFastAdd.textContent = ''
-        for (const fastProj of getUrlProjects()) {
-            let html = document.createElement('div')
-            html.setAttribute('div', getProjectName(fastProj) + '┅' + fastProj.nick + '┅' + fastProj.id)
-            html.appendChild(svgFail.cloneNode(true))
-            html.append(getProjectName(fastProj) + ' – ' + fastProj.nick + ' – ' + fastProj.id + ': ')
 
-            const status = document.createElement('span')
-            html.append(status)
-
-            listFastAdd.before(html)
-            await addProject(getProjectName(fastProj), fastProj.nick, fastProj.id, null, null, null, false, status)
-        }
         if (vars['disableNotifInfo'] != null) {
             if (settings.disabledNotifInfo != Boolean(vars['disableNotifInfo'])) {
                 settings.disabledNotifInfo = Boolean(vars['disableNotifInfo'])
@@ -2126,7 +2114,6 @@ async function fastAdd() {
             }
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             let html = document.createElement('div')
-            html.append(document.createElement('br'))
             html.append(svgSuccess.cloneNode(true))
             html.append(chrome.i18n.getMessage('disableNotifInfo'))
             listFastAdd.before(html)
@@ -2154,6 +2141,19 @@ async function fastAdd() {
             listFastAdd.before(html)
         }
 
+        for (const project of getUrlProjects()) {
+            let html = document.createElement('div')
+            html.setAttribute('div', getProjectName(project) + '┅' + project.nick + '┅' + project.id)
+            html.appendChild(svgFail.cloneNode(true))
+            html.append(getProjectName(project) + ' – ' + project.nick + ' – ' + project.id + ': ')
+
+            const status = document.createElement('span')
+            html.append(status)
+
+            listFastAdd.before(html)
+            await addProject(project, status)
+        }
+
         if (document.querySelector('div[class="modalContent"] > div > svg[stroke="#f44336"]') != null) {
             let buttonRetry = document.createElement('button')
             buttonRetry.setAttribute('class', 'col-xl-6 retryFastAdd col-lg-6')
@@ -2162,7 +2162,7 @@ async function fastAdd() {
             buttonRetry.addEventListener('click', ()=>{
                 document.location.reload(true)
             })
-        } else {
+        } else if (document.querySelector('div[class="modalContent"]').childElementCount > 1) {
             let successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
             successFastAdd.append(document.createElement('br'))
@@ -2170,6 +2170,8 @@ async function fastAdd() {
             successFastAdd.append(document.createElement('br'))
             successFastAdd.append(chrome.i18n.getMessage('closeTab'))
             listFastAdd.before(successFastAdd)
+        } else {
+            return
         }
 
         let buttonClose = document.createElement('button')
@@ -2214,7 +2216,7 @@ function openPoput(url, reload) {
     let popupBoxHeight = 430
     let width, height
     //if (browser.safari) popupBoxHeight += 45;/* safari popup window panel height, hardcoded to avoid popup jump */
-    var left = Math.max(0, (screen.width - popupBoxWidth) / 2) + (screen.availLeft | 0)
+    let left = Math.max(0, (screen.width - popupBoxWidth) / 2) + (screen.availLeft | 0)
       , top = Math.max(0, (screen.height - popupBoxWidth) / 2) + (screen.availTop | 0)
     poput = window.open(url, 'vk_openapi', 'width=' + popupBoxWidth + ',height=' + popupBoxHeight + ',left=' + left + ',top=' + top + ',menubar=0,toolbar=0,location=0,status=0')
     if (poput) {
@@ -2238,7 +2240,7 @@ function tabSelect(evt, tabs) {
         return
     }
     
-    var i, tabcontent, tablinks
+    let i, tabcontent, tablinks
 
     tabcontent = document.getElementsByClassName('tabcontent')
     for (let i = 0; i < tabcontent.length; i++) {
@@ -2297,7 +2299,7 @@ document.getElementById('helpTab2').addEventListener('click', function() {
 
 //Переключение между списками добавленных проектов
 function listSelect(evt, tabs) {
-    var x, listcontent, selectsite
+    let x, listcontent, selectsite
 
     listcontent = document.getElementsByClassName('listcontent')
     for (let x = 0; x < listcontent.length; x++) {
@@ -2363,8 +2365,8 @@ document.getElementById('generalStats').addEventListener('click', function() {
 var selectedTop = document.getElementById('project')
 
 selectedTop.addEventListener('click', function() {
-    var options = selectedTop.querySelectorAll('option')
-    var count = options.length
+    let options = selectedTop.querySelectorAll('option')
+    let count = options.length
     if (typeof (count) === 'undefined' || count < 2) {
         addActivityItem()
     }

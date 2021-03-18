@@ -45,7 +45,7 @@ async function vote() {
             document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > span > input').click()
         }
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 

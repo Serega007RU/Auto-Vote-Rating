@@ -8,7 +8,7 @@ async function vote() {
         document.getElementById('username').value = nick
         document.getElementById('btn').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 
@@ -28,16 +28,21 @@ async function getNickName() {
 }
 
 const timer = setInterval(()=>{
-    if (document.querySelector('div.alert.alert-danger') != null && document.querySelector('div.alert.alert-danger').textContent != '') {
-        if (document.querySelector('div.alert.alert-danger').textContent.includes('Již jsi hlasoval vrať se znovu za 2 hodiny')) {
-            chrome.runtime.sendMessage({later: true})
-        } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
+    try {
+        if (document.querySelector('div.alert.alert-danger') != null && document.querySelector('div.alert.alert-danger').textContent != '') {
+            if (document.querySelector('div.alert.alert-danger').textContent.includes('Již jsi hlasoval vrať se znovu za 2 hodiny')) {
+                chrome.runtime.sendMessage({later: true})
+            } else {
+                chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
+            }
+            clearInterval(timer)
         }
+        if (document.querySelector('div.alert.alert-success') != null && document.querySelector('div.alert.alert-danger').textContent != '') {
+            chrome.runtime.sendMessage({successfully: true})
+            return
+        }
+    } catch (e) {
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
         clearInterval(timer)
-    }
-    if (document.querySelector('div.alert.alert-success') != null && document.querySelector('div.alert.alert-danger').textContent != '') {
-        chrome.runtime.sendMessage({successfully: true})
-        return
     }
 }, 1000)

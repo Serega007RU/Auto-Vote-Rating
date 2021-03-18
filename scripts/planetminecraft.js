@@ -13,12 +13,14 @@ async function vote() {
             return
         }
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
-        document.querySelector('#submit_vote_form > input[type=text]:nth-child(1)').value = nick
-        document.querySelector('#submit_vote_form > input.r3submit').click()
+        if (document.querySelector('#submit_vote_form > input[name="mcname"]') != null) {
+            document.querySelector('#submit_vote_form > input[name="mcname"]').value = nick
+        } else {
+            console.warn('Не удалось найти поле для никнейма, возможно это голосование без награды')
+        }
+        document.querySelector('#submit_vote_form > input[type="submit"]').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack})
+        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 
