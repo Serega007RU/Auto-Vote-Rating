@@ -982,8 +982,9 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
                 scheme: 'https',
                 HolaVPN: true
             }
-            await addProxy(proxy, true)
-            proxies.push(proxy)
+            if (await addProxy(proxy, true)) {
+                proxies.push(proxy)
+            }
         }
     }
     await setValue('AVMRproxies', proxies, true)
@@ -995,12 +996,13 @@ async function addProxy(proxy, visually) {
     for (let prox of proxies) {
         if (proxy.ip == prox.ip && proxy.port == prox.port) {
             updateStatusProxy(chrome.i18n.getMessage('added'), false, 'success')
-            return
+            return false
         }
     }
 
     await addProxyList(proxy, visually)
     updateStatusProxy(chrome.i18n.getMessage('addSuccess'), false, 'success')
+    return true
 }
 
 async function checkProxy(proxy, scheme) {
