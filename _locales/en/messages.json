@@ -470,7 +470,7 @@
     "message": "the time stamp is set to"
   },
   "errorblock": {
-    "message": "Failed to connect to api-testing.cifrazia.com, $error$ If you don't have precise time set, extension will not work properly",
+    "message": "Failed to connect to api.cifrazia.com, $error$ If you don't have precise time set, extension will not work properly",
     "placeholders": {
       "error": {
         "content": "$1"
@@ -478,7 +478,7 @@
     }
   },
   "errorClock2": {
-    "message": "Failed to connect to api-testing.cifrazia.com, HTTP response: $httpCode$. If you don't have precise time set, extension will not work properly",
+    "message": "Failed to connect to api.cifrazia.com, HTTP response: $httpCode$. If you don't have precise time set, extension will not work properly",
     "placeholders": {
       "httpCode": {
         "content": "$1"

@@ -697,7 +697,7 @@ ul li {
 
 ul li:hover {
   background-color: #2A2A2F !important;
-  cursor: pointer;
+/*   cursor: pointer; */
 }
 
 .deleteProject:hover {
