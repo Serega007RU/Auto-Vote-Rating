@@ -415,16 +415,13 @@ async function addProjectList(project, visually) {
 async function addVKList(VK, visually) {
     let listVK = document.getElementById('VKList')
     let html = document.createElement('li')
-    let id = VK.name + '┄' + VK.id
-    html.id = 'div┄' + id
+    html.id = VK.id + '_' + VK.name
     html.className = 'multiVoteList'
     let div = document.createElement('div')
     let span = document.createElement('span')
-    span.id = id
     span.className = 'deleteProject'
     span.append(svgDelete.cloneNode(true))
     let span2 = document.createElement('span')
-    span2.id = 'repair_' + id
     span2.className = 'statsProject'
     span2.append(svgRepair.cloneNode(true))
     div.append(span2)
@@ -436,10 +433,10 @@ async function addVKList(VK, visually) {
         html.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
     }
     listVK.append(html)
-    document.getElementById(VK.name + '┄' + VK.id).addEventListener('click', function() {
+    span.addEventListener('click', function() {
         removeVKList(VK, false)
     })
-    document.getElementById('repair_' + id).addEventListener('click', async function() {
+    span2.addEventListener('click', async function() {
         for (let i = 0; i < VK.cookies.length; i++) {
             let cookie = VK.cookies[i]
             await setCookieDetails({
@@ -473,12 +470,10 @@ async function addVKList(VK, visually) {
 async function addProxyList(proxy, visually) {
     let listProxy = document.getElementById('ProxyList')
     let html = document.createElement('li')
-    let id = proxy.ip + '┄' + proxy.port
-    html.id = 'div┄' + id
+    html.id = proxy.ip + '_' + proxy.port
     html.className = 'multiVoteList'
     let div = document.createElement('div')
     let span = document.createElement('span')
-    span.id = id
     span.className = 'deleteProject'
     span.append(svgDelete.cloneNode(true))
     div.append(span)
@@ -489,7 +484,7 @@ async function addProxyList(proxy, visually) {
         html.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
     }
     listProxy.append(html)
-    document.getElementById(proxy.ip + '┄' + proxy.port).addEventListener('click', function() {
+    span.addEventListener('click', function() {
         removeProxyList(proxy, false)
     })
     if (visually) {
@@ -545,10 +540,14 @@ async function removeProjectList(project, visually) {
 }
 
 async function removeVKList(VK, visually) {
-    if (document.getElementById(VK.name + '┄' + VK.id) == null) return
-    if (document.getElementById('div' + '┄' + VK.name + '┄' + VK.id) == null) return
-    document.getElementById(VK.name + '┄' + VK.id).removeEventListener('click', function() {})
-    document.getElementById('div' + '┄' + VK.name + '┄' + VK.id).remove()
+    let li = document.getElementById(VK.id + '_' + VK.name)
+    if (li != null) {
+        li.querySelector('span.deleteProject').removeEventListener('click', null)
+        li.querySelector('span.statsProject').removeEventListener('click', null)
+        li.remove()
+    } else {
+        return
+    }
     if (visually) {
         document.querySelector('#VKButton > span').textContent = VKs.length
         return
@@ -562,10 +561,13 @@ async function removeVKList(VK, visually) {
 }
 
 async function removeProxyList(proxy, visually) {
-    if (document.getElementById(proxy.ip + '┄' + proxy.port) == null) return
-    if (document.getElementById('div' + '┄' + proxy.ip + '┄' + proxy.port) == null) return
-    document.getElementById(proxy.ip + '┄' + proxy.port).removeEventListener('click', function() {})
-    document.getElementById('div' + '┄' + proxy.ip + '┄' + proxy.port).remove()
+    let li = document.getElementById(proxy.ip + '_' + proxy.port)
+    if (li != null) {
+        li.querySelector('span.deleteProject').removeEventListener('click', null)
+        li.remove()
+    } else {
+        return
+    }
     if (visually) {
         document.querySelector('#ProxyButton > span').textContent = proxies.length
         return
