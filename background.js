@@ -58,7 +58,7 @@ var currentProxy
 //Прерывает выполнение fetch запросов на случай ошибки в режиме MultiVote
 var controller = new AbortController()
 
-var debug = true
+var debug = false
 
 //Токен TunnelBear
 let tunnelBear = {}
