@@ -59,11 +59,19 @@ var check = true
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
 var closeTabs = true
 
+//Где храним настройки
+let storageArea = 'local'
+
 //Инициализация настроек расширения
 initializeConfig()
 async function initializeConfig() {
+    storageArea = await getLocalValue('storageArea')
+    if (storageArea == null || storageArea == '') {
+        storageArea = 'local'
+        await setValue('storageArea', storageArea)
+    }
     for (const item of allProjects) {
-        this['projects' + item] = await getValue('AVMRprojects' + item)
+        window['projects' + item] = await getValue('AVMRprojects' + item)
     }
     settings = await getValue('AVMRsettings')
     generalStats = await getValue('generalStats')
@@ -71,7 +79,7 @@ async function initializeConfig() {
         generalStats = {}
 
     for (const item of allProjects) {
-        if (this['projects' + item] == null || !(typeof this['projects' + item][Symbol.iterator] === 'function')) this['projects' + item] = []
+        if (window['projects' + item] == null || !(typeof window['projects' + item][Symbol.iterator] === 'function')) window['projects' + item] = []
     }
 
     let cooldown = 1000
@@ -1301,7 +1309,7 @@ function getProjectPrefix(project, detailed) {
 }
 
 function getProjectList(project) {
-    return this['projects' + getProjectName(project)]
+    return window['projects' + getProjectName(project)]
 }
 
 //Проверяет правильное ли у вас время
@@ -1378,16 +1386,23 @@ async function removeCookie(url, name) {
 }
 
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
-async function getValue(name) {
+async function getLocalValue(name) {
     return new Promise(resolve=>{
         chrome.storage.local.get(name, data=>{
             resolve(data[name])
         })
     })
 }
+async function getValue(name) {
+    return new Promise(resolve=>{
+        chrome.storage[storageArea].get(name, data=>{
+            resolve(data[name])
+        })
+    })
+}
 async function setValue(key, value) {
     return new Promise(resolve=>{
-        chrome.storage.local.set({[key]: value}, data=>{
+        chrome.storage[storageArea].set({[key]: value}, data=>{
             resolve(data)
         })
     })
@@ -1415,7 +1430,7 @@ async function changeProject(project) {
 
 async function forLoopAllProjects(fuc) {
     for (const item of allProjects) {
-        for (let proj of this['projects' + item]) {
+        for (let proj of window['projects' + item]) {
             await fuc(proj)
         }
     }
@@ -1443,12 +1458,17 @@ function extractHostname(url) {
 chrome.storage.onChanged.addListener(function(changes, namespace) {
     for (let key in changes) {
         let storageChange = changes[key]
-        if (key.startsWith('AVMRprojects'))
-            this['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
-        else if (key == 'AVMRsettings')
+        if (key == 'storageArea') {
+            storageArea = storageChange.newValue
+        } else if (namespace != storageArea) {
+            return
+        } else if (key.startsWith('AVMRprojects')) {
+            window['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
+        } else if (key == 'AVMRsettings') {
             settings = storageChange.newValue
-        else if (key == 'generalStats')
+        } else if (key == 'generalStats') {
             generalStats = storageChange.newValue
+        }
     }
 })
 

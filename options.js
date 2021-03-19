@@ -43,6 +43,8 @@ var generalStats = {}
 var disableCheckProjects = false
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd
+//Где храним настройки
+let storageArea = 'local'
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -117,8 +119,13 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 async function restoreOptions() {
+    storageArea = await getValue('storageArea', 'local')
+    if (storageArea == null || storageArea == '') {
+        storageArea = 'local'
+        await setValue('storageArea', storageArea, false, 'local')
+    }
     for (const item of allProjects) {
-        this['projects' + item] = await getValue('AVMRprojects' + item)
+        window['projects' + item] = await getValue('AVMRprojects' + item)
     }
     settings = await getValue('AVMRsettings')
     generalStats = await getValue('generalStats')
@@ -130,8 +137,8 @@ async function restoreOptions() {
         updateStatusSave(chrome.i18n.getMessage('firstSettings'), true)
         
         for (const item of allProjects) {
-            this['projects' + item] = []
-            await setValue('AVMRprojects' + item, this['projects' + item], false)
+            window['projects' + item] = []
+            await setValue('AVMRprojects' + item, window['projects' + item], false)
         }
 
         settings = new Settings(false, false, false, false, true, false, 1000, false)
@@ -228,6 +235,31 @@ async function restoreOptions() {
                     document.getElementById('sheldTime').required = false
                 }
                 return
+            } else if (this.id == 'enableSyncStorage') {
+                let oldStorageArea = storageArea
+                if (this.checked) {
+                    storageArea = 'sync'
+                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopy'))
+                } else {
+                    storageArea = 'local'
+                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopyLocal'))
+                }
+                await setValue('storageArea', storageArea, false, 'local')
+                for (const item of allProjects) {
+                    await setValue('AVMRprojects' + item, window['projects' + item])
+                    await setValue('AVMRprojects' + item, null, false, oldStorageArea)
+                }
+                await setValue('AVMRsettings', settings)
+                await setValue('generalStats', generalStats)
+                await setValue('AVMRsettings', null, false, oldStorageArea)
+                await setValue('generalStats', null, false, oldStorageArea)
+
+                if (this.checked) {
+                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopySuccess'), false, 'success');
+                } else {
+                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), false, 'success');
+                }
+                return
             }
             await setValue('AVMRsettings', settings, true)
         })
@@ -241,6 +273,9 @@ async function restoreOptions() {
         document.getElementById('enabledSilentVote').value = 'enabled'
     } else {
         document.getElementById('enabledSilentVote').value = 'disabled'
+    }
+    if (storageArea == 'sync') {
+        document.getElementById('enableSyncStorage').checked = true
     }
     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
@@ -1013,7 +1048,7 @@ function updateStatus(message, type, disableTimer, level, element) {
     } else {
         status = document.getElementById(type)
     }
-    clearInterval(this[type + 'Timeout'])
+    clearInterval(window[type + 'Timeout'])
     while (status.firstChild)
        status.firstChild.remove()
     if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
@@ -1025,7 +1060,7 @@ function updateStatus(message, type, disableTimer, level, element) {
     }
     if (disableTimer || element != null)
         return
-    this[type + 'Timeout'] = setTimeout(function() {
+    window[type + 'Timeout'] = setTimeout(function() {
         while (status.firstChild)
             status.firstChild.remove()
         status.append('\u00A0')
@@ -1041,7 +1076,7 @@ function getFullProjectName(project) {
 }
 
 function getProjectList(project) {
-    return this['projects' + getProjectName(project)]
+    return window['projects' + getProjectName(project)]
 }
 
 function extractHostname(url) {
@@ -1073,11 +1108,15 @@ function extractHostname(url) {
 //})
 
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
-async function getValue(name) {
+async function getValue(name, area) {
+    if (!area) {
+        area = storageArea
+    }
     return new Promise(resolve=>{
-        chrome.storage.local.get(name, data=>{
+        chrome.storage[area].get(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageError'), false, 'error')
+                updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
+                console.error(chrome.runtime.lastError)
                 reject(chrome.runtime.lastError)
             } else {
                 resolve(data[name])
@@ -1085,13 +1124,18 @@ async function getValue(name) {
         })
     })
 }
-async function setValue(key, value, updateStatus) {
-    if (updateStatus)
+async function setValue(key, value, updateStatus, area) {
+    if (!area) {
+        area = storageArea
+    }
+    if (updateStatus) {
         updateStatusSave(chrome.i18n.getMessage('saving'), true)
+    }
     return new Promise(resolve=>{
-        chrome.storage.local.set({[key]: value}, data=>{
+        chrome.storage[area].set({[key]: value}, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageErrorSave'), false, 'error')
+                updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
+                console.error(chrome.runtime.lastError)
                 reject(chrome.runtime.lastError)
             } else {
                 if (updateStatus)
@@ -1104,19 +1148,19 @@ async function setValue(key, value, updateStatus) {
 
 //Слушатель на изменение настроек
 chrome.storage.onChanged.addListener(function(changes, namespace) {
+    if (namespace != storageArea) return
     for (const key in changes) {
         let storageChange = changes[key]
-        if (key.startsWith('AVMRprojects'))
-            this['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
-        else if (key == 'AVMRsettings') {
+        if (key.startsWith('AVMRprojects')) {
+            window['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
+        } else if (key == 'AVMRsettings') {
             settings = storageChange.newValue
             return
         } else if (key == 'generalStats') {
             generalStats = storageChange.newValue
             return
         }
-        if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function'))
-            return
+        if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function') || storageChange.newValue == null || !(typeof storageChange.newValue[Symbol.iterator] === 'function')) return
         if (storageChange.oldValue.length == storageChange.newValue.length) {
             updateProjectList(storageChange.newValue)
         }
@@ -1125,11 +1169,11 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 
 async function forLoopAllProjects(fuc, reverse) {
     for (const item of allProjects) {
-        if (reverse) this['projects' + item].reverse()
-        for (let proj of this['projects' + item]) {
+        if (reverse) window['projects' + item].reverse()
+        for (let proj of window['projects' + item]) {
             await fuc(proj)
         }
-        if (reverse) this['projects' + item].reverse()
+        if (reverse) window['projects' + item].reverse()
     }
 }
 
@@ -1213,7 +1257,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
                 try {
                     var allSetting = JSON.parse(e.target.result)
                     for (const item of allProjects) {
-                        this['projects' + item] = allSetting['projects' + item]
+                        window['projects' + item] = allSetting['projects' + item]
                     }
                     settings = allSetting.settings
                     generalStats = allSetting.generalStats
@@ -1222,7 +1266,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     updateStatusSave(chrome.i18n.getMessage('saving'), true)
                     for (const item of allProjects) {
-                        await setValue('AVMRprojects' + item, this['projects' + item], false)
+                        await setValue('AVMRprojects' + item, window['projects' + item], false)
                     }
                     await setValue('AVMRsettings', settings, false)
                     await setValue('generalStats', generalStats, false)
@@ -1279,14 +1323,14 @@ async function checkUpdateConflicts(save) {
     }
 
     for (const item of allProjects) {
-        if (this['projects' + item] == null || !(typeof this['projects' + item][Symbol.iterator] === 'function')) {
+        if (window['projects' + item] == null || !(typeof window['projects' + item][Symbol.iterator] === 'function')) {
             if (!updated) {
                 updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
                 updated = true
             }
-            this['projects' + item] = []
+            window['projects' + item] = []
             if (save)
-                await setValue('AVMRprojects' + item, this['projects' + item], false)
+                await setValue('AVMRprojects' + item, window['projects' + item], false)
         }
     }
 

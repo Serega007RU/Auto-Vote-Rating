@@ -36,8 +36,13 @@ async function vote(first) {
 }
 
 async function getNickName() {
+    const storageArea = await new Promise(resolve=>{
+        chrome.storage.local.get('storageArea', data=>{
+            resolve(data['storageArea'])
+        })
+    })
     const projects = await new Promise(resolve=>{
-        chrome.storage.local.get('AVMRprojectsMinecraftServersBiz', data=>{
+        chrome.storage[storageArea].get('AVMRprojectsMinecraftServersBiz', data=>{
             resolve(data['AVMRprojectsMinecraftServersBiz'])
         })
     })

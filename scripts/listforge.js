@@ -125,8 +125,13 @@ async function vote(first) {
 }
 
 async function getProject() {
+    const storageArea = await new Promise(resolve=>{
+        chrome.storage.local.get('storageArea', data=>{
+            resolve(data['storageArea'])
+        })
+    })
     const projects = await new Promise(resolve=>{
-        chrome.storage.local.get('AVMRprojectsListForge', data=>{
+        chrome.storage[storageArea].get('AVMRprojectsListForge', data=>{
             resolve(data['AVMRprojectsListForge'])
         })
     })
