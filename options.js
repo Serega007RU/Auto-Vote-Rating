@@ -314,8 +314,7 @@ async function addProjectList(project, visually) {
     let listProject = document.getElementById(getProjectName(project) + 'List')
     listProject.parentElement.firstElementChild.style.display = 'none'
     let li = document.createElement('li')
-    let id = getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)
-    li.id = 'div┄' + id
+    li.id = getProjectName(project) + '_' + project.id + '_' + project.nick
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon')
     if (!(project.time == null || project.time == '')) {
@@ -326,12 +325,10 @@ async function addProjectList(project, visually) {
     const div = document.createElement('div')
 
     const span1 = document.createElement('span')
-    span1.id = 'stats┄' + id
     span1.className = 'statsProject'
     span1.appendChild(svgStats.cloneNode(true))
 
     const span2 = document.createElement('span')
-    span2.id = id
     span2.className = 'deleteProject'
     span2.appendChild(svgDelete.cloneNode(true))
 
@@ -356,11 +353,11 @@ async function addProjectList(project, visually) {
 
     listProject.append(li)
     //Слушатель кнопки Удалить на проект
-    document.getElementById(id).addEventListener('click', function() {
+    span2.addEventListener('click', function() {
         removeProjectList(project, false)
     })
     //Слушатель кнопки Статистики и вывод её в модалку
-    document.getElementById('stats┄' + id).addEventListener('click', function() {
+    span1.addEventListener('click', function() {
         document.getElementById('modalStats').click()
         document.getElementById('statsSubtitle').textContent = getProjectName(project) + ' – ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + (project.name != null ? project.name : project.id))
         document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes ? project.stats.successVotes : 0
@@ -506,12 +503,14 @@ async function addProxyList(proxy, visually) {
 
 //Удалить проект из списка проекта
 async function removeProjectList(project, visually) {
-    if (document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)) == null)
+    let li = document.getElementById(getProjectName(project) + '_' + project.id + '_' + project.nick)
+    if (li != null) {
+        li.querySelector('span.deleteProject').removeEventListener('click', null)
+        li.querySelector('span.statsProject').removeEventListener('click', null)
+        li.remove()
+    } else {
         return
-    if (document.getElementById('div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)) == null)
-        return
-    document.getElementById(getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).removeEventListener('click', function() {})
-    document.getElementById('div' + '┄' + getProjectName(project) + '┄' + project.nick + '┄' + (project.Custom ? '' : project.id)).remove()
+    }
     if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'Tab').firstElementChild.removeAttribute('style')
     if (visually) return
     for (let i = getProjectList(project).length; i--; ) {
