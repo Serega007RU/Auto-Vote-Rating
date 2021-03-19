@@ -43,7 +43,7 @@ var disableCheckProjects = false
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd
 //Удалять ли куки ВКонтакте?
-var deleteCookies = true
+var deleteVKCookies = true
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -84,6 +84,12 @@ path1.setAttribute('d', 'M20.2 7.8l-7.7 7.7-4-4-5.7 5.7')
 path2.setAttribute('d', 'M15 7h6v6')
 svgStats.appendChild(path1)
 svgStats.appendChild(path2)
+
+const svgRepair = svgDelete.cloneNode()
+svgRepair.setAttribute('viewBox', '0 2 24 24')
+const path3 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+path3.setAttribute('d', 'M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2')
+svgRepair.appendChild(path3)
 
 const svgFail = svgDelete.cloneNode()
 svgFail.setAttribute('stroke', '#f44336')
@@ -420,6 +426,11 @@ async function addVKList(VK, visually) {
     span.id = id
     span.className = 'deleteProject'
     span.append(svgDelete.cloneNode(true))
+    let span2 = document.createElement('span')
+    span2.id = 'repair_' + id
+    span2.className = 'statsProject'
+    span2.append(svgRepair.cloneNode(true))
+    div.append(span2)
     div.append(span)
     html.append(div)
     html.append(VK.name + ' – ' + VK.id)
@@ -430,6 +441,27 @@ async function addVKList(VK, visually) {
     listVK.append(html)
     document.getElementById(VK.name + '┄' + VK.id).addEventListener('click', function() {
         removeVKList(VK, false)
+    })
+    document.getElementById('repair_' + id).addEventListener('click', async function() {
+        for (let i = 0; i < VK.cookies.length; i++) {
+            let cookie = VK.cookies[i]
+            await setCookieDetails({
+                url: 'https://' + cookie.domain.substring(1, cookie.domain.length) + cookie.path,
+                name: cookie.name,
+                value: cookie.value,
+                domain: cookie.domain,
+                path: cookie.path,
+                secure: cookie.secure,
+                httpOnly: cookie.httpOnly,
+                sameSite: cookie.sameSite,
+                expirationDate: cookie.expirationDate,
+                storeId: cookie.storeId
+            })
+        }
+        await removeVKList(VK)
+        deleteVKCookies = false
+        await addVK()
+        deleteVKCookies = true
     })
     if (visually) {
         document.querySelector('#VKButton > span').textContent = VKs.length
@@ -597,7 +629,11 @@ function updateProjectList(projects, key) {
 //Слушатель кнопки 'Добавить' на MultiVote VKontakte
 document.getElementById('AddVK').addEventListener('click', async () => {
     event.preventDefault()
-    if (confirm('Все куки и вкладки ВКонтакте будут удалены, вы согласны?')) {
+    await addVK()
+})
+
+async function addVK() {
+    if (!deleteVKCookies || confirm('Все куки и вкладки ВКонтакте будут удалены, вы согласны?')) {
         //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
         updateStatusVK(chrome.i18n.getMessage('deletingAllVK'), true)
 
@@ -609,14 +645,16 @@ document.getElementById('AddVK').addEventListener('click', async () => {
                 resolve()
             })
         })
-
-        let cookies = await new Promise(resolve => {
-            chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
-                resolve(cookies)
+        
+        if (deleteVKCookies) {
+            let cookies = await new Promise(resolve => {
+                chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
+                    resolve(cookies)
+                })
             })
-        })
-        for(let i=0; i<cookies.length;i++) {
-            if (deleteCookies) await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+            for(let i=0; i<cookies.length;i++) {
+                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+            }
         }
 
         updateStatusVK(chrome.i18n.getMessage('deletedAllVK'), false, 'success')
@@ -696,7 +734,7 @@ document.getElementById('AddVK').addEventListener('click', async () => {
         await wait(1500)
         await checkAuthVK()
     }
-})
+}
 
 //Проверяем авторизацию на всех Майнкрафт рейтингах где есть авторизация ВКонтакте и если пользователь не авторизован - предлагаем ему авторизоваться
 async function checkAuthVK() {
@@ -2700,6 +2738,14 @@ async function removeCookie(url, name) {
     return new Promise(resolve => {
         chrome.cookies.remove({'url': url, 'name': name}, function(details) {
             resolve(details)
+        })
+    })
+}
+
+async function setCookieDetails(details) {
+    return new Promise(resolve=>{
+        chrome.cookies.set(details, function(det) {
+            resolve(det)
         })
     })
 }
