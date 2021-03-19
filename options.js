@@ -1127,7 +1127,7 @@ async function addProject(project, element) {
 
     await forLoopAllProjects(function(proj) {
         if (settings.useMultiVote) {
-            if (getProjectName(proj) == choice && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick && !project.Custom) {
+            if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick && !project.Custom) {
                 const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), 'success')
                 if (!secondBonusText) {
                     updateStatusAdd(message, false, element)
@@ -1136,7 +1136,7 @@ async function addProject(project, element) {
                 }
                 returnAdd = true
                 return
-            } else if (proj.Custom && choice == 'Custom' && proj.nick == project.nick) {
+            } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
                 updateStatusAdd(chrome.i18n.getMessage('alreadyAdded'), false, element, 'success')
                 returnAdd = true
                 return
