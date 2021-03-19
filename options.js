@@ -257,6 +257,7 @@ async function addProjectList(project, visually) {
     let listProject = document.getElementById(getProjectName(project) + 'List')
     listProject.parentElement.firstElementChild.style.display = 'none'
     let li = document.createElement('li')
+    li.id = getProjectName(project) + '_' + project.id + '_' + project.nick
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon')
     if (!(project.time == null || project.time == '')) {
@@ -297,8 +298,6 @@ async function addProjectList(project, visually) {
     //Слушатель кнопки Удалить на проект
     span2.addEventListener('click', function() {
         removeProjectList(project, false)
-        span2.removeEventListener('click', null)
-        li.remove()
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     span1.addEventListener('click', function() {
@@ -357,6 +356,13 @@ async function addProjectList(project, visually) {
 
 //Удалить проект из списка проекта
 async function removeProjectList(project, visually) {
+    let li = document.getElementById(getProjectName(project) + '_' + project.id + '_' + project.nick)
+    if (li != null) {
+        li.querySelector('span.deleteProject').removeEventListener('click', null)
+        li.remove()
+    } else {
+        return
+    }
     if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'Tab').firstElementChild.removeAttribute('style')
     if (visually) return
     for (let i = getProjectList(project).length; i--; ) {
