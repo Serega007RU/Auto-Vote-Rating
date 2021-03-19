@@ -123,7 +123,9 @@ async function restoreOptions() {
     settings = await getValue('AVMRsettings')
     generalStats = await getValue('generalStats')
     if (generalStats == null)
-        generalStats = {}
+        generalStats = {
+            added: Date.now()
+        }
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
         updateStatusSave(chrome.i18n.getMessage('firstSettings'), true)
         
@@ -310,6 +312,7 @@ async function addProjectList(project, visually) {
         document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = project.stats.laterVotes ? project.stats.laterVotes : 0
         document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = project.stats.lastSuccessVote ? new Date(project.stats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
         document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = project.stats.lastAttemptVote ? new Date(project.stats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
+        document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = project.stats.added ? new Date(project.stats.added).toLocaleString().replace(',', '') : 'None'
     })
     if (document.getElementById(getProjectName(project) + 'Button') == null) {
         if (document.getElementById('addedProjectsTable1').childElementCount == 0) {
@@ -419,7 +422,9 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
     if (!project.TopGG && !project.DiscordBotList && !project.BotsForDiscord && document.getElementById('nick').value != '') {
         project.nick = document.getElementById('nick').value
     }
-    project.stats = {}
+    project.stats = {
+        added: Date.now()
+    }
     if (document.getElementById('sheldTimeCheckbox').checked && document.getElementById('sheldTime').value != '') {
         project.time = new Date(document.getElementById('sheldTime').value).getTime()
     } else {
@@ -920,7 +925,9 @@ function addProjectsBonus(project, element) {
                 timeoutHour: 0,
                 timeoutMinute: 10,
                 timeoutSecond: 0,
-                stats: {}
+                stats: {
+                    added: Date.now()
+                }
             }
             await addProject(vict, null)
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null)
@@ -1308,7 +1315,9 @@ function getUrlProjects() {
         if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize') {
             if (key == 'top' && Object.keys(project).length > 0) {
                 project.time = null
-                project.stats = {}
+                project.stats = {
+                    added: Date.now()
+                }
                 projects.push(project)
                 project = {}
             }
@@ -1321,7 +1330,9 @@ function getUrlProjects() {
     })
     if (Object.keys(project).length > 0) {
         project.time = null
-        project.stats = {}
+        project.stats = {
+            added: Date.now()
+        }
         projects.push(project)
     }
     //projects.reverse()
@@ -1569,6 +1580,7 @@ function resetStats() {
         document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = ''
+        document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsAdded')
     }
 }
 //Слушатель общей статистики и вывод её в модалку
@@ -1582,6 +1594,8 @@ document.getElementById('generalStats').addEventListener('click', function() {
     document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = generalStats.laterVotes ? generalStats.laterVotes : 0
     document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = generalStats.lastSuccessVote ? new Date(generalStats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
     document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = generalStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
+    document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsInstalled')
+    document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = generalStats.added ? new Date(generalStats.added).toLocaleString().replace(',', '') : 'None'
 })
 
 //Генерация поля ввода ID

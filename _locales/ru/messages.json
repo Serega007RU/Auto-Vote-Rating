@@ -589,6 +589,12 @@
   "statsLastAttemptVote": {
     "message": "Последняя попытка голосования"
   },
+  "statsAdded": {
+    "message": "Добавлен"
+  },
+  "statsInstalled": {
+    "message": "Установлен"
+  },
   "generalStats": {
     "message": "Общая статистика"
   },

@@ -630,6 +630,12 @@
   "statsLastAttemptVote": {
     "message": "Last attempt to vote"
   },
+  "statsAdded": {
+    "message": "Added"
+  },
+  "statsInstalled": {
+    "message": "Installed"
+  },
   "generalStats": {
     "message": "General statistics"
   },
