@@ -811,7 +811,7 @@
     "message": "Everything is OK with authorization, the account has been added"
   },
   "notAcceptAuth": {
-    "message": " click to log in. If you are not going to vote on the listed ratings then just ignore this message"
+    "message": "click to log in. If you are not going to vote on the listed ratings then just ignore this message"
   },
   "sheldTime": {
     "message": "Schedule a vote"

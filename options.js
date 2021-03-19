@@ -722,6 +722,7 @@ async function checkAuthVK() {
             a.id = 'authvk' + key
             a.textContent = key
             authStatus.append(a)
+            authStatus.append(' ')
             updateStatusVK(authStatus, true)
             needReturn = true
         } else if (response2.status != 0) {
@@ -730,7 +731,7 @@ async function checkAuthVK() {
         }
     }
     if (needReturn) {
-        authStatus.append(createMessage(chrome.i18n.getMessage('notAcceptAuth')), 'error')
+        authStatus.append(createMessage(chrome.i18n.getMessage('notAcceptAuth')))
         updateStatusVK(authStatus, true)
         for (let [key, value] of authVKUrls) {
             if (document.getElementById('authvk' + key) != null) {
