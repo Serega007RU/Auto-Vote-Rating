@@ -359,6 +359,7 @@ async function removeProjectList(project, visually) {
     let li = document.getElementById(getProjectName(project) + '_' + project.id + '_' + project.nick)
     if (li != null) {
         li.querySelector('span.deleteProject').removeEventListener('click', null)
+        li.querySelector('span.statsProject').removeEventListener('click', null)
         li.remove()
     } else {
         return
