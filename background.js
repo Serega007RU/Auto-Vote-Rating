@@ -198,7 +198,7 @@ async function checkOpen(project) {
     }
     if (settings.useMultiVote) {
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
-        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && currentVK != null) {
+        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && currentVK != null) {
             let usedProjects = getTopFromList(currentVK, project)
             for (let usedProject of usedProjects) {
                 if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
@@ -276,7 +276,7 @@ async function checkOpen(project) {
 async function newWindow(project) {
     //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
     if (settings.useMultiVote) {
-        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && currentVK == null) {
+        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && currentVK == null) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
             for (let vkontakte of VKs) {
@@ -1480,7 +1480,7 @@ async function endVote(request, sender, project) {
         }
 
         if (settings.useMultiVote)  {
-            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && !(settings.repeatAttemptLater && project.later && project.later >= 2 && request.later && (request.message && request.message != 'vk_error')) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && !(settings.repeatAttemptLater && project.later && project.later >= 2 && request.later && (request.message && request.message != 'vk_error')) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
                 let usedProject = {
                     id: project.id,
                     nextFreeVote: time
@@ -1569,7 +1569,7 @@ async function endVote(request, sender, project) {
         let retryCoolDown
         if (settings.useMultiVote) {
             sendMessage = message
-            if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft) && (message.includes(' ВК') || message.includes(' VK')) && currentVK != null) {
+            if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && (message.includes(' ВК') || message.includes('VK ')) && currentVK != null) {
                 currentVK.notWorking = true
                 await setValue('AVMRVKs', VKs)
             } else if (currentProxy != null) {
