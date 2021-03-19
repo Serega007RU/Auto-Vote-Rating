@@ -425,7 +425,7 @@ async function addVKList(VK, visually) {
     html.append(VK.name + ' – ' + VK.id)
     if (VK.notWorking) {
         html.append(document.createElement('br'))
-        html.append(createMessage(chrome.i18n.getMessage('notWork'), {error: true}))
+        html.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
     }
     listVK.append(html)
     document.getElementById(VK.name + '┄' + VK.id).addEventListener('click', function() {
@@ -457,7 +457,7 @@ async function addProxyList(proxy, visually) {
     html.append(proxy.ip + ':' + proxy.port + ' ' + proxy.scheme)
     if (proxy.notWorking) {
         html.append(document.createElement('br'))
-        html.append(createMessage(chrome.i18n.getMessage('notWork'), {error: true}))
+        html.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
     }
     listProxy.append(html)
     document.getElementById(proxy.ip + '┄' + proxy.port).addEventListener('click', function() {

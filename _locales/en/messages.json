@@ -569,7 +569,7 @@
     "message": "Proxy"
   },
   "notWork": {
-    "message": "Now working"
+    "message": "Not working"
   },
   "useMultiVote": {
     "message": "Use VK and Proxy when voting (enable MultiVote)"
