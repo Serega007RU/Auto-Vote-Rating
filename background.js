@@ -224,8 +224,8 @@ async function newWindow(project) {
         generalStats.monthSuccessVotes = 0
     }
     generalStats.lastAttemptVote = Date.now()
-//  await setValue('generalStats', generalStats)
-    await changeProject(project, true)
+    await setValue('generalStats', generalStats)
+    await changeProject(project)
 
     let silentVoteMode = false
     if (project.Custom) {
@@ -986,8 +986,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                 if (chrome.runtime.lastError.message != 'The tab was closed.') {
-                    if (!settings.disabledNotifError)
-                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                    if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
                     changeProject(project)
                 }
@@ -998,8 +997,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                 if (chrome.runtime.lastError.message != 'The frame was removed.') {
-                    if (!settings.disabledNotifError)
-                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                    if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
                     changeProject(project)
                 }
@@ -1405,12 +1403,12 @@ async function wait(ms) {
     })
 }
 
-async function changeProject(project, noSave) {
+async function changeProject(project) {
     let projects = getProjectList(project)
     for (let i in projects) {
         if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id) && getProjectName(projects[i]) == getProjectName(project)) {
             projects[i] = project
-            if (!noSave) await setValue('AVMRprojects' + getProjectName(project), projects)
+            await setValue('AVMRprojects' + getProjectName(project), projects)
             break
             //Stop this loop, we found it!
         }
