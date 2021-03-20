@@ -44,6 +44,8 @@ var disableCheckProjects = false
 var returnAdd
 //Удалять ли куки ВКонтакте?
 var deleteVKCookies = true
+//Где храним настройки
+let storageArea = 'local'
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -127,21 +129,28 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 async function restoreOptions() {
+    storageArea = await getValue('storageArea', 'local')
+    if (storageArea == null || storageArea == '') {
+        storageArea = 'local'
+        await setValue('storageArea', storageArea, false, 'local')
+    }
     for (const item of allProjects) {
-        this['projects' + item] = await getValue('AVMRprojects' + item)
+        window['projects' + item] = await getValue('AVMRprojects' + item)
     }
     VKs = await getValue('AVMRVKs')
     proxies = await getValue('AVMRproxies')
     settings = await getValue('AVMRsettings')
     generalStats = await getValue('generalStats')
     if (generalStats == null)
-        generalStats = {}
+        generalStats = {
+            added: Date.now()
+        }
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
         updateStatusSave(chrome.i18n.getMessage('firstSettings'), true)
         
         for (const item of allProjects) {
-            this['projects' + item] = []
-            await setValue('AVMRprojects' + item, this['projects' + item], false)
+            window['projects' + item] = []
+            await setValue('AVMRprojects' + item, window['projects' + item], false)
         }
 
         VKs = []
@@ -257,6 +266,31 @@ async function restoreOptions() {
                     document.getElementById('sheldTime').required = false
                 }
                 return
+            } else if (this.id == 'enableSyncStorage') {
+                let oldStorageArea = storageArea
+                if (this.checked) {
+                    storageArea = 'sync'
+                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopy'))
+                } else {
+                    storageArea = 'local'
+                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopyLocal'))
+                }
+                await setValue('storageArea', storageArea, false, 'local')
+                for (const item of allProjects) {
+                    await setValue('AVMRprojects' + item, window['projects' + item])
+                    await setValue('AVMRprojects' + item, null, false, oldStorageArea)
+                }
+                await setValue('AVMRsettings', settings)
+                await setValue('generalStats', generalStats)
+                await setValue('AVMRsettings', null, false, oldStorageArea)
+                await setValue('generalStats', null, false, oldStorageArea)
+
+                if (this.checked) {
+                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopySuccess'), false, 'success');
+                } else {
+                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), false, 'success');
+                }
+                return
             }
             await setValue('AVMRsettings', settings, true)
         })
@@ -290,6 +324,9 @@ async function restoreOptions() {
         document.getElementById('enabledSilentVote').value = 'enabled'
     } else {
         document.getElementById('enabledSilentVote').value = 'disabled'
+    }
+    if (storageArea == 'sync') {
+        document.getElementById('enableSyncStorage').checked = true
     }
     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
@@ -337,7 +374,7 @@ async function addProjectList(project, visually) {
 
     li.appendChild(div)
 
-    li.append((project.nick != null && project.nick != '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : ''))
+    li.append((project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : ''))
 
     li.appendChild(document.createElement('br'))
 
@@ -367,6 +404,7 @@ async function addProjectList(project, visually) {
         document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = project.stats.laterVotes ? project.stats.laterVotes : 0
         document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = project.stats.lastSuccessVote ? new Date(project.stats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
         document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = project.stats.lastAttemptVote ? new Date(project.stats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
+        document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = project.stats.added ? new Date(project.stats.added).toLocaleString().replace(',', '') : 'None'
     })
     if (document.getElementById(getProjectName(project) + 'Button') == null) {
         if (document.getElementById('addedProjectsTable1').childElementCount == 0) {
@@ -1081,7 +1119,9 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
     if (!project.TopGG && !project.DiscordBotList && !project.BotsForDiscord && document.getElementById('nick').value != '') {
         project.nick = document.getElementById('nick').value
     }
-    project.stats = {}
+    project.stats = {
+        added: Date.now()
+    }
     if (document.getElementById('sheldTimeCheckbox').checked && document.getElementById('sheldTime').value != '') {
         project.time = new Date(document.getElementById('sheldTime').value).getTime()
     } else {
@@ -1599,7 +1639,9 @@ function addProjectsBonus(project, element) {
                 timeoutHour: 0,
                 timeoutMinute: 10,
                 timeoutSecond: 0,
-                stats: {}
+                stats: {
+                    added: Date.now()
+                }
             }
             await addProject(vict, null)
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null)
@@ -1693,7 +1735,7 @@ function updateStatus(message, type, disableTimer, level, element) {
     } else {
         status = document.getElementById(type)
     }
-    clearInterval(this[type + 'Timeout'])
+    clearInterval(window[type + 'Timeout'])
     while (status.firstChild)
        status.firstChild.remove()
     if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
@@ -1705,7 +1747,7 @@ function updateStatus(message, type, disableTimer, level, element) {
     }
     if (disableTimer || element != null)
         return
-    this[type + 'Timeout'] = setTimeout(function() {
+    window[type + 'Timeout'] = setTimeout(function() {
         while (status.firstChild)
             status.firstChild.remove()
         status.append('\u00A0')
@@ -1721,7 +1763,7 @@ function getFullProjectName(project) {
 }
 
 function getProjectList(project) {
-    return this['projects' + getProjectName(project)]
+    return window['projects' + getProjectName(project)]
 }
 
 function extractHostname(url) {
@@ -1753,11 +1795,15 @@ function extractHostname(url) {
 //})
 
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
-async function getValue(name) {
+async function getValue(name, area) {
+    if (!area) {
+        area = storageArea
+    }
     return new Promise(resolve=>{
-        chrome.storage.local.get(name, data=>{
+        chrome.storage[area].get(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageError'), false, 'error')
+                updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
+                console.error(chrome.runtime.lastError)
                 reject(chrome.runtime.lastError)
             } else {
                 resolve(data[name])
@@ -1765,13 +1811,18 @@ async function getValue(name) {
         })
     })
 }
-async function setValue(key, value, updateStatus) {
-    if (updateStatus)
+async function setValue(key, value, updateStatus, area) {
+    if (!area) {
+        area = storageArea
+    }
+    if (updateStatus) {
         updateStatusSave(chrome.i18n.getMessage('saving'), true)
+    }
     return new Promise(resolve=>{
-        chrome.storage.local.set({[key]: value}, data=>{
+        chrome.storage[area].set({[key]: value}, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageErrorSave'), false, 'error')
+                updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
+                console.error(chrome.runtime.lastError)
                 reject(chrome.runtime.lastError)
             } else {
                 if (updateStatus)
@@ -1800,11 +1851,12 @@ async function wait(ms) {
 
 //Слушатель на изменение настроек
 chrome.storage.onChanged.addListener(function(changes, namespace) {
+    if (namespace != storageArea) return
     for (const key in changes) {
         let storageChange = changes[key]
-        if (key.startsWith('AVMRprojects'))
-            this['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
-        else if (key == 'AVMRsettings') {
+        if (key.startsWith('AVMRprojects')) {
+            window['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
+        } else if (key == 'AVMRsettings') {
             settings = storageChange.newValue
             if (settings.stopVote > Date.now()) {
                 document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
@@ -1825,8 +1877,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             }
             return
         }
-        if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function'))
-            return
+        if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function') || storageChange.newValue == null || !(typeof storageChange.newValue[Symbol.iterator] === 'function')) return
         if (storageChange.oldValue.length == storageChange.newValue.length) {
             updateProjectList(storageChange.newValue, key)
         }
@@ -1835,11 +1886,11 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 
 async function forLoopAllProjects(fuc, reverse) {
     for (const item of allProjects) {
-        if (reverse) this['projects' + item].reverse()
-        for (let proj of this['projects' + item]) {
+        if (reverse) window['projects' + item].reverse()
+        for (let proj of window['projects' + item]) {
             await fuc(proj)
         }
-        if (reverse) this['projects' + item].reverse()
+        if (reverse) window['projects' + item].reverse()
     }
 }
 
@@ -1985,7 +2036,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
                 try {
                     var allSetting = JSON.parse(e.target.result)
                     for (const item of allProjects) {
-                        this['projects' + item] = allSetting['projects' + item]
+                        window['projects' + item] = allSetting['projects' + item]
                     }
                     settings = allSetting.settings
                     generalStats = allSetting.generalStats
@@ -1996,7 +2047,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     updateStatusSave(chrome.i18n.getMessage('saving'), true)
                     for (const item of allProjects) {
-                        await setValue('AVMRprojects' + item, this['projects' + item], false)
+                        await setValue('AVMRprojects' + item, window['projects' + item], false)
                     }
                     await setValue('AVMRsettings', settings, false)
                     await setValue('generalStats', generalStats, false)
@@ -2075,14 +2126,14 @@ async function checkUpdateConflicts(save) {
     }
 
     for (const item of allProjects) {
-        if (this['projects' + item] == null || !(typeof this['projects' + item][Symbol.iterator] === 'function')) {
+        if (window['projects' + item] == null || !(typeof window['projects' + item][Symbol.iterator] === 'function')) {
             if (!updated) {
                 updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
                 updated = true
             }
-            this['projects' + item] = []
+            window['projects' + item] = []
             if (save)
-                await setValue('AVMRprojects' + item, this['projects' + item], false)
+                await setValue('AVMRprojects' + item, window['projects' + item], false)
         }
     }
 
@@ -2111,7 +2162,9 @@ function getUrlProjects() {
         if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize') {
             if (key == 'top' && Object.keys(project).length > 0) {
                 project.time = null
-                project.stats = {}
+                project.stats = {
+                    added: Date.now()
+                }
                 projects.push(project)
                 project = {}
             }
@@ -2124,7 +2177,9 @@ function getUrlProjects() {
     })
     if (Object.keys(project).length > 0) {
         project.time = null
-        project.stats = {}
+        project.stats = {
+            added: Date.now()
+        }
         projects.push(project)
     }
     //projects.reverse()
@@ -2388,6 +2443,7 @@ function resetStats() {
         document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = ''
+        document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsAdded')
     }
 }
 //Слушатель общей статистики и вывод её в модалку
@@ -2401,6 +2457,8 @@ document.getElementById('generalStats').addEventListener('click', function() {
     document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = generalStats.laterVotes ? generalStats.laterVotes : 0
     document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = generalStats.lastSuccessVote ? new Date(generalStats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
     document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = generalStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
+    document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsInstalled')
+    document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = generalStats.added ? new Date(generalStats.added).toLocaleString().replace(',', '') : 'None'
 })
 
 //Генерация поля ввода ID
