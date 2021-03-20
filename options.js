@@ -1181,43 +1181,11 @@ async function forLoopAllProjects(fuc, reverse) {
 document.getElementById('file-download').addEventListener('click', ()=>{
     updateStatusFile(chrome.i18n.getMessage('exporting'), true)
     let allSetting = {
-        projectsTopCraft,
-        projectsMcTOP,
-        projectsMCRate,
-        projectsMinecraftRating,
-        projectsMonitoringMinecraft,
-        projectsIonMc,
-        projectsMinecraftServersOrg,
-        projectsServeurPrive,
-        projectsPlanetMinecraft,
-        projectsTopG,
-        projectsListForge,
-        projectsMinecraftServerList,
-        projectsServerPact,
-        projectsMinecraftIpList,
-        projectsTopMinecraftServers,
-        projectsMinecraftServersBiz,
-        projectsHotMC,
-        projectsMinecraftServerNet,
-        projectsTopGames,
-        projectsTMonitoring,
-        projectsTopGG,
-        projectsDiscordBotList,
-        projectsBotsForDiscord,
-        projectsMMoTopRU,
-        projectsMCServers,
-        projectsMinecraftList,
-        projectsMinecraftIndex,
-        projectsServerList101,
-        projectsMCServerList,
-        projectsCraftList,
-        projectsCzechCraft,
-        projectsPixelmonServers,
-        projectsQTop,
-        projectsMinecraftBuzz,
-        projectsCustom,
         settings,
         generalStats
+    }
+    for (const item of allProjects) {
+        allSetting['projects' + item] = window['projects' + item]
     }
     let text = JSON.stringify(allSetting, null, '\t')
     let blob = new Blob([text],{type: 'text/json;charset=UTF-8;'})
