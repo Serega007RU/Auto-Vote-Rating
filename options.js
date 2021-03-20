@@ -247,12 +247,12 @@ async function restoreOptions() {
                 await setValue('storageArea', storageArea, false, 'local')
                 for (const item of allProjects) {
                     await setValue('AVMRprojects' + item, window['projects' + item])
-                    await setValue('AVMRprojects' + item, null, false, oldStorageArea)
+                    await removeValue('AVMRprojects' + item, oldStorageArea)
                 }
                 await setValue('AVMRsettings', settings)
                 await setValue('generalStats', generalStats)
-                await setValue('AVMRsettings', null, false, oldStorageArea)
-                await setValue('generalStats', null, false, oldStorageArea)
+                await removeValue('AVMRsettings', oldStorageArea)
+                await removeValue('generalStats', oldStorageArea)
 
                 if (this.checked) {
                     updateStatusSave(chrome.i18n.getMessage('settingsSyncCopySuccess'), false, 'success');
@@ -1140,6 +1140,22 @@ async function setValue(key, value, updateStatus, area) {
             } else {
                 if (updateStatus)
                     updateStatusSave(chrome.i18n.getMessage('successSave'), false, 'success')
+                resolve(data)
+            }
+        })
+    })
+}
+async function removeValue(name, area) {
+    if (!area) {
+        area = storageArea
+    }
+    return new Promise(resolve=>{
+        chrome.storage[area].remove(name, data=>{
+            if (chrome.runtime.lastError) {
+                updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
+                console.error(chrome.runtime.lastError)
+                reject(chrome.runtime.lastError)
+            } else {
                 resolve(data)
             }
         })
