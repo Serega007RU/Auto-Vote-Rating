@@ -278,12 +278,12 @@ async function restoreOptions() {
                 await setValue('storageArea', storageArea, false, 'local')
                 for (const item of allProjects) {
                     await setValue('AVMRprojects' + item, window['projects' + item])
-                    await setValue('AVMRprojects' + item, null, false, oldStorageArea)
+                    await removeValue('AVMRprojects' + item, oldStorageArea)
                 }
                 await setValue('AVMRsettings', settings)
                 await setValue('generalStats', generalStats)
-                await setValue('AVMRsettings', null, false, oldStorageArea)
-                await setValue('generalStats', null, false, oldStorageArea)
+                await removeValue('AVMRsettings', oldStorageArea)
+                await removeValue('generalStats', oldStorageArea)
 
                 if (this.checked) {
                     updateStatusSave(chrome.i18n.getMessage('settingsSyncCopySuccess'), false, 'success');
@@ -1832,6 +1832,22 @@ async function setValue(key, value, updateStatus, area) {
         })
     })
 }
+async function removeValue(name, area) {
+    if (!area) {
+        area = storageArea
+    }
+    return new Promise(resolve=>{
+        chrome.storage[area].remove(name, data=>{
+            if (chrome.runtime.lastError) {
+                updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
+                console.error(chrome.runtime.lastError)
+                reject(chrome.runtime.lastError)
+            } else {
+                resolve(data)
+            }
+        })
+    })
+}
 
 async function clearProxy() {
     return new Promise(resolve => {
@@ -1898,45 +1914,13 @@ async function forLoopAllProjects(fuc, reverse) {
 document.getElementById('file-download').addEventListener('click', ()=>{
     updateStatusFile(chrome.i18n.getMessage('exporting'), true)
     let allSetting = {
-        projectsTopCraft,
-        projectsMcTOP,
-        projectsMCRate,
-        projectsMinecraftRating,
-        projectsMonitoringMinecraft,
-        projectsIonMc,
-        projectsMinecraftServersOrg,
-        projectsServeurPrive,
-        projectsPlanetMinecraft,
-        projectsTopG,
-        projectsListForge,
-        projectsMinecraftServerList,
-        projectsServerPact,
-        projectsMinecraftIpList,
-        projectsTopMinecraftServers,
-        projectsMinecraftServersBiz,
-        projectsHotMC,
-        projectsMinecraftServerNet,
-        projectsTopGames,
-        projectsTMonitoring,
-        projectsTopGG,
-        projectsDiscordBotList,
-        projectsBotsForDiscord,
-        projectsMMoTopRU,
-        projectsMCServers,
-        projectsMinecraftList,
-        projectsMinecraftIndex,
-        projectsServerList101,
-        projectsMCServerList,
-        projectsCraftList,
-        projectsCzechCraft,
-        projectsPixelmonServers,
-        projectsQTop,
-        projectsMinecraftBuzz,
-        projectsCustom,
         VKs,
         proxies,
         settings,
         generalStats
+    }
+    for (const item of allProjects) {
+        allSetting['projects' + item] = window['projects' + item]
     }
     let text = JSON.stringify(allSetting, null, '\t')
     let blob = new Blob([text],{type: 'text/json;charset=UTF-8;'})
