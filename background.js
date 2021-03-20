@@ -861,7 +861,7 @@ async function silentVote(project) {
                     return
                 }
             } else {
-                endVote({message: 'Ошибка! div.alert.alert-success или div.alert.alert-danger является null'}, null, project)
+                endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null'}, null, project)
                 return
             }
         } else
@@ -890,7 +890,7 @@ async function silentVote(project) {
                 if (!response.ok) {
                     if (response.status == 503) {
                         if (i == 3) {
-                            endVote({message: 'Превышено максимально кол-во попыток голосования, код ошибки HTTP: ' + response.status}, null, project)
+                            endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + response.status)}, null, project)
                             return
                         }
                         await wait(3000)
@@ -904,14 +904,14 @@ async function silentVote(project) {
                 let doc = new DOMParser().parseFromString(html, 'text/html')
                 if (doc.querySelector('body') != null && doc.querySelector('body').textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
                     if (i == 3) {
-                        endVote({message: 'Превышено максимально кол-во попыток голосования, ' + doc.querySelector('body').textContent}, null, project)
+                        endVote({message: chrome.i18n.getMessage('errorAttemptVote') + doc.querySelector('body').textContent}, null, project)
                         return
                     }
                     continue
                 }
                 if (doc.querySelector('input[name=player]') != null) {
                     if (i == 3) {
-                        endVote({message: 'Превышено максимально кол-во попыток голосования, input[name=player] является ' + JSON.stringify(doc.querySelector('input[name=player]'))}, null, project)
+                        endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(doc.querySelector('input[name=player]')))}, null, project)
                         return
                     }
                     continue
@@ -1142,7 +1142,7 @@ async function silentVote(project) {
             }
 
             if (!await getRecipe(doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com'))) {
-                endVote({message: 'Не удалось найти рецепт: ' + doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')}, null, project)
+                endVote({message: 'Couldnt find the recipe: ' + doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')}, null, project)
                 return
             }
 
@@ -1357,7 +1357,7 @@ async function endVote(request, sender, project) {
         }
     }
     if (deleted) {
-        console.warn('Не удалось найти данный проект, возможно он был удалён', project)
+        console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
         return
     }
 

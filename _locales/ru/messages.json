@@ -917,5 +917,13 @@
   },
   "loginTB": {
     "message": "Чтобы сделать импорт прокси с TunnelBear необходима авторизация, "
+  },
+  "errorAttemptVote": {
+    "message": "Превышено максимальное кол-во попыток голосования, $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -295,7 +295,7 @@
     "message": "You must restart the extension to apply changes. After restarting, open settings again. Restart the extension?"
   },
   "storageError": {
-    "message": "An error occurred while reading settings: $error$",
+    "message": "An error occurred while reading the config: $error$",
     "placeholders": {
       "error": {
         "content": "$1"
@@ -737,7 +737,7 @@
     "message": "Successful votes for this month"
   },
   "statsLastMonthSuccessVotes": {
-    "message": "Successful votes for previous month "
+    "message": "Successful votes for previous month"
   },
   "statsErrorVotes": {
     "message": "Errors"
@@ -746,7 +746,7 @@
     "message": "'You have already voted' errors"
   },
   "statsLastSuccessVote": {
-    "message": "The last successful vote"
+    "message": "Last successful vote"
   },
   "statsLastAttemptVote": {
     "message": "Last vote attempt"
@@ -873,7 +873,7 @@
     "description": "Checkbox. Cloud save extension settings"
   },
   "enableSyncStorageTooltip": {
-    "message": "It is not recommended to enable this setting if you have a lot of projects in the list of added projects. The cloud has limited traffic and storage space. For this function to work, your account must be connected and synchronization enabled, otherwise the settings will still be saved locally Allows you to synchronize extension settings with multiple computers, it is not recommended to keep the extension enabled with this setting enabled on several computers at once",
+    "message": "Enabling this setting is not recommended if you have a lot of entries in the list of added projects. The cloud has limited traffic and storage space. For this to work, your browser must be logged in to the account and have synchronization enabled, otherwise settings will be saved to local storage no matter what Allows you to synchronize extension settings with multiple computers, but keeping the extension with this setting enabled on multiple computers is not recommended",
     "description": "Tooltip. Cloud save extension settings"
   },
   "settingsSyncCopy": {
@@ -955,5 +955,13 @@
   },
   "loginTB": {
     "message": "To import a proxy from TunnelBear, authorization is required, "
+  },
+  "errorAttemptVote": {
+    "message": "Exceeded the maximum number of voting attempts, $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   }
 }
