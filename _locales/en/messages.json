@@ -106,7 +106,7 @@
     "description": "Tooltip. Disable check when adding a project"
   },
   "priority": {
-    "message": "Add to priority",
+    "message": "Add in priority",
     "description": "Checkbox. Priority"
   },
   "priorityTooltip": {
@@ -118,7 +118,7 @@
     "description": "Label. Voting mode"
   },
   "enabledSilentVoteTooltip": {
-    "message": "Quiet Mode (Recommended) - Vote for projects entirely in the background without opening any tabs. Emulation mode - emulates a real user, opens a tab and clicks on the voting button, it's better to leave at least one open tab in the browser, otherwise the browser will be open on top of other windows and may cause inconvenience.",
+    "message": "Quiet Mode (Recommended) - Vote for projects entirely in the background without opening any tabs. Emulation mode - emulates a real user, opens a tab and clicks on the voting button, it is best to leave at least one open tab in the browser in this mode, otherwise the browser window will be open on top of other windows and may cause inconvenience.",
     "description": "Tooltip. Silent vote"
   },
   "enabledSilentVoteSilent": {
@@ -425,7 +425,7 @@
     "message": "Error occured while opening the tab: "
   },
   "errorAuthVK": {
-    "message": "VK authorization Error!"
+    "message": "VK authorization failed!"
   },
   "errorRedirected": {
     "message": "Voting error! Redirection to the unknown page occurred: $url$ Check this URL",
@@ -579,7 +579,7 @@
     "message": "Proxy"
   },
   "notWork": {
-    "message": "Not working"
+    "message": "Doesn't work"
   },
   "useMultiVote": {
     "message": "Use VK and Proxy when voting (enable MultiVote)"
@@ -594,28 +594,33 @@
     "message": "Choose type"
   },
   "notFoundProxy": {
-    "message": "There is no free proxy, auto-voting is completely suspended for 24 hours"
+    "message": "There is no free proxy, auto-voting is stopped for 24 hours"
   },
   "notFoundVK": {
-    "message": "There is no free VKontakte account, auto-voting is completely suspended for 24 hours"
+    "message": "There is no free VKontakte account, auto-voting is stopped for 24 hours"
   },
   "notFoundProxyTitle": {
     "message": "No free proxy available"
   },
   "notFoundVKTitle": {
-    "message": "There is no free account VKontakte"
+    "message": "No free VK account available"
   },
   "importProxy": {
-    "message": "Импорт"
+    "message": "Import"
   },
   "checkSchemeProxy": {
-    "message": "Defining the proxy type"
+    "message": "Defining the proxy type, current: $scheme$",
+    "placeholders": {
+      "scheme": {
+        "content": "$1"
+      }
+    }
   },
   "errorCheckSchemeProxy": {
     "message": "Unable to determine the type of proxy, this proxy is probably dead."
   },
   "authSteam": {
-    "message": "Requires Steam auth"
+    "message": "Requires auth Steam"
   },
   "privacyPass": {
     "message": "Install the "
@@ -627,7 +632,7 @@
     "message": "Delete all"
   },
   "deleteNotWorking": {
-    "message": "Remove non-working proxies"
+    "message": "Delete non-working proxies"
   },
   "clearCookies": {
     "message": "Clear cookies"
@@ -639,43 +644,43 @@
     "message": "All proxies were successfully deleted!"
   },
   "deletingNotWokingProxies": {
-    "message": "I delete non-working proxies..."
+    "message": "Deleting non-working proxies..."
   },
   "deletedNotWokingProxies": {
-    "message": "All non-working proxies have been successfully removed!"
+    "message": "All non-working proxies were successfully deleted!"
   },
   "deletingAllVKCookies": {
-    "message": "I delete all Vkontakte cookies..."
+    "message": "Deleting Vkontakte cookies and tabs..."
   },
   "deletedAllVKCookies": {
-    "message": "All VK cookies have been successfully deleted!"
+    "message": "All VK cookies and tabs were successfully deleted!"
   },
   "importTunnelBear": {
-    "message": "Importing proxies from TunnelBear"
+    "message": "Import proxies from TunnelBear"
   },
   "importTunnelBearStart": {
-    "message": "Starting import from TunnelBear"
+    "message": "Importing from TunnelBear"
   },
   "importTunnelBearEnd": {
-    "message": "Import from TunnelBear completed successfully"
+    "message": "Import from TunnelBear successfully completed"
   },
   "importWindscribe": {
-    "message": "Importing proxies from Windscribe"
+    "message": "Import proxies from Windscribe"
   },
   "importWindscribeStart": {
-    "message": "Starting import from Windscribe"
+    "message": "Importing from Windscribe"
   },
   "importWindscribeEnd": {
-    "message": "Import from Windscribe completed successfully"
+    "message": "Import from Windscribe successfully completed"
   },
   "importHolaVPN": {
-    "message": "Importing proxies from HolaVPN"
+    "message": "Import proxies from HolaVPN"
   },
   "importHolaVPNStart": {
-    "message": "Starting import from HolaVPN"
+    "message": "Importing from HolaVPN"
   },
   "importHolaVPNEnd": {
-    "message": "Import from HolaVPN completed successfully"
+    "message": "Import from HolaVPN successfully completed"
   },
   "randomize": {
     "message": "Randomize the next vote"
@@ -690,7 +695,7 @@
     "message": "soon..."
   },
   "timeout": {
-    "message": "Vote expecting time has expired, restarting the vote"
+    "message": "Vote expecting time has expired, restarting the voted"
   },
   "repeatAttemptLater": {
     "message": "Ignore the 'You have already voted' error at least 3 times"
@@ -711,7 +716,7 @@
     "message": "On/Off"
   },
   "voteSuspended": {
-    "message": "Auto-voting is suspended"
+    "message": "Auto-voting stopped"
   },
   "voteResumed": {
     "message": "Auto-voting resumed"
@@ -785,10 +790,10 @@
     "message": "Password"
   },
   "ipLabel": {
-    "message": "Specify the IP"
+    "message": "Enter IP"
   },
   "portLabel": {
-    "message": "Specified port"
+    "message": "Enter port"
   },
   "loginLabel": {
     "message": "Proxy login (Optional)"
@@ -797,7 +802,7 @@
     "message": "Proxy password (Optional)"
   },
   "typeLabel": {
-    "message": "Selected protocol"
+    "message": "Choose protocol"
   },
   "chooseMinute": {
     "message": "Set the time"
@@ -818,13 +823,13 @@
     "message": "on the last day of the month"
   },
   "openPopupVK": {
-    "message": "I open the Vkontakte authorization window"
+    "message": "Opening VK authorization window"
   },
   "notAuthVKTop": {
-    "message": "This Vkontakte account is not authorized for the following ratings: "
+    "message": "This VK account is not authorized for the following ratings: "
   },
   "authOK": {
-    "message": "Everything is OK with authorization, the account has been added"
+    "message": "Auth is OK, the account has been added"
   },
   "notAcceptAuth": {
     "message": "click to log in. If you are not going to vote on the listed ratings then just ignore this message"
@@ -833,13 +838,13 @@
     "message": "Schedule a vote"
   },
   "discordLogIn": {
-    "message": "You must be logged in to upvote discord bots!"
+    "message": "You must be logged in to upvote bots!"
   },
   "auth": {
     "message": "Only registered users can vote on this rating. Please log in or register."
   },
   "emptySite": {
-    "message": "It seems that this rating responded with an empty page, try to visit this page and then try adding again"
+    "message": "It seems that this rating gave out an empty page, try to go to the site of this rating and then try again to add"
   },
   "ordinalWorld": {
     "message": "World count number"
