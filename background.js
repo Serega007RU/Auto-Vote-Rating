@@ -224,8 +224,8 @@ async function newWindow(project) {
         generalStats.monthSuccessVotes = 0
     }
     generalStats.lastAttemptVote = Date.now()
-    await setValue('generalStats', generalStats)
-    await changeProject(project)
+//  await setValue('generalStats', generalStats)
+    await changeProject(project, true)
 
     let silentVoteMode = false
     if (project.Custom) {
@@ -1205,35 +1205,27 @@ async function endVote(request, sender, project) {
 
         if (request.successfully) {
             sendMessage = chrome.i18n.getMessage('successAutoVote')
-            if (!settings.disabledNotifInfo)
-                sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage)
 
-            if (!project.stats.successVotes)
-                project.stats.successVotes = 0
+            if (!project.stats.successVotes) project.stats.successVotes = 0
             project.stats.successVotes++
-            if (!project.stats.monthSuccessVotes)
-                project.stats.monthSuccessVotes = 0
+            if (!project.stats.monthSuccessVotes) project.stats.monthSuccessVotes = 0
             project.stats.monthSuccessVotes++
             project.stats.lastSuccessVote = Date.now()
 
-            if (!generalStats.successVotes)
-                generalStats.successVotes = 0
+            if (!generalStats.successVotes) generalStats.successVotes = 0
             generalStats.successVotes++
-            if (!generalStats.monthSuccessVotes)
-                generalStats.monthSuccessVotes = 0
+            if (!generalStats.monthSuccessVotes) generalStats.monthSuccessVotes = 0
             generalStats.monthSuccessVotes++
             generalStats.lastSuccessVote = Date.now()
         } else {
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
-            if (!settings.disabledNotifWarn)
-                sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage)
 
-            if (!project.stats.laterVotes)
-                project.stats.laterVotes = 0
+            if (!project.stats.laterVotes) project.stats.laterVotes = 0
             project.stats.laterVotes++
 
-            if (!generalStats.laterVotes)
-                generalStats.laterVotes = 0
+            if (!generalStats.laterVotes) generalStats.laterVotes = 0
             generalStats.laterVotes++
         }
         console.log(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
@@ -1264,15 +1256,12 @@ async function endVote(request, sender, project) {
         project.time = Date.now() + retryCoolDown
         project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        if (!settings.disabledNotifError)
-            sendNotification(getProjectPrefix(project, false), sendMessage)
+        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), sendMessage)
 
-        if (!project.stats.errorVotes)
-            project.stats.errorVotes = 0
+        if (!project.stats.errorVotes) project.stats.errorVotes = 0
         project.stats.errorVotes++
 
-        if (!generalStats.errorVotes)
-            generalStats.errorVotes = 0
+        if (!generalStats.errorVotes) generalStats.errorVotes = 0
         generalStats.errorVotes++
     }
 
@@ -1416,12 +1405,12 @@ async function wait(ms) {
     })
 }
 
-async function changeProject(project) {
+async function changeProject(project, noSave) {
     let projects = getProjectList(project)
     for (let i in projects) {
         if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id) && getProjectName(projects[i]) == getProjectName(project)) {
             projects[i] = project
-            await setValue('AVMRprojects' + getProjectName(project), projects)
+            if (!noSave) await setValue('AVMRprojects' + getProjectName(project), projects)
             break
             //Stop this loop, we found it!
         }
