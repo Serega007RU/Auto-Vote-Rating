@@ -1543,9 +1543,9 @@ async function endVote(request, sender, project) {
             if (settings.useMultiVote && settings.repeatAttemptLater && project.later) {
                 if (project.later < 3) {
                     project.time = null
-                    console.warn(chrome.i18n.getMessage('alreadyVotedRepeat'))
+                    console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
                 } else {
-                    console.warn(chrome.i18n.getMessage('alreadyVotedFail'))
+                    console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedFail'))
                 }
             }
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
