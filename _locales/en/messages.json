@@ -692,7 +692,13 @@
     "message": "Randomized"
   },
   "soon": {
-    "message": "soon..."
+    "message": "Soon..."
+  },
+  "inQueue": {
+    "message": "In the voting queue..."
+  },
+  "now": {
+    "message": "There is a vote going on right now..."
   },
   "timeout": {
     "message": "Vote expecting time has expired, restarting the voted"

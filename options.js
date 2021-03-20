@@ -354,9 +354,19 @@ async function addProjectList(project, visually) {
     li.id = getProjectName(project) + '_' + project.id + '_' + project.nick
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon')
-    if (!(project.time == null || project.time == '')) {
-        if (Date.now() < project.time)
-            text = new Date(project.time).toLocaleString().replace(',', '')
+    if (!(project.time == null || project.time == '') && Date.now() < project.time) {
+        text = new Date(project.time).toLocaleString().replace(',', '')
+    } else {
+        const queueProjects = chrome.extension.getBackgroundPage().queueProjects
+        for (let value of queueProjects) {
+            if (getProjectName(value) == getProjectName(project)) {
+                text = chrome.i18n.getMessage('inQueue')
+                if (JSON.stringify(value.id) == JSON.stringify(project.id) && value.nick == project.nick) {
+                    text = chrome.i18n.getMessage('now')
+                    break
+                }
+            }
+        }
     }
 
     const div = document.createElement('div')
@@ -629,7 +639,7 @@ async function removeProxyList(proxy, visually) {
 //Перезагрузка списка проектов
 function updateProjectList(projects, key) {
     if (projects != null) {
-        if (key.includes('AVMRprojects')) {
+        if (key.includes('AVMRprojects') && projects.length > 0) {
             const projectName = getProjectName(projects[0])
             document.getElementById(projectName + 'List').parentNode.replaceChild(document.getElementById(projectName + 'List').cloneNode(false), document.getElementById(projectName + 'List'))
             for (const project of projects) {
@@ -1894,9 +1904,9 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             return
         }
         if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function') || storageChange.newValue == null || !(typeof storageChange.newValue[Symbol.iterator] === 'function')) return
-        if (storageChange.oldValue.length == storageChange.newValue.length) {
-            updateProjectList(storageChange.newValue, key)
-        }
+//      if (storageChange.oldValue.length == storageChange.newValue.length) {
+        updateProjectList(storageChange.newValue, key)
+//      }
     }
 })
 

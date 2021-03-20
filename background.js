@@ -1274,8 +1274,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                 if (chrome.runtime.lastError.message != 'The tab was closed.') {
-                    if (!settings.disabledNotifError)
-                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                    if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
                     changeProject(project)
                 }
@@ -1286,8 +1285,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                 if (chrome.runtime.lastError.message != 'The frame was removed.') {
-                    if (!settings.disabledNotifError)
-                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                    if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
                     changeProject(project)
                 }
@@ -1521,22 +1519,17 @@ async function endVote(request, sender, project) {
 
         if (request.successfully) {
             sendMessage = chrome.i18n.getMessage('successAutoVote')
-            if (!settings.disabledNotifInfo)
-                sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage)
 
-            if (!project.stats.successVotes)
-                project.stats.successVotes = 0
+            if (!project.stats.successVotes) project.stats.successVotes = 0
             project.stats.successVotes++
-            if (!project.stats.monthSuccessVotes)
-                project.stats.monthSuccessVotes = 0
+            if (!project.stats.monthSuccessVotes) project.stats.monthSuccessVotes = 0
             project.stats.monthSuccessVotes++
             project.stats.lastSuccessVote = Date.now()
 
-            if (!generalStats.successVotes)
-                generalStats.successVotes = 0
+            if (!generalStats.successVotes) generalStats.successVotes = 0
             generalStats.successVotes++
-            if (!generalStats.monthSuccessVotes)
-                generalStats.monthSuccessVotes = 0
+            if (!generalStats.monthSuccessVotes) generalStats.monthSuccessVotes = 0
             generalStats.monthSuccessVotes++
             generalStats.lastSuccessVote = Date.now()
         } else {
@@ -1549,15 +1542,12 @@ async function endVote(request, sender, project) {
                 }
             }
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
-            if (!settings.disabledNotifWarn)
-                sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage)
 
-            if (!project.stats.laterVotes)
-                project.stats.laterVotes = 0
+            if (!project.stats.laterVotes) project.stats.laterVotes = 0
             project.stats.laterVotes++
 
-            if (!generalStats.laterVotes)
-                generalStats.laterVotes = 0
+            if (!generalStats.laterVotes) generalStats.laterVotes = 0
             generalStats.laterVotes++
         }
         console.log(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
@@ -1602,15 +1592,12 @@ async function endVote(request, sender, project) {
         }
         project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        if (!settings.disabledNotifError)
-            sendNotification(getProjectPrefix(project, false), sendMessage)
+        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), sendMessage)
 
-        if (!project.stats.errorVotes)
-            project.stats.errorVotes = 0
+        if (!project.stats.errorVotes) project.stats.errorVotes = 0
         project.stats.errorVotes++
 
-        if (!generalStats.errorVotes)
-            generalStats.errorVotes = 0
+        if (!generalStats.errorVotes) generalStats.errorVotes = 0
         generalStats.errorVotes++
     }
 
