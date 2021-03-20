@@ -267,7 +267,7 @@ async function checkOpen(project) {
                 resolve(cookies)
             })
         })
-        if (debug) console.log('Удаляю куки ' + url)
+        if (debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
         for (let i = 0; i < cookies.length; i++) {
             if (cookies[i].domain.charAt(0) == '.') {
                 await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
@@ -311,7 +311,7 @@ async function newWindow(project) {
                         await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
                     }
 
-                    console.log('Применяю куки ВК: ' + vkontakte.id + ' - ' + vkontakte.name)
+                    console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
 
                     //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
                     for (let i = 0; i < vkontakte.cookies.length; i++) {
@@ -363,10 +363,10 @@ async function newWindow(project) {
                 if (!used) {
                     found = true
                     //Применяет найденный незаюзанный свободный прокси
-                    console.log('Применяю прокси: ' + proxy.ip + ':' + proxy.port + ' ' + proxy.scheme)
+                    console.log(chrome.i18n.getMessage('applyProxy', proxy.ip + ':' + proxy.port + ' ' + proxy.scheme))
 
                     if (proxy.ip.includes('lazerpenguin') && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
-                        console.log('Токен TunnelBear является null или истекло его время действия, пытаюсь достать новый...')
+                        console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
                         let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
                             'headers': {
                                 'accept': 'application/json, text/plain, */*',
@@ -392,9 +392,9 @@ async function newWindow(project) {
                         if (!response.ok) {
                             settings.stopVote = Date.now() + 86400000
                             if (response.status == 401) {
-                                console.error('Необходима авторизация с TunnelBear, пожалуйста авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login Голосование приостановлено на 24 часа')
+                                console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
                                 if (!settings.disabledNotifError)
-                                    sendNotification('Необходима авторизация с TunnelBear', 'Авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login Голосование приостановлено на 24 часа')
+                                    sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
                                 return
                             }
                             console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status)
@@ -1515,7 +1515,7 @@ async function endVote(request, sender, project) {
                 proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy
                 await setValue('AVMRproxies', proxies)
             } else {
-                console.warn('currentProxy является null либо не найден')
+                console.warn('currentProxy is null or not found')
             }
         }
 
@@ -1543,9 +1543,9 @@ async function endVote(request, sender, project) {
             if (settings.useMultiVote && settings.repeatAttemptLater && project.later) {
                 if (project.later < 3) {
                     project.time = null
-                    console.warn('Вы уже голосовали, идём на повторную попытку с другим прокси...')
+                    console.warn(chrome.i18n.getMessage('alreadyVotedRepeat'))
                 } else {
-                    console.warn('Все попытки истелки, Вы уже голосовали, скорее всего кто-то с данного никнейма уже проголосовал')
+                    console.warn(chrome.i18n.getMessage('alreadyVotedFail'))
                 }
             }
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
@@ -1629,8 +1629,7 @@ async function endVote(request, sender, project) {
             }
         }
         if (settings.useMultiVote && queueProjects.size == 0) {
-            if (debug)
-                console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
+            if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
             await clearProxy()
             currentProxy = null
             currentVK = null
@@ -1862,8 +1861,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(handler, {
 }, ['blocking', 'requestHeaders'])
 
 async function stopVote() {
-    if (debug)
-        console.log('Отмена всех голосований и очистка всего')
+    if (debug) console.log('Отмена всех голосований и очистка всего')
     await clearProxy()
     currentVK = null
     currentProxy = null
@@ -1873,7 +1871,7 @@ async function stopVote() {
             if (chrome.runtime.lastError) {
                 console.warn(chrome.runtime.lastError.message)
                 if (!settings.disabledNotifError)
-                    sendNotification('Ошибка закрытия вкладки', chrome.runtime.lastError.message)
+                    sendNotification(chrome.i18n.getMessage('closeTabError'), chrome.runtime.lastError.message)
             }
         })
     }
@@ -1891,14 +1889,15 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
         }
         errorProxy.ip = currentProxy.ip
         if (errorProxy.count++ > 5) {
-            console.error('Ошибка авторизации прокси! Превышено максимальное кол-во попыток авторизации, скорее всего логин или пароль не правильные')
-            if (!settings.disabledNotifError)
-                sendNotification('Ошибка авторизации прокси', 'Превышено максимальное кол-во попыток авторизации, скорее всего логин или пароль не правильные')
+            console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxy2'))
+            if (!settings.disabledNotifError) {
+                sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxy2'))
+            }
             callbackFn()
             return
         }
         if (currentProxy.login) {
-            console.log('Прокси требует авторизацию, авторизовываюсь...')
+            console.log(chrome.i18n.getMessage('proxyAuth'))
             callbackFn({
                 authCredentials: {
                     'username': currentProxy.login,
@@ -1907,7 +1906,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             })
             return
         } else if (currentProxy.TunnelBear) {
-            console.log('Прокси TunnelBear требует авторизацию, авторизовываюсь...')
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'TunnelBear'))
             if (tunnelBear.token != null && tunnelBear.expires > Date.now()) {
                 callbackFn({
                     authCredentials: {
@@ -1918,14 +1917,15 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 return
             } else {
                 settings.stopVote = Date.now() + 86400000
-                console.error('Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
-                if (!settings.disabledNotifError)
-                    sendNotification('Ошибка авторизации прокси', 'Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа')
+                console.error(chrome.i18n.getMessage('errorAuthProxyTB'))
+                if (!settings.disabledNotifError) {
+                    sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyTB'))
+                }
                 await setValue('AVMRsettings', settings)
                 await stopVote()
             }
         } else if (currentProxy.Windscribe) {
-            console.log('Прокси Windscribe требует авторизацию, авторизовываюсь...')
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'Windscribe'))
             callbackFn({
                 authCredentials: {
                     'username': 'mdib1352-t94rvyq',
@@ -1934,7 +1934,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             })
             return
         } else if (currentProxy.HolaVPN) {
-            console.log('Прокси HolaVPN требует авторизацию, авторизовываюсь...')
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'HolaVPN'))
             callbackFn({
                 authCredentials: {
                     'username': 'user-uuid-c1b9e2c1bbab1664da384d748ef3899c',
@@ -1944,9 +1944,10 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             return
         } else {
             currentProxy.notWorking = true
-            console.error('Ошибка авторизации прокси! Данный прокси требует авторизацию по логину и паролю но вы его не задали в прокси')
-            if (!settings.disabledNotifError)
-                sendNotification('Ошибка авторизации прокси', 'Данный прокси требует авторизацию по логину и паролю но вы его не задали в прокси')
+            console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('message'))
+            if (!settings.disabledNotifError) {
+                sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('message'))
+            }
         }
     }
     callbackFn()

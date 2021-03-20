@@ -948,7 +948,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     a.target = 'blank_'
                     a.href = 'https://www.tunnelbear.com/account/login'
                     a.textContent = chrome.i18n.getMessage('authButton')
-                    updateStatusProxy([createMessage('Что бы сделать импорт прокси с TunnelBear необходима авторизация, ', 'error'), a], true)
+                    updateStatusProxy([createMessage(chrome.i18n.getMessage('loginTB'), 'error'), a], true)
                     return
                 }
                 updateStatusProxy(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, 'error')
@@ -968,7 +968,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     a.target = 'blank_'
                     a.href = 'https://www.tunnelbear.com/account/login'
                     a.textContent = chrome.i18n.getMessage('authButton')
-                    updateStatusProxy([createMessage('Что бы сделать импорт прокси с TunnelBear необходима авторизация, ', 'error'), a], true)
+                    updateStatusProxy([createMessage(chrome.i18n.getMessage('loginTB'), 'error'), a], true)
                     return
                 } else {
                     continue

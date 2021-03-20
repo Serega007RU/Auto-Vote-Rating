@@ -849,5 +849,73 @@
   },
   "settingsSyncCopyLocalSuccess": {
     "message": "Настройки были успешно скопированы в локальное хранилище"
+  },
+  "deletingCookies": {
+    "message": "Удаляю куки: $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "applyVKCookies": {
+    "message": "Применяю куки ВК: $vk$",
+    "placeholders": {
+      "vk": {
+        "content": "$1"
+      }
+    }
+  },
+  "applyProxy": {
+    "message": "Применяю прокси: $proxy$",
+    "placeholders": {
+      "proxy": {
+        "content": "$1"
+      }
+    }
+  },
+  "proxyTBTokenExpired": {
+    "message": "Токен TunnelBear является null или истекло его время действия, пытаюсь достать новый..."
+  },
+  "proxyTBAuth1": {
+    "message": "Необходима авторизация с TunnelBear"
+  },
+  "proxyTBAuth2": {
+    "message": "Авторизуйтесь по следующей ссылке: https://www.tunnelbear.com/account/login Голосование приостановлено на 24 часа"
+  },
+  "alreadyVotedRepeat": {
+    "message": "Вы уже голосовали, идём на повторную попытку с другим прокси..."
+  },
+  "alreadyVotedFail": {
+    "message": "Все попытки истелки, Вы уже голосовали, скорее всего кто-то с данного никнейма уже проголосовал"
+  },
+  "closeTabError": {
+    "message": "Ошибка закрытия вкладки"
+  },
+  "errorAuthProxy1": {
+    "message": "Ошибка авторизации прокси!"
+  },
+  "errorAuthProxy2": {
+    "message": "Превышено максимальное кол-во попыток авторизации, скорее всего логин или пароль не правильные"
+  },
+  "proxyAuth": {
+    "message": "Прокси требует авторизацию, авторизовываюсь..."
+  },
+  "proxyAuthOther": {
+    "message": "Прокси $proxy$ требует авторизацию, авторизовываюсь..."
+    "placeholders": {
+      "proxy": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorAuthProxyTB": {
+    "message": "Токен TunnelBear является null либо истекло его время действия, нечем авторизоваться в прокси! Голосование приостановлено на 24 часа"
+  },
+  "errorAuthProxyNoPassword": {
+    "message": "Данный прокси требует авторизацию по логину и паролю но вы его не задали в прокси"
+  },
+  "loginTB": {
+    "message": "Что бы сделать импорт прокси с TunnelBear необходима авторизация, "
   }
 }
