@@ -887,5 +887,73 @@
   },
   "settingsSyncCopyLocalSuccess": {
     "message": "Settings were successfully copied to local storage"
+  },
+  "deletingCookies": {
+    "message": "Deleting cookie: $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "applyVKCookies": {
+    "message": "Apply cookies VK: $vk$",
+    "placeholders": {
+      "vk": {
+        "content": "$1"
+      }
+    }
+  },
+  "applyProxy": {
+    "message": "Apply proxy: $proxy$",
+    "placeholders": {
+      "proxy": {
+        "content": "$1"
+      }
+    }
+  },
+  "proxyTBTokenExpired": {
+    "message": "The TunnelBear token is null or expired, I'm trying to get a new one..."
+  },
+  "proxyTBAuth1": {
+    "message": "Authorization with TunnelBear is required"
+  },
+  "proxyTBAuth2": {
+    "message": "Log in using the following link: https://www.tunnelbear.com/account/login Voting suspended for 24 hours"
+  },
+  "alreadyVotedRepeat": {
+    "message": "You have already voted, we are going to try again with a different proxy..."
+  },
+  "alreadyVotedFail": {
+    "message": "All attempts have expired, you have already voted, most likely someone with this nickname has already voted"
+  },
+  "closeTabError": {
+    "message": "Error closing the tab"
+  },
+  "errorAuthProxy1": {
+    "message": "Proxy authorization error!"
+  },
+  "errorAuthProxy2": {
+    "message": "Exceeded the maximum number of login attempts, most likely the username or password is incorrect"
+  },
+  "proxyAuth": {
+    "message": "The proxy requires authorization, I log in..."
+  },
+  "proxyAuthOther": {
+    "message": "Proxy $proxy$ requires authorization, I log in...",
+    "placeholders": {
+      "proxy": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorAuthProxyTB": {
+    "message": "The TunnelBear token is null or it has expired, there is nothing to log in to the proxy with! Voting suspended for 24 hours"
+  },
+  "errorAuthProxyNoPassword": {
+    "message": "This proxy requires authorization by username and password but you did not set it in the proxy"
+  },
+  "loginTB": {
+    "message": "To import a proxy from TunnelBear, authorization is required, "
   }
 }
