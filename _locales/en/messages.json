@@ -734,5 +734,13 @@
   },
   "settingsSyncCopyLocalSuccess": {
     "message": "Settings were successfully copied to local storage"
+  },
+  "errorAttemptVote": {
+    "message": "Exceeded the maximum number of voting attempts, $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   }
 }

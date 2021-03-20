@@ -691,5 +691,13 @@
   },
   "settingsSyncCopyLocalSuccess": {
     "message": "Настройки были успешно скопированы в локальное хранилище"
+  },
+  "errorAttemptVote": {
+    "message": "Превышено максимальное кол-во попыток голосования, $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   }
 }
