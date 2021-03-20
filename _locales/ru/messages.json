@@ -674,6 +674,9 @@
   "servers": {
     "message": "Сервера"
   },
+  "additionTopGG": {
+    "message": "Дополнительные параметры (необязательно)"
+  },
   "emptyError": {
     "message": "Пустая ошибка"
   },

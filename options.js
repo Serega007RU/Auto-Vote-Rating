@@ -513,6 +513,7 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
     } else if (project.TopGG) {
         project.game = document.getElementById('chooseTopGG').value
+        project.addition = document.getElementById('additionTopGG').value
     }
     
     if (project.Custom) {
@@ -1352,7 +1353,7 @@ function getUrlProjects() {
     let projects = []
     let project = {}
     let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize') {
+        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize' || key == 'addition') {
             if (key == 'top' && Object.keys(project).length > 0) {
                 project.time = null
                 project.stats = {
@@ -1942,9 +1943,13 @@ selectedTop.addEventListener('change', function() {
     if (selectedTop.value == 'TopGG') {
         document.getElementById('chooseTopGG1').removeAttribute('style')
         document.getElementById('chooseTopGG').removeAttribute('style')
+        document.getElementById('additionTopGG1').removeAttribute('style')
+        document.getElementById('additionTopGG').removeAttribute('style')
     } else if (laterChoose == 'TopGG') {
         document.getElementById('chooseTopGG1').style.display = 'none'
         document.getElementById('chooseTopGG').style.display = 'none'
+        document.getElementById('additionTopGG1').style.display = 'none'
+        document.getElementById('additionTopGG').style.display = 'none'
     }
 
     laterChoose = selectedTop.value

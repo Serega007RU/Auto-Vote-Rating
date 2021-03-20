@@ -312,7 +312,10 @@ async function newWindow(project) {
             if (!project.game) {
                 project.game = 'bot'
             }
-            url = 'https://top.gg/' + project.game + '/' + project.id + '/vote'
+            if (!project.addition) {
+                project.addition = ''
+            }
+            url = 'https://top.gg/' + project.game + '/' + project.id + '/vote' + project.addition
         } else if (project.DiscordBotList)
             url = 'https://discordbotlist.com/bots/' + project.id + '/upvote'
         else if (project.BotsForDiscord)
