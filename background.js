@@ -1485,18 +1485,39 @@ async function endVote(request, sender, project) {
         }
 
         if (settings.useMultiVote)  {
-            if (true && currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && !(settings.repeatAttemptLater && project.later && project.later >= 2 && request.later && (request.message && request.message != 'vk_error')) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
-                let usedProject = {
-                    id: project.id,
-                    nextFreeVote: time
+            if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+                if (request.later && settings.repeatAttemptLater && project.later != null) {
+                    if (project.TopCraft || project.McTOP) {
+                        if (request.message) {
+                            if (request.message == 'vk_error') {
+                                await useVK()
+                            }
+                        } else {
+                            if (project.later >= 2) {
+                                await useVK()
+                            }
+                        }
+                    } else {
+                        if (project.later >= 2) {
+                            await useVK()
+                        }
+                    }
+                } else {
+                    await useVK()
                 }
-                const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id == usedProject.id})
-                if (index > -1) {
-                    getTopFromList(currentVK, project).splice(index, 1)
+                async function useVK() {
+                    let usedProject = {
+                        id: project.id,
+                        nextFreeVote: time
+                    }
+                    const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id == usedProject.id})
+                    if (index > -1) {
+                        getTopFromList(currentVK, project).splice(index, 1)
+                    }
+                    getTopFromList(currentVK, project).push(usedProject)
+                    VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK
+                    await setValue('AVMRVKs', VKs)
                 }
-                getTopFromList(currentVK, project).push(usedProject)
-                VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK
-                await setValue('AVMRVKs', VKs)
             }
             
             if (currentProxy != null && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
@@ -1531,12 +1552,14 @@ async function endVote(request, sender, project) {
             if (!generalStats.monthSuccessVotes) generalStats.monthSuccessVotes = 0
             generalStats.monthSuccessVotes++
             generalStats.lastSuccessVote = Date.now()
+            delete project.later
         } else {
             if (settings.useMultiVote && settings.repeatAttemptLater && project.later) {
                 if (project.later < 3) {
                     project.time = null
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
                 } else {
+                    delete project.later
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedFail'))
                 }
             }
