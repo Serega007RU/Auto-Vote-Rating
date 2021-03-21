@@ -873,6 +873,9 @@
   "servers": {
     "message": "Guilds"
   },
+  "additionTopGG": {
+    "message": "Additional parameters (optional)"
+  },
   "emptyError": {
     "message": "Empty error"
   },

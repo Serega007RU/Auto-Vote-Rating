@@ -599,7 +599,10 @@ async function newWindow(project) {
             if (!project.game) {
                 project.game = 'bot'
             }
-            url = 'https://top.gg/' + project.game + '/' + project.id + '/vote'
+            if (!project.addition) {
+                project.addition = ''
+            }
+            url = 'https://top.gg/' + project.game + '/' + project.id + '/vote' + project.addition
         } else if (project.DiscordBotList)
             url = 'https://discordbotlist.com/bots/' + project.id + '/upvote'
         else if (project.BotsForDiscord)
@@ -1728,21 +1731,39 @@ async function removeCookie(url, name) {
 async function getLocalValue(name) {
     return new Promise(resolve=>{
         chrome.storage.local.get(name, data=>{
-            resolve(data[name])
+            if (chrome.runtime.lastError) {
+                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
+                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
+                reject(chrome.runtime.lastError)
+            } else {
+                resolve(data[name])
+            }
         })
     })
 }
 async function getValue(name) {
     return new Promise(resolve=>{
         chrome.storage[storageArea].get(name, data=>{
-            resolve(data[name])
+            if (chrome.runtime.lastError) {
+                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
+                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
+                reject(chrome.runtime.lastError)
+            } else {
+                resolve(data[name])
+            }
         })
     })
 }
 async function setValue(key, value) {
     return new Promise(resolve=>{
         chrome.storage[storageArea].set({[key]: value}, data=>{
-            resolve(data)
+            if (chrome.runtime.lastError) {
+                sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
+                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
+                reject(chrome.runtime.lastError)
+            } else {
+                resolve(data)
+            }
         })
     })
 }

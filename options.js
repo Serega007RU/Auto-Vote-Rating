@@ -1173,6 +1173,7 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
     } else if (project.TopGG) {
         project.game = document.getElementById('chooseTopGG').value
+        project.addition = document.getElementById('additionTopGG').value
     }
     
     if (project.Custom) {
@@ -1813,7 +1814,7 @@ async function getValue(name, area) {
         chrome.storage[area].get(name, data=>{
             if (chrome.runtime.lastError) {
                 updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
-                console.error(chrome.runtime.lastError)
+                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
                 resolve(data[name])
@@ -1832,7 +1833,7 @@ async function setValue(key, value, updateStatus, area) {
         chrome.storage[area].set({[key]: value}, data=>{
             if (chrome.runtime.lastError) {
                 updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
-                console.error(chrome.runtime.lastError)
+                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
                 if (updateStatus)
@@ -1849,8 +1850,8 @@ async function removeValue(name, area) {
     return new Promise(resolve=>{
         chrome.storage[area].remove(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
-                console.error(chrome.runtime.lastError)
+                updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
+                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
                 resolve(data)
@@ -2153,7 +2154,7 @@ function getUrlProjects() {
     let projects = []
     let project = {}
     let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize') {
+        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize' || key == 'addition') {
             if (key == 'top' && Object.keys(project).length > 0) {
                 project.time = null
                 project.stats = {
@@ -2759,9 +2760,13 @@ selectedTop.addEventListener('change', function() {
     if (selectedTop.value == 'TopGG') {
         document.getElementById('chooseTopGG1').removeAttribute('style')
         document.getElementById('chooseTopGG').removeAttribute('style')
+        document.getElementById('additionTopGG1').removeAttribute('style')
+        document.getElementById('additionTopGG').removeAttribute('style')
     } else if (laterChoose == 'TopGG') {
         document.getElementById('chooseTopGG1').style.display = 'none'
         document.getElementById('chooseTopGG').style.display = 'none'
+        document.getElementById('additionTopGG1').style.display = 'none'
+        document.getElementById('additionTopGG').style.display = 'none'
     }
 
     laterChoose = selectedTop.value
