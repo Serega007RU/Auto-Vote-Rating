@@ -108,11 +108,7 @@ async function initializeConfig() {
     if (settings && settings.cooldown && Number.isInteger(settings.cooldown))
         cooldown = settings.cooldown
 
-    if (settings && !settings.disabledCheckTime)
-        checkTime()
-
-    if (settings && !settings.disabledCheckTime)
-        checkTime()
+    if (settings && !settings.disabledCheckTime) checkTime()
 
     if (settings && settings.useMultiVote) {
         chrome.proxy.settings.get({}, async function(config) {
