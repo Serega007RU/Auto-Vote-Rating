@@ -1129,7 +1129,7 @@ async function getValue(name, area) {
         chrome.storage[area].get(name, data=>{
             if (chrome.runtime.lastError) {
                 updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
-                console.error(chrome.runtime.lastError)
+                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
                 resolve(data[name])
@@ -1148,7 +1148,7 @@ async function setValue(key, value, updateStatus, area) {
         chrome.storage[area].set({[key]: value}, data=>{
             if (chrome.runtime.lastError) {
                 updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
-                console.error(chrome.runtime.lastError)
+                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
                 if (updateStatus)
@@ -1165,8 +1165,8 @@ async function removeValue(name, area) {
     return new Promise(resolve=>{
         chrome.storage[area].remove(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
-                console.error(chrome.runtime.lastError)
+                updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
+                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
                 resolve(data)
