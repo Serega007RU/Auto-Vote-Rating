@@ -647,7 +647,7 @@ async function addProject(project, element) {
             jsPath = 'div[class="text-server"] > h1'
         } else if (project.MinecraftServerNet) {
             url = 'https://minecraft-server.net/details/' + project.id + '/'
-            jsPath = 'h1[class="text-break col-xl"]'
+            jsPath = 'div.card-header > h1'
         } else if (project.TopGames) {
             if (project.lang == 'fr') {
                 url = 'https://top-serveurs.net/' + project.game + '/' + project.id
