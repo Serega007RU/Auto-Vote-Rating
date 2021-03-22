@@ -190,7 +190,7 @@ async function checkOpen(project) {
         if (getProjectName(value) == getProjectName(project) || value.randomize && project.randomize) {
             if (!value.nextAttempt) return
             if (settings.MultiVote) {
-                if ((value.TopCraft || value.McTOP || value.MinecraftRating) && (!project.TopCraft || !project.McTOP || !project.MinecraftRating)) {
+                if ((value.TopCraft || value.McTOP || value.MinecraftRating) && (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
                     return
                 }
             }
@@ -349,7 +349,7 @@ async function newWindow(project) {
             }
         }
 
-        if (currentProxy == null) {
+        if (currentProxy == null && !project.TopCraft && !project.McTOP && !project.MinecraftRating) {
             //Ищет не юзанный свободный прокси
             let found = false
             for (let proxy of proxies) {
@@ -1539,7 +1539,7 @@ async function endVote(request, sender, project) {
                 getTopFromList(currentProxy, project).push(usedProject)
                 proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy
                 await setValue('AVMRproxies', proxies)
-            } else {
+            } else if (!project.TopCraft && !project.McTOP && !project.MinecraftRating) {
                 console.warn('currentProxy is null or not found')
             }
         }
