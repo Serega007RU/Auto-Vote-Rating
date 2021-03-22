@@ -744,6 +744,11 @@ async function addVK() {
         }
         let VK = {}
         try {
+            if (doc.querySelector('#login_blocked_wrap') != null) {
+                let text = doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
+                updateStatusVK(text, true, 'error')
+                return
+            }
             VK.name = doc.querySelector('#top_vkconnect_link > div > div.top_profile_vkconnect_name').textContent
             VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
         } catch(e) {
