@@ -1034,8 +1034,7 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
         let project = openedProjects.get(sender.tab.id)
         let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage(Object.keys(request)[0])
         console.warn(getProjectPrefix(project, true) + message)
-        if (!settings.disabledNotifWarn)
-            sendNotification(getProjectPrefix(project, false), message)
+        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
     } else {
         endVote(request, sender, null)
     }
@@ -1056,8 +1055,15 @@ async function endVote(request, sender, project) {
             })
         }
         openedProjects.delete(sender.tab.id)
-    } else if (!project)
-        return
+        //Обновление проекта из списка в случае его изменения
+        let projects = getProjectList(project)
+        for (const proj of projects) {
+            if (JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick) {
+                project = proj
+                break
+            }
+        }
+    } else if (!project) return
 
     if (settings.cooldown < 10000) {
         setTimeout(()=>{
@@ -1427,7 +1433,7 @@ async function wait(ms) {
 async function changeProject(project) {
     let projects = getProjectList(project)
     for (let i in projects) {
-        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id) && getProjectName(projects[i]) == getProjectName(project)) {
+        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id)) {
             projects[i] = project
             await setValue('AVMRprojects' + getProjectName(project), projects)
             break
