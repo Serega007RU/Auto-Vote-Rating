@@ -188,8 +188,12 @@ async function checkOpen(project) {
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
         if (getProjectName(value) == getProjectName(project) || value.randomize && project.randomize) {
-            if (!value.nextAttempt)
-                return
+            if (!value.nextAttempt) return
+            if (settings.MultiVote) {
+                if ((value.TopCraft || value.McTOP || value.MinecraftRating) && (!project.TopCraft || !project.McTOP || !project.MinecraftRating)) {
+                    return
+                }
+            }
             if (Date.now() < value.nextAttempt) {
                 return
             } else {
@@ -211,6 +215,9 @@ async function checkOpen(project) {
             }
         }
         if (currentProxy != null) {
+            if (project.TopCraft || project.McTOP || project.MinecraftRating) {
+                return
+            }
             let usedProjects = getTopFromList(currentProxy, project)
             for (let usedProject of usedProjects) {
                 if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
