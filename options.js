@@ -2139,7 +2139,7 @@ async function checkUpdateConflicts(save) {
     if (settings.proxyBlackList == null) {
         updated = true
         updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
-        settings.proxyBlackList = JSON.stringify(["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"])
+        settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
     }
 
     if (generalStats == null) {
