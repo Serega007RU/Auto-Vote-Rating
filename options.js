@@ -217,6 +217,8 @@ async function restoreOptions() {
                 return
             } else if (this.id == 'useMultiVote') {
                 settings.useMultiVote = this.checked
+            } else if (this.id == 'iFromUkraine') {
+                settings.iFromUkraine = this.checked
             } else if (this.id == 'repeatAttemptLater') {
                 settings.repeatAttemptLater = this.checked
             } else if (this.id == 'randomize') {
@@ -332,6 +334,8 @@ async function restoreOptions() {
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('cooldown').value = settings.cooldown
     document.getElementById('useMultiVote').checked = settings.useMultiVote
+    document.getElementById('iFromUkraine').checked = settings.iFromUkraine
+    document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
     if (settings.stopVote > Date.now()) {
         document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
@@ -1201,6 +1205,21 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
 document.getElementById('timeout').addEventListener('submit', ()=>{
     event.preventDefault()
     setCoolDown()
+})
+
+//Слушатель кнопки 'Установить' на blacklist proxy
+document.getElementById('formProxyBlackList').addEventListener('submit', async ()=>{
+    event.preventDefault()
+    let bl
+    try {
+        bl = JSON.parse(document.getElementById('proxyBlackList').value)
+    } catch (e) {
+        updateStatusProxy(e, true, 'error')
+        return
+    }
+    settings.proxyBlackList = bl
+    await setValue('AVMRsettings', settings)
+    updateStatusProxy(chrome.i18n.getMessage('proxyBLSet'), false, 'success')
 })
 
 async function addProject(project, element) {
@@ -2116,6 +2135,11 @@ async function checkUpdateConflicts(save) {
         updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
         settings.stopVote = 9000000000000000
         await setValue('AVMRsettings', settings, false)
+    }
+    if (settings.proxyBlackList == null) {
+        updated = true
+        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+        settings.proxyBlackList = JSON.stringify(["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"])
     }
 
     if (generalStats == null) {

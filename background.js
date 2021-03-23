@@ -190,7 +190,7 @@ async function checkOpen(project) {
         if (getProjectName(value) == getProjectName(project) || value.randomize && project.randomize) {
             if (!value.nextAttempt) return
             if (settings.MultiVote) {
-                if ((value.TopCraft || value.McTOP || value.MinecraftRating) && (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
+                if (/*settings.iFromUkraine &&*/ (value.TopCraft || value.McTOP || value.MinecraftRating) && (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
                     return
                 }
             }
@@ -215,7 +215,7 @@ async function checkOpen(project) {
             }
         }
         if (currentProxy != null) {
-            if (project.TopCraft || project.McTOP || project.MinecraftRating) {
+            if (/*settings.iFromUkraine &&*/ (project.TopCraft || project.McTOP || project.MinecraftRating)) {
                 return
             }
             let usedProjects = getTopFromList(currentProxy, project)
@@ -349,7 +349,7 @@ async function newWindow(project) {
             }
         }
 
-        if (currentProxy == null && !project.TopCraft && !project.McTOP && !project.MinecraftRating) {
+        if (currentProxy == null && (!settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))) {
             //Ищет не юзанный свободный прокси
             let found = false
             for (let proxy of proxies) {
@@ -417,7 +417,7 @@ async function newWindow(project) {
                                 host: proxy.ip,
                                 port: proxy.port
                             },
-                            bypassList: ['*vk.com', '*captcha.website', '*hcaptcha.com', '*google.com', '*gstatic.com', '*cloudflare.com', '<local>']
+                            bypassList: settings.proxyBlackList
                         }
                     }
                     await setProxy(config)
@@ -1527,7 +1527,7 @@ async function endVote(request, sender, project) {
                 }
             }
             
-            if (currentProxy != null && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
+            if (currentProxy != null && !project.TopCraft && !project.McTOP && !project.MinecraftRating && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
                 let usedProject = {
                     id: project.id,
                     nextFreeVote: time
@@ -1539,7 +1539,7 @@ async function endVote(request, sender, project) {
                 getTopFromList(currentProxy, project).push(usedProject)
                 proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy
                 await setValue('AVMRproxies', proxies)
-            } else if (!project.TopCraft && !project.McTOP && !project.MinecraftRating) {
+            } else if (!settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
                 console.warn('currentProxy is null or not found')
             }
         }

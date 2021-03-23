@@ -977,5 +977,14 @@
         "content": "$1"
       }
     }
+  },
+  "iFromUkraine": {
+    "message": "I live in Ukraine or I have vk.com blocked"
+  },
+  "proxyBlackList": {
+    "message": "Blacklist of sites for proxies"
+  },
+  "proxyBLSet": {
+    "message": "Black list of proxy sites updated"
   }
 }
