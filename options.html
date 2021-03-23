@@ -762,15 +762,17 @@
 						</ul>
 						<ul class="listcontent" id="ProxyTab" style="display: none;">
                             <div class="row">
-								<div class="form-group mb-1">
-									<label data-resource="proxyBlackList" for="proxyBlackList"></label> <span class="tooltip1 ml-1"><span class="tooltip1text">Шаблон: https://developer.chrome.com/docs/extensions/reference/proxy/#bypass-list</span></span>
-								</div>
-                                <form id="formProxyBlackList">
-                                    <input id="proxyBlackList" type="text" name="text">
-                                    <div class="mt-3 mb-2">
-							        	<button data-resource="setCooldown" type="submit" class="w-50" style="display: inline;"></button>
-							        </div>
-                                </form>
+                            	<form id="formProxyBlackList">
+                                <div class="col-xl-12 col-lg-12 col-md-12">
+                            		<div class="form-group mb-1">
+										<label data-resource="proxyBlackList" for="proxyBlackList"></label> <span class="tooltip1 ml-1"><span class="tooltip1text">Шаблон: <a href="https://developer.chrome.com/docs/extensions/reference/proxy/#bypass-list">https://developer.chrome.com/docs/extensions/reference/proxy/#bypass-list</a></span></span>
+									</div>
+                            		<div class="pblFormDiv">
+                            			<input id="proxyBlackList" type="text" name="text">
+                            			<button data-resource="setCooldown" type="submit"></button>
+                            		</div>
+                            	</div>
+                            	</form>
                             	<form id="addProxy">
                             	<div class="col-xl-4 col-lg-6 col-md-12">
                             		<div class="form-group mb-1">
