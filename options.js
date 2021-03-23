@@ -1553,6 +1553,12 @@ function tabSelect(evt, tabs) {
 }
 
 //Слушателей кнопок для переключения вкладок
+document.querySelector('.burger').addEventListener('click', ()=> {
+    document.querySelector('.burger').classList.toggle('active')
+    document.querySelector('nav').classList.toggle('active')
+
+})
+
 document.getElementById('addTab').addEventListener('click', function() {
     tabSelect(event, 'append')
 })
@@ -1564,22 +1570,6 @@ document.getElementById('addedTab').addEventListener('click', function() {
 })
 document.getElementById('helpTab').addEventListener('click', function() {
     tabSelect(event, 'help')
-})
-document.getElementById('addTab2').addEventListener('click', function() {
-    tabSelect(event, 'append')
-    document.getElementById('hmt').click()
-})
-document.getElementById('settingsTab2').addEventListener('click', function() {
-    tabSelect(event, 'settings')
-    document.getElementById('hmt').click()
-})
-document.getElementById('addedTab2').addEventListener('click', function() {
-    tabSelect(event, 'added')
-    document.getElementById('hmt').click()
-})
-document.getElementById('helpTab2').addEventListener('click', function() {
-    tabSelect(event, 'help')
-    document.getElementById('hmt').click()
 })
 
 //Переключение между списками добавленных проектов
@@ -1803,7 +1793,7 @@ selectedTop.addEventListener('change', function() {
     }
 
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || selectedTop.value == 'MMoTopRU' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU') {
-        document.querySelector('#addProject > div:nth-child(2) > div:nth-child(1) > label').textContent = chrome.i18n.getMessage('yourNick')
+        document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
 
         idSelector.removeAttribute('style')
@@ -1872,7 +1862,7 @@ selectedTop.addEventListener('change', function() {
                 document.getElementById('time').required = false
             }
 
-            document.querySelector('#addProject > div:nth-child(2) > div:nth-child(1) > label').textContent = chrome.i18n.getMessage('name')
+            document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('name')
             document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterName')
 //          document.getElementById('nick').required = true
 
@@ -1999,4 +1989,23 @@ document.getElementById('donate').addEventListener('mouseover', function(event) 
     } else {
         sound2.play()
     }
+})
+
+//Модалки
+document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
+    closeBtn.addEventListener('click', ()=> {
+        toggleModal(closeBtn.parentElement.parentElement.id)
+    })
+})
+
+let modalsBlock = document.querySelector('#modals')
+function toggleModal(modalID) {
+    modalsBlock.querySelector('.overlay').classList.toggle('active')
+    modalsBlock.querySelector('#'+modalID).classList.toggle('active')
+}
+
+modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
+    let activeModal = modalsBlock.querySelector('.modal.active')
+    activeModal.style.transform = 'scale(1.1)'
+    setTimeout(()=> activeModal.removeAttribute('style'), 100)
 })
