@@ -513,7 +513,13 @@ nav .logo img {
 	bottom: 0;
 }
 
-label[data-resource="notAvaibledInSilent"] {
+[data-resource="notAdded"] {
+	display: block;
+	text-align: center;
+	margin: 10px 0;
+}
+
+[data-resource="notAvaibledInSilent"] {
 	display: block;
 	text-align: center;
 	color: #da5e5e;
