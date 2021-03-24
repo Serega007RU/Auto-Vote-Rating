@@ -69,18 +69,20 @@ nav .logo img {
 }
 
 .burger {
-	transition: .5s;
+    z-index: 1;
+	transition: .5s left;
 	top: 5px; left: 5px;
 	border-radius: 10px;
 	padding: 5px;
 	background: #2A2A2F;
 	position: absolute;
-	width: 40px;
-	height: 40px;
+	width: 36px;
+	height: 36px;
 	display: none;
 }
 
 .burger.active {
+	position: fixed;
 	left: 255px;
 }
 
@@ -92,7 +94,7 @@ nav .logo img {
 	color: transparent;
 	position: absolute;
 	width: calc(100% - 10px);
-	height: 6px;
+	height: 4px;
 	border-radius: 100px;
 	background: #fff;
 }
@@ -102,11 +104,11 @@ nav .logo img {
 }
 
 .burger span {
-	top: 22px;
+	top: 21px;
 }
 
 .burger:after {
-	top: 36px;
+	top: 34px;
 }
 
 .burger.active:before,
@@ -222,14 +224,10 @@ nav .logo img {
 #modals .modal .head {
     justify-content: space-between;
     display: flex;
-    color: #53a9c3;
+    color: #5c84ad;
     font-size: 25px;
     padding-bottom: 10px;
     border-bottom: solid 1px #ccc
-}
-
-#modals .modal .head {
-    color: #5c84ad
 }
 
 #modals .modal .close {
@@ -277,6 +275,12 @@ nav .logo img {
 	margin: 10px auto;
 }
 
+#modals .modal .content img {
+	width: 20px;
+	height: 20px;
+	margin-right: 5px;
+}
+
 #modals .modal .content .message table tbody tr {
 	justify-content: space-between;
 	padding: 5px;
@@ -310,6 +314,10 @@ nav .logo img {
     justify-content: space-around
 }
 
+#modals .modal#addFastProject .content {
+	color: #fff;
+}
+
 @media(max-width: 450px) {
     #modals .modal {
         width:calc(100% - 30px)
@@ -332,6 +340,90 @@ nav .logo img {
 	text-align: center;
 	font-size: 24px;
 	font-weight: 600;
+}
+
+#projectsBlock .contentBlock {
+	margin-bottom: 15px;
+}
+
+#projectsBlock .buttonBlock {
+	margin-top: 15px;
+	margin-bottom: 20px;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-gap: 15px;
+}
+
+#projectsBlock .contentBlock .listcontent li {
+	background: #121214;
+	margin-bottom: 10px;
+	justify-content: space-between;
+	display: flex;
+	padding: 10px;
+	border-radius: 5px;
+}
+
+#projectsBlock .contentBlock .listcontent li .controlItems {
+	display: flex;
+}
+
+#projectsBlock .contentBlock .listcontent li .message {
+	display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
+	margin-right: 10px;
+}
+
+#projectsBlock .contentBlock .listcontent li img {
+	width: 30px;
+	display: block;
+	padding: 10px;
+	height: 30px;
+	opacity: .8;
+	transition: .3s;
+	border-radius: 5px;
+}
+
+#projectsBlock .contentBlock .listcontent li img:hover {
+	cursor: pointer;
+	opacity: 1;
+}
+
+#projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
+	background: #5c84ad;
+}
+
+#projectsBlock .contentBlock .listcontent li img[src="images/icons/delete.svg"]:hover {
+	background: #da5e5e;
+}
+
+#projectsBlock .contentBlock .listcontent li:nth-child(odd) {
+	background: #2a2a2f;
+}
+
+#projectsBlock .buttonBlock button {
+	position: relative;
+}
+
+#projectsBlock .buttonBlock button > span {
+    top: -10px;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 2;
+    font-size: 14px;
+    line-height: 30px;
+    border-radius: 100%;
+    height: 30px;
+    justify-content: center;
+    display: flex;
+    width: 30px;
+    position: absolute;
+    color: #000;
+    right: -10px;
+    background: #ccc;
 }
 
 #aboutProject {
@@ -387,9 +479,47 @@ nav .logo img {
     #addProject {
     	grid-template-columns: none;
     }
+
+    #projectsBlock .buttonBlock {
+    	grid-template-columns: repeat(2, 1fr);
+    }
+
+    #projectsBlock .contentBlock .listcontent li .controlItems {
+    	display: block;
+    }
+
+    #projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
+    	margin-right: 0;
+    	margin-bottom: 10px;
+    }
 }
 
 /* Разное */
+.successFastAdd {
+	margin-top: 20px;
+	color: #4caf50;
+}
+
+.fastAddEl {
+	margin-bottom: 5px;
+	position: relative;
+	display: flex;
+	text-align: left;
+	font-size: 14px;
+}
+
+.fastAddEl p {
+	position: absolute;
+	bottom: 0;
+}
+
+label[data-resource="notAvaibledInSilent"] {
+	display: block;
+	text-align: center;
+	color: #da5e5e;
+	margin: 10px 0;
+}
+
 #generalStats {
 	float: right;
 }
@@ -397,6 +527,7 @@ nav .logo img {
 #authvk {
 	font-size: 15px;
 	display: inline-flex;
+	margin: 10px 0;
 }
 
 #authvk > * {
@@ -431,6 +562,7 @@ nav .logo img {
 }
 
 .file,
+.selectsite,
 .justBtn,
 .submitBtn {
 	opacity: .9;
@@ -447,6 +579,7 @@ nav .logo img {
 	text-align: center;
 }
 
+.selectsite:hover,
 .file:hover,
 .justBtn:hover,
 .submitBtn:hover {
@@ -454,15 +587,22 @@ nav .logo img {
 	opacity: 1;
 }
 
-.justBtn {
-	width: 100%;
-}
-
+.selectsite,
 .file {
 	justify-content: center;
 	display: flex;
 	font-size: 14px;
 	background: #2a2a2f;
+}
+
+.selectsite.activeList {
+	opacity: 1;
+	background: #5c84ad;
+}
+
+.selectsite,
+.justBtn {
+	width: 100%;
 }
 
 .file > * {
@@ -486,6 +626,7 @@ nav .logo img {
 
 .tooltip1,
 .tooltip2 {
+	color: #fff;
 	margin-left: 5px;
 	position: relative;
 	display: inline-block;
@@ -614,9 +755,8 @@ input.checkbox:disabled + label {
 #add {
 	text-align: center;
 	font-size: 15px;
-	margin: auto;
-	height: 20px;
-	margin-top: 10px;
+	margin: 10px auto;
+	min-height: 20px;
 }
 
 #save {
@@ -632,8 +772,7 @@ input.checkbox:disabled + label {
 
 .input-block label,
 .label-block label {
-	color: #fff;
-	opacity: .6;
+	color: #696969;
 	font-size: 14px;
 	display: inline-block;
 	margin-bottom: 10px;

@@ -55,55 +55,11 @@ var authVKUrls = new Map([
     ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&redirect_uri=close.html']
 ])
 
-const svgDelete = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-svgDelete.setAttribute('width', 24)
-svgDelete.setAttribute('height', 24)
-svgDelete.setAttribute('viewBox', '0 0 24 24')
-svgDelete.setAttribute('fill', 'none')
-svgDelete.setAttribute('stroke', 'currentColor')
-svgDelete.setAttribute('stroke-width', 2)
-svgDelete.setAttribute('stroke-linecap', 'round')
-svgDelete.setAttribute('stroke-linejoin', 'round')
-const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-line1.setAttribute('x1', 18)
-line1.setAttribute('y1', 4)
-line1.setAttribute('x2', 6)
-line1.setAttribute('y2', 16)
-line2.setAttribute('x1', 6)
-line2.setAttribute('y1', 4)
-line2.setAttribute('x2', 18)
-line2.setAttribute('y2', 16)
-svgDelete.appendChild(line1)
-svgDelete.appendChild(line2)
+const svgFail = document.createElement('img')
+svgFail.src = 'images/icons/error.svg'
 
-const svgStats = svgDelete.cloneNode()
-svgStats.setAttribute('viewBox', '0 2 24 24')
-const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-path1.setAttribute('d', 'M20.2 7.8l-7.7 7.7-4-4-5.7 5.7')
-path2.setAttribute('d', 'M15 7h6v6')
-svgStats.appendChild(path1)
-svgStats.appendChild(path2)
-
-const svgFail = svgDelete.cloneNode()
-svgFail.setAttribute('stroke', '#f44336')
-svgFail.setAttribute('stroke-width', 3)
-svgFail.setAttribute('stroke-linejoin', 'bevel')
-const line3 = line1.cloneNode(true)
-const line4 = line2.cloneNode(true)
-line3.setAttribute('y2', 18)
-line4.setAttribute('y2', 18)
-svgFail.appendChild(line3)
-svgFail.appendChild(line4)
-
-const svgSuccess = svgDelete.cloneNode()
-svgSuccess.setAttribute('stroke', '#4CAF50')
-svgSuccess.setAttribute('stroke-width', 3)
-svgSuccess.setAttribute('stroke-linejoin', 'bevel')
-const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
-polyline.setAttribute('points', '20 6 9 17 4 12')
-svgSuccess.appendChild(polyline)
+const svgSuccess = document.createElement('img')
+svgSuccess.src = 'images/icons/success.svg'
 
 //Конструктор настроек
 function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disabledNotifError, enabledSilentVote, disabledCheckTime, cooldown) {
@@ -313,42 +269,45 @@ async function addProjectList(project, visually) {
     }
 
     const div = document.createElement('div')
+    div.classList.add('controlItems')
 
-    const span1 = document.createElement('span')
-    span1.className = 'statsProject'
-    span1.appendChild(svgStats.cloneNode(true))
+    const img1 = document.createElement('img')
+    img1.src = 'images/icons/stats.svg'
+    div.appendChild(img1)
 
-    const span2 = document.createElement('span')
-    span2.className = 'deleteProject'
-    span2.appendChild(svgDelete.cloneNode(true))
+    const img2 = document.createElement('img')
+    img2.src = 'images/icons/delete.svg'
+    div.appendChild(img2)
 
-    div.appendChild(span1)
-    div.appendChild(span2)
+    const contDiv = document.createElement('div')
+    contDiv.classList.add('message')
 
-    li.appendChild(div)
-
-    li.append((project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : ''))
-
-    li.appendChild(document.createElement('br'))
+    const nameProjectMes = document.createElement('div')
+    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '')
+    contDiv.append(nameProjectMes)
 
     if (project.error) {
-        const span3 = document.createElement('span')
-        span3.style = 'color:#f44336;'
-        span3.append(project.error)
-        li.appendChild(span3)
-        li.appendChild(document.createElement('br'))
+        const div2 = document.createElement('div')
+        div2.style = 'color:#da5e5e;'
+        div2.append(project.error)
+        contDiv.appendChild(div2)
     }
 
-    li.append(chrome.i18n.getMessage('nextVote') + ' ' + text)
+    const nextVoteMes = document.createElement('div')
+    nextVoteMes.textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
+    contDiv.append(nextVoteMes)
+
+    li.append(contDiv)
+    li.append(div)
 
     listProject.append(li)
     //Слушатель кнопки Удалить на проект
-    span2.addEventListener('click', function() {
+    img2.addEventListener('click', function() {
         removeProjectList(project, false)
     })
     //Слушатель кнопки Статистики и вывод её в модалку
-    span1.addEventListener('click', function() {
-        document.getElementById('modalStats').click()
+    img1.addEventListener('click', function() {
+        toggleModal('stats')
         document.getElementById('statsSubtitle').textContent = getProjectName(project) + ' – ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + (project.name != null ? project.name : project.id))
         document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes ? project.stats.successVotes : 0
         document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes ? project.stats.monthSuccessVotes : 0
@@ -360,12 +319,12 @@ async function addProjectList(project, visually) {
         document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = project.stats.added ? new Date(project.stats.added).toLocaleString().replace(',', '') : 'None'
     })
     if (document.getElementById(getProjectName(project) + 'Button') == null) {
-        if (document.getElementById('addedProjectsTable1').childElementCount == 0) {
-            document.getElementById('addedProjectsTable1').innerText = ''
+        if (document.querySelector('.buttonBlock').childElementCount == 0) {
+            document.querySelector('.buttonBlock').innerText = ''
         }
 
         let button = document.createElement('button')
-        button.setAttribute('class', 'selectsite projectListButtons')
+        button.setAttribute('class', 'selectsite')
         button.setAttribute('id', getProjectName(project) + 'Button')
         button.textContent = getFullProjectName(project)
 
@@ -373,15 +332,7 @@ async function addProjectList(project, visually) {
         count.textContent = getProjectList(project).length
         button.append(count)
 
-        if (document.getElementById('addedProjectsTable1').childElementCount > document.getElementById('addedProjectsTable2').childElementCount) {
-            document.getElementById('addedProjectsTable2').insertBefore(button, document.getElementById('addedProjectsTable2').firstElementChild)
-        } else if (document.getElementById('addedProjectsTable2').childElementCount > document.getElementById('addedProjectsTable3').childElementCount) {
-            document.getElementById('addedProjectsTable3').insertBefore(button, document.getElementById('addedProjectsTable3').firstElementChild)
-        } else if (document.getElementById('addedProjectsTable3').childElementCount > document.getElementById('addedProjectsTable4').childElementCount) {
-            document.getElementById('addedProjectsTable4').insertBefore(button, document.getElementById('addedProjectsTable4').firstElementChild)
-        } else {
-            document.getElementById('addedProjectsTable1').insertBefore(button, document.getElementById('addedProjectsTable1').firstElementChild)
-        }
+        document.querySelector('.buttonBlock').append(button)
         document.getElementById(getProjectName(project) + 'Button').addEventListener('click', function() {
             listSelect(event, getProjectName(project) + 'Tab')
         })
@@ -396,7 +347,7 @@ async function addProjectList(project, visually) {
     if (project.Custom && !settings.enableCustom) addCustom()
     //projects.push(project)
     //await setValue('AVMRprojects', projects, true)
-    if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
+    if (document.querySelector('.buttonBlock').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
     document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
@@ -406,8 +357,9 @@ async function addProjectList(project, visually) {
 async function removeProjectList(project, visually) {
     let li = document.getElementById(getProjectName(project) + '_' + project.id + '_' + project.nick)
     if (li != null) {
-        li.querySelector('span.deleteProject').removeEventListener('click', null)
-        li.querySelector('span.statsProject').removeEventListener('click', null)
+        li.querySelectorAll('img').forEach((el)=> {
+            el.removeEventListener('click', null)
+        })
         li.remove()
     } else {
         return
@@ -455,7 +407,7 @@ function updateProjectList(projects) {
             await addProjectList(proj, true)
         }, true)
     }
-    if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
+    if (document.querySelector('.buttonBlock').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
 }
@@ -893,7 +845,7 @@ async function addProject(project, element) {
     await addProjectList(project, false)
 
     /*f (random) {
-        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
+        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
     } else*/
     let array = []
     array.push(createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success'))
@@ -918,6 +870,7 @@ async function addProject(project, element) {
     if (project.MinecraftServersOrg || project.ListForge || project.ServerList101) {
         const a = document.createElement('a')
         a.target = 'blank_'
+        a.classList.add('link')
         a.href = 'https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'
 //      a.href = 'https://addons.mozilla.org/ru/firefox/addon/privacy-pass/'
         a.textContent = 'Privacy Pass'
@@ -992,7 +945,7 @@ function createMessage(text, level) {
         if (level == 'success') {
             span.style = 'color:#4CAF50;'
         } else if (level == 'error') {
-            span.style = 'color:#f44336;'
+            span.style = 'color:#da5e5e;'
         } /* else if (level == 'warn') {
             span.style = 'color:#??????;'
         } */
@@ -1387,9 +1340,9 @@ async function fastAdd() {
     if (window.location.href.includes('addFastProject')) {
         toggleModal('addFastProject')
         let vars = getUrlVars()
-        if (vars['name'] != null)
-            document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
-        let listFastAdd = document.querySelector('#addFastProject > div.content')
+        if (vars['name'] != null) document.querySelector('[data-resource="fastAdd"]').textContent = getUrlVars()['name']
+            
+        let listFastAdd = document.querySelector('#addFastProject > div.content > .message')
         listFastAdd.textContent = ''
 
         if (vars['disableNotifInfo'] != null) {
@@ -1399,8 +1352,14 @@ async function fastAdd() {
             }
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             let html = document.createElement('div')
+            html.classList.add('fastAddEl')
             html.append(svgSuccess.cloneNode(true))
-            html.append(chrome.i18n.getMessage('disableNotifInfo'))
+            let div = document.createElement('div')
+            let p = document.createElement('p')
+            p.textContent = chrome.i18n.getMessage('disableNotifInfo')
+            div.append(p)
+
+            html.append(div)
             listFastAdd.append(html)
         }
         if (vars['disableNotifWarn'] != null) {
@@ -1410,8 +1369,14 @@ async function fastAdd() {
             }
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             let html = document.createElement('div')
+            html.classList.add('fastAddEl')
             html.append(svgSuccess.cloneNode(true))
-            html.append(chrome.i18n.getMessage('disableNotifWarn'))
+            let div = document.createElement('div')
+            let p = document.createElement('p')
+            p.textContent = chrome.i18n.getMessage('disableNotifWarn')
+            div.append(p)
+
+            html.append(div)
             listFastAdd.append(html)
         }
         if (vars['disableNotifStart'] != null) {
@@ -1421,35 +1386,45 @@ async function fastAdd() {
             }
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             let html = document.createElement('div')
+            html.classList.add('fastAddEl')
             html.append(svgSuccess.cloneNode(true))
-            html.append(chrome.i18n.getMessage('disableNotifStart'))
+            let div = document.createElement('div')
+            let p = document.createElement('p')
+            p.textContent = chrome.i18n.getMessage('disableNotifStart')
+            div.append(p)
+
+            html.append(div)
             listFastAdd.append(html)
         }
 
         for (const project of getUrlProjects()) {
             let html = document.createElement('div')
+            html.classList.add('fastAddEl')
             html.setAttribute('div', getProjectName(project) + '┅' + project.nick + '┅' + project.id)
             html.appendChild(svgFail.cloneNode(true))
-            html.append(getProjectName(project) + ' – ' + project.nick + ' – ' + project.id + ': ')
 
+            let div = document.createElement('div')
+            let p = document.createElement('p')
+            p.textContent = getProjectName(project) + ' – ' + project.nick + ' – ' + project.id + ': '
             const status = document.createElement('span')
-            html.append(status)
+            p.append(status)
 
+            div.append(p)
+            html.append(div)
             listFastAdd.append(html)
             await addProject(project, status)
         }
 
-        if (document.querySelector('#addFastProject > div.content svg[stroke="#f44336"]') != null) {
+        if (document.querySelector('#addFastProject > div.content svg[stroke="#da5e5e"]') != null) {
             let buttonRetry = document.createElement('button')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
             listFastAdd.append(buttonRetry)
-            buttonRetry.addEventListener('click', ()=>{
+            buttonRetry.addEventListener('click', ()=> {
                 document.location.reload(true)
             })
         } else if (document.querySelector('#addFastProject > div.content').childElementCount > 0) {
             let successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
-            successFastAdd.append(document.createElement('br'))
             successFastAdd.append(chrome.i18n.getMessage('successFastAdd'))
             successFastAdd.append(document.createElement('br'))
             successFastAdd.append(chrome.i18n.getMessage('closeTab'))
@@ -1459,10 +1434,10 @@ async function fastAdd() {
         }
 
         let buttonClose = document.createElement('button')
+        buttonClose.classList.add('btn')
         buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
-
-        listFastAdd.append(buttonClose)
-        buttonClose.addEventListener('click', ()=>{
+        document.querySelector('#addFastProject > div.content > .events').append(buttonClose)
+        buttonClose.addEventListener('click', ()=> {
             window.close()
         })
     }
