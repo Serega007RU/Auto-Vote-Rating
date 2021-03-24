@@ -484,17 +484,13 @@
 		<div id="added" class="tabcontent" style="display: none;">
 			<h4 data-resource="addedProjects"></h4>
 			<hr color="#5A5A5C">
-			<p class="ml-4" data-resource="notAddedAll"></p>
+			<p data-resource="notAddedAll"></p>
 			<div class="row">
-				<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable1">
-				</div>
-				<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable2">
-				</div>
-				<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable3">
-				</div>
-				<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable4">
-				</div>
-				<div class="col-xl-12 mb-3">
+				<div id="addedProjectsTable1"></div>
+				<div id="addedProjectsTable2"></div>
+				<div id="addedProjectsTable3"></div>
+				<div id="addedProjectsTable4"></div>
+				<div>
 				    <ul class="listcontent" id="TopCraftTab" style="display: none;">
 				        <span data-resource="notAdded"></span>
 				        <div id="TopCraftList"></div>
@@ -517,37 +513,65 @@
 				    </ul>
 				    <ul class="listcontent" id="IonMcTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				    	<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				    	<label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="IonMcList"></div>
 				    </ul>
 				    <ul class="listcontent" id="MinecraftServersOrgTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="MinecraftServersOrgList"></div>
 				    </ul>
 				    <ul class="listcontent" id="ServeurPriveTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="ServeurPriveList"></div>
 				    </ul>
 				    <ul class="listcontent" id="PlanetMinecraftTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="PlanetMinecraftList"></div>
 				    </ul>
 				    <ul class="listcontent" id="TopGTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="TopGList"></div>
 				    </ul>
 				    <ul class="listcontent" id="ListForgeTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="ListForgeList"></div>
 				    </ul>
 				    <ul class="listcontent" id="MinecraftServerListTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="MinecraftServerListList"></div>
 				    </ul>
 				    <ul class="listcontent" id="ServerPactTab" style="display: none;">
@@ -560,72 +584,128 @@
 				    </ul>
 				    <ul class="listcontent" id="TopMinecraftServersTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="TopMinecraftServersList"></div>
 				    </ul>
 				    <ul class="listcontent" id="MinecraftServersBizTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="MinecraftServersBizList"></div>
 				    </ul>
 				    <ul class="listcontent" id="HotMCTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="HotMCList"></div>
 				    </ul>
 				    <ul class="listcontent" id="MinecraftServerNetTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="MinecraftServerNetList"></div>
 				    </ul>
 				    <ul class="listcontent" id="TopGamesTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="TopGamesList"></div>
 				    </ul>
 				    <ul class="listcontent" id="TMonitoringTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="TMonitoringList"></div>
 				    </ul>
 				    <ul class="listcontent" id="TopGGTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="TopGGList"></div>
 				    </ul>
 				    <ul class="listcontent" id="DiscordBotListTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="DiscordBotListList"></div>
 				    </ul>
 				    <ul class="listcontent" id="BotsForDiscordTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="BotsForDiscordList"></div>
 				    </ul>
 				    <ul class="listcontent" id="MMoTopRUTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="MMoTopRUList"></div>
 				    </ul>
 				    <ul class="listcontent" id="MCServersTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="MCServersList"></div>
 				    </ul>
 				    <ul class="listcontent" id="MinecraftListTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="MinecraftListList"></div>
 				    </ul>
 				    <ul class="listcontent" id="MinecraftIndexTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="MinecraftIndexList"></div>
 				    </ul>
 				    <ul class="listcontent" id="ServerList101Tab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="ServerList101List"></div>
 				    </ul>
 				    <ul class="listcontent" id="MCServerListTab" style="display: none;">
@@ -634,7 +714,11 @@
 				    </ul>
 				    <ul class="listcontent" id="CraftListTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="CraftListList"></div>
 				    </ul>
 				    <ul class="listcontent" id="CzechCraftTab" style="display: none;">
@@ -644,17 +728,29 @@
 				    </ul>
 				    <ul class="listcontent" id="PixelmonServersTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="PixelmonServersList"></div>
 				    </ul>
 				    <ul class="listcontent" id="QTopTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="QTopList"></div>
 				    </ul>
 				    <ul class="listcontent" id="MinecraftBuzzTab" style="display: none;">
 				        <div data-resource="notAdded"></div>
-				        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
+				        <label data-resource="notAvaibledInSilent">
+				        	<span class="tooltip2">
+				        		<span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+				        	</span>
+				        </label>
 				        <div id="MinecraftBuzzList"></div>
 				    </ul>
 				    <ul class="listcontent" id="CustomTab" style="display: none;">

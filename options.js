@@ -856,20 +856,13 @@ async function addProject(project, element) {
                 const message = createMessage(chrome.i18n.getMessage('authVK', getProjectName(project)), 'error')
                 const button = document.createElement('button')
                 button.id = 'authvk'
-                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-                svg.setAttribute('width', 24)
-                svg.setAttribute('height', 24)
-                svg.setAttribute('viewBox', '0 0 24 24')
-                svg.setAttribute('fill', 'none')
-                svg.setAttribute('stroke', 'currentColor')
-                svg.setAttribute('stroke-width', 2)
-                svg.setAttribute('stroke-linecap', 'round')
-                svg.setAttribute('stroke-linejoin', 'bevel')
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-                path.setAttribute('d', 'M5 12h13M12 5l7 7-7 7')
-                svg.append(path)
-                button.append(svg)
-                button.append(chrome.i18n.getMessage('authButton'))
+                button.classList.add('btn')
+                let img = document.createElement('img')
+                img.src = 'images/icons/arrow.svg'
+                button.append(img)
+                let text = document.createElement('div')
+                text.textContent = chrome.i18n.getMessage('authButton')
+                button.append(text)
                 updateStatusAdd([message, document.createElement('br'), button], true, element)
                 document.getElementById('authvk').addEventListener('click', function() {
                     if (element != null) {
@@ -1392,6 +1385,7 @@ function getUrlVars() {
 //Если страница настроек была открыта сторонним проектом то расширение переходит к быстрому добавлению проектов
 async function fastAdd() {
     if (window.location.href.includes('addFastProject')) {
+        toggleModal('addFastProject')
         let vars = getUrlVars()
         if (vars['name'] != null)
             document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
@@ -1445,15 +1439,14 @@ async function fastAdd() {
             await addProject(project, status)
         }
 
-        if (document.querySelector('div[class="modalContent"] > div > svg[stroke="#f44336"]') != null) {
+        if (document.querySelector('div.modalContent > div > svg[stroke="#f44336"]') != null) {
             let buttonRetry = document.createElement('button')
-            buttonRetry.setAttribute('class', 'col-xl-6 retryFastAdd col-lg-6')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
             listFastAdd.before(buttonRetry)
             buttonRetry.addEventListener('click', ()=>{
                 document.location.reload(true)
             })
-        } else if (document.querySelector('div[class="modalContent"]').childElementCount > 1) {
+        } else if (document.querySelector('div.modalContent').childElementCount > 1) {
             let successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
             successFastAdd.append(document.createElement('br'))
@@ -1466,15 +1459,12 @@ async function fastAdd() {
         }
 
         let buttonClose = document.createElement('button')
-        buttonClose.setAttribute('class', 'col-xl-6 closeSettings col-lg-6')
         buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
 
         listFastAdd.before(buttonClose)
         buttonClose.addEventListener('click', ()=>{
             window.close()
         })
-    } else if (window.location.href.includes('stats')) {
-        document.getElementById('closeStats2').click()
     }
 }
 
@@ -1617,6 +1607,7 @@ document.querySelector('#stats .close').addEventListener('click', ()=> {
 //Слушатель общей статистики и вывод её в модалку
 document.getElementById('generalStats').addEventListener('click', function() {
     // document.getElementById('modalStats').click()
+    toggleModal('stats')
     document.getElementById('statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = generalStats.successVotes ? generalStats.successVotes : 0
     document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.monthSuccessVotes ? generalStats.monthSuccessVotes : 0

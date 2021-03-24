@@ -394,6 +394,20 @@ nav .logo img {
 	float: right;
 }
 
+#authvk {
+	font-size: 15px;
+	display: inline-flex;
+}
+
+#authvk > * {
+	margin: auto 0;
+}
+
+#authvk > img {
+	width: 15px;
+	height: 15px;
+}
+
 .link {
 	color: #275daf !important;
 }
@@ -666,7 +680,7 @@ input.checkbox:disabled + label {
 .btn {
     font-size: 18px;
     border-radius: 5px;
-    background: #ccc;
+    background: #5c84ad;
     color: #fff;
     padding: 10px 20px;
     outline: none!important;
