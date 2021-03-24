@@ -361,7 +361,7 @@ nav .logo img {
 #addProject {
 	margin-top: 20px;
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 4fr 5fr;
 	grid-gap: 20px;
 }
 
@@ -390,6 +390,10 @@ nav .logo img {
 }
 
 /* Разное */
+#generalStats {
+	float: right;
+}
+
 .link {
 	color: #275daf !important;
 }

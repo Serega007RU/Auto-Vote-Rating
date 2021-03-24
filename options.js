@@ -1598,10 +1598,7 @@ if (document.getElementById('CustomButton') != null) {
 }
 
 //Слушатель закрытия модалки статистики и её сброс
-document.getElementById('closeStats').addEventListener('click', resetStats)
-document.getElementById('closeStats2').addEventListener('click', resetStats)
-
-function resetStats() {
+document.querySelector('#stats .close').addEventListener('click', ()=> {
     if (document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent != '') {
         document.getElementById('statsSubtitle').firstChild.remove()
         document.getElementById('statsSubtitle').append('\u00A0')
@@ -1614,7 +1611,8 @@ function resetStats() {
         document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsAdded')
     }
-}
+})
+
 
 //Слушатель общей статистики и вывод её в модалку
 document.getElementById('generalStats').addEventListener('click', function() {
