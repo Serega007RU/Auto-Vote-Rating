@@ -1389,7 +1389,7 @@ async function fastAdd() {
         let vars = getUrlVars()
         if (vars['name'] != null)
             document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
-        let listFastAdd = document.getElementById('modaltext')
+        let listFastAdd = document.querySelector('#addFastProject > div.content')
         listFastAdd.textContent = ''
 
         if (vars['disableNotifInfo'] != null) {
@@ -1401,7 +1401,7 @@ async function fastAdd() {
             let html = document.createElement('div')
             html.append(svgSuccess.cloneNode(true))
             html.append(chrome.i18n.getMessage('disableNotifInfo'))
-            listFastAdd.before(html)
+            listFastAdd.append(html)
         }
         if (vars['disableNotifWarn'] != null) {
             if (settings.disabledNotifWarn != Boolean(vars['disableNotifWarn'])) {
@@ -1412,7 +1412,7 @@ async function fastAdd() {
             let html = document.createElement('div')
             html.append(svgSuccess.cloneNode(true))
             html.append(chrome.i18n.getMessage('disableNotifWarn'))
-            listFastAdd.before(html)
+            listFastAdd.append(html)
         }
         if (vars['disableNotifStart'] != null) {
             if (settings.disabledNotifStart != Boolean(vars['disableNotifStart'])) {
@@ -1423,7 +1423,7 @@ async function fastAdd() {
             let html = document.createElement('div')
             html.append(svgSuccess.cloneNode(true))
             html.append(chrome.i18n.getMessage('disableNotifStart'))
-            listFastAdd.before(html)
+            listFastAdd.append(html)
         }
 
         for (const project of getUrlProjects()) {
@@ -1435,25 +1435,25 @@ async function fastAdd() {
             const status = document.createElement('span')
             html.append(status)
 
-            listFastAdd.before(html)
+            listFastAdd.append(html)
             await addProject(project, status)
         }
 
-        if (document.querySelector('div.modalContent > div > svg[stroke="#f44336"]') != null) {
+        if (document.querySelector('#addFastProject > div.content svg[stroke="#f44336"]') != null) {
             let buttonRetry = document.createElement('button')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
-            listFastAdd.before(buttonRetry)
+            listFastAdd.append(buttonRetry)
             buttonRetry.addEventListener('click', ()=>{
                 document.location.reload(true)
             })
-        } else if (document.querySelector('div.modalContent').childElementCount > 1) {
+        } else if (document.querySelector('#addFastProject > div.content').childElementCount > 0) {
             let successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
             successFastAdd.append(document.createElement('br'))
             successFastAdd.append(chrome.i18n.getMessage('successFastAdd'))
             successFastAdd.append(document.createElement('br'))
             successFastAdd.append(chrome.i18n.getMessage('closeTab'))
-            listFastAdd.before(successFastAdd)
+            listFastAdd.append(successFastAdd)
         } else {
             return
         }
@@ -1461,7 +1461,7 @@ async function fastAdd() {
         let buttonClose = document.createElement('button')
         buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
 
-        listFastAdd.before(buttonClose)
+        listFastAdd.append(buttonClose)
         buttonClose.addEventListener('click', ()=>{
             window.close()
         })
