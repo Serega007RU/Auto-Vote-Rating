@@ -1600,6 +1600,7 @@ if (document.getElementById('CustomButton') != null) {
 //Слушатель закрытия модалки статистики и её сброс
 document.getElementById('closeStats').addEventListener('click', resetStats)
 document.getElementById('closeStats2').addEventListener('click', resetStats)
+
 function resetStats() {
     if (document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent != '') {
         document.getElementById('statsSubtitle').firstChild.remove()
@@ -1614,6 +1615,7 @@ function resetStats() {
         document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsAdded')
     }
 }
+
 //Слушатель общей статистики и вывод её в модалку
 document.getElementById('generalStats').addEventListener('click', function() {
     // document.getElementById('modalStats').click()
@@ -1968,7 +1970,7 @@ document.getElementById('selectTime').addEventListener('change', function() {
 //Локализация
 let elements = document.querySelectorAll('[data-resource]')
 elements.forEach(function(el) {
-    el.append(chrome.i18n.getMessage(el.getAttribute('data-resource')))
+    el.prepend(chrome.i18n.getMessage(el.getAttribute('data-resource')))
 })
 document.querySelectorAll('[placeholder]').forEach(function(el) {
     el.placeholder = chrome.i18n.getMessage(el.placeholder)

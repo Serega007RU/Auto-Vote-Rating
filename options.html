@@ -40,12 +40,12 @@
 			<h4 data-resource="addTitle"></h4>
 			<hr color="#5A5A5C">
 			<form id="addProject">
-				<div class="formDiv">
-					<div class="label-block">
+				<div>
+					<div class="input-block">
 						<label data-resource="yourNick" for="nick"></label>
 						<input class="input" name="nick" id="nick" required placeholder="enterNick" type="text">
 					</div>
-					<div class="label-block">
+					<div class="input-block">
 						<label data-resource="siteTop" for="project"></label>
 						<select required id="project" class="select">
 							<option data-resource="selectTop" value="" selected disabled></option>
@@ -87,49 +87,50 @@
 						</select>
 					</div>
                     <!--Custom-->
-					<div style="display: none;" id="label6" class="label-block">
+					<div style="display: none;" id="label6" class="input-block">
 					    <label for="selectTime" data-resource="selectTime"></label>
 					    <select required id="selectTime" class="select">
 					        <option value="ms" data-resource="timeoutMS"></option>
 					        <option value="hour" data-resource="timeoutHour"></option>
 					    </select>
 					</div>
-					<div style="display: none;" id="label3" class="label-block">
+					<div style="display: none;" id="label3" class="input-block">
 					    <label for="time" data-resource="delayFetch"></label>
 					    <input id="time" name="customTime" placeholder="delayFetch" type="number" min="10000" class="input"></input>
 					</div>
-					<div style="display: none;" id="label7" class="label-block">
+					<div style="display: none;" id="label7" class="input-block">
 					    <label for="hour" data-resource="chooseHour"></label>
 					    <input id="hour" name="chooseHour" placeholder="chooseHour" type="time" step="1" min="0" max="23" class="input"></input>
 					</div>
                    
-					<div style="display: none;" id="label9" class="label-block">
+					<div style="display: none;" id="label9" class="input-block">
 					    <label for="sheldTime" data-resource="sheldTime"></label>
 					    <input id="sheldTime" type="datetime-local" class="input">
 					</div>
-					<div style="display: none;" id="label2" class="label-block">
+					<div style="display: none;" id="label2" class="input-block">
 					    <label for="responseURL" data-resource="urlFetch"></label>
 					    <input id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="input"></input>
 					</div>
-					<div style="display: none;" id="label1" class="label-block">
+					<div style="display: none;" id="label1" class="input-block">
 					    <label for="customBody" data-resource="bodyFetch"></label>
 					    <textarea id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="textarea"></textarea>
 					</div>
 
 					<!--TopGG-->
-					<div style="display: none;" id="chooseTopGG1" class="label-block">
-						<label data-resource="chooseTopGG" for="chooseTopGG"></label>
-						<span class="tooltip1">
-							<span class="tooltip1text">
-							    <span>https://top.gg/</span><span style="color:#d32f2f;">bot</span><span>/270904126974590976/vote</span>
+					<div style="display: none;" id="chooseTopGG1" class="input-block">
+						<label data-resource="chooseTopGG" for="chooseTopGG">
+							<span class="tooltip1">
+								<span class="tooltip1text">
+									<span>https://top.gg/</span><span style="color:#d32f2f;">bot</span><span>/270904126974590976/vote</span>
+								</span>
 							</span>
-						</span>
+						</label>
 						<select id="chooseTopGG" class="select">
 						    <option value="bot" data-resource="bots"></option>
 						    <option value="servers" data-resource="servers"></option>
 						</select>
 					</div>
-					<div style="display: none;" id="additionTopGG1" class="label-block">
+					<div style="display: none;" id="additionTopGG1" class="input-block">
 						<label data-resource="additionTopGG" for="additionTopGG"></label>
 						<span class="tooltip1">
 							<span class="tooltip1text">
@@ -140,16 +141,17 @@
 					</div>
 					
 					<!--ListForge-->
-					<div style="display: none;" id="urlGame" class="label-block">
-						<label data-resource="urlGame"></label>
-						<span class="tooltip1">
-							<span class="tooltip1text" id="spanGame">
-							    <span style="color:red;">URL</span>
-							    <span data-resource="gameIDTooltip"></span>
-							    <br>
-							    <span>https://</span><span style="color:#d32f2f;">minecraft-mp.com</span><span>/server/207380/vote/</span>
+					<div style="display: none;" id="urlGame" class="input-block">
+						<label data-resource="urlGame">
+							<span class="tooltip1">
+								<span class="tooltip1text" id="spanGame">
+								    <span style="color:red;">URL</span>
+								    <span data-resource="gameIDTooltip"></span>
+								    <br>
+								    <span>https://</span><span style="color:#d32f2f;">minecraft-mp.com</span><span>/server/207380/vote/</span>
+								</span>
 							</span>
-						</span>
+						</label>
 						<input class="input" name="chooseGame" type="text" id="chooseGameListForge" placeholder="chooseGameURL" list="gameListListForge" class="input">
 						<datalist id="gameListListForge">
 							<option value="7daystodie-servers.com">7 Days To Die</option>
@@ -183,16 +185,17 @@
 					</div>
 
 					<!--ServeurPrive, TopGames and MMoTopRU-->
-					<div style="display: none;" id="idGame" class="label-block">
-						<label data-resource="idGame"></label>
-						<span class="tooltip1">
-							<span class="tooltip1text" id="spanGame">
-							    <span style="color:red;">ID</span>
-							    <span data-resource="gameIDTooltip"></span>
-							    <br>
-							    <span id="gameIDTooltip1"></span><span id="gameIDTooltip2" style="color:#d32f2f;"></span><span id="gameIDTooltip3"></span>
+					<div style="display: none;" id="idGame" class="input-block">
+						<label data-resource="idGame">
+							<span class="tooltip1">
+								<span class="tooltip1text" id="spanGame">
+								    <span style="color:red;">ID</span>
+								    <span data-resource="gameIDTooltip"></span>
+								    <br>
+								    <span id="gameIDTooltip1"></span><span id="gameIDTooltip2" style="color:#d32f2f;"></span><span id="gameIDTooltip3"></span>
+								</span>
 							</span>
-						</span>
+						</label>
 						<input style="display: none;" class="input" name="chooseGame" type="text" id="chooseGameTopGames" placeholder="chooseGame" list="gameListTopGames" value="minecraft">
 						<datalist id="gameListTopGames">
 							<option value="minecraft">Minecraft</option>
@@ -233,7 +236,7 @@
 							<option value="jd">Jade Dynasty</option>
 						</datalist>
 					</div>
-					<div style="display: none;" class="label-block" id="label4">
+					<div style="display: none;" class="input-block" id="label4">
 						<label for="selectLang" data-resource="chooseLang"></label>
 						<select style="display: none;" id="selectLangTopGames" class="select">
 							<option value="de">Deutsch</option>
@@ -252,31 +255,33 @@
 							<option value="ru" selected>Русский</option>
 						</select>
 					</div>
-					<div style="display: none;" class="label-block" id="label5">
+					<div style="display: none;" class="input-block" id="label5">
 						<label for="countVote" data-resource="countVote"></label>
 						<input id="countVote" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="input" value="5">
 					</div>
-					<div style="display: none;" class="label-block" id="label10">
-						<label for="ordinalWorld" data-resource="ordinalWorld"></label>
-						<span class="tooltip1">
-							<span class="tooltip1text" id="spanOrdinalWorld">
-							    <span data-resource="ordinalWorldTooltip"></span>
+					<div style="display: none;" class="input-block" id="label10">
+						<label for="ordinalWorld" data-resource="ordinalWorld">
+							<span class="tooltip1">
+								<span class="tooltip1text" id="spanOrdinalWorld">
+								    <span data-resource="ordinalWorldTooltip"></span>
+								</span>
 							</span>
-						</span>
+						</label>
 						<input id="ordinalWorld" name="ordinalWorld" type="number" min="1" max="16" placeholder="ordinalWorld" class="input">
 					</div>
 					
 					<div id="idSelector" style="display: none;">
-					    <div class="label-block">
-							<label for="id" data-resource="projectID"></label>
-							<span class="tooltip1">
-								<span class="tooltip1text">
-									<span style="color:#d32f2f;">ID</span>
-									<span data-resource="projectIDTooltip"></span>
-									<br>
-									<span id="projectIDTooltip1"></span><span id="projectIDTooltip2" style="color:#d32f2f;"></span><span id="projectIDTooltip3"></span>
+					    <div class="input-block">
+							<label for="id" data-resource="projectID">
+								<span class="tooltip1">
+									<span class="tooltip1text">
+										<span style="color:#d32f2f;">ID</span>
+										<span data-resource="projectIDTooltip"></span>
+										<br>
+										<span id="projectIDTooltip1"></span><span id="projectIDTooltip2" style="color:#d32f2f;"></span><span id="projectIDTooltip3"></span>
+									</span>
 								</span>
-							</span>
+							</label>
 							<input class="input" name="id" id="id">
 					    </div>
 					    <datalist id="TopCraftIDList">
@@ -340,33 +345,41 @@
 					</div>
 					<button class="submitBtn" data-resource="addButton" id="submitAddProject" type="submit"></button>
 				</div>
-				<div class="checkDiv"> 
+				<div> 
 					<div class="label-block">
 						<label data-resource="advSettings"></label>
 					</div>
-					<div class="input-block">
+					<div class="check-block">
 						<input class="checkbox" id="customTimeOut" type="checkbox" name="checkbox" />
 						<label data-resource="customTimeOut" for="customTimeOut"></label> 
 					</div>
-					<div class="input-block">
+					<div class="check-block">
 						<input class="checkbox" id="lastDayMonth" type="checkbox" name="checkbox" disabled />
 						<label data-resource="lastDayMonth" for="lastDayMonth"></label> 
 					</div>
-					<div class="input-block">
+					<div class="check-block">
 						<input class="checkbox" id="sheldTimeCheckbox" type="checkbox" name="checkbox" />
 						<label data-resource="sheldTime" for="sheldTimeCheckbox"></label> 
 					</div>
-					<div class="input-block">
+					<div class="check-block">
 						<input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox" />
 						<label data-resource="disableCheckProjects" for="disableCheckProjects"></label> 
 					</div>
-					<div class="input-block">
+					<div class="check-block">
 						<input class="checkbox" id="priority" type="checkbox" name="checkbox" />
-						<label data-resource="priority" for="priority"></label> <span class="tooltip1 ml-1"><span data-resource="priorityTooltip" class="tooltip1text"></span></span>
+						<label data-resource="priority" for="priority">
+							<span class="tooltip1">
+								<span data-resource="priorityTooltip" class="tooltip1text"></span>
+							</span>
+						</label>
 					</div>
-					<div class="input-block">
+					<div class="check-block">
 						<input class="checkbox" id="randomize" type="checkbox" name="checkbox" />
-						<label data-resource="randomize" for="randomize"></label> <span class="tooltip1 ml-1"><span data-resource="randomizeTooltip" class="tooltip1text"></span></span>
+						<label data-resource="randomize" for="randomize">
+							<span class="tooltip1">
+								<span data-resource="randomizeTooltip" class="tooltip1text"></span>
+							</span>
+						</label>
 					</div>
 				</div>
 			</form>
@@ -377,63 +390,92 @@
 		<div id="settings" class="tabcontent" style="display: none;">
 			<h4 data-resource="optionsExtension"></h4>
 			<hr color="#5A5A5C">
-			<div class="row">
-				<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
-					<div class="form-group mb-1">
+			<div id="userSettings">
+				<div>
+					<div class="label-block">
 						<label data-resource="settings"></label>
 					</div>
-					<input class="checkbox" id="disabledNotifStart" type="checkbox" name="checkbox" />
-					<label data-resource="disabledNotifStart" for="disabledNotifStart"></label>
-					<br>
-					<input class="checkbox" id="disabledNotifInfo" type="checkbox" name="checkbox" />
-					<label data-resource="disabledNotifInfo" for="disabledNotifInfo"></label>
-					<br>
-					<input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox" />
-					<label data-resource="disabledNotifWarn" for="disabledNotifWarn"></label> <span class="tooltip1 ml-1"><span data-resource="disabledNotifWarnTooltip" class="tooltip1text"></span></span>
-					<br>
-					<input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox" />
-					<label data-resource="disabledNotifError" for="disabledNotifError"></label>
-					<br>
-					<input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox" />
-					<label data-resource="enableSyncStorage" for="enableSyncStorage"></label> <span class="tooltip1 ml-1"><span data-resource="enableSyncStorageTooltip" class="tooltip1text"></span></span>
-					<br>
-					<input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox" />
-					<label data-resource="disabledCheckTime" for="disabledCheckTime"></label>
-					<br>
-					<input class="checkbox" id="disabledCheckInternet" type="checkbox" name="checkbox" />
-					<label data-resource="disabledCheckInternet" for="disabledCheckInternet"></label>
+					<div class="check-block">
+						<input class="checkbox" id="disabledNotifStart" type="checkbox" name="checkbox" />
+						<label data-resource="disabledNotifStart" for="disabledNotifStart"></label>
+					</div>
+					<div class="check-block">
+						<input class="checkbox" id="disabledNotifInfo" type="checkbox" name="checkbox" />
+						<label data-resource="disabledNotifInfo" for="disabledNotifInfo"></label>
+					</div>
+					<div class="check-block">
+						<input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox" />
+						<label data-resource="disabledNotifWarn" for="disabledNotifWarn">
+							<span class="tooltip1">
+								<span data-resource="disabledNotifWarnTooltip" class="tooltip1text"></span>
+							</span>
+						</label>
+					</div>
+					<div class="check-block">
+						<input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox" />
+						<label data-resource="disabledNotifError" for="disabledNotifError"></label>
+					</div>
+					<div class="check-block">
+						<input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox" />
+						<label data-resource="enableSyncStorage" for="enableSyncStorage">
+							<span class="tooltip1">
+								<span data-resource="enableSyncStorageTooltip" class="tooltip1text"></span>
+							</span>
+						</label>
+					</div>
+					<div class="check-block">
+						<input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox" />
+						<label data-resource="disabledCheckTime" for="disabledCheckTime"></label>
+					</div>
+					<div class="check-block">
+						<input class="checkbox" id="disabledCheckInternet" type="checkbox" name="checkbox" />
+						<label data-resource="disabledCheckInternet" for="disabledCheckInternet"></label>
+					</div>
 				</div>
-				<div class="col-xl-4 col-lg-6 col-md-12 mb-3">
-					<div class="form-group mb-1">
-						<label data-resource="enabledSilentVote" for="enabledSilentVote"></label> <span class="tooltip2"><span data-resource="enabledSilentVoteTooltip" class="tooltip2text"></span></span>
+				<div>
+					<div class="input-block">
+						<label data-resource="enabledSilentVote" for="enabledSilentVote">
+							<span class="tooltip2">
+								<span data-resource="enabledSilentVoteTooltip" class="tooltip2text"></span>
+							</span>
+						</label>
+						<select required id="enabledSilentVote" class="select">
+							<option data-resource="enabledSilentVoteSilent" value="enabled"></option>
+							<option data-resource="enabledSilentVoteNoSilent" value="disabled"></option>
+						</select>
 					</div>
-					<select required id="enabledSilentVote" class="mb-2">
-						<option data-resource="enabledSilentVoteSilent" value="enabled"></option>
-						<option data-resource="enabledSilentVoteNoSilent" value="disabled"></option>
-					</select>
-					<div class="form-group mb-1">
+					<div class="input-block">
 						<label data-resource="cooldown" for="cooldown"></label>
+						<form id="timeout">
+							<input class="input" name="cooldown" id="cooldown" required type="number" min="1000" max="43200000">
+							<button data-resource="setCooldown" type="submit" class="justBtn"></button>
+						</form>
 					</div>
-					<form id="timeout">
-						<input name="cooldown" id="cooldown" required type="number" min="1000" max="43200000" class="mb-2">
-						<div id="submit2" class="mt-3 mb-2">
-							<button data-resource="setCooldown" type="submit" class="w-50" style="display: inline;"></button>
-						</div>
-					</form>
-					<div class="form-group mb-1">
+					<div class="label-block">
 						<label data-resource="settingsFile"></label>
 					</div>
-					<label data-resource="importSettings" for="file-upload" class="custom-file-upload mb-2">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-							<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /> </svg></label>
-					<input id="file-upload" type="file" accept="application/json" />
-					<label data-resource="exportSettings" id="file-download" class="custom-file-upload">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-							<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" /> </svg></label>
-					<label data-resource="exportLogs" id="logs-download" class="custom-file-upload">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-							<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" /> </svg></label>
-					<div id="file">&nbsp;</div>
+					<div id="fileSystem">
+						<div>
+							<label for="file-upload" class="file">
+								<span data-resource="importSettings"></span>
+								<img src="images/icons/importBtn.svg" alt="importBtn">
+							</label>
+							<input id="file-upload" type="file" accept="application/json" />
+						</div>
+						<div>
+							<label id="file-download" class="file">
+								<span data-resource="exportSettings"></span>
+								<img src="images/icons/exportBtn.svg" alt="exportBtn">
+							</label>
+						</div>
+						<div>
+							<label id="logs-download" class="file">
+								<span data-resource="exportLogs"></span>
+								<img src="images/icons/exportBtn.svg" alt="exportBtn">
+							</label>
+						</div>
+					</div>
+					<div id="file"></div>
 				</div>
 			</div>
 		</div>
@@ -628,39 +670,43 @@
 		<div id="help" class="tabcontent" style="display: none;">
 			<h4 data-resource="help"></h4>
 			<hr color="#5A5A5C">
-			<div class="row">
-				<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
-				<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
-					<p class="mt-3"><span data-resource="developers"></span><br><span data-resource="developer"></span> <a target="blank_" href="https://discord.com/users/441823506200788992"><span>Serega007</span></a><br><span data-resource="designer"></span> <a target="blank_" href="https://discord.com/users/279936883277168640"><span>Qworte</span></a></p>
-					<p data-resource="itsFree" class="mt-3 fw600"></p>
-					<p class="mt-3"><span data-resource="feedback"></span> <a target="blank_" href="https://discord.gg/GyvMtbU"><span data-resource="dmDiscord"></span></a><span data-resource="feedback2"> </span> <a target="blank_" href="https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd/support"><span data-resource="dmChromeWebStore"></span></a></span>.</p>
+			<div id="aboutProject">
+				<div data-resource="developers"></div>
+				<div data-resource="developer"> <a class="link"  target="blank_" href="https://discord.com/users/441823506200788992"><span>Serega007</span></a></div>
+				<div data-resource="designer"> <a class="link"  target="blank_" href="https://discord.com/users/279936883277168640"><span>Qworte</span></a></div>
+				<div class="free" data-resource="itsFree"></div>
+				<div class="text">
+					<span data-resource="feedback"><a class="link" target="blank_" href="https://discord.gg/GyvMtbU"><span data-resource="dmDiscord"></span></a>
+					</span>
+					<span data-resource="feedback2"><a class="link"  target="blank_" href="https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd/support"><span data-resource="dmChromeWebStore"></span></a></span>.
 				</div>
-				<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
 			</div>	
 		</div>
-		<a id="donate" data-resource="supportDev" target="blank_" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
+
+		<!-- Ассеты -->
+		<a class="link"  id="donate" data-resource="supportDev" target="blank_" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
 		<audio id="sound-link2" preload="auto">
 		    <source src="audio/coins1.mp3" type="audio/mpeg">
 		</audio>
 		<audio id="sound-link" preload="auto">
 		    <source src="audio/coins2.mp3" type="audio/mpeg">
 		</audio>
-		<div id="save">&nbsp;</div>
+		<div id="save"></div>
 	</div>
 
 	<!-- Модалки -->
-
 	<div id="modals">
 		<div class="overlay"></div>
-		
-		<div class="modal" id="testModal">
+
+		<!-- Быстрое добавление -->
+		<div class="modal" id="addFastProject">
 			<div class="head">
-				<h3>Changing the image</h3>
+				<h3 data-resource="fastAdd"></h3>
 				<div class="close"></div>
 			</div>
 			<div class="content">
 				<div class="message">
-					
+					<div data-resource="load" id=modaltext></div>
 				</div>
 				<div class="events">
 					<button class="btn">Да</button>
@@ -668,64 +714,56 @@
 				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="anelumen lowingnuska" id="addFastProject">
-		<a href="options.html" class="nedismiseg"></a>
-		<figure>
-			<h2 data-resource="fastAdd"><a href="options.html" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
-			<div class="modalContent">
-				<div data-resource="load" id=modaltext></div>
+		<!-- Статистика -->
+		<div class="modal" id="stats">
+			<div class="head">
+				<h3 data-resource="stats2"></h3>
+				<div id="statsSubtitle">&nbsp;</div>
+				<div class="close"></div>
 			</div>
-		</figure>
-	</div>
-	<div class="anelumen lowingnuska" id="stats">
-	    <a href="#/" class="nedismiseg" id="closeStats"></a>
-		<a id="modalStats" href="#stats"></a>
-		<figure>
-			<h2>
-			    <span data-resource="stats2"></span>
-			    <div id="statsSubtitle">&nbsp;</div>
-			    <a href="#/" class="compatibg-ukastywise" id="closeStats2" aria-label="Close Modal Box">×</a>
-			</h2>
+			<div class="content">
+				<div class="message">
+					<table>
+					    <tbody>
+					    	<tr>
+					    	    <td data-resource="statsSuccessVotes"></td>
+					    	    <th></th>
+					    	</tr>
+					    	<tr>
+					    	    <td data-resource="statsMonthSuccessVotes"></td>
+					    	    <th></th>
+					    	</tr>
+					    	<tr>
+					    	    <td data-resource="statsLastMonthSuccessVotes"></td>
+					    	    <th></th>
+					    	</tr>
+					    	<tr>
+					    	    <td data-resource="statsLaterVotes"></td>
+					    	    <th></th>
+					    	</tr>
+					    	<tr>
+					    	    <td data-resource="statsErrorVotes"></td>
+					    	    <th></th>
+					    	</tr>
+					    	<tr>
+					    	    <td data-resource="statsLastSuccessVote"></td>
+					    	    <th></th>
+					    	</tr>
+					    	<tr>
+					    	    <td data-resource="statsLastAttemptVote"></td>
+					    	    <th></th>
+					    	</tr>
+					    	<tr>
+					    	    <td data-resource="statsAdded"></td>
+					    	    <th></th>
+					    	</tr>
+					    </tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 
-            <div class="modalContent stats">
-                <table>
-                    <tr>
-                        <td data-resource="statsSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsMonthSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastMonthSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLaterVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsErrorVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastSuccessVote"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastAttemptVote"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsAdded"></td>
-                        <th></th>
-                    </tr>
-                </table>
-            </div>
-		</figure>
 	</div>
 
 	<script src="options.js"></script>

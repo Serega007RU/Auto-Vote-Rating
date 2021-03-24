@@ -5,6 +5,7 @@
 
 body {
 	background: #121214;
+	overflow-x: hidden;
 }
  
 body * {
@@ -13,7 +14,8 @@ body * {
 
 /* Навигация */
 nav {
-	transition: .5s;
+	z-index: 1;
+	transition: .5s left;
 	top: 0; left: 0;
 	width: 100px;
 	height: 100%;
@@ -27,7 +29,7 @@ nav ul > button {
 	opacity: .5;
 	color: #fff;
 	background: transparent;
-	transition: .2s;
+	transition: .2s opacity;
 	margin-bottom: 10px;
 	outline: none !important;
 	border: none !important;
@@ -60,7 +62,7 @@ nav .logo div {
 }
 
 nav .logo img {
-	margin: auto;
+	margin: 0 auto;
 	margin-bottom: 10px;
     width: 90%;
     display: block;
@@ -138,11 +140,27 @@ nav .logo img {
 @media(max-width: 950px) {
     nav {
     	width: 250px;
-    	left: -250px;
+    	left: -250px;    	
     }
 
     nav.active {
     	left: 0px;
+    }
+
+    nav .logo {
+    	justify-content: center;
+    	display: flex;
+    }
+
+    nav .logo div {
+    	font-size: 30px;
+    	margin: auto 0;
+    }
+
+    nav .logo img {
+    	width: 50px;
+    	margin: auto 0;
+    	margin-right: 10px;
     }
 
     .burger,
@@ -161,10 +179,6 @@ nav .logo img {
 
     nav ul > button > img {
     	margin: auto 10px;
-    }
-
-    nav .logo img {
-    	width: 50px;
     }
 }
 
@@ -192,13 +206,10 @@ nav .logo img {
     transition: .3s;
     margin: auto;
     position: fixed;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
+    top: 0; bottom: 0; right: 0; left: 0;
     width: 400px;
-    height: 250px;
-    background: #fff;
+    height: 300px;
+    background: #2a2a2f;
     border-radius: 10px;
     transform: scale(0);
     z-index: 30;
@@ -233,7 +244,8 @@ nav .logo img {
     cursor: pointer
 }
 
-#modals .modal .close:after,#modals .modal .close:before {
+#modals .modal .close:after,
+#modals .modal .close:before {
     content: ".";
     top: 10px;
     color: transparent;
@@ -241,7 +253,7 @@ nav .logo img {
     width: 25px;
     border-radius: 100px;
     height: 4px;
-    background: #5a5a5a
+    background: #ccc
 }
 
 #modals .modal .close:after {
@@ -254,10 +266,27 @@ nav .logo img {
 
 #modals .modal .content .message {
     font-size: 15px;
-    color: #5a5a5a;
+    color: #fff;
     text-align: center;
     padding: 5px;
     margin: auto
+}
+
+#modals .modal .content .message table {
+	width: 100%;
+	margin: 10px auto;
+}
+
+#modals .modal .content .message table tbody tr {
+	justify-content: space-between;
+	padding: 5px;
+	display: flex;
+	border-radius: 4px;
+	margin-bottom: 5px;
+}
+
+#modals .modal .content .message table tbody tr:nth-child(odd) {
+	background-color: #1b1b1e; 
 }
 
 #modals .modal .content .image {
@@ -305,23 +334,42 @@ nav .logo img {
 	font-weight: 600;
 }
 
-#donate {
-	color: #275daf !important;
-	float: right;
+#aboutProject {
+	margin: auto;
+	margin-top: 20px;
+	width: 50%;
+	text-align: center;
+	font-size: 19px;
+}
+
+#aboutProject > div {
+	margin-bottom: 5px;
+}
+
+#aboutProject .free {
+	margin-bottom: 10px;
+	font-weight: 600;
+	font-size: 18;
+}
+
+#aboutProject .text {
+	margin-bottom: 10px;
+	opacity: .9;
+	font-size: 16px;
 }
 
 #addProject {
 	margin-top: 20px;
-	justify-content: space-around;
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: 20px;
 }
 
-#addProject .checkDiv {
-	width: 40%;
-}
-
-#addProject .formDiv {
-	width: 45%;
+#userSettings {
+	margin-top: 20px;
+	display: grid;
+	grid-template-columns: 3fr 2fr;
+	grid-gap: 20px;
 }
 
 @media(max-width: 1250px) {
@@ -335,23 +383,40 @@ nav .logo img {
     	width: calc(100% - 30px);
     }
 
+    #userSettings,
     #addProject {
-    	display: block;
-    }
-
-    #addProject .checkDiv,
-    #addProject .formDiv {
-    	margin: auto;
-    	width: 100%;
-    }
-
-    #addProject .formDiv {
-    	margin-bottom: 15px;
+    	grid-template-columns: none;
     }
 }
 
 /* Разное */
+.link {
+	color: #275daf !important;
+}
+
+.link:hover {
+	color: #3674d2 !important;
+}
+
+#donate {
+	float: right;
+}
+
+#fileSystem > div {
+	margin-bottom: 10px;
+}
+
+#timeout {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: 5px;
+}
+
+.file,
+.justBtn,
 .submitBtn {
+	opacity: .9;
+	transition: .2s opacity;
 	display: block;
 	margin: auto;
 	border-radius: 5px;
@@ -361,106 +426,111 @@ nav .logo img {
 	color: #fff;
 	font-size: 19px;
 	padding: 9px 20px;
-}
-
-.tooltip1 {
-	position: relative;
-	display: inline-block;
-	border-radius: 25px;
-	background: #5c84ad;
-	width: 19px;
-	height: 19px;
-	cursor: help;
-	line-height: 1.1;
 	text-align: center;
-	font-size: initial !important;
 }
 
-.tooltip1:before {
-	content: "?";
-	font-weight: 600;
-}
-
-.tooltip1 .tooltip1text {
-	visibility: hidden;
-	overflow-wrap: anywhere;
-	width: 350px;
-	background-color: #000;
-	color: #fff;
-	text-align: center;
-	border-radius: 6px;
-	padding: 5px;
-	position: absolute;
-	z-index: 1;
-	bottom: 145%;
-	margin-left: -179px;
-	opacity: 0;
-	transition: opacity 0.3s;
-	font-size: initial !important;
-}
-
-.tooltip1 .tooltip1text::after {
-	content: "";
-	position: absolute;
-	top: 100%;
-	left: 50%;
-	margin-left: -5px;
-	border-width: 5px;
-	border-style: solid;
-	border-color: #000 transparent transparent transparent;
-}
-
-.tooltip1:hover .tooltip1text {
-	visibility: visible;
+.file:hover,
+.justBtn:hover,
+.submitBtn:hover {
+	cursor: pointer;
 	opacity: 1;
 }
 
-.tooltip2 {
-	border-radius: 25px;
-	background: #5c84ad;
-	width: 19px;
-	height: 19px;
-	cursor: help;
-	line-height: 1.1;
-	text-align: center;
-	font-size: initial !important;
-	position: relative;
-	display: inline-block;
-	border-bottom: 1px dotted #000;
+.justBtn {
+	width: 100%;
 }
 
+.file {
+	justify-content: center;
+	display: flex;
+	font-size: 14px;
+	background: #2a2a2f;
+}
+
+.file > * {
+	display: block;
+	margin: auto 0;
+}
+
+.file > img {
+	margin-left: 10px;
+}
+
+.file + input {
+	display: none;
+}
+
+.tooltip1:before,
 .tooltip2:before {
 	content: "?";
 	font-weight: 600;
 }
 
-.tooltip2 .tooltip2text {
-	visibility: hidden;
-	background: #000;
-	color: #fff;
+.tooltip1,
+.tooltip2 {
+	margin-left: 5px;
+	position: relative;
+	display: inline-block;
+	border-radius: 25px;
+	background: #5c84ad;
+	width: 19px;
+	height: 19px;
+	cursor: help;
+	line-height: 1.1;
 	text-align: center;
-	border-radius: 6px;
-	padding: 5px 0;
-	position: absolute;
-	z-index: 1;
+	font-size: initial !important;
+}
+
+.tooltip1 .tooltip1text,
+.tooltip2 .tooltip2text  {
+ 	visibility: hidden;
+ 	overflow-wrap: anywhere;
+ 	width: 350px;
+ 	background-color: #000;
+ 	color: #fff;
+ 	text-align: center;
+ 	border-radius: 6px;
+ 	padding: 5px;
+ 	position: absolute;
+ 	z-index: 1;
+ 	margin-left: -183px;
+ 	opacity: 0;
+ 	transition: opacity 0.3s;
+ 	font-size: initial !important;
+ }
+
+.tooltip1 .tooltip1text {
+	bottom: 145%;
+}
+
+.tooltip2 .tooltip2text {
 	top: 155%;
-	width: 350px;
-	margin-left: -179px;
+}
+
+.tooltip1 .tooltip1text::after,
+.tooltip2 .tooltip2text::after {
+ 	content: "";
+ 	position: absolute;
+ 	left: 50%;
+ 	margin-left: -5px;
+ 	border-width: 5px;
+ 	border-style: solid;
+ }
+ 
+.tooltip1 .tooltip1text::after {
+	top: 100%;
+	border-color: #000 transparent transparent transparent;
 }
 
 .tooltip2 .tooltip2text::after {
-	content: "";
-	position: absolute;
 	bottom: 100%;
-	left: 50%;
-	margin-left: -5px;
-	border-width: 5px;
-	border-style: solid;
-	border-color: transparent transparent black transparent;
+	border-color: transparent transparent #000 transparent;
 }
 
+.tooltip1:hover .tooltip1text,
 .tooltip2:hover .tooltip2text {
 	visibility: visible;
+	opacity: 1;
 }
 
 .checkbox {
@@ -468,6 +538,7 @@ nav .logo img {
 }
 
 .checkbox + label {
+	line-break: anywhere;
 	line-height: 1.2;
     display: inline-block;
 	position: relative;
@@ -516,6 +587,12 @@ input.checkbox:disabled + label {
 	transform: rotate(45deg);
 }
 
+#file {
+	font-size: 15px;
+	margin: auto;
+	height: 20px;
+}
+
 #add {
 	text-align: center;
 	font-size: 15px;
@@ -524,14 +601,18 @@ input.checkbox:disabled + label {
 	margin-top: 10px;
 }
 
-.label-block {
-	margin-bottom: 15px;
+#save {
+	font-size: 15px;
+	margin: auto;
+	height: 20px;
 }
 
-.input-block {
+.input-block,
+.check-block {
 	margin-bottom: 20px;
 }
 
+.input-block label,
 .label-block label {
 	color: #fff;
 	opacity: .6;
@@ -570,6 +651,7 @@ input.checkbox:disabled + label {
 .select {
 	height: 45px;
 	width: 100%;
+	cursor: pointer;
 }
 
 .textarea {
