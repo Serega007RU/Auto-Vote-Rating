@@ -14,7 +14,7 @@ body * {
 
 /* Навигация */
 nav {
-	z-index: 1;
+	z-index: 10;
 	transition: .5s left;
 	top: 0; left: 0;
 	width: 100px;
@@ -187,7 +187,6 @@ nav .logo img {
 /* Модалки */
 #modals .overlay {
     z-index: 30;
-    transition: .5s;
     opacity: 0;
     position: fixed;
     top: 0;
@@ -200,17 +199,17 @@ nav .logo img {
 
 #modals .overlay.active {
     opacity: .2;
+    transition: .3s;
     pointer-events: auto
 }
 
 #modals .modal {
     padding: 15px;
-    transition: .3s;
     margin: auto;
     position: fixed;
     top: 0; bottom: 0; right: 0; left: 0;
     width: 400px;
-    height: 300px;
+    height: 350px;
     background: #2a2a2f;
     border-radius: 10px;
     transform: scale(0);
@@ -218,6 +217,7 @@ nav .logo img {
 }
 
 #modals .modal.active {
+	transition: .3s;
     transform: scale(1)
 }
 
@@ -263,11 +263,18 @@ nav .logo img {
 }
 
 #modals .modal .content .message {
+	overflow-y: auto;
+	height: 260px;
     font-size: 15px;
     color: #fff;
     text-align: center;
     padding: 5px;
-    margin: auto
+    margin: 20px auto;
+}
+
+#modals .modal#addFastProject .content .message {
+	height: 240px;
+	margin: 10px auto;
 }
 
 #modals .modal .content .message table {
@@ -307,9 +314,7 @@ nav .logo img {
 }
 
 #modals .modal .content .events {
-    position: absolute;
     bottom: 25px;
-    width: calc(100% - 30px);
     display: flex;
     justify-content: space-around
 }
@@ -412,7 +417,7 @@ nav .logo img {
     top: -10px;
     font-weight: 600;
     pointer-events: none;
-    z-index: 2;
+    z-index: 1;
     font-size: 14px;
     line-height: 30px;
     border-radius: 100%;
@@ -494,26 +499,37 @@ nav .logo img {
     }
 }
 
+@media(max-width: 450px) {
+    #projectsBlock .buttonBlock {
+    	grid-template-columns: 1fr;
+    }
+}
+
 /* Разное */
+#statsSubtitle {
+	font-size: 14px;
+}
+
 .successFastAdd {
 	margin-top: 20px;
 	color: #4caf50;
 }
 
 .fastAddEl {
-	margin-bottom: 5px;
-	position: relative;
+	padding: 5px 0;
+	border-bottom: dashed 1px #ccc;
 	display: flex;
 	text-align: left;
 	font-size: 14px;
 }
 
-.fastAddEl p {
-	position: absolute;
-	bottom: 0;
+.fastAddEl > * {
+	display: block;
+	margin: auto 0;
 }
 
 [data-resource="notAdded"] {
+	font-size: 14px;
 	display: block;
 	text-align: center;
 	margin: 10px 0;
@@ -696,6 +712,13 @@ nav .logo img {
 .tooltip2:hover .tooltip2text {
 	visibility: visible;
 	opacity: 1;
+}
+
+@media(max-width: 450px) {
+    .tooltip1,
+	.tooltip2 {
+		display: none;
+	}
 }
 
 .checkbox {

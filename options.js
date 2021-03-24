@@ -992,9 +992,7 @@ function updateStatus(message, type, disableTimer, level, element) {
         } else {
             if (message.style && message.style.color == 'rgb(76, 175, 80)') {
                 const img = element.parentElement.parentElement.parentElement.firstElementChild
-                console.log(img)
                 img.src = 'images/icons/success.svg'
-                console.log(img)
             }
         }
     } else {
@@ -1393,13 +1391,14 @@ async function fastAdd() {
         for (const project of getUrlProjects()) {
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
-            html.setAttribute('div', getProjectName(project) + '┅' + project.nick + '┅' + project.id)
+            html.setAttribute('div', getProjectName(project)+'–'+project.nick+'–'+project.id)
             html.appendChild(svgFail.cloneNode(true))
 
             let div = document.createElement('div')
             let p = document.createElement('p')
-            p.textContent = getProjectName(project) + ' – ' + project.nick + ' – ' + project.id + ': '
+            p.textContent = getProjectName(project)+' – '+project.nick+' – '+project.id
             const status = document.createElement('span')
+            p.append(document.createElement('br'))
             p.append(status)
 
             div.append(p)
@@ -1959,6 +1958,14 @@ document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
 
 let modalsBlock = document.querySelector('#modals')
 function toggleModal(modalID) {
+    if (modalsBlock.querySelector('.overlay').classList.contains('active')) {
+        modalsBlock.querySelector('.overlay').style.transition = '.3s'
+        modalsBlock.querySelector('#'+modalID).style.transition = '.3s'
+        setTimeout(()=> {
+            modalsBlock.querySelector('.overlay').removeAttribute('style')
+            modalsBlock.querySelector('#'+modalID).removeAttribute('style')
+        }, 300)
+    }
     modalsBlock.querySelector('.overlay').classList.toggle('active')
     modalsBlock.querySelector('#'+modalID).classList.toggle('active')
 }
