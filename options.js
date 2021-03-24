@@ -984,26 +984,19 @@ function updateStatus(message, type, disableTimer, level, element) {
         if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
             for (const m of message) {
                 if (m.style && m.style.color == 'rgb(76, 175, 80)') {
-                    const svg = element.parentElement.firstElementChild
-                    svg.setAttribute('stroke', '#4CAF50')
-                    svg.firstElementChild.remove()
-                    svg.firstElementChild.remove()
-                    const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
-                    polyline.setAttribute('points', '20 6 9 17 4 12')
-                    svg.append(polyline)
+                    const img = element.parentElement.parentElement.parentElement.firstElementChild
+                    console.log(img)
+                    img.src = 'images/icons/success.svg'
                 }
             }
         } else {
             if (message.style && message.style.color == 'rgb(76, 175, 80)') {
-                const svg = element.parentElement.firstElementChild
-                svg.setAttribute('stroke', '#4CAF50')
-                svg.firstElementChild.remove()
-                svg.firstElementChild.remove()
-                const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
-                polyline.setAttribute('points', '20 6 9 17 4 12')
-                svg.append(polyline)
+                const img = element.parentElement.parentElement.parentElement.firstElementChild
+                console.log(img)
+                img.src = 'images/icons/success.svg'
+                console.log(img)
             }
-            }
+        }
     } else {
         status = document.getElementById(type)
     }
