@@ -150,31 +150,23 @@ async function restoreOptions() {
                 if (this.checked) {
                     document.getElementById('lastDayMonth').disabled = false
                     document.getElementById('label6').removeAttribute('style')
-                    document.getElementById('selectTime').removeAttribute('style')
                     if (document.getElementById('selectTime').value == 'ms') {
                         document.getElementById('label3').removeAttribute('style')
-                        document.getElementById('time').removeAttribute('style')
                         document.getElementById('time').required = true
                         document.getElementById('label7').style.display = 'none'
-                        document.getElementById('hour').style.display = 'none'
                         document.getElementById('hour').required = false
                     } else {
                         document.getElementById('label7').removeAttribute('style')
-                        document.getElementById('hour').removeAttribute('style')
                         document.getElementById('hour').required = true
                         document.getElementById('label3').style.display = 'none'
-                        document.getElementById('time').style.display = 'none'
                         document.getElementById('time').required = false
                     }
                 } else {
                     document.getElementById('lastDayMonth').disabled = true
                     document.getElementById('label6').style.display = 'none'
-                    document.getElementById('selectTime').style.display = 'none'
                     document.getElementById('label3').style.display = 'none'
-                    document.getElementById('time').style.display = 'none'
                     document.getElementById('time').required = false
                     document.getElementById('label7').style.display = 'none'
-                    document.getElementById('hour').style.display = 'none'
                     document.getElementById('hour').required = false
                 }
                 return
@@ -183,11 +175,9 @@ async function restoreOptions() {
             } else if (this.id == 'sheldTimeCheckbox') {
                 if (this.checked) {
                     document.getElementById('label9').removeAttribute('style')
-                    document.getElementById('sheldTime').removeAttribute('style')
                     document.getElementById('sheldTime').required = true
                 } else {
                     document.getElementById('label9').style.display = 'none'
-                    document.getElementById('sheldTime').style.display = 'none'
                     document.getElementById('sheldTime').required = false
                 }
                 return
@@ -326,7 +316,9 @@ async function addProjectList(project, visually) {
         let button = document.createElement('button')
         button.setAttribute('class', 'selectsite')
         button.setAttribute('id', getProjectName(project) + 'Button')
+        button.style.order = allProjects.indexOf(getProjectName(project))
         button.textContent = getFullProjectName(project)
+        console.log(button.style.order)
 
         let count = document.createElement('span')
         count.textContent = getProjectList(project).length
@@ -1756,21 +1748,16 @@ selectedTop.addEventListener('change', function() {
 
         idSelector.removeAttribute('style')
 
-        document.getElementById('customBody').style.display = 'none'
         document.getElementById('label1').style.display = 'none'
         document.getElementById('label2').style.display = 'none'
         document.getElementById('label4').style.display = 'none'
         document.getElementById('label5').style.display = 'none'
         document.getElementById('label10').style.display = 'none'
-        document.getElementById('responseURL').style.display = 'none'
-        document.getElementById('countVote').style.display = 'none'
         document.getElementById('countVote').required = false
-        document.getElementById('ordinalWorld').style.display = 'none'
         document.getElementById('ordinalWorld').required = false
         if (laterChoose && (laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU')) {
             document.getElementById('selectLang' + laterChoose).style.display = 'none'
             document.getElementById('selectLang' + laterChoose).required = false
-            document.getElementById('gameList' + laterChoose).style.display = 'none'
             document.getElementById('chooseGame' + laterChoose).style.display = 'none'
             document.getElementById('chooseGame' + laterChoose).required = false
         }
@@ -1778,12 +1765,9 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('customTimeOut').disabled = false
         if (!document.getElementById('customTimeOut').checked) {
             document.getElementById('label6').style.display = 'none'
-            document.getElementById('selectTime').style.display = 'none'
             document.getElementById('label3').style.display = 'none'
-            document.getElementById('time').style.display = 'none'
             document.getElementById('time').required = false
             document.getElementById('label7').style.display = 'none'
-            document.getElementById('hour').style.display = 'none'
             document.getElementById('hour').required = false
         }
 
@@ -1799,24 +1783,17 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('id').required = false
 
             document.getElementById('label6').removeAttribute('style')
-            document.getElementById('selectTime').removeAttribute('style')
-            document.getElementById('customBody').removeAttribute('style')
             document.getElementById('label1').removeAttribute('style')
             document.getElementById('label2').removeAttribute('style')
-            document.getElementById('responseURL').removeAttribute('style')
             if (document.getElementById('selectTime').value == 'ms') {
                 document.getElementById('label3').removeAttribute('style')
-                document.getElementById('time').removeAttribute('style')
                 document.getElementById('time').required = true
                 document.getElementById('label7').style.display = 'none'
-                document.getElementById('hour').style.display = 'none'
                 document.getElementById('hour').required = false
             } else {
                 document.getElementById('label7').removeAttribute('style')
-                document.getElementById('hour').removeAttribute('style')
                 document.getElementById('hour').required = true
                 document.getElementById('label3').style.display = 'none'
-                document.getElementById('time').style.display = 'none'
                 document.getElementById('time').required = false
             }
 
@@ -1829,18 +1806,15 @@ selectedTop.addEventListener('change', function() {
 //          document.getElementById('nick').required = false
             
             if (selectedTop.value != 'MMoTopRU') {
-                document.getElementById('countVote').removeAttribute('style')
                 document.getElementById('countVote').required = true
                 document.getElementById('label5').removeAttribute('style')
             } else {
-                document.getElementById('ordinalWorld').removeAttribute('style')
                 document.getElementById('ordinalWorld').required = true
                 document.getElementById('label10').removeAttribute('style')
             }
 
             document.getElementById('selectLang' + selectedTop.value).removeAttribute('style')
             document.getElementById('selectLang' + selectedTop.value).required = true
-            document.getElementById('gameList' + selectedTop.value).removeAttribute('style')
             document.getElementById('chooseGame' + selectedTop.value).removeAttribute('style')
             document.getElementById('chooseGame' + selectedTop.value).required = true
 
@@ -1876,28 +1850,20 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('nick').required = false
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
         document.getElementById('urlGame').removeAttribute('style')
-        document.getElementById('gameListListForge').removeAttribute('style')
         document.getElementById('chooseGameListForge').required = true
-        document.getElementById('chooseGameListForge').removeAttribute('style')
     } else if (laterChoose == 'ListForge') {
         document.getElementById('nick').required = true
         if (selectedTop.value != 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('urlGame').style.display = 'none'
-        document.getElementById('gameListListForge').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
-        document.getElementById('chooseGameListForge').style.display = 'none'
     }
 
     if (selectedTop.value == 'TopGG') {
         document.getElementById('chooseTopGG1').removeAttribute('style')
-        document.getElementById('chooseTopGG').removeAttribute('style')
         document.getElementById('additionTopGG1').removeAttribute('style')
-        document.getElementById('additionTopGG').removeAttribute('style')
     } else if (laterChoose == 'TopGG') {
         document.getElementById('chooseTopGG1').style.display = 'none'
-        document.getElementById('chooseTopGG').style.display = 'none'
         document.getElementById('additionTopGG1').style.display = 'none'
-        document.getElementById('additionTopGG').style.display = 'none'
     }
 
     laterChoose = selectedTop.value
@@ -1907,17 +1873,13 @@ selectedTop.addEventListener('change', function() {
 document.getElementById('selectTime').addEventListener('change', function() {
     if (this.value == 'ms') {
         document.getElementById('label3').removeAttribute('style')
-        document.getElementById('time').removeAttribute('style')
         document.getElementById('time').required = true
         document.getElementById('label7').style.display = 'none'
-        document.getElementById('hour').style.display = 'none'
         document.getElementById('hour').required = false
     } else {
         document.getElementById('label7').removeAttribute('style')
-        document.getElementById('hour').removeAttribute('style')
         document.getElementById('hour').required = true
         document.getElementById('label3').style.display = 'none'
-        document.getElementById('time').style.display = 'none'
         document.getElementById('time').required = false
 
     }

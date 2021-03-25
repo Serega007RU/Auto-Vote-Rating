@@ -515,6 +515,11 @@ nav .logo img {
 	font-size: 14px;
 }
 
+[data-resource="notAddedAll"] {
+    text-align: center;
+    margin-top: 10px;
+}
+
 .successFastAdd {
 	margin-top: 20px;
 	color: #4caf50;
@@ -567,6 +572,7 @@ nav .logo img {
 }
 
 .link {
+	cursor: pointer;
 	color: #275daf !important;
 }
 
