@@ -497,10 +497,10 @@ nav .logo img {
     	margin-right: 0;
     	margin-bottom: 10px;
     }
-}
 
-#aboutProject {
-    width: 100%;
+    #aboutProject {
+        width: 100%;
+    }
 }
 
 @media(max-width: 450px) {
