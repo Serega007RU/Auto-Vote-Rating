@@ -385,7 +385,6 @@ function updateProjectList(projects) {
     if (projects != null) {
         if (projects.length > 0) {
             const projectName = getProjectName(projects[0])
-            console.log(projects, projectName)
             document.getElementById(projectName + 'List').parentNode.replaceChild(document.getElementById(projectName + 'List').cloneNode(false), document.getElementById(projectName + 'List'))
             for (const project of projects) {
                 addProjectList(project, true)
