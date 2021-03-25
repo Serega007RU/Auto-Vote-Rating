@@ -458,7 +458,7 @@ nav .logo img {
 #addProject {
 	margin-top: 20px;
 	display: grid;
-	grid-template-columns: 4fr 5fr;
+	grid-template-columns: 4fr 4fr;
 	grid-gap: 20px;
 }
 
@@ -497,6 +497,10 @@ nav .logo img {
     	margin-right: 0;
     	margin-bottom: 10px;
     }
+}
+
+#aboutProject {
+    width: 100%;
 }
 
 @media(max-width: 450px) {
