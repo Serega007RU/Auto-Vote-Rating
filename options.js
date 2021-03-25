@@ -385,6 +385,7 @@ function updateProjectList(projects) {
     if (projects != null) {
         if (projects.length > 0) {
             const projectName = getProjectName(projects[0])
+            console.log(projects, projectName)
             document.getElementById(projectName + 'List').parentNode.replaceChild(document.getElementById(projectName + 'List').cloneNode(false), document.getElementById(projectName + 'List'))
             for (const project of projects) {
                 addProjectList(project, true)
@@ -1115,6 +1116,8 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             return
         } else if (key == 'generalStats') {
             generalStats = storageChange.newValue
+            return
+        } else if (key == 'storageArea') {
             return
         }
         if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function') || storageChange.newValue == null || !(typeof storageChange.newValue[Symbol.iterator] === 'function')) return
