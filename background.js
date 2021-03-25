@@ -605,11 +605,11 @@ async function silentVote(project) {
                 }
                 if (!response.ok) {
                     if (response.status == 503) {
-                        if (i == 3) {
+                        if (i >= 3) {
                             endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + response.status)}, null, project)
                             return
                         }
-                        await wait(3000)
+                        await wait(5000)
                         continue
                     } else {
                         endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
@@ -619,17 +619,23 @@ async function silentVote(project) {
 
                 let doc = new DOMParser().parseFromString(html, 'text/html')
                 if (doc.querySelector('body') != null && doc.querySelector('body').textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-                    if (i == 3) {
+                    if (i >= 3) {
                         endVote({message: chrome.i18n.getMessage('errorAttemptVote') + doc.querySelector('body').textContent}, null, project)
                         return
                     }
+                    await wait(5000)
                     continue
                 }
+                if (document.querySelector('form[method="POST"]') != null && document.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
+                    endVote({message: document.querySelector('form[method="POST"]').textContent.trim()}, null, project)
+                    return
+                }
                 if (doc.querySelector('input[name=player]') != null) {
-                    if (i == 3) {
+                    if (i >= 3) {
                         endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(doc.querySelector('input[name=player]')))}, null, project)
                         return
                     }
+                    await wait(5000)
                     continue
                 }
 
