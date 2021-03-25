@@ -444,7 +444,8 @@ nav .logo img {
 }
 
 #aboutProject .free {
-	margin-bottom: 10px;
+	margin-top: 15px;
+	margin-bottom: 20px;
 	font-weight: 600;
 	font-size: 18;
 }
@@ -458,7 +459,7 @@ nav .logo img {
 #addProject {
 	margin-top: 20px;
 	display: grid;
-	grid-template-columns: 4fr 4fr;
+	grid-template-columns: repeat(2, 1fr);
 	grid-gap: 20px;
 }
 
@@ -730,7 +731,6 @@ nav .logo img {
 }
 
 .checkbox + label {
-	line-break: anywhere;
 	line-height: 1.2;
     display: inline-block;
 	position: relative;
