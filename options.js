@@ -318,7 +318,6 @@ async function addProjectList(project, visually) {
         button.setAttribute('id', getProjectName(project) + 'Button')
         button.style.order = allProjects.indexOf(getProjectName(project))
         button.textContent = getFullProjectName(project)
-        console.log(button.style.order)
 
         let count = document.createElement('span')
         count.textContent = getProjectList(project).length
@@ -1838,12 +1837,10 @@ selectedTop.addEventListener('change', function() {
 
     if (selectedTop.value == 'TopGG' || selectedTop.value == 'DiscordBotList' || selectedTop.value == 'BotsForDiscord') {
         document.getElementById('nick').required = false
-        document.getElementById('nick').style.display = 'none'
-        document.getElementById('nick').previousElementSibling.style.display = 'none'
+        document.getElementById('nick').parentElement.style.display = 'none'
     } else if (laterChoose == 'TopGG' || laterChoose == 'DiscordBotList' || laterChoose == 'BotsForDiscord') {
         document.getElementById('nick').required = true
-        document.getElementById('nick').removeAttribute('style')
-        document.getElementById('nick').previousElementSibling.removeAttribute('style')
+        document.getElementById('nick').parentElement.removeAttribute('style')
     }
     
     if (selectedTop.value == 'ListForge') {
