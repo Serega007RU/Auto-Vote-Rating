@@ -1197,6 +1197,7 @@ async function endVote(request, sender, project) {
         }
 
         if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(),time.getMonth() + 1,0).getDate() != new Date().getDate())) {
+            time = new Date()
             if (project.timeoutHour) {
                 if (!project.timeoutMinute) project.timeoutMinute = 0
                 if (!project.timeoutSecond) project.timeoutSecond = 0
