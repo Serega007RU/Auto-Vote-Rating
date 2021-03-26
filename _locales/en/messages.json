@@ -982,5 +982,8 @@
   },
   "proxyBLSet": {
     "message": "Black list of proxy sites updated"
+  },
+  "pattern": {
+    "message": "Pattern: "
   }
 }
