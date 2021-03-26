@@ -394,6 +394,10 @@ function updateProjectList(projects) {
         for (const item of allProjects) {
             document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
         }
+        document.querySelector('div.buttonBlock').parentNode.replaceChild(document.querySelector('div.buttonBlock').cloneNode(false), document.querySelector('div.buttonBlock'))
+        if (document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]') != null) {
+            document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]').style.display = 'none'
+        }
         forLoopAllProjects(async function(proj) {
             await addProjectList(proj, true)
         }, true)
@@ -1328,11 +1332,9 @@ async function fastAdd() {
         let listFastAdd = document.querySelector('#addFastProject > div.content > .message')
         listFastAdd.textContent = ''
 
-        if (vars['disableNotifInfo'] != null) {
-            if (settings.disabledNotifInfo != Boolean(vars['disableNotifInfo'])) {
-                settings.disabledNotifInfo = Boolean(vars['disableNotifInfo'])
-                await setValue('AVMRsettings', settings, true)
-            }
+        if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] == 'true') {
+            settings.disabledNotifInfo = true
+            await setValue('AVMRsettings', settings, true)
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1345,11 +1347,9 @@ async function fastAdd() {
             html.append(div)
             listFastAdd.append(html)
         }
-        if (vars['disableNotifWarn'] != null) {
-            if (settings.disabledNotifWarn != Boolean(vars['disableNotifWarn'])) {
-                settings.disabledNotifWarn = Boolean(vars['disableNotifWarn'])
-                await setValue('AVMRsettings', settings, true)
-            }
+        if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] == 'true') {
+            settings.disabledNotifWarn = true
+            await setValue('AVMRsettings', settings, true)
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1362,11 +1362,9 @@ async function fastAdd() {
             html.append(div)
             listFastAdd.append(html)
         }
-        if (vars['disableNotifStart'] != null) {
-            if (settings.disabledNotifStart != Boolean(vars['disableNotifStart'])) {
-                settings.disabledNotifStart = Boolean(vars['disableNotifStart'])
-                await setValue('AVMRsettings', settings, true)
-            }
+        if (vars['disableNotifStart'] != null && vars['disableNotifStart'] == 'true') {
+            settings.disabledNotifStart = true
+            await setValue('AVMRsettings', settings, true)
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1419,7 +1417,7 @@ async function fastAdd() {
         }
 
         let buttonClose = document.createElement('button')
-        buttonClose.classList.add('btn')
+        buttonClose.classList.add('btn', 'redBtn')
         buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
         document.querySelector('#addFastProject > div.content > .events').append(buttonClose)
         buttonClose.addEventListener('click', ()=> {
@@ -1918,6 +1916,9 @@ document.getElementById('donate').addEventListener('mouseover', function(event) 
 //Модалки
 document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
     closeBtn.addEventListener('click', ()=> {
+        if (closeBtn.parentElement.parentElement.id == 'addFastProject') {
+            location.href = 'options.html'
+        }
         toggleModal(closeBtn.parentElement.parentElement.id)
     })
 })
@@ -1938,6 +1939,10 @@ function toggleModal(modalID) {
 
 modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     let activeModal = modalsBlock.querySelector('.modal.active')
+    if (activeModal.id == 'stats') {
+        toggleModal('stats')
+        return
+    }
     activeModal.style.transform = 'scale(1.1)'
     setTimeout(()=> activeModal.removeAttribute('style'), 100)
 })
