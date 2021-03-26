@@ -985,5 +985,8 @@
   },
   "pattern": {
     "message": "Pattern: "
+  },
+  "otherProxy": {
+    "message": "Some other extension on the VPN/proxy is interfering with us, disable these extensions and then we can manage the proxy. Voting suspended for 24 hours"
   }
 }

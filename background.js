@@ -357,6 +357,21 @@ async function newWindow(project) {
         }
 
         if (currentProxy == null && (settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))) {
+            let proxyDetails = await new Promise(resolve => {
+                chrome.proxy.settings.get({}, async function(details) {
+                    resolve(details)
+                })
+            })
+            if (!(proxyDetails.levelOfControl == 'controllable_by_this_extension' || proxyDetails.levelOfControl == 'controlled_by_this_extension')) {
+                settings.stopVote = Date.now() + 86400000
+                console.error(chrome.i18n.getMessage('otherProxy'))
+                if (!settings.disabledNotifError) {
+                    sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
+                }
+                await setValue('AVMRsettings', settings)
+                await stopVote()
+                return
+            }
             //Ищет не юзанный свободный прокси
             let found = false
             for (let proxy of proxies) {
