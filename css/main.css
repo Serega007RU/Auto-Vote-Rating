@@ -981,6 +981,10 @@ input.checkbox:disabled + label {
     opacity: 1
 }
 
+.redBtn {
+	background: #da5e5e;
+}
+
 /* Скроллер */
 ::-webkit-scrollbar-button {
 	background-image:url('');

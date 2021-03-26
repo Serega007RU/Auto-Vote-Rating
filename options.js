@@ -466,20 +466,26 @@ async function addProxyList(proxy, visually) {
     let listProxy = document.getElementById('ProxyList')
     let html = document.createElement('li')
     html.id = proxy.ip + '_' + proxy.port
-    html.className = 'multiVoteList'
+    let mes = document.createElement('div')
+    mes.classList.add('message')
     let div = document.createElement('div')
-    let span = document.createElement('span')
-    span.className = 'deleteProject'
-    span.append(svgDelete.cloneNode(true))
-    div.append(span)
-    html.append(div)
-    html.append(proxy.ip + ':' + proxy.port + ' ' + proxy.scheme)
+    div.textContent = proxy.ip + ':' + proxy.port + ' ' + proxy.scheme
+    mes.append(div)
+    let control = document.createElement('div')
+    control.classList.add('controlItems')
+    let del = (svgDelete.cloneNode(true))
+    control.append(del)
+    
     if (proxy.notWorking) {
         html.append(document.createElement('br'))
-        html.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
+        let div2 = document.createElement('div')
+        div2.textContent = createMessage(chrome.i18n.getMessage('notWork'), 'error')
+        mes.append(div2)
     }
+    html.append(mes)
+    html.append(control)
     listProxy.append(html)
-    span.addEventListener('click', function() {
+    del.addEventListener('click', function() {
         removeProxyList(proxy, false)
     })
     if (visually) {
@@ -559,7 +565,7 @@ async function removeVKList(VK, visually) {
 async function removeProxyList(proxy, visually) {
     let li = document.getElementById(proxy.ip + '_' + proxy.port)
     if (li != null) {
-        li.querySelector('span.deleteProject').removeEventListener('click', null)
+        li.querySelector('img:nth-child(1)').removeEventListener('click', null)
         li.remove()
     } else {
         return
