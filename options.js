@@ -976,7 +976,6 @@ function updateStatus(message, type, disableTimer, level, element) {
             for (const m of message) {
                 if (m.style && m.style.color == 'rgb(76, 175, 80)') {
                     const img = element.parentElement.parentElement.parentElement.firstElementChild
-                    console.log(img)
                     img.src = 'images/icons/success.svg'
                 }
             }
@@ -1400,14 +1399,15 @@ async function fastAdd() {
             await addProject(project, status)
         }
 
-        if (document.querySelector('#addFastProject > div.content svg[stroke="#da5e5e"]') != null) {
+        if (document.querySelector('#addFastProject img[src="images/icons/error.svg"]') != null) {
             let buttonRetry = document.createElement('button')
+            buttonRetry.classList.add('btn')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
-            listFastAdd.append(buttonRetry)
+            document.querySelector('#addFastProject > div.content > .events').append(buttonRetry)
             buttonRetry.addEventListener('click', ()=> {
                 document.location.reload(true)
             })
-        } else if (document.querySelector('#addFastProject > div.content').childElementCount > 0) {
+        } else if (document.querySelector('#addFastProject > div.content > div.message').childElementCount > 0) {
             let successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
             successFastAdd.append(chrome.i18n.getMessage('successFastAdd'))

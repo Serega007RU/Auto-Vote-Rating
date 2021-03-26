@@ -909,15 +909,19 @@ input.checkbox:disabled + label {
 }
 
 .btn {
-    font-size: 18px;
+    font-size: 14px;
     border-radius: 5px;
     background: #5c84ad;
     color: #fff;
-    padding: 10px 20px;
+    padding: 5px 10px;
     outline: none!important;
     border: none!important;
     opacity: .9;
     transition: .2s
+}
+
+.redBtn {
+    background: #da5e5e;
 }
 
 .btn:hover {
