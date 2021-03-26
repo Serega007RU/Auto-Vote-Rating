@@ -173,8 +173,6 @@ async function restoreOptions() {
                 return
             } else if (this.id == 'useMultiVote') {
                 settings.useMultiVote = this.checked
-            } else if (this.id == 'iFromUkraine') {
-                settings.iFromUkraine = this.checked
             } else if (this.id == 'repeatAttemptLater') {
                 settings.repeatAttemptLater = this.checked
             } else if (this.id == 'randomize') {
@@ -275,7 +273,6 @@ async function restoreOptions() {
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('cooldown').value = settings.cooldown
     document.getElementById('useMultiVote').checked = settings.useMultiVote
-    document.getElementById('iFromUkraine').checked = settings.iFromUkraine
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
     if (settings.stopVote > Date.now()) {

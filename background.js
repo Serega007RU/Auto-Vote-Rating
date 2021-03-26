@@ -356,7 +356,7 @@ async function newWindow(project) {
             }
         }
 
-        if (currentProxy == null && (settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))) {
+        if (currentProxy == null && (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
             let proxyDetails = await new Promise(resolve => {
                 chrome.proxy.settings.get({}, async function(details) {
                     resolve(details)
@@ -1574,7 +1574,7 @@ async function endVote(request, sender, project) {
                 getTopFromList(currentProxy, project).push(usedProject)
                 proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy
                 await setValue('AVMRproxies', proxies)
-            } else if (settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
+            } else if (!project.TopCraft && !project.McTOP && !project.MinecraftRating) {
                 console.warn('currentProxy is null or not found')
             }
         }
