@@ -678,8 +678,10 @@ nav .logo img {
 }
 
 .input-block .tooltip1,
-.label-block .tooltip2 {
-	top: -3px;
+.input-block .tooltip2,
+.label-block .tooltip2,
+.label-block .tooltip1  {
+    top: -3px;
 }
 
 .tooltip1 .tooltip1text,
