@@ -1,917 +1,1091 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title data-resource="appName"></title>
-	<link rel="stylesheet" href="css/style.css">
-	<link rel="stylesheet" href="css/bootstrap.css"> 
-</head>
-<body>
-	<input type="checkbox" id="hmt" class="hidden-menu-ticker">
-	<span class="btn-menu-back"></span>
-	<label class="btn-menu" for="hmt" style="display: none;">
-		<span class="first"></span>
-		<span class="second"></span>
-		<span class="third"></span>
-	</label>
-	<ul class="hidden-menu">
-		<label data-resource="tabs" class="ml-2"></label>
-		<button data-resource="addButton" class="mt-4 tablinks active" id="addTab2">
-			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-				<line x1="12" y1="5" x2="12" y2="19"></line>
-				<line x1="5" y1="12" x2="19" y2="12"></line>
-			</svg></button>
-		<button data-resource="addedButton" class="tablinks" id="addedTab2">
-			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-				<rect x="3" y="3" width="7" height="7"></rect>
-				<rect x="14" y="3" width="7" height="7"></rect>
-				<rect x="14" y="14" width="7" height="7"></rect>
-				<rect x="3" y="14" width="7" height="7"></rect>
-			</svg></button>
-		<button data-resource="optionsButton" class="tablinks" id="settingsTab2">
-			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-				<line x1="4" y1="21" x2="4" y2="14"></line>
-				<line x1="4" y1="10" x2="4" y2="3"></line>
-				<line x1="12" y1="21" x2="12" y2="12"></line>
-				<line x1="12" y1="8" x2="12" y2="3"></line>
-				<line x1="20" y1="21" x2="20" y2="16"></line>
-				<line x1="20" y1="12" x2="20" y2="3"></line>
-				<line x1="1" y1="14" x2="7" y2="14"></line>
-				<line x1="9" y1="8" x2="15" y2="8"></line>
-				<line x1="17" y1="16" x2="23" y2="16"></line>
-			</svg></button>
-		<button data-resource="help" class="tablinks" id="helpTab2">
-			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-			</svg></button>
-		<button data-resource="multivote" class="tablinks" id="multivoteTab2">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg></button>
-		<button data-resource="stopVote" class="tablinks" id="stopVote2" style="position: absolute; bottom: 0;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00d510" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
-                <line x1="12" y1="2" x2="12" y2="12"></line>
-            </svg></button>
-	</ul>
-	<div class="container">
-		<div id="centerLayer">
-			<div class="nav-panel">
-				<div>
-					<img src="images/logo.png" class="w-100 p-2">
-					A.V.R.
-				</div>
-				<button data-resource="addButton" class="tablinks active" id="addTab">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-						<line x1="12" y1="5" x2="12" y2="19"></line>
-						<line x1="5" y1="12" x2="19" y2="12"></line>
-					</svg>
-					<br></button>
-				<button data-resource="addedButton" class="tablinks" id="addedTab">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-						<rect x="3" y="3" width="7" height="7"></rect>
-						<rect x="14" y="3" width="7" height="7"></rect>
-						<rect x="14" y="14" width="7" height="7"></rect>
-						<rect x="3" y="14" width="7" height="7"></rect>
-					</svg>
-					<br></button>
-				<button data-resource="optionsButton" class="tablinks" id="settingsTab">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-						<line x1="4" y1="21" x2="4" y2="14"></line>
-						<line x1="4" y1="10" x2="4" y2="3"></line>
-						<line x1="12" y1="21" x2="12" y2="12"></line>
-						<line x1="12" y1="8" x2="12" y2="3"></line>
-						<line x1="20" y1="21" x2="20" y2="16"></line>
-						<line x1="20" y1="12" x2="20" y2="3"></line>
-						<line x1="1" y1="14" x2="7" y2="14"></line>
-						<line x1="9" y1="8" x2="15" y2="8"></line>
-						<line x1="17" y1="16" x2="23" y2="16"></line>
-					</svg>
-					<br></button>
-				<button data-resource="help" class="tablinks" id="helpTab">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="16" x2="12" y2="12"></line>
-                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
-					</svg>
-					<br></button>
-				<button data-resource="multivote" class="tablinks" id="multivoteTab">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-						<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-						<circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-						<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-					<br></button>
-				<button data-resource="stopVote" class="tablinks" id="stopVote" style="position: absolute; bottom: 0;">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00d510" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
-						<line x1="12" y1="2" x2="12" y2="12"></line>
-					</svg>
-					<br></button>
-			</div>
-			<div id="append" class="tabcontent" style="display: block;">
-				<h4 data-resource="addTitle" align="center"></h4>
-				<hr color="#5A5A5C">
-				<div class="row">
-					<form id="addProject">
-						<div class="col-xl-1 col-lg-0 col-md-12"></div>
-						<div class="col-xl-4 col-lg-6 col-md-12 mb-3">
-							<div class="form-group mb-1">
-								<label data-resource="yourNick" for="nick"></label>
-							</div>
-							<input name="nick" id="nick" required placeholder="enterNick" type="text" class="mb-2">
-							<div class="form-group mb-1">
-								<label data-resource="siteTop" for="project"></label>
-							</div>
-							<select required id="project" class="mb-2">
-								<option data-resource="selectTop" value="" selected disabled></option>
-								<option value="TopCraft">TopCraft.ru</option>
-								<option value="McTOP">McTOP.su</option>
-								<option value="MCRate">MCRate.su</option>
-								<option value="MinecraftRating">MinecraftRating.ru</option>
-								<option value="MonitoringMinecraft">MonitoringMinecraft.ru</option>
-								<option value="IonMc">IonMc.top</option>
-								<option value="MinecraftServersOrg">MinecraftServers.org</option>
-								<option value="ServeurPrive">Serveur-Prive.net</option>
-								<option value="PlanetMinecraft">PlanetMinecraft.com</option>
-								<option value="TopG">TopG.org</option>
-								<option value="ListForge">ListForge.net</option>
-								<option value="MinecraftServerList">Minecraft-Server-List.com</option>
-								<option value="ServerPact">ServerPact.com</option>
-								<option value="MinecraftIpList">MinecraftIpList.com</option>
-								<option value="TopMinecraftServers">TopMinecraftServers.org</option>
-								<option value="MinecraftServersBiz">MinecraftServers.biz</option>
-								<option value="HotMC">HotMC.ru</option>
-								<option value="MinecraftServerNet">Minecraft-Server.net</option>
-								<option value="TopGames">Top-Games.net or Top-Serveurs.net</option>
-								<option value="TMonitoring">TMonitoring.com</option>
-								<option value="TopGG">Top.gg</option>
-								<option value="DiscordBotList">DiscordBotList.com</option>
-								<option value="BotsForDiscord">BotsForDiscord.com</option>
-								<option value="MMoTopRU">MMoTop.ru</option>
-								<option value="MCServers">MC-Servers.com</option>
-								<option value="MinecraftList">MinecraftList.org</option>
-								<option value="MinecraftIndex">Minecraft-Index.com</option>
-								<option value="ServerList101">ServerList101.com</option>
-								<option value="MCServerList">MCServer-List.eu</option>
-								<option hidden value="CraftList">CraftList.org</option>
-								<option value="CzechCraft">Czech-Craft.eu</option>
-								<option value="PixelmonServers">PixelmonServers.com</option>
-								<option value="QTop">Q-Top.ru</option>
-								<option value="MinecraftBuzz">Minecraft.Buzz</option>
-								<option hidden value="Custom" data-resource="Custom"></option>
-							</select>
-                            <!--Custom-->
-							<div style="display: none;" id="label6" class="form-group mb-1">
-							    <label for="selectTime" data-resource="selectTime"></label>
-							</div>
-                            <select style="display: none;" required id="selectTime" class="mb-2">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <title data-resource="appName"></title>
+        <link rel="stylesheet" href="css/reset.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+        <div class="burger">
+            <span></span>
+        </div>
+        <nav>
+            <div class="logo">
+                <img src="images/logo.png">
+                <div>A.V.R.</div>
+            </div>
+            <ul>
+                <button class="tablinks active" id="addTab">
+                    <img src="images/icons/addBtn.svg" alt="addBtn">
+                    <div data-resource="addButton"></div>
+                </button>
+                <button class="tablinks" id="addedTab">
+                    <img src="images/icons/addedBtn.svg" alt="addedBtn">
+                    <div data-resource="addedButton"></div>
+                </button>
+                <button class="tablinks" id="settingsTab">
+                    <img src="images/icons/optionsBtn.svg" alt="optionsBtn">
+                    <div data-resource="optionsButton"></div>
+                </button>
+                <button class="tablinks" id="helpTab">
+                    <img src="images/icons/helpBtn.svg" alt="helpBtn">
+                    <div data-resource="help"></div>
+                </button>
+                <button class="tablinks" id="multivoteTab">
+           			<img src="images/icons/multivote.svg" alt="multivote">
+           			<div data-resource="multivote"></div>
+           		</button>
+            	<button class="tablinks" id="stopVote">
+            		<img src="images/icons/start.svg" alt="stop">
+            		<div data-resource="stopVote"></div>
+            	</button>
+            </ul>
+        </nav>
+        <div class="container">
+            <!-- Добавить -->
+            <div id="append" class="tabcontent" style="display: block;">
+                <h4 data-resource="addTitle"></h4>
+                <hr color="#5A5A5C">
+                <form id="addProject">
+                    <div>
+                        <div class="input-block">
+                            <label data-resource="yourNick" for="nick"></label>
+                            <input class="input" name="nick" id="nick" required placeholder="enterNick" type="text">
+                        </div>
+                        <div class="input-block">
+                            <label data-resource="siteTop" for="project"></label>
+                            <select required id="project" class="select">
+                                <option data-resource="selectTop" value="" selected="" disabled=""></option>
+                                <option value="BotsForDiscord">BotsForDiscord.com</option>
+                                <option value="CraftList">CraftList.org</option>
+                                <option value="CzechCraft">Czech-Craft.eu</option>
+                                <option value="DiscordBotList">DiscordBotList.com</option>
+                                <option value="HotMC">HotMC.ru</option>
+                                <option value="IonMc">IonMc.top</option>
+                                <option value="ListForge">ListForge.net</option>
+                                <option value="MCServers">MC-Servers.com</option>
+                                <option value="MCRate">MCRate.su</option>
+                                <option value="MCServerList">MCServer-List.eu</option>
+                                <option value="MMoTopRU">MMoTop.ru</option>
+                                <option value="McTOP">McTOP.su</option>
+                                <option value="MinecraftIndex">Minecraft-Index.com</option>
+                                <option value="MinecraftServerList">Minecraft-Server-List.com</option>
+                                <option value="MinecraftServerNet">Minecraft-Server.net</option>
+                                <option value="MinecraftBuzz">Minecraft.Buzz</option>
+                                <option value="MinecraftIpList">MinecraftIpList.com</option>
+                                <option value="MinecraftList">MinecraftList.org</option>
+                                <option value="MinecraftRating">MinecraftRating.ru</option>
+                                <option value="MinecraftServersBiz">MinecraftServers.biz</option>
+                                <option value="MinecraftServersOrg">MinecraftServers.org</option>
+                                <option value="MonitoringMinecraft">MonitoringMinecraft.ru</option>
+                                <option value="PixelmonServers">PixelmonServers.com</option>
+                                <option value="PlanetMinecraft">PlanetMinecraft.com</option>
+                                <option value="QTop">Q-Top.ru</option>
+                                <option value="ServerList101">ServerList101.com</option>
+                                <option value="ServerPact">ServerPact.com</option>
+                                <option value="ServeurPrive">Serveur-Prive.net</option>
+                                <option value="TMonitoring">TMonitoring.com</option>
+                                <option value="TopCraft">TopCraft.ru</option>
+                                <option value="TopGames">Top-Games.net or Top-Serveurs.net</option>
+                                <option value="TopGG">Top.gg</option>
+                                <option value="TopG">TopG.org</option>
+                                <option value="TopMinecraftServers">TopMinecraftServers.org</option>
+                                <option value="Custom" data-resource="Custom"></option>
+                            </select>
+                        </div>
+                        <!--Custom-->
+                        <div style="display: none;" id="label6" class="input-block">
+                            <label for="selectTime" data-resource="selectTime"></label>
+                            <select required id="selectTime" class="select">
                                 <option value="ms" data-resource="timeoutMS"></option>
                                 <option value="hour" data-resource="timeoutHour"></option>
                             </select>
-							<div style="display: none;" id="label3" class="form-group mb-1">
-							    <label for="time" data-resource="delayFetch"></label>
-							</div>
-                            <input style="display: none;" id="time" name="customTime" placeholder="delayFetch" type="number" min="10000" class="mb-2" style="display: none;"></input>
-							<div style="display: none;" id="label7" class="form-group mb-1">
-							    <label for="hour" data-resource="chooseHour"></label>
-							</div>
-                            <input style="display: none;" id="hour" name="chooseHour" placeholder="chooseHour" type="time" step="1" class="mb-2" min="0" max="23"></input>
-							
-							<div style="display: none;" id="label9" class="form-group mb-1">
-							    <label for="sheldTime" data-resource="sheldTime"></label>
-							</div>
-							<input style="display: none;" id="sheldTime" type="datetime-local" class="mb-2">
-
-							<div style="display: none;" id="label2" class="form-group mb-1">
-							    <label for="responseURL" data-resource="urlFetch"></label>
-							</div>
-							<input style="display: none;" id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="mb-2"></input>
-							<div style="display: none;" id="label1" class="form-group mb-1">
-							    <label for="customBody" data-resource="bodyFetch"></label>
-							</div>
-							<textarea style="display: none;" id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="mb-2"></textarea>
-
-							<!--TopGG-->
-							<div style="display: none;" id="chooseTopGG1" class="form-group mb-1">
-								<label data-resource="chooseTopGG" for="chooseTopGG"></label>
-								<span class="tooltip1">
-									<span class="tooltip1text">
-									    <span>https://top.gg/</span><span style="color:#d32f2f;">bot</span><span>/270904126974590976/vote</span>
-									</span>
-								</span>
-							</div>
-							<select style="display: none;" id="chooseTopGG" class="mb-2">
-							    <option value="bot" data-resource="bots"></option>
-							    <option value="servers" data-resource="servers"></option>
-							</select>
-							<div style="display: none;" id="additionTopGG1" class="form-group mb-1">
-								<label data-resource="additionTopGG" for="additionTopGG"></label>
-								<span class="tooltip1">
-									<span class="tooltip1text">
-									    <span>https://top.gg/bot/617037497574359050/vote</span><span style="color:#d32f2f;">?currency=DOGE</span>
-									</span>
-								</span>
-							</div>
-                            <input style="display: none;" id="additionTopGG" name="additionTopGG" placeholder="additionTopGG" type="text" class="mb-2" style="display: none;"></input>
-							
-							<!--ListForge-->
-							<div style="display: none;" id="urlGame" class="form-group mb-1">
-								<label data-resource="urlGame"></label>
-								<span class="tooltip1">
-									<span class="tooltip1text" id="spanGame">
-									    <span style="color:red;">URL</span>
-									    <span data-resource="gameIDTooltip"></span>
-									    <br>
-									    <span>https://</span><span style="color:#d32f2f;">minecraft-mp.com</span><span>/server/207380/vote/</span>
-									</span>
-								</span>
-							</div>
-							<datalist style="display: none;" id="gameListListForge">
-								<option value="7daystodie-servers.com">7 Days To Die</option>
-								<option value="ark-servers.net">ARK : Survival Evolved</option>
-								<option value="arma3-servers.net">Arma3</option>
-								<option value="atlas-servers.io">Atlas</option>
-								<option value="conan-exiles.com">Conan Exiles</option>
-								<option value="counter-strike-servers.net">Counter Strike : Global Offensive</option>
-								<option value="cubeworld-servers.com">Cube World</option>
-								<option value="dayz-servers.org">DayZ</option>
-								<option value="ecoservers.io">ECO</option>
-								<option value="empyrion-servers.com">Empyrion</option>
-								<option value="gmod-servers.com">Garry's Mod</option>
-								<option value="hurtworld-servers.net">Hurtworld</option>
-								<option value="hytale-servers.io">Hytale</option>
-								<option value="life-is-feudal.org">Life is Feudal</option>
-								<option value="minecraft-mp.com">Minecraft</option>
-								<option value="minecraftpocket-servers.com">Minecraft Pocket</option>
-								<option value="miscreated-servers.com">Miscreated</option>
-								<option value="reign-of-kings.net">Reign of Kings</option>
-								<option value="rust-servers.net">Rust</option>
-								<option value="space-engineers.com">Space Engineers</option>
-								<option value="squad-servers.com">Squad</option>
-								<option value="starbound-servers.net">Starbound</option>
-								<option value="tf2-servers.com">Team Fortress 2</option>
-								<option value="teamspeak-servers.org">Teamspeak</option>
-								<option value="terraria-servers.com">Terraria</option>
-								<option value="unturned-servers.net">Unturned</option>
-								<option value="wurm-unlimited.com">Wurm Unlimited</option>
-							</datalist>
-							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGameListForge" placeholder="chooseGameURL" list="gameListListForge">
-
-							<!--ServeurPrive, TopGames and MMoTopRU-->
-							<div style="display: none;" id="idGame" class="form-group mb-1">
-								<label data-resource="idGame"></label>
-								<span class="tooltip1">
-									<span class="tooltip1text" id="spanGame">
-									    <span style="color:red;">ID</span>
-									    <span data-resource="gameIDTooltip"></span>
-									    <br>
-									    <span id="gameIDTooltip1"></span><span id="gameIDTooltip2" style="color:#d32f2f;"></span><span id="gameIDTooltip3"></span>
-									</span>
-								</span>
-							</div>
-							<datalist style="display: none;" id="gameListTopGames">
-								<option value="minecraft">Minecraft</option>
-								<option value="garrys-mod">Garry's mod</option>
-								<option value="discord">Discord</option>
-								<option value="roblox">Roblox</option>
-								<option value="rdr">Red Dead Redemption 2</option>
-								<option value="hytale">Hytale</option>
-								<option value="terraria">Terraria</option>
-								<option value="ark">ARK</option>
-								<option value="dayz">Dayz</option>
-								<option value="l4d2">Left 4 Dead 2</option>
-								<option value="rust">Rust</option>
-								<option value="gta">GTA 5</option>
-								<option value="discord">Discord</option>
-							</datalist>
-							<datalist style="display: none;" id="gameListServeurPrive">
-								<option value="minecraft">Minecraft</option>
-								<option value="discord">Discord</option>
-								<option value="grand-theft-auto">Grand Theft Auto V</option>
-								<option value="ark-survival-evolved">Ark : Survival Evolved</option>
-								<option value="rust">Rust</option>
-								<option value="hytale">Hytale</option>
-								<option value="minecraft-bedrock">Minecraft Bedrock</option>
-								<option value="ark">ARK</option>
-								<option value="garrys-mod">Garry's Mod</option>
-							</datalist>
-							<datalist style="display: none;" id="gameListMMoTopRU">
-								<option value="wow">World War Craft</option>
-								<option value="la2">Lineage 2</option>
-								<option value="pw">Perfect World</option>
-								<option value="mu">Global FIU Online</option>
-								<option value="aion">Aion</option>
-								<option value="rf">RF Online</option>
-								<option value="all">Online Games (All)</option>
-								<option value="jd">Jade Dynasty</option>
-							</datalist>
-							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGameTopGames" placeholder="chooseGame" list="gameListTopGames" value="minecraft">
-							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGameServeurPrive" placeholder="chooseGame" list="gameListServeurPrive" value="minecraft">
-							<input style="display: none;" class="mb-2" name="chooseGame" type="text" id="chooseGameMMoTopRU" placeholder="chooseGame" list="gameListMMoTopRU">
-							<div style="display: none;" class="form-group mb-1" id="label4">
-								<label for="selectLang" data-resource="chooseLang"></label>
-							</div>
-							<select style="display: none;" id="selectLangTopGames" class="mb-2">
-								<option value="de">Deutsch</option>
-								<option value="en">English</option>
-								<option value="es">Español</option>
-								<option value="fr" selected>Français</option>
-								<option value="pt">Português</option>
-								<option value="ru">Русский</option>
-							</select>
-							<select style="display: none;" id="selectLangServeurPrive" class="mb-2">
-								<option value="en">English</option>
-								<option value="fr" selected>Français</option>
-							</select>
-							<select style="display: none;" id="selectLangMMoTopRU" class="mb-2">
-								<option value="en">English</option>
-								<option value="ru" selected>Русский</option>
-							</select>
-							<div style="display: none;" class="form-group mb-1" id="label5">
-								<label for="countVote" data-resource="countVote"></label>
-							</div>
-							<input style="display: none;" id="countVote" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="mb-2" value="5">
-							<div style="display: none;" class="form-group mb-1" id="label10">
-								<label for="ordinalWorld" data-resource="ordinalWorld"></label>
-								<span class="tooltip1">
-									<span class="tooltip1text" id="spanOrdinalWorld">
-									    <span data-resource="ordinalWorldTooltip"></span>
-									</span>
-								</span>
-							</div>
-							<input style="display: none;" id="ordinalWorld" name="ordinalWorld" type="number" min="1" max="16" placeholder="ordinalWorld" class="mb-2">
-
-							<div id="idSelector" style="display: none;">
-							    <div class="form-group mb-1">
-									<label for="id" data-resource="projectID"></label>
-									<span class="tooltip1">
-										<span class="tooltip1text">
-											<span style="color:#d32f2f;">ID</span>
-											<span data-resource="projectIDTooltip"></span>
-											<br>
-											<span id="projectIDTooltip1"></span><span id="projectIDTooltip2" style="color:#d32f2f;"></span><span id="projectIDTooltip3"></span>
-										</span>
-									</span>
-							    </div>
-
-							    <input class="mb-2" name="id" id="id">
-							    <datalist id="TopCraftIDList">
-                                    <option value="10340">Cifrazia</option><option value="6711">WarMine</option><option value="7666">Arago.Games</option><option value="7126">Borealis</option><option value="7411">CenturyMine</option><option value="6482">CubixWorld</option><option value="8732">DiverseMine</option><option value="308">Excalibur-Craft</option><option value="3254">FineMine</option><option value="7125">FrostLand</option><option value="628">Gamai</option><option value="7863">GamePoint</option><option value="9536">GrandGear</option><option value="1041">Grand-Mine</option><option value="5966">HunterCraft</option><option value="216">IPlayCraft</option><option value="2762">LavaCraft</option><option value="5835">Letragon</option><option value="218">McSKill</option><option value="304">MinecraftOnly</option><option value="6287">MythicalPlanet</option><option value="5323">MythicalWorld</option><option value="9598">OneLand</option><option value="9311">OrangeCraft</option><option value="5451">PentaCraft</option><option value="6031">Pixelmon.PRO</option><option value="318">qoobworld</option><option value="9597">ShadowCraft</option><option value="9867">SideMC</option><option value="1283">SimpleMinecraft</option><option value="9584">skolot.fun</option><option value="600">SMARTYcraft</option><option value="8179">VictoryCraft</option><option value="8992">ShowyCraft</option><option value="7755">HillMine</option><option value="10312">LoliLand</option><option value="10363">Kayrison</option>
-							    </datalist>
-							    <datalist id="McTOPIDList">
-							        <option value="4975">WarMine</option><option value="4561">Arago.Games</option><option value="2241">Borealis</option><option value="4888">CenturyMine</option><option value="5089">DiverseMine</option><option value="1088">Excalibur-Craft</option><option value="3337">FineMine</option><option value="4580">FrostLand</option><option value="1765">Gamai</option><option value="4763">GamePoint</option><option value="5516">GrandGear</option><option value="3050">HunterCraft</option><option value="5864">IPlayCraft</option><option value="45">LavaCraft</option><option value="397">Letragon</option><option value="54">MinecraftOnly</option><option value="4483">MythicalPlanet</option><option value="1654">MythicalWorld</option><option value="2474">PentaCraft</option><option value="4585">Pixelmon.PRO</option><option value="1142">qoobworld</option><option value="1">SimpleMinecraft</option><option value="5685">skolot.fun</option><option value="317">SMARTYcraft</option><option value="4729">VictoryCraft</option><option value="5231">ShowyCraft</option><option value="4709">HillMine</option><option value="6029">Kayrison</option>
-							    </datalist>
-							    <datalist id="MCRateIDList">
-							        <option value="8935">Cifrazia</option><option value="7003">CubixWorld</option><option value="4396">Excalibur-Craft</option><option value="4703">FineMine</option><option value="7450">FrostLand</option><option value="8428">Gamai</option><option value="8493">GrandGear</option><option value="10">LavaCraft</option><option value="4852">Letragon</option><option value="5154">MinecraftOnly</option><option value="6099">MythicalWorld</option><option value="6071">PentaCraft</option><option value="6434">Pixelmon.PRO</option><option value="1762">qoobworld</option><option value="4692">SimpleMinecraft</option><option value="4427">HillMine</option>
-							    </datalist>
-							    <datalist id="MinecraftRatingIDList">
-							        <option value="cubixworld">CubixWorld</option><option value="grandgear">GrandGear</option><option value="diversemine">DiverseMine</option><option value="excalibur-craft">Excalibur-Craft</option><option value="borealis">Borealis</option><option value="gamepoint">GamePoint</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="penta-craft">PentaCraft</option><option value="oneland">OneLand</option><option value="orangecraft">OrangeCraft</option><option value="pixelmon">Pixelmon.PRO</option><option value="shadowcraft">ShadowCraft</option><option value="sidemc">SideMC</option><option value="smc">SimpleMinecraft</option><option value="victorycraft">VictoryCraft</option><option value="hillmine">HillMine</option><option value="loliland">LoliLand</option>
-							    </datalist>
-							    <datalist id="MonitoringMinecraftIDList">
-							        <option value="cubixworld">CubixWorld</option><option value="gg">GrandGear</option><option value="grand-mine">Grand-Mine</option><option value="mcskill">McSKill</option><option value="minecraftonly">MinecraftOnly</option><option value="mythicalworld">MythicalWorld</option><option value="orangecraft">OrangeCraft</option><option value="pixelmonpro">Pixelmon.PRO</option><option value="skolotfun">skolot.fun</option><option value="smc">SimpleMinecraft</option><option value="loliland">LoliLand</option>
-							    </datalist>
-							    <datalist id="IonMcIDList">
-							        <option value="80">Pixelmon.PRO 1.12.2</option><option value="83">FineMine.RU</option>
-							    </datalist>
-							    <datalist id="MinecraftServersOrgIDList">
-							        <option value="564053">Legends Evolved</option>
-							    </datalist>
-							    <datalist id="ServeurPriveIDList">
-                                    <option value="gommehd-net-4932">GommeHD.net</option>
-							    </datalist>
-							    <datalist id="PlanetMinecraftIDList">
-							        <option value="legends-evolved">Legends Evolved</option>
-							    </datalist>
-							    <datalist id="TopGIDList">
-							        <option value="405637">Hypixel</option><option value="414300">Mineplex</option><option value="512397">Legends Evolved</option>
-							    </datalist>
-							    <datalist id="MinecraftServerListIDList">
-							        <option value="292028">Hypixel</option><option value="218820">Mineplex</option>
-							    </datalist>
-							    <datalist id="ServerPactIDList">
-							        <option value="24604">Hypixel</option>
-							    </datalist>
-							    <datalist id="MinecraftIpListIDList">
-							        <option value="2576">Hypixel</option>
-							    </datalist>
-							    <datalist id="HotMCIDList">
-							        <option value="199493">qoobworld</option>
-							    </datalist>
-							    <datalist id="TMonitoringIDList">
-							        <option value="qoobworldru">qoobworld</option>
-							    </datalist>
-							    <datalist id="TopGGIDList">
-							        <option value="memes">Dank Memer</option>
-							        <option value="172002275412279296">Tatsumaki</option>
-							        <option value="zerotwo">Zero Two</option>
-							    </datalist>
-							    <datalist id="DiscordBotListIDList">
-							        <option value="dank-memer">Dank Memer</option>
-							        <option value="tatsu">Tatsumaki</option>
-							        <option value="zerotwo">Zero Two</option>
-							    </datalist>
-							    <datalist id="BotsForDiscordIDList">
-							        <option value="469610550159212554">Zero Two</option>
-							    </datalist>
-							</div>
-						</div>
-						<div class="col-xl-2 col-lg-1 col-md-0"></div>
-						<div class="col-xl-4 col-lg-5 col-md-8 mb-3"> 
-							<div class="form-group mb-1">
-								<label data-resource="advSettings"></label>
-							</div>
-							<input class="checkbox" id="customTimeOut" type="checkbox" name="checkbox" />
-							<label data-resource="customTimeOut" for="customTimeOut"></label> 
-							<br>
-							<input class="checkbox" id="lastDayMonth" type="checkbox" name="checkbox" disabled />
-							<label data-resource="lastDayMonth" for="lastDayMonth"></label> 
-							<br>
-							<input class="checkbox" id="sheldTimeCheckbox" type="checkbox" name="checkbox" />
-							<label data-resource="sheldTime" for="sheldTimeCheckbox"></label> 
-							<br>
-							<input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox" />
-							<label data-resource="disableCheckProjects" for="disableCheckProjects"></label> 
-							<br>
-							<input class="checkbox" id="priority" type="checkbox" name="checkbox" />
-							<label data-resource="priority" for="priority"></label> <span class="tooltip1 ml-1"><span data-resource="priorityTooltip" class="tooltip1text"></span></span>
-							<br>
-							<input class="checkbox" id="randomize" type="checkbox" name="checkbox" />
-							<label data-resource="randomize" for="randomize"></label> <span class="tooltip1 ml-1"><span data-resource="randomizeTooltip" class="tooltip1text"></span></span>
-						</div>
-						<div class="col-xl-1 col-lg-0 col-md-12"></div>
-						<div class="col-xl-1 col-lg-0 col-md-12"></div>
-						<div class="col-xl-4 col-lg-6 col-md-12">
-							<div id="submit">
-								<button data-resource="addButton" id="submitAddProject" type="submit"></button>
-							</div>
-						</div>
-						<div class="col-xl-12 col-lg-12 col-md-12 mb-3">
-							<div id="add">&nbsp;</div>
-						</div>
-					</form>
-				</div>
-			</div>
-			<div id="settings" class="tabcontent" style="display: none;">
-				<h4 data-resource="optionsExtension" align="center"></h4>
-				<hr color="#5A5A5C">
-				<div class="row">
-					<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
-						<div class="form-group mb-1">
-							<label data-resource="settings"></label>
-						</div>
-						<input class="checkbox" id="disabledNotifStart" type="checkbox" name="checkbox" />
-						<label data-resource="disabledNotifStart" for="disabledNotifStart"></label>
-						<br>
-						<input class="checkbox" id="disabledNotifInfo" type="checkbox" name="checkbox" />
-						<label data-resource="disabledNotifInfo" for="disabledNotifInfo"></label>
-						<br>
-						<input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox" />
-						<label data-resource="disabledNotifWarn" for="disabledNotifWarn"></label> <span class="tooltip1 ml-1"><span data-resource="disabledNotifWarnTooltip" class="tooltip1text"></span></span>
-						<br>
-						<input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox" />
-						<label data-resource="disabledNotifError" for="disabledNotifError"></label>
-						<br>
-						<input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox" />
-						<label data-resource="enableSyncStorage" for="enableSyncStorage"></label> <span class="tooltip1 ml-1"><span data-resource="enableSyncStorageTooltip" class="tooltip1text"></span></span>
-						<br>
-						<input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox" />
-						<label data-resource="disabledCheckTime" for="disabledCheckTime"></label>
-						<br>
-						<input class="checkbox" id="disabledCheckInternet" type="checkbox" name="checkbox" />
-						<label data-resource="disabledCheckInternet" for="disabledCheckInternet"></label>
-					</div>
-					<div class="col-xl-4 col-lg-6 col-md-12 mb-3">
-						<div class="form-group mb-1">
-							<label data-resource="enabledSilentVote" for="enabledSilentVote"></label> <span class="tooltip2"><span data-resource="enabledSilentVoteTooltip" class="tooltip2text"></span></span>
-						</div>
-						<select required id="enabledSilentVote" class="mb-2">
-							<option data-resource="enabledSilentVoteSilent" value="enabled"></option>
-							<option data-resource="enabledSilentVoteNoSilent" value="disabled"></option>
-						</select>
-						<div class="form-group mb-1">
-							<label data-resource="cooldown" for="cooldown"></label>
-						</div>
-						<form id="timeout">
-							<input name="cooldown" id="cooldown" required type="number" min="1000" max="43200000" class="mb-2">
-							<div id="submit2" class="mt-3 mb-2">
-								<button data-resource="setCooldown" type="submit" class="w-50" style="display: inline;"></button>
-							</div>
-						</form>
-						<div class="form-group mb-1">
-							<label data-resource="settingsFile"></label>
-						</div>
-						<label data-resource="importSettings" for="file-upload" class="custom-file-upload mb-2">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /> </svg>
-						</label>
-						<input id="file-upload" type="file" accept="application/json"/>
-						<label data-resource="exportSettings" id="file-download" class="custom-file-upload">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" /> </svg></label>
-						<label data-resource="exportLogs" id="logs-download" class="custom-file-upload">
-							<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel">
-								<path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" /> </svg></label>
-						<div id="file">&nbsp;</div>
-					</div>
-				</div>
-			</div>
-			<div id="added" class="tabcontent" style="display: none;">
-				<h4 data-resource="addedProjects" align="center"></h4>
-				<hr color="#5A5A5C">
-				<p class="ml-4" data-resource="notAddedAll"></p>
-				<div class="row">
-					<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable1">
-					</div>
-					<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable2">
-					</div>
-					<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable3">
-					</div>
-					<div class="col-xl-3 col-lg-6 col-md-12 mb-3" id="addedProjectsTable4">
-					</div>
-					<div class="col-xl-12 mb-3">
-					    <ul class="listcontent" id="TopCraftTab" style="display: none;">
-					        <span data-resource="notAdded"></span>
-					        <div id="TopCraftList"></div>
-					    </ul>
-					    <ul class="listcontent" id="McTOPTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <div id="McTOPList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MCRateTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <div id="MCRateList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MinecraftRatingTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <div id="MinecraftRatingList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MonitoringMinecraftTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <div id="MonitoringMinecraftList"></div>
-					    </ul>
-					    <ul class="listcontent" id="IonMcTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					    	<label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="IonMcList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MinecraftServersOrgTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="MinecraftServersOrgList"></div>
-					    </ul>
-					    <ul class="listcontent" id="ServeurPriveTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="ServeurPriveList"></div>
-					    </ul>
-					    <ul class="listcontent" id="PlanetMinecraftTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="PlanetMinecraftList"></div>
-					    </ul>
-					    <ul class="listcontent" id="TopGTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="TopGList"></div>
-					    </ul>
-					    <ul class="listcontent" id="ListForgeTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="ListForgeList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MinecraftServerListTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="MinecraftServerListList"></div>
-					    </ul>
-					    <ul class="listcontent" id="ServerPactTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <div id="ServerPactList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MinecraftIpListTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <div id="MinecraftIpListList"></div>
-					    </ul>
-					    <ul class="listcontent" id="TopMinecraftServersTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="TopMinecraftServersList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MinecraftServersBizTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="MinecraftServersBizList"></div>
-					    </ul>
-					    <ul class="listcontent" id="HotMCTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="HotMCList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MinecraftServerNetTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="MinecraftServerNetList"></div>
-					    </ul>
-					    <ul class="listcontent" id="TopGamesTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="TopGamesList"></div>
-					    </ul>
-					    <ul class="listcontent" id="TMonitoringTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="TMonitoringList"></div>
-					    </ul>
-					    <ul class="listcontent" id="TopGGTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="TopGGList"></div>
-					    </ul>
-					    <ul class="listcontent" id="DiscordBotListTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="DiscordBotListList"></div>
-					    </ul>
-					    <ul class="listcontent" id="BotsForDiscordTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="BotsForDiscordList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MMoTopRUTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="MMoTopRUList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MCServersTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="MCServersList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MinecraftListTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="MinecraftListList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MinecraftIndexTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="MinecraftIndexList"></div>
-					    </ul>
-					    <ul class="listcontent" id="ServerList101Tab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="ServerList101List"></div>
-					    </ul>
-					    <ul class="listcontent" id="MCServerListTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <div id="MCServerListList"></div>
-					    </ul>
-					    <ul class="listcontent" id="CraftListTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="CraftListList"></div>
-					    </ul>
-					    <ul class="listcontent" id="CzechCraftTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="CzechCraftList"></div>
-					    </ul>
-					    <ul class="listcontent" id="PixelmonServersTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="PixelmonServersList"></div>
-					    </ul>
-					    <ul class="listcontent" id="QTopTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="QTopList"></div>
-					    </ul>
-					    <ul class="listcontent" id="MinecraftBuzzTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <label data-resource="notAvaibledInSilent"></label> <span class="tooltip2"><span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span></span>
-					        <div id="MinecraftBuzzList"></div>
-					    </ul>
-					    <ul class="listcontent" id="CustomTab" style="display: none;">
-					        <div data-resource="notAdded"></div>
-					        <div id="CustomList"></div>
-					    </ul>
-					</div>
-				</div>
-				<a id="generalStats" data-resource="generalStats" class="float-right" href="#stats"></a>
-			</div>
-			<div id="help" class="tabcontent" style="display: none;">
-				<h4 data-resource="help" align="center"></h4>
-				<hr color="#5A5A5C">
-				<div class="row">
-					<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
-					<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
-						<p class="mt-3"><span data-resource="developers"></span><br><span data-resource="developer"></span> <a target="blank_" href="https://discord.com/users/441823506200788992"><span>Serega007</span></a><br><span data-resource="designer"></span> <a target="blank_" href="https://discord.com/users/279936883277168640"><span>Qworte</span></a></p>
-						<p data-resource="itsFree" class="mt-3 fw600"></p>
-						<p class="mt-3"><span data-resource="feedback"></span> <a target="blank_" href="https://discord.gg/GyvMtbU"><span data-resource="dmDiscord"></span></a><span data-resource="feedback2"> </span> <a target="blank_" href="https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd/support"><span data-resource="dmChromeWebStore"></span></a></span>.</p>
-<!-- 					<p class="mt-3"><span data-resource="feedback"></span> <a target="blank_" href="https://discord.gg/GyvMtbU"><span data-resource="dmDiscord"></span></a><span data-resource="feedback3"> </span> <a href="mailto:ermaksochi@gmail.com"><span data-resource="email"></span></a></span>.</p> -->
-					</div>
-					<div class="col-xl-3 col-lg-3 col-md-12 mb-3"></div>
-				</div>
-			</div>
-			<div id="multivote" class="tabcontent" style="display: none;">
-				<h4 data-resource="multivote" align="center"></h4>
-				<hr color="#5A5A5C">
-				<div class="row">
-					<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
-						<input class="checkbox" id="useMultiVote" type="checkbox" name="checkbox" />
-						<label data-resource="useMultiVote" for="useMultiVote"></label>
-					</div>
-					<div class="col-xl-6 col-lg-6 col-md-12 mb-3">
-						<input class="checkbox" id="repeatAttemptLater" type="checkbox" name="checkbox" />
-						<label data-resource="repeatAttemptLater" for="repeatAttemptLater"></label>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
-						<button data-resource="VK" class="selectsite projectListButtons" id="VKButton">
-                            <span>0</span>
-						</button>
-					</div>
-					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
-                        <button data-resource="proxy" class="selectsite projectListButtons" id="ProxyButton">
-                            <span>0</span>
-                        </button>
-					</div>
-					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
-                        <!--<button class="selectsite" id="IonMcButton">IonMc</button>-->
-					</div>
-					<div class="col-xl-3 col-lg-6 col-md-12 mb-3">
-					    
-					</div>
-					<div class="col-xl-12 mb-3">
-						<ul class="listcontent" id="VKTab" style="display: none;">
-						    <div>
-                            <input class="checkbox" id="iFromUkraine" type="checkbox" name="checkbox">
-                            <label data-resource="iFromUkraine" for="iFromUkraine"></label>
+                        </div>
+                        <div style="display: none;" id="label3" class="input-block">
+                            <label for="time" data-resource="delayFetch"></label>
+                            <input id="time" name="customTime" placeholder="delayFetch" type="number" min="10000" class="input"></input>
+                        </div>
+                        <div style="display: none;" id="label7" class="input-block">
+                            <label for="hour" data-resource="chooseHour"></label>
+                            <input id="hour" name="chooseHour" placeholder="chooseHour" type="time" step="1" min="0" max="23" class="input"></input>
+                        </div>
+                        <div style="display: none;" id="label9" class="input-block">
+                            <label for="sheldTime" data-resource="sheldTime"></label>
+                            <input id="sheldTime" type="datetime-local" class="input">
+                        </div>
+                        <div style="display: none;" id="label2" class="input-block">
+                            <label for="responseURL" data-resource="urlFetch"></label>
+                            <input id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="input"></input>
+                        </div>
+                        <div style="display: none;" id="label1" class="input-block">
+                            <label for="customBody" data-resource="bodyFetch"></label>
+                            <textarea id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="textarea"></textarea>
+                        </div>
+                        <!--TopGG-->
+                        <div style="display: none;" id="chooseTopGG1" class="input-block">
+                            <label data-resource="chooseTopGG" for="chooseTopGG">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span>https://top.gg/</span>
+                                        <span style="color:#d32f2f;">bot</span>
+                                        <span>/270904126974590976/vote</span>
+                                    </span>
+                                </span>
+                            </label>
+                            <select id="chooseTopGG" class="select">
+                                <option value="bot" data-resource="bots"></option>
+                                <option value="servers" data-resource="servers"></option>
+                            </select>
+                        </div>
+                        <div style="display: none;" id="additionTopGG1" class="input-block">
+                            <label data-resource="additionTopGG" for="additionTopGG"></label>
+                            <span class="tooltip1">
+                                <span class="tooltip1text">
+                                    <span>https://top.gg/bot/617037497574359050/vote</span>
+                                    <span style="color:#d32f2f;">?currency=DOGE</span>
+                                </span>
+                            </span>
+                            <input id="additionTopGG" name="additionTopGG" placeholder="additionTopGG" type="text" class="input"></input>
+                        </div>
+                        <!--ListForge-->
+                        <div style="display: none;" id="urlGame" class="input-block">
+                            <label data-resource="urlGame">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span style="color:red;">URL</span>
+                                        <span data-resource="gameIDTooltip"></span>
+                                        <br>
+                                        <span>https://</span>
+                                        <span style="color:#d32f2f;">minecraft-mp.com</span>
+                                        <span>/server/207380/vote/</span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input class="input" name="chooseGame" type="text" id="chooseGameListForge" placeholder="chooseGameURL" list="gameListListForge" class="input">
+                            <datalist id="gameListListForge">
+                                <option value="7daystodie-servers.com">7 Days To Die</option>
+                                <option value="ark-servers.net">ARK : Survival Evolved</option>
+                                <option value="arma3-servers.net">Arma3</option>
+                                <option value="atlas-servers.io">Atlas</option>
+                                <option value="conan-exiles.com">Conan Exiles</option>
+                                <option value="counter-strike-servers.net">Counter Strike : Global Offensive</option>
+                                <option value="cubeworld-servers.com">Cube World</option>
+                                <option value="dayz-servers.org">DayZ</option>
+                                <option value="ecoservers.io">ECO</option>
+                                <option value="empyrion-servers.com">Empyrion</option>
+                                <option value="gmod-servers.com">Garry's Mod</option>
+                                <option value="hurtworld-servers.net">Hurtworld</option>
+                                <option value="hytale-servers.io">Hytale</option>
+                                <option value="life-is-feudal.org">Life is Feudal</option>
+                                <option value="minecraft-mp.com">Minecraft</option>
+                                <option value="minecraftpocket-servers.com">Minecraft Pocket</option>
+                                <option value="miscreated-servers.com">Miscreated</option>
+                                <option value="reign-of-kings.net">Reign of Kings</option>
+                                <option value="rust-servers.net">Rust</option>
+                                <option value="space-engineers.com">Space Engineers</option>
+                                <option value="squad-servers.com">Squad</option>
+                                <option value="starbound-servers.net">Starbound</option>
+                                <option value="tf2-servers.com">Team Fortress 2</option>
+                                <option value="teamspeak-servers.org">Teamspeak</option>
+                                <option value="terraria-servers.com">Terraria</option>
+                                <option value="unturned-servers.net">Unturned</option>
+                                <option value="wurm-unlimited.com">Wurm Unlimited</option>
+                            </datalist>
+                        </div>
+                        <!--ServeurPrive, TopGames and MMoTopRU-->
+                        <div style="display: none;" id="idGame" class="input-block">
+                            <label data-resource="idGame">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span style="color:red;">ID</span>
+                                        <span data-resource="gameIDTooltip"></span>
+                                        <br>
+                                        <span id="gameIDTooltip1"></span>
+                                        <span id="gameIDTooltip2" style="color:#d32f2f;"></span>
+                                        <span id="gameIDTooltip3"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input style="display: none;" class="input" name="chooseGame" type="text" id="chooseGameTopGames" placeholder="chooseGame" list="gameListTopGames" value="minecraft">
+                            <datalist id="gameListTopGames">
+                                <option value="ark">ARK</option>
+                                <option value="dayz">Dayz</option>
+                                <option value="discord">Discord</option>
+                                <option value="garrys-mod">Garry's mod</option>
+                                <option value="gta">GTA 5</option>
+                                <option value="hytale">Hytale</option>
+                                <option value="l4d2">Left 4 Dead 2</option>
+                                <option value="minecraft">Minecraft</option>
+                                <option value="rdr">Red Dead Redemption 2</option>
+                                <option value="roblox">Roblox</option>
+                                <option value="rust">Rust</option>
+                                <option value="terraria">Terraria</option>
+                            </datalist>
+                            <input style="display: none;" class="input" name="chooseGame" type="text" id="chooseGameServeurPrive" placeholder="chooseGame" list="gameListServeurPrive" value="minecraft">
+                            <datalist id="gameListServeurPrive">
+                                <option value="ark">ARK</option>
+                                <option value="ark-survival-evolved">Ark : Survival Evolved</option>
+                                <option value="discord">Discord</option>
+                                <option value="garrys-mod">Garry's Mod</option>
+                                <option value="grand-theft-auto">Grand Theft Auto V</option>
+                                <option value="hytale">Hytale</option>
+                                <option value="minecraft">Minecraft</option>
+                                <option value="minecraft-bedrock">Minecraft Bedrock</option>
+                                <option value="rust">Rust</option>
+                            </datalist>
+                            <input style="display: none;" class="input" name="chooseGame" type="text" id="chooseGameMMoTopRU" placeholder="chooseGame" list="gameListMMoTopRU">
+                            <datalist id="gameListMMoTopRU">
+                                <option value="aion">Aion</option>
+                                <option value="mu">Global FIU Online</option>
+                                <option value="jd">Jade Dynasty</option>
+                                <option value="la2">Lineage 2</option>
+                                <option value="all">Online Games (All)</option>
+                                <option value="pw">Perfect World</option>
+                                <option value="rf">RF Online</option>
+                                <option value="wow">World War Craft</option>
+                            </datalist>
+                        </div>
+                        <div style="display: none;" class="input-block" id="label4">
+                            <label for="selectLang" data-resource="chooseLang"></label>
+                            <select style="display: none;" id="selectLangTopGames" class="select">
+                                <option value="de">Deutsch</option>
+                                <option value="en">English</option>
+                                <option value="es">Español</option>
+                                <option value="fr" selected>Français</option>
+                                <option value="pt">Português</option>
+                                <option value="ru">Русский</option>
+                            </select>
+                            <select style="display: none;" id="selectLangServeurPrive" class="select">
+                                <option value="en">English</option>
+                                <option value="fr" selected>Français</option>
+                            </select>
+                            <select style="display: none;" id="selectLangMMoTopRU" class="select">
+                                <option value="en">English</option>
+                                <option value="ru" selected>Русский</option>
+                            </select>
+                        </div>
+                        <div style="display: none;" class="input-block" id="label5">
+                            <label for="countVote" data-resource="countVote"></label>
+                            <input id="countVote" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="input" value="5">
+                        </div>
+                        <div style="display: none;" class="input-block" id="label10">
+                            <label for="ordinalWorld" data-resource="ordinalWorld">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text" id="spanOrdinalWorld">
+                                        <span data-resource="ordinalWorldTooltip"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input id="ordinalWorld" name="ordinalWorld" type="number" min="1" max="16" placeholder="ordinalWorld" class="input">
+                        </div>
+                        <div id="idSelector" style="display: none;">
+                            <div class="input-block">
+                                <label for="id" data-resource="projectID">
+                                    <span class="tooltip1">
+                                        <span class="tooltip1text">
+                                            <span style="color:#d32f2f;">ID</span>
+                                            <span data-resource="projectIDTooltip"></span>
+                                            <br>
+                                            <span id="projectIDTooltip1"></span><span id="projectIDTooltip2" style="color:#d32f2f;"></span><span id="projectIDTooltip3"></span>
+                                        </span>
+                                    </span>
+                                </label>
+                                <input class="input" name="id" id="id">
                             </div>
-                            <br>
-							<button class="addButton mt-0 mb-1" data-resource="addButton" id="AddVK"></button>
-<!-- 						<button id="deleteAllVKCookies" data-resource="clearCookies" class="float-right"></button> -->
-							<span class="d-block" id="vk">&nbsp;</span>
+                            <datalist id="TopCraftIDList">
+                                <option value="7666">Arago.Games</option>
+                                <option value="7126">Borealis</option>
+                                <option value="7411">CenturyMine</option>
+                                <option value="10340">Cifrazia</option>
+                                <option value="6482">CubixWorld</option>
+                                <option value="8732">DiverseMine</option>
+                                <option value="308">Excalibur-Craft</option>
+                                <option value="3254">FineMine</option>
+                                <option value="7125">FrostLand</option>
+                                <option value="628">Gamai</option>
+                                <option value="7863">GamePoint</option>
+                                <option value="1041">Grand-Mine</option>
+                                <option value="9536">GrandGear</option>
+                                <option value="7755">HillMine</option>
+                                <option value="5966">HunterCraft</option>
+                                <option value="216">IPlayCraft</option>
+                                <option value="10363">Kayrison</option>
+                                <option value="2762">LavaCraft</option>
+                                <option value="5835">Letragon</option>
+                                <option value="10312">LoliLand</option>
+                                <option value="218">McSKill</option>
+                                <option value="304">MinecraftOnly</option>
+                                <option value="6287">MythicalPlanet</option>
+                                <option value="5323">MythicalWorld</option>
+                                <option value="9598">OneLand</option>
+                                <option value="9311">OrangeCraft</option>
+                                <option value="5451">PentaCraft</option>
+                                <option value="6031">Pixelmon.PRO</option>
+                                <option value="600">SMARTYcraft</option>
+                                <option value="9597">ShadowCraft</option>
+                                <option value="8992">ShowyCraft</option>
+                                <option value="9867">SideMC</option>
+                                <option value="1283">SimpleMinecraft</option>
+                                <option value="8179">VictoryCraft</option>
+                                <option value="6711">WarMine</option>
+                                <option value="318">qoobworld</option>
+                                <option value="9584">skolot.fun</option>
+                            </datalist>
+                            <datalist id="McTOPIDList">
+                                <option value="4561">Arago.Games</option>
+                                <option value="2241">Borealis</option>
+                                <option value="4888">CenturyMine</option>
+                                <option value="5089">DiverseMine</option>
+                                <option value="1088">Excalibur-Craft</option>
+                                <option value="3337">FineMine</option>
+                                <option value="4580">FrostLand</option>
+                                <option value="1765">Gamai</option>
+                                <option value="4763">GamePoint</option>
+                                <option value="5516">GrandGear</option>
+                                <option value="4709">HillMine</option>
+                                <option value="3050">HunterCraft</option>
+                                <option value="5864">IPlayCraft</option>
+                                <option value="6029">Kayrison</option>
+                                <option value="45">LavaCraft</option>
+                                <option value="397">Letragon</option>
+                                <option value="54">MinecraftOnly</option>
+                                <option value="4483">MythicalPlanet</option>
+                                <option value="1654">MythicalWorld</option>
+                                <option value="2474">PentaCraft</option>
+                                <option value="4585">Pixelmon.PRO</option>
+                                <option value="317">SMARTYcraft</option>
+                                <option value="5231">ShowyCraft</option>
+                                <option value="1">SimpleMinecraft</option>
+                                <option value="4729">VictoryCraft</option>
+                                <option value="4975">WarMine</option>
+                                <option value="1142">qoobworld</option>
+                                <option value="5685">skolot.fun</option>
+                            </datalist>
+                            <datalist id="MCRateIDList">
+                                <option value="8935">Cifrazia</option>
+                                <option value="7003">CubixWorld</option>
+                                <option value="4396">Excalibur-Craft</option>
+                                <option value="4703">FineMine</option>
+                                <option value="7450">FrostLand</option>
+                                <option value="8428">Gamai</option>
+                                <option value="8493">GrandGear</option>
+                                <option value="4427">HillMine</option>
+                                <option value="10">LavaCraft</option>
+                                <option value="4852">Letragon</option>
+                                <option value="5154">MinecraftOnly</option>
+                                <option value="6099">MythicalWorld</option>
+                                <option value="6071">PentaCraft</option>
+                                <option value="6434">Pixelmon.PRO</option>
+                                <option value="4692">SimpleMinecraft</option>
+                                <option value="1762">qoobworld</option>
+                            </datalist>
+                            <datalist id="MinecraftRatingIDList">
+                                <option value="borealis">Borealis</option>
+                                <option value="cubixworld">CubixWorld</option>
+                                <option value="diversemine">DiverseMine</option>
+                                <option value="excalibur-craft">Excalibur-Craft</option>
+                                <option value="gamepoint">GamePoint</option>
+                                <option value="grand-mine">Grand-Mine</option>
+                                <option value="grandgear">GrandGear</option>
+                                <option value="hillmine">HillMine</option>
+                                <option value="loliland">LoliLand</option>
+                                <option value="mcskill">McSKill</option>
+                                <option value="minecraftonly">MinecraftOnly</option>
+                                <option value="mythicalworld">MythicalWorld</option>
+                                <option value="oneland">OneLand</option>
+                                <option value="orangecraft">OrangeCraft</option>
+                                <option value="penta-craft">PentaCraft</option>
+                                <option value="pixelmon">Pixelmon.PRO</option>
+                                <option value="shadowcraft">ShadowCraft</option>
+                                <option value="sidemc">SideMC</option>
+                                <option value="smc">SimpleMinecraft</option>
+                                <option value="victorycraft">VictoryCraft</option>
+                            </datalist>
+                            <datalist id="MonitoringMinecraftIDList">
+                                <option value="cubixworld">CubixWorld</option>
+                                <option value="grand-mine">Grand-Mine</option>
+                                <option value="gg">GrandGear</option>
+                                <option value="loliland">LoliLand</option>
+                                <option value="mcskill">McSKill</option>
+                                <option value="minecraftonly">MinecraftOnly</option>
+                                <option value="mythicalworld">MythicalWorld</option>
+                                <option value="orangecraft">OrangeCraft</option>
+                                <option value="pixelmonpro">Pixelmon.PRO</option>
+                                <option value="smc">SimpleMinecraft</option>
+                                <option value="skolotfun">skolot.fun</option>
+                            </datalist>
+                            <datalist id="IonMcIDList">
+                                <option value="83">FineMine.RU</option>
+                                <option value="80">Pixelmon.PRO 1.12.2</option>
+                            </datalist>
+                            <datalist id="MinecraftServersOrgIDList">
+                                <option value="564053">Legends Evolved</option>
+                            </datalist>
+                            <datalist id="ServeurPriveIDList">
+                                <option value="gommehd-net-4932">GommeHD.net</option>
+                            </datalist>
+                            <datalist id="PlanetMinecraftIDList">
+                                <option value="legends-evolved">Legends Evolved</option>
+                            </datalist>
+                            <datalist id="TopGIDList">
+                                <option value="405637">Hypixel</option>
+                                <option value="512397">Legends Evolved</option>
+                                <option value="414300">Mineplex</option>
+                            </datalist>
+                            <datalist id="MinecraftServerListIDList">
+                                <option value="292028">Hypixel</option>
+                                <option value="218820">Mineplex</option>
+                            </datalist>
+                            <datalist id="ServerPactIDList">
+                                <option value="24604">Hypixel</option>
+                            </datalist>
+                            <datalist id="MinecraftIpListIDList">
+                                <option value="2576">Hypixel</option>
+                            </datalist>
+                            <datalist id="HotMCIDList">
+                                <option value="199493">qoobworld</option>
+                            </datalist>
+                            <datalist id="TMonitoringIDList">
+                                <option value="qoobworldru">qoobworld</option>
+                            </datalist>
+                            <datalist id="TopGGIDList">
+                                <option value="memes">Dank Memer</option>
+                                <option value="172002275412279296">Tatsumaki</option>
+                                <option value="zerotwo">Zero Two</option>
+                            </datalist>
+                            <datalist id="DiscordBotListIDList">
+                                <option value="dank-memer">Dank Memer</option>
+                                <option value="tatsu">Tatsumaki</option>
+                                <option value="zerotwo">Zero Two</option>
+                            </datalist>
+                            <datalist id="BotsForDiscordIDList">
+                                <option value="469610550159212554">Zero Two</option>
+                            </datalist>
+                        </div>
+                        <button class="submitBtn" data-resource="addButton" id="submitAddProject" type="submit"></button>
+                    </div>
+                    <div>
+                        <div class="label-block">
+                            <label data-resource="advSettings"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="customTimeOut" type="checkbox" name="checkbox"/>
+                            <label data-resource="customTimeOut" for="customTimeOut"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="lastDayMonth" type="checkbox" name="checkbox" disabled/>
+                            <label data-resource="lastDayMonth" for="lastDayMonth"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="sheldTimeCheckbox" type="checkbox" name="checkbox"/>
+                            <label data-resource="sheldTime" for="sheldTimeCheckbox"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox"/>
+                            <label data-resource="disableCheckProjects" for="disableCheckProjects"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="priority" type="checkbox" name="checkbox"/>
+                            <label data-resource="priority" for="priority">
+                                <span class="tooltip1">
+                                    <span data-resource="priorityTooltip" class="tooltip1text"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="randomize" type="checkbox" name="checkbox"/>
+                            <label data-resource="randomize" for="randomize">
+                                <span class="tooltip1">
+                                    <span data-resource="randomizeTooltip" class="tooltip1text"></span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+                <div id="add"></div>
+            </div>
+            <!-- Настройки -->
+            <div id="settings" class="tabcontent" style="display: none;">
+                <h4 data-resource="optionsExtension"></h4>
+                <hr color="#5A5A5C">
+                <div class="userSettings">
+                    <div>
+                        <div class="label-block">
+                            <label data-resource="settings"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledNotifStart" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledNotifStart" for="disabledNotifStart"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledNotifInfo" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledNotifInfo" for="disabledNotifInfo"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledNotifWarn" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledNotifWarn" for="disabledNotifWarn">
+                                <span class="tooltip1">
+                                    <span data-resource="disabledNotifWarnTooltip" class="tooltip1text"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledNotifError" for="disabledNotifError"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox"/>
+                            <label data-resource="enableSyncStorage" for="enableSyncStorage">
+                                <span class="tooltip1">
+                                    <span data-resource="enableSyncStorageTooltip" class="tooltip1text"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledCheckTime" for="disabledCheckTime"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledCheckInternet" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledCheckInternet" for="disabledCheckInternet"></label>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="input-block">
+                            <label data-resource="enabledSilentVote" for="enabledSilentVote">
+                                <span class="tooltip2">
+                                    <span data-resource="enabledSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <select required id="enabledSilentVote" class="select">
+                                <option data-resource="enabledSilentVoteSilent" value="enabled"></option>
+                                <option data-resource="enabledSilentVoteNoSilent" value="disabled"></option>
+                            </select>
+                        </div>
+                        <div class="input-block">
+                            <label data-resource="cooldown" for="cooldown"></label>
+                            <form id="timeout">
+                                <input class="input" name="cooldown" id="cooldown" required type="number" min="1000" max="43200000">
+                                <button data-resource="setCooldown" type="submit" class="justBtn"></button>
+                            </form>
+                        </div>
+                        <div class="label-block">
+                            <label data-resource="settingsFile"></label>
+                        </div>
+                        <div class="fileSystem">
+                            <div>
+                                <label for="file-upload" class="file">
+                                    <span data-resource="importSettings"></span>
+                                    <img src="images/icons/importBtn.svg" alt="importBtn">
+                                </label>
+                                <input id="file-upload" type="file" accept="application/json"/>
+                            </div>
+                            <div>
+                                <label id="file-download" class="file">
+                                    <span data-resource="exportSettings"></span>
+                                    <img src="images/icons/exportBtn.svg" alt="exportBtn">
+                                </label>
+                            </div>
+                            <div>
+                                <label id="logs-download" class="file">
+                                    <span data-resource="exportLogs"></span>
+                                    <img src="images/icons/exportBtn.svg" alt="exportBtn">
+                                </label>
+                            </div>
+                        </div>
+                        <div id="file"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Добавленные -->
+            <div id="added" class="tabcontent" style="display: none;">
+                <h4 data-resource="addedProjects"></h4>
+                <hr color="#5A5A5C">
+                <p data-resource="notAddedAll"></p>
+                <div class="projectsBlock">
+                    <div class="buttonBlock"></div>
+                    <div class="contentBlock">
+                        <ul class="listcontent" id="TopCraftTab" style="display: none;">
+                            <span data-resource="notAdded"></span>
+                            <div id="TopCraftList"></div>
+                        </ul>
+                        <ul class="listcontent" id="McTOPTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <div id="McTOPList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MCRateTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <div id="MCRateList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MinecraftRatingTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <div id="MinecraftRatingList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MonitoringMinecraftTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <div id="MonitoringMinecraftList"></div>
+                        </ul>
+                        <ul class="listcontent" id="IonMcTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="IonMcList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MinecraftServersOrgTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="MinecraftServersOrgList"></div>
+                        </ul>
+                        <ul class="listcontent" id="ServeurPriveTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="ServeurPriveList"></div>
+                        </ul>
+                        <ul class="listcontent" id="PlanetMinecraftTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="PlanetMinecraftList"></div>
+                        </ul>
+                        <ul class="listcontent" id="TopGTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="TopGList"></div>
+                        </ul>
+                        <ul class="listcontent" id="ListForgeTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="ListForgeList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MinecraftServerListTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="MinecraftServerListList"></div>
+                        </ul>
+                        <ul class="listcontent" id="ServerPactTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <div id="ServerPactList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MinecraftIpListTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <div id="MinecraftIpListList"></div>
+                        </ul>
+                        <ul class="listcontent" id="TopMinecraftServersTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="TopMinecraftServersList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MinecraftServersBizTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="MinecraftServersBizList"></div>
+                        </ul>
+                        <ul class="listcontent" id="HotMCTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="HotMCList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MinecraftServerNetTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="MinecraftServerNetList"></div>
+                        </ul>
+                        <ul class="listcontent" id="TopGamesTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="TopGamesList"></div>
+                        </ul>
+                        <ul class="listcontent" id="TMonitoringTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="TMonitoringList"></div>
+                        </ul>
+                        <ul class="listcontent" id="TopGGTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="TopGGList"></div>
+                        </ul>
+                        <ul class="listcontent" id="DiscordBotListTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="DiscordBotListList"></div>
+                        </ul>
+                        <ul class="listcontent" id="BotsForDiscordTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="BotsForDiscordList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MMoTopRUTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="MMoTopRUList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MCServersTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="MCServersList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MinecraftListTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="MinecraftListList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MinecraftIndexTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="MinecraftIndexList"></div>
+                        </ul>
+                        <ul class="listcontent" id="ServerList101Tab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="ServerList101List"></div>
+                        </ul>
+                        <ul class="listcontent" id="MCServerListTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <div id="MCServerListList"></div>
+                        </ul>
+                        <ul class="listcontent" id="CraftListTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="CraftListList"></div>
+                        </ul>
+                        <ul class="listcontent" id="CzechCraftTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="CzechCraftList"></div>
+                        </ul>
+                        <ul class="listcontent" id="PixelmonServersTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="PixelmonServersList"></div>
+                        </ul>
+                        <ul class="listcontent" id="QTopTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="QTopList"></div>
+                        </ul>
+                        <ul class="listcontent" id="MinecraftBuzzTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <label data-resource="notAvaibledInSilent">
+                                <span class="tooltip2">
+                                    <span data-resource="warnSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <div id="MinecraftBuzzList"></div>
+                        </ul>
+                        <ul class="listcontent" id="CustomTab" style="display: none;">
+                            <div data-resource="notAdded"></div>
+                            <div id="CustomList"></div>
+                        </ul>
+                    </div>
+                </div>
+                <a id="generalStats" data-resource="generalStats" class="link"></a>
+            </div>
+            <!-- MultiVote -->
+            <div id="multivote" class="tabcontent" style="display: none;">
+				<h4 data-resource="multivote"></h4>
+				<hr color="#5A5A5C">
+				<div class="multivoteBlock">
+					<div class="controlInputs">
+						<div class="check-block">
+							<input class="checkbox" id="useMultiVote" type="checkbox" name="checkbox" />
+							<label data-resource="useMultiVote" for="useMultiVote"></label>
+						</div>
+						<div class="check-block">
+							<input class="checkbox" id="repeatAttemptLater" type="checkbox" name="checkbox" />
+							<label data-resource="repeatAttemptLater" for="repeatAttemptLater"></label>
+						</div>
+					</div>
+					<div class="buttonBlock">
+						<button data-resource="VK" class="selectsite" id="VKButton"><span>0</span></button>
+            		     <button data-resource="proxy" class="selectsite" id="ProxyButton"><span>0</span></button>
+            		     <!--<button class="selectsite" id="IonMcButton">IonMc</button>-->
+					</div>
+					<div class="contentBlock">
+						<ul class="listcontent" id="VKTab" style="display: none;">
+						    <div class="inputEl">
+						    	<button class="submitBtn" data-resource="addButton" id="AddVK"></button>
+						    </div>
+							<!--<button id="deleteAllVKCookies" data-resource="clearCookies"></button>-->
+							<span id="vk"></span>
 							<div id="VKList"></div>
 						</ul>
 						<ul class="listcontent" id="ProxyTab" style="display: none;">
-                            <div class="row">
-                            	<form id="formProxyBlackList">
-                                <div class="col-xl-12 col-lg-12 col-md-12">
-                            		<div class="form-group mb-1">
-										<label data-resource="proxyBlackList" for="proxyBlackList"></label> <span class="tooltip1 ml-1"><span class="tooltip1text">Шаблон: <a href="https://developer.chrome.com/docs/extensions/reference/proxy/#bypass-list">https://developer.chrome.com/docs/extensions/reference/proxy/#bypass-list</a></span></span>
-									</div>
-                            		<div class="pblFormDiv">
-                            			<input id="proxyBlackList" type="text" name="text">
-                            			<button data-resource="setCooldown" type="submit"></button>
-                            		</div>
-                            	</div>
-                            	</form>
-                            	<form id="addProxy">
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<div class="form-group mb-1">
-                            			<label data-resource="ipLabel" for="ip"></label>
-                            		</div>
-                            		<input name="ip" id="ip" class="mb-2" required placeholder="ip">
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<div class="form-group mb-1">
-                            			<label data-resource="portLabel" for="port"></label>
-                            		</div>
-                            		<input type="number" name="port" id="port" class="mb-2" required placeholder="port">
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<div class="form-group mb-1">
-                            			<label data-resource="typeLabel" for="proxyType"></label>
-                            		</div>
-                            		<select id="proxyType" class="mb-2" required>
-                            			<option data-resource="type" value="" selected disabled></option>
-                            			<option value="http">http</option>
-                            			<option value="https">https</option>
-                            			<option value="quic">quic</option>
-                            			<option value="socks4">socks4</option>
-                            			<option value="socks5">socks5</option>
-                            		</select>
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<div class="form-group mb-1">
-                            			<label data-resource="loginLabel" for="login"></label>
-                            		</div>
-                            		<input type="text" name="login" id="login" class="mb-2" placeholder="login">
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<div class="form-group mb-1">
-                            			<label data-resource="passwordLabel" for="password"></label>
-                            		</div>
-                            		<input type="password" name="password" id="password" class="mb-2" placeholder="password">
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12 addProxyDiv">
-                            		<button class="addButton w-100" data-resource="addButton" id="submitAddProxy" type="submit"></button>
-                            	</div>
-                            	</form>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<label class="addButton mutiVoteButton mb-2" data-resource="importProxy" for="importProxy"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="bevel"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 4.2v10.3" /></svg></label>
-                            	<input id="importProxy" type="file" accept=".txt">
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<button class="mutiVoteButton mb-2" id="importTunnelBear" data-resource="importTunnelBear"></button>
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<button class="mutiVoteButton mb-2" id="importWindscribe" data-resource="importWindscribe"></button>
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<button class="mutiVoteButton mb-2" id="importHolaVPN" data-resource="importHolaVPN"></button>
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<button class="mutiVoteButton mb-2" id="deleteNotWorkingProxies" data-resource="deleteNotWorking"></button>
-                            	</div>
-                            	<div class="col-xl-4 col-lg-6 col-md-12">
-                            		<button class="mutiVoteButton mb-2" id="deleteAllProxies" data-resource="deleteAll"></button>
-                            	</div>
-                            </div>
-                            <div class="mt-3" id="proxy">&nbsp;</div>
-                            <div id="ProxyList"></div>
-                        </ul>
-						<!--<ul class="listcontent" id="IonMcTab" style="display: none;">
-							
-						</ul>-->
+            		        <form id="formProxyBlackList">
+            		        	<div class="label-block">
+            		        		<label data-resource="proxyBlackList" for="proxyBlackList">
+            		        			<span class="tooltip1">
+            		        				<span class="tooltip1text" data-resource="pattern"><a class="link" target="_blank" href="https://developer.chrome.com/docs/extensions/reference/proxy/#bypass-list">https://developer.chrome.com/docs/extensions/reference/proxy/#bypass-list</a></span>
+            		        			</span>
+            		        		</label>
+            		        	</div>
+            		        	<div class="inputEl">
+            		        		<input id="proxyBlackList" type="text" name="text" class="input">
+            		        		<button data-resource="setCooldown" type="submit" class="justBtn"></button>
+            		        	</div>
+            		        </form>
+
+            		        <form id="addProxy">
+            		        	<div class="input-block">
+            		        		<label data-resource="ipLabel" for="ip"></label>
+            		        		<input name="ip" id="ip" class="input" required placeholder="ip">
+            		        	</div>
+            		        	<div class="input-block">
+            		        		<label data-resource="portLabel" for="port"></label>
+            		        		<input type="number" name="port" class="input" id="port" required placeholder="port">
+            		        	</div>
+            		        	<div class="input-block">
+            		        		<label data-resource="typeLabel" for="proxyType"></label>
+            		        		<select id="proxyType" class="select" required>
+            		        			<option data-resource="type" value="" selected disabled></option>
+            		        			<option value="http">http</option>
+            		        			<option value="https">https</option>
+            		        			<option value="quic">quic</option>
+            		        			<option value="socks4">socks4</option>
+            		        			<option value="socks5">socks5</option>
+            		        		</select>
+            		        	</div>
+            		        	<div class="input-block">
+            		        		<label data-resource="loginLabel" for="login"></label>
+            		        		<input type="text" name="login" id="login" class="input" placeholder="login">
+            		        	</div>
+            		        	<div class="input-block">
+            		        		<label data-resource="passwordLabel" for="password"></label>
+            		        		<input type="password" name="password" id="password" class="input" placeholder="password">
+            		        	</div>
+            		        	<button class="justBtn" data-resource="addButton" id="submitAddProxy" type="submit"></button>
+            		        </form>
+
+            		        <div class="importProxyBtns">
+            		        	<div>
+            		        		<label class="file" for="importProxy" class="importProxy">
+            		        		    <span data-resource="importProxy"></span>
+            		        		    <img src="images/icons/importBtn.svg" alt="importBtn">
+            		        		</label>
+            		        		<input id="importProxy" type="file" accept=".txt">
+            		        	</div>
+            		        	<button class="justBtn" id="importTunnelBear" data-resource="importTunnelBear"></button>
+            		        	<button class="justBtn" id="importWindscribe" data-resource="importWindscribe"></button>
+            		        	<button class="justBtn" id="importHolaVPN" data-resource="importHolaVPN"></button>
+            		        	<button class="justBtn redBtn" id="deleteNotWorkingProxies" data-resource="deleteNotWorking"></button>
+            		        	<button class="justBtn redBtn" id="deleteAllProxies" data-resource="deleteAll"></button>
+            		        </div>
+
+            		        <div id="proxy"></div>
+            		        <div id="ProxyList"></div>
+            		     </ul>
 					</div>
 				</div>
 			</div>
-			<a id="donate" data-resource="supportDev" target="blank_" class="float-right" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
-		    <audio id="sound-link2" preload="auto">
-			    <source src="audio/coins1.mp3" type="audio/mpeg">
-		    </audio>
-		    <audio id="sound-link" preload="auto">
-			    <source src="audio/coins2.mp3" type="audio/mpeg">
-		    </audio>
-			<div id="save">&nbsp;</div>
-		</div>
-	</div>
 
-	<div class="anelumen lowingnuska" id="addFastProject">
-		<a href="options.html" class="nedismiseg"></a>
-		<figure>
-			<h2 data-resource="fastAdd"><a href="options.html" class="compatibg-ukastywise" aria-label="Close Modal Box">×</a></h2>
-			<div class="modalContent">
-				<div data-resource="load" id=modaltext></div>
-			</div>
-		</figure>
-	</div>
-	<div class="anelumen lowingnuska" id="stats">
-	    <a href="#/" class="nedismiseg" id="closeStats"></a>
-		<a id="modalStats" href="#stats"></a>
-		<figure>
-			<h2>
-			    <span data-resource="stats2"></span>
-			    <div id="statsSubtitle">&nbsp;</div>
-			    <a href="#/" class="compatibg-ukastywise" id="closeStats2" aria-label="Close Modal Box">×</a>
-			</h2>
-
-            <div class="modalContent stats">
-                <table>
-                    <tr>
-                        <td data-resource="statsSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsMonthSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastMonthSuccessVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLaterVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsErrorVotes"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastSuccessVote"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsLastAttemptVote"></td>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td data-resource="statsAdded"></td>
-                        <th></th>
-                    </tr>
-                </table>
+            <!-- О расширении -->
+            <div id="help" class="tabcontent" style="display: none;">
+                <h4 data-resource="help"></h4>
+                <hr color="#5A5A5C">
+                <div class="aboutProject">
+                	<a target="blank_" href="https://discord.gg/GyvMtbU" class="social"><img src="images/icons/ds.svg" alt="ds"></a>
+                    <div class="cont">
+                    	<div data-resource="developers"></div>
+                    	<div data-resource="developer">
+                    	    <a class="link" target="blank_" href="https://discord.com/users/441823506200788992">
+                    	        <span>Serega007</span>
+                    	    </a>
+                    	</div>
+                    	<div data-resource="designer">
+                    	    <a class="link" target="blank_" href="https://discord.com/users/279936883277168640">
+                    	        <span>Qworte</span>
+                    	    </a>
+                    	</div>
+                    	<div class="free" data-resource="itsFree"></div>
+                    	<div class="text">
+                    	    <span data-resource="feedback"></span>
+                    	    <span data-resource="dmDiscord"></span>
+                    	    <span data-resource="feedback2">
+                    	        <a class="link" target="blank_" href="https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd/support">
+                    	            <span data-resource="dmChromeWebStore"></span>
+                    	        </a>
+                    	    </span>
+                    	</div>
+                    </div>
+                    <a target="blank_" href="https://gitlab.com/Serega007/auto-vote-rating" class="social"><img src="images/icons/git.svg" alt="git"></a>
+                </div>
             </div>
-		</figure>
-	</div>
+            <!-- Ассеты -->
+            <a class="link" id="donate" data-resource="supportDev" target="blank_" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
+            <audio id="sound-link2" preload="auto">
+                <source src="audio/coins1.mp3" type="audio/mpeg">
+            </audio>
+            <audio id="sound-link" preload="auto">
+                <source src="audio/coins2.mp3" type="audio/mpeg">
+            </audio>
+            <div id="save"></div>
+        </div>
 
-	<script src="options.js"></script>
-</body>
+        <!-- Модалки -->
+        <div id="modals">
+            <div class="overlay"></div>
+            <!-- Быстрое добавление -->
+            <div class="modal" id="addFastProject">
+                <div class="head">
+                    <h3 data-resource="fastAdd"></h3>
+                    <div class="close"></div>
+                </div>
+                <div class="content">
+                    <div class="message"></div>
+                    <div class="events"></div>
+                </div>
+            </div>
+            <!-- Статистика -->
+            <div class="modal" id="stats">
+                <div class="head">
+                    <div class="title">
+                        <h3 data-resource="stats2"></h3>
+                        <div id="statsSubtitle"></div>
+                    </div>
+                    <div class="close"></div>
+                </div>
+                <div class="content">
+                    <div class="message">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td data-resource="statsSuccessVotes"></td>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td data-resource="statsMonthSuccessVotes"></td>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td data-resource="statsLastMonthSuccessVotes"></td>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td data-resource="statsLaterVotes"></td>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td data-resource="statsErrorVotes"></td>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td data-resource="statsLastSuccessVote"></td>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td data-resource="statsLastAttemptVote"></td>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td data-resource="statsAdded"></td>
+                                    <th></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+>>>>>>> dev
+            </div>
+        </div>
+        <script src="options.js"></script>
+    </body>

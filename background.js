@@ -189,11 +189,6 @@ async function checkOpen(project) {
     for (let value of queueProjects) {
         if (getProjectName(value) == getProjectName(project) || value.randomize && project.randomize) {
             if (!value.nextAttempt) return
-            if (settings.MultiVote) {
-                if (/*settings.iFromUkraine &&*/ (value.TopCraft || value.McTOP || value.MinecraftRating) && (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
-                    return
-                }
-            }
             if (Date.now() < value.nextAttempt) {
                 return
             } else {
@@ -201,6 +196,18 @@ async function checkOpen(project) {
                 console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
                 if (!settings.disabledNotifError)
                     sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
+            }
+        }
+        if (settings.useMultiVote) {
+            if (project.TopCraft || project.McTOP || project.MinecraftRating) {
+                if (!value.TopCraft && !value.McTOP && !value.MinecraftRating) {
+                    return
+                }
+            }
+            if (value.TopCraft || value.McTOP || value.MinecraftRating) {
+                if (!project.TopCraft && !project.McTOP && !project.MinecraftRating) {
+                    return
+                }
             }
         }
     }
@@ -215,7 +222,7 @@ async function checkOpen(project) {
             }
         }
         if (currentProxy != null) {
-            if (/*settings.iFromUkraine &&*/ (project.TopCraft || project.McTOP || project.MinecraftRating)) {
+            if (project.TopCraft || project.McTOP || project.MinecraftRating) {
                 return
             }
             let usedProjects = getTopFromList(currentProxy, project)
@@ -349,7 +356,22 @@ async function newWindow(project) {
             }
         }
 
-        if (currentProxy == null && (!settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))) {
+        if (currentProxy == null && (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
+            let proxyDetails = await new Promise(resolve => {
+                chrome.proxy.settings.get({}, async function(details) {
+                    resolve(details)
+                })
+            })
+            if (!(proxyDetails.levelOfControl == 'controllable_by_this_extension' || proxyDetails.levelOfControl == 'controlled_by_this_extension')) {
+                settings.stopVote = Date.now() + 86400000
+                console.error(chrome.i18n.getMessage('otherProxy'))
+                if (!settings.disabledNotifError) {
+                    sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
+                }
+                await setValue('AVMRsettings', settings)
+                await stopVote()
+                return
+            }
             //Ищет не юзанный свободный прокси
             let found = false
             for (let proxy of proxies) {
@@ -895,11 +917,11 @@ async function silentVote(project) {
                 }
                 if (!response.ok) {
                     if (response.status == 503) {
-                        if (i == 3) {
+                        if (i >= 3) {
                             endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + response.status)}, null, project)
                             return
                         }
-                        await wait(3000)
+                        await wait(5000)
                         continue
                     } else {
                         endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
@@ -909,17 +931,23 @@ async function silentVote(project) {
 
                 let doc = new DOMParser().parseFromString(html, 'text/html')
                 if (doc.querySelector('body') != null && doc.querySelector('body').textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-                    if (i == 3) {
+                    if (i >= 3) {
                         endVote({message: chrome.i18n.getMessage('errorAttemptVote') + doc.querySelector('body').textContent}, null, project)
                         return
                     }
+                    await wait(5000)
                     continue
                 }
+                if (document.querySelector('form[method="POST"]') != null && document.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
+                    endVote({message: document.querySelector('form[method="POST"]').textContent.trim()}, null, project)
+                    return
+                }
                 if (doc.querySelector('input[name=player]') != null) {
-                    if (i == 3) {
+                    if (i >= 3) {
                         endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(doc.querySelector('input[name=player]')))}, null, project)
                         return
                     }
+                    await wait(5000)
                     continue
                 }
 
@@ -1325,8 +1353,7 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
         let project = openedProjects.get(sender.tab.id)
         let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage(Object.keys(request)[0])
         console.warn(getProjectPrefix(project, true) + message)
-        if (!settings.disabledNotifWarn)
-            sendNotification(getProjectPrefix(project, false), message)
+        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
     } else {
         endVote(request, sender, null)
     }
@@ -1347,9 +1374,16 @@ async function endVote(request, sender, project) {
             })
         }
         openedProjects.delete(sender.tab.id)
-    } else if (!project)
-        return
-    
+        //Обновление проекта из списка в случае его изменения
+        let projects = getProjectList(project)
+        for (const proj of projects) {
+            if (JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick) {
+                project = proj
+                break
+            }
+        }
+    } else if (!project) return
+
     delete project.nextAttempt
 
     let deleted = true
@@ -1472,6 +1506,7 @@ async function endVote(request, sender, project) {
         }
 
         if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(),time.getMonth() + 1,0).getDate() != new Date().getDate())) {
+            time = new Date()
             if (project.timeoutHour) {
                 if (!project.timeoutMinute) project.timeoutMinute = 0
                 if (!project.timeoutSecond) project.timeoutSecond = 0
@@ -1539,7 +1574,7 @@ async function endVote(request, sender, project) {
                 getTopFromList(currentProxy, project).push(usedProject)
                 proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy
                 await setValue('AVMRproxies', proxies)
-            } else if (!settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
+            } else if (!project.TopCraft && !project.McTOP && !project.MinecraftRating) {
                 console.warn('currentProxy is null or not found')
             }
         }
@@ -1821,7 +1856,7 @@ async function wait(ms) {
 async function changeProject(project) {
     let projects = getProjectList(project)
     for (let i in projects) {
-        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id) && getProjectName(projects[i]) == getProjectName(project)) {
+        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id)) {
             projects[i] = project
             await setValue('AVMRprojects' + getProjectName(project), projects)
             break

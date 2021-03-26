@@ -53,64 +53,20 @@ var authVKUrls = new Map([
     ['MCRate', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
     ['MinecraftRating', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
     ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
-    ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&redirect_uri=close.html']
+    ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&response_type=token&redirect_uri=close.html']
 ])
 
-const svgDelete = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-svgDelete.setAttribute('width', 24)
-svgDelete.setAttribute('height', 24)
-svgDelete.setAttribute('viewBox', '0 0 24 24')
-svgDelete.setAttribute('fill', 'none')
-svgDelete.setAttribute('stroke', 'currentColor')
-svgDelete.setAttribute('stroke-width', 2)
-svgDelete.setAttribute('stroke-linecap', 'round')
-svgDelete.setAttribute('stroke-linejoin', 'round')
-const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line')
-line1.setAttribute('x1', 18)
-line1.setAttribute('y1', 4)
-line1.setAttribute('x2', 6)
-line1.setAttribute('y2', 16)
-line2.setAttribute('x1', 6)
-line2.setAttribute('y1', 4)
-line2.setAttribute('x2', 18)
-line2.setAttribute('y2', 16)
-svgDelete.appendChild(line1)
-svgDelete.appendChild(line2)
+const svgRepair = document.createElement('img')
+svgRepair.src = 'images/icons/repair.svg'
 
-const svgStats = svgDelete.cloneNode()
-svgStats.setAttribute('viewBox', '0 2 24 24')
-const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-path1.setAttribute('d', 'M20.2 7.8l-7.7 7.7-4-4-5.7 5.7')
-path2.setAttribute('d', 'M15 7h6v6')
-svgStats.appendChild(path1)
-svgStats.appendChild(path2)
+const svgFail = document.createElement('img')
+svgFail.src = 'images/icons/error.svg'
 
-const svgRepair = svgDelete.cloneNode()
-svgRepair.setAttribute('viewBox', '0 2 24 24')
-const path3 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-path3.setAttribute('d', 'M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2')
-svgRepair.appendChild(path3)
+const svgSuccess = document.createElement('img')
+svgSuccess.src = 'images/icons/success.svg'
 
-const svgFail = svgDelete.cloneNode()
-svgFail.setAttribute('stroke', '#f44336')
-svgFail.setAttribute('stroke-width', 3)
-svgFail.setAttribute('stroke-linejoin', 'bevel')
-const line3 = line1.cloneNode(true)
-const line4 = line2.cloneNode(true)
-line3.setAttribute('y2', 18)
-line4.setAttribute('y2', 18)
-svgFail.appendChild(line3)
-svgFail.appendChild(line4)
-
-const svgSuccess = svgDelete.cloneNode()
-svgSuccess.setAttribute('stroke', '#4CAF50')
-svgSuccess.setAttribute('stroke-width', 3)
-svgSuccess.setAttribute('stroke-linejoin', 'bevel')
-const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
-polyline.setAttribute('points', '20 6 9 17 4 12')
-svgSuccess.appendChild(polyline)
+const svgDelete = document.createElement('img')
+svgDelete.src = 'images/icons/delete.svg'
 
 //Конструктор настроек
 function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disabledNotifError, enabledSilentVote, disabledCheckTime, cooldown) {
@@ -217,8 +173,6 @@ async function restoreOptions() {
                 return
             } else if (this.id == 'useMultiVote') {
                 settings.useMultiVote = this.checked
-            } else if (this.id == 'iFromUkraine') {
-                settings.iFromUkraine = this.checked
             } else if (this.id == 'repeatAttemptLater') {
                 settings.repeatAttemptLater = this.checked
             } else if (this.id == 'randomize') {
@@ -227,31 +181,23 @@ async function restoreOptions() {
                 if (this.checked) {
                     document.getElementById('lastDayMonth').disabled = false
                     document.getElementById('label6').removeAttribute('style')
-                    document.getElementById('selectTime').removeAttribute('style')
                     if (document.getElementById('selectTime').value == 'ms') {
                         document.getElementById('label3').removeAttribute('style')
-                        document.getElementById('time').removeAttribute('style')
                         document.getElementById('time').required = true
                         document.getElementById('label7').style.display = 'none'
-                        document.getElementById('hour').style.display = 'none'
                         document.getElementById('hour').required = false
                     } else {
                         document.getElementById('label7').removeAttribute('style')
-                        document.getElementById('hour').removeAttribute('style')
                         document.getElementById('hour').required = true
                         document.getElementById('label3').style.display = 'none'
-                        document.getElementById('time').style.display = 'none'
                         document.getElementById('time').required = false
                     }
                 } else {
                     document.getElementById('lastDayMonth').disabled = true
                     document.getElementById('label6').style.display = 'none'
-                    document.getElementById('selectTime').style.display = 'none'
                     document.getElementById('label3').style.display = 'none'
-                    document.getElementById('time').style.display = 'none'
                     document.getElementById('time').required = false
                     document.getElementById('label7').style.display = 'none'
-                    document.getElementById('hour').style.display = 'none'
                     document.getElementById('hour').required = false
                 }
                 return
@@ -260,11 +206,9 @@ async function restoreOptions() {
             } else if (this.id == 'sheldTimeCheckbox') {
                 if (this.checked) {
                     document.getElementById('label9').removeAttribute('style')
-                    document.getElementById('sheldTime').removeAttribute('style')
                     document.getElementById('sheldTime').required = true
                 } else {
                     document.getElementById('label9').style.display = 'none'
-                    document.getElementById('sheldTime').style.display = 'none'
                     document.getElementById('sheldTime').required = false
                 }
                 return
@@ -300,22 +244,17 @@ async function restoreOptions() {
     let stopVoteButton = async function () {
         if (settings.stopVote > Date.now()) {
             settings.stopVote = 0
-            document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#00d510')
-            document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#00d510')
+            document.querySelector('#stopVote img').src = 'images/icons/start.svg'
             updateStatusSave(chrome.i18n.getMessage('voteResumed'), false, 'success')
         } else {
             settings.stopVote = 9000000000000000
-            document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
-            document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
-
+            document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
             await chrome.extension.getBackgroundPage().stopVote()
-            
             updateStatusSave(chrome.i18n.getMessage('voteSuspended'), false, 'error')
         }
         await setValue('AVMRsettings', settings, false)
     }
     document.getElementById('stopVote').addEventListener('click', stopVoteButton)
-    document.getElementById('stopVote2').addEventListener('click', stopVoteButton)
 
     //Считывает настройки расширение и выдаёт их в html
     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
@@ -334,12 +273,10 @@ async function restoreOptions() {
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('cooldown').value = settings.cooldown
     document.getElementById('useMultiVote').checked = settings.useMultiVote
-    document.getElementById('iFromUkraine').checked = settings.iFromUkraine
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
     if (settings.stopVote > Date.now()) {
-        document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
-        document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
+        document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
     }
     if (settings.enableCustom || projectsCustom.length > 0)
         addCustom()
@@ -374,42 +311,45 @@ async function addProjectList(project, visually) {
     }
 
     const div = document.createElement('div')
+    div.classList.add('controlItems')
 
-    const span1 = document.createElement('span')
-    span1.className = 'statsProject'
-    span1.appendChild(svgStats.cloneNode(true))
+    const img1 = document.createElement('img')
+    img1.src = 'images/icons/stats.svg'
+    div.appendChild(img1)
 
-    const span2 = document.createElement('span')
-    span2.className = 'deleteProject'
-    span2.appendChild(svgDelete.cloneNode(true))
+    const img2 = document.createElement('img')
+    img2.src = 'images/icons/delete.svg'
+    div.appendChild(img2)
 
-    div.appendChild(span1)
-    div.appendChild(span2)
+    const contDiv = document.createElement('div')
+    contDiv.classList.add('message')
 
-    li.appendChild(div)
-
-    li.append((project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : ''))
-
-    li.appendChild(document.createElement('br'))
+    const nameProjectMes = document.createElement('div')
+    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '')
+    contDiv.append(nameProjectMes)
 
     if (project.error) {
-        const span3 = document.createElement('span')
-        span3.style = 'color:#f44336;'
-        span3.append(project.error)
-        li.appendChild(span3)
-        li.appendChild(document.createElement('br'))
+        const div2 = document.createElement('div')
+        div2.style = 'color:#da5e5e;'
+        div2.append(project.error)
+        contDiv.appendChild(div2)
     }
 
-    li.append(chrome.i18n.getMessage('nextVote') + ' ' + text)
+    const nextVoteMes = document.createElement('div')
+    nextVoteMes.textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
+    contDiv.append(nextVoteMes)
+
+    li.append(contDiv)
+    li.append(div)
 
     listProject.append(li)
     //Слушатель кнопки Удалить на проект
-    span2.addEventListener('click', function() {
+    img2.addEventListener('click', function() {
         removeProjectList(project, false)
     })
     //Слушатель кнопки Статистики и вывод её в модалку
-    span1.addEventListener('click', function() {
-        document.getElementById('modalStats').click()
+    img1.addEventListener('click', function() {
+        toggleModal('stats')
         document.getElementById('statsSubtitle').textContent = getProjectName(project) + ' – ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + (project.name != null ? project.name : project.id))
         document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes ? project.stats.successVotes : 0
         document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes ? project.stats.monthSuccessVotes : 0
@@ -421,28 +361,21 @@ async function addProjectList(project, visually) {
         document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = project.stats.added ? new Date(project.stats.added).toLocaleString().replace(',', '') : 'None'
     })
     if (document.getElementById(getProjectName(project) + 'Button') == null) {
-        if (document.getElementById('addedProjectsTable1').childElementCount == 0) {
-            document.getElementById('addedProjectsTable1').innerText = ''
+        if (document.querySelector('.buttonBlock').childElementCount == 0) {
+            document.querySelector('.buttonBlock').innerText = ''
         }
 
         let button = document.createElement('button')
-        button.setAttribute('class', 'selectsite projectListButtons')
+        button.setAttribute('class', 'selectsite')
         button.setAttribute('id', getProjectName(project) + 'Button')
+        button.style.order = allProjects.indexOf(getProjectName(project))
         button.textContent = getFullProjectName(project)
 
         let count = document.createElement('span')
         count.textContent = getProjectList(project).length
         button.append(count)
 
-        if (document.getElementById('addedProjectsTable1').childElementCount > document.getElementById('addedProjectsTable2').childElementCount) {
-            document.getElementById('addedProjectsTable2').insertBefore(button, document.getElementById('addedProjectsTable2').firstElementChild)
-        } else if (document.getElementById('addedProjectsTable2').childElementCount > document.getElementById('addedProjectsTable3').childElementCount) {
-            document.getElementById('addedProjectsTable3').insertBefore(button, document.getElementById('addedProjectsTable3').firstElementChild)
-        } else if (document.getElementById('addedProjectsTable3').childElementCount > document.getElementById('addedProjectsTable4').childElementCount) {
-            document.getElementById('addedProjectsTable4').insertBefore(button, document.getElementById('addedProjectsTable4').firstElementChild)
-        } else {
-            document.getElementById('addedProjectsTable1').insertBefore(button, document.getElementById('addedProjectsTable1').firstElementChild)
-        }
+        document.querySelector('.buttonBlock').append(button)
         document.getElementById(getProjectName(project) + 'Button').addEventListener('click', function() {
             listSelect(event, getProjectName(project) + 'Tab')
         })
@@ -457,7 +390,7 @@ async function addProjectList(project, visually) {
     if (project.Custom && !settings.enableCustom) addCustom()
     //projects.push(project)
     //await setValue('AVMRprojects', projects, true)
-    if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
+    if (document.querySelector('.buttonBlock').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
     document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
@@ -468,27 +401,34 @@ async function addVKList(VK, visually) {
     let listVK = document.getElementById('VKList')
     let html = document.createElement('li')
     html.id = VK.id + '_' + VK.name
-    html.className = 'multiVoteList'
+    let mesBlock = document.createElement('div')
+    mesBlock.classList.add('message')
+    let contBlock = document.createElement('div')
+    contBlock.classList.add('controlItems')
+
     let div = document.createElement('div')
-    let span = document.createElement('span')
-    span.className = 'deleteProject'
-    span.append(svgDelete.cloneNode(true))
-    let span2 = document.createElement('span')
-    span2.className = 'statsProject'
-    span2.append(svgRepair.cloneNode(true))
-    div.append(span2)
-    div.append(span)
-    html.append(div)
-    html.append(VK.name + ' – ' + VK.id)
+    div.textContent = VK.name+' – '+VK.id
+    mesBlock.append(div)
+
+    let repairBtn = svgRepair.cloneNode(true)
+    contBlock.append(repairBtn)
+
+    let delBtn = svgDelete.cloneNode(true)
+    contBlock.append(delBtn)
+
     if (VK.notWorking) {
-        html.append(document.createElement('br'))
-        html.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
+        let div2 = document.createElement('div')
+        div2.textContent = createMessage(chrome.i18n.getMessage('notWork'), 'error')
+        mesBlock.append(div2)
     }
+    html.append(mesBlock)
+    html.append(contBlock)
+
     listVK.append(html)
-    span.addEventListener('click', function() {
+    delBtn.addEventListener('click', function() {
         removeVKList(VK, false)
     })
-    span2.addEventListener('click', async function() {
+    repairBtn.addEventListener('click', async function() {
         for (let i = 0; i < VK.cookies.length; i++) {
             let cookie = VK.cookies[i]
             await setCookieDetails({
@@ -523,20 +463,26 @@ async function addProxyList(proxy, visually) {
     let listProxy = document.getElementById('ProxyList')
     let html = document.createElement('li')
     html.id = proxy.ip + '_' + proxy.port
-    html.className = 'multiVoteList'
+    let mes = document.createElement('div')
+    mes.classList.add('message')
     let div = document.createElement('div')
-    let span = document.createElement('span')
-    span.className = 'deleteProject'
-    span.append(svgDelete.cloneNode(true))
-    div.append(span)
-    html.append(div)
-    html.append(proxy.ip + ':' + proxy.port + ' ' + proxy.scheme)
+    div.textContent = proxy.ip + ':' + proxy.port + ' ' + proxy.scheme
+    mes.append(div)
+    let control = document.createElement('div')
+    control.classList.add('controlItems')
+    let del = (svgDelete.cloneNode(true))
+    control.append(del)
+    
     if (proxy.notWorking) {
         html.append(document.createElement('br'))
-        html.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
+        let div2 = document.createElement('div')
+        div2.textContent = createMessage(chrome.i18n.getMessage('notWork'), 'error')
+        mes.append(div2)
     }
+    html.append(mes)
+    html.append(control)
     listProxy.append(html)
-    span.addEventListener('click', function() {
+    del.addEventListener('click', function() {
         removeProxyList(proxy, false)
     })
     if (visually) {
@@ -552,8 +498,9 @@ async function addProxyList(proxy, visually) {
 async function removeProjectList(project, visually) {
     let li = document.getElementById(getProjectName(project) + '_' + project.id + '_' + project.nick)
     if (li != null) {
-        li.querySelector('span.deleteProject').removeEventListener('click', null)
-        li.querySelector('span.statsProject').removeEventListener('click', null)
+        li.querySelectorAll('img').forEach((el)=> {
+            el.removeEventListener('click', null)
+        })
         li.remove()
     } else {
         return
@@ -594,8 +541,8 @@ async function removeProjectList(project, visually) {
 async function removeVKList(VK, visually) {
     let li = document.getElementById(VK.id + '_' + VK.name)
     if (li != null) {
-        li.querySelector('span.deleteProject').removeEventListener('click', null)
-        li.querySelector('span.statsProject').removeEventListener('click', null)
+        li.querySelector('img:nth-child(1)').removeEventListener('click', null)
+        li.querySelector('img:nth-child(2)').removeEventListener('click', null)
         li.remove()
     } else {
         return
@@ -615,7 +562,7 @@ async function removeVKList(VK, visually) {
 async function removeProxyList(proxy, visually) {
     let li = document.getElementById(proxy.ip + '_' + proxy.port)
     if (li != null) {
-        li.querySelector('span.deleteProject').removeEventListener('click', null)
+        li.querySelector('img:nth-child(1)').removeEventListener('click', null)
         li.remove()
     } else {
         return
@@ -654,11 +601,15 @@ function updateProjectList(projects, key) {
         for (const item of allProjects) {
             document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
         }
+        document.querySelector('div.buttonBlock').parentNode.replaceChild(document.querySelector('div.buttonBlock').cloneNode(false), document.querySelector('div.buttonBlock'))
+        if (document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]') != null) {
+            document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]').style.display = 'none'
+        }
         forLoopAllProjects(async function(proj) {
             await addProjectList(proj, true)
         }, true)
     }
-    if (document.getElementById('addedProjectsTable1').childElementCount > 0) {
+    if (document.querySelector('.buttonBlock').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
 
@@ -815,6 +766,7 @@ async function checkAuthVK() {
         if (response2.ok) {
             let a = document.createElement('a')
             a.href = '#'
+            a.classList.add('link')
             a.id = 'authvk' + key
             a.textContent = key
             authStatus.append(a)
@@ -1348,7 +1300,7 @@ async function addProject(project, element) {
             jsPath = 'div[class="text-server"] > h1'
         } else if (project.MinecraftServerNet) {
             url = 'https://minecraft-server.net/details/' + project.id + '/'
-            jsPath = 'h1[class="text-break col-xl"]'
+            jsPath = 'div.card-header > h1'
         } else if (project.TopGames) {
             if (project.lang == 'fr') {
                 url = 'https://top-serveurs.net/' + project.game + '/' + project.id
@@ -1557,20 +1509,13 @@ async function addProject(project, element) {
                 const message = createMessage(chrome.i18n.getMessage('authVK', getProjectName(project)), 'error')
                 const button = document.createElement('button')
                 button.id = 'authvk'
-                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-                svg.setAttribute('width', 24)
-                svg.setAttribute('height', 24)
-                svg.setAttribute('viewBox', '0 0 24 24')
-                svg.setAttribute('fill', 'none')
-                svg.setAttribute('stroke', 'currentColor')
-                svg.setAttribute('stroke-width', 2)
-                svg.setAttribute('stroke-linecap', 'round')
-                svg.setAttribute('stroke-linejoin', 'bevel')
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-                path.setAttribute('d', 'M5 12h13M12 5l7 7-7 7')
-                svg.append(path)
-                button.append(svg)
-                button.append(chrome.i18n.getMessage('authButton'))
+                button.classList.add('btn')
+                let img = document.createElement('img')
+                img.src = 'images/icons/arrow.svg'
+                button.append(img)
+                let text = document.createElement('div')
+                text.textContent = chrome.i18n.getMessage('authButton')
+                button.append(text)
                 updateStatusAdd([message, document.createElement('br'), button], true, element)
                 document.getElementById('authvk').addEventListener('click', function() {
                     if (element != null) {
@@ -1601,7 +1546,7 @@ async function addProject(project, element) {
     await addProjectList(project, false)
 
     /*f (random) {
-        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#f44336;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element)
+        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
     } else*/
     let array = []
     array.push(createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success'))
@@ -1626,6 +1571,7 @@ async function addProject(project, element) {
     if (project.MinecraftServersOrg || project.ListForge || project.ServerList101) {
         const a = document.createElement('a')
         a.target = 'blank_'
+        a.classList.add('link')
         a.href = 'https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'
 //      a.href = 'https://addons.mozilla.org/ru/firefox/addon/privacy-pass/'
         a.textContent = 'Privacy Pass'
@@ -1700,7 +1646,7 @@ function createMessage(text, level) {
         if (level == 'success') {
             span.style = 'color:#4CAF50;'
         } else if (level == 'error') {
-            span.style = 'color:#f44336;'
+            span.style = 'color:#da5e5e;'
         } /* else if (level == 'warn') {
             span.style = 'color:#??????;'
         } */
@@ -1747,26 +1693,16 @@ function updateStatus(message, type, disableTimer, level, element) {
         if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
             for (const m of message) {
                 if (m.style && m.style.color == 'rgb(76, 175, 80)') {
-                    const svg = element.parentElement.firstElementChild
-                    svg.setAttribute('stroke', '#4CAF50')
-                    svg.firstElementChild.remove()
-                    svg.firstElementChild.remove()
-                    const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
-                    polyline.setAttribute('points', '20 6 9 17 4 12')
-                    svg.append(polyline)
+                    const img = element.parentElement.parentElement.parentElement.firstElementChild
+                    img.src = 'images/icons/success.svg'
                 }
             }
         } else {
             if (message.style && message.style.color == 'rgb(76, 175, 80)') {
-                const svg = element.parentElement.firstElementChild
-                svg.setAttribute('stroke', '#4CAF50')
-                svg.firstElementChild.remove()
-                svg.firstElementChild.remove()
-                const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline')
-                polyline.setAttribute('points', '20 6 9 17 4 12')
-                svg.append(polyline)
+                const img = element.parentElement.parentElement.parentElement.firstElementChild
+                img.src = 'images/icons/success.svg'
             }
-            }
+        }
     } else {
         status = document.getElementById(type)
     }
@@ -1910,11 +1846,9 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         } else if (key == 'AVMRsettings') {
             settings = storageChange.newValue
             if (settings.stopVote > Date.now()) {
-                document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#ff0000')
-                document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
+                document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
             } else {
-                document.querySelector('#stopVote2').firstElementChild.setAttribute('stroke', '#00d510')
-                document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#00d510')
+                document.querySelector('#stopVote img').setAttribute('src', 'images/icons/start.svg')
             }
             return
         } else if (key == 'generalStats') {
@@ -1926,6 +1860,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             if (storageChange.oldValue && storageChange.oldValue.length == storageChange.newValue.length) {
                 updateProjectList(storageChange.newValue, key)
             }
+        } else if (key == 'storageArea') {
             return
         }
         if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function') || storageChange.newValue == null || !(typeof storageChange.newValue[Symbol.iterator] === 'function')) return
@@ -1946,7 +1881,7 @@ async function forLoopAllProjects(fuc, reverse) {
 }
 
 //Слушатель на экспорт настроек
-document.getElementById('file-download').addEventListener('click', ()=>{
+document.getElementById('file-download').addEventListener('click', ()=> {
     updateStatusFile(chrome.i18n.getMessage('exporting'), true)
     let allSetting = {
         VKs,
@@ -2139,7 +2074,7 @@ async function checkUpdateConflicts(save) {
     if (settings.proxyBlackList == null) {
         updated = true
         updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
-        settings.proxyBlackList = JSON.stringify(["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"])
+        settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
     }
 
     if (generalStats == null) {
@@ -2222,89 +2157,104 @@ function getUrlVars() {
 //Если страница настроек была открыта сторонним проектом то расширение переходит к быстрому добавлению проектов
 async function fastAdd() {
     if (window.location.href.includes('addFastProject')) {
+        toggleModal('addFastProject')
         let vars = getUrlVars()
-        if (vars['name'] != null)
-            document.querySelector('h2[data-resource="fastAdd"]').childNodes[1].textContent = getUrlVars()['name']
-        let listFastAdd = document.getElementById('modaltext')
+        if (vars['name'] != null) document.querySelector('[data-resource="fastAdd"]').textContent = getUrlVars()['name']
+            
+        let listFastAdd = document.querySelector('#addFastProject > div.content > .message')
         listFastAdd.textContent = ''
 
-        if (vars['disableNotifInfo'] != null) {
-            if (settings.disabledNotifInfo != Boolean(vars['disableNotifInfo'])) {
-                settings.disabledNotifInfo = Boolean(vars['disableNotifInfo'])
-                await setValue('AVMRsettings', settings, true)
-            }
+        if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] == 'true') {
+            settings.disabledNotifInfo = true
+            await setValue('AVMRsettings', settings, true)
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             let html = document.createElement('div')
+            html.classList.add('fastAddEl')
             html.append(svgSuccess.cloneNode(true))
-            html.append(chrome.i18n.getMessage('disableNotifInfo'))
-            listFastAdd.before(html)
+            let div = document.createElement('div')
+            let p = document.createElement('p')
+            p.textContent = chrome.i18n.getMessage('disableNotifInfo')
+            div.append(p)
+
+            html.append(div)
+            listFastAdd.append(html)
         }
-        if (vars['disableNotifWarn'] != null) {
-            if (settings.disabledNotifWarn != Boolean(vars['disableNotifWarn'])) {
-                settings.disabledNotifWarn = Boolean(vars['disableNotifWarn'])
-                await setValue('AVMRsettings', settings, true)
-            }
+        if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] == 'true') {
+            settings.disabledNotifWarn = true
+            await setValue('AVMRsettings', settings, true)
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             let html = document.createElement('div')
+            html.classList.add('fastAddEl')
             html.append(svgSuccess.cloneNode(true))
-            html.append(chrome.i18n.getMessage('disableNotifWarn'))
-            listFastAdd.before(html)
+            let div = document.createElement('div')
+            let p = document.createElement('p')
+            p.textContent = chrome.i18n.getMessage('disableNotifWarn')
+            div.append(p)
+
+            html.append(div)
+            listFastAdd.append(html)
         }
-        if (vars['disableNotifStart'] != null) {
-            if (settings.disabledNotifStart != Boolean(vars['disableNotifStart'])) {
-                settings.disabledNotifStart = Boolean(vars['disableNotifStart'])
-                await setValue('AVMRsettings', settings, true)
-            }
+        if (vars['disableNotifStart'] != null && vars['disableNotifStart'] == 'true') {
+            settings.disabledNotifStart = true
+            await setValue('AVMRsettings', settings, true)
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             let html = document.createElement('div')
+            html.classList.add('fastAddEl')
             html.append(svgSuccess.cloneNode(true))
-            html.append(chrome.i18n.getMessage('disableNotifStart'))
-            listFastAdd.before(html)
+            let div = document.createElement('div')
+            let p = document.createElement('p')
+            p.textContent = chrome.i18n.getMessage('disableNotifStart')
+            div.append(p)
+
+            html.append(div)
+            listFastAdd.append(html)
         }
 
         for (const project of getUrlProjects()) {
             let html = document.createElement('div')
-            html.setAttribute('div', getProjectName(project) + '┅' + project.nick + '┅' + project.id)
+            html.classList.add('fastAddEl')
+            html.setAttribute('div', getProjectName(project)+'–'+project.nick+'–'+project.id)
             html.appendChild(svgFail.cloneNode(true))
-            html.append(getProjectName(project) + ' – ' + project.nick + ' – ' + project.id + ': ')
 
+            let div = document.createElement('div')
+            let p = document.createElement('p')
+            p.textContent = getProjectName(project)+' – '+project.nick+' – '+project.id
             const status = document.createElement('span')
-            html.append(status)
+            p.append(document.createElement('br'))
+            p.append(status)
 
-            listFastAdd.before(html)
+            div.append(p)
+            html.append(div)
+            listFastAdd.append(html)
             await addProject(project, status)
         }
 
-        if (document.querySelector('div[class="modalContent"] > div > svg[stroke="#f44336"]') != null) {
+        if (document.querySelector('#addFastProject img[src="images/icons/error.svg"]') != null) {
             let buttonRetry = document.createElement('button')
-            buttonRetry.setAttribute('class', 'col-xl-6 retryFastAdd col-lg-6')
+            buttonRetry.classList.add('btn')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
-            listFastAdd.before(buttonRetry)
-            buttonRetry.addEventListener('click', ()=>{
+            document.querySelector('#addFastProject > div.content > .events').append(buttonRetry)
+            buttonRetry.addEventListener('click', ()=> {
                 document.location.reload(true)
             })
-        } else if (document.querySelector('div[class="modalContent"]').childElementCount > 1) {
+        } else if (document.querySelector('#addFastProject > div.content > div.message').childElementCount > 0) {
             let successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
-            successFastAdd.append(document.createElement('br'))
             successFastAdd.append(chrome.i18n.getMessage('successFastAdd'))
             successFastAdd.append(document.createElement('br'))
             successFastAdd.append(chrome.i18n.getMessage('closeTab'))
-            listFastAdd.before(successFastAdd)
+            listFastAdd.append(successFastAdd)
         } else {
             return
         }
 
         let buttonClose = document.createElement('button')
-        buttonClose.setAttribute('class', 'col-xl-6 closeSettings col-lg-6')
+        buttonClose.classList.add('btn', 'redBtn')
         buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
-
-        listFastAdd.before(buttonClose)
-        buttonClose.addEventListener('click', ()=>{
+        document.querySelector('#addFastProject > div.content > .events').append(buttonClose)
+        buttonClose.addEventListener('click', ()=> {
             window.close()
         })
-    } else if (window.location.href.includes('stats')) {
-        document.getElementById('closeStats2').click()
     }
 }
 
@@ -2360,6 +2310,11 @@ function tabSelect(evt, tabs) {
     if (evt.currentTarget.className.includes('active')) {
         return
     }
+
+    if (document.querySelector('.burger.active')) {
+        document.querySelector('.burger.active').classList.remove('active')
+        document.querySelector('nav').classList.remove('active')
+    }
     
     let i, tabcontent, tablinks
 
@@ -2383,6 +2338,15 @@ function tabSelect(evt, tabs) {
 }
 
 //Слушателей кнопок для переключения вкладок
+document.querySelector('.burger').addEventListener('click', ()=> {
+    document.querySelector('.burger').classList.toggle('active')
+    document.querySelector('nav').classList.toggle('active')
+
+})
+
+document.getElementById('multivoteTab').addEventListener('click', function() {
+    tabSelect(event, 'multivote')
+})
 document.getElementById('addTab').addEventListener('click', function() {
     tabSelect(event, 'append')
 })
@@ -2397,25 +2361,6 @@ document.getElementById('helpTab').addEventListener('click', function() {
 })
 document.getElementById('multivoteTab').addEventListener('click', function() {
     tabSelect(event, 'multivote')
-})
-document.getElementById('addTab2').addEventListener('click', function() {
-    tabSelect(event, 'append')
-    document.getElementById('hmt').click()
-})
-document.getElementById('settingsTab2').addEventListener('click', function() {
-    tabSelect(event, 'settings')
-    document.getElementById('hmt').click()
-})
-document.getElementById('addedTab2').addEventListener('click', function() {
-    tabSelect(event, 'added')
-    document.getElementById('hmt').click()
-})
-document.getElementById('multivoteTab2').addEventListener('click', function() {
-    tabSelect(event, 'multivote')
-})
-document.getElementById('helpTab2').addEventListener('click', function() {
-    tabSelect(event, 'help')
-    document.getElementById('hmt').click()
 })
 
 //Переключение между списками добавленных проектов
@@ -2454,9 +2399,7 @@ document.getElementById('ProxyButton').addEventListener('click', function() {
 // })
 
 //Слушатель закрытия модалки статистики и её сброс
-document.getElementById('closeStats').addEventListener('click', resetStats)
-document.getElementById('closeStats2').addEventListener('click', resetStats)
-function resetStats() {
+document.querySelector('#stats .close').addEventListener('click', ()=> {
     if (document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent != '') {
         document.getElementById('statsSubtitle').firstChild.remove()
         document.getElementById('statsSubtitle').append('\u00A0')
@@ -2469,10 +2412,13 @@ function resetStats() {
         document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsAdded')
     }
-}
+})
+
+
 //Слушатель общей статистики и вывод её в модалку
 document.getElementById('generalStats').addEventListener('click', function() {
     // document.getElementById('modalStats').click()
+    toggleModal('stats')
     document.getElementById('statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = generalStats.successVotes ? generalStats.successVotes : 0
     document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.monthSuccessVotes ? generalStats.monthSuccessVotes : 0
@@ -2649,26 +2595,21 @@ selectedTop.addEventListener('change', function() {
     }
 
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || selectedTop.value == 'MMoTopRU' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU') {
-        document.querySelector('#addProject > div:nth-child(2) > div:nth-child(1) > label').textContent = chrome.i18n.getMessage('yourNick')
+        document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
 
         idSelector.removeAttribute('style')
 
-        document.getElementById('customBody').style.display = 'none'
         document.getElementById('label1').style.display = 'none'
         document.getElementById('label2').style.display = 'none'
         document.getElementById('label4').style.display = 'none'
         document.getElementById('label5').style.display = 'none'
         document.getElementById('label10').style.display = 'none'
-        document.getElementById('responseURL').style.display = 'none'
-        document.getElementById('countVote').style.display = 'none'
         document.getElementById('countVote').required = false
-        document.getElementById('ordinalWorld').style.display = 'none'
         document.getElementById('ordinalWorld').required = false
         if (laterChoose && (laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU')) {
             document.getElementById('selectLang' + laterChoose).style.display = 'none'
             document.getElementById('selectLang' + laterChoose).required = false
-            document.getElementById('gameList' + laterChoose).style.display = 'none'
             document.getElementById('chooseGame' + laterChoose).style.display = 'none'
             document.getElementById('chooseGame' + laterChoose).required = false
         }
@@ -2676,12 +2617,9 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('customTimeOut').disabled = false
         if (!document.getElementById('customTimeOut').checked) {
             document.getElementById('label6').style.display = 'none'
-            document.getElementById('selectTime').style.display = 'none'
             document.getElementById('label3').style.display = 'none'
-            document.getElementById('time').style.display = 'none'
             document.getElementById('time').required = false
             document.getElementById('label7').style.display = 'none'
-            document.getElementById('hour').style.display = 'none'
             document.getElementById('hour').required = false
         }
 
@@ -2697,28 +2635,21 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('id').required = false
 
             document.getElementById('label6').removeAttribute('style')
-            document.getElementById('selectTime').removeAttribute('style')
-            document.getElementById('customBody').removeAttribute('style')
             document.getElementById('label1').removeAttribute('style')
             document.getElementById('label2').removeAttribute('style')
-            document.getElementById('responseURL').removeAttribute('style')
             if (document.getElementById('selectTime').value == 'ms') {
                 document.getElementById('label3').removeAttribute('style')
-                document.getElementById('time').removeAttribute('style')
                 document.getElementById('time').required = true
                 document.getElementById('label7').style.display = 'none'
-                document.getElementById('hour').style.display = 'none'
                 document.getElementById('hour').required = false
             } else {
                 document.getElementById('label7').removeAttribute('style')
-                document.getElementById('hour').removeAttribute('style')
                 document.getElementById('hour').required = true
                 document.getElementById('label3').style.display = 'none'
-                document.getElementById('time').style.display = 'none'
                 document.getElementById('time').required = false
             }
 
-            document.querySelector('#addProject > div:nth-child(2) > div:nth-child(1) > label').textContent = chrome.i18n.getMessage('name')
+            document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('name')
             document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterName')
 //          document.getElementById('nick').required = true
 
@@ -2727,18 +2658,15 @@ selectedTop.addEventListener('change', function() {
 //          document.getElementById('nick').required = false
             
             if (selectedTop.value != 'MMoTopRU') {
-                document.getElementById('countVote').removeAttribute('style')
                 document.getElementById('countVote').required = true
                 document.getElementById('label5').removeAttribute('style')
             } else {
-                document.getElementById('ordinalWorld').removeAttribute('style')
                 document.getElementById('ordinalWorld').required = true
                 document.getElementById('label10').removeAttribute('style')
             }
 
             document.getElementById('selectLang' + selectedTop.value).removeAttribute('style')
             document.getElementById('selectLang' + selectedTop.value).required = true
-            document.getElementById('gameList' + selectedTop.value).removeAttribute('style')
             document.getElementById('chooseGame' + selectedTop.value).removeAttribute('style')
             document.getElementById('chooseGame' + selectedTop.value).required = true
 
@@ -2762,40 +2690,30 @@ selectedTop.addEventListener('change', function() {
 
     if (selectedTop.value == 'TopGG' || selectedTop.value == 'DiscordBotList' || selectedTop.value == 'BotsForDiscord') {
         document.getElementById('nick').required = false
-        document.getElementById('nick').style.display = 'none'
-        document.getElementById('nick').previousElementSibling.style.display = 'none'
+        document.getElementById('nick').parentElement.style.display = 'none'
     } else if (laterChoose == 'TopGG' || laterChoose == 'DiscordBotList' || laterChoose == 'BotsForDiscord') {
         document.getElementById('nick').required = true
-        document.getElementById('nick').removeAttribute('style')
-        document.getElementById('nick').previousElementSibling.removeAttribute('style')
+        document.getElementById('nick').parentElement.removeAttribute('style')
     }
     
     if (selectedTop.value == 'ListForge') {
         document.getElementById('nick').required = false
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
         document.getElementById('urlGame').removeAttribute('style')
-        document.getElementById('gameListListForge').removeAttribute('style')
         document.getElementById('chooseGameListForge').required = true
-        document.getElementById('chooseGameListForge').removeAttribute('style')
     } else if (laterChoose == 'ListForge') {
         document.getElementById('nick').required = true
         if (selectedTop.value != 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('urlGame').style.display = 'none'
-        document.getElementById('gameListListForge').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
-        document.getElementById('chooseGameListForge').style.display = 'none'
     }
 
     if (selectedTop.value == 'TopGG') {
         document.getElementById('chooseTopGG1').removeAttribute('style')
-        document.getElementById('chooseTopGG').removeAttribute('style')
         document.getElementById('additionTopGG1').removeAttribute('style')
-        document.getElementById('additionTopGG').removeAttribute('style')
     } else if (laterChoose == 'TopGG') {
         document.getElementById('chooseTopGG1').style.display = 'none'
-        document.getElementById('chooseTopGG').style.display = 'none'
         document.getElementById('additionTopGG1').style.display = 'none'
-        document.getElementById('additionTopGG').style.display = 'none'
     }
 
     laterChoose = selectedTop.value
@@ -2805,17 +2723,13 @@ selectedTop.addEventListener('change', function() {
 document.getElementById('selectTime').addEventListener('change', function() {
     if (this.value == 'ms') {
         document.getElementById('label3').removeAttribute('style')
-        document.getElementById('time').removeAttribute('style')
         document.getElementById('time').required = true
         document.getElementById('label7').style.display = 'none'
-        document.getElementById('hour').style.display = 'none'
         document.getElementById('hour').required = false
     } else {
         document.getElementById('label7').removeAttribute('style')
-        document.getElementById('hour').removeAttribute('style')
         document.getElementById('hour').required = true
         document.getElementById('label3').style.display = 'none'
-        document.getElementById('time').style.display = 'none'
         document.getElementById('time').required = false
 
     }
@@ -2840,7 +2754,7 @@ async function setCookieDetails(details) {
 //Локализация
 let elements = document.querySelectorAll('[data-resource]')
 elements.forEach(function(el) {
-    el.append(chrome.i18n.getMessage(el.getAttribute('data-resource')))
+    el.prepend(chrome.i18n.getMessage(el.getAttribute('data-resource')))
 })
 document.querySelectorAll('[placeholder]').forEach(function(el) {
     el.placeholder = chrome.i18n.getMessage(el.placeholder)
@@ -2861,4 +2775,38 @@ document.getElementById('donate').addEventListener('mouseover', function(event) 
     } else {
         sound2.play()
     }
+})
+
+//Модалки
+document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
+    closeBtn.addEventListener('click', ()=> {
+        if (closeBtn.parentElement.parentElement.id == 'addFastProject') {
+            location.href = 'options.html'
+        }
+        toggleModal(closeBtn.parentElement.parentElement.id)
+    })
+})
+
+let modalsBlock = document.querySelector('#modals')
+function toggleModal(modalID) {
+    if (modalsBlock.querySelector('.overlay').classList.contains('active')) {
+        modalsBlock.querySelector('.overlay').style.transition = '.3s'
+        modalsBlock.querySelector('#'+modalID).style.transition = '.3s'
+        setTimeout(()=> {
+            modalsBlock.querySelector('.overlay').removeAttribute('style')
+            modalsBlock.querySelector('#'+modalID).removeAttribute('style')
+        }, 300)
+    }
+    modalsBlock.querySelector('.overlay').classList.toggle('active')
+    modalsBlock.querySelector('#'+modalID).classList.toggle('active')
+}
+
+modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
+    let activeModal = modalsBlock.querySelector('.modal.active')
+    if (activeModal.id == 'stats') {
+        toggleModal('stats')
+        return
+    }
+    activeModal.style.transform = 'scale(1.1)'
+    setTimeout(()=> activeModal.removeAttribute('style'), 100)
 })

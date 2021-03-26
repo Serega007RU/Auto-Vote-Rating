@@ -12,19 +12,16 @@ async function vote(first) {
             return
         }
         //Если есть сообщение
-        if (document.querySelector('h4[class="alert-heading text-center"]') != null) {
-            if (document.querySelector('h4[class="alert-heading text-center"]').textContent.includes('Vote Successful')) {
-                chrome.runtime.sendMessage({successfully: true})
-                return
+        if (document.querySelector('div.alert.alert-success') != null) {
+            chrome.runtime.sendMessage({successfully: true})
+            return
+        }
+        if (document.querySelector('div.alert.alert-danger') != null) {
+            if (document.querySelector('div.alert.alert-danger').textContent.includes('already voting')) {
+                chrome.runtime.sendMessage({later: Date.now() + 86400000})//+ 24 часа
+            } else {
+                chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent.trim()})
             }
-            if (document.querySelector('h4[class="alert-heading text-center"]').textContent.includes('Vote Un-successful')) {
-                if (document.querySelector('h4[class="alert-heading text-center"]').nextElementSibling.textContent.includes('already voting')) {
-                    chrome.runtime.sendMessage({later: Date.now() + 86400000})
-                    //+ 24 часа
-                    return
-                }
-            }
-            chrome.runtime.sendMessage({message: document.querySelector('h4[class="alert-heading text-center"]').nextElementSibling.textContent})
             return
         }
         if (first) {
