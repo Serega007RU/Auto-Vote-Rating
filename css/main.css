@@ -621,6 +621,16 @@ nav .logo img {
 #stopVote {
 	position: absolute;
 	bottom: 0;
+	opacity: 1;
+}
+
+#stopVote:hover div {
+	opacity: 1;
+}
+
+#stopVote div {
+	opacity: .5;
+	transition: .2s;
 }
 
 #statsSubtitle {

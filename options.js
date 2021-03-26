@@ -279,7 +279,7 @@ async function restoreOptions() {
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
     if (settings.stopVote > Date.now()) {
-        document.querySelector('#stopVote').firstElementChild.setAttribute('stroke', '#ff0000')
+        document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
     }
     if (settings.enableCustom || projectsCustom.length > 0)
         addCustom()
