@@ -964,10 +964,16 @@ input.checkbox:disabled + label {
 #proxy,
 #vk,
 #add {
+	display: block;
 	text-align: center;
 	font-size: 15px;
 	margin: 10px auto;
 	min-height: 20px;
+}
+
+#vk,
+#proxy {
+	text-align: left;
 }
 
 #save {
