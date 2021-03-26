@@ -604,6 +604,10 @@ function updateProjectList(projects, key) {
         for (const item of allProjects) {
             document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
         }
+        document.querySelector('div.buttonBlock').parentNode.replaceChild(document.querySelector('div.buttonBlock').cloneNode(false), document.querySelector('div.buttonBlock'))
+        if (document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]') != null) {
+            document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]').style.display = 'none'
+        }
         forLoopAllProjects(async function(proj) {
             await addProjectList(proj, true)
         }, true)
@@ -1693,7 +1697,6 @@ function updateStatus(message, type, disableTimer, level, element) {
             for (const m of message) {
                 if (m.style && m.style.color == 'rgb(76, 175, 80)') {
                     const img = element.parentElement.parentElement.parentElement.firstElementChild
-                    console.log(img)
                     img.src = 'images/icons/success.svg'
                 }
             }
@@ -2164,11 +2167,9 @@ async function fastAdd() {
         let listFastAdd = document.querySelector('#addFastProject > div.content > .message')
         listFastAdd.textContent = ''
 
-        if (vars['disableNotifInfo'] != null) {
-            if (settings.disabledNotifInfo != Boolean(vars['disableNotifInfo'])) {
-                settings.disabledNotifInfo = Boolean(vars['disableNotifInfo'])
-                await setValue('AVMRsettings', settings, true)
-            }
+        if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] == 'true') {
+            settings.disabledNotifInfo = true
+            await setValue('AVMRsettings', settings, true)
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -2181,11 +2182,9 @@ async function fastAdd() {
             html.append(div)
             listFastAdd.append(html)
         }
-        if (vars['disableNotifWarn'] != null) {
-            if (settings.disabledNotifWarn != Boolean(vars['disableNotifWarn'])) {
-                settings.disabledNotifWarn = Boolean(vars['disableNotifWarn'])
-                await setValue('AVMRsettings', settings, true)
-            }
+        if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] == 'true') {
+            settings.disabledNotifWarn = true
+            await setValue('AVMRsettings', settings, true)
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -2198,11 +2197,9 @@ async function fastAdd() {
             html.append(div)
             listFastAdd.append(html)
         }
-        if (vars['disableNotifStart'] != null) {
-            if (settings.disabledNotifStart != Boolean(vars['disableNotifStart'])) {
-                settings.disabledNotifStart = Boolean(vars['disableNotifStart'])
-                await setValue('AVMRsettings', settings, true)
-            }
+        if (vars['disableNotifStart'] != null && vars['disableNotifStart'] == 'true') {
+            settings.disabledNotifStart = true
+            await setValue('AVMRsettings', settings, true)
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -2235,14 +2232,15 @@ async function fastAdd() {
             await addProject(project, status)
         }
 
-        if (document.querySelector('#addFastProject > div.content svg[stroke="#da5e5e"]') != null) {
+        if (document.querySelector('#addFastProject img[src="images/icons/error.svg"]') != null) {
             let buttonRetry = document.createElement('button')
+            buttonRetry.classList.add('btn')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
-            listFastAdd.append(buttonRetry)
+            document.querySelector('#addFastProject > div.content > .events').append(buttonRetry)
             buttonRetry.addEventListener('click', ()=> {
                 document.location.reload(true)
             })
-        } else if (document.querySelector('#addFastProject > div.content').childElementCount > 0) {
+        } else if (document.querySelector('#addFastProject > div.content > div.message').childElementCount > 0) {
             let successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
             successFastAdd.append(chrome.i18n.getMessage('successFastAdd'))
@@ -2254,7 +2252,7 @@ async function fastAdd() {
         }
 
         let buttonClose = document.createElement('button')
-        buttonClose.classList.add('btn')
+        buttonClose.classList.add('btn', 'redBtn')
         buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
         document.querySelector('#addFastProject > div.content > .events').append(buttonClose)
         buttonClose.addEventListener('click', ()=> {
@@ -2785,6 +2783,9 @@ document.getElementById('donate').addEventListener('mouseover', function(event) 
 //Модалки
 document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
     closeBtn.addEventListener('click', ()=> {
+        if (closeBtn.parentElement.parentElement.id == 'addFastProject') {
+            location.href = 'options.html'
+        }
         toggleModal(closeBtn.parentElement.parentElement.id)
     })
 })
@@ -2805,6 +2806,10 @@ function toggleModal(modalID) {
 
 modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     let activeModal = modalsBlock.querySelector('.modal.active')
+    if (activeModal.id == 'stats') {
+        toggleModal('stats')
+        return
+    }
     activeModal.style.transform = 'scale(1.1)'
     setTimeout(()=> activeModal.removeAttribute('style'), 100)
 })
