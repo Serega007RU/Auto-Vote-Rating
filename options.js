@@ -246,11 +246,11 @@ async function restoreOptions() {
     let stopVoteButton = async function () {
         if (settings.stopVote > Date.now()) {
             settings.stopVote = 0
-            document.querySelector('#stopVote img').setAttribute('src', 'images/icons/start.svg')
+            document.querySelector('#stopVote img').src = 'images/icons/start.svg'
             updateStatusSave(chrome.i18n.getMessage('voteResumed'), false, 'success')
         } else {
             settings.stopVote = 9000000000000000
-            document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
+            document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
             await chrome.extension.getBackgroundPage().stopVote()
             updateStatusSave(chrome.i18n.getMessage('voteSuspended'), false, 'error')
         }
