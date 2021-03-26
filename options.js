@@ -1480,6 +1480,11 @@ function tabSelect(evt, tabs) {
     if (evt.currentTarget.className.includes('active')) {
         return
     }
+
+    if (document.querySelector('.burger.active')) {
+        document.querySelector('.burger.active').classList.remove('active')
+        document.querySelector('nav').classList.remove('active')
+    }
     
     let i, tabcontent, tablinks
 
