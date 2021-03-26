@@ -189,11 +189,6 @@ async function checkOpen(project) {
     for (let value of queueProjects) {
         if (getProjectName(value) == getProjectName(project) || value.randomize && project.randomize) {
             if (!value.nextAttempt) return
-            if (settings.MultiVote) {
-                if (/*settings.iFromUkraine &&*/ (value.TopCraft || value.McTOP || value.MinecraftRating) && (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
-                    return
-                }
-            }
             if (Date.now() < value.nextAttempt) {
                 return
             } else {
@@ -201,6 +196,18 @@ async function checkOpen(project) {
                 console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
                 if (!settings.disabledNotifError)
                     sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
+            }
+        }
+        if (settings.useMultiVote) {
+            if (project.TopCraft || project.McTOP || project.MinecraftRating) {
+                if (!value.TopCraft && !value.McTOP && !value.MinecraftRating) {
+                    return
+                }
+            }
+            if (value.TopCraft || value.McTOP || value.MinecraftRating) {
+                if (!project.TopCraft && !project.McTOP && !project.MinecraftRating) {
+                    return
+                }
             }
         }
     }
@@ -215,7 +222,7 @@ async function checkOpen(project) {
             }
         }
         if (currentProxy != null) {
-            if (/*settings.iFromUkraine &&*/ (project.TopCraft || project.McTOP || project.MinecraftRating)) {
+            if (project.TopCraft || project.McTOP || project.MinecraftRating) {
                 return
             }
             let usedProjects = getTopFromList(currentProxy, project)
@@ -349,7 +356,7 @@ async function newWindow(project) {
             }
         }
 
-        if (currentProxy == null && (!settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))) {
+        if (currentProxy == null && (settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))) {
             //Ищет не юзанный свободный прокси
             let found = false
             for (let proxy of proxies) {
@@ -1552,7 +1559,7 @@ async function endVote(request, sender, project) {
                 getTopFromList(currentProxy, project).push(usedProject)
                 proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy
                 await setValue('AVMRproxies', proxies)
-            } else if (!settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
+            } else if (settings.iFromUkraine || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
                 console.warn('currentProxy is null or not found')
             }
         }
