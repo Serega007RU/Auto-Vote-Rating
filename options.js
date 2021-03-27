@@ -889,10 +889,10 @@ function addProjectsBonus(project, element) {
 //      document.getElementById('secondBonusMythicalWorld').addEventListener('click', async()=>{
 //          let response = await fetch('https://mythicalworld.su/bonus')
 //          if (!response.ok) {
-//              updateStatusAdd(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, element, 'error')
+//              createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error', null, element)
 //              return
 //          } else if (response.redirected) {
-//              updateStatusAdd(chrome.i18n.getMessage('redirectedSecondBonus', response.url), true, element, 'error')
+//              createNotif(chrome.i18n.getMessage('redirectedSecondBonus', response.url), 'error', null, element)
 //              return
 //          }
 //          await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', null, 'https://mythicalworld.su/bonus', {ms: 86400000}, priorityOption, null)
@@ -947,68 +947,6 @@ function createMessage(text, level) {
     }
     span.textContent = text
     return span
-}
-
-function updateStatusAdd(message, disableTimer, element, level) {
-    updateStatus(message, 'add', disableTimer, level, element)
-}
-function updateStatusSave(message, disableTimer, level) {
-    updateStatus(message, 'save', disableTimer, level)
-}
-function updateStatusFile(message, disableTimer, level) {
-    updateStatus(message, 'file', disableTimer, level)
-}
-var addTimeout
-var saveTimeout
-var fileTimeout
-function updateStatus(message, type, disableTimer, level, element) {
-    if (level) {
-        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-            for (const m in message) {
-                if (typeof message[m] === 'string') {
-                    message[m] = createMessage(message[m], level)
-                }
-            }
-        } else {
-            message = createMessage(message, level)
-        }
-    }
-    let status
-    if (element != null) {
-        status = element
-        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-            for (const m of message) {
-                if (m.style && m.style.color == 'rgb(76, 175, 80)') {
-                    const img = element.parentElement.parentElement.parentElement.firstElementChild
-                    img.src = 'images/icons/success.svg'
-                }
-            }
-        } else {
-            if (message.style && message.style.color == 'rgb(76, 175, 80)') {
-                const img = element.parentElement.parentElement.parentElement.firstElementChild
-                img.src = 'images/icons/success.svg'
-            }
-        }
-    } else {
-        status = document.getElementById(type)
-    }
-    clearInterval(window[type + 'Timeout'])
-    while (status.firstChild)
-       status.firstChild.remove()
-    if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-        for (const m of message) {
-            status.append(m)
-        }
-    } else {
-        status.append(message)
-    }
-    if (disableTimer || element != null)
-        return
-    window[type + 'Timeout'] = setTimeout(function() {
-        while (status.firstChild)
-            status.firstChild.remove()
-        status.append('\u00A0')
-    }, 3000)
 }
 
 function getProjectName(project) {
@@ -1141,7 +1079,7 @@ async function forLoopAllProjects(fuc, reverse) {
 
 //Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', ()=>{
-    updateStatusFile(chrome.i18n.getMessage('exporting'), true)
+    createNotif(chrome.i18n.getMessage('exporting'))
     let allSetting = {
         settings,
         generalStats
@@ -1157,11 +1095,11 @@ document.getElementById('file-download').addEventListener('click', ()=>{
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
     anchor.dataset.downloadurl = ['text/json;charset=UTF-8;', anchor.download, anchor.href].join(':')
     anchor.click()
-    updateStatusFile(chrome.i18n.getMessage('exportingEnd'), false, 'success')
+    createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
 })
 
 document.getElementById('logs-download').addEventListener('click', ()=>{
-    updateStatusFile(chrome.i18n.getMessage('exporting'), true)
+    createNotif(chrome.i18n.getMessage('exporting'))
 
     let blob = new Blob([localStorage.consoleHistory],{type: 'text/plain;charset=UTF-8;'})
     let anchor = document.createElement('a')
@@ -1172,12 +1110,12 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
     
     openPoput(anchor.href)
 
-    updateStatusFile(chrome.i18n.getMessage('exportingEnd'), false, 'success')
+    createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
 })
 
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', (evt)=>{
-    updateStatusFile(chrome.i18n.getMessage('importing'), true)
+    createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (evt.target.files.length == 0) return
         let file = evt.target.files[0]
@@ -1218,10 +1156,10 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     await updateProjectList()
 
-                    updateStatusFile(chrome.i18n.getMessage('importingEnd'), false, 'success')
+                    createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
                 } catch (e) {
                     console.error(e)
-                    updateStatusFile(e, true, 'error')
+                    createNotif(e, 'error')
                 }
             }
         })(file)
@@ -1229,7 +1167,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
         document.getElementById('file-upload').value = ''
     } catch (e) {
         console.error(e)
-        updateStatusFile(e, true, 'error')
+        createNotif(e, 'error')
     }
 }, false)
 
