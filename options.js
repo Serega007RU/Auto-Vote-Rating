@@ -1946,3 +1946,44 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     activeModal.style.transform = 'scale(1.1)'
     setTimeout(()=> activeModal.removeAttribute('style'), 100)
 })
+
+//notifications
+function createNotif(type, message) {
+    let notif = document.createElement('div')
+    notif.classList.add('notif', 'show', type)
+    let delay = (type == 'hint') ? 3000 : 5000
+    if (type == 'error') delay = 30000
+
+    if (type != 'hint') {
+        let imgBlock = document.createElement('img')
+        imgBlock.src = 'images/notif/'+type+'.png'
+        notif.append(imgBlock)
+    }
+    
+    let progressBlock = document.createElement('div')
+    progressBlock.classList.add('progress')
+    let progressBar = document.createElement('div')
+    progressBar.style.animation = 'notif-progress '+delay/1000+'s linear'
+    progressBlock.append(progressBar)
+    notif.append(progressBlock)
+
+    let mesBlock = document.createElement('div')
+    mesBlock.textContent = message
+    notif.append(mesBlock)
+    document.querySelector('#notifBlock').prepend(notif)
+
+    notif.addEventListener('click', ()=> {
+        notif.classList.remove('show')
+        notif.classList.add('hide')
+        notif.removeEventListener('click', null)
+        setTimeout(()=> notif.remove(), 500)
+    })
+
+    setTimeout(()=> {
+        notif.classList.remove('show')
+        notif.classList.add('hide')
+        notif.removeEventListener('click', null)
+        setTimeout(()=> notif.remove(), 500)
+    }, delay)
+    
+}
