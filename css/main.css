@@ -849,25 +849,6 @@ input.checkbox:disabled + label {
 	transform: rotate(45deg);
 }
 
-#file {
-	font-size: 15px;
-	margin: auto;
-	height: 20px;
-}
-
-#add {
-	text-align: center;
-	font-size: 15px;
-	margin: 10px auto;
-	min-height: 20px;
-}
-
-#save {
-	font-size: 15px;
-	margin: auto;
-	height: 20px;
-}
-
 .input-block,
 .check-block {
 	margin-bottom: 20px;
