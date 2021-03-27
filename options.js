@@ -1891,13 +1891,9 @@ function createNotif(message, type, delay, element) {
     let notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
     if (!delay){
-        if (type == 'hint') {
-            delay = 3000
-        } else if (type == 'error') {
-            delay = 30000
-        } else {
-            delay = 5000
-        }
+        if (type == 'hint') delay = 3000
+        else if (type == 'error') delay = 30000
+        else delay = 5000
     }
 
     if (type != 'hint') {
@@ -1914,14 +1910,22 @@ function createNotif(message, type, delay, element) {
 
     let mesBlock = document.createElement('div')
     if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-        for (const m of message) {
-            mesBlock.append(m)
-        }
+        for (const m of message) mesBlock.append(m)
     } else {
         mesBlock.append(message)
     }
     notif.append(mesBlock)
-    document.querySelector('#notifBlock').prepend(notif)
+
+    let allNotifH = 10
+    document.querySelectorAll('#notifBlock > .notif').forEach((el)=> {
+        allNotifH = allNotifH+el.clientHeight+10
+    })
+    if (window.innerHeight > (allNotifH)) {
+        document.querySelector('#notifBlock').append(notif)
+    } else {
+        console.log('Нет места, уведомление не отображено')
+    }
+    
 
 //  document.querySelectorAll('#notifBlock > div.hint').forEach((element) => {
 //      element.classList.remove('show')

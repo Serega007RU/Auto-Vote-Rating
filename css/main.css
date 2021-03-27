@@ -1034,11 +1034,11 @@ input.checkbox:disabled + label {
 @keyframes notif-show {   
     0% {
         opacity: 0;
-        transform: scale(0) translateX(0px) rotate(360deg);
+        transform: scale(0) translateX(0px);
     }
     100% {
         opacity: 1;
-        transform: scale(1) translateX(-330px) rotate(0deg);
+        transform: scale(1) translateX(-330px);
     }
 }
 
@@ -1055,14 +1055,14 @@ input.checkbox:disabled + label {
 
 /* Скроллер */
 ::-webkit-scrollbar-button {
-	background-image:url('');
-	background-repeat:no-repeat;
-	width:5px;
-	height:0px;
+	background-image: url('');
+	background-repeat: no-repeat;
+	width: 5px;
+	height: 0px;
 }
 
 ::-webkit-scrollbar-track {
-	background-color:#2A2A2F;
+	background-color: #2A2A2F;
 	border-radius: 2px;
 }
 
@@ -1077,10 +1077,10 @@ input.checkbox:disabled + label {
 }
 
 ::-webkit-resizer{
-	background-image:url('');
-	background-repeat:no-repeat;
-	width:4px;
-	height:0px;
+	background-image: url('');
+	background-repeat: no-repeat;
+	width: 4px;
+	height: 0px;
 }
 
 ::-webkit-scrollbar{
