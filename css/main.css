@@ -940,11 +940,13 @@ input.checkbox:disabled + label {
 }
 
 #notifBlock > .notif { 
+	transform-origin: right top;
     cursor: pointer;
     pointer-events: auto;
     right: -330px;
     transition: .5s;
     margin: 10px;
+    margin-bottom: 0;
     display: flex;
     width: calc(100% - 36px);
     padding: 8px;
@@ -955,19 +957,26 @@ input.checkbox:disabled + label {
     position: relative;
 }
 
+#notifBlock > .notif.hint {
+    min-height: 20px;
+    padding-top: 8px;
+}
+
 #notifBlock > .notif.show {
     transform: translateX(-330px);
     animation: notif-show .5s linear;
 }
 
 #notifBlock > .notif.hide {
-    transform: translateX(0px);
+    transform: translateX(0);
     animation: notif-hide .5s linear;
 }
 
-#notifBlock > .notif.hint {
-    min-height: 20px;
-    padding-top: 8px;
+#notifBlock > .notif.hidden {
+    min-height: 0;
+    max-height: 0;
+    padding: 0;
+    margin: 0;
 }
 
 #notifBlock > .notif .progress {

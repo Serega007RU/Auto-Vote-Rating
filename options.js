@@ -1923,9 +1923,8 @@ function createNotif(message, type, delay, element) {
     if (window.innerHeight > (allNotifH)) {
         document.querySelector('#notifBlock').append(notif)
     } else {
-        console.log('Нет места, уведомление не отображено')
+        console.log('Нет места, уведомление не было отображено')
     }
-    
 
 //  document.querySelectorAll('#notifBlock > div.hint').forEach((element) => {
 //      element.classList.remove('show')
@@ -1934,18 +1933,17 @@ function createNotif(message, type, delay, element) {
 //      setTimeout(()=> element.remove(), 500)
 //  })
 
-    notif.addEventListener('click', (event)=> {
-        if (event.target.tagName != 'DIV') return
-        notif.classList.remove('show')
-        notif.classList.add('hide')
-        notif.removeEventListener('click', null)
-        setTimeout(()=> notif.remove(), 500)
+    notif.addEventListener('click', (e)=> {
+        if (e.target.tagName != 'DIV') return
+        removeNotif(notif)
     })
-    
-    setTimeout(()=> {
-        notif.classList.remove('show')
-        notif.classList.add('hide')
-        notif.removeEventListener('click', null)
-        setTimeout(()=> notif.remove(), 500)
-    }, delay)
+    setTimeout(()=> removeNotif(notif), delay)
+
+    function removeNotif(elem) {
+        elem.classList.remove('show')
+        elem.classList.add('hide')
+        elem.removeEventListener('click', null)
+        setTimeout(()=> elem.classList.add('hidden'), 500)
+        setTimeout(()=> elem.remove(), 1000)
+    }
 }
