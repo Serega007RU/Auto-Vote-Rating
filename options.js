@@ -1985,5 +1985,4 @@ function createNotif(type, message) {
         notif.removeEventListener('click', null)
         setTimeout(()=> notif.remove(), 500)
     }, delay)
-    
 }

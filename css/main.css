@@ -928,6 +928,136 @@ input.checkbox:disabled + label {
     opacity: 1
 }
 
+/* Нотификации */
+#notifBlock {
+    position: fixed;
+    z-index: 10;
+    top: 0;
+    right: 0;
+    width: 330px;
+    pointer-events: none;
+    height: 100%;
+}
+
+@media(max-width: 450px) {
+    #notifBlock {
+        width: 100%;
+    }
+}
+
+#notifBlock > .notif { 
+    cursor: pointer;
+    pointer-events: auto;
+    right: -330px;
+    transition: .5s;
+    margin: 10px;
+    display: flex;
+    width: calc(100% - 36px);
+    padding: 8px;
+    padding-top: 14px;
+    color: #fff;
+    min-height: 50px;
+    border-radius: 5px;
+    position: relative;
+}
+
+#notifBlock > .notif.show {
+    transform: translateX(-330px);
+    animation: notif-show .5s linear;
+}
+
+#notifBlock > .notif.hide {
+    transform: translateX(0px);
+    animation: notif-hide .5s linear;
+}
+
+#notifBlock > .notif.hint {
+    min-height: 20px;
+}
+
+#notifBlock > .notif .progress {
+    background: rgba(100, 100, 100, .3);
+    border-radius: 100px;
+    width: calc(100% - 10px);
+    height: 6px;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+#notifBlock > .notif .progress div {
+    background: #fff;
+    border-radius: 100px;
+    height: 6px;
+    width: 100%;
+}
+
+#notifBlock > .notif img,
+#notifBlock > .notif div {
+    margin: auto 0;
+}
+
+#notifBlock > .notif div {
+    font-size: 15px;
+}
+
+#notifBlock > .notif img {
+    height: 40px;
+    width: 40px;
+    margin-right: 10px;
+}
+
+#notifBlock > .notif.error {
+    background: #da5e5e;
+}
+    
+#notifBlock > .notif.warn {
+    background: #f1af4c;
+}
+
+#notifBlock > .notif.info {
+    background: #5c84ad;
+}
+
+#notifBlock > .notif.success {
+    background: #4caf50;
+}
+
+#notifBlock > .notif.hint {
+    background: #37373d;
+}
+
+@keyframes notif-progress {   
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+@keyframes notif-show {   
+    0% {
+        opacity: 0;
+        transform: scale(0) translateX(0px) rotate(360deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateX(-330px) rotate(0deg);
+    }
+}
+
+@keyframes notif-hide {   
+    0% {
+        opacity: 1;
+        transform: scale(1) translateX(-330px);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0) translateX(0px);
+    }
+}
+
 /* Скроллер */
 ::-webkit-scrollbar-button {
 	background-image:url('');
