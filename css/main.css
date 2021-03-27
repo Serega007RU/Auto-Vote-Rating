@@ -563,6 +563,7 @@ nav .logo img {
 }
 
 [data-resource="notAvaibledInSilent"] {
+	position: relative;
 	display: block;
 	text-align: center;
 	color: #da5e5e;
@@ -690,6 +691,8 @@ nav .logo img {
 	font-size: initial !important;
 }
 
+[data-resource="notAvaibledInSilent"] .tooltip1,
+[data-resource="notAvaibledInSilent"] .tooltip2,
 .input-block .tooltip1,
 .input-block .tooltip2,
 .label-block .tooltip2,
