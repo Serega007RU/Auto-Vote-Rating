@@ -90,7 +90,7 @@ async function restoreOptions() {
             added: Date.now()
         }
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
-        updateStatusSave(chrome.i18n.getMessage('firstSettings'), true)
+        createNotif(chrome.i18n.getMessage('firstSettings'))
         
         for (const item of allProjects) {
             window['projects' + item] = []
@@ -101,7 +101,7 @@ async function restoreOptions() {
         await setValue('AVMRsettings', settings, false)
 
         console.log(chrome.i18n.getMessage('settingsGen'))
-        updateStatusSave(chrome.i18n.getMessage('firstSettingsSave'), false, 'success')
+        createNotif(chrome.i18n.getMessage('firstSettingsSave'), 'success')
         alert(chrome.i18n.getMessage('firstInstall'))
     }
 
@@ -185,10 +185,10 @@ async function restoreOptions() {
                 let oldStorageArea = storageArea
                 if (this.checked) {
                     storageArea = 'sync'
-                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopy'))
+                    createNotif(chrome.i18n.getMessage('settingsSyncCopy'))
                 } else {
                     storageArea = 'local'
-                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopyLocal'))
+                    createNotif(chrome.i18n.getMessage('settingsSyncCopyLocal'))
                 }
                 await setValue('storageArea', storageArea, false, 'local')
                 for (const item of allProjects) {
@@ -201,9 +201,9 @@ async function restoreOptions() {
                 await removeValue('generalStats', oldStorageArea)
 
                 if (this.checked) {
-                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopySuccess'), false, 'success');
+                    createNotif(chrome.i18n.getMessage('settingsSyncCopySuccess'), 'success');
                 } else {
-                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), false, 'success');
+                    createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success');
                 }
                 return
             }
@@ -230,7 +230,7 @@ async function restoreOptions() {
         addCustom()
     chrome.notifications.getPermissionLevel(function(callback){
         if (callback != 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
-            updateStatusSave(chrome.i18n.getMessage('notificationsDisabled'), true, 'error')
+            createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
         }
     })
 }
@@ -468,7 +468,7 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
         try {
             body = JSON.parse(document.getElementById('customBody').value)
         } catch (e) {
-            updateStatusAdd(e, true, element, 'error')
+            createNotif(e, 'error')
             return
         }
         project.id = body
@@ -486,7 +486,7 @@ document.getElementById('timeout').addEventListener('submit', ()=>{
 })
 
 async function addProject(project, element) {
-    updateStatusAdd(chrome.i18n.getMessage('adding'), true, element)
+    createNotif(chrome.i18n.getMessage('adding'), null, null, element)
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
     let secondBonusText
@@ -505,24 +505,24 @@ async function addProject(project, element) {
 
     await forLoopAllProjects(function(proj) {
         if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
-            const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), 'success')
+            const message = chrome.i18n.getMessage('alreadyAdded')
             if (!secondBonusText) {
-                updateStatusAdd(message, false, element)
+                createNotif(message, 'success', null, element)
             } else {
-                updateStatusAdd([message, document.createElement('br'), secondBonusText, secondBonusButton], Boolean(!element), element)
+                createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
             }
             returnAdd = true
             return
         } else if (((proj.MCRate && project.MCRate) || (proj.ServerPact && project.ServerPact) || (proj.MinecraftServersOrg && project.MinecraftServersOrg) || (proj.HotMC && project.HotMC) || (proj.MMoTopRU && project.MMoTopRU && proj.game == project.game)) && proj.nick == project.nick && !disableCheckProjects) {
-            updateStatusAdd(chrome.i18n.getMessage('oneProject', getProjectName(proj)), false, element, 'error')
+            createNotif(chrome.i18n.getMessage('oneProject', getProjectName(proj)), 'error', null, element)
             returnAdd = true
             return
         } else if (proj.MinecraftIpList && project.MinecraftIpList && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
-            updateStatusAdd(chrome.i18n.getMessage('oneProjectMinecraftIpList'), false, element, 'error')
+            createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
             returnAdd = true
             return
         } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
-            updateStatusAdd(chrome.i18n.getMessage('alreadyAdded'), false, element, 'success')
+            createNotif(chrome.i18n.getMessage('alreadyAdded'), 'success', null, element)
             returnAdd = true
             return
         }
@@ -534,7 +534,7 @@ async function addProject(project, element) {
     }
     let projectURL = ''
     if (!(disableCheckProjects || project.Custom)) {
-        updateStatusAdd(chrome.i18n.getMessage('checkHasProject'), true, element)
+        createNotif(chrome.i18n.getMessage('checkHasProject'), null, null, element)
         let url
         let jsPath
         if (project.TopCraft) {
@@ -664,27 +664,27 @@ async function addProject(project, element) {
             }
         } catch (e) {
             if (e == 'TypeError: Failed to fetch') {
-                updateStatusAdd(chrome.i18n.getMessage('notConnectInternet'), true, element, 'error')
+                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error', null, element)
                 return
             } else {
-                updateStatusAdd(e, true, element, 'error')
+                createNotif(e, 'error', null, element)
                 return
             }
         }
 
         if (response.status == 404) {
-            updateStatusAdd(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, true, element, 'error')
+            createNotif(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, 'error', null, element)
             return
         } else if (response.redirected) {
             if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.CraftList || project.MinecraftBuzz) {
-                updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
+                createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                 return
             }
-            updateStatusAdd(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, true, element, 'error')
+            createNotif(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, 'error', null, element)
             return
         } else if (response.status == 503) {//None
         } else if (!response.ok) {
-            updateStatusAdd(chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status, true, element, 'error')
+            createNotif(chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status, 'error', null, element)
             return
         }
 
@@ -694,50 +694,50 @@ async function addProject(project, element) {
             if (project.MCRate) {
                 //А зачем 404 отдавать в status код? Мы лучше отошлём 200 и только потом на странице напишем что не найдено 404
                 if (doc.querySelector('div[class=error]') != null) {
-                    updateStatusAdd(doc.querySelector('div[class=error]').textContent, true, element, 'error')
+                    createNotif(doc.querySelector('div[class=error]').textContent, 'error', null, element)
                     return
                 }
             } else if (project.ServerPact) {
                 if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center') != null && doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center').textContent.includes('This server does not exist')) {
-                    updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                     return
                 }
             } else if (project.ListForge) {
                 if (doc.querySelector('a[href="https://listforge.net/"]') == null && doc.querySelector('a[href="http://listforge.net/"]') == null) {
-                    updateStatusAdd()
+                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                     return
                 }
             } else if (project.MinecraftIpList) {
                 if (doc.querySelector(jsPath) == null) {
-                    updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                     return
                 }
             } else if (project.IonMc) {
                 if (doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div') != null) {
-                    updateStatusAdd(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, true, element, 'error')
+                    createNotif(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, true, element, 'error')
                     return
                 }
 //          } else if (project.TopGG) {
 //              if (doc.querySelector('a.btn.primary') != null && doc.querySelector('a.btn.primary').textContent.includes('Login')) {
-//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
 //          } else if (project.DiscordBotList) {
 //              if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
-//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
 //          } else if (project.BotsForDiscord) {
 //              if (doc.getElementById("sign-in") != null) {
-//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
             } else if (project.MMoTopRU) {
                 if (doc.querySelector('body > div') == null && doc.querySelectorAll('body > script[type="text/javascript"]').length == 1) {
-                    updateStatusAdd(chrome.i18n.getMessage('emptySite'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('emptySite'), 'error', null, element)
                     return
                 } else if (doc.querySelector('a[href="https://mmotop.ru/users/sign_in"]') != null) {
-                    updateStatusAdd(chrome.i18n.getMessage('auth'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('auth'), 'error', null, element)
                     return
                 }
             }
@@ -780,21 +780,21 @@ async function addProject(project, element) {
         } catch (e) {
             console.error(e)
         }
-        updateStatusAdd(chrome.i18n.getMessage('checkHasProjectSuccess'), true, element)
+        createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
 
         //Проверка авторизации ВКонтакте
         if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
-            updateStatusAdd(chrome.i18n.getMessage('checkAuthVK'), true, element)
+            createNotif(chrome.i18n.getMessage('checkAuthVK'), null, null, element)
             let url2 = authVKUrls.get(getProjectName(project))
             let response2
             try {
                 response2 = await fetch(url2, {redirect: 'manual'})
             } catch (e) {
                 if (e == 'TypeError: Failed to fetch') {
-                    updateStatusAdd(chrome.i18n.getMessage('notConnectInternetVPN'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error', null, element)
                     return
                 } else {
-                    updateStatusAdd(e, true, element, 'error')
+                    createNotif(e, 'error', null, element)
                     return
                 }
             }
@@ -810,7 +810,7 @@ async function addProject(project, element) {
                 let text = document.createElement('div')
                 text.textContent = chrome.i18n.getMessage('authButton')
                 button.append(text)
-                updateStatusAdd([message, document.createElement('br'), button], true, element)
+                createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
                 document.getElementById('authvk').addEventListener('click', function() {
                     if (element != null) {
                         openPoput(url2, function() {
@@ -824,10 +824,10 @@ async function addProject(project, element) {
                 })
                 return
             } else if (response2.status != 0) {
-                updateStatusAdd(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, true, element, 'error')
+                createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error', null, element)
                 return
             }
-            updateStatusAdd(chrome.i18n.getMessage('checkAuthVKSuccess'), true, element)
+            createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), 'success', null, element)
         }
     }
 
@@ -843,7 +843,7 @@ async function addProject(project, element) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
     } else*/
     let array = []
-    array.push(createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success'))
+    array.push(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL)
 //  if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote && !element) {
 //      const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
 //      const span = document.createElement('span')
@@ -875,7 +875,7 @@ async function addProject(project, element) {
         array.push(chrome.i18n.getMessage('privacyPass2'))
     }
     
-    updateStatusAdd(array, true, element)
+    createNotif(array, 'success', 30000, element)
 
     if (project.MinecraftIndex || project.PixelmonServers) {
         alert(chrome.i18n.getMessage('alertCaptcha'))
@@ -1059,7 +1059,7 @@ async function getValue(name, area) {
     return new Promise(resolve=>{
         chrome.storage[area].get(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
+                createNotif(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), 'error')
                 console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
@@ -1073,17 +1073,17 @@ async function setValue(key, value, updateStatus, area) {
         area = storageArea
     }
     if (updateStatus) {
-        updateStatusSave(chrome.i18n.getMessage('saving'), true)
+        createNotif(chrome.i18n.getMessage('saving'))
     }
     return new Promise(resolve=>{
         chrome.storage[area].set({[key]: value}, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
+                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), 'error')
                 console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
                 if (updateStatus)
-                    updateStatusSave(chrome.i18n.getMessage('successSave'), false, 'success')
+                    createNotif(chrome.i18n.getMessage('successSave'), 'success')
                 resolve(data)
             }
         })
@@ -1096,7 +1096,7 @@ async function removeValue(name, area) {
     return new Promise(resolve=>{
         chrome.storage[area].remove(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
+                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), 'error')
                 console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
@@ -1194,13 +1194,13 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     await checkUpdateConflicts(false)
 
-                    updateStatusSave(chrome.i18n.getMessage('saving'), true)
+                    createNotif(chrome.i18n.getMessage('saving'))
                     for (const item of allProjects) {
                         await setValue('AVMRprojects' + item, window['projects' + item], false)
                     }
                     await setValue('AVMRsettings', settings, false)
                     await setValue('generalStats', generalStats, false)
-                    updateStatusSave(chrome.i18n.getMessage('successSave'), false, 'success')
+                    createNotif(chrome.i18n.getMessage('successSave'), 'success')
 
                     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
                     document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
@@ -1238,7 +1238,7 @@ async function checkUpdateConflicts(save) {
     //Если пользователь обновился с версии 3.3.1
     if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
         updated = true
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+        createNotif(chrome.i18n.getMessage('settingsUpdate'))
         await forLoopAllProjects(async function(proj) {
             proj.stats = {}
             //Да, это весьма не оптимизированно
@@ -1247,7 +1247,7 @@ async function checkUpdateConflicts(save) {
     }
     if (generalStats == null) {
         updated = true
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+        createNotif(chrome.i18n.getMessage('settingsUpdate'))
         generalStats = {}
         if (save) await setValue('generalStats', generalStats, false)
     }
@@ -1255,7 +1255,7 @@ async function checkUpdateConflicts(save) {
     for (const item of allProjects) {
         if (window['projects' + item] == null || !(typeof window['projects' + item][Symbol.iterator] === 'function')) {
             if (!updated) {
-                updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+                createNotif(chrome.i18n.getMessage('settingsUpdate'))
                 updated = true
             }
             window['projects' + item] = []
@@ -1266,7 +1266,7 @@ async function checkUpdateConflicts(save) {
 
     if (updated) {
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdateEnd2'), false, 'success')
+        createNotif(chrome.i18n.getMessage('settingsUpdateEnd2'), 'success')
     }
 }
 
@@ -1948,37 +1948,58 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
 })
 
 //notifications
-function createNotif(type, message) {
+function createNotif(message, type, delay, element) {
+    if (!type) type = 'hint'
     let notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
-    let delay = (type == 'hint') ? 3000 : 5000
-    if (type == 'error') delay = 30000
+    if (!delay){
+        if (type == 'hint') {
+            delay = 3000
+        } else if (type == 'error') {
+            delay = 30000
+        } else {
+            delay = 5000
+        }
+    }
 
     if (type != 'hint') {
         let imgBlock = document.createElement('img')
         imgBlock.src = 'images/notif/'+type+'.png'
         notif.append(imgBlock)
+        let progressBlock = document.createElement('div')
+        progressBlock.classList.add('progress')
+        let progressBar = document.createElement('div')
+        progressBar.style.animation = 'notif-progress '+delay/1000+'s linear'
+        progressBlock.append(progressBar)
+        notif.append(progressBlock)
     }
-    
-    let progressBlock = document.createElement('div')
-    progressBlock.classList.add('progress')
-    let progressBar = document.createElement('div')
-    progressBar.style.animation = 'notif-progress '+delay/1000+'s linear'
-    progressBlock.append(progressBar)
-    notif.append(progressBlock)
 
     let mesBlock = document.createElement('div')
-    mesBlock.textContent = message
+    if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
+        for (const m of message) {
+            mesBlock.append(m)
+        }
+    } else {
+        mesBlock.append(message)
+    }
     notif.append(mesBlock)
     document.querySelector('#notifBlock').prepend(notif)
 
-    notif.addEventListener('click', ()=> {
+//  document.querySelectorAll('#notifBlock > div.hint').forEach((element) => {
+//      element.classList.remove('show')
+//      element.classList.add('hide')
+//      element.removeEventListener('click', null)
+//      setTimeout(()=> element.remove(), 500)
+//  })
+
+    notif.addEventListener('click', (event)=> {
+        if (event.target.tagName != 'DIV') return
         notif.classList.remove('show')
         notif.classList.add('hide')
         notif.removeEventListener('click', null)
         setTimeout(()=> notif.remove(), 500)
     })
-
+    
     setTimeout(()=> {
         notif.classList.remove('show')
         notif.classList.add('hide')

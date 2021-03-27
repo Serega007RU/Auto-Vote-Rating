@@ -216,6 +216,14 @@ nav .logo img {
     z-index: 30;
 }
 
+#modals .modal#addFastProject {
+	height: 450px;
+}
+
+#modals .modal#stats {
+	height: 300px;
+}
+
 #modals .modal.active {
 	transition: .3s;
     transform: scale(1)
@@ -269,12 +277,16 @@ nav .logo img {
     color: #fff;
     text-align: center;
     padding: 5px;
-    margin: 20px auto;
 }
 
-#modals .modal#addFastProject .content .message {
-	height: 240px;
-	margin: 10px auto;
+#modals .modal .content .message {
+	margin: 20px auto;
+	margin-top: 10px;
+	height: 335px;
+}
+
+#modals .modal#stats .content .message {
+	margin: 0 auto;
 }
 
 #modals .modal .content .message table {
@@ -973,6 +985,7 @@ input.checkbox:disabled + label {
 
 #notifBlock > .notif.hint {
     min-height: 20px;
+    padding-top: 8px;
 }
 
 #notifBlock > .notif .progress {
