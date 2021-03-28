@@ -78,7 +78,7 @@ async function restoreOptions() {
     storageArea = await getValue('storageArea', 'local')
     if (storageArea == null || storageArea == '') {
         storageArea = 'local'
-        await setValue('storageArea', storageArea, false, 'local')
+        await setValue('storageArea', storageArea, 'local')
     }
     for (const item of allProjects) {
         window['projects' + item] = await getValue('AVMRprojects' + item)
@@ -94,11 +94,11 @@ async function restoreOptions() {
         
         for (const item of allProjects) {
             window['projects' + item] = []
-            await setValue('AVMRprojects' + item, window['projects' + item], false)
+            await setValue('AVMRprojects' + item, window['projects' + item])
         }
 
         settings = new Settings(false, false, false, false, true, false, 1000, false)
-        await setValue('AVMRsettings', settings, false)
+        await setValue('AVMRsettings', settings)
 
         console.log(chrome.i18n.getMessage('settingsGen'))
         createNotif(chrome.i18n.getMessage('firstSettingsSave'), 'success')
@@ -190,7 +190,7 @@ async function restoreOptions() {
                     storageArea = 'local'
                     createNotif(chrome.i18n.getMessage('settingsSyncCopyLocal'))
                 }
-                await setValue('storageArea', storageArea, false, 'local')
+                await setValue('storageArea', storageArea, 'local')
                 for (const item of allProjects) {
                     await setValue('AVMRprojects' + item, window['projects' + item])
                     await removeValue('AVMRprojects' + item, oldStorageArea)
@@ -207,7 +207,7 @@ async function restoreOptions() {
                 }
                 return
             }
-            await setValue('AVMRsettings', settings, true)
+            await setValue('AVMRsettings', settings)
         })
     }
     //Считывает настройки расширение и выдаёт их в html
@@ -334,10 +334,10 @@ async function addProjectList(project, visually) {
     } else {
         getProjectList(project).push(project)
     }
-    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true)
+    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
     if (project.Custom && !settings.enableCustom) addCustom()
     //projects.push(project)
-    //await setValue('AVMRprojects', projects, true)
+    //await setValue('AVMRprojects', projects)
     if (document.querySelector('.buttonBlock').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
@@ -362,9 +362,9 @@ async function removeProjectList(project, visually) {
         if (temp.nick == project.nick && JSON.stringify(temp.id) == JSON.stringify(project.id) && getProjectName(temp) == getProjectName(project))
             getProjectList(project).splice(i, 1)
     }
-    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true)
+    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
     //projects.splice(deleteCount, 1)
-    //await setValue('AVMRprojects', projects, true)
+    //await setValue('AVMRprojects', projects)
     document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
     for (let value of chrome.extension.getBackgroundPage().queueProjects) {
         if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
@@ -827,7 +827,7 @@ async function addProject(project, element) {
                 createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error', null, element)
                 return
             }
-            createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), 'success', null, element)
+            createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), null, null, element)
         }
     }
 
@@ -874,8 +874,11 @@ async function addProject(project, element) {
         array.push(a)
         array.push(chrome.i18n.getMessage('privacyPass2'))
     }
-    
-    createNotif(array, 'success', 30000, element)
+    if (array.length > 1) {
+        createNotif(array, 'success', 30000, element)
+    } else {
+        createNotif(array, 'success', null, element)
+    }
 
     if (project.MinecraftIndex || project.PixelmonServers) {
         alert(chrome.i18n.getMessage('alertCaptcha'))
@@ -928,7 +931,7 @@ async function setCoolDown() {
     if (settings.cooldown && settings.cooldown == document.getElementById('cooldown').valueAsNumber)
         return
     settings.cooldown = document.getElementById('cooldown').valueAsNumber
-    await setValue('AVMRsettings', settings, true)
+    await setValue('AVMRsettings', settings)
     if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
         chrome.runtime.reload()
     }
@@ -1006,12 +1009,9 @@ async function getValue(name, area) {
         })
     })
 }
-async function setValue(key, value, updateStatus, area) {
+async function setValue(key, value, area) {
     if (!area) {
         area = storageArea
-    }
-    if (updateStatus) {
-        createNotif(chrome.i18n.getMessage('saving'))
     }
     return new Promise(resolve=>{
         chrome.storage[area].set({[key]: value}, data=>{
@@ -1020,8 +1020,6 @@ async function setValue(key, value, updateStatus, area) {
                 console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
-                if (updateStatus)
-                    createNotif(chrome.i18n.getMessage('successSave'), 'success')
                 resolve(data)
             }
         })
@@ -1132,13 +1130,11 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     await checkUpdateConflicts(false)
 
-                    createNotif(chrome.i18n.getMessage('saving'))
                     for (const item of allProjects) {
-                        await setValue('AVMRprojects' + item, window['projects' + item], false)
+                        await setValue('AVMRprojects' + item, window['projects' + item])
                     }
-                    await setValue('AVMRsettings', settings, false)
-                    await setValue('generalStats', generalStats, false)
-                    createNotif(chrome.i18n.getMessage('successSave'), 'success')
+                    await setValue('AVMRsettings', settings)
+                    await setValue('generalStats', generalStats)
 
                     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
                     document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
@@ -1180,14 +1176,14 @@ async function checkUpdateConflicts(save) {
         await forLoopAllProjects(async function(proj) {
             proj.stats = {}
             //Да, это весьма не оптимизированно
-            if (save) await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj), false)
+            if (save) await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj))
         }, false)
     }
     if (generalStats == null) {
         updated = true
         createNotif(chrome.i18n.getMessage('settingsUpdate'))
         generalStats = {}
-        if (save) await setValue('generalStats', generalStats, false)
+        if (save) await setValue('generalStats', generalStats)
     }
 
     for (const item of allProjects) {
@@ -1198,7 +1194,7 @@ async function checkUpdateConflicts(save) {
             }
             window['projects' + item] = []
             if (save)
-                await setValue('AVMRprojects' + item, window['projects' + item], false)
+                await setValue('AVMRprojects' + item, window['projects' + item])
         }
     }
 
@@ -1216,7 +1212,7 @@ modeVote.addEventListener('change', async function() {
     } else {
         settings.enabledSilentVote = false
     }
-    await setValue('AVMRsettings', settings, true)
+    await setValue('AVMRsettings', settings)
 })
 
 //Достаёт все проекты указанные в URL
@@ -1272,7 +1268,7 @@ async function fastAdd() {
 
         if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] == 'true') {
             settings.disabledNotifInfo = true
-            await setValue('AVMRsettings', settings, true)
+            await setValue('AVMRsettings', settings)
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1287,7 +1283,7 @@ async function fastAdd() {
         }
         if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] == 'true') {
             settings.disabledNotifWarn = true
-            await setValue('AVMRsettings', settings, true)
+            await setValue('AVMRsettings', settings)
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1302,7 +1298,7 @@ async function fastAdd() {
         }
         if (vars['disableNotifStart'] != null && vars['disableNotifStart'] == 'true') {
             settings.disabledNotifStart = true
-            await setValue('AVMRsettings', settings, true)
+            await setValue('AVMRsettings', settings)
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1383,7 +1379,7 @@ function addCustom() {
 //  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
-        setValue('AVMRsettings', settings, false)
+        setValue('AVMRsettings', settings)
     }
 }
 
@@ -1890,7 +1886,7 @@ function createNotif(message, type, delay, element) {
     if (!type) type = 'hint'
     let notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
-    if (!delay){
+    if (!delay) {
         if (type == 'hint') delay = 3000
         else if (type == 'error') delay = 30000
         else delay = 5000
