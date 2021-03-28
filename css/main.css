@@ -349,7 +349,6 @@ nav .logo img {
 	background: #1b1b1e;
 	border-radius: 10px;
 	padding: 15px;
-	padding-bottom: 35px;
 	color: #fff;
 }
 
@@ -487,6 +486,11 @@ nav .logo img {
 	grid-gap: 20px;
 }
 
+.bottomLabel {
+	display: flex;
+	justify-content: space-between;
+}
+
 @media(max-width: 1250px) {
     .container {
     	width: 800px;
@@ -571,7 +575,7 @@ nav .logo img {
 }
 
 #generalStats {
-	float: right;
+	display: block;
 }
 
 #authvk {
@@ -590,6 +594,7 @@ nav .logo img {
 }
 
 .link {
+	text-decoration: underline;
 	cursor: pointer;
 	color: #275daf !important;
 }
@@ -599,7 +604,7 @@ nav .logo img {
 }
 
 #donate {
-	float: right;
+	display: block;
 }
 
 .fileSystem > div {

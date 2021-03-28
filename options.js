@@ -1409,9 +1409,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
 
 //Переключение между вкладками
 function tabSelect(evt, tabs) {
-    if (evt.currentTarget.className.includes('active')) {
-        return
-    }
+    if (evt.currentTarget.className.includes('active')) return
 
     if (document.querySelector('.burger.active')) {
         document.querySelector('.burger.active').classList.remove('active')
@@ -1432,11 +1430,6 @@ function tabSelect(evt, tabs) {
 
     document.getElementById(tabs).style.display = 'block'
     evt.currentTarget.className += ' active'
-    if (tabs == 'added') {
-        document.getElementById('donate').style.display = 'none'
-    } else {
-        document.getElementById('donate').style.display = 'inline'
-    }
 }
 
 //Слушателей кнопок для переключения вкладок
