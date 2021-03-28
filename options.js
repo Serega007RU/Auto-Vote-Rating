@@ -1408,48 +1408,25 @@ document.addEventListener('DOMContentLoaded', async()=>{
 })
 
 //Переключение между вкладками
-function tabSelect(evt, tabs) {
-    if (evt.currentTarget.className.includes('active')) return
+document.querySelectorAll('.tablinks').forEach((item)=> {
+    item.addEventListener('click', ()=> {
+        if (item.classList.contains('active')) return
 
-    if (document.querySelector('.burger.active')) {
-        document.querySelector('.burger.active').classList.remove('active')
-        document.querySelector('nav').classList.remove('active')
-    }
-    
-    let i, tabcontent, tablinks
+        if (document.querySelector('.burger.active')) {
+            document.querySelector('.burger.active').classList.remove('active')
+            document.querySelector('nav').classList.remove('active')
+        }
 
-    tabcontent = document.getElementsByClassName('tabcontent')
-    for (let i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = 'none'
-    }
+        document.querySelectorAll('.tabcontent').forEach((elem)=> {
+            elem.style.display = 'none'
+        })
+        document.querySelectorAll('.tablinks').forEach((elem)=> {
+            elem.classList.remove('active')
+        })
 
-    tablinks = document.getElementsByClassName('tablinks')
-    for (let i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(' active', '')
-    }
-
-    document.getElementById(tabs).style.display = 'block'
-    evt.currentTarget.className += ' active'
-}
-
-//Слушателей кнопок для переключения вкладок
-document.querySelector('.burger').addEventListener('click', ()=> {
-    document.querySelector('.burger').classList.toggle('active')
-    document.querySelector('nav').classList.toggle('active')
-
-})
-
-document.getElementById('addTab').addEventListener('click', function() {
-    tabSelect(event, 'append')
-})
-document.getElementById('settingsTab').addEventListener('click', function() {
-    tabSelect(event, 'settings')
-})
-document.getElementById('addedTab').addEventListener('click', function() {
-    tabSelect(event, 'added')
-})
-document.getElementById('helpTab').addEventListener('click', function() {
-    tabSelect(event, 'help')
+        item.classList.add('active')
+        document.getElementById(item.getAttribute('data-tab')).style.display = 'block'
+    })
 })
 
 //Переключение между списками добавленных проектов
@@ -1471,8 +1448,8 @@ function listSelect(evt, tabs) {
 }
 
 //Слушатели кнопок списка доавленных проектов
-if (document.getElementById('CustomButton') != null) {
-    document.getElementById('CustomButton').addEventListener('click', function() {
+if (document.getElementById('CustomButton')) {
+    document.getElementById('CustomButton').addEventListener('click', ()=> {
         listSelect(event, 'CustomTab')
     })
 }
