@@ -1493,21 +1493,6 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
     }
 })
 
-//Поддержка для мобильных устройсв, заставляем думать ServerPact и MinecraftIpList что мы с компьютера а не с телефона
-handler = function(n) {
-    for (let t = 0, i = n.requestHeaders.length; t < i; ++t) {
-        if (n.requestHeaders[t].name === 'User-Agent' && (n.requestHeaders[t].value.includes('Mobile') || n.requestHeaders[t].value.includes('Android') || n.requestHeaders[t].value.includes('iPhone'))) {
-            n.requestHeaders[t].value = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-            break
-        }
-    }
-    return {requestHeaders: n.requestHeaders}
-}
-
-chrome.webRequest.onBeforeSendHeaders.addListener(handler, {
-    urls: ['*://www.serverpact.com/*', '*://minecraftiplist.com/*']
-}, ['blocking', 'requestHeaders'])
-
 chrome.runtime.onInstalled.addListener(async function(details) {
     if (details.reason == 'install') {
         chrome.runtime.openOptionsPage()
