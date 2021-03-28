@@ -1804,9 +1804,9 @@ document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('d
 
 //Звук монеток когда наводишь курсор на ссылку поддержки))
 let play = true
-let sound1 = document.getElementById('sound-link')
+let sound1 = new Audio('audio/coins1.mp3')
 sound1.volume = 0.3
-let sound2 = document.getElementById('sound-link2')
+let sound2 = new Audio('audio/coins2.mp3')
 sound2.volume = 0.3
 document.getElementById('donate').addEventListener('mouseover', function(event) {
     play = !play
