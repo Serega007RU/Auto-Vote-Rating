@@ -417,9 +417,8 @@ async function addVKList(VK, visually) {
     contBlock.append(delBtn)
 
     if (VK.notWorking) {
-        let div2 = document.createElement('div')
-        div2.textContent = createMessage(chrome.i18n.getMessage('notWork'), 'error')
-        mesBlock.append(div2)
+        mesBlock.append(document.createElement('br'))
+        mesBlock.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
     }
     html.append(mesBlock)
     html.append(contBlock)
@@ -474,10 +473,8 @@ async function addProxyList(proxy, visually) {
     control.append(del)
     
     if (proxy.notWorking) {
-        html.append(document.createElement('br'))
-        let div2 = document.createElement('div')
-        div2.textContent = createMessage(chrome.i18n.getMessage('notWork'), 'error')
-        mes.append(div2)
+        mes.append(document.createElement('br'))
+        mes.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
     }
     html.append(mes)
     html.append(control)
