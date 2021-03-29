@@ -575,6 +575,7 @@ nav .logo img {
 }
 
 #generalStats {
+	visibility: hidden;
 	display: block;
 }
 
@@ -632,7 +633,7 @@ nav .logo img {
 	background: #5c84ad;
 	color: #fff;
 	font-size: 19px;
-	padding: 9px 20px;
+	padding: 10px 20px;
 	text-align: center;
 }
 
@@ -849,7 +850,7 @@ input.checkbox:disabled + label {
 
 .checkbox:checked + label:before {
 	width: 10px;
-	top: -5px;
+	top: 0;
 	left: 5px;
 	border-radius: 0;
 	opacity: 1;

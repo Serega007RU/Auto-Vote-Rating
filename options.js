@@ -1424,6 +1424,10 @@ document.querySelectorAll('.tablinks').forEach((item)=> {
             elem.classList.remove('active')
         })
 
+        let genStats = document.querySelector('#generalStats')
+        if (item.getAttribute('data-tab') == 'added') genStats.style.visibility = 'visible'
+        else genStats.removeAttribute('style')
+ 
         item.classList.add('active')
         document.getElementById(item.getAttribute('data-tab')).style.display = 'block'
     })
@@ -1472,7 +1476,7 @@ document.querySelector('#stats .close').addEventListener('click', ()=> {
 
 
 //Слушатель общей статистики и вывод её в модалку
-document.getElementById('generalStats').addEventListener('click', function() {
+document.getElementById('generalStats').addEventListener('click', ()=> {
     // document.getElementById('modalStats').click()
     toggleModal('stats')
     document.getElementById('statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
