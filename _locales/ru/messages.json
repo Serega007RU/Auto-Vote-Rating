@@ -638,6 +638,15 @@
   "importHolaVPNEnd": {
     "message": "Импорт с HolaVPN успешно завершён"
   },
+  "importZenMate": {
+    "message": "Импорт прокси с ZenMate"
+  },
+  "importZenMateStart": {
+    "message": "Начинаю импорт с ZenMate"
+  },
+  "importZenMateEnd": {
+    "message": "Импорт с ZenMate успешно завершён"
+  },
   "randomize": {
     "message": "Рандомизировать следующее голосование"
   },

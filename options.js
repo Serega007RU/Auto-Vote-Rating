@@ -1037,6 +1037,83 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
     updateStatusProxy(chrome.i18n.getMessage('importHolaVPNEnd'), false, 'success')
 })
 
+//Слушатель на импорт с ZenMate
+document.getElementById('importZenMate').addEventListener('click', async () => {
+    updateStatusProxy(chrome.i18n.getMessage('importZenMateStart'), true)
+    let response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/103", {
+      "headers": {
+        "accept": "application/json, text/plain, */*",
+        "accept-language": "ru,en-US;q=0.9,en;q=0.8",
+        "cache-control": "no-cache",
+        "pragma": "no-cache",
+        "sec-ch-ua": "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "none",
+        "x-app-key": "ZMEx4hfuto83htix763jf9cz3n59f73v659f",
+        "x-device-id": "97589925",
+        "x-device-secret": "ef483afb122e05400f895434df1394a82d31e340"
+      },
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "body": null,
+      "method": "GET",
+      "mode": "cors",
+      "credentials": "include"
+    })
+    let vpns = await response.json()
+    for (const vpn of vpns) {
+        let host = vpn.dnsname.split(':')
+        const proxy = {
+            ip: host[0],
+            port: Number(host[1]),
+            scheme: 'https',
+            ZenMate: true
+        }
+        if (await addProxy(proxy, true)) {
+            proxies.push(proxy)
+        }
+    }
+    await setValue('AVMRproxies', proxies, true)
+
+    response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/104", {
+      "headers": {
+        "accept": "application/json, text/plain, */*",
+        "accept-language": "ru,en-US;q=0.9,en;q=0.8",
+        "cache-control": "no-cache",
+        "pragma": "no-cache",
+        "sec-ch-ua": "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "none",
+        "x-app-key": "ZMEx4hfuto83htix763jf9cz3n59f73v659f",
+        "x-device-id": "97589925",
+        "x-device-secret": "ef483afb122e05400f895434df1394a82d31e340"
+      },
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "body": null,
+      "method": "GET",
+      "mode": "cors",
+      "credentials": "include"
+    })
+    vpns = await response.json()
+    for (const vpn of vpns) {
+        let host = vpn.dnsname.split(':')
+        const proxy = {
+            ip: host[0],
+            port: Number(host[1]),
+            scheme: 'https',
+            ZenMate: true
+        }
+        if (await addProxy(proxy, true)) {
+            proxies.push(proxy)
+        }
+    }
+    await setValue('AVMRproxies', proxies, true)
+    updateStatusProxy(chrome.i18n.getMessage('importZenMateEnd'), false, 'success')
+})
+
 async function addProxy(proxy, visually) {
     updateStatusProxy(chrome.i18n.getMessage('adding'), true)
     for (let prox of proxies) {
