@@ -365,9 +365,6 @@ async function addProjectList(project, visually) {
 async function removeProjectList(project, visually) {
     let li = document.getElementById(getProjectName(project) + '_' + project.id + '_' + project.nick)
     if (li != null) {
-        li.querySelectorAll('img').forEach((el)=> {
-            el.removeEventListener('click', null)
-        })
         li.remove()
     } else {
         return
@@ -428,7 +425,7 @@ function updateProjectList(projects) {
 document.getElementById('addProject').addEventListener('submit', async()=>{
     event.preventDefault()
     if (blockButtons) {
-        createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
         blockButtons = true
@@ -832,7 +829,7 @@ async function addProject(project, element) {
             }
 
             if (response2.ok) {
-                const message = createMessage(chrome.i18n.getMessage('authVK', getProjectName(project)), 'error')
+                const message = chrome.i18n.getMessage('authVK', getProjectName(project))
                 const button = document.createElement('button')
                 button.id = 'authvk'
                 button.classList.add('btn')
@@ -844,7 +841,6 @@ async function addProject(project, element) {
                 button.append(text)
                 createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
                 button.addEventListener('click', function() {
-                    button.removeEventListener('click', null)
                     if (element != null) {
                         openPoput(url2, function() {
                             document.location.reload(true)
@@ -885,7 +881,7 @@ async function addProject(project, element) {
     let array = []
     array.push(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL)
 //  if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote && !element) {
-//      const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
+//      const messageWSV = chrome.i18n.getMessage('warnSilentVote', getProjectName(project))
 //      const span = document.createElement('span')
 //      span.className = 'tooltip2'
 //      span.style = 'color: white;'
@@ -982,21 +978,6 @@ async function setCoolDown() {
     if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
         chrome.runtime.reload()
     }
-}
-
-function createMessage(text, level) {
-    const span = document.createElement('span')
-    if (level) {
-        if (level == 'success') {
-            span.style = 'color:#4CAF50;'
-        } else if (level == 'error') {
-            span.style = 'color:#da5e5e;'
-        } /* else if (level == 'warn') {
-            span.style = 'color:#??????;'
-        } */
-    }
-    span.textContent = text
-    return span
 }
 
 function getProjectName(project) {
@@ -1950,12 +1931,10 @@ function createNotif(message, type, delay, element) {
 //  document.querySelectorAll('#notifBlock > div.hint').forEach((element) => {
 //      element.classList.remove('show')
 //      element.classList.add('hide')
-//      element.removeEventListener('click', null)
 //      setTimeout(()=> element.remove(), 500)
 //  })
 
     notif.addEventListener('click', (e)=> {
-        if (e.target.tagName != 'DIV') return
         removeNotif(notif)
     })
     setTimeout(()=> removeNotif(notif), delay)
@@ -1963,7 +1942,6 @@ function createNotif(message, type, delay, element) {
     function removeNotif(elem) {
         elem.classList.remove('show')
         elem.classList.add('hide')
-        elem.removeEventListener('click', null)
         setTimeout(()=> elem.classList.add('hidden'), 500)
         setTimeout(()=> elem.remove(), 1000)
     }
