@@ -360,7 +360,7 @@ async function silentVote(project) {
     try {
         if (project.TopCraft) {
             let response = await fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/')
-            if (!checkResponseError(project, response, 'topcraft.ru', null, true)) return
+            if (!await checkResponseError(project, response, 'topcraft.ru', null, true)) return
             let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
             response = await fetch('https://topcraft.ru/projects/vote/', {
                 credentials: 'include',
@@ -370,7 +370,7 @@ async function silentVote(project) {
                 'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
                 'method': 'POST'
             })
-            if (!checkResponseError(project, response, 'topcraft.ru', [400], true)) return
+            if (!await checkResponseError(project, response, 'topcraft.ru', [400], true)) return
             if (response.status == 400 && response.html.length != 0) {
                 console.warn('Текст ошибки 400:', response.html)
                 endVote({later: true}, null, project)
@@ -382,7 +382,7 @@ async function silentVote(project) {
 
         if (project.McTOP) {
             let response = await fetch('https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/')
-            if (!checkResponseError(project, response, 'mctop.su', null, true)) return
+            if (!await checkResponseError(project, response, 'mctop.su', null, true)) return
             let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
             response = await fetch('https://mctop.su/projects/vote/', {
                 credentials: 'include',
@@ -392,7 +392,7 @@ async function silentVote(project) {
                 'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
                 'method': 'POST'
             })
-            if (!checkResponseError(project, response, 'mctop.su', [400], true)) return
+            if (!await checkResponseError(project, response, 'mctop.su', [400], true)) return
             if (response.status == 400 && response.html.length != 0) {
                 console.warn('Текст ошибки 400:', response.html)
                 endVote({later: true}, null, project)
@@ -404,7 +404,7 @@ async function silentVote(project) {
 
         if (project.MCRate) {
             let response = await fetch('https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code')
-            if (!checkResponseError(project, response, 'mcrate.su', null, true)) return
+            if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
             let code = response.url.substring(response.url.length - 18)
             if (response.doc.querySelector('input[name=login_player]') != null) {
                 response = await fetch('http://mcrate.su/save/rate', {
@@ -420,7 +420,7 @@ async function silentVote(project) {
                     'body': 'login_player=' + project.nick + '&token_vk_secure=' + response.doc.getElementsByName('token_vk_secure').item(0).value + '&uid_vk_secure=' + response.doc.getElementsByName('uid_vk_secure').item(0).value + '&id_project=' + project.id + '&code_vk_secure=' + response.doc.getElementsByName('code_vk_secure').item(0).value + '&mcrate_hash=' + response.doc.getElementsByName('mcrate_hash').item(0).value,
                     'method': 'POST'
                 })
-                if (!checkResponseError(project, response, 'mcrate.su', null, true)) return
+                if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
             }
             if (response.doc.querySelector('div[class=report]') != null) {
                 if (response.doc.querySelector('div[class=report]').textContent.includes('Ваш голос засчитан')) {
@@ -453,7 +453,7 @@ async function silentVote(project) {
 
         if (project.MinecraftRating) {
             let response = await fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45')
-            if (!checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
+            if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
                 if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
 //                  let numbers = response.doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number)
@@ -512,7 +512,7 @@ async function silentVote(project) {
                     'body': 'player=' + project.nick + '',
                     'method': 'POST'
                 })
-                if (!checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
+                if (!await checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
                 if (response.status == 503) {
                     if (i >= 3) {
                         endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + response.status)}, null, project)
@@ -594,7 +594,7 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
-            if (!checkResponseError(project, response, 'serverpact.com')) return
+            if (!await checkResponseError(project, response, 'serverpact.com')) return
             function generatePass(nb) {
                 let chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@'
                 let pass = ''
@@ -648,7 +648,7 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
-            if (!checkResponseError(project, response2, 'serverpact.com')) return
+            if (!await checkResponseError(project, response2, 'serverpact.com')) return
             if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
                 endVote({successfully: true}, null, project)
                 return
@@ -683,7 +683,7 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
-            if (!checkResponseError(project, response, 'minecraftiplist.com')) return
+            if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
 
             if (response.doc.querySelector('#InnerWrapper > script:nth-child(10)') != null && response.doc.querySelector('table[class="CraftingTarget"]') == null) {
                 if (secondVoteMinecraftIpList) {
@@ -776,7 +776,7 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
-            if (!checkResponseError(project, response, 'minecraftiplist.com')) return
+            if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
 
             if (response.doc.querySelector('#Content > div.Error') != null) {
                 if (response.doc.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
@@ -869,7 +869,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     if (bypassCodes) {
         for (const code of bypassCodes) {
-            if (response.stats == code) {
+            if (response.status == code) {
                 return true
             }
         }
