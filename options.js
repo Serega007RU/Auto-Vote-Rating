@@ -1893,8 +1893,7 @@ function createNotif(message, type, delay, element) {
     let notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
     if (!delay) {
-        if (type == 'hint') delay = 3000
-        else if (type == 'error') delay = 30000
+        if (type == 'error') delay = 30000
         else delay = 5000
     }
 
@@ -1908,6 +1907,10 @@ function createNotif(message, type, delay, element) {
         progressBar.style.animation = 'notif-progress '+delay/1000+'s linear'
         progressBlock.append(progressBar)
         notif.append(progressBlock)
+
+        setTimeout(()=> {
+            removeNotif(notif)
+        }, delay)
     }
 
     let mesBlock = document.createElement('div')
@@ -1928,16 +1931,17 @@ function createNotif(message, type, delay, element) {
         console.log('Нет места, уведомление не было отображено')
     }
 
-//  document.querySelectorAll('#notifBlock > div.hint').forEach((element) => {
-//      element.classList.remove('show')
-//      element.classList.add('hide')
-//      setTimeout(()=> element.remove(), 500)
-//  })
-
     notif.addEventListener('click', (e)=> {
         removeNotif(notif)
     })
-    setTimeout(()=> removeNotif(notif), delay)
+
+
+
+    if (notif.previousElementSibling != null && notif.previousElementSibling.className.includes('hint')) {
+        setTimeout(()=> {
+            removeNotif(notif.previousElementSibling)
+        }, 3000)
+    }
 
     function removeNotif(elem) {
         elem.classList.remove('show')
