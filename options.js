@@ -950,8 +950,9 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     scheme: 'https',
                     TunnelBear: true
                 }
-                await addProxy(proxy, true)
-                proxies.push(proxy)
+                if (await addProxy(proxy, true)) {
+                    proxies.push(proxy)
+                }
             }
         }
     } catch (e) {
@@ -991,8 +992,9 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
                                 scheme: 'https',
                                 Windscribe: true
                             }
-                            await addProxy(proxy, true)
-                            proxies.push(proxy)
+                            if (await addProxy(proxy, true)) {
+                                proxies.push(proxy)
+                            }
                         }
                     }
                 }
