@@ -747,5 +747,13 @@
         "content": "$1"
       }
     }
+  },
+  "oauthVK": {
+    "message": "The $rating$ app requests access to your account.",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -854,14 +854,31 @@ async function silentVote(project) {
 }
 
 async function checkResponseError(project, response, url, bypassCodes, vk) {
+    let host = extractHostname(response.url)
+    if (vk && host.includes('vk.com')) {
+        //Почему не UTF-8?
+        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+    }
     response.html = await response.text()
     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
-    let host = extractHostname(response.url)
-    if (vk) {
-        if (host.includes('vk.com')) {
-            endVote({errorAuthVK: true}, null, project)
-            return false
+    if (vk && host.includes('vk.com')) {
+        //Узнаём причину почему мы зависли на авторизации ВК
+        let text
+        if (response.doc.querySelector('div.oauth_form_access') != null) {
+            text = chrome.i18n.getMessage('oauthVK', response.doc.querySelector('div.oauth_form_access > b').textContent)
+        } else if (response.doc.querySelector('div.oauth_content > div') != null) {
+            text = response.doc.querySelector('div.oauth_content > div').textContent
+        } else if (response.doc.querySelector('#login_blocked_wrap') != null) {
+            text = response.doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + response.doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
+        } else if (response.doc.querySelector('div.login_blocked_panel') != null) {
+            text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
+        } else {
+            text = 'null'
         }
+        endVote({errorAuthVK: text}, null, project)
+        return false
+    } else {
+        
     }
     if (!host.includes(url)) {
         endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
