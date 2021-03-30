@@ -844,6 +844,7 @@ async function addProject(project, element) {
                 button.append(text)
                 createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
                 button.addEventListener('click', function() {
+                    button.removeEventListener('click', null)
                     if (element != null) {
                         openPoput(url2, function() {
                             document.location.reload(true)
