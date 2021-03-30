@@ -443,6 +443,9 @@ async function silentVote(project) {
                 endVote({later: true}, null, project)
                 return
             } else if (response.doc.querySelector('div[class="error"]') != null) {
+                if (response.doc.querySelector('div[class="error"]').textContent.includes("уже голосовали")) {
+                    endVote({later: true}, null, project)
+                }
                 endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
                 return
             } else {
