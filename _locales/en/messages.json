@@ -755,5 +755,8 @@
         "content": "$1"
       }
     }
+  },
+  "notFast": {
+    "message": "Not so fast, wait for the function to run"
   }
 }

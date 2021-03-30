@@ -45,6 +45,8 @@ var disableCheckProjects = false
 var returnAdd
 //Где храним настройки
 let storageArea = 'local'
+//Блокировать ли кнопки которые требуют времени на выполнение?
+let blockButtons = false
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -113,6 +115,13 @@ async function restoreOptions() {
     let checkbox = document.querySelectorAll('input[name=checkbox]')
     for (const check of checkbox) {
         check.addEventListener('change', async function() {
+            if (blockButtons) {
+                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+                return
+            } else {
+                blockButtons = true
+            }
+            let _return = false
             if (this.id == 'disabledNotifStart')
                 settings.disabledNotifStart = this.checked
             else if (this.id == 'disabledNotifInfo')
@@ -124,7 +133,7 @@ async function restoreOptions() {
                     settings.disabledNotifError = this.checked
                 } else if (this.checked) {
                     this.checked = false
-                    return
+                    _return = true
                 } else {
                     settings.disabledNotifError = this.checked
                 }
@@ -140,12 +149,12 @@ async function restoreOptions() {
                 } else {
                     disableCheckProjects = this.checked
                 }
-                return
+                _return = true
             } else if (this.id == 'priority') {
                 if (this.checked && !confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
                     this.checked = false
                 }
-                return
+                _return = true
             } else if (this.id == 'customTimeOut') {
                 if (this.checked) {
                     document.getElementById('lastDayMonth').disabled = false
@@ -169,9 +178,9 @@ async function restoreOptions() {
                     document.getElementById('label7').style.display = 'none'
                     document.getElementById('hour').required = false
                 }
-                return
+                _return = true
             } else if (this.id == 'lastDayMonth' || this.id == 'randomize') {
-                return
+                _return = true
             } else if (this.id == 'sheldTimeCheckbox') {
                 if (this.checked) {
                     document.getElementById('label9').removeAttribute('style')
@@ -180,7 +189,7 @@ async function restoreOptions() {
                     document.getElementById('label9').style.display = 'none'
                     document.getElementById('sheldTime').required = false
                 }
-                return
+                _return = true
             } else if (this.id == 'enableSyncStorage') {
                 let oldStorageArea = storageArea
                 if (this.checked) {
@@ -205,9 +214,10 @@ async function restoreOptions() {
                 } else {
                     createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success');
                 }
-                return
+                _return = true
             }
-            await setValue('AVMRsettings', settings)
+            if (!_return) await setValue('AVMRsettings', settings)
+            blockButtons = false
         })
     }
     //Считывает настройки расширение и выдаёт их в html
@@ -292,8 +302,15 @@ async function addProjectList(project, visually) {
 
     listProject.append(li)
     //Слушатель кнопки Удалить на проект
-    img2.addEventListener('click', function() {
-        removeProjectList(project, false)
+    img2.addEventListener('click', async function() {
+        if (blockButtons) {
+            createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+            return
+        } else {
+            blockButtons = true
+        }
+        await removeProjectList(project, false)
+        blockButtons = false
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', function() {
@@ -408,8 +425,14 @@ function updateProjectList(projects) {
 }
 
 //Слушатель кнопки "Добавить"
-document.getElementById('addProject').addEventListener('submit', ()=>{
+document.getElementById('addProject').addEventListener('submit', async()=>{
     event.preventDefault()
+    if (blockButtons) {
+        createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
     let project = {}
     project[document.getElementById('project').value] = true
     project.id = document.getElementById('id').value
@@ -469,20 +492,29 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
             body = JSON.parse(document.getElementById('customBody').value)
         } catch (e) {
             createNotif(e, 'error')
+            blockButtons = false
             return
         }
         project.id = body
         project.responseURL = document.getElementById('responseURL').value
-        addProject(project, null)
+        await addProject(project, null)
     } else {
-        addProject(project, null)
+        await addProject(project, null)
     }
+    blockButtons = false
 })
 
 //Слушатель кнопки "Установить" на кулдауне
-document.getElementById('timeout').addEventListener('submit', ()=>{
+document.getElementById('timeout').addEventListener('submit', async ()=>{
     event.preventDefault()
-    setCoolDown()
+    if (blockButtons) {
+        createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    await setCoolDown()
+    blockButtons = false
 })
 
 async function addProject(project, element) {
@@ -811,14 +843,21 @@ async function addProject(project, element) {
                 text.textContent = chrome.i18n.getMessage('authButton')
                 button.append(text)
                 createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
-                document.getElementById('authvk').addEventListener('click', function() {
+                button.addEventListener('click', function() {
                     if (element != null) {
                         openPoput(url2, function() {
                             document.location.reload(true)
                         })
                     } else {
-                        openPoput(url2, function() {
-                            addProject(project, element)
+                        openPoput(url2, async function() {
+                            if (blockButtons) {
+                                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+                                return
+                            } else {
+                                blockButtons = true
+                            }
+                            await addProject(project, element)
+                            blockButtons = false
                         })
                     }
                 })
@@ -908,6 +947,12 @@ function addProjectsBonus(project, element) {
 //      })
 /*  } else */if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async()=>{
+            if (blockButtons) {
+                createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+                return
+            } else {
+                blockButtons = true
+            }
             let vict = {
                 Custom: true,
                 nick: 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'),
@@ -923,6 +968,7 @@ function addProjectsBonus(project, element) {
             }
             await addProject(vict, null)
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null)
+            blockButtons = false
         })
     }
 }
@@ -984,13 +1030,6 @@ function extractHostname(url) {
 
     return hostname
 }
-
-//Слушатель кнопки "Обновить список серверов"
-//document.getElementById('syncOptions').addEventListener('click', async function() {
-//    let projects = await getValue('projects')
-//    projects = projects.projects
-//    updateProjectList(projects)
-//})
 
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
 async function getValue(name, area) {
@@ -1113,6 +1152,10 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
 
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', (evt)=>{
+    if (blockButtons) {
+        createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+        return
+    }
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (evt.target.files.length == 0) return
@@ -1207,12 +1250,19 @@ async function checkUpdateConflicts(save) {
 //Слушатель переключателя режима голосования
 let modeVote = document.getElementById('enabledSilentVote')
 modeVote.addEventListener('change', async function() {
+    if (blockButtons) {
+        createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
     if (modeVote.value == 'enabled') {
         settings.enabledSilentVote = true
     } else {
         settings.enabledSilentVote = false
     }
     await setValue('AVMRsettings', settings)
+    blockButtons = false
 })
 
 //Достаёт все проекты указанные в URL
