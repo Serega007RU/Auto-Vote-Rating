@@ -678,6 +678,15 @@
   "importHolaVPNEnd": {
     "message": "Import from HolaVPN successfully completed"
   },
+  "importZenMate": {
+    "message": "Import proxies from ZenMate"
+  },
+  "importZenMateStart": {
+    "message": "Importing from ZenMate"
+  },
+  "importZenMateEnd": {
+    "message": "Import from ZenMate successfully completed"
+  },
   "randomize": {
     "message": "Randomize the next vote"
   },
