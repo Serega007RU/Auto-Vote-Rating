@@ -280,9 +280,10 @@ async function newWindow(project) {
             }
         } else if (project.PlanetMinecraft)
             url = 'https://www.planetminecraft.com/server/' + project.id + '/vote/'
-        else if (project.TopG)
-            url = 'https://topg.org/Minecraft/in-' + project.id
-        else if (project.ListForge)
+        else if (project.TopG) {
+            if (project.game == null) project.game = 'minecraft-servers'
+            url = 'https://topg.org/' + project.game + '/server-' + project.id
+        } else if (project.ListForge)
             url = 'https://' + project.game + '/server/' + project.id + '/vote/'
         else if (project.MinecraftServerList)
             url = 'https://minecraft-server-list.com/server/' + project.id + '/vote/'

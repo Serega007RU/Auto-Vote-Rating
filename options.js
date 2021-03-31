@@ -464,6 +464,8 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
     }
     if (project.ListForge) {
         project.game = document.getElementById('chooseGameListForge').value
+    } else if (project.TopG) {
+        project.game = document.getElementById('chooseGameTopG').value
     } else if (project.TopGames) {
         project.game = document.getElementById('chooseGameTopGames').value
         project.lang = document.getElementById('selectLangTopGames').value
@@ -598,8 +600,8 @@ async function addProject(project, element) {
             url = 'https://www.planetminecraft.com/server/' + project.id + '/'
             jsPath = '#resource-title-text'
         } else if (project.TopG) {
-            url = 'https://topg.org/ru/Minecraft/server-' + project.id
-            jsPath = 'body > main > site > div.main > div > div > div.col-lg-4 > div.widget.stacked.widget-table.action-table.nom > div.widget-content > table > tbody > tr:nth-child(7) > td:nth-child(2) > div'
+            url = 'https://topg.org/' + project.game + '/server-' + project.id
+            jsPath = 'div.sheader'
         } else if (project.ListForge) {
             url = 'https://' + project.game + '/server/' + project.id + '/vote/'
             jsPath = 'head > title'
@@ -1585,7 +1587,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip2').textContent = 'legends-evolved'
         document.getElementById('projectIDTooltip3').textContent = '/vote/'
     } else if (selectedTop.value == 'TopG') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://topg.org/Minecraft/in-'
+        document.getElementById('projectIDTooltip1').textContent = 'https://topg.org/minecraft-servers/server-'
         document.getElementById('projectIDTooltip2').textContent = '405637'
         document.getElementById('projectIDTooltip3').textContent = ''
     } else if (selectedTop.value == 'ListForge') {
@@ -1798,6 +1800,14 @@ selectedTop.addEventListener('change', function() {
         if (selectedTop.value != 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('urlGame').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
+    }
+
+    if (selectedTop.value == 'TopG') {
+        document.getElementById('urlGameTopG').removeAttribute('style')
+        document.getElementById('chooseGameTopG').required = true
+    } else if (laterChoose == 'TopG') {
+        document.getElementById('urlGameTopG').style.display = 'none'
+        document.getElementById('chooseGameTopG').required = false
     }
 
     if (selectedTop.value == 'TopGG') {
