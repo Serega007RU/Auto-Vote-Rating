@@ -1888,7 +1888,7 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
 })
 
 //notifications
-function createNotif(message, type, delay, element) {
+async function createNotif(message, type, delay, element) {
     if (!type) type = 'hint'
     let notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
@@ -1907,10 +1907,6 @@ function createNotif(message, type, delay, element) {
         progressBar.style.animation = 'notif-progress '+delay/1000+'s linear'
         progressBlock.append(progressBar)
         notif.append(progressBlock)
-
-        setTimeout(()=> {
-            removeNotif(notif)
-        }, delay)
     }
 
     let mesBlock = document.createElement('div')
@@ -1920,22 +1916,45 @@ function createNotif(message, type, delay, element) {
         mesBlock.append(message)
     }
     notif.append(mesBlock)
+    notif.style.visibility = 'hidden'
+    document.getElementById('notifBlock').append(notif)
 
-    let allNotifH = 10
-    document.querySelectorAll('#notifBlock > .notif').forEach((el)=> {
-        allNotifH = allNotifH+el.clientHeight+10
-    })
-    if (window.innerHeight > (allNotifH)) {
-        document.querySelector('#notifBlock').append(notif)
-    } else {
-        console.log('Нет места, уведомление не было отображено')
+    let allNotifH
+    function calcAllNotifH() {
+        allNotifH = 10
+        document.querySelectorAll('#notifBlock > .notif').forEach((el)=> {
+            allNotifH = allNotifH + el.clientHeight + 10
+        })
+    }
+    calcAllNotifH()
+
+    notif.remove()
+    notif.removeAttribute('style')
+
+    while (window.innerHeight < allNotifH) {
+        await new Promise(resolve=>{
+            function listener(event) {
+                if (event.animationName == 'notif-hide') {
+                    document.getElementById('notifBlock').removeEventListener('animationend', listener)
+                    resolve()
+                }
+            }
+            document.getElementById('notifBlock').addEventListener('animationend', listener)
+        })
+        calcAllNotifH()
+    }
+
+    document.getElementById('notifBlock').append(notif)
+
+    if (type != 'hint') {
+        setTimeout(()=> {
+            removeNotif(notif)
+        }, delay)
     }
 
     notif.addEventListener('click', (e)=> {
         removeNotif(notif)
     })
-
-
 
     if (notif.previousElementSibling != null && notif.previousElementSibling.className.includes('hint')) {
         setTimeout(()=> {
