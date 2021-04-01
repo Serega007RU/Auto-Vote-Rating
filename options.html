@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
+        <div id="notifBlock"></div>
         <div class="burger">
             <span></span>
         </div>
@@ -17,23 +18,23 @@
                 <div>A.V.R.</div>
             </div>
             <ul>
-                <button class="tablinks active" id="addTab">
+                <button class="tablinks active" id="addTab" data-tab="append">
                     <img src="images/icons/addBtn.svg" alt="addBtn">
                     <div data-resource="addButton"></div>
                 </button>
-                <button class="tablinks" id="addedTab">
+                <button class="tablinks" id="addedTab" data-tab="added">
                     <img src="images/icons/addedBtn.svg" alt="addedBtn">
                     <div data-resource="addedButton"></div>
                 </button>
-                <button class="tablinks" id="settingsTab">
+                <button class="tablinks" id="settingsTab" data-tab="settings">
                     <img src="images/icons/optionsBtn.svg" alt="optionsBtn">
                     <div data-resource="optionsButton"></div>
                 </button>
-                <button class="tablinks" id="helpTab">
+                <button class="tablinks" id="helpTab" data-tab="help">
                     <img src="images/icons/helpBtn.svg" alt="helpBtn">
                     <div data-resource="help"></div>
                 </button>
-                <button class="tablinks" id="multivoteTab">
+                <button class="tablinks" id="multivoteTab" data-tab="multivote">
            			<img src="images/icons/multivote.svg" alt="multivote">
            			<div data-resource="multivote"></div>
            		</button>
@@ -128,9 +129,7 @@
                             <label data-resource="chooseTopGG" for="chooseTopGG">
                                 <span class="tooltip1">
                                     <span class="tooltip1text">
-                                        <span>https://top.gg/</span>
-                                        <span style="color:#d32f2f;">bot</span>
-                                        <span>/270904126974590976/vote</span>
+                                        <span>https://top.gg/</span><span style="color:#d32f2f;">bot</span><span>/270904126974590976/vote</span>
                                     </span>
                                 </span>
                             </label>
@@ -143,8 +142,7 @@
                             <label data-resource="additionTopGG" for="additionTopGG"></label>
                             <span class="tooltip1">
                                 <span class="tooltip1text">
-                                    <span>https://top.gg/bot/617037497574359050/vote</span>
-                                    <span style="color:#d32f2f;">?currency=DOGE</span>
+                                    <span>https://top.gg/bot/617037497574359050/vote</span><span style="color:#d32f2f;">?currency=DOGE</span>
                                 </span>
                             </span>
                             <input id="additionTopGG" name="additionTopGG" placeholder="additionTopGG" type="text" class="input"></input>
@@ -157,9 +155,7 @@
                                         <span style="color:red;">URL</span>
                                         <span data-resource="gameIDTooltip"></span>
                                         <br>
-                                        <span>https://</span>
-                                        <span style="color:#d32f2f;">minecraft-mp.com</span>
-                                        <span>/server/207380/vote/</span>
+                                        <span>https://</span><span style="color:#d32f2f;">minecraft-mp.com</span><span>/server/207380/vote/</span>
                                     </span>
                                 </span>
                             </label>
@@ -194,6 +190,27 @@
                                 <option value="wurm-unlimited.com">Wurm Unlimited</option>
                             </datalist>
                         </div>
+                        <!--TopG-->
+                        <div style="display: none;" id="urlGameTopG" class="input-block">
+                            <label data-resource="urlGame">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span style="color:red;">URL</span>
+                                        <span data-resource="gameIDTooltip"></span>
+                                        <br>
+                                        <span>https://topg.org/</span><span style="color:#d32f2f;">minecraft-servers</span><span>/server-405637</span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input class="input" name="chooseGame" type="text" id="chooseGameTopG" placeholder="chooseGameURL" list="gameListTopG" class="input">
+                            <datalist id="gameListTopG">
+                                <option value="minecraft-servers">Minecraft</option>
+                                <option value="cs-servers">Counter Strike: 1.6</option>
+                                <option value="mu-private-servers">Mu Online</option>
+                                <option value="wow-private-servers">World of Warcraft</option>
+                                <option value="runescape-private-servers">Runescape</option>
+                            </datalist>
+                        </div>
                         <!--ServeurPrive, TopGames and MMoTopRU-->
                         <div style="display: none;" id="idGame" class="input-block">
                             <label data-resource="idGame">
@@ -202,9 +219,7 @@
                                         <span style="color:red;">ID</span>
                                         <span data-resource="gameIDTooltip"></span>
                                         <br>
-                                        <span id="gameIDTooltip1"></span>
-                                        <span id="gameIDTooltip2" style="color:#d32f2f;"></span>
-                                        <span id="gameIDTooltip3"></span>
+                                        <span id="gameIDTooltip1"></span><span id="gameIDTooltip2" style="color:#d32f2f;"></span><span id="gameIDTooltip3"></span>
                                     </span>
                                 </span>
                             </label>
@@ -504,7 +519,6 @@
                         </div>
                     </div>
                 </form>
-                <div id="add"></div>
             </div>
             <!-- Настройки -->
             <div id="settings" class="tabcontent" style="display: none;">
@@ -595,7 +609,6 @@
                                 </label>
                             </div>
                         </div>
-                        <div id="file"></div>
                     </div>
                 </div>
             </div>
@@ -879,7 +892,6 @@
                         </ul>
                     </div>
                 </div>
-                <a id="generalStats" data-resource="generalStats" class="link"></a>
             </div>
             <!-- MultiVote -->
             <div id="multivote" class="tabcontent" style="display: none;">
@@ -907,7 +919,6 @@
 						    	<button class="submitBtn" data-resource="addButton" id="AddVK"></button>
 						    </div>
 							<!--<button id="deleteAllVKCookies" data-resource="clearCookies"></button>-->
-							<div id="vk"></div>
 							<div id="VKList"></div>
 						</ul>
 						<ul class="listcontent" id="ProxyTab" style="display: none;">
@@ -971,8 +982,6 @@
             		        	<button class="justBtn redBtn" id="deleteNotWorkingProxies" data-resource="deleteNotWorking"></button>
             		        	<button class="justBtn redBtn" id="deleteAllProxies" data-resource="deleteAll"></button>
             		        </div>
-
-            		        <div id="proxy"></div>
             		        <div id="ProxyList"></div>
             		     </ul>
 					</div>
@@ -1012,14 +1021,10 @@
                 </div>
             </div>
             <!-- Ассеты -->
-            <a class="link" id="donate" data-resource="supportDev" target="blank_" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
-            <audio id="sound-link2" preload="auto">
-                <source src="audio/coins1.mp3" type="audio/mpeg">
-            </audio>
-            <audio id="sound-link" preload="auto">
-                <source src="audio/coins2.mp3" type="audio/mpeg">
-            </audio>
-            <div id="save"></div>
+            <div class="bottomLabel">
+                <a id="generalStats" data-resource="generalStats" class="link"></a>
+                <a class="link" id="donate" data-resource="supportDev" target="blank_" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
+            </div>
         </div>
 
         <!-- Модалки -->

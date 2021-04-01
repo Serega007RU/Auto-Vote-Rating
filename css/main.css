@@ -216,6 +216,14 @@ nav .logo img {
     z-index: 30;
 }
 
+#modals .modal#addFastProject {
+	height: 450px;
+}
+
+#modals .modal#stats {
+	height: 300px;
+}
+
 #modals .modal.active {
 	transition: .3s;
     transform: scale(1)
@@ -269,12 +277,16 @@ nav .logo img {
     color: #fff;
     text-align: center;
     padding: 5px;
-    margin: 20px auto;
 }
 
-#modals .modal#addFastProject .content .message {
-	height: 240px;
-	margin: 10px auto;
+#modals .modal .content .message {
+	margin: 20px auto;
+	margin-top: 10px;
+	height: 335px;
+}
+
+#modals .modal#stats .content .message {
+	margin: 0 auto;
 }
 
 #modals .modal .content .message table {
@@ -325,7 +337,7 @@ nav .logo img {
 
 @media(max-width: 450px) {
     #modals .modal {
-        width:calc(100% - 30px)
+        width: calc(100% - 30px);
     }
 }
 
@@ -492,6 +504,11 @@ nav .logo img {
 }
 
 .multivoteBlock .controlInputs {
+	display: flex;
+	justify-content: space-between;
+}
+
+.bottomLabel {
 	display: flex;
 	justify-content: space-between;
 }
@@ -668,6 +685,7 @@ nav .logo img {
 }
 
 [data-resource="notAvaibledInSilent"] {
+	position: relative;
 	display: block;
 	text-align: center;
 	color: #da5e5e;
@@ -675,7 +693,8 @@ nav .logo img {
 }
 
 #generalStats {
-	float: right;
+	visibility: hidden;
+	display: block;
 }
 
 #authvk {
@@ -694,6 +713,7 @@ nav .logo img {
 }
 
 .link {
+	text-decoration: underline;
 	cursor: pointer;
 	color: #275daf !important;
 }
@@ -703,7 +723,8 @@ nav .logo img {
 }
 
 #donate {
-	float: right;
+	text-align: right;
+	display: block;
 }
 
 .fileSystem > div {
@@ -730,7 +751,7 @@ nav .logo img {
 	background: #5c84ad;
 	color: #fff;
 	font-size: 19px;
-	padding: 9px 20px;
+	padding: 10px 20px;
 	text-align: center;
 }
 
@@ -795,6 +816,8 @@ nav .logo img {
 	font-size: initial !important;
 }
 
+[data-resource="notAvaibledInSilent"] .tooltip1,
+[data-resource="notAvaibledInSilent"] .tooltip2,
 .input-block .tooltip1,
 .input-block .tooltip2,
 .label-block .tooltip2,
@@ -945,7 +968,7 @@ input.checkbox:disabled + label {
 
 .checkbox:checked + label:before {
 	width: 10px;
-	top: -5px;
+	top: 0;
 	left: 5px;
 	border-radius: 0;
 	opacity: 1;
@@ -1054,20 +1077,156 @@ input.checkbox:disabled + label {
     opacity: 1
 }
 
-.redBtn {
-	background: #da5e5e;
+/* Нотификации */
+#notifBlock {
+    position: fixed;
+    z-index: 10;
+    top: 0;
+    right: 0;
+    width: 330px;
+    pointer-events: none;
+    height: 100%;
+}
+
+@media(max-width: 450px) {
+    #notifBlock {
+        width: 100%;
+    }
+}
+
+#notifBlock > .notif { 
+	transform-origin: right top;
+    cursor: pointer;
+    pointer-events: auto;
+    right: -330px;
+    transition: .5s;
+    margin: 10px;
+    margin-bottom: 0;
+    display: flex;
+    width: calc(100% - 36px);
+    padding: 8px;
+    padding-top: 14px;
+    color: #fff;
+    min-height: 50px;
+    border-radius: 5px;
+    position: relative;
+}
+
+#notifBlock > .notif.hint {
+    min-height: 20px;
+    padding-top: 8px;
+}
+
+#notifBlock > .notif.show {
+    transform: translateX(-330px);
+    animation: notif-show .5s linear;
+}
+
+#notifBlock > .notif.hide {
+    transform: translateX(0);
+    animation: notif-hide .5s linear;
+}
+
+#notifBlock > .notif.hidden {
+    min-height: 0;
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+#notifBlock > .notif .progress {
+    background: rgba(100, 100, 100, .3);
+    border-radius: 100px;
+    width: calc(100% - 10px);
+    height: 6px;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+#notifBlock > .notif .progress div {
+    background: #fff;
+    border-radius: 100px;
+    height: 6px;
+    width: 100%;
+}
+
+#notifBlock > .notif img,
+#notifBlock > .notif div {
+    margin: auto 0;
+}
+
+#notifBlock > .notif div {
+    font-size: 15px;
+}
+
+#notifBlock > .notif img {
+    height: 40px;
+    width: 40px;
+    margin-right: 10px;
+}
+
+#notifBlock > .notif.error {
+    background: #da5e5e;
+}
+    
+#notifBlock > .notif.warn {
+    background: #f1af4c;
+}
+
+#notifBlock > .notif.info {
+    background: #5c84ad;
+}
+
+#notifBlock > .notif.success {
+    background: #4caf50;
+}
+
+#notifBlock > .notif.hint {
+    background: #37373d;
+}
+
+@keyframes notif-progress {   
+    0% {
+        width: 0%;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+@keyframes notif-show {   
+    0% {
+        opacity: 0;
+        transform: scale(0) translateX(0px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateX(-330px);
+    }
+}
+
+@keyframes notif-hide {   
+    0% {
+        opacity: 1;
+        transform: scale(1) translateX(-330px);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0) translateX(0px);
+    }
 }
 
 /* Скроллер */
 ::-webkit-scrollbar-button {
-	background-image:url('');
-	background-repeat:no-repeat;
-	width:5px;
-	height:0px;
+	background-image: url('');
+	background-repeat: no-repeat;
+	width: 5px;
+	height: 0px;
 }
 
 ::-webkit-scrollbar-track {
-	background-color:#2A2A2F;
+	background-color: #2A2A2F;
 	border-radius: 2px;
 }
 
@@ -1082,10 +1241,10 @@ input.checkbox:disabled + label {
 }
 
 ::-webkit-resizer{
-	background-image:url('');
-	background-repeat:no-repeat;
-	width:4px;
-	height:0px;
+	background-image: url('');
+	background-repeat: no-repeat;
+	width: 4px;
+	height: 0px;
 }
 
 ::-webkit-scrollbar{

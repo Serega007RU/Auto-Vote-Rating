@@ -46,6 +46,8 @@ var returnAdd
 var deleteVKCookies = true
 //Где храним настройки
 let storageArea = 'local'
+//Блокировать ли кнопки которые требуют времени на выполнение?
+let blockButtons = false
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -88,7 +90,7 @@ async function restoreOptions() {
     storageArea = await getValue('storageArea', 'local')
     if (storageArea == null || storageArea == '') {
         storageArea = 'local'
-        await setValue('storageArea', storageArea, false, 'local')
+        await setValue('storageArea', storageArea, 'local')
     }
     for (const item of allProjects) {
         window['projects' + item] = await getValue('AVMRprojects' + item)
@@ -102,22 +104,22 @@ async function restoreOptions() {
             added: Date.now()
         }
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
-        updateStatusSave(chrome.i18n.getMessage('firstSettings'), true)
+        createNotif(chrome.i18n.getMessage('firstSettings'))
         
         for (const item of allProjects) {
             window['projects' + item] = []
-            await setValue('AVMRprojects' + item, window['projects' + item], false)
+            await setValue('AVMRprojects' + item, window['projects' + item])
         }
 
         VKs = []
         proxies = []
         settings = new Settings(false, false, false, false, true, false, 1000, false)
-        await setValue('AVMRsettings', settings, false)
-        await setValue('AVMRVKs', VKs, false)
-        await setValue('AVMRproxies', proxies, false)
+        await setValue('AVMRsettings', settings)
+        await setValue('AVMRVKs', VKs)
+        await setValue('AVMRproxies', proxies)
 
         console.log(chrome.i18n.getMessage('settingsGen'))
-        updateStatusSave(chrome.i18n.getMessage('firstSettingsSave'), false, 'success')
+        createNotif(chrome.i18n.getMessage('firstSettingsSave'), 'success')
         alert(chrome.i18n.getMessage('firstInstall'))
     }
 
@@ -125,11 +127,11 @@ async function restoreOptions() {
 
     //Если пользователь обновился с версии без MultiVote (special for settings)
     if (settings.stopVote == null) {
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+        createNotif(chrome.i18n.getMessage('settingsUpdate'))
         settings.stopVote = 9000000000000000
-        await setValue('AVMRsettings', settings, false)
+        await setValue('AVMRsettings', settings)
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdateEnd2'), false, 'success')
+        createNotif(chrome.i18n.getMessage('settingsUpdateEnd2'), 'success')
     }
 
     updateProjectList()
@@ -138,6 +140,13 @@ async function restoreOptions() {
     let checkbox = document.querySelectorAll('input[name=checkbox]')
     for (const check of checkbox) {
         check.addEventListener('change', async function() {
+            if (blockButtons) {
+                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+                return
+            } else {
+                blockButtons = true
+            }
+            let _return = false
             if (this.id == 'disabledNotifStart')
                 settings.disabledNotifStart = this.checked
             else if (this.id == 'disabledNotifInfo')
@@ -149,7 +158,7 @@ async function restoreOptions() {
                     settings.disabledNotifError = this.checked
                 } else if (this.checked) {
                     this.checked = false
-                    return
+                    _return = true
                 } else {
                     settings.disabledNotifError = this.checked
                 }
@@ -165,18 +174,18 @@ async function restoreOptions() {
                 } else {
                     disableCheckProjects = this.checked
                 }
-                return
+                _return = true
             } else if (this.id == 'priority') {
                 if (this.checked && !confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
                     this.checked = false
                 }
-                return
+                _return = true
             } else if (this.id == 'useMultiVote') {
                 settings.useMultiVote = this.checked
             } else if (this.id == 'repeatAttemptLater') {
                 settings.repeatAttemptLater = this.checked
             } else if (this.id == 'randomize') {
-                return
+                _return = true
             } else if (this.id == 'customTimeOut') {
                 if (this.checked) {
                     document.getElementById('lastDayMonth').disabled = false
@@ -200,9 +209,9 @@ async function restoreOptions() {
                     document.getElementById('label7').style.display = 'none'
                     document.getElementById('hour').required = false
                 }
-                return
+                _return = true
             } else if (this.id == 'lastDayMonth' || this.id == 'randomize') {
-                return
+                _return = true
             } else if (this.id == 'sheldTimeCheckbox') {
                 if (this.checked) {
                     document.getElementById('label9').removeAttribute('style')
@@ -211,48 +220,53 @@ async function restoreOptions() {
                     document.getElementById('label9').style.display = 'none'
                     document.getElementById('sheldTime').required = false
                 }
-                return
+                _return = true
             } else if (this.id == 'enableSyncStorage') {
                 let oldStorageArea = storageArea
                 if (this.checked) {
                     storageArea = 'sync'
-                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopy'))
+                    createNotif(chrome.i18n.getMessage('settingsSyncCopy'))
                 } else {
                     storageArea = 'local'
-                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopyLocal'))
+                    createNotif(chrome.i18n.getMessage('settingsSyncCopyLocal'))
                 }
-                await setValue('storageArea', storageArea, false, 'local')
+                await setValue('storageArea', storageArea, 'local')
                 for (const item of allProjects) {
                     await setValue('AVMRprojects' + item, window['projects' + item])
                     await removeValue('AVMRprojects' + item, oldStorageArea)
                 }
                 await setValue('AVMRsettings', settings)
                 await setValue('generalStats', generalStats)
+                await setValue('AVMRVKs', VKs)
+                await setValue('AVMRproxies', proxies)
                 await removeValue('AVMRsettings', oldStorageArea)
                 await removeValue('generalStats', oldStorageArea)
+                await removeValue('AVMRVKs', oldStorageArea)
+                await removeValue('AVMRproxies', oldStorageArea)
 
                 if (this.checked) {
-                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopySuccess'), false, 'success');
+                    createNotif(chrome.i18n.getMessage('settingsSyncCopySuccess'), 'success');
                 } else {
-                    updateStatusSave(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), false, 'success');
+                    createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success');
                 }
-                return
+                _return = true
             }
-            await setValue('AVMRsettings', settings, true)
+            if (!_return) await setValue('AVMRsettings', settings)
+            blockButtons = false
         })
     }
     let stopVoteButton = async function () {
         if (settings.stopVote > Date.now()) {
             settings.stopVote = 0
             document.querySelector('#stopVote img').src = 'images/icons/start.svg'
-            updateStatusSave(chrome.i18n.getMessage('voteResumed'), false, 'success')
+            createNotif(chrome.i18n.getMessage('voteResumed'), 'info')
         } else {
             settings.stopVote = 9000000000000000
             document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
             await chrome.extension.getBackgroundPage().stopVote()
-            updateStatusSave(chrome.i18n.getMessage('voteSuspended'), false, 'error')
+            createNotif(chrome.i18n.getMessage('voteSuspended'), 'info')
         }
-        await setValue('AVMRsettings', settings, false)
+        await setValue('AVMRsettings', settings)
     }
     document.getElementById('stopVote').addEventListener('click', stopVoteButton)
 
@@ -282,7 +296,7 @@ async function restoreOptions() {
         addCustom()
     chrome.notifications.getPermissionLevel(function(callback){
         if (callback != 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
-            updateStatusSave(chrome.i18n.getMessage('notificationsDisabled'), true, 'error')
+            createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
         }
     })
 }
@@ -344,8 +358,15 @@ async function addProjectList(project, visually) {
 
     listProject.append(li)
     //Слушатель кнопки Удалить на проект
-    img2.addEventListener('click', function() {
-        removeProjectList(project, false)
+    img2.addEventListener('click', async function() {
+        if (blockButtons) {
+            createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+            return
+        } else {
+            blockButtons = true
+        }
+        await removeProjectList(project, false)
+        blockButtons = false
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', function() {
@@ -386,10 +407,10 @@ async function addProjectList(project, visually) {
     } else {
         getProjectList(project).push(project)
     }
-    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true)
+    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
     if (project.Custom && !settings.enableCustom) addCustom()
     //projects.push(project)
-    //await setValue('AVMRprojects', projects, true)
+    //await setValue('AVMRprojects', projects)
     if (document.querySelector('.buttonBlock').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
@@ -453,7 +474,7 @@ async function addVKList(VK, visually) {
         return
     }
     VKs.push(VK)
-    await setValue('AVMRVKs', VKs, true)
+    await setValue('AVMRVKs', VKs)
     document.querySelector('#VKButton > span').textContent = VKs.length
 }
 
@@ -487,7 +508,7 @@ async function addProxyList(proxy, visually) {
         return
     }
     proxies.push(proxy)
-    await setValue('AVMRproxies', proxies, true)
+    await setValue('AVMRproxies', proxies)
     document.querySelector('#ProxyButton > span').textContent = proxies.length
 }
 
@@ -495,9 +516,6 @@ async function addProxyList(proxy, visually) {
 async function removeProjectList(project, visually) {
     let li = document.getElementById(getProjectName(project) + '_' + project.id + '_' + project.nick)
     if (li != null) {
-        li.querySelectorAll('img').forEach((el)=> {
-            el.removeEventListener('click', null)
-        })
         li.remove()
     } else {
         return
@@ -509,9 +527,9 @@ async function removeProjectList(project, visually) {
         if (temp.nick == project.nick && JSON.stringify(temp.id) == JSON.stringify(project.id) && getProjectName(temp) == getProjectName(project))
             getProjectList(project).splice(i, 1)
     }
-    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project), true)
+    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
     //projects.splice(deleteCount, 1)
-    //await setValue('AVMRprojects', projects, true)
+    //await setValue('AVMRprojects', projects)
     document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
     for (let value of chrome.extension.getBackgroundPage().queueProjects) {
         if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
@@ -552,7 +570,7 @@ async function removeVKList(VK, visually) {
         let temp = VKs[i]
         if (temp.id == VK.id && temp.name == VK.name) VKs.splice(i, 1)
     }
-    await setValue('AVMRVKs', VKs, true)
+    await setValue('AVMRVKs', VKs)
     document.querySelector('#VKButton > span').textContent = VKs.length
 }
 
@@ -572,7 +590,7 @@ async function removeProxyList(proxy, visually) {
         let temp = proxies[i]
         if (temp.ip == proxy.ip && temp.port == proxy.port) proxies.splice(i, 1)
     }
-    await setValue('AVMRproxies', proxies, true)
+    await setValue('AVMRproxies', proxies)
     document.querySelector('#ProxyButton > span').textContent = proxies.length
     //Если в этот момент прокси использовался
     if (chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
@@ -630,13 +648,20 @@ function updateProjectList(projects, key) {
 //Слушатель кнопки 'Добавить' на MultiVote VKontakte
 document.getElementById('AddVK').addEventListener('click', async () => {
     event.preventDefault()
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
     await addVK()
+    blockButtons = false
 })
 
 async function addVK() {
     if (!deleteVKCookies || confirm('Все куки и вкладки ВКонтакте будут удалены, вы согласны?')) {
         //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
-        updateStatusVK(chrome.i18n.getMessage('deletingAllVK'), true)
+        createNotif(chrome.i18n.getMessage('deletingAllVK'))
 
         await new Promise(resolve => {
             chrome.tabs.query({url: '*://*.vk.com/*'}, function(tabs) {
@@ -658,8 +683,8 @@ async function addVK() {
             }
         }
 
-        updateStatusVK(chrome.i18n.getMessage('deletedAllVK'), false, 'success')
-        updateStatusVK(chrome.i18n.getMessage('openPopupVK'), true)
+        createNotif(chrome.i18n.getMessage('deletedAllVK'))
+        createNotif(chrome.i18n.getMessage('openPopupVK'))
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
         await new Promise(resolve => {
@@ -669,21 +694,21 @@ async function addVK() {
         })
 
         //После закрытия окна авторизации попытка добавить аккаунт ВКонтакте
-        updateStatusVK(chrome.i18n.getMessage('adding'), true)
+        createNotif(chrome.i18n.getMessage('adding'))
         let response
         try {
             response = await fetch('https://vk.com/')
         } catch (e) {
             if (e == 'TypeError: Failed to fetch') {
-                updateStatusVK(chrome.i18n.getMessage('notConnectInternet'), true, 'error')
+                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error')
                 return
             } else {
-                updateStatusVK(e, true, 'error')
+                createNotif(e, 'error')
                 return
             }
         }
         if (!response.ok) {
-            updateStatusVK(chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status, true, 'error')
+            createNotif(chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status, 'error')
             return
         }
         //Почему не UTF-8?
@@ -691,26 +716,26 @@ async function addVK() {
         let html = await response.text()
         let doc = new DOMParser().parseFromString(html, 'text/html')
         if (doc.querySelector('#index_login_button') != null) {
-            updateStatusVK(chrome.i18n.getMessage('notAuthVK'), true, 'error')
+            createNotif(chrome.i18n.getMessage('notAuthVK'), 'error')
             return
         }
         let VK = {}
         try {
             if (doc.querySelector('#login_blocked_wrap') != null) {
                 let text = doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
-                updateStatusVK(text, true, 'error')
+                createNotif(text, 'error')
                 return
             }
             VK.name = doc.querySelector('#top_vkconnect_link > div > div.top_profile_vkconnect_name').textContent
             VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
         } catch(e) {
-            updateStatusVK(e, true, 'error')
+            createNotif(e, 'error')
             return
         }
 
         for (let vkontakte of VKs) {
             if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
-                updateStatusVK(chrome.i18n.getMessage('added'), false, 'success')
+                createNotif(chrome.i18n.getMessage('added'), 'success')
                 await wait(1500)
                 await checkAuthVK()
                 return
@@ -735,7 +760,7 @@ async function addVK() {
 
         await addVKList(VK, false)
         
-        updateStatusVK(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, false, 'success')
+        createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
 
         await wait(1500)
         await checkAuthVK()
@@ -744,8 +769,8 @@ async function addVK() {
 
 //Проверяем авторизацию на всех Майнкрафт рейтингах где есть авторизация ВКонтакте и если пользователь не авторизован - предлагаем ему авторизоваться
 async function checkAuthVK() {
-    updateStatusVK(chrome.i18n.getMessage('checkAuthVK'), true)
-    let authStatus = createMessage(chrome.i18n.getMessage('notAuthVKTop'), 'error')
+    createNotif(chrome.i18n.getMessage('checkAuthVK'))
+    let authStatus = chrome.i18n.getMessage('notAuthVKTop')
     let needReturn = false
     for (let [key, value] of authVKUrls) {
         let response2
@@ -753,9 +778,9 @@ async function checkAuthVK() {
             response2 = await fetch(value, {redirect: 'manual'})
         } catch (e) {
             if (e == 'TypeError: Failed to fetch') {
-                updateStatusVK(chrome.i18n.getMessage('notConnectInternetVPN'), true, 'error')
+                createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error')
             } else {
-                updateStatusVK(e, true, 'error')
+                createNotif(e, 'error')
             }
             needReturn = true
         }
@@ -768,16 +793,16 @@ async function checkAuthVK() {
             a.textContent = key
             authStatus.append(a)
             authStatus.append(' ')
-            updateStatusVK(authStatus, true)
+            createNotif(authStatus, 'warn', 30000)
             needReturn = true
         } else if (response2.status != 0) {
-            updateStatusVK(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, true, 'error')
+            createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error')
             needReturn = true
         }
     }
     if (needReturn) {
         authStatus.append(createMessage(chrome.i18n.getMessage('notAcceptAuth')))
-        updateStatusVK(authStatus, true)
+        createNotif(authStatus, 'warn', 30000)
         for (let [key, value] of authVKUrls) {
             if (document.getElementById('authvk' + key) != null) {
                 document.getElementById('authvk' + key).addEventListener('click', function() {
@@ -789,12 +814,12 @@ async function checkAuthVK() {
         }
         return
     }
-    updateStatusVK(chrome.i18n.getMessage('authOK'), false, 'success')
+    createNotif(chrome.i18n.getMessage('authOK'), 'success')
 }
 
 // //Слушатель кнопки 'Удалить куки' на MultiVote VKontakte
 // document.getElementById('deleteAllVKCookies').addEventListener('click', async () => {
-//     updateStatusVK(chrome.i18n.getMessage('deletingAllVKCookies'), true)
+//     createNotif(chrome.i18n.getMessage('deletingAllVKCookies'))
 //     let cookies = await new Promise(resolve => {
 //         chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
 //             resolve(cookies)
@@ -803,34 +828,55 @@ async function checkAuthVK() {
 //     for(let i=0; i<cookies.length;i++) {
 //         await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
 //     }
-//     updateStatusVK(createMessage(chrome.i18n.getMessage('deletedAllVKCookies'), false, 'success')
+//     createNotif(createMessage(chrome.i18n.getMessage('deletedAllVKCookies'), 'success')
 // })
 
 //Слушатель кнопки 'Удалить нерабочие' прокси
 document.getElementById('deleteNotWorkingProxies').addEventListener('click', async () => {
-    updateStatusProxy(chrome.i18n.getMessage('deletingNotWorkingProxies'), true)
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('deletingNotWorkingProxies'))
     let proxiesCopy = [...proxies]
     for (let prox of proxiesCopy) {
         if (prox.notWorking) {
             await removeProxyList(prox, false)
         }
     }
-    updateStatusProxy(chrome.i18n.getMessage('deletedNotWorkingProxies'), false, 'success')
+    createNotif(chrome.i18n.getMessage('deletedNotWorkingProxies'), 'success')
+    blockButtons = false
 })
 
 //Слушатель кнопки 'Удалить всё' на Прокси
 document.getElementById('deleteAllProxies').addEventListener('click', async () => {
-    updateStatusProxy(chrome.i18n.getMessage('deletingAllProxies'), true)
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('deletingAllProxies'))
     document.getElementById('ProxyList').parentNode.replaceChild(document.getElementById('ProxyList').cloneNode(false), document.getElementById('ProxyList'))
     proxies = []
-    await setValue('AVMRproxies', proxies, true)
+    await setValue('AVMRproxies', proxies)
     document.querySelector('#ProxyButton > span').textContent = proxies.length
-    updateStatusProxy(chrome.i18n.getMessage('deletedAllProxies'), false, 'success')
+    createNotif(chrome.i18n.getMessage('deletedAllProxies'), 'success')
+    blockButtons = false
 })
 
 //Слушатель кнопки 'Добавить' на Прокси
 document.getElementById('addProxy').addEventListener('submit', async () => {
     event.preventDefault()
+
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
 
     let proxy = {}
     proxy.ip = document.querySelector('#ip').value
@@ -839,14 +885,14 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
         proxy.scheme = document.querySelector('#proxyType').value
 //     } else {
 //         //Если не указан тип прокси пытаемся его определить самому
-//         updateStatusProxy(chrome.i18n.getMessage('checkSchemeProxy', 'socks5'), true)
+//         createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'socks5'))
 //         let error = await checkProxy(proxy, 'socks5')
 //         if (!error) {
 //             proxy.scheme = 'socks5'
 //         }
 
 //         if (error) {
-//             updateStatusProxy(chrome.i18n.getMessage('checkSchemeProxy', 'socks4'), true)
+//             createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'socks4'))
 //             error = await checkProxy(proxy, 'socks4')
 //             if (!error) {
 //                 proxy.scheme = 'socks4'
@@ -854,7 +900,7 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
 //         }
 
 //         if (error) {
-//             updateStatusProxy(chrome.i18n.getMessage('checkSchemeProxy', 'https'), true)
+//             createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'https'))
 //             error = await checkProxy(proxy, 'https')
 //             if (!error) {
 //                 proxy.scheme = 'https'
@@ -862,7 +908,7 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
 //         }
         
 //         if (error) {
-//             updateStatusProxy(chrome.i18n.getMessage('checkSchemeProxy', 'http'), true)
+//             createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'http'))
 //             error = await checkProxy(proxy, 'http')
 //             if (!error) {
 //                 proxy.scheme = 'http'
@@ -870,7 +916,7 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
 //         }
 
 //         if (error) {
-//             updateStatusProxy(chrome.i18n.getMessage('errorCheckSchemeProxy'), true, 'error')
+//             createNotif(chrome.i18n.getMessage('errorCheckSchemeProxy'), 'error')
 //             return
 //         }
     }
@@ -880,12 +926,19 @@ document.getElementById('addProxy').addEventListener('submit', async () => {
     }
 
     await addProxy(proxy)
+    blockButtons = false
 })
 
 //Слушатель на импорт с TunnelBear
 let token
 document.getElementById('importTunnelBear').addEventListener('click', async () => {
-    updateStatusProxy(chrome.i18n.getMessage('importTunnelBearStart'), true)
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importTunnelBearStart'))
     try {
         if (token == null) {
             let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
@@ -916,10 +969,12 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     a.target = 'blank_'
                     a.href = 'https://www.tunnelbear.com/account/login'
                     a.textContent = chrome.i18n.getMessage('authButton')
-                    updateStatusProxy([createMessage(chrome.i18n.getMessage('loginTB'), 'error'), a], true)
+                    createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
+                    blockButtons = false
                     return
                 }
-                updateStatusProxy(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, 'error')
+                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
+                blockButtons = false
                 return
             }
             let json = await response.json()
@@ -930,13 +985,14 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
         for (let country of countries) {
             response = await fetch('https://api.polargrizzly.com/vpns/countries/' + country, {'headers': {'authorization': token}})
             if (!response.ok) {
-                updateStatusProxy(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, 'error')
+                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
                 if (response.status == 401) {
                     let a = document.createElement('a')
                     a.target = 'blank_'
                     a.href = 'https://www.tunnelbear.com/account/login'
                     a.textContent = chrome.i18n.getMessage('authButton')
-                    updateStatusProxy([createMessage(chrome.i18n.getMessage('loginTB'), 'error'), a], true)
+                    createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
+                    blockButtons = false
                     return
                 } else {
                     continue
@@ -950,23 +1006,31 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     scheme: 'https',
                     TunnelBear: true
                 }
-                if (await addProxy(proxy, true)) {
+                if (await addProxy(proxy, true, true)) {
                     proxies.push(proxy)
                 }
             }
         }
     } catch (e) {
-        updateStatusProxy(e, true, 'error')
+        createNotif(e, 'error')
         console.error(e)
+        blockButtons = false
         return
     }
-    await setValue('AVMRproxies', proxies, true)
-    updateStatusProxy(chrome.i18n.getMessage('importTunnelBearEnd'), false, 'success')
+    await setValue('AVMRproxies', proxies)
+    createNotif(chrome.i18n.getMessage('importTunnelBearEnd'), 'success')
+    blockButtons = false
 })
 
 //Слушатель на импорт с Windscribe
 document.getElementById('importWindscribe').addEventListener('click', async () => {
-    updateStatusProxy(chrome.i18n.getMessage('importWindscribeStart'), true)
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importWindscribeStart'))
     let i = 0
     while (i < 1) {
         i++
@@ -978,7 +1042,8 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
                 response = await fetch('https://assets.windscribe.com/serverlist/openvpn/1/ef53494bc440751713a7ad93e939aa190cee7458')
             }
             if (!response.ok) {
-                updateStatusProxy(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, 'error')
+                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
+                blockButtons = false
                 return
             }
             const json = await response.json()
@@ -992,7 +1057,7 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
                                 scheme: 'https',
                                 Windscribe: true
                             }
-                            if (await addProxy(proxy, true)) {
+                            if (await addProxy(proxy, true, true)) {
                                 proxies.push(proxy)
                             }
                         }
@@ -1000,18 +1065,26 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
                 }
             }
         } catch (e) {
-            updateStatusProxy(e, true, 'error')
+            createNotif(e, 'error')
             console.error(e)
+            blockButtons = false
             return
         }
-        await setValue('AVMRproxies', proxies, true)
+        await setValue('AVMRproxies', proxies)
     }
-    updateStatusProxy(chrome.i18n.getMessage('importWindscribeEnd'), false, 'success')
+    createNotif(chrome.i18n.getMessage('importWindscribeEnd'), 'success')
+    blockButtons = false
 })
 
 //Слушатель на импорт с HolaVPN
 document.getElementById('importHolaVPN').addEventListener('click', async () => {
-    updateStatusProxy(chrome.i18n.getMessage('importHolaVPNStart'), true)
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importHolaVPNStart'))
     let response = await fetch('https://client.hola.org/client_cgi/vpn_countries.json')
     const countries = await response.json()
     for (country of countries) {
@@ -1030,18 +1103,25 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
                 scheme: 'https',
                 HolaVPN: true
             }
-            if (await addProxy(proxy, true)) {
+            if (await addProxy(proxy, true, true)) {
                 proxies.push(proxy)
             }
         }
     }
-    await setValue('AVMRproxies', proxies, true)
-    updateStatusProxy(chrome.i18n.getMessage('importHolaVPNEnd'), false, 'success')
+    await setValue('AVMRproxies', proxies)
+    createNotif(chrome.i18n.getMessage('importHolaVPNEnd'), 'success')
+    blockButtons = false
 })
 
 //Слушатель на импорт с ZenMate
 document.getElementById('importZenMate').addEventListener('click', async () => {
-    updateStatusProxy(chrome.i18n.getMessage('importZenMateStart'), true)
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importZenMateStart'))
     let response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/103", {
       "headers": {
         "accept": "application/json, text/plain, */*",
@@ -1072,11 +1152,11 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
             scheme: 'https',
             ZenMate: true
         }
-        if (await addProxy(proxy, true)) {
+        if (await addProxy(proxy, true, true)) {
             proxies.push(proxy)
         }
     }
-    await setValue('AVMRproxies', proxies, true)
+    await setValue('AVMRproxies', proxies)
 
     response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/104", {
       "headers": {
@@ -1108,25 +1188,26 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
             scheme: 'https',
             ZenMate: true
         }
-        if (await addProxy(proxy, true)) {
+        if (await addProxy(proxy, true, true)) {
             proxies.push(proxy)
         }
     }
-    await setValue('AVMRproxies', proxies, true)
-    updateStatusProxy(chrome.i18n.getMessage('importZenMateEnd'), false, 'success')
+    await setValue('AVMRproxies', proxies)
+    createNotif(chrome.i18n.getMessage('importZenMateEnd'), 'success')
+    blockButtons = false
 })
 
-async function addProxy(proxy, visually) {
-    updateStatusProxy(chrome.i18n.getMessage('adding'), true)
+async function addProxy(proxy, visually, dontNotif) {
+    if (!dontNotif) createNotif(chrome.i18n.getMessage('adding'))
     for (let prox of proxies) {
         if (proxy.ip == prox.ip && proxy.port == prox.port) {
-            updateStatusProxy(chrome.i18n.getMessage('added'), false, 'success')
+            if (!dontNotif) createNotif(chrome.i18n.getMessage('added'), 'success')
             return false
         }
     }
 
     await addProxyList(proxy, visually)
-    updateStatusProxy(chrome.i18n.getMessage('addSuccess'), false, 'success')
+    if (!dontNotif) createNotif(chrome.i18n.getMessage('addSuccess'), 'success')
     return true
 }
 
@@ -1158,8 +1239,14 @@ async function checkProxy(proxy, scheme) {
 }
 
 //Слушатель кнопки "Добавить"
-document.getElementById('addProject').addEventListener('submit', ()=>{
+document.getElementById('addProject').addEventListener('submit', async()=>{
     event.preventDefault()
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
     let project = {}
     project[document.getElementById('project').value] = true
     project.id = document.getElementById('id').value
@@ -1194,6 +1281,8 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
     }
     if (project.ListForge) {
         project.game = document.getElementById('chooseGameListForge').value
+    } else if (project.TopG) {
+        project.game = document.getElementById('chooseGameTopG').value
     } else if (project.TopGames) {
         project.game = document.getElementById('chooseGameTopGames').value
         project.lang = document.getElementById('selectLangTopGames').value
@@ -1218,40 +1307,57 @@ document.getElementById('addProject').addEventListener('submit', ()=>{
         try {
             body = JSON.parse(document.getElementById('customBody').value)
         } catch (e) {
-            updateStatusAdd(e, true, element, 'error')
+            createNotif(e, 'error')
+            blockButtons = false
             return
         }
         project.id = body
         project.responseURL = document.getElementById('responseURL').value
-        addProject(project, null)
+        await addProject(project, null)
     } else {
-        addProject(project, null)
+        await addProject(project, null)
     }
+    blockButtons = false
 })
 
-//Слушатель кнопки 'Установить' на кулдауне
-document.getElementById('timeout').addEventListener('submit', ()=>{
+//Слушатель кнопки "Установить" на кулдауне
+document.getElementById('timeout').addEventListener('submit', async ()=>{
     event.preventDefault()
-    setCoolDown()
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    await setCoolDown()
+    blockButtons = false
 })
 
 //Слушатель кнопки 'Установить' на blacklist proxy
 document.getElementById('formProxyBlackList').addEventListener('submit', async ()=>{
     event.preventDefault()
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
     let bl
     try {
         bl = JSON.parse(document.getElementById('proxyBlackList').value)
     } catch (e) {
-        updateStatusProxy(e, true, 'error')
+        createNotif(e, 'error')
+        blockButtons = false
         return
     }
     settings.proxyBlackList = bl
     await setValue('AVMRsettings', settings)
-    updateStatusProxy(chrome.i18n.getMessage('proxyBLSet'), false, 'success')
+    createNotif(chrome.i18n.getMessage('proxyBLSet'), 'success')
+    blockButtons = false
 })
 
 async function addProject(project, element) {
-    updateStatusAdd(chrome.i18n.getMessage('adding'), true, element)
+    createNotif(chrome.i18n.getMessage('adding'), null, null, element)
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
     let secondBonusText
@@ -1271,39 +1377,39 @@ async function addProject(project, element) {
     await forLoopAllProjects(function(proj) {
         if (settings.useMultiVote) {
             if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick && !project.Custom) {
-                const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), 'success')
+                const message = chrome.i18n.getMessage('alreadyAdded')
                 if (!secondBonusText) {
-                    updateStatusAdd(message, false, element)
+                    createNotif(message, 'success', null, element)
                 } else {
-                    updateStatusAdd([message, document.createElement('br'), secondBonusText, secondBonusButton], Boolean(!element), element)
+                    createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
                 }
                 returnAdd = true
                 return
             } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
-                updateStatusAdd(chrome.i18n.getMessage('alreadyAdded'), false, element, 'success')
+                createNotif(chrome.i18n.getMessage('alreadyAdded'), 'success', null, element)
                 returnAdd = true
                 return
             }
         } else {
             if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
-                const message = createMessage(chrome.i18n.getMessage('alreadyAdded'), 'success')
+                const message = chrome.i18n.getMessage('alreadyAdded')
                 if (!secondBonusText) {
-                    updateStatusAdd(message, false, element)
+                    createNotif(message, 'success', null, element)
                 } else {
-                    updateStatusAdd([message, document.createElement('br'), secondBonusText, secondBonusButton], Boolean(!element), element)
+                    createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
                 }
                 returnAdd = true
                 return
             } else if (((proj.MCRate && project.MCRate) || (proj.ServerPact && project.ServerPact) || (proj.MinecraftServersOrg && project.MinecraftServersOrg) || (proj.HotMC && project.HotMC) || (proj.MMoTopRU && project.MMoTopRU && proj.game == project.game)) && proj.nick == project.nick && !disableCheckProjects) {
-                updateStatusAdd(chrome.i18n.getMessage('oneProject', getProjectName(proj)), false, element, 'error')
+                createNotif(chrome.i18n.getMessage('oneProject', getProjectName(proj)), 'error', null, element)
                 returnAdd = true
                 return
             } else if (proj.MinecraftIpList && project.MinecraftIpList && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
-                updateStatusAdd(chrome.i18n.getMessage('oneProjectMinecraftIpList'), false, element, 'error')
+                createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
                 returnAdd = true
                 return
             } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
-                updateStatusAdd(chrome.i18n.getMessage('alreadyAdded'), false, element, 'success')
+                createNotif(chrome.i18n.getMessage('alreadyAdded'), 'success', null, element)
                 returnAdd = true
                 return
             }
@@ -1316,7 +1422,7 @@ async function addProject(project, element) {
     }
     let projectURL = ''
     if (!(disableCheckProjects || project.Custom)) {
-        updateStatusAdd(chrome.i18n.getMessage('checkHasProject'), true, element)
+        createNotif(chrome.i18n.getMessage('checkHasProject'), null, null, element)
         let url
         let jsPath
         if (project.TopCraft) {
@@ -1351,8 +1457,8 @@ async function addProject(project, element) {
             url = 'https://www.planetminecraft.com/server/' + project.id + '/'
             jsPath = '#resource-title-text'
         } else if (project.TopG) {
-            url = 'https://topg.org/ru/Minecraft/server-' + project.id
-            jsPath = 'body > main > site > div.main > div > div > div.col-lg-4 > div.widget.stacked.widget-table.action-table.nom > div.widget-content > table > tbody > tr:nth-child(7) > td:nth-child(2) > div'
+            url = 'https://topg.org/' + project.game + '/server-' + project.id
+            jsPath = 'div.sheader'
         } else if (project.ListForge) {
             url = 'https://' + project.game + '/server/' + project.id + '/vote/'
             jsPath = 'head > title'
@@ -1446,27 +1552,27 @@ async function addProject(project, element) {
             }
         } catch (e) {
             if (e == 'TypeError: Failed to fetch') {
-                updateStatusAdd(chrome.i18n.getMessage('notConnectInternet'), true, element, 'error')
+                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error', null, element)
                 return
             } else {
-                updateStatusAdd(e, true, element, 'error')
+                createNotif(e, 'error', null, element)
                 return
             }
         }
 
         if (response.status == 404) {
-            updateStatusAdd(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, true, element, 'error')
+            createNotif(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, 'error', null, element)
             return
         } else if (response.redirected) {
             if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.CraftList || project.MinecraftBuzz) {
-                updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
+                createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                 return
             }
-            updateStatusAdd(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, true, element, 'error')
+            createNotif(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, 'error', null, element)
             return
         } else if (response.status == 503) {//None
         } else if (!response.ok) {
-            updateStatusAdd(chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status, true, element, 'error')
+            createNotif(chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status, 'error', null, element)
             return
         }
 
@@ -1476,50 +1582,50 @@ async function addProject(project, element) {
             if (project.MCRate) {
                 //А зачем 404 отдавать в status код? Мы лучше отошлём 200 и только потом на странице напишем что не найдено 404
                 if (doc.querySelector('div[class=error]') != null) {
-                    updateStatusAdd(doc.querySelector('div[class=error]').textContent, true, element, 'error')
+                    createNotif(doc.querySelector('div[class=error]').textContent, 'error', null, element)
                     return
                 }
             } else if (project.ServerPact) {
                 if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center') != null && doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center').textContent.includes('This server does not exist')) {
-                    updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                     return
                 }
             } else if (project.ListForge) {
                 if (doc.querySelector('a[href="https://listforge.net/"]') == null && doc.querySelector('a[href="http://listforge.net/"]') == null) {
-                    updateStatusAdd()
+                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                     return
                 }
             } else if (project.MinecraftIpList) {
                 if (doc.querySelector(jsPath) == null) {
-                    updateStatusAdd(chrome.i18n.getMessage('notFoundProject'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                     return
                 }
             } else if (project.IonMc) {
                 if (doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div') != null) {
-                    updateStatusAdd(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, true, element, 'error')
+                    createNotif(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, true, element, 'error')
                     return
                 }
 //          } else if (project.TopGG) {
 //              if (doc.querySelector('a.btn.primary') != null && doc.querySelector('a.btn.primary').textContent.includes('Login')) {
-//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
 //          } else if (project.DiscordBotList) {
 //              if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
-//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
 //          } else if (project.BotsForDiscord) {
 //              if (doc.getElementById("sign-in") != null) {
-//                  updateStatusAdd(chrome.i18n.getMessage('discordLogIn'), true, element, 'error')
+//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
             } else if (project.MMoTopRU) {
                 if (doc.querySelector('body > div') == null && doc.querySelectorAll('body > script[type="text/javascript"]').length == 1) {
-                    updateStatusAdd(chrome.i18n.getMessage('emptySite'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('emptySite'), 'error', null, element)
                     return
                 } else if (doc.querySelector('a[href="https://mmotop.ru/users/sign_in"]') != null) {
-                    updateStatusAdd(chrome.i18n.getMessage('auth'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('auth'), 'error', null, element)
                     return
                 }
             }
@@ -1562,27 +1668,27 @@ async function addProject(project, element) {
         } catch (e) {
             console.error(e)
         }
-        updateStatusAdd(chrome.i18n.getMessage('checkHasProjectSuccess'), true, element)
+        createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
 
         //Проверка авторизации ВКонтакте
         if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && !settings.useMultiVote) {
-            updateStatusAdd(chrome.i18n.getMessage('checkAuthVK'), true, element)
+            createNotif(chrome.i18n.getMessage('checkAuthVK'), null, null, element)
             let url2 = authVKUrls.get(getProjectName(project))
             let response2
             try {
                 response2 = await fetch(url2, {redirect: 'manual'})
             } catch (e) {
                 if (e == 'TypeError: Failed to fetch') {
-                    updateStatusAdd(chrome.i18n.getMessage('notConnectInternetVPN'), true, element, 'error')
+                    createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error', null, element)
                     return
                 } else {
-                    updateStatusAdd(e, true, element, 'error')
+                    createNotif(e, 'error', null, element)
                     return
                 }
             }
 
             if (response2.ok) {
-                const message = createMessage(chrome.i18n.getMessage('authVK', getProjectName(project)), 'error')
+                const message = chrome.i18n.getMessage('authVK', getProjectName(project))
                 const button = document.createElement('button')
                 button.id = 'authvk'
                 button.classList.add('btn')
@@ -1592,24 +1698,31 @@ async function addProject(project, element) {
                 let text = document.createElement('div')
                 text.textContent = chrome.i18n.getMessage('authButton')
                 button.append(text)
-                updateStatusAdd([message, document.createElement('br'), button], true, element)
-                document.getElementById('authvk').addEventListener('click', function() {
+                createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
+                button.addEventListener('click', function() {
                     if (element != null) {
                         openPoput(url2, function() {
                             document.location.reload(true)
                         })
                     } else {
-                        openPoput(url2, function() {
-                            addProject(project, element)
+                        openPoput(url2, async function() {
+                            if (blockButtons) {
+                                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+                                return
+                            } else {
+                                blockButtons = true
+                            }
+                            await addProject(project, element)
+                            blockButtons = false
                         })
                     }
                 })
                 return
             } else if (response2.status != 0) {
-                updateStatusAdd(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, true, element, 'error')
+                createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error', null, element)
                 return
             }
-            updateStatusAdd(chrome.i18n.getMessage('checkAuthVKSuccess'), true, element)
+            createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), null, null, element)
         }
     }
 
@@ -1622,12 +1735,12 @@ async function addProject(project, element) {
     await addProjectList(project, false)
 
     /*f (random) {
-        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
+        createNotif('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
     } else*/
     let array = []
-    array.push(createMessage(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL, 'success'))
+    array.push(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL)
 //  if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote && !element) {
-//      const messageWSV = createMessage(chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + ' ', 'error')
+//      const messageWSV = chrome.i18n.getMessage('warnSilentVote', getProjectName(project))
 //      const span = document.createElement('span')
 //      span.className = 'tooltip2'
 //      span.style = 'color: white;'
@@ -1656,8 +1769,11 @@ async function addProject(project, element) {
         array.push(a)
         array.push(chrome.i18n.getMessage('privacyPass2'))
     }
-    
-    updateStatusAdd(array, true, element)
+    if (array.length > 1) {
+        createNotif(array, 'success', 30000, element)
+    } else {
+        createNotif(array, 'success', null, element)
+    }
 
     if (project.MinecraftIndex || project.PixelmonServers) {
         alert(chrome.i18n.getMessage('alertCaptcha'))
@@ -1671,10 +1787,10 @@ function addProjectsBonus(project, element) {
 //      document.getElementById('secondBonusMythicalWorld').addEventListener('click', async()=>{
 //          let response = await fetch('https://mythicalworld.su/bonus')
 //          if (!response.ok) {
-//              updateStatusAdd(chrome.i18n.getMessage('notConnect', response.url) + response.status, true, element, 'error')
+//              createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error', null, element)
 //              return
 //          } else if (response.redirected) {
-//              updateStatusAdd(chrome.i18n.getMessage('redirectedSecondBonus', response.url), true, element, 'error')
+//              createNotif(chrome.i18n.getMessage('redirectedSecondBonus', response.url), 'error', null, element)
 //              return
 //          }
 //          await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', null, 'https://mythicalworld.su/bonus', {ms: 86400000}, priorityOption, null)
@@ -1687,6 +1803,12 @@ function addProjectsBonus(project, element) {
 //      })
 /*  } else */if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async()=>{
+            if (blockButtons) {
+                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+                return
+            } else {
+                blockButtons = true
+            }
             let vict = {
                 Custom: true,
                 nick: 'VictoryCraft ' + chrome.i18n.getMessage('dailyBonus'),
@@ -1702,6 +1824,7 @@ function addProjectsBonus(project, element) {
             }
             await addProject(vict, null)
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null)
+            blockButtons = false
         })
     }
 }
@@ -1710,95 +1833,10 @@ async function setCoolDown() {
     if (settings.cooldown && settings.cooldown == document.getElementById('cooldown').valueAsNumber)
         return
     settings.cooldown = document.getElementById('cooldown').valueAsNumber
-    await setValue('AVMRsettings', settings, true)
+    await setValue('AVMRsettings', settings)
     if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
         chrome.runtime.reload()
     }
-}
-
-function createMessage(text, level) {
-    const span = document.createElement('span')
-    if (level) {
-        if (level == 'success') {
-            span.style = 'color:#4CAF50;'
-        } else if (level == 'error') {
-            span.style = 'color:#da5e5e;'
-        } /* else if (level == 'warn') {
-            span.style = 'color:#??????;'
-        } */
-    }
-    span.textContent = text
-    return span
-}
-
-function updateStatusProxy(message, disableTimer, level) {
-    updateStatus(message, 'proxy', disableTimer, level)
-}
-function updateStatusVK(message, disableTimer, level) {
-    updateStatus(message, 'vk', disableTimer, level)
-}
-function updateStatusAdd(message, disableTimer, element, level) {
-    updateStatus(message, 'add', disableTimer, level, element)
-}
-function updateStatusSave(message, disableTimer, level) {
-    updateStatus(message, 'save', disableTimer, level)
-}
-function updateStatusFile(message, disableTimer, level) {
-    updateStatus(message, 'file', disableTimer, level)
-}
-var addTimeout
-var saveTimeout
-var fileTimeout
-var proxyTimeout
-var vkTimeout
-function updateStatus(message, type, disableTimer, level, element) {
-    if (level) {
-        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-            for (const m in message) {
-                if (typeof message[m] === 'string') {
-                    message[m] = createMessage(message[m], level)
-                }
-            }
-        } else {
-            message = createMessage(message, level)
-        }
-    }
-    let status
-    if (element != null) {
-        status = element
-        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-            for (const m of message) {
-                if (m.style && m.style.color == 'rgb(76, 175, 80)') {
-                    const img = element.parentElement.parentElement.parentElement.firstElementChild
-                    img.src = 'images/icons/success.svg'
-                }
-            }
-        } else {
-            if (message.style && message.style.color == 'rgb(76, 175, 80)') {
-                const img = element.parentElement.parentElement.parentElement.firstElementChild
-                img.src = 'images/icons/success.svg'
-            }
-        }
-    } else {
-        status = document.getElementById(type)
-    }
-    clearInterval(window[type + 'Timeout'])
-    while (status.firstChild)
-       status.firstChild.remove()
-    if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-        for (const m of message) {
-            status.append(m)
-        }
-    } else {
-        status.append(message)
-    }
-    if (disableTimer || element != null)
-        return
-    window[type + 'Timeout'] = setTimeout(function() {
-        while (status.firstChild)
-            status.firstChild.remove()
-        status.append('\u00A0')
-    }, 3000)
 }
 
 function getProjectName(project) {
@@ -1834,13 +1872,6 @@ function extractHostname(url) {
     return hostname
 }
 
-//Слушатель кнопки 'Обновить список серверов'
-//document.getElementById('syncOptions').addEventListener('click', async function() {
-//    let projects = await getValue('projects')
-//    projects = projects.projects
-//    updateProjectList(projects)
-//})
-
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
 async function getValue(name, area) {
     if (!area) {
@@ -1849,7 +1880,7 @@ async function getValue(name, area) {
     return new Promise(resolve=>{
         chrome.storage[area].get(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), true, 'error')
+                createNotif(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), 'error')
                 console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
@@ -1858,22 +1889,17 @@ async function getValue(name, area) {
         })
     })
 }
-async function setValue(key, value, updateStatus, area) {
+async function setValue(key, value, area) {
     if (!area) {
         area = storageArea
-    }
-    if (updateStatus) {
-        updateStatusSave(chrome.i18n.getMessage('saving'), true)
     }
     return new Promise(resolve=>{
         chrome.storage[area].set({[key]: value}, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
+                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), 'error')
                 console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
-                if (updateStatus)
-                    updateStatusSave(chrome.i18n.getMessage('successSave'), false, 'success')
                 resolve(data)
             }
         })
@@ -1886,7 +1912,7 @@ async function removeValue(name, area) {
     return new Promise(resolve=>{
         chrome.storage[area].remove(name, data=>{
             if (chrome.runtime.lastError) {
-                updateStatusSave(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), true, 'error')
+                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), 'error')
                 console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
                 reject(chrome.runtime.lastError)
             } else {
@@ -1958,7 +1984,7 @@ async function forLoopAllProjects(fuc, reverse) {
 
 //Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', ()=> {
-    updateStatusFile(chrome.i18n.getMessage('exporting'), true)
+    createNotif(chrome.i18n.getMessage('exporting'))
     let allSetting = {
         VKs,
         proxies,
@@ -1976,12 +2002,12 @@ document.getElementById('file-download').addEventListener('click', ()=> {
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
     anchor.dataset.downloadurl = ['text/json;charset=UTF-8;', anchor.download, anchor.href].join(':')
     anchor.click()
-    updateStatusFile(chrome.i18n.getMessage('exportingEnd'), false, 'success')
+    createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
 })
 
 //Слушатель на импорт прокси листа
 document.getElementById('importProxy').addEventListener('change', (evt) => {
-    updateStatusProxy(chrome.i18n.getMessage('importing'), true)
+    createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (evt.target.files.length == 0) return
         let file = evt.target.files[0]
@@ -2019,15 +2045,17 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
                         if (continueFor) {
                             continue
                         }
-                        await addProxy(varProxy)
+                        if (await addProxy(varProxy, true, true)) {
+                            proxies.push(proxy)
+                        }
                     }
 
-                    await updateProjectList()
+                    await setValue('AVMRproxies', proxies)
 
-                    updateStatusProxy(chrome.i18n.getMessage('importingEnd'), false, 'success')
+                    createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
                 } catch (e) {
                     console.error(e)
-                    updateStatusProxy(e, true, 'error')
+                    createNotif(e, 'error')
                 }
             }
         })(file)
@@ -2035,12 +2063,12 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
         document.getElementById('file-upload').value = ''
     } catch (e) {
         console.error(e)
-        updateStatusProxy(e, true, 'error')
+        createNotif(e, 'error')
     }
 }, false)
 
 document.getElementById('logs-download').addEventListener('click', ()=>{
-    updateStatusFile(chrome.i18n.getMessage('exporting'), true)
+    createNotif(chrome.i18n.getMessage('exporting'))
 
     let blob = new Blob([localStorage.consoleHistory],{type: 'text/plain;charset=UTF-8;'})
     let anchor = document.createElement('a')
@@ -2051,12 +2079,16 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
     
     openPoput(anchor.href)
 
-    updateStatusFile(chrome.i18n.getMessage('exportingEnd'), false, 'success')
+    createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
 })
 
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', (evt)=>{
-    updateStatusFile(chrome.i18n.getMessage('importing'), true)
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    }
+    createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (evt.target.files.length == 0) return
         let file = evt.target.files[0]
@@ -2075,16 +2107,13 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     await checkUpdateConflicts(false)
 
-                    updateStatusSave(chrome.i18n.getMessage('saving'), true)
                     for (const item of allProjects) {
-                        await setValue('AVMRprojects' + item, window['projects' + item], false)
+                        await setValue('AVMRprojects' + item, window['projects' + item])
                     }
-                    await setValue('AVMRsettings', settings, false)
-                    await setValue('generalStats', generalStats, false)
-                    await setValue('AVMRVKs', VKs, false)
-                    await setValue('AVMRproxies', proxies, false)
-
-                    updateStatusSave(chrome.i18n.getMessage('successSave'), false, 'success')
+                    await setValue('AVMRsettings', settings)
+                    await setValue('generalStats', generalStats)
+                    await setValue('AVMRVKs', VKs)
+                    await setValue('AVMRproxies', proxies)
 
                     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
                     document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
@@ -2104,10 +2133,10 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
 
                     await updateProjectList()
 
-                    updateStatusFile(chrome.i18n.getMessage('importingEnd'), false, 'success')
+                    createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
                 } catch (e) {
                     console.error(e)
-                    updateStatusFile(e, true, 'error')
+                    createNotif(e, 'error')
                 }
             }
         })(file)
@@ -2115,7 +2144,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
         document.getElementById('file-upload').value = ''
     } catch (e) {
         console.error(e)
-        updateStatusFile(e, true, 'error')
+        createNotif(e, 'error')
     }
 }, false)
 
@@ -2124,69 +2153,76 @@ async function checkUpdateConflicts(save) {
     //Если пользователь обновился с версии 3.3.1
     if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
         updated = true
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+        createNotif(chrome.i18n.getMessage('settingsUpdate'))
         await forLoopAllProjects(async function(proj) {
             proj.stats = {}
             //Да, это весьма не оптимизированно
-            if (save) await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj), false)
+            if (save) await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj))
         }, false)
     }
 
     //Если пользователь обновился с версии без MultiVote
     if (VKs == null || !(typeof VKs[Symbol.iterator] === 'function') || proxies == null || !(typeof proxies[Symbol.iterator] === 'function')) {
         updated = true
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+        createNotif(chrome.i18n.getMessage('settingsUpdate'))
         VKs = []
         proxies = []
-        await setValue('AVMRVKs', VKs, false)
-        await setValue('AVMRproxies', proxies, false)
+        await setValue('AVMRVKs', VKs)
+        await setValue('AVMRproxies', proxies)
     }
     if (settings.stopVote == null) {
         updated = true
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+        createNotif(chrome.i18n.getMessage('settingsUpdate'))
         settings.stopVote = 9000000000000000
-        await setValue('AVMRsettings', settings, false)
+        await setValue('AVMRsettings', settings)
     }
     if (settings.proxyBlackList == null) {
         updated = true
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+        createNotif(chrome.i18n.getMessage('settingsUpdate'))
         settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
     }
 
     if (generalStats == null) {
         updated = true
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+        createNotif(chrome.i18n.getMessage('settingsUpdate'))
         generalStats = {}
-        if (save) await setValue('generalStats', generalStats, false)
+        if (save) await setValue('generalStats', generalStats)
     }
 
     for (const item of allProjects) {
         if (window['projects' + item] == null || !(typeof window['projects' + item][Symbol.iterator] === 'function')) {
             if (!updated) {
-                updateStatusSave(chrome.i18n.getMessage('settingsUpdate'), true)
+                createNotif(chrome.i18n.getMessage('settingsUpdate'))
                 updated = true
             }
             window['projects' + item] = []
             if (save)
-                await setValue('AVMRprojects' + item, window['projects' + item], false)
+                await setValue('AVMRprojects' + item, window['projects' + item])
         }
     }
 
     if (updated) {
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
-        updateStatusSave(chrome.i18n.getMessage('settingsUpdateEnd2'), false, 'success')
+        createNotif(chrome.i18n.getMessage('settingsUpdateEnd2'), 'success')
     }
 }
 
 //Слушатель переключателя режима голосования
 let modeVote = document.getElementById('enabledSilentVote')
 modeVote.addEventListener('change', async function() {
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
     if (modeVote.value == 'enabled') {
         settings.enabledSilentVote = true
     } else {
         settings.enabledSilentVote = false
     }
-    await setValue('AVMRsettings', settings, true)
+    await setValue('AVMRsettings', settings)
+    blockButtons = false
 })
 
 //Достаёт все проекты указанные в URL
@@ -2242,7 +2278,7 @@ async function fastAdd() {
 
         if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] == 'true') {
             settings.disabledNotifInfo = true
-            await setValue('AVMRsettings', settings, true)
+            await setValue('AVMRsettings', settings)
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -2257,7 +2293,7 @@ async function fastAdd() {
         }
         if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] == 'true') {
             settings.disabledNotifWarn = true
-            await setValue('AVMRsettings', settings, true)
+            await setValue('AVMRsettings', settings)
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -2272,7 +2308,7 @@ async function fastAdd() {
         }
         if (vars['disableNotifStart'] != null && vars['disableNotifStart'] == 'true') {
             settings.disabledNotifStart = true
-            await setValue('AVMRsettings', settings, true)
+            await setValue('AVMRsettings', settings)
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             let html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -2353,7 +2389,7 @@ function addCustom() {
 //  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
-        setValue('AVMRsettings', settings, false)
+        setValue('AVMRsettings', settings)
     }
 }
 
@@ -2382,61 +2418,28 @@ document.addEventListener('DOMContentLoaded', async()=>{
 })
 
 //Переключение между вкладками
-function tabSelect(evt, tabs) {
-    if (evt.currentTarget.className.includes('active')) {
-        return
-    }
+document.querySelectorAll('.tablinks').forEach((item)=> {
+    item.addEventListener('click', ()=> {
+        if (item.classList.contains('active')) return
 
-    if (document.querySelector('.burger.active')) {
-        document.querySelector('.burger.active').classList.remove('active')
-        document.querySelector('nav').classList.remove('active')
-    }
-    
-    let i, tabcontent, tablinks
+        if (document.querySelector('.burger.active')) {
+            document.querySelector('.burger.active').classList.remove('active')
+            document.querySelector('nav').classList.remove('active')
+        }
 
-    tabcontent = document.getElementsByClassName('tabcontent')
-    for (let i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = 'none'
-    }
-
-    tablinks = document.getElementsByClassName('tablinks')
-    for (let i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(' active', '')
-    }
-
-    document.getElementById(tabs).style.display = 'block'
-    evt.currentTarget.className += ' active'
-    if (tabs == 'added') {
-        document.getElementById('donate').style.display = 'none'
-    } else {
-        document.getElementById('donate').style.display = 'inline'
-    }
-}
-
-//Слушателей кнопок для переключения вкладок
-document.querySelector('.burger').addEventListener('click', ()=> {
-    document.querySelector('.burger').classList.toggle('active')
-    document.querySelector('nav').classList.toggle('active')
-
-})
-
-document.getElementById('multivoteTab').addEventListener('click', function() {
-    tabSelect(event, 'multivote')
-})
-document.getElementById('addTab').addEventListener('click', function() {
-    tabSelect(event, 'append')
-})
-document.getElementById('settingsTab').addEventListener('click', function() {
-    tabSelect(event, 'settings')
-})
-document.getElementById('addedTab').addEventListener('click', function() {
-    tabSelect(event, 'added')
-})
-document.getElementById('helpTab').addEventListener('click', function() {
-    tabSelect(event, 'help')
-})
-document.getElementById('multivoteTab').addEventListener('click', function() {
-    tabSelect(event, 'multivote')
+        document.querySelectorAll('.tabcontent').forEach((elem)=> {
+            elem.style.display = 'none'
+        })
+        document.querySelectorAll('.tablinks').forEach((elem)=> {
+            elem.classList.remove('active')
+        })
+        let genStats = document.querySelector('#generalStats')
+        if (item.getAttribute('data-tab') == 'added') genStats.style.visibility = 'visible'
+        else genStats.removeAttribute('style')
+ 
+        item.classList.add('active')
+        document.getElementById(item.getAttribute('data-tab')).style.display = 'block'
+    })
 })
 
 //Переключение между списками добавленных проектов
@@ -2458,8 +2461,8 @@ function listSelect(evt, tabs) {
 }
 
 //Слушатели кнопок списка доавленных проектов
-if (document.getElementById('CustomButton') != null) {
-    document.getElementById('CustomButton').addEventListener('click', function() {
+if (document.getElementById('CustomButton')) {
+    document.getElementById('CustomButton').addEventListener('click', ()=> {
         listSelect(event, 'CustomTab')
     })
 }
@@ -2492,7 +2495,7 @@ document.querySelector('#stats .close').addEventListener('click', ()=> {
 
 
 //Слушатель общей статистики и вывод её в модалку
-document.getElementById('generalStats').addEventListener('click', function() {
+document.getElementById('generalStats').addEventListener('click', ()=> {
     // document.getElementById('modalStats').click()
     toggleModal('stats')
     document.getElementById('statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
@@ -2569,7 +2572,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip2').textContent = 'legends-evolved'
         document.getElementById('projectIDTooltip3').textContent = '/vote/'
     } else if (selectedTop.value == 'TopG') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://topg.org/Minecraft/in-'
+        document.getElementById('projectIDTooltip1').textContent = 'https://topg.org/minecraft-servers/server-'
         document.getElementById('projectIDTooltip2').textContent = '405637'
         document.getElementById('projectIDTooltip3').textContent = ''
     } else if (selectedTop.value == 'ListForge') {
@@ -2784,6 +2787,14 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('chooseGameListForge').required = false
     }
 
+    if (selectedTop.value == 'TopG') {
+        document.getElementById('urlGameTopG').removeAttribute('style')
+        document.getElementById('chooseGameTopG').required = true
+    } else if (laterChoose == 'TopG') {
+        document.getElementById('urlGameTopG').style.display = 'none'
+        document.getElementById('chooseGameTopG').required = false
+    }
+
     if (selectedTop.value == 'TopGG') {
         document.getElementById('chooseTopGG1').removeAttribute('style')
         document.getElementById('additionTopGG1').removeAttribute('style')
@@ -2840,9 +2851,9 @@ document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('d
 
 //Звук монеток когда наводишь курсор на ссылку поддержки))
 let play = true
-let sound1 = document.getElementById('sound-link')
+let sound1 = new Audio('audio/coins1.mp3')
 sound1.volume = 0.3
-let sound2 = document.getElementById('sound-link2')
+let sound2 = new Audio('audio/coins2.mp3')
 sound2.volume = 0.3
 document.getElementById('donate').addEventListener('mouseover', function(event) {
     play = !play
@@ -2886,3 +2897,86 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     activeModal.style.transform = 'scale(1.1)'
     setTimeout(()=> activeModal.removeAttribute('style'), 100)
 })
+
+//notifications
+async function createNotif(message, type, delay, element) {
+    if (!type) type = 'hint'
+    let notif = document.createElement('div')
+    notif.classList.add('notif', 'show', type)
+    if (!delay) {
+        if (type == 'error') delay = 30000
+        else delay = 5000
+    }
+
+    if (type != 'hint') {
+        let imgBlock = document.createElement('img')
+        imgBlock.src = 'images/notif/'+type+'.png'
+        notif.append(imgBlock)
+        let progressBlock = document.createElement('div')
+        progressBlock.classList.add('progress')
+        let progressBar = document.createElement('div')
+        progressBar.style.animation = 'notif-progress '+delay/1000+'s linear'
+        progressBlock.append(progressBar)
+        notif.append(progressBlock)
+    }
+
+    let mesBlock = document.createElement('div')
+    if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
+        for (const m of message) mesBlock.append(m)
+    } else {
+        mesBlock.append(message)
+    }
+    notif.append(mesBlock)
+    notif.style.visibility = 'hidden'
+    document.getElementById('notifBlock').append(notif)
+
+    let allNotifH
+    function calcAllNotifH() {
+        allNotifH = 10
+        document.querySelectorAll('#notifBlock > .notif').forEach((el)=> {
+            allNotifH = allNotifH + el.clientHeight + 10
+        })
+    }
+    calcAllNotifH()
+
+    notif.remove()
+    notif.removeAttribute('style')
+
+    while (window.innerHeight < allNotifH) {
+        await new Promise(resolve=>{
+            function listener(event) {
+                if (event.animationName == 'notif-hide') {
+                    document.getElementById('notifBlock').removeEventListener('animationend', listener)
+                    resolve()
+                }
+            }
+            document.getElementById('notifBlock').addEventListener('animationend', listener)
+        })
+        calcAllNotifH()
+    }
+
+    document.getElementById('notifBlock').append(notif)
+
+    if (type != 'hint') {
+        setTimeout(()=> {
+            removeNotif(notif)
+        }, delay)
+    }
+
+    notif.addEventListener('click', (e)=> {
+        removeNotif(notif)
+    })
+
+    if (notif.previousElementSibling != null && notif.previousElementSibling.className.includes('hint')) {
+        setTimeout(()=> {
+            removeNotif(notif.previousElementSibling)
+        }, 3000)
+    }
+
+    function removeNotif(elem) {
+        elem.classList.remove('show')
+        elem.classList.add('hide')
+        setTimeout(()=> elem.classList.add('hidden'), 500)
+        setTimeout(()=> elem.remove(), 1000)
+    }
+}

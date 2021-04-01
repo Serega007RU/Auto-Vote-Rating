@@ -592,9 +592,10 @@ async function newWindow(project) {
             }
         } else if (project.PlanetMinecraft)
             url = 'https://www.planetminecraft.com/server/' + project.id + '/vote/'
-        else if (project.TopG)
-            url = 'https://topg.org/Minecraft/in-' + project.id
-        else if (project.ListForge)
+        else if (project.TopG) {
+            if (project.game == null) project.game = 'minecraft-servers'
+            url = 'https://topg.org/' + project.game + '/server-' + project.id
+        } else if (project.ListForge)
             url = 'https://' + project.game + '/server/' + project.id + '/vote/'
         else if (project.MinecraftServerList)
             url = 'https://minecraft-server-list.com/server/' + project.id + '/vote/'
@@ -672,22 +673,8 @@ async function silentVote(project) {
     try {
         if (project.TopCraft) {
             let response = await fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/')
-            let html = await response.text()
-            let host = extractHostname(response.url)
-            if (host.includes('vk.')) {
-                endVote({errorAuthVK: true}, null, project)
-                return
-            }
-            if (!host.includes('topcraft.')) {
-                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                return
-            }
-            if (!response.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
-                return
-            }
-            let doc = new DOMParser().parseFromString(html, 'text/html')
-            let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
+            if (!await checkResponseError(project, response, 'topcraft.ru', null, true)) return
+            let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
             response = await fetch('https://topcraft.ru/projects/vote/', {
                 credentials: 'include',
                 'headers': {
@@ -696,17 +683,10 @@ async function silentVote(project) {
                 'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
                 'method': 'POST'
             })
-            html = await response.text()
-            if (!extractHostname(response.url).includes('topcraft.')) {
-                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                return
-            }
-            if (response.status == 400 && html.length != 0) {
-                console.warn('Текст ошибки 400:', html)
-                endVote({later: true, message: html}, null, project)
-                return
-            } else if (!response.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
+            if (!await checkResponseError(project, response, 'topcraft.ru', [400], true)) return
+            if (response.status == 400 && response.html.length != 0) {
+                console.warn('Текст ошибки 400:', response.html)
+                endVote({later: true}, null, project)
                 return
             }
             endVote({successfully: true}, null, project)
@@ -715,22 +695,8 @@ async function silentVote(project) {
 
         if (project.McTOP) {
             let response = await fetch('https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/')
-            let html = await response.text()
-            let host = extractHostname(response.url)
-            if (host.includes('vk.')) {
-                endVote({errorAuthVK: true}, null, project)
-                return
-            }
-            if (!host.includes('mctop.')) {
-                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                return
-            }
-            if (!response.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
-                return
-            }
-            let doc = new DOMParser().parseFromString(html, 'text/html')
-            let csrftoken = doc.querySelector('input[name="csrfmiddlewaretoken"]').value
+            if (!await checkResponseError(project, response, 'mctop.su', null, true)) return
+            let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
             response = await fetch('https://mctop.su/projects/vote/', {
                 credentials: 'include',
                 'headers': {
@@ -739,17 +705,10 @@ async function silentVote(project) {
                 'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
                 'method': 'POST'
             })
-            html = await response.text()
-            if (!extractHostname(response.url).includes('mctop.')) {
-                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                return
-            }
-            if (response.status == 400 && html.length != 0) {
-                console.warn('Текст ошибки 400:', html)
-                endVote({later: true, message: html}, null, project)
-                return
-            } else if (!response.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
+            if (!await checkResponseError(project, response, 'mctop.su', [400], true)) return
+            if (response.status == 400 && response.html.length != 0) {
+                console.warn('Текст ошибки 400:', response.html)
+                endVote({later: true}, null, project)
                 return
             }
             endVote({successfully: true}, null, project)
@@ -758,24 +717,10 @@ async function silentVote(project) {
 
         if (project.MCRate) {
             let response = await fetch('https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code')
-            let html = await response.text()
-            let host = extractHostname(response.url)
-            if (host.includes('vk.')) {
-                endVote({errorAuthVK: true}, null, project)
-                return
-            }
-            if (!host.includes('mcrate.')) {
-                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                return
-            }
-            if (!response.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
-                return
-            }
-            let doc = new DOMParser().parseFromString(html, 'text/html')
+            if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
             let code = response.url.substring(response.url.length - 18)
-            if (doc.querySelector('input[name=login_player]') != null) {
-                await fetch('http://mcrate.su/save/rate', {
+            if (response.doc.querySelector('input[name=login_player]') != null) {
+                response = await fetch('http://mcrate.su/save/rate', {
                     'headers': {
                         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                         'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
@@ -785,33 +730,22 @@ async function silentVote(project) {
                     },
                     'referrer': 'http://mcrate.su/add/rate?idp=' + project.id + '&code=' + code,
                     'referrerPolicy': 'no-referrer-when-downgrade',
-                    'body': 'login_player=' + project.nick + '&token_vk_secure=' + doc.getElementsByName('token_vk_secure').item(0).value + '&uid_vk_secure=' + doc.getElementsByName('uid_vk_secure').item(0).value + '&id_project=' + project.id + '&code_vk_secure=' + doc.getElementsByName('code_vk_secure').item(0).value + '&mcrate_hash=' + doc.getElementsByName('mcrate_hash').item(0).value,
+                    'body': 'login_player=' + project.nick + '&token_vk_secure=' + response.doc.getElementsByName('token_vk_secure').item(0).value + '&uid_vk_secure=' + response.doc.getElementsByName('uid_vk_secure').item(0).value + '&id_project=' + project.id + '&code_vk_secure=' + response.doc.getElementsByName('code_vk_secure').item(0).value + '&mcrate_hash=' + response.doc.getElementsByName('mcrate_hash').item(0).value,
                     'method': 'POST'
-                }).then(response=>response.text().then((html)=>{
-                    doc = new DOMParser().parseFromString(html, 'text/html')
-                    response = response
-                }))
-                host = extractHostname(response.url)
-                if (!host.includes('mcrate.')) {
-                    endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                    return
-                }
-                if (!response.ok) {
-                    endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
-                    return
-                }
+                })
+                if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
             }
-            if (doc.querySelector('div[class=report]') != null) {
-                if (doc.querySelector('div[class=report]').textContent.includes('Ваш голос засчитан')) {
+            if (response.doc.querySelector('div[class=report]') != null) {
+                if (response.doc.querySelector('div[class=report]').textContent.includes('Ваш голос засчитан')) {
                     endVote({successfully: true}, null, project)
                 } else {
-                    endVote({message: doc.querySelector('div[class=report]').textContent}, null, project)
+                    endVote({message: response.doc.querySelector('div[class=report]').textContent}, null, project)
                 }
                 return
-            } else if (doc.querySelector('span[class=count_hour]') != null) {
+            } else if (response.doc.querySelector('span[class=count_hour]') != null) {
 //              Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
 //              Берёт из скрипта переменную в которой хранится сколько осталось до следующего голосования
-//              let count2 = doc.querySelector('#center-main > div.center_panel > script:nth-child(2)').text.substring(30, 45)
+//              let count2 = response.doc.querySelector('#center-main > div.center_panel > script:nth-child(2)').text.substring(30, 45)
 //              let count = count2.match(/\d+/g).map(Number)
 //              let hour = parseInt(count / 3600)
 //              let min = parseInt((count - hour * 3600) / 60)
@@ -821,8 +755,11 @@ async function silentVote(project) {
 //              let later = Date.now() - (86400000 - milliseconds)
                 endVote({later: true}, null, project)
                 return
-            } else if (doc.querySelector('div[class="error"]') != null) {
-                endVote({message: doc.querySelector('div[class="error"]').textContent}, null, project)
+            } else if (response.doc.querySelector('div[class="error"]') != null) {
+                if (response.doc.querySelector('div[class="error"]').textContent.includes("уже голосовали")) {
+                    endVote({later: true}, null, project)
+                }
+                endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
                 return
             } else {
                 endVote({errorVoteNoElement: true}, null, project)
@@ -832,24 +769,10 @@ async function silentVote(project) {
 
         if (project.MinecraftRating) {
             let response = await fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=http://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45')
-            let html = await response.text()
-            let host = extractHostname(response.url)
-            if (host.includes('vk.')) {
-                endVote({errorAuthVK: true}, null, project)
-                return
-            }
-            if (!host.includes('minecraftrating.')) {
-                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                return
-            }
-            if (!response.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
-                return
-            }
-            let doc = new DOMParser().parseFromString(html, 'text/html')
-            if (doc.querySelector('div.alert.alert-danger') != null) {
-                if (doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
-//                  let numbers = doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number)
+            if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
+            if (response.doc.querySelector('div.alert.alert-danger') != null) {
+                if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
+//                  let numbers = response.doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number)
 //                  let count = 0
 //                  let year = 0
 //                  let month = 0
@@ -877,15 +800,15 @@ async function silentVote(project) {
                     endVote({later: true}, null, project)
                     return
                 } else {
-                    endVote({message: doc.querySelector('div.alert.alert-danger').textContent}, null, project)
+                    endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
                     return
                 }
-            } else if (doc.querySelector('div.alert.alert-success') != null) {
-                if (doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
+            } else if (response.doc.querySelector('div.alert.alert-success') != null) {
+                if (response.doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
                     endVote({successfully: true}, null, project)
                     return
                 } else {
-                    endVote({message: doc.querySelector('div.alert.alert-success').textContent}, null, project)
+                    endVote({message: response.doc.querySelector('div.alert.alert-success').textContent}, null, project)
                     return
                 }
             } else {
@@ -905,34 +828,19 @@ async function silentVote(project) {
                     'body': 'player=' + project.nick + '',
                     'method': 'POST'
                 })
-                let html = await response.text()
-                let host = extractHostname(response.url)
-                if (host.includes('vk.')) {
-                    endVote({errorAuthVK: true}, null, project)
-                    return
-                }
-                if (!host.includes('monitoringminecraft.')) {
-                    endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                    return
-                }
-                if (!response.ok) {
-                    if (response.status == 503) {
-                        if (i >= 3) {
-                            endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + response.status)}, null, project)
-                            return
-                        }
-                        await wait(5000)
-                        continue
-                    } else {
-                        endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
+                if (!await checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
+                if (response.status == 503) {
+                    if (i >= 3) {
+                        endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + response.status)}, null, project)
                         return
                     }
+                    await wait(5000)
+                    continue
                 }
 
-                let doc = new DOMParser().parseFromString(html, 'text/html')
-                if (doc.querySelector('body') != null && doc.querySelector('body').textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
+                if (response.doc.querySelector('body') != null && response.doc.querySelector('body').textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
                     if (i >= 3) {
-                        endVote({message: chrome.i18n.getMessage('errorAttemptVote') + doc.querySelector('body').textContent}, null, project)
+                        endVote({message: chrome.i18n.getMessage('errorAttemptVote') + response.doc.querySelector('body').textContent}, null, project)
                         return
                     }
                     await wait(5000)
@@ -942,19 +850,19 @@ async function silentVote(project) {
                     endVote({message: document.querySelector('form[method="POST"]').textContent.trim()}, null, project)
                     return
                 }
-                if (doc.querySelector('input[name=player]') != null) {
+                if (response.doc.querySelector('input[name=player]') != null) {
                     if (i >= 3) {
-                        endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(doc.querySelector('input[name=player]')))}, null, project)
+                        endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(response.doc.querySelector('input[name=player]')))}, null, project)
                         return
                     }
                     await wait(5000)
                     continue
                 }
 
-                if (doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
+                if (response.doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
                     //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
                     //Берёт последние 30 символов
-                    let string = doc.querySelector('center').textContent.substring(doc.querySelector('center').textContent.length - 30)
+                    let string = response.doc.querySelector('center').textContent.substring(response.doc.querySelector('center').textContent.length - 30)
                     //Из полученного текста достаёт все цифры в Array List
                     let numbers = string.match(/\d+/g).map(Number)
                     let count = 0
@@ -973,7 +881,7 @@ async function silentVote(project) {
                     let later = Date.now() + milliseconds
                     endVote({later: later}, null, project)
                     return
-                } else if (doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
+                } else if (response.doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
                     endVote({successfully: true}, null, project)
                     return
                 } else {
@@ -1002,17 +910,7 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
-            let html = await response.text()
-            let host = extractHostname(response.url)
-            if (!host.includes('serverpact.')) {
-                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                return
-            }
-            if (!response.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
-                return
-            }
-            let doc = new DOMParser().parseFromString(html, 'text/html')
+            if (!await checkResponseError(project, response, 'serverpact.com')) return
             function generatePass(nb) {
                 let chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@'
                 let pass = ''
@@ -1047,7 +945,7 @@ async function silentVote(project) {
                 return
             }
 
-            let response2 = await fetch('https://www.serverpact.com/vote-' + project.id, {
+            response = await fetch('https://www.serverpact.com/vote-' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,en-US;q=0.8',
@@ -1061,25 +959,20 @@ async function silentVote(project) {
                     'upgrade-insecure-requests': '1'
                 },
                 'referrerPolicy': 'no-referrer-when-downgrade',
-                'body': doc.querySelector('div.QapTcha > input[type=hidden]').name + '=' + doc.querySelector('div.QapTcha > input[type=hidden]').value + '&' + captchaPass + '=&minecraftusername=' + project.nick + '&voten=Send+your+vote',
+                'body': response.doc.querySelector('div.QapTcha > input[type=hidden]').name + '=' + response.doc.querySelector('div.QapTcha > input[type=hidden]').value + '&' + captchaPass + '=&minecraftusername=' + project.nick + '&voten=Send+your+vote',
                 'method': 'POST',
                 'mode': 'cors',
                 'credentials': 'include'
             })
-            if (!response2.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
-                return
-            }
-            html = await response2.text()
-            doc = new DOMParser().parseFromString(html, 'text/html')
-            if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
+            if (!await checkResponseError(project, response2, 'serverpact.com')) return
+            if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
                 endVote({successfully: true}, null, project)
                 return
-            } else if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null && (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('You can only vote once') || doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('already voted'))) {
+            } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null && (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('You can only vote once') || response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('already voted'))) {
                 endVote({later: Date.now() + 43200000}, null, project)
                 return
-            } else if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null) {
-                endVote({message: doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.substring(0, doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.indexOf('\n'))}, null, project)
+            } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null) {
+                endVote({message: response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.substring(0, response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.indexOf('\n'))}, null, project)
                 return
             } else {
                 endVote({errorVoteUnknown2: true}, null, project)
@@ -1106,19 +999,9 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
-            let html = await response.text()
-            let host = extractHostname(response.url)
-            if (!host.includes('minecraftiplist.')) {
-                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                return
-            }
-            if (!response.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
-                return
-            }
-            let doc = new DOMParser().parseFromString(html, 'text/html')
+            if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
 
-            if (doc.querySelector('#InnerWrapper > script:nth-child(10)') != null && doc.querySelector('table[class="CraftingTarget"]') == null) {
+            if (response.doc.querySelector('#InnerWrapper > script:nth-child(10)') != null && response.doc.querySelector('table[class="CraftingTarget"]') == null) {
                 if (secondVoteMinecraftIpList) {
                     secondVoteMinecraftIpList = false
                     endVote('Error time zone', null, project)
@@ -1145,16 +1028,15 @@ async function silentVote(project) {
                 silentVote(project)
                 return
             }
-            if (secondVoteMinecraftIpList)
-                secondVoteMinecraftIpList = false
+            if (secondVoteMinecraftIpList) secondVoteMinecraftIpList = false
 
-            if (doc.querySelector('#Content > div.Error') != null) {
-                if (doc.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
-                    endVote({message: doc.querySelector('#Content > div.Error').textContent}, null, project)
+            if (response.doc.querySelector('#Content > div.Error') != null) {
+                if (response.doc.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
+                    endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
                     return
                 }
-                if (doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server') || doc.querySelector('#Content > div.Error').textContent.includes('has no votes')) {
-                    let numbers = doc.querySelector('#Content > div.Error').textContent.substring(doc.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
+                if (response.doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server') || response.doc.querySelector('#Content > div.Error').textContent.includes('has no votes')) {
+                    let numbers = response.doc.querySelector('#Content > div.Error').textContent.substring(response.doc.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
                     let count = 0
                     let hour = 0
                     let min = 0
@@ -1171,16 +1053,15 @@ async function silentVote(project) {
                     endVote({later: Date.now() + (86400000 - milliseconds)}, null, project)
                     return
                 }
-                endVote({message: doc.querySelector('#Content > div.Error').textContent}, null, project)
+                endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
                 return
             }
 
-            if (!await getRecipe(doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com'))) {
-                endVote({message: 'Couldnt find the recipe: ' + doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')}, null, project)
+            if (!await getRecipe(response.doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com'))) {
+                endVote({message: 'Couldnt find the recipe: ' + response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')}, null, project)
                 return
             }
-
-            await craft(doc.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
+            await craft(response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
 
             code = 0
             code2 = 0
@@ -1211,25 +1092,15 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
-            html = await response.text()
-            host = extractHostname(response.url)
-            if (!host.includes('minecraftiplist.')) {
-                endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
-                return
-            }
-            if (!response.ok) {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
-                return
-            }
-            doc = new DOMParser().parseFromString(html, 'text/html')
+            if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
 
-            if (doc.querySelector('#Content > div.Error') != null) {
-                if (doc.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
-                    endVote({message: doc.querySelector('#Content > div.Error').textContent}, null, project)
+            if (response.doc.querySelector('#Content > div.Error') != null) {
+                if (response.doc.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
+                    endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
                     return
                 }
-                if (doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
-                    let numbers = doc.querySelector('#Content > div.Error').textContent.substring(doc.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
+                if (response.doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
+                    let numbers = response.doc.querySelector('#Content > div.Error').textContent.substring(response.doc.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
                     let count = 0
                     let hour = 0
                     let min = 0
@@ -1246,10 +1117,10 @@ async function silentVote(project) {
                     endVote({later: Date.now() + (86400000 - milliseconds)}, null, project)
                     return
                 }
-                endVote({message: doc.querySelector('#Content > div.Error').textContent}, null, project)
+                endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
                 return
             }
-            if (doc.querySelector('#Content > div.Good') != null && doc.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
+            if (response.doc.querySelector('#Content > div.Good') != null && response.doc.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
                 endVote({successfully: true}, null, project)
                 return
             }
@@ -1296,6 +1167,51 @@ async function silentVote(project) {
             endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + e}, null, project)
         }
     }
+}
+
+async function checkResponseError(project, response, url, bypassCodes, vk) {
+    let host = extractHostname(response.url)
+    if (vk && host.includes('vk.com')) {
+        //Почему не UTF-8?
+        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+    }
+    response.html = await response.text()
+    response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+    if (vk && host.includes('vk.com')) {
+        //Узнаём причину почему мы зависли на авторизации ВК
+        let text
+        if (response.doc.querySelector('div.oauth_form_access') != null) {
+            text = chrome.i18n.getMessage('oauthVK', response.doc.querySelector('div.oauth_form_access > b').textContent)
+        } else if (response.doc.querySelector('div.oauth_content > div') != null) {
+            text = response.doc.querySelector('div.oauth_content > div').textContent
+        } else if (response.doc.querySelector('#login_blocked_wrap') != null) {
+            text = response.doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + response.doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
+        } else if (response.doc.querySelector('div.login_blocked_panel') != null) {
+            text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
+        } else {
+            text = 'null'
+        }
+        endVote({errorAuthVK: text}, null, project)
+        return false
+    } else {
+        
+    }
+    if (!host.includes(url)) {
+        endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
+        return false
+    }
+    if (bypassCodes) {
+        for (const code of bypassCodes) {
+            if (response.status == code) {
+                return true
+            }
+        }
+    }
+    if (!response.ok) {
+        endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
+        return false
+    }
+    return true
 }
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
@@ -1914,20 +1830,6 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         }
     }
 })
-
-//Поддержка для мобильных устройсв, заставляем думать ServerPact и MinecraftIpList что мы с компьютера а не с телефона
-handler = function(n) {
-    for (let t = 0, i = n.requestHeaders.length; t < i; ++t) {
-        if (n.requestHeaders[t].name === 'User-Agent' && (n.requestHeaders[t].value.includes('Mobile') || n.requestHeaders[t].value.includes('Android') || n.requestHeaders[t].value.includes('iPhone'))) {
-            n.requestHeaders[t].value = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36'
-            break
-        }
-    }
-    return {requestHeaders: n.requestHeaders}
-}
-chrome.webRequest.onBeforeSendHeaders.addListener(handler, {
-    urls: ['*://www.serverpact.com/*', '*://minecraftiplist.com/*']
-}, ['blocking', 'requestHeaders'])
 
 async function stopVote() {
     if (debug) console.log('Отмена всех голосований и очистка всего')

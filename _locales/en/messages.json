@@ -994,5 +994,16 @@
   },
   "otherProxy": {
     "message": "Some other extension on the VPN/proxy is interfering with us, disable these extensions and then we can manage the proxy. Voting suspended for 24 hours"
+  },
+  "oauthVK": {
+    "message": "The $rating$ app requests access to your account.",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
+  "notFast": {
+    "message": "Not so fast, wait for the function to run"
   }
 }
