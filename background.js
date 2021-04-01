@@ -2011,6 +2011,15 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 }
             })
             return
+        } else if (currentProxy.ZenMate) {
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'ZenMate'))
+            callbackFn({
+                authCredentials: {
+                    'username': '97589925',
+                    'password': 'ef483afb122e05400f895434df1394a82d31e340'
+                }
+            })
+            return
         } else {
             currentProxy.notWorking = true
             console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('message'))
