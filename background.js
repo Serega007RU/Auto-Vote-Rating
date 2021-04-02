@@ -1547,7 +1547,7 @@ async function endVote(request, sender, project) {
         let retryCoolDown
         if (settings.useMultiVote) {
             sendMessage = message
-            if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && (message.includes(' ВК') || message.includes('VK ')) && currentVK != null) {
+            if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = true
                 await setValue('AVMRVKs', VKs)
             } else if (currentProxy != null) {
