@@ -770,7 +770,8 @@ async function addVK() {
 //Проверяем авторизацию на всех Майнкрафт рейтингах где есть авторизация ВКонтакте и если пользователь не авторизован - предлагаем ему авторизоваться
 async function checkAuthVK() {
     createNotif(chrome.i18n.getMessage('checkAuthVK'))
-    let authStatus = chrome.i18n.getMessage('notAuthVKTop')
+    let authStatus = []
+    authStatus.push(chrome.i18n.getMessage('notAuthVKTop'))
     let needReturn = false
     for (let [key, value] of authVKUrls) {
         let response2
@@ -791,9 +792,8 @@ async function checkAuthVK() {
             a.classList.add('link')
             a.id = 'authvk' + key
             a.textContent = key
-            authStatus.append(a)
-            authStatus.append(' ')
-            createNotif(authStatus, 'warn', 30000)
+            authStatus.push(a)
+            authStatus.push(' ')
             needReturn = true
         } else if (response2.status != 0) {
             createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error')
@@ -801,7 +801,7 @@ async function checkAuthVK() {
         }
     }
     if (needReturn) {
-        authStatus.append(createMessage(chrome.i18n.getMessage('notAcceptAuth')))
+        authStatus.push(chrome.i18n.getMessage('notAcceptAuth'))
         createNotif(authStatus, 'warn', 30000)
         for (let [key, value] of authVKUrls) {
             if (document.getElementById('authvk' + key) != null) {
