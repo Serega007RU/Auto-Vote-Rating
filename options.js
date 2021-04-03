@@ -439,7 +439,11 @@ async function addVKList(VK, visually) {
 
     if (VK.notWorking) {
         mesBlock.append(document.createElement('br'))
-        mesBlock.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
+        if (VK.notWorking == true) {
+            mesBlock.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
+        } else {
+            mesBlock.append(createMessage(VK.notWorking, 'error'))
+        }
     }
     html.append(mesBlock)
     html.append(contBlock)
@@ -1842,6 +1846,21 @@ async function setCoolDown() {
     if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
         chrome.runtime.reload()
     }
+}
+
+function createMessage(text, level) {
+    const span = document.createElement('span')
+    if (level) {
+        if (level == 'success') {
+            span.style = 'color:#4CAF50;'
+        } else if (level == 'error') {
+            span.style = 'color:#da5e5e;'
+        } else if (level == 'warn') {
+            span.style = 'color:#f1af4c;'
+        }
+    }
+    span.textContent = text
+    return span
 }
 
 function getProjectName(project) {

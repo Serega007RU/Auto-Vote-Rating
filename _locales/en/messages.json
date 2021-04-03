@@ -429,7 +429,12 @@
     "message": "Error occured while opening the tab: "
   },
   "errorAuthVK": {
-    "message": "VK authorization failed!"
+    "message": "Error with the VK account! $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   },
   "errorRedirected": {
     "message": "Voting error! Redirection to the unknown page occurred: $url$ Check this URL",

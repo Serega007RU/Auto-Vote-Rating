@@ -1561,7 +1561,7 @@ async function endVote(request, sender, project) {
         if (settings.useMultiVote) {
             sendMessage = message
             if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && request.errorAuthVK && currentVK != null) {
-                currentVK.notWorking = true
+                currentVK.notWorking = request.errorAuthVK
                 await setValue('AVMRVKs', VKs)
             } else if (currentProxy != null) {
                 currentProxy.notWorking = true
