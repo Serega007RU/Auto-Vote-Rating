@@ -743,7 +743,6 @@ async function addVK() {
         for (let vkontakte of VKs) {
             if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
                 createNotif(chrome.i18n.getMessage('added'), 'success')
-                await wait(1500)
                 await checkAuthVK()
                 return
             }
@@ -769,7 +768,6 @@ async function addVK() {
         
         createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
 
-        await wait(1500)
         await checkAuthVK()
     }
 }
