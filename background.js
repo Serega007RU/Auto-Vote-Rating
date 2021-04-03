@@ -764,10 +764,14 @@ async function silentVote(project) {
                 endVote({later: true}, null, project)
                 return
             } else if (response.doc.querySelector('div[class="error"]') != null) {
-                if (response.doc.querySelector('div[class="error"]').textContent.includes("уже голосовали")) {
+                const error = response.doc.querySelector('div[class="error"]').textContent
+                if (error.includes("уже голосовали")) {
                     endVote({later: true}, null, project)
+                } else if (error.includes('Ваш ВК ID заблокирован для голосовани')) {
+                    endVote({errorAuthVK: error}, null, project)
+                } else {
+                    endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
                 }
-                endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
                 return
             } else {
                 endVote({errorVoteNoElement: true}, null, project)
@@ -1530,7 +1534,7 @@ async function endVote(request, sender, project) {
                 }
             }
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
-//          if (typeof request.later == 'string') sendMessage = sendMessage + ' ' + request.later
+            if (typeof request.later == 'string') sendMessage = sendMessage + ' ' + request.later
             if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage)
 
             if (!project.stats.laterVotes) project.stats.laterVotes = 0

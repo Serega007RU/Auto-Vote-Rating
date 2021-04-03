@@ -389,7 +389,7 @@
     "message": "Ошибка при открытии вкладки: "
   },
   "errorAuthVK": {
-    "message": "Ошибка авторизации ВК! $error$",
+    "message": "Error with the VK account! $error$",
     "placeholders": {
       "error": {
         "content": "$1"
