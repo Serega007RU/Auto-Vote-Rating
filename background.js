@@ -1473,7 +1473,9 @@ async function endVote(request, sender, project) {
                         }
                     }
                 } else {
-                    await useVK()
+                    if (!((project.TopCraft || project.McTOP) && request.later == 'nick_error')) {
+                        await useVK()
+                    }
                 }
                 async function useVK() {
                     let usedProject = {
