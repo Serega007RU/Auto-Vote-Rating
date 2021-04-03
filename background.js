@@ -1030,7 +1030,7 @@ async function endVote(request, sender, project) {
     let sendMessage = ''
     if (request.successfully || request.later) {
         let time = new Date()
-        if (project.TopCraft || project.McTOP || project.MinecraftRating || project.IonMc || project.QTop) {
+        if (project.TopCraft || project.McTOP || project.MinecraftRating || project.MonitoringMinecraft || project.IonMc || project.QTop) {
             //Топы на которых время сбрасывается в 00:00 по МСК
             if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
@@ -1085,7 +1085,7 @@ async function endVote(request, sender, project) {
         } else {
             if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList) {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList || project.CzechCraft) {
+            } else if (project.MinecraftIpList || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList || project.CzechCraft) {
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (project.ServeurPrive || project.TopGames) {
                 project.countVote = project.countVote + 1
