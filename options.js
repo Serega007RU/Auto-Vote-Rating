@@ -449,6 +449,12 @@ async function addVKList(VK, visually) {
         removeVKList(VK, false)
     })
     repairBtn.addEventListener('click', async function() {
+        if (blockButtons) {
+            createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+            return
+        } else {
+            blockButtons = true
+        }
         for (let i = 0; i < VK.cookies.length; i++) {
             let cookie = VK.cookies[i]
             await setCookieDetails({
@@ -468,6 +474,7 @@ async function addVKList(VK, visually) {
         deleteVKCookies = false
         await addVK()
         deleteVKCookies = true
+        blockButtons = false
     })
     if (visually) {
         document.querySelector('#VKButton > span').textContent = VKs.length
