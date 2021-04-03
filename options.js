@@ -259,12 +259,12 @@ async function restoreOptions() {
         if (settings.stopVote > Date.now()) {
             settings.stopVote = 0
             document.querySelector('#stopVote img').src = 'images/icons/start.svg'
-            createNotif(chrome.i18n.getMessage('voteResumed'), 'info')
+            createNotif(chrome.i18n.getMessage('voteResumed'), 'success', 5000)
         } else {
             settings.stopVote = 9000000000000000
             document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
             await chrome.extension.getBackgroundPage().stopVote()
-            createNotif(chrome.i18n.getMessage('voteSuspended'), 'info')
+            createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
         }
         await setValue('AVMRsettings', settings)
     }
@@ -2443,6 +2443,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
 
 //Переключение между вкладками
 document.querySelectorAll('.tablinks').forEach((item)=> {
+    if (item.id == 'stopVote') return
     item.addEventListener('click', ()=> {
         if (item.classList.contains('active')) return
 
