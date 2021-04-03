@@ -237,7 +237,12 @@
     "message": "It seems that you don't have an Internet connection or page is not available, see the details in the console"
   },
   "notFoundProjectCode": {
-    "message": "There is no such project! HTTP response: "
+    "message": "There is no such project! HTTP response: $code$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
   },
   "notFoundProject": {
     "message": "There is no such project!"
@@ -260,10 +265,13 @@
     }
   },
   "notConnect": {
-    "message": "Failed to connect to $url$, HTTP response: ",
+    "message": "Failed to connect to $url$, HTTP response: $code$",
     "placeholders": {
       "url": {
         "content": "$1"
+      },
+      "code": {
+        "content": "$2"
       }
     }
   },
@@ -432,7 +440,12 @@
     }
   },
   "errorVote": {
-    "message": "Voting error! HTTP response: "
+    "message": "Voting error! HTTP response: $code$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
   },
   "errorVoteNoElement": {
     "message": "Voting error, it seems some necessary element/button is missing. Report this error to the extension developer"

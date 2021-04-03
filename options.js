@@ -1566,7 +1566,7 @@ async function addProject(project, element) {
         }
 
         if (response.status == 404) {
-            createNotif(chrome.i18n.getMessage('notFoundProjectCode') + '' + response.status, 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notFoundProjectCode', response.status), 'error', null, element)
             return
         } else if (response.redirected) {
             if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.CraftList || project.MinecraftBuzz) {
@@ -1577,7 +1577,7 @@ async function addProject(project, element) {
             return
         } else if (response.status == 503) {//None
         } else if (!response.ok) {
-            createNotif(chrome.i18n.getMessage('notConnect', getProjectName(project)) + response.status, 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notConnect', [getProjectName(project), response.status]), 'error', null, element)
             return
         }
 
@@ -1724,7 +1724,7 @@ async function addProject(project, element) {
                 })
                 return
             } else if (response2.status != 0) {
-                createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error', null, element)
+                createNotif(chrome.i18n.getMessage('notConnect', [extractHostname(response.url), response2.status]), 'error', null, element)
                 return
             }
             createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), null, null, element)
@@ -1792,7 +1792,7 @@ function addProjectsBonus(project, element) {
 //      document.getElementById('secondBonusMythicalWorld').addEventListener('click', async()=>{
 //          let response = await fetch('https://mythicalworld.su/bonus')
 //          if (!response.ok) {
-//              createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error', null, element)
+//              createNotif(chrome.i18n.getMessage('notConnect', [response.url, response.status]), 'error', null, element)
 //              return
 //          } else if (response.redirected) {
 //              createNotif(chrome.i18n.getMessage('redirectedSecondBonus', response.url), 'error', null, element)

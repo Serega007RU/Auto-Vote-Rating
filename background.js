@@ -684,9 +684,14 @@ async function silentVote(project) {
                 'method': 'POST'
             })
             if (!await checkResponseError(project, response, 'topcraft.ru', [400], true)) return
-            if (response.status == 400 && response.html.length != 0) {
-                console.warn('Текст ошибки 400:', response.html)
-                endVote({later: true}, null, project)
+            if (response.status == 400) {
+                if (response.html == 'vk_error' || response.html == 'nick_error') {
+                    endVote({later: response.html}, null, project)
+                } else if (response.html.length > 0 && response.html.length < 500) {
+                    endVote({message: response.html}, null, project)
+                } else {
+                    endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
+                }
                 return
             }
             endVote({successfully: true}, null, project)
@@ -706,9 +711,12 @@ async function silentVote(project) {
                 'method': 'POST'
             })
             if (!await checkResponseError(project, response, 'mctop.su', [400], true)) return
-            if (response.status == 400 && response.html.length != 0) {
-                console.warn('Текст ошибки 400:', response.html)
-                endVote({later: true}, null, project)
+            if (response.status == 400) {
+                if (response.html.length != 0 && response.html.length < 500) {
+                    endVote({later: response.html})
+                } else {
+                    endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
+                }
                 return
             }
             endVote({successfully: true}, null, project)
@@ -1143,7 +1151,7 @@ async function silentVote(project) {
                     return
                 }
             } else {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
+                endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
                 return
             }
         } else
@@ -1155,7 +1163,7 @@ async function silentVote(project) {
                 endVote({successfully: true}, null, project)
                 return
             } else {
-                endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
+                endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
                 return
             }
         }
@@ -1208,7 +1216,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         }
     }
     if (!response.ok) {
-        endVote({message: chrome.i18n.getMessage('errorVote') + response.status}, null, project)
+        endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
         return false
     }
     return true
@@ -1372,7 +1380,7 @@ async function endVote(request, sender, project) {
             }
             time.setUTCHours(12, (project.priority ? 1 : 10), 0, 0)
         }
-        if (request.later && request.later != true) {
+        if (request.later && Number.isInteger(request.later)) {
             time = new Date(request.later)
             if (project.ServeurPrive || project.TopGames) {
                 project.countVote = project.countVote + 1
@@ -1522,6 +1530,7 @@ async function endVote(request, sender, project) {
                 }
             }
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
+//          if (typeof request.later == 'string') sendMessage = sendMessage + ' ' + request.later
             if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage)
 
             if (!project.stats.laterVotes) project.stats.laterVotes = 0
