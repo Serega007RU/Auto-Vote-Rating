@@ -712,8 +712,10 @@ async function silentVote(project) {
             })
             if (!await checkResponseError(project, response, 'mctop.su', [400], true)) return
             if (response.status == 400) {
-                if (response.html.length != 0 && response.html.length < 500) {
-                    endVote({later: response.html})
+                if (response.html == 'vk_error' || response.html == 'nick_error') {
+                    endVote({later: response.html}, null, project)
+                } else if (response.html.length > 0 && response.html.length < 500) {
+                    endVote({message: response.html}, null, project)
                 } else {
                     endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
                 }
@@ -1342,7 +1344,7 @@ async function endVote(request, sender, project) {
             }
         }
         let time = new Date()
-        if (project.TopCraft || project.McTOP || project.MinecraftRating || project.IonMc || project.QTop) {
+        if (project.TopCraft || project.McTOP || project.MinecraftRating || project.MonitoringMinecraft || project.IonMc || project.QTop) {
             //Топы на которых время сбрасывается в 00:00 по МСК
             if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                 time.setUTCDate(time.getUTCDate() + 1)
@@ -1397,7 +1399,7 @@ async function endVote(request, sender, project) {
         } else {
             if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList) {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.MinecraftIpList || project.MonitoringMinecraft || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList || project.CzechCraft) {
+            } else if (project.MinecraftIpList || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList || project.CzechCraft) {
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (project.ServeurPrive || project.TopGames) {
                 project.countVote = project.countVote + 1
