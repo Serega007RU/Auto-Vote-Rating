@@ -400,8 +400,10 @@ async function silentVote(project) {
             })
             if (!await checkResponseError(project, response, 'mctop.su', [400], true)) return
             if (response.status == 400) {
-                if (response.html.length != 0 && response.html.length < 500) {
-                    endVote({later: response.html})
+                if (response.html == 'vk_error' || response.html == 'nick_error') {
+                    endVote({later: response.html}, null, project)
+                } else if (response.html.length > 0 && response.html.length < 500) {
+                    endVote({message: response.html}, null, project)
                 } else {
                     endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
                 }
