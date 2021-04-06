@@ -82,6 +82,7 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
     this.useMultiVote = false
     this.repeatAttemptLater = false
     this.stopVote = 9000000000000000
+    this.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
 }
 
 // Restores select box and checkbox state using the preferences
@@ -124,15 +125,6 @@ async function restoreOptions() {
     }
 
     await checkUpdateConflicts(true)
-
-    //Если пользователь обновился с версии без MultiVote (special for settings)
-    if (settings.stopVote == null) {
-        createNotif(chrome.i18n.getMessage('settingsUpdate'))
-        settings.stopVote = 9000000000000000
-        await setValue('AVMRsettings', settings)
-        console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
-        createNotif(chrome.i18n.getMessage('settingsUpdateEnd2'), 'success')
-    }
 
     updateProjectList()
 
