@@ -1939,6 +1939,15 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 }
             })
             return
+        } else if (currentProxy.NordVPN) {
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'ZenMate'))
+            callbackFn({
+                authCredentials: {
+                    'username': 'n2qNF1K4PBLbWWkJSTfmGEdX',
+                    'password': 'UKweV43HJP5QnWtVEaWnCChM'
+                }
+            })
+            return
         } else {
             currentProxy.notWorking = true
             console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('message'))
