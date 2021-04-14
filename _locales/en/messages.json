@@ -672,38 +672,30 @@
   "importTunnelBear": {
     "message": "Import proxies from TunnelBear"
   },
-  "importTunnelBearStart": {
-    "message": "Importing from TunnelBear"
-  },
-  "importTunnelBearEnd": {
-    "message": "Import from TunnelBear successfully completed"
-  },
   "importWindscribe": {
     "message": "Import proxies from Windscribe"
-  },
-  "importWindscribeStart": {
-    "message": "Importing from Windscribe"
-  },
-  "importWindscribeEnd": {
-    "message": "Import from Windscribe successfully completed"
   },
   "importHolaVPN": {
     "message": "Import proxies from HolaVPN"
   },
-  "importHolaVPNStart": {
-    "message": "Importing from HolaVPN"
-  },
-  "importHolaVPNEnd": {
-    "message": "Import from HolaVPN successfully completed"
-  },
   "importZenMate": {
     "message": "Import proxies from ZenMate"
   },
-  "importZenMateStart": {
-    "message": "Importing from ZenMate"
+  "importVPNStart": {
+    "message": "Importing from $vpn$",
+    "placeholders": {
+      "vpn": {
+        "content": "$1"
+      }
+    }
   },
-  "importZenMateEnd": {
-    "message": "Import from ZenMate successfully completed"
+  "importVPNEnd": {
+    "message": "Import from $vpn$ successfully completed",
+    "placeholders": {
+      "vpn": {
+        "content": "$1"
+      }
+    }
   },
   "randomize": {
     "message": "Randomize the next vote"

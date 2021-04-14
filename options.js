@@ -939,7 +939,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
     } else {
         blockButtons = true
     }
-    createNotif(chrome.i18n.getMessage('importTunnelBearStart'))
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'TunnelBear'))
     try {
         if (token == null) {
             let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
@@ -1019,7 +1019,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
         return
     }
     await setValue('AVMRproxies', proxies)
-    createNotif(chrome.i18n.getMessage('importTunnelBearEnd'), 'success')
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'TunnelBear'), 'success')
     blockButtons = false
 })
 
@@ -1031,7 +1031,7 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
     } else {
         blockButtons = true
     }
-    createNotif(chrome.i18n.getMessage('importWindscribeStart'))
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'Windscribe'))
     let i = 0
     while (i < 1) {
         i++
@@ -1073,7 +1073,7 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
         }
         await setValue('AVMRproxies', proxies)
     }
-    createNotif(chrome.i18n.getMessage('importWindscribeEnd'), 'success')
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'Windscribe'), 'success')
     blockButtons = false
 })
 
@@ -1085,7 +1085,7 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
     } else {
         blockButtons = true
     }
-    createNotif(chrome.i18n.getMessage('importHolaVPNStart'))
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'HolaVPN'))
     try {
         let response = await fetch('https://client.hola.org/client_cgi/vpn_countries.json')
         const countries = await response.json()
@@ -1117,7 +1117,7 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
         return
     }
     await setValue('AVMRproxies', proxies)
-    createNotif(chrome.i18n.getMessage('importHolaVPNEnd'), 'success')
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'HolaVPN'), 'success')
     blockButtons = false
 })
 
@@ -1129,7 +1129,7 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
     } else {
         blockButtons = true
     }
-    createNotif(chrome.i18n.getMessage('importZenMateStart'))
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'ZenMate'))
     try {
         let response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/103", {
           "headers": {
@@ -1208,7 +1208,7 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
         return
     }
     await setValue('AVMRproxies', proxies)
-    createNotif(chrome.i18n.getMessage('importZenMateEnd'), 'success')
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'ZenMate'), 'success')
     blockButtons = false
 })
 

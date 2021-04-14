@@ -632,38 +632,30 @@
   "importTunnelBear": {
     "message": "Импорт прокси с TunnelBear"
   },
-  "importTunnelBearStart": {
-    "message": "Начинаю импорт с TunnelBear"
-  },
-  "importTunnelBearEnd": {
-    "message": "Импорт с TunnelBear успешно завершён"
-  },
   "importWindscribe": {
     "message": "Импорт прокси с Windscribe"
-  },
-  "importWindscribeStart": {
-    "message": "Начинаю импорт с Windscribe"
-  },
-  "importWindscribeEnd": {
-    "message": "Импорт с Windscribe успешно завершён"
   },
   "importHolaVPN": {
     "message": "Импорт прокси с HolaVPN"
   },
-  "importHolaVPNStart": {
-    "message": "Начинаю импорт с HolaVPN"
-  },
-  "importHolaVPNEnd": {
-    "message": "Импорт с HolaVPN успешно завершён"
-  },
   "importZenMate": {
     "message": "Импорт прокси с ZenMate"
   },
-  "importZenMateStart": {
-    "message": "Начинаю импорт с ZenMate"
+  "importVPNStart": {
+    "message": "Начинаю импорт с $vpn$",
+    "placeholders": {
+      "vpn": {
+        "content": "$1"
+      }
+    }
   },
-  "importZenMateEnd": {
-    "message": "Импорт с ZenMate успешно завершён"
+  "importVPNEnd": {
+    "message": "Импорт с $vpn$ успешно завершён",
+    "placeholders": {
+      "vpn": {
+        "content": "$1"
+      }
+    }
   },
   "randomize": {
     "message": "Рандомизировать следующее голосование"
