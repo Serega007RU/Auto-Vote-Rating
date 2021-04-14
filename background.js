@@ -1940,7 +1940,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             })
             return
         } else if (currentProxy.NordVPN) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'ZenMate'))
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'NordVPN'))
             callbackFn({
                 authCredentials: {
                     'username': 'n2qNF1K4PBLbWWkJSTfmGEdX',
