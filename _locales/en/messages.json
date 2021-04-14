@@ -681,6 +681,9 @@
   "importZenMate": {
     "message": "Import proxies from ZenMate"
   },
+  "importNordVPN": {
+    "message": "Import proxies from NordVPN"
+  },
   "importVPNStart": {
     "message": "Importing from $vpn$",
     "placeholders": {

@@ -1212,6 +1212,40 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
     blockButtons = false
 })
 
+//Слушатель на импорт с NordVPN
+document.getElementById('importNordVPN').addEventListener('click', async () => {
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'NordVPN'))
+    try {
+        let response = await fetch('https://api.nordvpn.com/server')
+        let vpns = await response.json()
+        for (const vpn of vpns) {
+            const proxy = {
+                ip: vpn.domain,
+                port: 89,
+                scheme: 'https',
+                NordVPN: true
+            }
+            if (await addProxy(proxy, true, true)) {
+                proxies.push(proxy)
+            }
+        }
+    } catch (e) {
+        createNotif(e, 'error')
+        console.error(e)
+        blockButtons = false
+        return
+    }
+    await setValue('AVMRproxies', proxies)
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'NordVPN'), 'success')
+    blockButtons = false
+})
+
 async function addProxy(proxy, visually, dontNotif) {
     if (!dontNotif) createNotif(chrome.i18n.getMessage('adding'))
     for (let prox of proxies) {
