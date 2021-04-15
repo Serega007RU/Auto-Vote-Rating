@@ -114,7 +114,7 @@ async function restoreOptions() {
 
         VKs = []
         proxies = []
-        settings = new Settings(false, false, false, false, true, false, 1000, false)
+        settings = new Settings(true, false, false, false, true, false, 1000, false)
         await setValue('AVMRsettings', settings)
         await setValue('AVMRVKs', VKs)
         await setValue('AVMRproxies', proxies)
@@ -1513,7 +1513,7 @@ async function addProject(project, element) {
             url = 'http://mcrate.su/project/' + project.id
             jsPath = '#button-circle > a'
         } else if (project.MinecraftRating) {
-            url = 'http://minecraftrating.ru/projects/' + project.id + '/'
+            url = 'https://minecraftrating.ru/projects/' + project.id + '/'
             jsPath = 'table[class="table server-table"] > tbody > tr:nth-child(2) > td:nth-child(2) > a'
         } else if (project.MonitoringMinecraft) {
             url = 'https://monitoringminecraft.ru/top/' + project.id + '/'
@@ -2654,7 +2654,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip2').textContent = '4396'
         document.getElementById('projectIDTooltip3').textContent = ''
     } else if (selectedTop.value == 'MinecraftRating') {
-        document.getElementById('projectIDTooltip1').textContent = 'http://minecraftrating.ru/projects/'
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftrating.ru/projects/'
         document.getElementById('projectIDTooltip2').textContent = 'cubixworld'
         document.getElementById('projectIDTooltip3').textContent = '/'
     } else if (selectedTop.value == 'MonitoringMinecraft') {
