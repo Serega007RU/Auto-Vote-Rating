@@ -1441,6 +1441,11 @@ document.addEventListener('DOMContentLoaded', async()=>{
     fastAdd()
 })
 
+document.querySelector('.burger').addEventListener('click', ()=>{
+    document.querySelector('.burger').classList.add('active')
+    document.querySelector('nav').classList.add('active')
+})
+
 //Переключение между вкладками
 document.querySelectorAll('.tablinks').forEach((item)=> {
     item.addEventListener('click', ()=> {
