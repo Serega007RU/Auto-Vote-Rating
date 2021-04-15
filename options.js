@@ -1018,6 +1018,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
         blockButtons = false
         return
     }
+    randomizeProxyList()
     await setValue('AVMRproxies', proxies)
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'TunnelBear'), 'success')
     blockButtons = false
@@ -1071,6 +1072,7 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
             blockButtons = false
             return
         }
+        randomizeProxyList()
         await setValue('AVMRproxies', proxies)
     }
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'Windscribe'), 'success')
@@ -1116,6 +1118,7 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
         blockButtons = false
         return
     }
+    randomizeProxyList()
     await setValue('AVMRproxies', proxies)
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'HolaVPN'), 'success')
     blockButtons = false
@@ -1165,7 +1168,7 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
                 proxies.push(proxy)
             }
         }
-        await setValue('AVMRproxies', proxies)
+//      await setValue('AVMRproxies', proxies)
     
 //      response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/104", {
 //        "headers": {
@@ -1207,6 +1210,7 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
         blockButtons = false
         return
     }
+    randomizeProxyList()
     await setValue('AVMRproxies', proxies)
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'ZenMate'), 'success')
     blockButtons = false
@@ -1241,10 +1245,25 @@ document.getElementById('importNordVPN').addEventListener('click', async () => {
         blockButtons = false
         return
     }
+    randomizeProxyList()
     await setValue('AVMRproxies', proxies)
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'NordVPN'), 'success')
     blockButtons = false
 })
+
+function randomizeProxyList() {
+    proxies.sort(function(a, b) {
+        if (a.notWorking && b.notWorking) {
+            return 0
+        } else if (a.notWorking) {
+            return 1
+        } else if (b.notWorking) {
+            return -1
+        } else {
+            return Math.random() - 0.5
+        }
+    })
+}
 
 async function addProxy(proxy, visually, dontNotif) {
     if (!dontNotif) createNotif(chrome.i18n.getMessage('adding'))
@@ -2113,7 +2132,7 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
                             proxies.push(proxy)
                         }
                     }
-
+                    
                     await setValue('AVMRproxies', proxies)
 
                     createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
