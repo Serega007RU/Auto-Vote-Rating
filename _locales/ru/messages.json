@@ -976,5 +976,16 @@
   },
   "notFast": {
     "message": "Не так быстро, дождитесь выполнения функции"
+  },
+  "updateAvailbe": {
+    "message": "Доступно обновление $version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "download": {
+    "message": "Скачать"
   }
 }

@@ -291,6 +291,16 @@ async function restoreOptions() {
             createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
         }
     })
+
+    let response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/files/manifest.json/raw?ref=multivote')
+    let json = await response.json()
+    if (new Version(chrome.runtime.getManifest().version).compareTo(new Version(json.version)) == -1) {
+        let a = document.createElement('a')
+        a.target = 'blank_'
+        a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/archive/multivote/auto-vote-rating-multivote.zip'
+        a.textContent = chrome.i18n.getMessage('download')
+        createNotif([chrome.i18n.getMessage('updateAvailbe', json.version), document.createElement('br'), a], 'success', 30000)
+    }
 }
 
 //Добавить проект в список проекта
@@ -2019,6 +2029,18 @@ async function wait(ms) {
             resolve()
         }, ms)
     })
+}
+
+function Version(s){
+  this.arr = s.split('.').map(Number);
+}
+Version.prototype.compareTo = function(v){
+  for (let i=0; ;i++) {
+    if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1;
+    if (i>=this.arr.length) return -1;
+    var diff = this.arr[i]-v.arr[i]
+    if (diff) return diff>0 ? 1 : -1;
+  }
 }
 
 //Слушатель на изменение настроек

@@ -1018,5 +1018,16 @@
   },
   "notFast": {
     "message": "Not so fast, wait for the function to run"
+  },
+  "updateAvailbe": {
+    "message": "Update available $version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "download": {
+    "message": "Download"
   }
 }
