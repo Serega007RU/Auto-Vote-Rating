@@ -99,7 +99,7 @@ async function restoreOptions() {
             await setValue('AVMRprojects' + item, window['projects' + item])
         }
 
-        settings = new Settings(false, false, false, false, true, false, 1000, false)
+        settings = new Settings(true, false, false, false, true, false, 1000, false)
         await setValue('AVMRsettings', settings)
 
         console.log(chrome.i18n.getMessage('settingsGen'))
