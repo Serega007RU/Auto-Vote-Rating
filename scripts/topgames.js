@@ -53,8 +53,7 @@ async function vote() {
 
         if (document.getElementById('playername') != null) {
             const nick = await getNickName()
-            if (nick == null)
-                return
+            if (nick == null) return
             document.getElementById('playername').value = nick
         }
 
@@ -64,12 +63,20 @@ async function vote() {
                     //Ждёт загрузки reCaptcha
                     document.querySelector('button[type="submit"').click()
                     clearInterval(timer)
+                } else if (document.getElementById('desc4StatusButton-1') != null && (document.getElementById('desc4StatusButton-1').textContent.includes('succès') || document.getElementById('desc4StatusButton-1').textContent.includes('success'))) {
+                    document.querySelector('button[type="submit"').click()
+                    clearInterval(timer)
                 }
             } catch (e) {
                 chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
                 clearInterval(timer)
             }
         }, 1000)
+
+        if (document.querySelector('.mtcaptcha') != null) {
+            chrome.runtime.sendMessage({captcha: true})
+            return
+        }
     } catch (e) {
         chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
