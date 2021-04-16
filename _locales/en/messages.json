@@ -1064,5 +1064,8 @@
   },
   "voteMode": {
     "message": "Force the voting mode to be set"
+  },
+  "updateInstr": {
+    "message": "Instructions for updating the extension"
   }
 }

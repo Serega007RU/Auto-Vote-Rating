@@ -311,7 +311,27 @@ async function restoreOptions() {
         a.target = 'blank_'
         a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/archive/multivote/auto-vote-rating-multivote.zip'
         a.textContent = chrome.i18n.getMessage('download')
-        createNotif([chrome.i18n.getMessage('updateAvailbe', json.version), document.createElement('br'), a], 'success', 30000)
+        createNotif([chrome.i18n.getMessage('updateAvailbe', json.version), document.createElement('br'), a], 'success', 60000)
+        a.addEventListener('click', ()=>{
+            toggleModal('addFastProject')
+            document.querySelector('[data-resource="fastAdd"]').textContent = chrome.i18n.getMessage('updateInstr')
+            let message = document.querySelector('#addFastProject > div.content > .message')
+            message.append(chrome.i18n.getMessage('updateInstr2'))
+            let exportSettings = document.createElement('a')
+            exportSettings.className = 'link'
+            exportSettings.textContent = chrome.i18n.getMessage('exportSettings')
+            message.append(exportSettings)
+            exportSettings.addEventListener('click', ()=>{document.getElementById('file-download').click()})
+            message.append(chrome.i18n.getMessage('updateInstr3'))
+            message.append(document.createElement('br'))
+            message.append(chrome.i18n.getMessage('updateInstr4'))
+            let reloadExtension = document.createElement('a')
+            reloadExtension.className = 'link'
+            reloadExtension.textContent = chrome.i18n.getMessage('updateInstr5')
+            message.append(reloadExtension)
+            reloadExtension.addEventListener('click', ()=>{chrome.runtime.reload()})
+            message.append(chrome.i18n.getMessage('updateInstr6'))
+        })
     }
 }
 
@@ -1710,8 +1730,6 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
 		    	continue
 		    }
             doc = new DOMParser().parseFromString(html, 'text/html')
-            console.log(doc)
-            console.log(html)
             let number = doc.querySelector('.lk-desc2.border-rad.block-desc-padding').textContent.match(/\d+/g).map(Number)
             let coin = number[1]
             coins = coins + coin
