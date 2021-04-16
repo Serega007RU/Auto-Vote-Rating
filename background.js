@@ -1982,6 +1982,9 @@ chrome.runtime.onInstalled.addListener(async function(details) {
             await setValue('AVMRprojectsMinecraftMp', null)
         }
     }
+    if (details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version(chrome.runtime.getManifest().version)) == -1) {
+        chrome.runtime.openOptionsPage()
+    }
 })
 
 function getTopFromList(list, project) {
