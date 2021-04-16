@@ -1469,8 +1469,8 @@ document.addEventListener('DOMContentLoaded', async()=>{
 })
 
 document.querySelector('.burger').addEventListener('click', ()=>{
-    document.querySelector('.burger').classList.add('active')
-    document.querySelector('nav').classList.add('active')
+    document.querySelector('.burger').classList.toggle('active')
+    document.querySelector('nav').classList.toggle('active')
 })
 
 //Переключение между вкладками
@@ -2004,15 +2004,9 @@ async function createNotif(message, type, delay, element) {
 
     document.getElementById('notifBlock').append(notif)
 
-    if (type != 'hint') {
-        setTimeout(()=> {
-            removeNotif(notif)
-        }, delay)
-    }
+    if (type != 'hint') setTimeout(()=> removeNotif(notif), delay)
 
-    notif.addEventListener('click', (e)=> {
-        removeNotif(notif)
-    })
+    notif.addEventListener('click', ()=> removeNotif(notif))
 
     if (notif.previousElementSibling != null && notif.previousElementSibling.className.includes('hint')) {
         setTimeout(()=> {
@@ -2021,6 +2015,7 @@ async function createNotif(message, type, delay, element) {
     }
 
     function removeNotif(elem) {
+        if (!elem) return
         elem.classList.remove('show')
         elem.classList.add('hide')
         setTimeout(()=> elem.classList.add('hidden'), 500)
