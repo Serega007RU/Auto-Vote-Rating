@@ -63,9 +63,6 @@ async function vote() {
                     //Ждёт загрузки reCaptcha
                     document.querySelector('button[type="submit"').click()
                     clearInterval(timer)
-                } else if (document.getElementById('desc4StatusButton-1') != null && (document.getElementById('desc4StatusButton-1').textContent.includes('succès') || document.getElementById('desc4StatusButton-1').textContent.includes('success'))) {
-                    document.querySelector('button[type="submit"').click()
-                    clearInterval(timer)
                 }
             } catch (e) {
                 chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
