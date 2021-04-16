@@ -1671,7 +1671,10 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
         blockButtons = true
     }
     let nick = document.getElementById('sendBorealisNick').value
-    if (!confirm('Вы дейсвительно хотите отправить все бореалисики и голоса на аккаунт ' + nick + '?')) return
+    if (!confirm('Вы дейсвительно хотите отправить все бореалисики и голоса на аккаунт ' + nick + '?')) {
+        blockButtons = false
+        return
+    }
     let coins = 0
     let votes = 0
     for (const acc of borealisAccounts) {
@@ -1691,18 +1694,29 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                     storeId: cookie.storeId
                 })
             }
-            let response = await fetch('https://borealis.su/index.php?do=lk')
+            let response = await fetch('https://borealis.su/index.php?do=lk', {
+                'headers': {
+                  'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+		          'content-type': 'application/x-www-form-urlencoded',
+                  'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                },
+                'method': 'POST'
+            })
             //Почему не UTF-8?
 		    response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
             html = await response.text()
 		    if (html.length < 250) {
 		    	createNotif(acc.nick + ' ' + html, 'error')
-		    	return
+		    	continue
 		    }
             doc = new DOMParser().parseFromString(html, 'text/html')
-            let number = document.querySelector('.lk-desc2.border-rad.block-desc-padding').textContent.match(/\d+/g).map(Number)
+            console.log(doc)
+            console.log(html)
+            let number = doc.querySelector('.lk-desc2.border-rad.block-desc-padding').textContent.match(/\d+/g).map(Number)
             let coin = number[1]
+            coins = coins + coin
             let vote = number[2]
+            votes = votes + vote
             if (coin > 0) {
                 response = await fetch('https://borealis.su/index.php?do=lk', {
                   'headers': {
@@ -1711,17 +1725,17 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                     'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
                   },
                   'body': 'username=' + nick + '&amount=' + coin + '&transferBorealics=1',
-                  'method': 'POST',
+                  'method': 'POST'
                 })
                 //Почему не UTF-8?
 		        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
                 html = await response.text()
 		        if (html.length < 250) {
 		        	createNotif(acc.nick + ' ' + html, 'error')
-		        	return
+		        	continue
 		        }
                 doc = new DOMParser().parseFromString(html, 'text/html')
-                createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent)
+                createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + coin + ' бореалисиков')
             } else {
                 createNotif('На ' + acc.nick + ' 0 бореалисиков', 'warn')
             }
@@ -1733,17 +1747,17 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                     'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
                   },
                   'body': 'username=' + nick + '&amount=' + vote + '&transferBorealics=1&isVote=1',
-                  'method': 'POST',
+                  'method': 'POST'
                 })
                 //Почему не UTF-8?
 		        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
                 html = await response.text()
 		        if (html.length < 250) {
 		        	createNotif(acc.nick + ' ' + html, 'error')
-		        	return
+		        	continue
 		        }
                 doc = new DOMParser().parseFromString(html, 'text/html')
-                createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent)
+                createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + vote + ' голосов')
             } else {
                 createNotif('На ' + acc.nick + ' 0 голосов', 'warn')
             }
