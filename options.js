@@ -215,6 +215,13 @@ async function restoreOptions() {
                     createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success');
                 }
                 _return = true
+            } else if (this.id == 'voteMode') {
+                if (this.checked) {
+                    document.getElementById('label8').removeAttribute('style')
+                } else {
+                    document.getElementById('label8').style.display = 'none'
+                }
+                _return = true
             }
             if (!_return) await setValue('AVMRsettings', settings)
             blockButtons = false
@@ -283,7 +290,7 @@ async function addProjectList(project, visually) {
     contDiv.classList.add('message')
 
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '')
+    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
     contDiv.append(nameProjectMes)
 
     if (project.error) {
@@ -455,6 +462,9 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
     }
     if (document.getElementById('lastDayMonth').checked) {
         project.lastDayMonth = true
+    }
+    if (!project.Custom && document.getElementById('voteMode').checked) {
+        project[document.getElementById('voteModeSelect').value] = true
     }
     if (document.getElementById('priority').checked) {
         project.priority = true
@@ -1271,7 +1281,7 @@ function getUrlProjects() {
     let projects = []
     let project = {}
     let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize' || key == 'addition') {
+        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize' || key == 'addition' || key == 'silentMode' || key == 'emulateMode') {
             if (key == 'top' && Object.keys(project).length > 0) {
                 project.time = null
                 project.stats = {
@@ -1280,7 +1290,7 @@ function getUrlProjects() {
                 projects.push(project)
                 project = {}
             }
-            if (key == 'top' || key == 'randomize') {
+            if (key == 'top' || key == 'randomize' || key == 'silentMode' || key == 'emulateMode') {
                 project[value] = true
             } else {
                 project[key] = value
@@ -1731,6 +1741,7 @@ selectedTop.addEventListener('change', function() {
         }
         document.getElementById('idGame').style.display = 'none'
         document.getElementById('customTimeOut').disabled = false
+        document.getElementById('voteMode').disabled = false
         if (!document.getElementById('customTimeOut').checked) {
             document.getElementById('label6').style.display = 'none'
             document.getElementById('label3').style.display = 'none'
@@ -1744,6 +1755,8 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('customTimeOut').checked = false
             document.getElementById('lastDayMonth').disabled = true
             document.getElementById('lastDayMonth').checked = false
+            document.getElementById('voteMode').disabled = true
+            document.getElementById('voteMode').checked = false
 
             idSelector.setAttribute('style', 'height: 0px;')
             idSelector.style.display = 'none'

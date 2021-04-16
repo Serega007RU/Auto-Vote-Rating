@@ -116,6 +116,17 @@
                             <label for="customBody" data-resource="bodyFetch"></label>
                             <textarea id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="textarea"></textarea>
                         </div>
+                        <div style="display: none;" id="label8" class="input-block">
+                            <label for="voteModeSelect" data-resource="enabledSilentVote">
+                                <span class="tooltip2">
+                                    <span data-resource="enabledSilentVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <select id="voteModeSelect" class="select">
+                                <option data-resource="enabledSilentVoteSilent" value="silentMode"></option>
+                                <option data-resource="enabledSilentVoteNoSilent" value="emulateMode"></option>
+                            </select>
+                        </div>
                         <!--TopGG-->
                         <div style="display: none;" id="chooseTopGG1" class="input-block">
                             <label data-resource="chooseTopGG" for="chooseTopGG">
@@ -509,6 +520,10 @@
                                     <span data-resource="randomizeTooltip" class="tooltip1text"></span>
                                 </span>
                             </label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="voteMode" type="checkbox" name="checkbox"/>
+                            <label data-resource="voteMode" for="voteMode"></label>
                         </div>
                     </div>
                 </form>

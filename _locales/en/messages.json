@@ -783,5 +783,8 @@
   },
   "notFast": {
     "message": "Not so fast, wait for the function to run"
+  },
+  "voteMode": {
+    "message": "Force the voting mode to be set"
   }
 }

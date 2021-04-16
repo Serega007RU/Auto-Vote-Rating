@@ -234,6 +234,8 @@ async function newWindow(project) {
         if (!project.emulateMode && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList)) {
             silentVoteMode = true
         }
+    } else if (project.silentMode && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList)) {
+        silentVoteMode = true
     }
     if (silentVoteMode) {
         silentVote(project)
