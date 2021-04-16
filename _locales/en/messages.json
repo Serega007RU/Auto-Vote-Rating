@@ -700,6 +700,18 @@
       }
     }
   },
+  "privacyPass3": {
+    "message": "Or register on "
+  },
+  "privacyPass4": {
+    "message": " and follow the instructions. After set the cookies on hCaptcha, install any extension that can edit the cookies in the browser, for example "
+  },
+  "privacyPass5": {
+    "message": " and extend the validity of all cookies for the domain hcaptcha.com for a few years"
+  },
+  "this": {
+    "message": "this"
+  },
   "randomize": {
     "message": "Randomize the next vote"
   },
@@ -1029,5 +1041,8 @@
   },
   "download": {
     "message": "Download"
+  },
+  "voteMode": {
+    "message": "Force the voting mode to be set"
   }
 }

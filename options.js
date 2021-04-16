@@ -242,6 +242,13 @@ async function restoreOptions() {
                     createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success');
                 }
                 _return = true
+            } else if (this.id == 'voteMode') {
+                if (this.checked) {
+                    document.getElementById('label8').removeAttribute('style')
+                } else {
+                    document.getElementById('label8').style.display = 'none'
+                }
+                _return = true
             }
             if (!_return) await setValue('AVMRsettings', settings)
             blockButtons = false
@@ -341,7 +348,7 @@ async function addProjectList(project, visually) {
     contDiv.classList.add('message')
 
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '')
+    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
     contDiv.append(nameProjectMes)
 
     if (project.error) {
@@ -1351,6 +1358,9 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
     if (document.getElementById('lastDayMonth').checked) {
         project.lastDayMonth = true
     }
+    if (!project.Custom && document.getElementById('voteMode').checked) {
+        project[document.getElementById('voteModeSelect').value] = true
+    }
     if (document.getElementById('priority').checked) {
         project.priority = true
     }
@@ -1836,19 +1846,36 @@ async function addProject(project, element) {
         array.push(secondBonusButton)
     }
     if (project.MinecraftServersOrg || project.ListForge || project.ServerList101) {
+        array.push(document.createElement('br'))
+        array.push(chrome.i18n.getMessage('privacyPass'))
         const a = document.createElement('a')
         a.target = 'blank_'
         a.classList.add('link')
         a.href = 'https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'
 //      a.href = 'https://addons.mozilla.org/ru/firefox/addon/privacy-pass/'
         a.textContent = 'Privacy Pass'
-        array.push(document.createElement('br'))
-        array.push(chrome.i18n.getMessage('privacyPass'))
         array.push(a)
         array.push(chrome.i18n.getMessage('privacyPass2'))
+        array.push(document.createElement('br'))
+        array.push(chrome.i18n.getMessage('privacyPass3'))
+        const a2 = document.createElement('a')
+        a2.target = 'blank_'
+        a2.classList.add('link')
+        a2.href = 'https://www.hcaptcha.com/accessibility'
+        a2.textContent = 'https://www.hcaptcha.com/accessibility'
+        array.push(a2)
+        array.push(chrome.i18n.getMessage('privacyPass4'))
+        const a3 = document.createElement('a')
+        a3.target = 'blank_'
+        a3.classList.add('link')
+        a3.href = 'https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg'
+//      a3.href = 'https://addons.mozilla.org/ru/firefox/addon/etc2/'
+        a3.textContent = chrome.i18n.getMessage('this')
+        array.push(a3)
+        array.push(chrome.i18n.getMessage('privacyPass5'))
     }
     if (array.length > 1) {
-        createNotif(array, 'success', 30000, element)
+        createNotif(array, 'success', 60000, element)
     } else {
         createNotif(array, 'success', null, element)
     }
@@ -2335,7 +2362,7 @@ function getUrlProjects() {
     let projects = []
     let project = {}
     let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize' || key == 'addition') {
+        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize' || key == 'addition' || key == 'silentMode' || key == 'emulateMode') {
             if (key == 'top' && Object.keys(project).length > 0) {
                 project.time = null
                 project.stats = {
@@ -2344,7 +2371,7 @@ function getUrlProjects() {
                 projects.push(project)
                 project = {}
             }
-            if (key == 'top' || key == 'randomize') {
+            if (key == 'top' || key == 'randomize' || key == 'silentMode' || key == 'emulateMode') {
                 project[value] = true
             } else {
                 project[key] = value
@@ -2520,6 +2547,11 @@ function openPoput(url, reload) {
 document.addEventListener('DOMContentLoaded', async()=>{
     await restoreOptions()
     fastAdd()
+})
+
+document.querySelector('.burger').addEventListener('click', ()=>{
+    document.querySelector('.burger').classList.toggle('active')
+    document.querySelector('nav').classList.toggle('active')
 })
 
 //Переключение между вкладками
@@ -2800,6 +2832,7 @@ selectedTop.addEventListener('change', function() {
         }
         document.getElementById('idGame').style.display = 'none'
         document.getElementById('customTimeOut').disabled = false
+        document.getElementById('voteMode').disabled = false
         if (!document.getElementById('customTimeOut').checked) {
             document.getElementById('label6').style.display = 'none'
             document.getElementById('label3').style.display = 'none'
@@ -2813,6 +2846,8 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('customTimeOut').checked = false
             document.getElementById('lastDayMonth').disabled = true
             document.getElementById('lastDayMonth').checked = false
+            document.getElementById('voteMode').disabled = true
+            document.getElementById('voteMode').checked = false
 
             idSelector.setAttribute('style', 'height: 0px;')
             idSelector.style.display = 'none'
@@ -3006,6 +3041,19 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
 
 //notifications
 async function createNotif(message, type, delay, element) {
+    if (element != null) {
+        element.textContent = ''
+        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
+            for (const m of message) element.append(m)
+        } else {
+            element.textContent = message
+        }
+        element.className = type
+        if (type == 'success') {
+            element.parentElement.parentElement.parentElement.firstElementChild.src = 'images/icons/success.svg'
+        }
+        return
+    }
     if (!type) type = 'hint'
     let notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
@@ -3063,15 +3111,9 @@ async function createNotif(message, type, delay, element) {
 
     document.getElementById('notifBlock').append(notif)
 
-    if (type != 'hint') {
-        setTimeout(()=> {
-            removeNotif(notif)
-        }, delay)
-    }
+    if (type != 'hint') setTimeout(()=> removeNotif(notif), delay)
 
-    notif.addEventListener('click', (e)=> {
-        removeNotif(notif)
-    })
+    notif.addEventListener('click', ()=> removeNotif(notif))
 
     if (notif.previousElementSibling != null && notif.previousElementSibling.className.includes('hint')) {
         setTimeout(()=> {
@@ -3080,6 +3122,7 @@ async function createNotif(message, type, delay, element) {
     }
 
     function removeNotif(elem) {
+        if (!elem) return
         elem.classList.remove('show')
         elem.classList.add('hide')
         setTimeout(()=> elem.classList.add('hidden'), 500)

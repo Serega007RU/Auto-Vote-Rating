@@ -382,16 +382,7 @@ nav .logo img {
 
 .contentBlock .listcontent li .controlItems {
 	display: flex;
-}
-
-.contentBlock .listcontent li .message {
-	display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.multivoteBlock .contentBlock .listcontent li .message {
-	justify-content: center;
+	justify-content: space-between;
 }
 
 .contentBlock .listcontent li img[src="images/icons/repair.svg"],
@@ -399,7 +390,14 @@ nav .logo img {
 	margin-right: 10px;
 }
 
-.contentBlock .listcontent li img {
+.contentBlock .listcontent li .message {
+	line-height: 1.5;
+	display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.contentBlock .listcontent li .controlItems img {
 	width: 30px;
 	display: block;
 	padding: 10px;
@@ -584,17 +582,20 @@ nav .logo img {
     }
 
     .contentBlock .listcontent li .controlItems {
-    	display: block;
+    	flex-direction: column;
     }
 
     .contentBlock .listcontent li img[src="images/icons/repair.svg"],
     .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
     	margin-right: 0;
-    	margin-bottom: 10px;
     }
 
     .aboutProject .cont {
         width: 100%;
+    }
+
+    .projectsBlock .contentBlock .listcontent li .controlItems img {
+    	padding: 5px;
     }
 }
 
@@ -698,9 +699,10 @@ nav .logo img {
 }
 
 #authvk {
+	padding: 0 8px;
 	font-size: 15px;
 	display: inline-flex;
-	margin: 10px 0;
+	margin: 10px auto;
 }
 
 #authvk > * {
@@ -1088,12 +1090,6 @@ input.checkbox:disabled + label {
     height: 100%;
 }
 
-@media(max-width: 450px) {
-    #notifBlock {
-        width: 100%;
-    }
-}
-
 #notifBlock > .notif { 
 	transform-origin: right top;
     cursor: pointer;
@@ -1105,16 +1101,30 @@ input.checkbox:disabled + label {
     display: flex;
     width: calc(100% - 36px);
     padding: 8px;
-    padding-top: 14px;
+    padding-top: 16px !important;
     color: #fff;
     min-height: 50px;
     border-radius: 5px;
     position: relative;
 }
 
+@media(max-width: 450px) {
+    #notifBlock > .notif {
+    	padding: 6px;
+        margin: 10px 5px;
+        width: calc(100% - 22px);
+    }
+}
+
+@media(max-width: 330px) {
+    #notifBlock {
+    	width: 100%;
+    }
+}
+
 #notifBlock > .notif.hint {
     min-height: 20px;
-    padding-top: 8px;
+    padding-top: 8px !important;
 }
 
 #notifBlock > .notif.show {
@@ -1157,7 +1167,14 @@ input.checkbox:disabled + label {
 }
 
 #notifBlock > .notif div {
+	overflow-wrap: anywhere;
     font-size: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+#notifBlock > .notif div .link {
+	display: contents;
 }
 
 #notifBlock > .notif img {
@@ -1184,6 +1201,16 @@ input.checkbox:disabled + label {
 
 #notifBlock > .notif.hint {
     background: #37373d;
+}
+
+#addFastProject span.error {
+	color: #da5e5e;
+}
+#addFastProject span.warn {
+	color: #f1af4c;
+}
+#addFastProject span.success {
+	color: #4caf50;
 }
 
 @keyframes notif-progress {   
