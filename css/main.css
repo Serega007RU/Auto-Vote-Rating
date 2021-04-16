@@ -1041,6 +1041,16 @@ input.checkbox:disabled + label {
     background: #37373d;
 }
 
+#addFastProject span.error {
+	color: #da5e5e;
+}
+#addFastProject span.warn {
+	color: #f1af4c;
+}
+#addFastProject span.success {
+	color: #4caf50;
+}
+
 @keyframes notif-progress {   
     0% {
         width: 0%;

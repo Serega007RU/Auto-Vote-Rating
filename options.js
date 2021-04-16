@@ -1921,6 +1921,19 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
 
 //notifications
 async function createNotif(message, type, delay, element) {
+    if (element != null) {
+        element.textContent = ''
+        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
+            for (const m of message) element.append(m)
+        } else {
+            element.textContent = message
+        }
+        element.className = type
+        if (type == 'success') {
+            element.parentElement.parentElement.parentElement.firstElementChild.src = 'images/icons/success.svg'
+        }
+        return
+    }
     if (!type) type = 'hint'
     let notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
