@@ -1,4 +1,4 @@
-if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/)) {
+if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) {
     const timer1 = setInterval(()=>{
         if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null
             && isScrolledIntoView(document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border'))
@@ -17,7 +17,7 @@ if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anch
             return
         }
     }, 1000)
-} else if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/)) {
+} else if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) {
     //Интеграция с расширением Buster: Captcha Solver for Humans
     //Работает весьма хреново, + требуется в этом расширении удалить проверку isTrusted для того что б можно было нажать на кнопку
     const timer7 = setInterval(()=>{
