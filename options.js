@@ -97,6 +97,7 @@ async function restoreOptions() {
         window['projects' + item] = await getValue('AVMRprojects' + item)
     }
     VKs = await getValue('AVMRVKs')
+    borealisAccounts = await getValue('borealisAccounts')
     proxies = await getValue('AVMRproxies')
     settings = await getValue('AVMRsettings')
     generalStats = await getValue('generalStats')
@@ -113,10 +114,12 @@ async function restoreOptions() {
         }
 
         VKs = []
+        borealisAccounts = []
         proxies = []
         settings = new Settings(true, false, false, false, true, false, 1000, false)
         await setValue('AVMRsettings', settings)
         await setValue('AVMRVKs', VKs)
+        await setValue('borealisAccounts', borealisAccounts)
         await setValue('AVMRproxies', proxies)
 
         console.log(chrome.i18n.getMessage('settingsGen'))
@@ -230,10 +233,12 @@ async function restoreOptions() {
                 await setValue('AVMRsettings', settings)
                 await setValue('generalStats', generalStats)
                 await setValue('AVMRVKs', VKs)
+                await setValue('borealisAccounts', borealisAccounts)
                 await setValue('AVMRproxies', proxies)
                 await removeValue('AVMRsettings', oldStorageArea)
                 await removeValue('generalStats', oldStorageArea)
                 await removeValue('AVMRVKs', oldStorageArea)
+                await removeValue('borealisAccounts', oldStorageArea)
                 await removeValue('AVMRproxies', oldStorageArea)
 
                 if (this.checked) {
@@ -498,6 +503,78 @@ async function addVKList(VK, visually) {
     document.querySelector('#VKButton > span').textContent = VKs.length
 }
 
+//Добавить аккаунт Borealis в список
+async function addBorealisList(acc, visually) {
+    let listBorealis = document.getElementById('BorealisList')
+    let html = document.createElement('li')
+    html.id = acc.nick
+    let mesBlock = document.createElement('div')
+    mesBlock.classList.add('message')
+    let contBlock = document.createElement('div')
+    contBlock.classList.add('controlItems')
+
+    let div = document.createElement('div')
+    div.textContent = acc.nick
+    mesBlock.append(div)
+
+    let repairBtn = svgRepair.cloneNode(true)
+    contBlock.append(repairBtn)
+
+    let delBtn = svgDelete.cloneNode(true)
+    contBlock.append(delBtn)
+
+    if (acc.notWorking) {
+        mesBlock.append(document.createElement('br'))
+        if (acc.notWorking == true) {
+            mesBlock.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
+        } else {
+            mesBlock.append(createMessage(acc.notWorking, 'error'))
+        }
+    }
+    html.append(mesBlock)
+    html.append(contBlock)
+
+    listBorealis.append(html)
+    delBtn.addEventListener('click', function() {
+        removeBorealisList(acc, false)
+    })
+    repairBtn.addEventListener('click', async function() {
+        if (blockButtons) {
+            createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+            return
+        } else {
+            blockButtons = true
+        }
+        for (let i = 0; i < acc.cookies.length; i++) {
+            let cookie = acc.cookies[i]
+            await setCookieDetails({
+                url: 'https://' + cookie.domain.substring(1, cookie.domain.length) + cookie.path,
+                name: cookie.name,
+                value: cookie.value,
+                domain: cookie.domain,
+                path: cookie.path,
+                secure: cookie.secure,
+                httpOnly: cookie.httpOnly,
+                sameSite: cookie.sameSite,
+                expirationDate: cookie.expirationDate,
+                storeId: cookie.storeId
+            })
+        }
+        await removeBorealisList(acc)
+        deleteVKCookies = false
+        await addBorealis()
+        deleteVKCookies = true
+        blockButtons = false
+    })
+    if (visually) {
+        document.querySelector('#BorealisButton > span').textContent = borealisAccounts.length
+        return
+    }
+    borealisAccounts.push(acc)
+    await setValue('borealisAccounts', borealisAccounts)
+    document.querySelector('#BorealisButton > span').textContent = borealisAccounts.length
+}
+
 //Добавить прокси в список
 async function addProxyList(proxy, visually) {
     let listProxy = document.getElementById('ProxyList')
@@ -594,6 +671,27 @@ async function removeVKList(VK, visually) {
     document.querySelector('#VKButton > span').textContent = VKs.length
 }
 
+async function removeBorealisList(acc, visually) {
+    let li = document.getElementById(acc.nick)
+    if (li != null) {
+        li.querySelector('img:nth-child(1)').removeEventListener('click', null)
+        li.querySelector('img:nth-child(2)').removeEventListener('click', null)
+        li.remove()
+    } else {
+        return
+    }
+    if (visually) {
+        document.querySelector('#BorealisButton > span').textContent = borealisAccounts.length
+        return
+    }
+    for (let i = borealisAccounts.length; i--;) {
+        let temp = borealisAccounts[i]
+        if (temp.nick == acc.nick) borealisAccounts.splice(i, 1)
+    }
+    await setValue('borealisAccounts', borealisAccounts)
+    document.querySelector('#BorealisButton > span').textContent = borealisAccounts.length
+}
+
 async function removeProxyList(proxy, visually) {
     let li = document.getElementById(proxy.ip + '_' + proxy.port)
     if (li != null) {
@@ -656,6 +754,14 @@ function updateProjectList(projects, key) {
         }
     }
 
+    //Список Borealis
+    if (projects == null || key == 'borealisAccounts') {
+        document.getElementById('BorealisList').parentNode.replaceChild(document.getElementById('BorealisList').cloneNode(false), document.getElementById('BorealisList'))
+        for (let acc of borealisAccounts) {
+            addBorealisList(acc, true)
+        }
+    }
+
     //Список прокси
     if (projects == null || key == 'AVMRproxies') {
         document.getElementById('ProxyList').parentNode.replaceChild(document.getElementById('ProxyList').cloneNode(false), document.getElementById('ProxyList'))
@@ -681,7 +787,7 @@ document.getElementById('AddVK').addEventListener('click', async () => {
 async function addVK() {
     if (!deleteVKCookies || confirm('Все куки и вкладки ВКонтакте будут удалены, вы согласны?')) {
         //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
-        createNotif(chrome.i18n.getMessage('deletingAllVK'))
+        createNotif(chrome.i18n.getMessage('deletingAllAcc', 'VK'))
 
         await new Promise(resolve => {
             chrome.tabs.query({url: '*://*.vk.com/*'}, function(tabs) {
@@ -703,8 +809,8 @@ async function addVK() {
             }
         }
 
-        createNotif(chrome.i18n.getMessage('deletedAllVK'))
-        createNotif(chrome.i18n.getMessage('openPopupVK'))
+        createNotif(chrome.i18n.getMessage('deletedAllAcc', 'VK'))
+        createNotif(chrome.i18n.getMessage('openPopupAcc', 'VK'))
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
         await new Promise(resolve => {
@@ -736,7 +842,7 @@ async function addVK() {
         let html = await response.text()
         let doc = new DOMParser().parseFromString(html, 'text/html')
         if (doc.querySelector('#index_login_button') != null) {
-            createNotif(chrome.i18n.getMessage('notAuthVK'), 'error')
+            createNotif(chrome.i18n.getMessage('notAuthAcc', 'VK'), 'error')
             return
         }
         let VK = {}
@@ -782,6 +888,117 @@ async function addVK() {
         createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
 
         await checkAuthVK()
+    }
+}
+
+//Слушатель кнопки 'Добавить' на MultiVote Borealis
+document.getElementById('AddBorealis').addEventListener('click', async () => {
+    event.preventDefault()
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    await addBorealis()
+    blockButtons = false
+})
+
+async function addBorealis() {
+    if (!deleteVKCookies || confirm('Все куки и вкладки Borealis будут удалены, вы согласны?')) {
+        //Удаление всех куки и вкладок Borealis перед добавлением нового аккаунта Borealis
+        createNotif(chrome.i18n.getMessage('deletingAllAcc', 'Borealis'))
+
+        await new Promise(resolve => {
+            chrome.tabs.query({url: '*://*.borealis.su/*'}, function(tabs) {
+                for (tab of tabs) {
+                    chrome.tabs.remove(tab.id)
+                }
+                resolve()
+            })
+        })
+        
+        if (deleteVKCookies) {
+            let cookies = await new Promise(resolve => {
+                chrome.cookies.getAll({domain: '.borealis.su'}, function(cookies) {
+                    resolve(cookies)
+                })
+            })
+            for(let i=0; i<cookies.length;i++) {
+                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+            }
+        }
+
+        createNotif(chrome.i18n.getMessage('deletedAllAcc', 'Borealis'))
+        createNotif(chrome.i18n.getMessage('openPopupAcc', 'Borealis'))
+        
+        //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
+        await new Promise(resolve => {
+            openPoput('https://borealis.su/', function () {
+                resolve()
+            })
+        })
+
+        //После закрытия окна авторизации попытка добавить аккаунт ВКонтакте
+        createNotif(chrome.i18n.getMessage('adding'))
+        let response
+        try {
+            response = await fetch('https://borealis.su/')
+        } catch (e) {
+            if (e == 'TypeError: Failed to fetch') {
+                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error')
+                return
+            } else {
+                createNotif(e, 'error')
+                return
+            }
+        }
+        if (!response.ok) {
+            createNotif(chrome.i18n.getMessage('notConnect', 'https://borealis.su/') + response.status, 'error')
+            return
+        }
+        //Почему не UTF-8?
+        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+        let html = await response.text()
+        let doc = new DOMParser().parseFromString(html, 'text/html')
+        if (doc.querySelector('div.userinfo-pos > div.rcol2 a') == null) {
+            createNotif(chrome.i18n.getMessage('notAuthAcc', 'Borealis'), 'error')
+            return
+        }
+        let acc = {}
+        try {
+            acc.nick = doc.querySelector('div.userinfo-pos > div.rcol2 a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '').replace('https://borealis.su/user/', '').replace('/', '')
+        } catch(e) {
+            createNotif(e, 'error')
+            return
+        }
+
+        for (let bAcc of borealisAccounts) {
+            if (acc.nick == bAcc.nick) {
+                createNotif(chrome.i18n.getMessage('added'), 'success')
+                return
+            }
+        }
+        
+        //Достаём все куки Borealis и запоминаем их
+        acc.cookies = await new Promise(resolve => {
+            chrome.cookies.getAll({domain: '.borealis.su'}, function(cookies) {
+                resolve(cookies)
+            })
+        })
+
+        let i = 0
+        for (let cookie of acc.cookies) {
+            if (cookie.name == 'xf_session') {
+                acc.cookies.splice(i, 1)
+                break
+            }
+            i++
+        }
+
+        await addBorealisList(acc, false)
+        
+        createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + acc.nick, 'success')
     }
 }
 
@@ -1444,6 +1661,100 @@ document.getElementById('formProxyBlackList').addEventListener('submit', async (
     blockButtons = false
 })
 
+//Слушатель кнопки 'Отправить' на Borealis
+document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
+    event.preventDefault()
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    let nick = document.getElementById('sendBorealisNick').value
+    if (!confirm('Вы дейсвительно хотите отправить все бореалисики и голоса на аккаунт ' + nick + '?')) return
+    let coins = 0
+    let votes = 0
+    for (const acc of borealisAccounts) {
+		try {
+            for (let i = 0; i < acc.cookies.length; i++) {
+                let cookie = acc.cookies[i]
+                await setCookieDetails({
+                    url: 'https://' + cookie.domain.substring(1, cookie.domain.length) + cookie.path,
+                    name: cookie.name,
+                    value: cookie.value,
+                    domain: cookie.domain,
+                    path: cookie.path,
+                    secure: cookie.secure,
+                    httpOnly: cookie.httpOnly,
+                    sameSite: cookie.sameSite,
+                    expirationDate: cookie.expirationDate,
+                    storeId: cookie.storeId
+                })
+            }
+            let response = await fetch('https://borealis.su/index.php?do=lk')
+            //Почему не UTF-8?
+		    response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+            html = await response.text()
+		    if (html.length < 250) {
+		    	createNotif(acc.nick + ' ' + html, 'error')
+		    	return
+		    }
+            doc = new DOMParser().parseFromString(html, 'text/html')
+            let number = document.querySelector('.lk-desc2.border-rad.block-desc-padding').textContent.match(/\d+/g).map(Number)
+            let coin = number[1]
+            let vote = number[2]
+            if (coin > 0) {
+                response = await fetch('https://borealis.su/index.php?do=lk', {
+                  'headers': {
+                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+		        	'content-type': 'application/x-www-form-urlencoded',
+                    'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                  },
+                  'body': 'username=' + nick + '&amount=' + coin + '&transferBorealics=1',
+                  'method': 'POST',
+                })
+                //Почему не UTF-8?
+		        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+                html = await response.text()
+		        if (html.length < 250) {
+		        	createNotif(acc.nick + ' ' + html, 'error')
+		        	return
+		        }
+                doc = new DOMParser().parseFromString(html, 'text/html')
+                createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent)
+            } else {
+                createNotif('На ' + acc.nick + ' 0 бореалисиков', 'warn')
+            }
+            if (vote > 0) {
+                response = await fetch('https://borealis.su/index.php?do=lk', {
+                  'headers': {
+                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+		        	'content-type': 'application/x-www-form-urlencoded',
+                    'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                  },
+                  'body': 'username=' + nick + '&amount=' + vote + '&transferBorealics=1&isVote=1',
+                  'method': 'POST',
+                })
+                //Почему не UTF-8?
+		        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+                html = await response.text()
+		        if (html.length < 250) {
+		        	createNotif(acc.nick + ' ' + html, 'error')
+		        	return
+		        }
+                doc = new DOMParser().parseFromString(html, 'text/html')
+                createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent)
+            } else {
+                createNotif('На ' + acc.nick + ' 0 голосов', 'warn')
+            }
+		} catch(e) {
+			createNotif(acc.nick + ' ' + e, 'error')
+		}
+    }
+    createNotif('Всё передано, в сумме было передано ' + coins + ' бореалисиков и ' + votes + ' голосов', 'success')
+    blockButtons = false
+})
+
 async function addProject(project, element) {
     createNotif(chrome.i18n.getMessage('adding'), null, null, element)
 
@@ -2088,7 +2399,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
         } else if (key == 'generalStats') {
             generalStats = storageChange.newValue
             return
-        } else if (key == 'AVMRproxies' || key == 'AVMRVKs') {
+        } else if (key == 'AVMRproxies' || key == 'AVMRVKs' || key == 'borealisAccounts') {
             if (key == 'AVMRproxies') proxies = storageChange.newValue
             if (key == 'AVMRVKs') VKs = storageChange.newValue
             if (storageChange.oldValue && storageChange.oldValue.length == storageChange.newValue.length) {
@@ -2119,6 +2430,7 @@ document.getElementById('file-download').addEventListener('click', ()=> {
     createNotif(chrome.i18n.getMessage('exporting'))
     let allSetting = {
         VKs,
+        borealisAccounts,
         proxies,
         settings,
         generalStats
@@ -2235,6 +2547,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
                     settings = allSetting.settings
                     generalStats = allSetting.generalStats
                     VKs = allSetting.VKs
+                    borealisAccounts = allSetting.borealisAccounts
                     proxies = allSetting.proxies
 
                     await checkUpdateConflicts(false)
@@ -2245,6 +2558,7 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
                     await setValue('AVMRsettings', settings)
                     await setValue('generalStats', generalStats)
                     await setValue('AVMRVKs', VKs)
+                    await setValue('borealisAccounts', borealisAccounts)
                     await setValue('AVMRproxies', proxies)
 
                     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
@@ -2301,6 +2615,12 @@ async function checkUpdateConflicts(save) {
         proxies = []
         await setValue('AVMRVKs', VKs)
         await setValue('AVMRproxies', proxies)
+    }
+    if (borealisAccounts == null || !(typeof borealisAccounts[Symbol.iterator] === 'function')) {
+        updated = true
+        createNotif(chrome.i18n.getMessage('settingsUpdate'))
+        borealisAccounts = []
+        await setValue('borealisAccounts', borealisAccounts)
     }
     if (settings.stopVote == null) {
         updated = true
@@ -2614,6 +2934,9 @@ document.getElementById('ProxyButton').addEventListener('click', function() {
 // document.getElementById('IonMcButton').addEventListener('click', function() {
 //     listSelect(event, 'IonMcTab')
 // })
+document.getElementById('BorealisButton').addEventListener('click', function() {
+    listSelect(event, 'BorealisTab')
+})
 
 //Слушатель закрытия модалки статистики и её сброс
 document.querySelector('#stats .close').addEventListener('click', ()=> {
@@ -2985,7 +3308,8 @@ elements.forEach(function(el) {
     el.prepend(chrome.i18n.getMessage(el.getAttribute('data-resource')))
 })
 document.querySelectorAll('[placeholder]').forEach(function(el) {
-    el.placeholder = chrome.i18n.getMessage(el.placeholder)
+    const text = chrome.i18n.getMessage(el.placeholder)
+    if (text != '') el.placeholder = el.placeholder = text
 })
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))

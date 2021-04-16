@@ -518,6 +518,13 @@ nav .logo img {
 	grid-template-columns: 7fr 2fr;
 }
 
+#sendBorealis .inputEl {
+	display: grid;
+	margin-bottom: 20px;
+	grid-gap: 20px;
+	grid-template-columns: 7fr 2fr;
+}
+
 .importProxyBtns,
 #addProxy {
 	display: grid;
@@ -549,6 +556,16 @@ nav .logo img {
 }
 
 #VKTab .inputEl > * {
+	margin: 0;
+}
+
+#BorealisTab .inputEl {
+	display: flex;
+	margin-bottom: 20px;
+	justify-content: space-between;
+}
+
+#BorealisTab .inputEl > * {
 	margin: 0;
 }
 

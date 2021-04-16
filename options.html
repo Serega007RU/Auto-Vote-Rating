@@ -926,8 +926,9 @@
 					</div>
 					<div class="buttonBlock">
 						<button data-resource="VK" class="selectsite" id="VKButton"><span>0</span></button>
-            		     <button data-resource="proxy" class="selectsite" id="ProxyButton"><span>0</span></button>
-            		     <!--<button class="selectsite" id="IonMcButton">IonMc</button>-->
+            		    <button data-resource="proxy" class="selectsite" id="ProxyButton"><span>0</span></button>
+            		    <!--<button class="selectsite" id="IonMcButton">IonMc</button>-->
+            		    <button class="selectsite" id="BorealisButton">Borealis.su<span>0</span></button>
 					</div>
 					<div class="contentBlock">
 						<ul class="listcontent" id="VKTab" style="display: none;">
@@ -1001,6 +1002,31 @@
             		        </div>
             		        <div id="ProxyList"></div>
             		     </ul>
+						<ul class="listcontent" id="BorealisTab" style="display: none;">
+						    Данный функционал реализован по просьбе SkillsMr
+						    <br>
+						    На данный момент данный функционал бесполезен, используйте коды вместо никнеймов голосования
+						    <a class="link" target="_blank" href="https://borealis.su/engine/ajax/newAlias.php">Здесь генерировать коды</a>
+						    <a class="link" target="_blank" href="http://ipic.su/img/img7/fs/Snimokekrana2021-04-17004428.1618609518.png">Немного информации про эти коды</a>
+						    <br><br>
+						    <form id="sendBorealis">
+                                <div class="label-block">
+            		            	<label for="sendBorealisNick">Никнейм
+            		            		<span class="tooltip1">
+            		            			<span class="tooltip1text">Отправит со всех добавленных аккаунтов на указанный ник все бореалисики и голоса</span>
+            		            		</span>
+            		            	</label>
+            		            </div>
+                                <div class="inputEl">
+            		            	<input id="sendBorealisNick" type="text" name="text" class="input" placeholder="Укажите ник">
+            		            	<button type="submit" class="justBtn">Отправить</button>
+            		            </div>
+            		        </form>
+						    <div class="inputEl">
+						    	<button class="submitBtn" data-resource="addButton" id="AddBorealis"></button>
+						    </div>
+							<div id="BorealisList"></div>
+						</ul>
 					</div>
 				</div>
 			</div>

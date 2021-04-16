@@ -561,8 +561,13 @@
   "added": {
     "message": "Уже добавлен"
   },
-  "notAuthVK": {
-    "message": "Вы не авторизовались во ВКонтакте"
+  "notAuthAcc": {
+    "message": "Вы не авторизовались во $acc$",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   },
   "type": {
     "message": "Выберите тип"
@@ -623,11 +628,21 @@
   "deletedNotWorkingProxies": {
     "message": "Все нерабочие прокси успешно удалены!"
   },
-  "deletingAllVK": {
-    "message": "Удаляю все куки и вкладки ВКонтакте..."
+  "deletingAllAcc": {
+    "message": "Удаляю все куки и вкладки $acc$...",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   },
-  "deletedAllVK": {
-    "message": "Все куки и вкладки ВКонтакте успешно удалены!"
+  "deletedAllAcc": {
+    "message": "Все куки и вкладки $acc$ успешно удалены!",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   },
   "importTunnelBear": {
     "message": "Импорт прокси с TunnelBear"
@@ -818,8 +833,13 @@
   "lastDayMonth2": {
     "message": "в последний день месяца"
   },
-  "openPopupVK": {
-    "message": "Открываю окно авторизации ВКонтакте"
+  "openPopupAcc": {
+    "message": "Открываю окно авторизации $acc$. После авторизации, закройте окно авторизации",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   },
   "notAuthVKTop": {
     "message": "Данный аккаунт ВКонтакте не авторизован на следующих рейтингах: "

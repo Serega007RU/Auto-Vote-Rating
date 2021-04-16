@@ -601,8 +601,13 @@
   "added": {
     "message": "Already added"
   },
-  "notAuthVK": {
-    "message": "You are not logged in to VKontakte"
+  "notAuthAcc": {
+    "message": "You are not logged in to $acc$",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   },
   "type": {
     "message": "Choose type"
@@ -663,11 +668,21 @@
   "deletedNotWokingProxies": {
     "message": "All non-working proxies were successfully deleted!"
   },
-  "deletingAllVKCookies": {
-    "message": "Deleting Vkontakte cookies and tabs..."
+  "deletingAllAcc": {
+    "message": "Deleting $acc$ cookies and tabs...",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   },
-  "deletedAllVKCookies": {
-    "message": "All VK cookies and tabs were successfully deleted!"
+  "deletedAllAcc": {
+    "message": "All $acc$ cookies and tabs were successfully deleted!",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   },
   "importTunnelBear": {
     "message": "Import proxies from TunnelBear"
@@ -858,8 +873,13 @@
   "lastDayMonth2": {
     "message": "on the last day of the month"
   },
-  "openPopupVK": {
-    "message": "Opening VK authorization window"
+  "openPopupAcc": {
+    "message": "Opening $acc$ authorization window. After authorization, close the authorization window",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   },
   "notAuthVKTop": {
     "message": "This VK account is not authorized for the following ratings: "
