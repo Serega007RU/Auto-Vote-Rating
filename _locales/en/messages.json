@@ -1067,5 +1067,20 @@
   },
   "updateInstr": {
     "message": "Instructions for updating the extension"
+  },
+  "updateInstr2": {
+    "message": "Before updating, we recommend "
+  },
+  "updateInstr3": {
+    "message": " just in case you mess up."
+  },
+  "updateInstr4": {
+    "message": "Unzip the downloaded archive with the replacement files to the folder where you installed the extension (where you first unpacked the extension and installed it). After unpacking "
+  },
+  "updateInstr5": {
+    "message": "restart"
+  },
+  "updateInstr6": {
+    "message": " extension."
   }
 }
