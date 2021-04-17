@@ -1,22 +1,16 @@
-Auto Vote Rating - Chrome Extension - версия MultiVote
-
-Автоматическое голосование на рейтингах таких как [TopCraft.ru](http://topcraft.ru/), [McTOP.su](https://mctop.su/), [MCRate.su](http://mcrate.su/), [MinecraftRating.ru](http://minecraftrating.ru/), [MonitoringMinecraft.ru](http://monitoringminecraft.ru/), [IonMc.top](https://ionmc.top/), [MinecraftServers.org](https://minecraftservers.org/), [Serveur-Prive.net](https://serveur-prive.net/minecraft), [PlanetMinecraft.com](https://www.planetminecraft.com/), [TopG.org](https://topg.org/Minecraft), [Minecraft-Mp.com](https://minecraft-mp.com/), [Minecraft-Server-List.com](http://minecraft-server-list.com/), [ServerPact.com](https://www.serverpact.com/), [MinecraftIpList.com](https://www.minecraftiplist.com/), [TopMinecraftServers.org](https://topminecraftservers.org/), [MinecraftServers.biz](http://minecraftservers.biz/), [HotMC.ru](https://hotmc.ru/), [Minecraft-Server.net](https://minecraft-server.net/), [Top-Games.net или Top-Serveurs.net](https://top-games.net/), [TMonitoring.com](https://tmonitoring.com/), [Top.GG](https://top.gg/), [DiscordBotList.com](https://discordbotlist.com/), [BotsForDiscord.com](https://botsfordiscord.com/), [MMoTop.RU](https://mmotop.ru/), [MC-Servers.com](https://mc-servers.com/), [MinecraftList.org](https://minecraftlist.org/), [Minecraft-Index.com](https://www.minecraft-index.com/), [ServerList101.com](https://serverlist101.com/), [MCServerList](https://mcserver-list.eu/), [CraftList](https://craftlist.org/), [CzechCraft](https://czech-craft.eu/) [PixelmonServers](https://pixelmonservers.com/), [QTop](http://q-top.ru/) и [MinecraftBuzz](https://minecraft.buzz/) для проектов или серверов (игровых)
-
-Проверено на следующих браузерах:
-- Google Chrome
-- Opera
-- Mozilla Firefox
-- Яндекс Браузер
-- Яндекс Браузер на Android (имеются проблемы с работой в фоновом режиме)
-- Microsoft Edge
-- Kiwi Browser (имеются проблемы с диалоговыми окнами и тихим голосованием на MinecraftRating)
-
-Если хотите скачать и установить расширение с репозитория:
-1. скачайте данный репозиторий
-2. распакуйте в удобную папку
-3. на chrome://extensions/ (это URL) включите режим разработчика (справа сверху)
-4. слева сверху должна появиться кнопка "Загрузить распакованное расширение", нажмите на него
-5. выберите каталог в который вы распакавывали
+# Auto Vote Rating - Chrome Extension - MultiVote version
+List of sites that the extension supports: [TopCraft.ru](http://topcraft.ru/), [McTOP.su](https://mctop.su/), [MCRate.su](http://mcrate.su/), [MinecraftRating.ru](http://minecraftrating.ru/), [MonitoringMinecraft.ru](http://monitoringminecraft.ru/), [IonMc.top](https://ionmc.top/), [MinecraftServers.org](https://minecraftservers.org/), [Serveur-Prive.net](https://serveur-prive.net/minecraft), [PlanetMinecraft.com](https://www.planetminecraft.com/), [TopG.org](https://topg.org/Minecraft), [Minecraft-Mp.com](https://minecraft-mp.com/), [Minecraft-Server-List.com](http://minecraft-server-list.com/), [ServerPact.com](https://www.serverpact.com/), [MinecraftIpList.com](https://www.minecraftiplist.com/), [TopMinecraftServers.org](https://topminecraftservers.org/), [MinecraftServers.biz](http://minecraftservers.biz/), [HotMC.ru](https://hotmc.ru/), [Minecraft-Server.net](https://minecraft-server.net/), [Top-Games.net или Top-Serveurs.net](https://top-games.net/), [TMonitoring.com](https://tmonitoring.com/), [Top.GG](https://top.gg/), [DiscordBotList.com](https://discordbotlist.com/), [BotsForDiscord.com](https://botsfordiscord.com/), [MMoTop.RU](https://mmotop.ru/), [MC-Servers.com](https://mc-servers.com/), [MinecraftList.org](https://minecraftlist.org/), [Minecraft-Index.com](https://www.minecraft-index.com/), [ServerList101.com](https://serverlist101.com/), [MCServerList](https://mcserver-list.eu/), [CraftList](https://craftlist.org/), [CzechCraft](https://czech-craft.eu/) [PixelmonServers](https://pixelmonservers.com/), [QTop](http://q-top.ru/), [MinecraftBuzz](https://minecraft.buzz/)
+### Links to the extension where you can install it:
+[Chrome Web Store](https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd)   
+[Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/auto-vote-rating/)   
+[Opera Addons](https://addons.opera.com/ru/extensions/details/auto-vote-minecraft-rating/)   
+[Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/auto-vote-rating/ecoifpgiojfhmihcfomafdcmkphafpba)  
+## Install the extension from zip archive
+Here is a short guide how to install an unpacked extension on Google Chrome or Chromium-based browsers
+1. Unzip the archive to any convenient location
+2. Open the "Extensions" page (`chrome://extensions/`) in the browser and turn on the "Developer mode"
+![](http://ipic.su/img/img7/fs/68747470733a2f2f692e696d6775722e636f6d2f786463686451612e706e67.1618619824.png)
+3. Click on the "Load unpacked" button and select the directory where you unpacked the archive.
 
 Используйте программу git что бы удобнее обновляться если будут выходить обновления данной ветки
 
