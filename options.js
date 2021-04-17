@@ -243,9 +243,9 @@ async function restoreOptions() {
     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('cooldown').value = settings.cooldown
-    if (settings.enableCustom || projectsCustom.length > 0)
-        addCustom()
-    chrome.notifications.getPermissionLevel(function(callback){
+    if (settings.enableCustom || projectsCustom.length > 0) addCustom()
+    //Для FireFox почему-то не доступно это API
+    chrome.notifications.getPermissionLevel(function(callback) {
         if (callback != 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
             createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
         }
