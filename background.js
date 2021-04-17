@@ -1461,17 +1461,15 @@ async function endVote(request, sender, project) {
             if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
                 if (request.later && settings.repeatAttemptLater && project.later != null) {
                     if (project.TopCraft || project.McTOP) {
-                        if (request.later) {
-                            if (request.later == 'vk_error') {
-                                await useVK()
-                            }
+                        if (request.later == 'vk_error') {
+                            await useVK()
                         } else {
-                            if (project.later >= 2) {
+                            if (project.later >= 15) {
                                 await useVK()
                             }
                         }
                     } else {
-                        if (project.later >= 2) {
+                        if (project.later >= 15) {
                             await useVK()
                         }
                     }
@@ -1530,7 +1528,7 @@ async function endVote(request, sender, project) {
             delete project.later
         } else {
             if (settings.useMultiVote && settings.repeatAttemptLater && project.later) {
-                if (project.later < 3) {
+                if (project.later <= 15) {
                     project.time = null
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
                 } else {
@@ -1599,7 +1597,7 @@ async function endVote(request, sender, project) {
         generalStats.errorVotes++
     }
 
-    if (project.priority || (settings.useMultiVote && settings.repeatAttemptLater && project.later && project.later < 3)) {
+    if (project.priority || (settings.useMultiVote && settings.repeatAttemptLater && project.later && project.later <= 15)) {
         getProjectList(project).unshift(project)
     } else {
         getProjectList(project).push(project)

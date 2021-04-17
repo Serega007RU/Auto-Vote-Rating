@@ -749,7 +749,7 @@
     "message": "Vote expecting time has expired, restarting the voted"
   },
   "repeatAttemptLater": {
-    "message": "Ignore the 'You have already voted' error at least 3 times"
+    "message": "Ignore the 'You have already voted' error at least 15 times"
   },
   "chooseLang": {
     "message": "Choose language/region"
