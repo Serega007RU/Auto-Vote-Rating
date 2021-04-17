@@ -79,8 +79,8 @@ function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disa
     this.enabledSilentVote = enabledSilentVote
     this.disabledCheckTime = disabledCheckTime
     this.cooldown = cooldown
-    this.useMultiVote = false
-    this.repeatAttemptLater = false
+    this.useMultiVote = true
+    this.repeatAttemptLater = true
     this.stopVote = 9000000000000000
     this.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
 }
