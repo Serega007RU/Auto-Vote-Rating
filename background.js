@@ -65,7 +65,9 @@ let tunnelBear = {}
 
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 var check = true
-var break_ = false
+var break1 = false
+var break2 = false
+let lastErrorNotFound
 
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
 var closeTabs = true
@@ -117,19 +119,6 @@ async function initializeConfig() {
                 await clearProxy()
             }
         })
-
-//         if (chrome.privacy.network.webRTCMultipleRoutesEnabled !== undefined) {
-//             await new Promise(resolve => { chrome.privacy.network.webRTCMultipleRoutesEnabled.set({ value: false }, function() {resolve()}) })
-//         }
-//         if (chrome.privacy.network.webRTCNonProxiedUdpEnabled !== undefined) {
-//             await new Promise(resolve => { chrome.privacy.network.webRTCNonProxiedUdpEnabled.set({ value: false }, function() {resolve()}) })
-//         }
-//         if (chrome.privacy.network.webRTCIPHandlingPolicy !== undefined) {
-//             await new Promise(resolve => { chrome.privacy.network.webRTCIPHandlingPolicy.set({ value: 'disable_non_proxied_udp' }, function() {resolve()}) })
-//         }
-//         if (chrome.privacy.network.networkPredictionEnabled !== undefined) {
-//             await new Promise(resolve => { chrome.privacy.network.networkPredictionEnabled.set({ value: false }, function() {resolve()}) })
-//         }
     }
     
     //Проверка на голосование
@@ -169,7 +158,8 @@ async function checkVote() {
     })
 
     check = true
-    break_ = false
+    break1 = false
+    break2 = false
 }
 
 async function checkOpen(project) {
@@ -346,12 +336,13 @@ async function newWindow(project) {
             }
             //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк то приостанавливает ВСЁ авто-голосование на 24 часа
             if (!found) {
-                settings.stopVote = Date.now() + 86400000
-                console.error(chrome.i18n.getMessage('notFoundVK'))
-                if (!settings.disabledNotifError)
-                    sendNotification(chrome.i18n.getMessage('notFoundVKTitle'), chrome.i18n.getMessage('notFoundVK'))
-                await setValue('AVMRsettings', settings)
-                await stopVote()
+//              settings.stopVote = Date.now() + 86400000
+                lastErrorNotFound = chrome.i18n.getMessage('notFoundVKTitle')
+                console.warn(chrome.i18n.getMessage('notFoundVK', getProjectName(project)))
+                if (!settings.disabledNotifWarn) sendNotification(lastErrorNotFound, chrome.i18n.getMessage('notFoundVK', getProjectName(project)))
+//              await setValue('AVMRsettings', settings)
+//              await stopVote()
+                break2 = true
                 return
             }
         }
@@ -458,15 +449,18 @@ async function newWindow(project) {
 
             //Если не удалось найти хотя бы одно свободное не заюзанное прокси то приостанавливает ВСЁ авто-голосование на 24 часа
             if (!found) {
-                settings.stopVote = Date.now() + 86400000
-                console.error(chrome.i18n.getMessage('notFoundProxy'))
-                if (!settings.disabledNotifError)
-                    sendNotification(chrome.i18n.getMessage('notFoundProxyTitle'), chrome.i18n.getMessage('notFoundProxy'))
-                await setValue('AVMRsettings', settings)
-                await stopVote()
+//              settings.stopVote = Date.now() + 86400000
+                lastErrorNotFound = chrome.i18n.getMessage('notFoundProxyTitle')
+                console.warn(chrome.i18n.getMessage('notFoundProxy', getProjectName(project)))
+                if (!settings.disabledNotifWarn) sendNotification(lastErrorNotFound, chrome.i18n.getMessage('notFoundProxy', getProjectName(project)))
+//              await setValue('AVMRsettings', settings)
+//              await stopVote()
+                break2 = true
                 return
             }
         }
+
+        lastErrorNotFound = null
 
         //Очистка куки
         let url
@@ -1798,12 +1792,26 @@ async function changeProject(project) {
 }
 
 async function forLoopAllProjects(fuc) {
+    if (lastErrorNotFound != null) lastErrorNotFound = null
     for (const item of allProjects) {
-        if (break_) break
+        if (break1) {
+            break1 = false
+            break
+        }
         for (let proj of window['projects' + item]) {
-            if (break_) break
+            if (break2) {
+                break2 = false
+                break
+            }
             await fuc(proj)
         }
+    }
+    if (lastErrorNotFound != null) {
+        settings.stopVote = Date.now() + 86400000
+        console.error(lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
+        if (!settings.disabledNotifError) sendNotification(lastErrorNotFound, lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
+        await setValue('AVMRsettings', settings)
+        await stopVote()
     }
 }
 
@@ -1864,7 +1872,8 @@ async function stopVote() {
     }
     controller.abort()
     openedProjects.clear()
-    break_ = true
+    break1 = true
+    break2 = true
 }
 
 //Если требуется авторизация для Прокси

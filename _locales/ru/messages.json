@@ -572,17 +572,27 @@
   "type": {
     "message": "Выберите тип"
   },
-  "notFoundProxy": {
-    "message": "Нет свободного прокси, авто-голосование полностью приостановлено на 24 часа"
+  "notFoundVKTitle": {
+    "message": "Нет свободного аккаунта ВКонтакте"
   },
   "notFoundVK": {
-    "message": "Нет свободного аккаунта ВКонтакте, авто-голосование полностью приостановлено на 24 часа"
+    "message": "Для $top$ нет свободного аккаунта ВКонтакте",
+    "placeholders": {
+      "top": {
+        "content": "$1"
+      }
+    }
   },
   "notFoundProxyTitle": {
     "message": "Нет свободного прокси"
   },
-  "notFoundVKTitle": {
-    "message": "Нет свободного аккаунта ВКонтакте"
+  "notFoundProxy": {
+    "message": "Для $top$ нет свободного прокси",
+    "placeholders": {
+      "top": {
+        "content": "$1"
+      }
+    }
   },
   "importProxy": {
     "message": "Импорт"
@@ -728,6 +738,9 @@
   },
   "voteSuspended": {
     "message": "Автоголосование приостановлено"
+  },
+  "voteSuspendedDay": {
+    "message": "Автоголосование приостановлено на 24 часа"
   },
   "voteResumed": {
     "message": "Автоголосование возобновлено"

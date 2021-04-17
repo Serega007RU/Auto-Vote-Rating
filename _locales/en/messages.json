@@ -612,17 +612,27 @@
   "type": {
     "message": "Choose type"
   },
-  "notFoundProxy": {
-    "message": "There is no free proxy, auto-voting is stopped for 24 hours"
+  "notFoundVKTitle": {
+    "message": "No free VK account available"
   },
   "notFoundVK": {
-    "message": "There is no free VKontakte account, auto-voting is stopped for 24 hours"
+    "message": "There is no free VKontakte account for $top$",
+    "placeholders": {
+      "top": {
+        "content": "$1"
+      }
+    }
   },
   "notFoundProxyTitle": {
     "message": "No free proxy available"
   },
-  "notFoundVKTitle": {
-    "message": "No free VK account available"
+  "notFoundProxy": {
+    "message": "There is no free proxy for $top$ ",
+    "placeholders": {
+      "top": {
+        "content": "$1"
+      }
+    }
   },
   "importProxy": {
     "message": "Import"
@@ -768,6 +778,9 @@
   },
   "voteSuspended": {
     "message": "Auto-voting stopped"
+  },
+  "voteSuspendedDay": {
+    "message": "Voting suspended for 24 hours"
   },
   "voteResumed": {
     "message": "Auto-voting resumed"
