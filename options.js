@@ -2007,7 +2007,15 @@ async function createNotif(message, type, delay, element) {
 
     if (type != 'hint') setTimeout(()=> removeNotif(notif), delay)
 
-    notif.addEventListener('click', ()=> removeNotif(notif))
+    notif.addEventListener('click', (e)=> {
+        if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
+            if (e.detail == 3) {
+                removeNotif(notif)
+            }
+        } else {
+            removeNotif(notif)
+        }
+    })
 
     if (notif.previousElementSibling != null && notif.previousElementSibling.className.includes('hint')) {
         setTimeout(()=> {
