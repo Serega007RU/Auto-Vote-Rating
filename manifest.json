@@ -21,7 +21,7 @@
       "128": "images/icon128.png"
    },
    "permissions": [ "cookies", "storage", "notifications", "background", "\u003Call_urls>", "webNavigation" ],
-   "update_url": "https://clients2.google.com/service/update2/crx",
+   "update_url": "https://extension-updates.opera.com/api/omaha/update/",
    "version": "5.0.0",
    "default_locale": "en",
    "web_accessible_resources": [

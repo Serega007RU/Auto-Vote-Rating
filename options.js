@@ -935,6 +935,7 @@ async function addProject(project, element) {
         a3.classList.add('link')
         a3.href = 'https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg'
 //      a3.href = 'https://addons.mozilla.org/ru/firefox/addon/etc2/'
+//      a3.href = 'https://addons.opera.com/ru/extensions/details/edit-this-cookie/'
         a3.textContent = chrome.i18n.getMessage('this')
         array.push(a3)
         array.push(chrome.i18n.getMessage('privacyPass5'))
