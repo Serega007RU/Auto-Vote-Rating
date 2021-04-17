@@ -296,9 +296,9 @@ async function restoreOptions() {
     if (settings.stopVote > Date.now()) {
         document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
     }
-    if (settings.enableCustom || projectsCustom.length > 0)
-        addCustom()
-    chrome.notifications.getPermissionLevel(function(callback){
+    if (settings.enableCustom || projectsCustom.length > 0) addCustom()
+    //Для FireFox почему-то не доступно это API
+    chrome.notifications.getPermissionLevel(function(callback) {
         if (callback != 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
             createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
         }
@@ -2213,6 +2213,7 @@ async function addProject(project, element) {
         a3.classList.add('link')
         a3.href = 'https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg'
 //      a3.href = 'https://addons.mozilla.org/ru/firefox/addon/etc2/'
+//      a3.href = 'https://addons.opera.com/ru/extensions/details/edit-this-cookie/'
         a3.textContent = chrome.i18n.getMessage('this')
         array.push(a3)
         array.push(chrome.i18n.getMessage('privacyPass5'))
@@ -3469,7 +3470,15 @@ async function createNotif(message, type, delay, element) {
 
     if (type != 'hint') setTimeout(()=> removeNotif(notif), delay)
 
-    notif.addEventListener('click', ()=> removeNotif(notif))
+    notif.addEventListener('click', (e)=> {
+        if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
+            if (e.detail == 3) {
+                removeNotif(notif)
+            }
+        } else {
+            removeNotif(notif)
+        }
+    })
 
     if (notif.previousElementSibling != null && notif.previousElementSibling.className.includes('hint')) {
         setTimeout(()=> {
