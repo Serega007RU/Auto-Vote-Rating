@@ -3017,6 +3017,7 @@ selectedTop.addEventListener('click', function() {
 
 var laterChoose
 selectedTop.addEventListener('change', function() {
+    document.getElementById('id').value = ''
     document.getElementById('idSelector').removeAttribute('style')
 
     if (document.getElementById(selectedTop.value + 'IDList') != null) {
