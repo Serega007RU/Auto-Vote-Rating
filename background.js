@@ -334,7 +334,7 @@ async function newWindow(project) {
                     break
                 }
             }
-            //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк то приостанавливает ВСЁ авто-голосование на 24 часа
+            //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк
             if (!found) {
 //              settings.stopVote = Date.now() + 86400000
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundVKTitle')
@@ -342,6 +342,11 @@ async function newWindow(project) {
                 if (!settings.disabledNotifWarn) sendNotification(lastErrorNotFound, chrome.i18n.getMessage('notFoundVK', getProjectName(project)))
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
+                for (const value of queueProjects) {
+                    if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+                        queueProjects.delete(value)
+                    }
+                }
                 break2 = true
                 return
             }
@@ -381,7 +386,7 @@ async function newWindow(project) {
                     //Применяет найденный незаюзанный свободный прокси
                     console.log(chrome.i18n.getMessage('applyProxy', proxy.ip + ':' + proxy.port + ' ' + proxy.scheme))
 
-                    if (proxy.ip.includes('lazerpenguin') && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
+                    if (proxy.TunnelBear && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
                         console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
                         let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
                             'headers': {
@@ -407,14 +412,14 @@ async function newWindow(project) {
                         })
                         if (!response.ok) {
                             settings.stopVote = Date.now() + 86400000
+                            await setValue('AVMRsettings', settings)
+                            await stopVote()
                             if (response.status == 401) {
                                 console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
-                                if (!settings.disabledNotifError)
-                                    sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
+                                if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
                                 return
                             }
                             console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status)
-                            await setValue('AVMRsettings', settings)
                             return
                         }
                         let json = await response.json()
@@ -447,7 +452,7 @@ async function newWindow(project) {
                 }
             }
 
-            //Если не удалось найти хотя бы одно свободное не заюзанное прокси то приостанавливает ВСЁ авто-голосование на 24 часа
+            //Если не удалось найти хотя бы одно свободное не заюзанное прокси
             if (!found) {
 //              settings.stopVote = Date.now() + 86400000
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundProxyTitle')
@@ -455,6 +460,11 @@ async function newWindow(project) {
                 if (!settings.disabledNotifWarn) sendNotification(lastErrorNotFound, chrome.i18n.getMessage('notFoundProxy', getProjectName(project)))
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
+                for (const value of queueProjects) {
+                    if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+                        queueProjects.delete(value)
+                    }
+                }
                 break2 = true
                 return
             }
@@ -1600,7 +1610,7 @@ async function endVote(request, sender, project) {
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
 
     setTimeout(async ()=>{
-        for (let value of queueProjects) {
+        for (const value of queueProjects) {
             if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
                 queueProjects.delete(value)
             }
