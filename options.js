@@ -1024,8 +1024,12 @@ async function addBorealis() {
 
 //Проверяем авторизацию на всех Майнкрафт рейтингах где есть авторизация ВКонтакте и если пользователь не авторизован - предлагаем ему авторизоваться
 async function checkAuthVK() {
+    document.querySelector('#notifBlock ')
     createNotif(chrome.i18n.getMessage('checkAuthVK'))
     let authStatus = []
+    let idAuth = document.createElement('div')
+    idAuth.id = 'notAuthVK'
+    authStatus.push(idAuth)
     authStatus.push(chrome.i18n.getMessage('notAuthVKTop'))
     let needReturn = false
     for (let [key, value] of authVKUrls) {
@@ -1047,6 +1051,14 @@ async function checkAuthVK() {
             a.classList.add('link')
             a.id = 'authvk' + key
             a.textContent = key
+            a.addEventListener('click', function() {
+                openPoput(value, function () {
+                    if (document.getElementById('notAuthVK') != null) {
+                        removeNotif(document.getElementById('notAuthVK').parentElement.parentElement)
+                    }
+                    checkAuthVK()
+                })
+            })
             authStatus.push(a)
             authStatus.push(' ')
             needReturn = true
@@ -1058,15 +1070,6 @@ async function checkAuthVK() {
     if (needReturn) {
         authStatus.push(chrome.i18n.getMessage('notAcceptAuth'))
         createNotif(authStatus, 'warn', 30000)
-        for (let [key, value] of authVKUrls) {
-            if (document.getElementById('authvk' + key) != null) {
-                document.getElementById('authvk' + key).addEventListener('click', function() {
-                    openPoput(value, function () {
-                        checkAuthVK()
-                    })
-                })
-            }
-        }
         return
     }
     createNotif(chrome.i18n.getMessage('authOK'), 'success')
@@ -3486,12 +3489,12 @@ async function createNotif(message, type, delay, element) {
             removeNotif(notif.previousElementSibling)
         }, 3000)
     }
+}
 
-    function removeNotif(elem) {
-        if (!elem) return
-        elem.classList.remove('show')
-        elem.classList.add('hide')
-        setTimeout(()=> elem.classList.add('hidden'), 500)
-        setTimeout(()=> elem.remove(), 1000)
-    }
+function removeNotif(elem) {
+    if (!elem) return
+    elem.classList.remove('show')
+    elem.classList.add('hide')
+    setTimeout(()=> elem.classList.add('hidden'), 500)
+    setTimeout(()=> elem.remove(), 1000)
 }
