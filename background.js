@@ -1478,7 +1478,7 @@ async function endVote(request, sender, project) {
                         }
                     }
                 } else {
-                    if (!((project.TopCraft || project.McTOP) && request.later == 'nick_error')) {
+                    if (!(project.TopCraft || project.McTOP) && request.later == 'nick_error') {
                         await useVK()
                     }
                 }
@@ -1531,7 +1531,7 @@ async function endVote(request, sender, project) {
             generalStats.lastSuccessVote = Date.now()
             delete project.later
         } else {
-            if (settings.useMultiVote && settings.repeatAttemptLater && project.later) {
+            if (settings.useMultiVote && settings.repeatAttemptLater && project.later && !(project.TopCraft || project.McTOP || project.MinecraftRating)) {
                 if (project.later <= 15) {
                     project.time = null
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
