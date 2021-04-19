@@ -1471,7 +1471,9 @@ async function endVote(request, sender, project) {
             if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
                 if (request.later && settings.repeatAttemptLater && project.later != null) {
                     if (project.TopCraft || project.McTOP) {
-                        if (request.later == 'vk_error') {
+                        if (request.later == 'nick_error') {
+                            //None
+                        } else if (request.later == 'vk_error') {
                             await useVK()
                         } else {
                             if (project.later >= 15) {
@@ -1484,9 +1486,7 @@ async function endVote(request, sender, project) {
                         }
                     }
                 } else {
-                    if (!(project.TopCraft || project.McTOP) && request.later == 'nick_error') {
-                        await useVK()
-                    }
+                    await useVK()
                 }
                 async function useVK() {
                     let usedProject = {
