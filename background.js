@@ -189,6 +189,7 @@ async function checkOpen(project) {
             }
         }
         if (settings.useMultiVote) {
+            //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
             if (project.TopCraft || project.McTOP || project.MinecraftRating) {
                 if (!value.TopCraft && !value.McTOP && !value.MinecraftRating) {
                     return
@@ -196,7 +197,12 @@ async function checkOpen(project) {
             }
             if (value.TopCraft || value.McTOP || value.MinecraftRating) {
                 if (!project.TopCraft && !project.McTOP && !project.MinecraftRating) {
-                    return
+                    //Если безпроксиевый рейтинг закончил голосование, позволяет проксиевым начать голосовать ради экономии времени
+                    if (value.time > Date.now()) {
+                        continue
+                    } else {
+                        return
+                    }
                 }
             }
         }
