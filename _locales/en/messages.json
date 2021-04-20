@@ -1105,6 +1105,6 @@
     }
   },
   "useProxyOnUnProxyTop": {
-    "message": "Использовать прокси на рейтингах где не используется прокси (TopCraft, McTOP и MinecraftRating)"
+    "message": "Use a proxy on ratings where no proxy is used (TopCraft, McTOP и MinecraftRating)"
   }
 }
