@@ -1061,5 +1061,8 @@
         "content": "$1"
       }
     }
+  },
+  "useProxyOnUnProxyTop": {
+    "message": "Использовать прокси на рейтингах где не используется прокси (TopCraft, McTOP и MinecraftRating)"
   }
 }

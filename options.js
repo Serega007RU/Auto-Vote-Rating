@@ -179,6 +179,8 @@ async function restoreOptions() {
                 settings.useMultiVote = this.checked
             } else if (this.id == 'repeatAttemptLater') {
                 settings.repeatAttemptLater = this.checked
+            } else if (this.id == 'useProxyOnUnProxyTop') {
+                settings.useProxyOnUnProxyTop = this.checked
             } else if (this.id == 'randomize') {
                 _return = true
             } else if (this.id == 'customTimeOut') {
@@ -293,6 +295,7 @@ async function restoreOptions() {
     document.getElementById('useMultiVote').checked = settings.useMultiVote
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
+    document.getElementById('useProxyOnUnProxyTop').checked = settings.useProxyOnUnProxyTop
     if (settings.stopVote > Date.now()) {
         document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
     }

@@ -188,7 +188,8 @@ async function checkOpen(project) {
                     sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
             }
         }
-        if (settings.useMultiVote) {
+        if (settings.useMultiVote && !settings.useProxyOnUnProxyTop) {
+            console.log('test')
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
             if (project.TopCraft || project.McTOP || project.MinecraftRating) {
                 if (!value.TopCraft && !value.McTOP && !value.MinecraftRating) {
@@ -218,7 +219,8 @@ async function checkOpen(project) {
             }
         }
         if (currentProxy != null) {
-            if (project.TopCraft || project.McTOP || project.MinecraftRating) {
+            if (!settings.useProxyOnUnProxyTop && (project.TopCraft || project.McTOP || project.MinecraftRating)) {
+                console.log('test2')
                 return
             }
             let usedProjects = getTopFromList(currentProxy, project)
@@ -358,7 +360,7 @@ async function newWindow(project) {
             }
         }
 
-        if (currentProxy == null && (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
+        if (currentProxy == null && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))) {
             let proxyDetails = await new Promise(resolve => {
                 chrome.proxy.settings.get({}, async function(details) {
                     resolve(details)
@@ -1503,7 +1505,7 @@ async function endVote(request, sender, project) {
                 }
             }
             
-            if (currentProxy != null && !project.TopCraft && !project.McTOP && !project.MinecraftRating && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
+            if (currentProxy != null && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
                 let usedProject = {
                     id: project.id,
                     nextFreeVote: time
@@ -1515,7 +1517,7 @@ async function endVote(request, sender, project) {
                 getTopFromList(currentProxy, project).push(usedProject)
                 proxies[proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port})] = currentProxy
                 await setValue('AVMRproxies', proxies)
-            } else if (!project.TopCraft && !project.McTOP && !project.MinecraftRating) {
+            } else if (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
                 console.warn('currentProxy is null or not found')
             }
         }
@@ -1537,7 +1539,7 @@ async function endVote(request, sender, project) {
             generalStats.lastSuccessVote = Date.now()
             delete project.later
         } else {
-            if (settings.useMultiVote && settings.repeatAttemptLater && project.later && !(project.TopCraft || project.McTOP || project.MinecraftRating)) {
+            if (settings.useMultiVote && settings.repeatAttemptLater && project.later && !(project.TopCraft || project.McTOP || project.MinecraftRating)) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
                 if (project.later <= 15) {
                     project.time = null
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
@@ -1627,7 +1629,7 @@ async function endVote(request, sender, project) {
             currentProxy = null
             currentVK = null
         }
-    }, (settings.useMultiVote || settings.cooldown < 10000) && !project.TopCraft && !project.McTOP && !project.MinecraftRating ? 0 : 10000)
+    }, (settings.useMultiVote || settings.cooldown < 10000) && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) ? 0 : 10000)
 }
 
 //Отправитель уведомлений
