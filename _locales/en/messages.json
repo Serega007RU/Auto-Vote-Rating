@@ -1095,5 +1095,13 @@
   },
   "updateInstr6": {
     "message": " extension."
+  },
+  "updated": {
+    "message": "Extension successfully updated to $version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
   }
 }

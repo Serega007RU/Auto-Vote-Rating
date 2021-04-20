@@ -1053,5 +1053,13 @@
   },
   "updateInstr6": {
     "message": " расширение."
+  },
+  "updated": {
+    "message": "Расширение успешно обновлено до версии $version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
   }
 }

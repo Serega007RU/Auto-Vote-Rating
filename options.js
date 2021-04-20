@@ -332,6 +332,9 @@ async function restoreOptions() {
             reloadExtension.addEventListener('click', ()=>{chrome.runtime.reload()})
             message.append(chrome.i18n.getMessage('updateInstr6'))
         })
+    } else if (document.URL.endsWith('?updated')) {
+        window.history.replaceState(null, null, 'options.html')
+        createNotif(chrome.i18n.getMessage('updated', chrome.runtime.getManifest().version), 'success')
     }
 }
 

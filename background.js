@@ -2004,9 +2004,9 @@ chrome.runtime.onInstalled.addListener(async function(details) {
             await setValue('AVMRprojectsListForge', projectsListForge)
             await setValue('AVMRprojectsMinecraftMp', null)
         }
-    }
-    if (details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version(chrome.runtime.getManifest().version)) == -1) {
-        chrome.runtime.openOptionsPage()
+    } else if (details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version(chrome.runtime.getManifest().version)) == -1) {
+//      chrome.runtime.openOptionsPage()
+        window.open('options.html?updated')
     }
 })
 
