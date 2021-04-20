@@ -189,7 +189,6 @@ async function checkOpen(project) {
             }
         }
         if (settings.useMultiVote && !settings.useProxyOnUnProxyTop) {
-            console.log('test')
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
             if (project.TopCraft || project.McTOP || project.MinecraftRating) {
                 if (!value.TopCraft && !value.McTOP && !value.MinecraftRating) {
@@ -220,7 +219,6 @@ async function checkOpen(project) {
         }
         if (currentProxy != null) {
             if (!settings.useProxyOnUnProxyTop && (project.TopCraft || project.McTOP || project.MinecraftRating)) {
-                console.log('test2')
                 return
             }
             let usedProjects = getTopFromList(currentProxy, project)
