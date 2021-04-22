@@ -940,6 +940,9 @@ input.checkbox:disabled + label {
 
 /* Нотификации */
 #notifBlock {
+    justify-content: flex-end;
+    display: flex;
+    flex-direction: column;
     position: fixed;
     z-index: 10;
     top: 0;
