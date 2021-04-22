@@ -2025,7 +2025,6 @@ async function createNotif(message, type, delay, element) {
     }
 
     function removeNotif(elem) {
-        return
         if (!elem) return
         elem.classList.remove('show')
         elem.classList.add('hide')
