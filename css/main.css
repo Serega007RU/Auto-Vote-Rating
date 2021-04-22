@@ -940,9 +940,10 @@ input.checkbox:disabled + label {
 
 /* Нотификации */
 #notifBlock {
-    justify-content: flex-end;
+	flex-direction: column;
     display: flex;
-    flex-direction: column;
+    flex-flow: wrap-reverse;
+    align-content: flex-end;
     position: fixed;
     z-index: 10;
     top: 0;
@@ -956,10 +957,9 @@ input.checkbox:disabled + label {
 	transform-origin: right top;
     cursor: pointer;
     pointer-events: auto;
-    right: -330px;
+    right: 0;
     transition: .5s;
-    margin: 10px;
-    margin-bottom: 0;
+    margin: 10px 0 0 10px;
     display: flex;
     width: calc(100% - 36px);
     padding: 8px;
@@ -990,12 +990,12 @@ input.checkbox:disabled + label {
 }
 
 #notifBlock > .notif.show {
-    transform: translateX(-330px);
+    transform: translateX(0);
     animation: notif-show .5s linear;
 }
 
 #notifBlock > .notif.hide {
-    transform: translateX(0);
+    transform: translateX(100%);
     animation: notif-hide .5s linear;
 }
 
@@ -1087,22 +1087,22 @@ input.checkbox:disabled + label {
 @keyframes notif-show {   
     0% {
         opacity: 0;
-        transform: scale(0) translateX(0px);
+        transform: scale(0) translateX(100%);
     }
     100% {
         opacity: 1;
-        transform: scale(1) translateX(-330px);
+        transform: scale(1) translateX(0);
     }
 }
 
 @keyframes notif-hide {   
     0% {
         opacity: 1;
-        transform: scale(1) translateX(-330px);
+        transform: scale(1) translateX(0);
     }
     100% {
         opacity: 0;
-        transform: scale(0) translateX(0px);
+        transform: scale(0) translateX(100%);
     }
 }
 
