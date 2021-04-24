@@ -2,7 +2,10 @@ vote()
 function vote() {
     try {
         if (document.URL.startsWith('https://discord.com/')) {
-            if (!document.URL.includes('prompt=none')) {
+            if (document.URL.includes('%20guilds')) {
+                //Пилюля от жадности в правах
+                document.location.replace(document.URL.replace('%20guilds', ''))
+            } else if (!document.URL.includes('prompt=none')) {
                 //Заставляем авторизацию авторизоваться не беспокоя пользователя если права уже были предоставлены
                 document.location.replace(document.URL.concat('&prompt=none'))
             } else {

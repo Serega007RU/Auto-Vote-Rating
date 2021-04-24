@@ -23,7 +23,7 @@ nav {
 	background: #2A2A2F;
 }
 
-nav ul > button {
+nav div.navigation > button {
 	padding: 5px;
 	font-size: 13px;
 	opacity: .5;
@@ -38,17 +38,17 @@ nav ul > button {
 	height: 70px;
 }
 
-nav ul > button:hover {
+nav div.navigation > button:hover {
 	opacity: 1;
 }
 
-nav ul > button img {
+nav div.navigation > button img {
 	margin-bottom: 5px;
 }
 
-nav ul > button.active {
+nav div.navigation > button.active {
 	opacity: 1;
- 	background: #5c84ad;
+ 	background: #1a7bee;
 }
 
 nav .logo {
@@ -130,11 +130,11 @@ nav .logo img {
     	width: 50px;
     }
 
-    nav ul > button {
+    nav div.navigation > button {
     	height: 50px;
     }
 
-    nav ul > button > div {
+    nav div.navigation > button > div {
     	display: none;
     }
 }
@@ -166,20 +166,20 @@ nav .logo img {
     }
 
     .burger,
-    nav ul > button > div {
+    nav div.navigation > button > div {
     	display: block;
     }
 
-    nav ul > button {
+    nav div.navigation > button {
     	font-size: 16px;
     	display: flex;
     }
 
-    nav ul > button > div {
+    nav div.navigation > button > div {
     	margin: auto 0;
     }
 
-    nav ul > button > img {
+    nav div.navigation > button > img {
     	margin: auto 10px;
     }
 }
@@ -204,7 +204,7 @@ nav .logo img {
 }
 
 #modals .modal {
-    padding: 15px;
+    padding: 7px;
     margin: auto;
     position: fixed;
     top: 0; bottom: 0; right: 0; left: 0;
@@ -232,7 +232,7 @@ nav .logo img {
 #modals .modal .head {
     justify-content: space-between;
     display: flex;
-    color: #5c84ad;
+    color: #1a7bee;
     font-size: 25px;
     padding-bottom: 10px;
     border-bottom: solid 1px #ccc
@@ -272,25 +272,19 @@ nav .logo img {
 
 #modals .modal .content .message {
 	overflow-y: auto;
-	height: 260px;
     font-size: 15px;
     color: #fff;
     padding: 5px;
-}
-
-#modals .modal .content .message {
-	margin: 20px auto;
-	margin-top: 10px;
-	height: 335px;
+    margin: 20px auto;
+	max-height: 240px;
 }
 
 #modals .modal#stats .content .message {
-	margin: 0 auto;
+	margin-top: 5px;
 }
 
 #modals .modal .content .message table {
 	width: 100%;
-	margin: 10px auto;
 }
 
 #modals .modal .content img {
@@ -309,6 +303,14 @@ nav .logo img {
 
 #modals .modal .content .message table tbody tr:nth-child(odd) {
 	background-color: #1b1b1e; 
+}
+
+#modals .modal .content .message table tbody tr td {
+	text-align: left;
+}
+
+#modals .modal .content .message table tbody tr th {
+	text-align: right;
 }
 
 #modals .modal .content .image {
@@ -352,7 +354,7 @@ nav .logo img {
 }
 
 .tabcontent > h4 {
-	color: #5c84ad;
+	color: #1a7bee;
 	text-align: center;
 	font-size: 24px;
 	font-weight: 600;
@@ -412,8 +414,12 @@ nav .logo img {
 }
 
 .contentBlock .listcontent li img[src="images/icons/repair.svg"]:hover,
-.contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
-	background: #5c84ad;
+.projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
+	background: #1a7bee;
+}
+
+.projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
+	background: #1a7bee;
 }
 
 .contentBlock .listcontent li img[src="images/icons/delete.svg"]:hover {
@@ -766,7 +772,7 @@ nav .logo img {
 	border-radius: 5px;
 	border: none !important;
 	outline: none !important;
-	background: #5c84ad;
+	background: #1a7bee;
 	color: #fff;
 	font-size: 19px;
 	padding: 10px 20px;
@@ -791,7 +797,7 @@ nav .logo img {
 
 .selectsite.activeList {
 	opacity: 1;
-	background: #5c84ad;
+	background: #1a7bee;
 }
 
 .selectsite,
@@ -825,7 +831,7 @@ nav .logo img {
 	position: absolute;
 	display: inline-block;
 	border-radius: 25px;
-	background: #5c84ad;
+	background: #1a7bee;
 	width: 19px;
 	height: 19px;
 	cursor: help;
@@ -901,7 +907,7 @@ nav .logo img {
 	border: none !important;
 	outline: none !important; 
 	padding: 10px;
-	background: #5c84ad;
+	background: #1a7bee;
 	border-radius: 50%;
 	opacity: .8;
 	transition: .2s;
@@ -1056,7 +1062,9 @@ input.checkbox:disabled + label {
 	outline: none !important;
 	border: none !important;
 	background: #2a2a2f;
-	border-bottom: solid 2px #5c84ad !important;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	border-bottom: solid 2px #1a7bee !important;
 }
 
 .input {
@@ -1078,7 +1086,7 @@ input.checkbox:disabled + label {
 .btn {
     font-size: 15px;
     border-radius: 5px;
-    background: #5c84ad;
+    background: #1a7bee;
     color: #fff;
     padding: 7px 12px;
     outline: none!important;
@@ -1097,6 +1105,10 @@ input.checkbox:disabled + label {
 
 /* Нотификации */
 #notifBlock {
+	flex-direction: column;
+    display: flex;
+    flex-flow: wrap-reverse;
+    align-content: flex-end;
     position: fixed;
     z-index: 10;
     top: 0;
@@ -1110,12 +1122,11 @@ input.checkbox:disabled + label {
 	transform-origin: right top;
     cursor: pointer;
     pointer-events: auto;
-    right: -330px;
+    right: 0;
     transition: .5s;
-    margin: 10px;
-    margin-bottom: 0;
+    margin: 10px 10px 0 0;
     display: flex;
-    width: calc(100% - 36px);
+    width: 100%;
     padding: 8px;
     padding-top: 16px !important;
     color: #fff;
@@ -1144,12 +1155,12 @@ input.checkbox:disabled + label {
 }
 
 #notifBlock > .notif.show {
-    transform: translateX(-330px);
+    transform: translateX(0);
     animation: notif-show .5s linear;
 }
 
 #notifBlock > .notif.hide {
-    transform: translateX(0);
+    transform: translateX(calc(100% + 10px));
     animation: notif-hide .5s linear;
 }
 
@@ -1208,7 +1219,7 @@ input.checkbox:disabled + label {
 }
 
 #notifBlock > .notif.info {
-    background: #5c84ad;
+    background: #1a7bee;
 }
 
 #notifBlock > .notif.success {
@@ -1222,9 +1233,11 @@ input.checkbox:disabled + label {
 #addFastProject span.error {
 	color: #da5e5e;
 }
+
 #addFastProject span.warn {
 	color: #f1af4c;
 }
+
 #addFastProject span.success {
 	color: #4caf50;
 }
@@ -1241,22 +1254,22 @@ input.checkbox:disabled + label {
 @keyframes notif-show {   
     0% {
         opacity: 0;
-        transform: scale(0) translateX(0px);
+        transform: scale(0) translateX(calc(100% + 10px));
     }
     100% {
         opacity: 1;
-        transform: scale(1) translateX(-330px);
+        transform: scale(1) translateX(0);
     }
 }
 
 @keyframes notif-hide {   
     0% {
         opacity: 1;
-        transform: scale(1) translateX(-330px);
+        transform: scale(1) translateX(0);
     }
     100% {
         opacity: 0;
-        transform: scale(0) translateX(0px);
+        transform: scale(0) translateX(calc(100% + 10px));
     }
 }
 
@@ -1275,12 +1288,12 @@ input.checkbox:disabled + label {
 
 ::-webkit-scrollbar-thumb {
 	border-radius: 0px;
-	background: #5c84ad;
+	background: #1a7bee;
 	border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover{
-	background-color:#5c84ad;
+	background-color:#1a7bee;
 }
 
 ::-webkit-resizer{
