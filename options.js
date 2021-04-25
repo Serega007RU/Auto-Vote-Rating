@@ -3357,21 +3357,6 @@ document.querySelectorAll('[placeholder]').forEach(function(el) {
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
 
-//Звук монеток когда наводишь курсор на ссылку поддержки))
-let play = true
-let sound1 = new Audio('audio/coins1.mp3')
-sound1.volume = 0.07
-let sound2 = new Audio('audio/coins2.mp3')
-sound2.volume = 0.07
-document.getElementById('donate').addEventListener('mouseover', function(event) {
-    play = !play
-    if (play) {
-        sound1.play()
-    } else {
-        sound2.play()
-    }
-})
-
 //Модалки
 document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
     closeBtn.addEventListener('click', ()=> {
