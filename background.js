@@ -1892,6 +1892,16 @@ async function stopVote() {
     break2 = true
 }
 
+chrome.proxy.onProxyError.addListener(function(details) {
+    console.log('onProxyError', JSON.stringify(details))
+})
+
+chrome.webRequest.onErrorOccurred.addListener(function(details) {
+    if (details.initiator && details.initiator == 'chrome-extension://' + chrome.runtime.id) {
+        console.log('onErrorOccurred', JSON.stringify(details))
+    }
+}, {urls: ['<all_urls>']}, ['extraHeaders'])
+
 //Если требуется авторизация для Прокси
 let errorProxy = {ip: '', count: 0}
 chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn) {
