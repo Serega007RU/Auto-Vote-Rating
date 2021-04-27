@@ -1627,7 +1627,7 @@ async function endVote(request, sender, project) {
             currentProxy = null
             currentVK = null
         }
-    }, (settings.useMultiVote || settings.cooldown < 10000) && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) ? 0 : 10000)
+    }, settings.useMultiVote && settings.cooldown < 10000 && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) ? 0 : 10000)
 }
 
 //Отправитель уведомлений
