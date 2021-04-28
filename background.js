@@ -343,9 +343,9 @@ async function newWindow(project) {
             //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк
             if (!found) {
 //              settings.stopVote = Date.now() + 86400000
-                lastErrorNotFound = chrome.i18n.getMessage('notFoundVKTitle')
-                console.warn(chrome.i18n.getMessage('notFoundVK', getProjectName(project)))
-                if (!settings.disabledNotifWarn) sendNotification(lastErrorNotFound, chrome.i18n.getMessage('notFoundVK', getProjectName(project)))
+                lastErrorNotFound = chrome.i18n.getMessage('notFoundVK')
+                console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
+                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
                 for (const value of queueProjects) {
@@ -353,7 +353,7 @@ async function newWindow(project) {
                         queueProjects.delete(value)
                     }
                 }
-                break2 = true
+//              break2 = true
                 return
             }
         }
@@ -461,9 +461,9 @@ async function newWindow(project) {
             //Если не удалось найти хотя бы одно свободное не заюзанное прокси
             if (!found) {
 //              settings.stopVote = Date.now() + 86400000
-                lastErrorNotFound = chrome.i18n.getMessage('notFoundProxyTitle')
-                console.warn(chrome.i18n.getMessage('notFoundProxy', getProjectName(project)))
-                if (!settings.disabledNotifWarn) sendNotification(lastErrorNotFound, chrome.i18n.getMessage('notFoundProxy', getProjectName(project)))
+                lastErrorNotFound = chrome.i18n.getMessage('notFoundProxy')
+                console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
+                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
                 for (const value of queueProjects) {
@@ -471,7 +471,7 @@ async function newWindow(project) {
                         queueProjects.delete(value)
                     }
                 }
-                break2 = true
+//              break2 = true
                 return
             }
         }

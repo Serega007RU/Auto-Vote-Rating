@@ -572,27 +572,11 @@
   "type": {
     "message": "Выберите тип"
   },
-  "notFoundVKTitle": {
+  "notFoundVK": {
     "message": "Нет свободного аккаунта ВКонтакте"
   },
-  "notFoundVK": {
-    "message": "Для $top$ нет свободного аккаунта ВКонтакте",
-    "placeholders": {
-      "top": {
-        "content": "$1"
-      }
-    }
-  },
-  "notFoundProxyTitle": {
-    "message": "Нет свободного прокси"
-  },
   "notFoundProxy": {
-    "message": "Для $top$ нет свободного прокси",
-    "placeholders": {
-      "top": {
-        "content": "$1"
-      }
-    }
+    "message": "Нет свободного прокси"
   },
   "importProxy": {
     "message": "Импорт"

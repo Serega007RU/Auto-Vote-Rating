@@ -612,27 +612,11 @@
   "type": {
     "message": "Choose type"
   },
-  "notFoundVKTitle": {
+  "notFoundVK": {
     "message": "No free VK account available"
   },
-  "notFoundVK": {
-    "message": "There is no free VKontakte account for $top$",
-    "placeholders": {
-      "top": {
-        "content": "$1"
-      }
-    }
-  },
-  "notFoundProxyTitle": {
-    "message": "No free proxy available"
-  },
   "notFoundProxy": {
-    "message": "There is no free proxy for $top$ ",
-    "placeholders": {
-      "top": {
-        "content": "$1"
-      }
-    }
+    "message": "No free proxy available"
   },
   "importProxy": {
     "message": "Import"
