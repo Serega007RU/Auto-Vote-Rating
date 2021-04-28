@@ -2038,7 +2038,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
 
 function getTopFromList(list, project) {
     if (typeof list[getProjectName(project)] === 'string') {
-        return {id: project.id, nextFreeVote: Number.POSITIVE_INFINITY}
+        return [{id: project.id, nextFreeVote: Number.POSITIVE_INFINITY}]
     }
     if (!list[getProjectName(project)]) list[getProjectName(project)] = []
     return list[getProjectName(project)]
