@@ -781,7 +781,7 @@ async function silentVote(project) {
                 const error = response.doc.querySelector('div[class="error"]').textContent
                 if (error.includes("уже голосовали")) {
                     endVote({later: true}, null, project)
-                } else if (error.includes('Ваш ВК ID заблокирован для голосовани')) {
+                } else if (error.includes('Ваш ВК ID заблокирован для голосовани') || error.includes('Ваш аккаунт заблокирован')) {
                     endVote({errorAuthVK: error}, null, project)
                 } else {
                     endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
@@ -1627,7 +1627,7 @@ async function endVote(request, sender, project) {
             currentProxy = null
             currentVK = null
         }
-    }, (settings.useMultiVote || settings.cooldown < 10000) && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) ? 0 : 10000)
+    }, settings.useMultiVote && settings.cooldown < 10000 && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) ? 0 : 10000)
 }
 
 //Отправитель уведомлений
