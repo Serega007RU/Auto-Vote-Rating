@@ -781,8 +781,8 @@ async function silentVote(project) {
                 const error = response.doc.querySelector('div[class="error"]').textContent
                 if (error.includes("уже голосовали")) {
                     endVote({later: true}, null, project)
-                } else if (error.includes('Ваш ВК ID заблокирован для голосовани') || error.includes('Ваш аккаунт заблокирован')) {
-                    endVote({errorAuthVK: error}, null, project)
+//              } else if (error.includes('Ваш ВК ID заблокирован для голосовани') || error.includes('Ваш аккаунт заблокирован')) {
+//                  endVote({errorAuthVK: error}, null, project)
                 } else {
                     endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
                 }
@@ -1576,6 +1576,22 @@ async function endVote(request, sender, project) {
             if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
                 await setValue('AVMRVKs', VKs)
+            } else if (project.MCRate && message.includes('Ваш аккаунт заблокирован для голосования за этот проект')) {
+                let usedProject = {
+                    id: project.id,
+                    nextFreeVote: 999999999999999,
+                    error: message
+                }
+                const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id == usedProject.id})
+                if (index > -1) {
+                    getTopFromList(currentVK, project).splice(index, 1)
+                }
+                getTopFromList(currentVK, project).push(usedProject)
+                VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK
+                await setValue('AVMRVKs', VKs)
+            } else if (project.MCRate && message.includes('Ваш ВК ID заблокирован для голосовани')) {
+                currentVK.MCRate = message
+                await setValue('AVMRVKs', VKs)
             } else if (currentProxy != null) {
                 currentProxy.notWorking = true
                 await setValue('AVMRproxies', proxies)
@@ -2021,6 +2037,9 @@ chrome.runtime.onInstalled.addListener(async function(details) {
 })
 
 function getTopFromList(list, project) {
+    if (typeof list[getProjectName(project)] === 'string') {
+        return {id: project.id, nextFreeVote: Number.POSITIVE_INFINITY}
+    }
     if (!list[getProjectName(project)]) list[getProjectName(project)] = []
     return list[getProjectName(project)]
 }
