@@ -2001,7 +2001,7 @@ async function addProject(project, element) {
         }
 
         if (response.status == 404) {
-            createNotif(chrome.i18n.getMessage('notFoundProjectCode', response.status), 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notFoundProjectCode', String(response.status)), 'error', null, element)
             return
         } else if (response.redirected) {
             if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.CraftList || project.MinecraftBuzz) {
@@ -2012,7 +2012,7 @@ async function addProject(project, element) {
             return
         } else if (response.status == 503) {//None
         } else if (!response.ok) {
-            createNotif(chrome.i18n.getMessage('notConnect', [getProjectName(project), response.status]), 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notConnect', [getProjectName(project), String(response.status)]), 'error', null, element)
             return
         }
 
@@ -2159,7 +2159,7 @@ async function addProject(project, element) {
                 })
                 return
             } else if (response2.status != 0) {
-                createNotif(chrome.i18n.getMessage('notConnect', [extractHostname(response.url), response2.status]), 'error', null, element)
+                createNotif(chrome.i18n.getMessage('notConnect', [extractHostname(response.url), String(response2.status)]), 'error', null, element)
                 return
             }
             createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), null, null, element)
@@ -2245,7 +2245,7 @@ function addProjectsBonus(project, element) {
 //      document.getElementById('secondBonusMythicalWorld').addEventListener('click', async()=>{
 //          let response = await fetch('https://mythicalworld.su/bonus')
 //          if (!response.ok) {
-//              createNotif(chrome.i18n.getMessage('notConnect', [response.url, response.status]), 'error', null, element)
+//              createNotif(chrome.i18n.getMessage('notConnect', [response.url, String(response.status)]), 'error', null, element)
 //              return
 //          } else if (response.redirected) {
 //              createNotif(chrome.i18n.getMessage('redirectedSecondBonus', response.url), 'error', null, element)
@@ -3356,21 +3356,6 @@ document.querySelectorAll('[placeholder]').forEach(function(el) {
 })
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
-
-//Звук монеток когда наводишь курсор на ссылку поддержки))
-let play = true
-let sound1 = new Audio('audio/coins1.mp3')
-sound1.volume = 0.07
-let sound2 = new Audio('audio/coins2.mp3')
-sound2.volume = 0.07
-document.getElementById('donate').addEventListener('mouseover', function(event) {
-    play = !play
-    if (play) {
-        sound1.play()
-    } else {
-        sound2.play()
-    }
-})
 
 //Модалки
 document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {

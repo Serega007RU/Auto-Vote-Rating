@@ -702,7 +702,7 @@ async function silentVote(project) {
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
                 } else {
-                    endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
+                    endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
                 }
                 return
             }
@@ -729,7 +729,7 @@ async function silentVote(project) {
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
                 } else {
-                    endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
+                    endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
                 }
                 return
             }
@@ -857,7 +857,7 @@ async function silentVote(project) {
                 if (!await checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
                 if (response.status == 503) {
                     if (i >= 3) {
-                        endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + response.status)}, null, project)
+                        endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + String(response.status))}, null, project)
                         return
                     }
                     await wait(5000)
@@ -1169,7 +1169,7 @@ async function silentVote(project) {
                     return
                 }
             } else {
-                endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
+                endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
                 return
             }
         } else
@@ -1181,7 +1181,7 @@ async function silentVote(project) {
                 endVote({successfully: true}, null, project)
                 return
             } else {
-                endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
+                endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
                 return
             }
         }
@@ -1234,7 +1234,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         }
     }
     if (!response.ok) {
-        endVote({message: chrome.i18n.getMessage('errorVote', response.status)}, null, project)
+        endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
         return false
     }
     return true
@@ -1690,7 +1690,7 @@ async function checkTime() {
                     sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2)
             }
         } else {
-            console.error(chrome.i18n.getMessage('errorClock2', response.status.toString()))
+            console.error(chrome.i18n.getMessage('errorClock2', String(response.status)))
         }
     } catch (e) {
         console.error(chrome.i18n.getMessage('errorClock', e))
@@ -1891,6 +1891,16 @@ async function stopVote() {
     break1 = true
     break2 = true
 }
+
+chrome.proxy.onProxyError.addListener(function(details) {
+    console.log('onProxyError', JSON.stringify(details))
+})
+
+chrome.webRequest.onErrorOccurred.addListener(function(details) {
+    if (details.initiator && details.initiator == 'chrome-extension://' + chrome.runtime.id) {
+        console.log('onErrorOccurred', JSON.stringify(details))
+    }
+}, {urls: ['<all_urls>']}, ['extraHeaders'])
 
 //Если требуется авторизация для Прокси
 let errorProxy = {ip: '', count: 0}
