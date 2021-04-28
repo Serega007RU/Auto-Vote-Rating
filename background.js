@@ -228,68 +228,8 @@ async function checkOpen(project) {
                 }
             }
         }
-    }
 
-    let retryCoolDown
-    if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList) {
-        retryCoolDown = 300000
-    } else {
-        retryCoolDown = 900000
-    }
-    project.nextAttempt = Date.now() + retryCoolDown
-    queueProjects.add(project)
-    
-    //Если эта вкладка была уже открыта, он закрывает её
-    for (let[key,value] of openedProjects.entries()) {
-        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
-            openedProjects.delete(key)
-            if (closeTabs) {
-                chrome.tabs.remove(key, function() {
-                    if (chrome.runtime.lastError) {
-                        console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
-                            sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                    }
-                })
-            }
-        }
-    }
-
-    if (project.error) {
-        delete project.error
-    }
-
-    console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
-    if (!settings.disabledNotifStart)
-        sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
-
-    if (project.MonitoringMinecraft) {
-        let url
-        if (project.MonitoringMinecraft) {
-            url = '.monitoringminecraft.ru'
-        }
-        let cookies = await new Promise(resolve=>{
-            chrome.cookies.getAll({domain: url}, function(cookies) {
-                resolve(cookies)
-            })
-        })
-        if (debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
-        for (let i = 0; i < cookies.length; i++) {
-            if (cookies[i].domain.charAt(0) == '.') {
-                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
-            } else {
-                await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
-            }
-        }
-    }
-
-    await newWindow(project)
-}
-
-//Открывает вкладку для голосования или начинает выполнять fetch закросы
-async function newWindow(project) {
-    //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
-    if (settings.useMultiVote) {
+        //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
         if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && currentVK == null) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
@@ -344,8 +284,8 @@ async function newWindow(project) {
             if (!found) {
 //              settings.stopVote = Date.now() + 86400000
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundVK')
-                console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
-                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
+//              console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
+//              if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
                 for (const value of queueProjects) {
@@ -462,8 +402,8 @@ async function newWindow(project) {
             if (!found) {
 //              settings.stopVote = Date.now() + 86400000
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundProxy')
-                console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
-                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
+//              console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
+//              if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
                 for (const value of queueProjects) {
@@ -520,8 +460,7 @@ async function newWindow(project) {
                 resolve(cookies)
             })
         })
-        if (debug)
-            console.log('Удаляю куки ' + url)
+        if (debug) console.log('Удаляю куки ' + url)
         for (let i = 0; i < cookies.length; i++) {
             if (cookies[i].domain.charAt(0) == '.') {
                 await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
@@ -529,10 +468,66 @@ async function newWindow(project) {
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
             }
         }
-
-//         await wait(5000)
-
     }
+
+    let retryCoolDown
+    if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList) {
+        retryCoolDown = 300000
+    } else {
+        retryCoolDown = 900000
+    }
+    project.nextAttempt = Date.now() + retryCoolDown
+    queueProjects.add(project)
+    
+    //Если эта вкладка была уже открыта, он закрывает её
+    for (let[key,value] of openedProjects.entries()) {
+        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+            openedProjects.delete(key)
+            if (closeTabs) {
+                chrome.tabs.remove(key, function() {
+                    if (chrome.runtime.lastError) {
+                        console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                        if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
+                            sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                    }
+                })
+            }
+        }
+    }
+
+    if (project.error) {
+        delete project.error
+    }
+
+    console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
+    if (!settings.disabledNotifStart)
+        sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
+
+    if (project.MonitoringMinecraft && !settings.useMultiVote) {
+        let url
+        if (project.MonitoringMinecraft) {
+            url = '.monitoringminecraft.ru'
+        }
+        let cookies = await new Promise(resolve=>{
+            chrome.cookies.getAll({domain: url}, function(cookies) {
+                resolve(cookies)
+            })
+        })
+        if (debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
+        for (let i = 0; i < cookies.length; i++) {
+            if (cookies[i].domain.charAt(0) == '.') {
+                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+            } else {
+                await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
+            }
+        }
+    }
+
+    await newWindow(project)
+}
+
+//Открывает вкладку для голосования или начинает выполнять fetch закросы
+async function newWindow(project) {
 
     if (project.stats.lastAttemptVote && (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear())) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
