@@ -664,7 +664,7 @@ async function silentVote(project) {
                 'mode': 'cors',
                 'credentials': 'include'
             })
-            if (!await checkResponseError(project, response2, 'serverpact.com')) return
+            if (!await checkResponseError(project, response, 'serverpact.com')) return
             if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
                 endVote({successfully: true}, null, project)
                 return
