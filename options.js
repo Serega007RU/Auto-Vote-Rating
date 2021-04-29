@@ -2534,8 +2534,9 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
                         if (continueFor) {
                             continue
                         }
+                        if (!varProxy.scheme) varProxy.scheme = 'https'
                         if (await addProxy(varProxy, true, true)) {
-                            proxies.push(proxy)
+                            proxies.push(varProxy)
                         }
                     }
                     
@@ -2549,7 +2550,7 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
             }
         })(file)
         reader.readAsText(file)
-        document.getElementById('file-upload').value = ''
+        document.getElementById('importProxy').value = ''
     } catch (e) {
         console.error(e)
         createNotif(e, 'error')
