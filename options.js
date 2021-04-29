@@ -1364,9 +1364,12 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
             })
             const vpns = await response.json()
             for (vpn of vpns.ztun[country]) {
+                let host = vpn.replace('HTTP ', '').split(':')
+                let port = 22223
+                if (host[1] != '22222') port = Number(host[1])
                 const proxy = {
-                    ip: vpn.replace('HTTP ', '').replace(':22222', ''),
-                    port: 22223,
+                    ip:host[0],
+                    port: port,
                     scheme: 'https',
                     HolaVPN: true
                 }
