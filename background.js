@@ -434,14 +434,16 @@ async function checkOpen(project) {
             url = '.fairtop.in'
         } else if (project.IonMc) {
             url = '.ionmc.top'
+        } else if (project.MinecraftServersOrg) {
+            url = '.minecraftservers.org'
         } else if (project.ServeurPrive) {
             url = '.serveur-prive.net'
         } else if (project.PlanetMinecraft) {
             url = '.planetminecraft.com'
         } else if (project.TopG) {
             url = '.topg.org'
-        } else if (project.MinecraftMp) {
-            url = '.minecraft-mp.com'
+        } else if (project.ListForge) {
+            url = '.' + project.game
         } else if (project.MinecraftServerList) {
             url = '.minecraft-server-list.com'
         } else if (project.ServerPact) {
@@ -452,20 +454,63 @@ async function checkOpen(project) {
             url = '.topminecraftservers.org'
         } else if (project.MinecraftServersBiz) {
             url = '.minecraftservers.biz'
-        } else if (project.MinecraftServersOrg) {
-            url = '.minecraftservers.org'
-        }
-        let cookies = await new Promise(resolve=>{
-            chrome.cookies.getAll({domain: url}, function(cookies) {
-                resolve(cookies)
-            })
-        })
-        if (debug) console.log('Удаляю куки ' + url)
-        for (let i = 0; i < cookies.length; i++) {
-            if (cookies[i].domain.charAt(0) == '.') {
-                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+        } else if (project.HotMC) {
+            url = '.hotmc.ru'
+        } else if (project.MinecraftServerNet) {
+            url = '.minecraft-server.net'
+        } else if (project.TopGames) {
+            if (project.lang == 'fr') {
+                url = '.top-serveurs.net'
             } else {
-                await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
+                url = '.top-games.net'
+            }
+            url = '.minecraftservers.biz'
+        } else if (project.TMonitoring) {
+            url = '.tmonitoring.com'
+        } else if (project.TopGG) {
+            url = '.top.gg'
+        } else if (project.DiscordBotList) {
+            url = '.discordbotlist.com'
+        } else if (project.BotsForDiscord) {
+            url = '.botsfordiscord.com'
+        } else if (project.MMoTopRU) {
+            url = '.mmotop.ru'
+        } else if (project.MCServers) {
+            url = '.mc-servers.com'
+        } else if (project.MinecraftList) {
+            url = '.minecraftlist.org'
+        } else if (project.MinecraftIndex) {
+            url = '.minecraft-index.com'
+        } else if (project.ServerList101) {
+            url = '.serverlist101.com'
+        } else if (project.MCServerList) {
+            url = '.mcserver-list.eu'
+        } else if (project.CraftList) {
+            url = '.craftlist.org'
+        } else if (project.CzechCraft) {
+            url = '.czech-craft.eu'
+        } else if (project.PixelmonServers) {
+            url = '.pixelmonservers.com'
+        } else if (project.QTop) {
+            url = '.q-top.ru'
+        } else if (project.MinecraftBuzz) {
+            url = '.minecraft.buzz'
+        }/* else if (project.Custom) {
+            url = '.custom.com'
+        }*/
+        if (url != null && url != '') {
+            let cookies = await new Promise(resolve=>{
+                chrome.cookies.getAll({domain: url}, function(cookies) {
+                    resolve(cookies)
+                })
+            })
+            if (debug) console.log('Удаляю куки ' + url)
+            for (let i = 0; i < cookies.length; i++) {
+                if (cookies[i].domain.charAt(0) == '.') {
+                    await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+                } else {
+                    await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
+                }
             }
         }
     }
