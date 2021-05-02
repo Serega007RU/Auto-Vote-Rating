@@ -3467,23 +3467,34 @@ async function createNotif(message, type, delay, element) {
 
     document.getElementById('notifBlock').append(notif)
 
-    if (type != 'hint') setTimeout(()=> removeNotif(notif), delay)
+    let timer
+    if (type != 'hint') timer = new Timer(()=> removeNotif(notif), delay)
+
+    if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
+        setTimeout(()=> removeNotif(notif.previousElementSibling), 3000)
+    }
 
     notif.addEventListener('click', (e)=> {
         if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
-            if (e.detail == 3) {
-                removeNotif(notif)
-            }
+            if (e.detail == 3) removeNotif(notif)
         } else {
             removeNotif(notif)
         }
     })
 
-    if (notif.previousElementSibling != null && notif.previousElementSibling.className.includes('hint')) {
-        setTimeout(()=> {
-            removeNotif(notif.previousElementSibling)
-        }, 3000)
-    }
+    notif.addEventListener('mouseover', ()=> {
+        if (!notif.classList.contains('hint')) {
+            timer.pause()
+            notif.querySelector('.progress div').style.animationPlayState = 'paused'
+        }
+    })
+
+    notif.addEventListener('mouseout', ()=> {
+        if (!notif.classList.contains('hint')) {
+            timer.resume()
+            notif.querySelector('.progress div').style.animationPlayState = 'running'
+        }
+    })
 }
 
 function removeNotif(elem) {
@@ -3492,4 +3503,21 @@ function removeNotif(elem) {
     elem.classList.add('hide')
     setTimeout(()=> elem.classList.add('hidden'), 500)
     setTimeout(()=> elem.remove(), 1000)
+}
+
+let Timer = function(callback, delay) {
+    let timerId, start, remaining = delay;
+
+    this.pause = function() {
+        window.clearTimeout(timerId);
+        remaining -= Date.now() - start;
+    };
+
+    this.resume = function() {
+        start = Date.now();
+        window.clearTimeout(timerId);
+        timerId = window.setTimeout(callback, remaining);
+    };
+
+    this.resume();
 }
