@@ -1994,6 +1994,10 @@ async function createNotif(message, type, delay, element) {
     let timer
     if (type != 'hint') timer = new Timer(()=> removeNotif(notif), delay)
 
+    if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
+        setTimeout(()=> removeNotif(notif.previousElementSibling), 3000)
+    }
+
     notif.addEventListener('click', (e)=> {
         if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
             if (e.detail == 3) removeNotif(notif)
