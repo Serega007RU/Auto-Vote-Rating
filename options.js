@@ -1991,7 +1991,8 @@ async function createNotif(message, type, delay, element) {
 
     document.getElementById('notifBlock').append(notif)
 
-    if (type != 'hint') setTimeout(()=> removeNotif(notif), delay)
+    let timer
+    if (type != 'hint') timer = new Timer(()=> removeNotif(notif), delay)
 
     notif.addEventListener('click', (e)=> {
         if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
@@ -2003,19 +2004,17 @@ async function createNotif(message, type, delay, element) {
 
     notif.addEventListener('mouseover', ()=> {
         if (!notif.classList.contains('hint')) {
+            timer.pause()
             notif.querySelector('.progress div').style.animationPlayState = 'paused'
         }
     })
 
     notif.addEventListener('mouseout', ()=> {
         if (!notif.classList.contains('hint')) {
+            timer.resume()
             notif.querySelector('.progress div').style.animationPlayState = 'running'
         }
     })
-
-    if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
-        setTimeout(()=> removeNotif(notif.previousElementSibling), 3000)
-    }
 
     function removeNotif(elem) {
         if (!elem) return
@@ -2024,4 +2023,21 @@ async function createNotif(message, type, delay, element) {
         setTimeout(()=> elem.classList.add('hidden'), 500)
         setTimeout(()=> elem.remove(), 1000)
     }
+}
+
+let Timer = function(callback, delay) {
+    let timerId, start, remaining = delay;
+
+    this.pause = function() {
+        window.clearTimeout(timerId);
+        remaining -= Date.now() - start;
+    };
+
+    this.resume = function() {
+        start = Date.now();
+        window.clearTimeout(timerId);
+        timerId = window.setTimeout(callback, remaining);
+    };
+
+    this.resume();
 }
