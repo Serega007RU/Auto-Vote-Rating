@@ -19,36 +19,22 @@ function vote() {
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
-//      if (document.querySelector("#nav-collapse > ul.navbar-nav.ml-auto > li > a").firstElementChild.textContent.includes('Log in')) {
-//          chrome.runtime.sendMessage({discordLogIn: true})
-//          return
-//      }
 
         if (document.querySelector('div.main-content') != null && document.querySelector('div.main-content').textContent == 'Logging you in...') {
             return
         }
 
-        const timer2 = setInterval(()=>{
-            try {
-                if (document.querySelector('button.btn.btn-blurple').disabled == false) {
-                    document.querySelector('button.btn.btn-blurple').click()
-                    clearInterval(timer2)
-                }
-            } catch (e) {
-                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
-                clearInterval(timer2)
-            }
-        }, 1000)
+        document.querySelector('button.btn.btn-blurple').click()
         
         const timer3 = setInterval(()=>{
             try {
-                if (document.querySelector('div[role="status"][aria-live="polite"]').textContent == 'User has already voted.') {
+                if (document.querySelector('div[role="status"][aria-live="polite"]') != null && document.querySelector('div[role="status"][aria-live="polite"]').textContent == 'User has already voted.') {
                     chrome.runtime.sendMessage({later: true})
                     clearInterval(timer3)
-                } else if (document.querySelector('div[class="col-12 col-md-6 text-center"] > h1').textContent == 'Thank you for voting!') {
+                } else if (document.querySelector('div[class="col-12 col-md-6 text-center"] > h1') != null && document.querySelector('div[class="col-12 col-md-6 text-center"] > h1').textContent == 'Thank you for voting!') {
                     chrome.runtime.sendMessage({successfully: true})
                     clearInterval(timer3)
-                } else if (document.querySelector('div[role="status"][aria-live="polite"]').textContent != '') {
+                } else if (document.querySelector('div[role="status"][aria-live="polite"]') != null && document.querySelector('div[role="status"][aria-live="polite"]').textContent != '') {
                     chrome.runtime.sendMessage({message: document.querySelector('div[role="status"][aria-live="polite"]').textContent})
                     clearInterval(timer3)
                 } else {
