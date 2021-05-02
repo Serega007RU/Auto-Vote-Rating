@@ -1995,18 +1995,26 @@ async function createNotif(message, type, delay, element) {
 
     notif.addEventListener('click', (e)=> {
         if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
-            if (e.detail == 3) {
-                removeNotif(notif)
-            }
+            if (e.detail == 3) removeNotif(notif)
         } else {
             removeNotif(notif)
         }
     })
 
-    if (notif.previousElementSibling != null && notif.previousElementSibling.className.includes('hint')) {
-        setTimeout(()=> {
-            removeNotif(notif.previousElementSibling)
-        }, 3000)
+    notif.addEventListener('mouseover', ()=> {
+        if (!notif.classList.contains('hint')) {
+            notif.querySelector('.progress div').style.animationPlayState = 'paused'
+        }
+    })
+
+    notif.addEventListener('mouseout', ()=> {
+        if (!notif.classList.contains('hint')) {
+            notif.querySelector('.progress div').style.animationPlayState = 'running'
+        }
+    })
+
+    if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
+        setTimeout(()=> removeNotif(notif.previousElementSibling), 3000)
     }
 
     function removeNotif(elem) {

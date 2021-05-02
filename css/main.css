@@ -217,7 +217,7 @@ nav .logo img {
 }
 
 #modals .modal#addFastProject {
-	height: 450px;
+	height: 365px;
 }
 
 #modals .modal#stats {
@@ -239,6 +239,8 @@ nav .logo img {
 }
 
 #modals .modal .close {
+	height: 25px;
+	margin: auto 0;
     position: relative;
     width: 25px;
     opacity: .6;
@@ -388,6 +390,7 @@ nav .logo img {
 
 .projectsBlock .contentBlock .listcontent li .controlItems {
 	display: flex;
+	margin: auto 0;
 	justify-content: space-between;
 }
 
@@ -521,6 +524,7 @@ nav .logo img {
 
     .projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
     	margin-right: 0;
+    	margin-bottom: 5px;
     }
 
     .aboutProject .cont {
@@ -963,7 +967,8 @@ input.checkbox:disabled + label {
     pointer-events: auto;
     right: 0;
     transition: .5s;
-    margin: 10px 10px 0 0;
+    transition: .3s box-shadow;
+    margin: 10px 10px 0 10px;
     display: flex;
     width: 100%;
     padding: 8px;
@@ -974,12 +979,10 @@ input.checkbox:disabled + label {
     position: relative;
 }
 
-@media(max-width: 450px) {
-    #notifBlock > .notif {
-    	padding: 6px;
-        margin: 10px 5px;
-        width: calc(100% - 22px);
-    }
+#notifBlock > .notif:hover {
+	-webkit-box-shadow: 0px 0px 7px 2px rgba(255, 255, 255, 0.5);
+	-moz-box-shadow: 0px 0px 7px 2px rgba(255, 255, 255, 0.5);
+	box-shadow: 0px 0px 7px 2px rgba(255, 255, 255, 0.5);
 }
 
 @media(max-width: 330px) {
