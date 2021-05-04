@@ -44,6 +44,8 @@ var generalStats = {}
 
 //Текущие открытые вкладки расширением
 var openedProjects = new Map()
+//Текущие fetch запросы
+let fetchProjects = new Map()
 //Текущие проекты за которые сейчас голосует расширение
 var queueProjects = new Set()
 
@@ -724,17 +726,17 @@ async function newWindow(project) {
 async function silentVote(project) {
     try {
         if (project.TopCraft) {
-            let response = await fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/')
+            let response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
             if (!await checkResponseError(project, response, 'topcraft.ru', null, true)) return
             let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
-            response = await fetch('https://topcraft.ru/projects/vote/', {
+            response = await _fetch('https://topcraft.ru/projects/vote/', {
                 credentials: 'include',
                 'headers': {
                     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
                 },
                 'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
                 'method': 'POST'
-            })
+            }, project)
             if (!await checkResponseError(project, response, 'topcraft.ru', [400], true)) return
             if (response.status == 400) {
                 if (response.html == 'vk_error' || response.html == 'nick_error') {
@@ -751,17 +753,17 @@ async function silentVote(project) {
         } else
 
         if (project.McTOP) {
-            let response = await fetch('https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/')
+            let response = await _fetch('https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
             if (!await checkResponseError(project, response, 'mctop.su', null, true)) return
             let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
-            response = await fetch('https://mctop.su/projects/vote/', {
+            response = await _fetch('https://mctop.su/projects/vote/', {
                 credentials: 'include',
                 'headers': {
                     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
                 },
                 'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
                 'method': 'POST'
-            })
+            }, project)
             if (!await checkResponseError(project, response, 'mctop.su', [400], true)) return
             if (response.status == 400) {
                 if (response.html == 'vk_error' || response.html == 'nick_error') {
@@ -778,11 +780,11 @@ async function silentVote(project) {
         } else
 
         if (project.MCRate) {
-            let response = await fetch('https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code')
+            let response = await _fetch('https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code', null, project)
             if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
             let code = response.url.substring(response.url.length - 18)
             if (response.doc.querySelector('input[name=login_player]') != null) {
-                response = await fetch('http://mcrate.su/save/rate', {
+                response = await _fetch('http://mcrate.su/save/rate', {
                     'headers': {
                         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                         'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
@@ -794,7 +796,7 @@ async function silentVote(project) {
                     'referrerPolicy': 'no-referrer-when-downgrade',
                     'body': 'login_player=' + project.nick + '&token_vk_secure=' + response.doc.getElementsByName('token_vk_secure').item(0).value + '&uid_vk_secure=' + response.doc.getElementsByName('uid_vk_secure').item(0).value + '&id_project=' + project.id + '&code_vk_secure=' + response.doc.getElementsByName('code_vk_secure').item(0).value + '&mcrate_hash=' + response.doc.getElementsByName('mcrate_hash').item(0).value,
                     'method': 'POST'
-                })
+                }, project)
                 if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
             }
             if (response.doc.querySelector('div[class=report]') != null) {
@@ -834,7 +836,7 @@ async function silentVote(project) {
         } else
 
         if (project.MinecraftRating) {
-            let response = await fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45')
+            let response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
             if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
                 if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
@@ -887,13 +889,13 @@ async function silentVote(project) {
             let i = 0
             while (i <= 3) {
                 i++
-                let response = await fetch('https://monitoringminecraft.ru/top/' + project.id + '/vote', {
+                let response = await _fetch('https://monitoringminecraft.ru/top/' + project.id + '/vote', {
                     'headers': {
                         'content-type': 'application/x-www-form-urlencoded'
                     },
                     'body': 'player=' + project.nick + '',
                     'method': 'POST'
-                })
+                }, project)
                 if (!await checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
                 if (response.status == 503) {
                     if (i >= 3) {
@@ -958,7 +960,7 @@ async function silentVote(project) {
         } else
 
         if (project.ServerPact) {
-            let response = await fetch('https://www.serverpact.com/vote-' + project.id, {
+            let response = await _fetch('https://www.serverpact.com/vote-' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -975,7 +977,7 @@ async function silentVote(project) {
                 'method': 'GET',
                 'mode': 'cors',
                 'credentials': 'include'
-            })
+            }, project)
             if (!await checkResponseError(project, response, 'serverpact.com')) return
             function generatePass(nb) {
                 let chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@'
@@ -987,7 +989,7 @@ async function silentVote(project) {
                 return pass
             }
             let captchaPass = generatePass(32)
-            let captcha = await fetch('https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php', {
+            let captcha = await _fetch('https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php', {
                 'headers': {
                     'accept': 'application/json, text/javascript, */*; q=0.01',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -1004,14 +1006,14 @@ async function silentVote(project) {
                 'method': 'POST',
                 'mode': 'cors',
                 'credentials': 'include'
-            })
+            }, project)
             let json = captcha.json()
             if (json.error) {
                 endVote({message: 'Error in captcha'}, null, project)
                 return
             }
 
-            response = await fetch('https://www.serverpact.com/vote-' + project.id, {
+            response = await _fetch('https://www.serverpact.com/vote-' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,en-US;q=0.8',
@@ -1029,7 +1031,7 @@ async function silentVote(project) {
                 'method': 'POST',
                 'mode': 'cors',
                 'credentials': 'include'
-            })
+            }, project)
             if (!await checkResponseError(project, response, 'serverpact.com')) return
             if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
                 endVote({successfully: true}, null, project)
@@ -1047,7 +1049,7 @@ async function silentVote(project) {
         } else
 
         if (project.MinecraftIpList) {
-            let response = await fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
+            let response = await _fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -1064,7 +1066,7 @@ async function silentVote(project) {
                 'method': 'GET',
                 'mode': 'cors',
                 'credentials': 'include'
-            })
+            }, project)
             if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
 
             if (response.doc.querySelector('#InnerWrapper > script:nth-child(10)') != null && response.doc.querySelector('table[class="CraftingTarget"]') == null) {
@@ -1073,7 +1075,7 @@ async function silentVote(project) {
                     endVote('Error time zone', null, project)
                     return
                 }
-                await fetch('https://minecraftiplist.com/timezone.php?timezone=Europe/Moscow', {
+                await _fetch('https://minecraftiplist.com/timezone.php?timezone=Europe/Moscow', {
                     'headers': {
                         'accept': '*/*',
                         'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -1089,7 +1091,7 @@ async function silentVote(project) {
                     'method': 'GET',
                     'mode': 'cors',
                     'credentials': 'include'
-                })
+                }, project)
                 secondVoteMinecraftIpList = true
                 silentVote(project)
                 return
@@ -1139,7 +1141,7 @@ async function silentVote(project) {
                 code2 += content[i] << ((i - 6) * 5)
             }
 
-            response = await fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
+            response = await _fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -1157,7 +1159,7 @@ async function silentVote(project) {
                 'method': 'POST',
                 'mode': 'cors',
                 'credentials': 'include'
-            })
+            }, project)
             if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
 
             if (response.doc.querySelector('#Content > div.Error') != null) {
@@ -1193,7 +1195,7 @@ async function silentVote(project) {
         } else
 
         if (project.MCServerList) {
-            let response = await fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'})
+            let response = await _fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'}, project)
             let json = await response.json()
             if (response.ok) {
                 if (json[0].success == "false") {
@@ -1215,7 +1217,7 @@ async function silentVote(project) {
         } else
 
         if (project.Custom) {
-            let response = await fetch(project.responseURL, project.id)
+            let response = await _fetch(project.responseURL, project.id, project)
             await response.text()
             if (response.ok) {
                 endVote({successfully: true}, null, project)
@@ -1227,10 +1229,10 @@ async function silentVote(project) {
         }
     } catch (e) {
         if (e == 'TypeError: Failed to fetch') {
-            endVote({notConnectInternet: true}, null, project)
+//          endVote({notConnectInternet: true}, null, project)
         } else {
             console.error(e)
-            endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + e}, null, project)
+            endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + e.stack}, null, project)
         }
     }
 }
@@ -1309,23 +1311,55 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
     }
 })
 
-//Слушатель ошибок net::ERR для вкладок
-chrome.webNavigation.onErrorOccurred.addListener(function(details) {
-    if (details.processId != -1 || details.parentFrameId != -1)
-        return
-    let project = openedProjects.get(details.tabId)
-    if (project == null)
-        return
-    console.warn(getProjectPrefix(project, true) + details.error)
-    if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED'))
-        return
-    let sender = {
-        tab: {
-            id: details.tabId
+chrome.webRequest.onErrorOccurred.addListener(function(details) {
+    if (details.initiator == 'chrome-extension://' + chrome.runtime.id) {
+        if (fetchProjects.has(details.requestId)) {
+            endVote({errorVoteNetwork: [details.error, details.url]}, null, fetchProjects.get(details.requestId))
+        }
+    } else if (details.type == 'main_frame') {
+        if (openedProjects.has(details.tabId)) {
+            let project = openedProjects.get(details.tabId)
+            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED')) {
+                console.warn(getProjectPrefix(project, true) + details.error)
+                return
+            }
+            let sender = {
+                tab: {
+                    id: details.tabId
+                }
+            }
+            endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
         }
     }
-    endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + details.error}, sender, project)
-})
+}, {urls: ['<all_urls>']})
+
+async function _fetch(url, options, project) {
+    let listener
+    const removeListener = ()=>{
+        if (listener) {
+            chrome.webRequest.onBeforeRequest.removeListener(listener)
+            listener = null
+        }
+    }
+
+    listener = (details)=>{
+        //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net:ERR из fetch запроса?
+        if (details.initiator == 'chrome-extension://' + chrome.runtime.id && details.url.includes(url)) {
+            fetchProjects.set(details.requestId, project)
+            removeListener()
+        }
+    }
+    chrome.webRequest.onBeforeRequest.addListener(listener, {urls: ['<all_urls>']})
+
+    try {
+        const response = await fetch(url, options)
+        return response
+    } catch(e) {
+        throw e
+    } finally {
+        removeListener()
+    }
+}
 
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
@@ -1364,6 +1398,12 @@ async function endVote(request, sender, project) {
             }
         }
     } else if (!project) return
+
+    for (let[key,value] of fetchProjects.entries()) {
+        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+            fetchProjects.delete(key)
+        }
+    }
 
     delete project.nextAttempt
 
@@ -1947,16 +1987,6 @@ async function stopVote() {
     break1 = true
     break2 = true
 }
-
-chrome.proxy.onProxyError.addListener(function(details) {
-    console.log('onProxyError', JSON.stringify(details))
-})
-
-chrome.webRequest.onErrorOccurred.addListener(function(details) {
-    if (details.initiator && details.initiator == 'chrome-extension://' + chrome.runtime.id) {
-        console.log('onErrorOccurred', JSON.stringify(details))
-    }
-}, {urls: ['<all_urls>']}, ['extraHeaders'])
 
 //Если требуется авторизация для Прокси
 let errorProxy = {ip: '', count: 0}

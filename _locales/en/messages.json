@@ -482,6 +482,17 @@
   "errorVoteUnknown": {
     "message": "Error when voting! Here's what we know: "
   },
+  "errorVoteNetwork": {
+    "message": "Error when voting! Error code: $code$ URL: $url$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      },
+      "url": {
+        "content": "$2"
+      }
+    }
+  },
   "errorNextVote": {
     "message": "Next voting attempt will be made in $minutes$ minutes",
     "placeholders": {

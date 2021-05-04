@@ -442,6 +442,17 @@
   "errorVoteUnknown": {
     "message": "Ошибка при голосовании! Вот что известно: "
   },
+  "errorVoteNetwork": {
+    "message": "Ошибка при голосовании! Код ошибки: $code$ URL: $url$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      },
+      "url": {
+        "content": "$2"
+      }
+    }
+  },
   "errorNextVote": {
     "message": "Следующая попытка голосования будет сделана через $minutes$ минут",
     "placeholders": {
