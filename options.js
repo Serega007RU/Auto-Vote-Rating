@@ -478,7 +478,6 @@ async function addVKList(VK, visually) {
     contBlock.append(delBtn)
 
     if (VK.notWorking) {
-        mesBlock.append(document.createElement('br'))
         if (VK.notWorking == true) {
             mesBlock.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
         } else {
@@ -547,7 +546,6 @@ async function addBorealisList(acc, visually) {
     contBlock.append(delBtn)
 
     if (acc.notWorking) {
-        mesBlock.append(document.createElement('br'))
         if (acc.notWorking == true) {
             mesBlock.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
         } else {
@@ -611,7 +609,6 @@ async function addProxyList(proxy, visually) {
     control.append(del)
     
     if (proxy.notWorking) {
-        mes.append(document.createElement('br'))
         mes.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
     }
     html.append(mes)
