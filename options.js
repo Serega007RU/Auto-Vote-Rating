@@ -421,7 +421,7 @@ function updateProjectList(projects) {
         }
         forLoopAllProjects(async function(proj) {
             await addProjectList(proj, true)
-        }, true)
+        })
     }
     if (document.querySelector('.buttonBlock').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
@@ -567,7 +567,7 @@ async function addProject(project, element) {
             returnAdd = true
             return
         }
-    }, false)
+    })
     if (returnAdd) {
         addProjectsBonus(project, element)
         returnAdd = false
@@ -1116,13 +1116,11 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
     }
 })
 
-async function forLoopAllProjects(fuc, reverse) {
+async function forLoopAllProjects(fuc) {
     for (const item of allProjects) {
-        if (reverse) window['projects' + item].reverse()
         for (let proj of window['projects' + item]) {
             await fuc(proj)
         }
-        if (reverse) window['projects' + item].reverse()
     }
 }
 
@@ -1232,7 +1230,7 @@ async function checkUpdateConflicts(save) {
             proj.stats = {}
             //Да, это весьма не оптимизированно
             if (save) await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj))
-        }, false)
+        })
     }
     if (generalStats == null) {
         updated = true
@@ -1305,7 +1303,6 @@ function getUrlProjects() {
         }
         projects.push(project)
     }
-    //projects.reverse()
     return projects
 }
 
