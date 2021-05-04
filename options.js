@@ -1744,52 +1744,58 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
             doc = new DOMParser().parseFromString(html, 'text/html')
             let number = doc.querySelector('.lk-desc2.border-rad.block-desc-padding').textContent.match(/\d+/g).map(Number)
             let coin = number[1]
-            coins = coins + coin
             let vote = number[2]
-            votes = votes + vote
-            if (coin > 0) {
-                response = await fetch('https://borealis.su/index.php?do=lk', {
-                  'headers': {
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-		        	'content-type': 'application/x-www-form-urlencoded',
-                    'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
-                  },
-                  'body': 'username=' + nick + '&amount=' + coin + '&transferBorealics=1',
-                  'method': 'POST'
-                })
-                //Почему не UTF-8?
-		        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
-                html = await response.text()
-		        if (html.length < 250) {
-		        	createNotif(acc.nick + ' ' + html, 'error')
-		        	continue
-		        }
-                doc = new DOMParser().parseFromString(html, 'text/html')
-                createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + coin + ' бореалисиков')
-            } else {
-                createNotif('На ' + acc.nick + ' 0 бореалисиков', 'warn')
+            
+            if (document.getElementById('#BorealisWhatToSend').value == 'Бореалисики и голоса' || document.getElementById('#BorealisWhatToSend').value == 'Только бореалисики') {
+                coins = coins + coin
+                if (coin > 0) {
+                    response = await fetch('https://borealis.su/index.php?do=lk', {
+                      'headers': {
+                        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+		            	'content-type': 'application/x-www-form-urlencoded',
+                        'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                      },
+                      'body': 'username=' + nick + '&amount=' + coin + '&transferBorealics=1',
+                      'method': 'POST'
+                    })
+                    //Почему не UTF-8?
+		            response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+                    html = await response.text()
+		            if (html.length < 250) {
+		            	createNotif(acc.nick + ' ' + html, 'error')
+		            	continue
+		            }
+                    doc = new DOMParser().parseFromString(html, 'text/html')
+                    createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + coin + ' бореалисиков')
+                } else {
+                    createNotif('На ' + acc.nick + ' 0 бореалисиков', 'warn')
+                }
             }
-            if (vote > 0) {
-                response = await fetch('https://borealis.su/index.php?do=lk', {
-                  'headers': {
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-		        	'content-type': 'application/x-www-form-urlencoded',
-                    'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
-                  },
-                  'body': 'username=' + nick + '&amount=' + vote + '&transferBorealics=1&isVote=1',
-                  'method': 'POST'
-                })
-                //Почему не UTF-8?
-		        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
-                html = await response.text()
-		        if (html.length < 250) {
-		        	createNotif(acc.nick + ' ' + html, 'error')
-		        	continue
-		        }
-                doc = new DOMParser().parseFromString(html, 'text/html')
-                createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + vote + ' голосов')
-            } else {
-                createNotif('На ' + acc.nick + ' 0 голосов', 'warn')
+            
+            if (document.getElementById('#BorealisWhatToSend').value == 'Бореалисики и голоса' || document.getElementById('#BorealisWhatToSend').value == 'Только голоса') {
+                votes = votes + vote
+                if (vote > 0) {
+                    response = await fetch('https://borealis.su/index.php?do=lk', {
+                      'headers': {
+                        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+		            	'content-type': 'application/x-www-form-urlencoded',
+                        'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                      },
+                      'body': 'username=' + nick + '&amount=' + vote + '&transferBorealics=1&isVote=1',
+                      'method': 'POST'
+                    })
+                    //Почему не UTF-8?
+		            response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+                    html = await response.text()
+		            if (html.length < 250) {
+		            	createNotif(acc.nick + ' ' + html, 'error')
+		            	continue
+		            }
+                    doc = new DOMParser().parseFromString(html, 'text/html')
+                    createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + vote + ' голосов')
+                } else {
+                    createNotif('На ' + acc.nick + ' 0 голосов', 'warn')
+                }
             }
 		} catch(e) {
 			createNotif(acc.nick + ' ' + e, 'error')
@@ -3355,7 +3361,6 @@ document.querySelectorAll('[placeholder]').forEach(function(el) {
     const text = chrome.i18n.getMessage(el.placeholder)
     if (text != '') el.placeholder = el.placeholder = text
 })
-document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
 
 //Модалки
