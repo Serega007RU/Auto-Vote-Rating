@@ -1239,12 +1239,19 @@ async function silentVote(project) {
 
 async function checkResponseError(project, response, url, bypassCodes, vk) {
     let host = extractHostname(response.url)
-    if (vk && host.includes('vk.com')) {
-        //Почему не UTF-8?
-        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
-    }
+    let clone = response.clone()
     response.html = await response.text()
     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+    if (vk && host.includes('vk.com')) {
+        if (response.doc.querySelector('meta[http-equiv="content-type"]')?.content?.includes('windows-1251')) {
+            //Почему не UTF-8?
+            response = await new Response(new TextDecoder('windows-1251').decode(await clone.arrayBuffer()))
+            response.html = await response.text()
+            response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+        } else {
+            console.warn('Что-то не так с кодирвкой ' + doc.querySelector('meta[http-equiv="content-type"]')?.outerHTML)
+        }
+    }
     if (vk && host.includes('vk.com')) {
         //Узнаём причину почему мы зависли на авторизации ВК
         let text

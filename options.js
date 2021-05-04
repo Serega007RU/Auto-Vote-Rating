@@ -858,10 +858,17 @@ async function addVK(repair) {
             createNotif(chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status, 'error')
             return
         }
-        //Почему не UTF-8?
-        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+        let clone = response.clone()
         let html = await response.text()
         let doc = new DOMParser().parseFromString(html, 'text/html')
+        if (doc.querySelector('meta[http-equiv="content-type"]')?.content?.includes('windows-1251')) {
+            //Почему не UTF-8?
+            response = await new Response(new TextDecoder('windows-1251').decode(await clone.arrayBuffer()))
+            html = await response.text()
+            doc = new DOMParser().parseFromString(html, 'text/html')
+        } else {
+            createNotif('Что-то не так с кодирвкой ' + doc.querySelector('meta[http-equiv="content-type"]')?.outerHTML, 'warn')
+        }
         if (doc.querySelector('#index_login_button') != null) {
             createNotif(chrome.i18n.getMessage('notAuthAcc', 'VK'), 'error')
             return
