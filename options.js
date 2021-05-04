@@ -1918,6 +1918,8 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
 
 //notifications
 async function createNotif(message, type, delay, element) {
+    if (!type) type = 'hint'
+    console.log('['+type+']'+' '+message)
     if (element != null) {
         element.textContent = ''
         if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
@@ -1931,7 +1933,6 @@ async function createNotif(message, type, delay, element) {
         }
         return
     }
-    if (!type) type = 'hint'
     let notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
     if (!delay) {
