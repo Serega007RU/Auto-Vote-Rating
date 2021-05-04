@@ -2000,7 +2000,7 @@ async function createNotif(message, type, delay, element) {
 
     notif.addEventListener('click', (e)=> {
         if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
-            if (e.detail == 3) removeNotif(notif)
+            if (e.detail == 2) removeNotif(notif)
         } else {
             removeNotif(notif)
         }
