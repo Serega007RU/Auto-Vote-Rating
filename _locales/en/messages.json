@@ -1101,5 +1101,16 @@
   },
   "useProxyOnUnProxyTop": {
     "message": "Use a proxy on ratings where no proxy is used (TopCraft, McTOP и MinecraftRating)"
+  },
+  "reAddSuccess": {
+    "message": "Successfully re-added"
+  },
+  "confirmDeleteAcc": {
+    "message": "All cookies and $acc$ tabs will be deleted, do you agree?",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   }
 }

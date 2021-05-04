@@ -514,10 +514,7 @@ async function addVKList(VK, visually) {
                 storeId: cookie.storeId
             })
         }
-        await removeVKList(VK)
-        deleteVKCookies = false
-        await addVK()
-        deleteVKCookies = true
+        await addVK(true)
         blockButtons = false
     })
     if (visually) {
@@ -586,10 +583,7 @@ async function addBorealisList(acc, visually) {
                 storeId: cookie.storeId
             })
         }
-        await removeBorealisList(acc)
-        deleteVKCookies = false
-        await addBorealis()
-        deleteVKCookies = true
+        await addBorealis(true)
         blockButtons = false
     })
     if (visually) {
@@ -810,21 +804,21 @@ document.getElementById('AddVK').addEventListener('click', async () => {
     blockButtons = false
 })
 
-async function addVK() {
-    if (!deleteVKCookies || confirm('Все куки и вкладки ВКонтакте будут удалены, вы согласны?')) {
-        //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
-        createNotif(chrome.i18n.getMessage('deletingAllAcc', 'VK'))
-
-        await new Promise(resolve => {
-            chrome.tabs.query({url: '*://*.vk.com/*'}, function(tabs) {
-                for (tab of tabs) {
-                    chrome.tabs.remove(tab.id)
-                }
-                resolve()
+async function addVK(repair) {
+    if (repair || !deleteVKCookies || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'VKontakte'))) {
+        if (deleteVKCookies && !repair) {
+            //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
+            createNotif(chrome.i18n.getMessage('deletingAllAcc', 'VK'))
+            
+            await new Promise(resolve => {
+                chrome.tabs.query({url: '*://*.vk.com/*'}, function(tabs) {
+                    for (tab of tabs) {
+                        chrome.tabs.remove(tab.id)
+                    }
+                    resolve()
+                })
             })
-        })
-        
-        if (deleteVKCookies) {
+
             let cookies = await new Promise(resolve => {
                 chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
                     resolve(cookies)
@@ -833,9 +827,10 @@ async function addVK() {
             for(let i=0; i<cookies.length;i++) {
                 await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
             }
+            
+            createNotif(chrome.i18n.getMessage('deletedAllAcc', 'VK'))
         }
 
-        createNotif(chrome.i18n.getMessage('deletedAllAcc', 'VK'))
         createNotif(chrome.i18n.getMessage('openPopupAcc', 'VK'))
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
@@ -885,11 +880,13 @@ async function addVK() {
             return
         }
 
-        for (let vkontakte of VKs) {
-            if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
-                createNotif(chrome.i18n.getMessage('added'), 'success')
-                await checkAuthVK()
-                return
+        if (!repair) {
+            for (let vkontakte of VKs) {
+                if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
+                    createNotif(chrome.i18n.getMessage('added'), 'success')
+                    await checkAuthVK()
+                    return
+                }
             }
         }
         
@@ -908,10 +905,20 @@ async function addVK() {
             }
             i++
         }
-
-        await addVKList(VK, false)
         
-        createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
+        if (repair) {
+            for (_vk in VKs) {
+                if (VK.id == VKs[_vk].id) {
+                    VKs[_vk] = VK
+                    break
+                }
+            }
+            await setValue('AVMRVKs', VKs)
+            createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
+        } else {
+            await addVKList(VK, false)
+            createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
+        }
 
         await checkAuthVK()
     }
@@ -930,32 +937,35 @@ document.getElementById('AddBorealis').addEventListener('click', async () => {
     blockButtons = false
 })
 
-async function addBorealis() {
-    if (!deleteVKCookies || confirm('Все куки и вкладки Borealis будут удалены, вы согласны?')) {
-        //Удаление всех куки и вкладок Borealis перед добавлением нового аккаунта Borealis
-        createNotif(chrome.i18n.getMessage('deletingAllAcc', 'Borealis'))
-
-        await new Promise(resolve => {
-            chrome.tabs.query({url: '*://*.borealis.su/*'}, function(tabs) {
-                for (tab of tabs) {
-                    chrome.tabs.remove(tab.id)
-                }
-                resolve()
-            })
-        })
-        
-        if (deleteVKCookies) {
-            let cookies = await new Promise(resolve => {
-                chrome.cookies.getAll({domain: '.borealis.su'}, function(cookies) {
-                    resolve(cookies)
+async function addBorealis(repair) {
+    if (repair || !deleteVKCookies || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
+        if (deleteVKCookies && !repair) {
+            //Удаление всех куки и вкладок Borealis перед добавлением нового аккаунта Borealis
+            createNotif(chrome.i18n.getMessage('deletingAllAcc', 'Borealis'))
+            
+            await new Promise(resolve => {
+                chrome.tabs.query({url: '*://*.borealis.su/*'}, function(tabs) {
+                    for (tab of tabs) {
+                        chrome.tabs.remove(tab.id)
+                    }
+                    resolve()
                 })
             })
-            for(let i=0; i<cookies.length;i++) {
-                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
-            }
-        }
 
-        createNotif(chrome.i18n.getMessage('deletedAllAcc', 'Borealis'))
+            if (deleteVKCookies) {
+                let cookies = await new Promise(resolve => {
+                    chrome.cookies.getAll({domain: '.borealis.su'}, function(cookies) {
+                        resolve(cookies)
+                    })
+                })
+                for(let i=0; i<cookies.length;i++) {
+                    await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+                }
+            }
+            
+            createNotif(chrome.i18n.getMessage('deletedAllAcc', 'Borealis'))
+        }
+        
         createNotif(chrome.i18n.getMessage('openPopupAcc', 'Borealis'))
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
@@ -965,7 +975,7 @@ async function addBorealis() {
             })
         })
 
-        //После закрытия окна авторизации попытка добавить аккаунт ВКонтакте
+        //После закрытия окна авторизации попытка добавить аккаунт Borealis
         createNotif(chrome.i18n.getMessage('adding'))
         let response
         try {
@@ -998,11 +1008,13 @@ async function addBorealis() {
             createNotif(e, 'error')
             return
         }
-
-        for (let bAcc of borealisAccounts) {
-            if (acc.nick == bAcc.nick) {
-                createNotif(chrome.i18n.getMessage('added'), 'success')
-                return
+        
+        if (!repair) {
+            for (let bAcc of borealisAccounts) {
+                if (acc.nick == bAcc.nick) {
+                    createNotif(chrome.i18n.getMessage('added'), 'success')
+                    return
+                }
             }
         }
         
@@ -1022,9 +1034,19 @@ async function addBorealis() {
             i++
         }
 
-        await addBorealisList(acc, false)
-        
-        createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + acc.nick, 'success')
+        if (repair) {
+            for (_acc in borealisAccounts) {
+                if (acc.nick == borealisAccounts[_acc].nick) {
+                    borealisAccounts[_acc] = acc
+                    break
+                }
+            }
+            await setValue('borealisAccounts', borealisAccounts)
+            createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + acc.nick, 'success')
+        } else {
+            await addBorealisList(acc, false)
+            createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + acc.nick, 'success')
+        }
     }
 }
 

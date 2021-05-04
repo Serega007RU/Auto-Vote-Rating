@@ -1059,5 +1059,16 @@
   },
   "useProxyOnUnProxyTop": {
     "message": "Использовать прокси на рейтингах где не используется прокси (TopCraft, McTOP и MinecraftRating)"
+  },
+  "reAddSuccess": {
+    "message": "Успешно передобавлен"
+  },
+  "confirmDeleteAcc": {
+    "message": "Все куки и вкладки $acc$ будут удалены, вы согласны?",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
   }
 }
