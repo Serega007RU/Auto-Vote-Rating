@@ -1048,7 +1048,7 @@ async function getValue(name, area) {
     if (!area) {
         area = storageArea
     }
-    return new Promise(resolve=>{
+    return new Promise((resolve, reject)=>{
         chrome.storage[area].get(name, data=>{
             if (chrome.runtime.lastError) {
                 createNotif(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), 'error')
@@ -1064,7 +1064,7 @@ async function setValue(key, value, area) {
     if (!area) {
         area = storageArea
     }
-    return new Promise(resolve=>{
+    return new Promise((resolve, reject)=>{
         chrome.storage[area].set({[key]: value}, data=>{
             if (chrome.runtime.lastError) {
                 createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), 'error')
@@ -1080,7 +1080,7 @@ async function removeValue(name, area) {
     if (!area) {
         area = storageArea
     }
-    return new Promise(resolve=>{
+    return new Promise((resolve, reject)=>{
         chrome.storage[area].remove(name, data=>{
             if (chrome.runtime.lastError) {
                 createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), 'error')
