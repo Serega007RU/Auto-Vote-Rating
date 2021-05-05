@@ -1804,7 +1804,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                 }
             }
             
-            if (document.getElementById('BorealisWhatToSend').value == 'бореалики и голоса' || document.getElementById('BorealisWhatToSend').value == 'Только голоса') {
+            if (document.getElementById('BorealisWhatToSend').value == 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value == 'Только голоса') {
                 votes = votes + vote
                 if (vote > 0) {
                     response = await fetch('https://borealis.su/index.php?do=lk', {
