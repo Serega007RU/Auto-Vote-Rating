@@ -1726,7 +1726,7 @@ async function endVote(request, sender, project) {
                 await setValue('AVMRVKs', VKs)
             } else if (currentProxy != null && request && request.errorVoteNetwork) {
                 if (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT')) {
-                    currentProxy.notWorking = true
+                    currentProxy.notWorking = request.errorVoteNetwork[0]
                     await setValue('AVMRproxies', proxies)
                     await stopVote()
                 }
@@ -2137,10 +2137,10 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             })
             return
         } else {
-            currentProxy.notWorking = true
-            console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('message'))
+            currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword')
+            console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword'))
             if (!settings.disabledNotifError) {
-                sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('message'))
+                sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyNoPassword'))
             }
         }
     }

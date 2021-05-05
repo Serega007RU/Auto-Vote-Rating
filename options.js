@@ -611,7 +611,11 @@ async function addProxyList(proxy, visually) {
     control.append(del)
     
     if (proxy.notWorking) {
-        mes.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
+        if (proxy.notWorking == true) {
+            mes.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
+        } else {
+            mes.append(createMessage(proxy.notWorking, 'error'))
+        }
     }
     html.append(mes)
     html.append(control)
