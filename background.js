@@ -1457,7 +1457,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
                 for (let value of queueProjects) {
                     if (getProjectName(project) == getProjectName(value) && JSON.stringify(project.id) == JSON.stringify(value) && project.nick == value.nick) {
                         queueProjects.delete(value)
-                        queueProjects.add(value)
+                        queueProjects.add(project)
                     }
                 }
             }
