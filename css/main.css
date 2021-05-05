@@ -1,6 +1,6 @@
 @font-face {
-    font-family: TestFont;
-    src: url(../fonts/test.ttf);
+    font-family: Roboto;
+    src: url(../fonts/Roboto.ttf);
 }
 
 body {
@@ -9,7 +9,7 @@ body {
 }
  
 body * {
-	font-family: TestFont;
+	font-family: Roboto;
 }
 
 /* Навигация */
