@@ -311,7 +311,7 @@ async function addProjectList(project, visually) {
     //Слушатель кнопки Удалить на проект
     img2.addEventListener('click', async function() {
         if (blockButtons) {
-            createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+            createNotif(chrome.i18n.getMessage('notFast'), 'warn')
             return
         } else {
             blockButtons = true
@@ -517,7 +517,7 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
 document.getElementById('timeout').addEventListener('submit', async ()=>{
     event.preventDefault()
     if (blockButtons) {
-        createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
         blockButtons = true
@@ -755,7 +755,7 @@ async function addProject(project, element) {
                 }
             } else if (project.IonMc) {
                 if (doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div') != null) {
-                    createNotif(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, true, element, 'error')
+                    createNotif(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, 'error', null, element)
                     return
                 }
 //          } else if (project.TopGG) {
@@ -975,7 +975,7 @@ function addProjectsBonus(project, element) {
 /*  } else */if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async()=>{
             if (blockButtons) {
-                createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
                 return
             } else {
                 blockButtons = true
@@ -1163,7 +1163,7 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', (evt)=>{
     if (blockButtons) {
-        createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     }
     createNotif(chrome.i18n.getMessage('importing'))
@@ -1261,7 +1261,7 @@ async function checkUpdateConflicts(save) {
 let modeVote = document.getElementById('enabledSilentVote')
 modeVote.addEventListener('change', async function() {
     if (blockButtons) {
-        createNotif(createNotif(chrome.i18n.getMessage('notFast'), 'warn'), 'warn')
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
         blockButtons = true
