@@ -1778,7 +1778,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
             let coin = number[1]
             let vote = number[2]
             
-            if (document.getElementById('#BorealisWhatToSend').value == 'Бореалики и голоса' || document.getElementById('#BorealisWhatToSend').value == 'Только бореалики') {
+            if (document.getElementById('BorealisWhatToSend').value == 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value == 'Только бореалики') {
                 coins = coins + coin
                 if (coin > 0) {
                     response = await fetch('https://borealis.su/index.php?do=lk', {
@@ -1804,7 +1804,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                 }
             }
             
-            if (document.getElementById('#BorealisWhatToSend').value == 'бореалики и голоса' || document.getElementById('#BorealisWhatToSend').value == 'Только голоса') {
+            if (document.getElementById('BorealisWhatToSend').value == 'бореалики и голоса' || document.getElementById('BorealisWhatToSend').value == 'Только голоса') {
                 votes = votes + vote
                 if (vote > 0) {
                     response = await fetch('https://borealis.su/index.php?do=lk', {
