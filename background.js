@@ -152,8 +152,7 @@ async function checkOpen(project) {
             } else {
                 queueProjects.delete(value)
                 console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
-                if (!settings.disabledNotifError)
-                    sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
+                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
             }
         }
     }
@@ -183,9 +182,7 @@ async function checkOpen(project) {
         }
     }
 
-    if (project.error) {
-        delete project.error
-    }
+    delete project.error
 
     console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
     if (!settings.disabledNotifStart)
@@ -1003,6 +1000,9 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
         let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage(Object.keys(request)[0])
         console.warn(getProjectPrefix(project, true) + message)
         if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
+        project.error = message
+        delete project.nextAttempt
+        await changeProject(project)
     } else {
         endVote(request, sender, null)
     }
@@ -1023,14 +1023,6 @@ async function endVote(request, sender, project) {
             })
         }
         openedProjects.delete(sender.tab.id)
-        //Обновление проекта из списка в случае его изменения
-        let projects = getProjectList(project)
-        for (const proj of projects) {
-            if (JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick) {
-                project = proj
-                break
-            }
-        }
     } else if (!project) return
 
     for (let[key,value] of fetchProjects.entries()) {
@@ -1184,6 +1176,8 @@ async function endVote(request, sender, project) {
         if (project.randomize) {
             project.time = project.time + Math.floor(Math.random() * 43200000)
         }
+
+        delete project.error
 
         if (request.successfully) {
             sendMessage = chrome.i18n.getMessage('successAutoVote')
@@ -1454,6 +1448,19 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
             return
         } else if (key.startsWith('AVMRprojects')) {
             window['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
+            for (const project of storageChange.newValue) {
+                for (let[key,value] of openedProjects.entries()) {
+                    if (getProjectName(project) == getProjectName(value) && JSON.stringify(project.id) == JSON.stringify(value) && project.nick == value.nick) {
+                        openedProjects.set(key, project)
+                    }
+                }
+                for (let value of queueProjects) {
+                    if (getProjectName(project) == getProjectName(value) && JSON.stringify(project.id) == JSON.stringify(value) && project.nick == value.nick) {
+                        queueProjects.delete(value)
+                        queueProjects.add(value)
+                    }
+                }
+            }
         } else if (key == 'AVMRsettings') {
             settings = storageChange.newValue
         } else if (key == 'generalStats') {
