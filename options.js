@@ -2780,10 +2780,10 @@ async function checkUpdateConflicts(save) {
                 updated = true
             }
             window['projects' + item] = []
-            if (save)
-                await setValue('AVMRprojects' + item, window['projects' + item])
+            if (save) await setValue('AVMRprojects' + item, window['projects' + item])
         }
     }
+    if (save) await setValue('AVMRsettings', settings)
 
     if (updated) {
         console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
