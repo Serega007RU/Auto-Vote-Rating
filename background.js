@@ -863,7 +863,7 @@ async function silentVote(project) {
 //          endVote({notConnectInternet: true}, null, project)
         } else {
             console.error(e)
-            endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + e.stack}, null, project)
+            endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
         }
     }
 }
@@ -945,7 +945,12 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 chrome.webRequest.onErrorOccurred.addListener(function(details) {
     if (details.initiator == 'chrome-extension://' + chrome.runtime.id) {
         if (fetchProjects.has(details.requestId)) {
-            endVote({errorVoteNetwork: [details.error, details.url]}, null, fetchProjects.get(details.requestId))
+            let project = fetchProjects.get(details.tabId)
+            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED')) {
+                console.warn(getProjectPrefix(project, true) + details.error)
+                return
+            }
+            endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
         }
     } else if (details.type == 'main_frame') {
         if (openedProjects.has(details.tabId)) {
