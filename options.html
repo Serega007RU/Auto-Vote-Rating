@@ -1008,23 +1008,24 @@
             		     </ul>
 						<ul class="listcontent" id="BorealisTab" style="display: none;">
 						    Данный функционал реализован по просьбе SkillsMr
-						    <br>
-						    Если захотите голосовать по коду: 
-						    <a class="link" target="_blank" href="https://borealis.su/engine/ajax/newAlias.php">Здесь генерировать коды</a>
 						    <br><br>
+                            <form id="FormAddNicksBorealis">
+                                <input id="countNicksBorealis" type="number" name="number" class="input" placeholder="На сколько аккаунтов?" required>
+                                <button class="submitBtn" id="AddNicksBorealis">Добавить никнеймы по коду голосования</button>
+                            </form>
 						    <form id="sendBorealis">
                                 <div class="label-block">
             		            	<label for="sendBorealisNick">Никнейм
             		            		<span class="tooltip1">
-            		            			<span class="tooltip1text">Отправит со всех добавленных аккаунтов на указанный ник все бореалисики и голоса</span>
+            		            			<span class="tooltip1text">Отправит со всех добавленных аккаунтов на указанный ник все бореалики и голоса</span>
             		            		</span>
             		            	</label>
             		            </div>
                                 <div class="inputEl">
             		            	<input id="sendBorealisNick" type="text" name="text" class="input" placeholder="enterNick" required>
             		            	<select class="select" id="BorealisWhatToSend">
-            		            		<option>Бореалисики и голоса</option>
-            		            		<option>Только бореалисики</option>
+            		            		<option>Бореалики и голоса</option>
+            		            		<option>Только бореалики</option>
             		            		<option>Только голоса</option>
             		            	</select>
             		            	<button type="submit" class="justBtn">Отправить</button>

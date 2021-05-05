@@ -276,6 +276,8 @@ async function restoreOptions() {
     }
     document.getElementById('stopVote').addEventListener('click', stopVoteButton)
 
+    document.getElementById('countNicksBorealis').max = VKs.length
+
     //Считывает настройки расширение и выдаёт их в html
     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
     document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
@@ -379,7 +381,7 @@ async function addProjectList(project, visually) {
     contDiv.classList.add('message')
 
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
+    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '') + (project.borealisNickExpires ? ' (' + chrome.i18n.getMessage('tempNick') + ')' : '')
     contDiv.append(nameProjectMes)
 
     if (project.error) {
@@ -1729,7 +1731,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
         blockButtons = true
     }
     let nick = document.getElementById('sendBorealisNick').value
-    if (!confirm('Вы дейсвительно хотите отправить все бореалисики и голоса на аккаунт ' + nick + '?')) {
+    if (!confirm('Вы дейсвительно хотите отправить все бореалики и голоса на аккаунт ' + nick + '?')) {
         blockButtons = false
         return
     }
@@ -1772,7 +1774,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
             let coin = number[1]
             let vote = number[2]
             
-            if (document.getElementById('#BorealisWhatToSend').value == 'Бореалисики и голоса' || document.getElementById('#BorealisWhatToSend').value == 'Только бореалисики') {
+            if (document.getElementById('#BorealisWhatToSend').value == 'Бореалики и голоса' || document.getElementById('#BorealisWhatToSend').value == 'Только бореалики') {
                 coins = coins + coin
                 if (coin > 0) {
                     response = await fetch('https://borealis.su/index.php?do=lk', {
@@ -1794,11 +1796,11 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                     doc = new DOMParser().parseFromString(html, 'text/html')
                     createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + coin + ' бореалисиков')
                 } else {
-                    createNotif('На ' + acc.nick + ' 0 бореалисиков', 'warn')
+                    createNotif('На ' + acc.nick + ' 0 бореаликов', 'warn')
                 }
             }
             
-            if (document.getElementById('#BorealisWhatToSend').value == 'Бореалисики и голоса' || document.getElementById('#BorealisWhatToSend').value == 'Только голоса') {
+            if (document.getElementById('#BorealisWhatToSend').value == 'бореалики и голоса' || document.getElementById('#BorealisWhatToSend').value == 'Только голоса') {
                 votes = votes + vote
                 if (vote > 0) {
                     response = await fetch('https://borealis.su/index.php?do=lk', {
@@ -1827,8 +1829,58 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
 			createNotif(acc.nick + ' ' + e, 'error')
 		}
     }
-    createNotif('Всё передано, в сумме было передано ' + coins + ' бореалисиков и ' + votes + ' голосов', 'success')
+    createNotif('Всё передано, в сумме было передано ' + coins + ' бореаликов и ' + votes + ' голосов', 'success')
     blockButtons = false
+})
+
+//Слушатель кнопки 'Добавить никнеймы' на Borealis
+document.getElementById('FormAddNicksBorealis').addEventListener('submit', async ()=>{
+    event.preventDefault()
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    if (settings.stopVote < Date.now()) {
+        document.getElementById('stopVote').click()
+    }
+    createNotif(chrome.i18n.getMessage('adding'))
+    let array = [{top: 'TopCraft', id: '7126'}, {top: 'McTOP', id: '2241'}, {top: 'MinecraftRating', id: 'borealis'}]
+    try {
+        for (let i = 0; i < this.countNicksBorealis.valueAsNumber; i++) {
+            let response = await fetch('https://borealis.su/engine/ajax/newAlias.php')
+            if (!response.ok) {
+                throw chrome.i18n.getMessage('notConnect', [response.url, String(response.status)])
+            }
+            let html = await response.text()
+            let find = html.match('Код для голосования: ')
+            if (find == null) {
+                throw html
+            }
+            html = html.substring(find.index + find[0].length, html.length)
+            for (let arr of array) {
+                let project = {
+                    [arr.top]: true,
+                    id: arr.id,
+                    name: 'borealis',
+                    nick: html,
+                    stats: {
+                        added: Date.now()
+                    },
+                    time: null,
+                    borealisNickExpires: Date.now() + 82800000
+                }
+                await addProjectList(project)
+            }
+        }
+    } catch(e) {
+        createNotif(e, 'error')
+        return
+    } finally {
+        blockButtons = false
+    }
+    createNotif('Успешно добавлены никнеймы Borealis', 'success')
 })
 
 async function addProject(project, element) {

@@ -526,11 +526,28 @@ nav .logo img {
 	grid-template-columns: 7fr 2fr;
 }
 
+#sendBorealis {
+	padding-top: 15px;
+    border-top: 1px #5A5A5C solid;
+    border-bottom: 1px #5A5A5C solid;
+}
+
+#BorealisTab > .inputEl {
+	padding-top: 15px;
+}
+
 #sendBorealis .inputEl {
 	display: grid;
 	margin-bottom: 20px;
 	grid-gap: 20px;
 	grid-template-columns: 7fr 2fr;
+}
+
+#FormAddNicksBorealis {
+    display: inline-grid;
+    margin-bottom: 21px;
+    grid-gap: 38px;
+    grid-template-columns: 1fr 2fr;
 }
 
 .importProxyBtns,

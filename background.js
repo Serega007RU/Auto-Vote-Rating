@@ -517,6 +517,47 @@ async function checkOpen(project) {
         }
     }
 
+    //Обновление никнейма для Borealis если истёк его срок действия
+    if (project.borealisNickExpires <= Date.now()) {
+        console.log(getProjectPrefix(project, true) + 'Истёк срок действия никнейма Borealis, обновляю его...')
+        try {
+            let response = await fetch('https://borealis.su/engine/ajax/newAlias.php')
+            if (!response.ok) {
+                throw chrome.i18n.getMessage('notConnect', [response.url, String(response.status)])
+            }
+            let html = await response.text()
+            let find = html.match('Код для голосования: ')
+            if (find == null) {
+                throw html
+            }
+            html = html.substring(find.index + find[0].length, html.length)
+            forLoopAllProjects(function(proj) {
+                if (proj.borealisNickExpires && proj.nick == project.nick) {
+                    proj.nick = html
+                    proj.borealisNickExpires = Date.now + Date.now() + 82800000
+                }
+            })
+            await setValue('AVMRprojectsTopCraft', projectsTopCraft)
+            await setValue('AVMRprojectsMcTOP', projectsMcTOP)
+            await setValue('AVMRprojectsMinecraftRating', projectsMinecraftRating)
+        } catch (e) {
+            console.error(getProjectPrefix(project, true) + e)
+            if (!settings.disabledNotifError) {
+                sendNotification(getProjectPrefix(project, false), e)
+            }
+            project.error = e
+            forLoopAllProjects(function(proj) {
+                if (proj.borealisNickExpires) {
+                    proj.time = Date.now() + 300000
+                }
+            })
+            await setValue('AVMRprojectsTopCraft', projectsTopCraft)
+            await setValue('AVMRprojectsMcTOP', projectsMcTOP)
+            await setValue('AVMRprojectsMinecraftRating', projectsMinecraftRating)
+            return
+        }
+    }
+
     let retryCoolDown
     if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList) {
         retryCoolDown = 300000

@@ -1112,5 +1112,8 @@
         "content": "$1"
       }
     }
+  },
+  "tempNick": {
+    "message": "Temporary nickname"
   }
 }
