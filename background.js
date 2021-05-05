@@ -532,9 +532,9 @@ async function checkOpen(project) {
             }
             html = html.substring(find.index + find[0].length, html.length)
             forLoopAllProjects(function(proj) {
-                if (proj.borealisNickExpires && proj.nick == project.nick) {
+                if (proj.borealisNickExpires != null && proj.nick == project.nick) {
                     proj.nick = html
-                    proj.borealisNickExpires = Date.now + Date.now() + 82800000
+                    proj.borealisNickExpires = Date.now() + 82800000
                 }
             })
             await setValue('AVMRprojectsTopCraft', projectsTopCraft)
@@ -547,7 +547,7 @@ async function checkOpen(project) {
             }
             project.error = e
             forLoopAllProjects(function(proj) {
-                if (proj.borealisNickExpires) {
+                if (proj.borealisNickExpires != null) {
                     proj.time = Date.now() + 300000
                 }
             })
