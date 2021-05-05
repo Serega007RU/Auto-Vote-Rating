@@ -1639,7 +1639,7 @@ async function endVote(request, sender, project) {
                 console.warn('currentProxy is null or not found')
             }
         }
-        
+
         delete project.error
 
         if (request.successfully) {
@@ -1714,7 +1714,7 @@ async function endVote(request, sender, project) {
             } else if (project.MCRate && message.includes('Ваш ВК ID заблокирован для голосовани')) {
                 currentVK.MCRate = message
                 await setValue('AVMRVKs', VKs)
-            } else if (currentProxy != null) {
+            } else if (currentProxy != null && (request[0].includes('PROXY')) || request[0].includes('TUNNEL')) {
                 currentProxy.notWorking = true
                 await setValue('AVMRproxies', proxies)
             }
