@@ -1266,10 +1266,9 @@ async function silentVote(project) {
             }
         }
     } catch (e) {
-        if (e == 'TypeError: Failed to fetch') {
+        if (e == 'TypeError: Failed to fetch' || e.message == 'The user aborted a request.') {
 //          endVote({notConnectInternet: true}, null, project)
         } else {
-            console.error(e)
             endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + e.stack}, null, project)
         }
     }
@@ -1395,6 +1394,12 @@ async function _fetch(url, options, project) {
         }
     }
     chrome.webRequest.onBeforeRequest.addListener(listener, {urls: ['<all_urls>']})
+
+    if (!options) options = {}
+    if (controller.signal.aborted) {
+        controller = new AbortController()
+    }
+    options.signal = controller.signal
 
     try {
         const response = await fetch(url, options)
@@ -1714,11 +1719,13 @@ async function endVote(request, sender, project) {
             } else if (project.MCRate && message.includes('Ваш ВК ID заблокирован для голосовани')) {
                 currentVK.MCRate = message
                 await setValue('AVMRVKs', VKs)
-            } else if (currentProxy != null && (request[0].includes('PROXY')) || request[0].includes('TUNNEL')) {
-                currentProxy.notWorking = true
-                await setValue('AVMRproxies', proxies)
+            } else if (currentProxy != null && request && request.errorVoteNetwork) {
+                if (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT')) {
+                    currentProxy.notWorking = true
+                    await setValue('AVMRproxies', proxies)
+                    await stopVote()
+                }
             }
-            await stopVote()
         } else if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
             retryCoolDown = 300000
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
@@ -2039,6 +2046,7 @@ async function stopVote() {
     }
     controller.abort()
     openedProjects.clear()
+    fetchProjects.clear()
     break1 = true
     break2 = true
 }
