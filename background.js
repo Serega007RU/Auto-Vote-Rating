@@ -1883,7 +1883,7 @@ async function removeCookie(url, name) {
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
 async function getLocalValue(name) {
     return new Promise((resolve, reject)=>{
-        chrome.storage.local.get(name, data=>{
+        chrome.storage.local.get(name, function(data) {
             if (chrome.runtime.lastError) {
                 sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
                 console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
@@ -1896,7 +1896,7 @@ async function getLocalValue(name) {
 }
 async function getValue(name) {
     return new Promise((resolve, reject)=>{
-        chrome.storage[storageArea].get(name, data=>{
+        chrome.storage[storageArea].get(name, function(data) {
             if (chrome.runtime.lastError) {
                 sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
                 console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
@@ -1909,7 +1909,7 @@ async function getValue(name) {
 }
 async function setValue(key, value) {
     return new Promise((resolve, reject)=>{
-        chrome.storage[storageArea].set({[key]: value}, data=>{
+        chrome.storage[storageArea].set({[key]: value}, function(data) {
             if (chrome.runtime.lastError) {
                 sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
                 console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
