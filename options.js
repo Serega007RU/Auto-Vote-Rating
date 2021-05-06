@@ -2444,9 +2444,9 @@ async function getValue(name, area) {
     return new Promise((resolve, reject)=>{
         chrome.storage[area].get(name, function(data) {
             if (chrome.runtime.lastError) {
-                createNotif(chrome.i18n.getMessage('storageError', chrome.runtime.lastError), 'error')
-                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
-                reject(chrome.runtime.lastError)
+                createNotif(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message), 'error')
+                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
+                reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data[name])
             }
@@ -2460,9 +2460,9 @@ async function setValue(key, value, area) {
     return new Promise((resolve, reject)=>{
         chrome.storage[area].set({[key]: value}, function(data) {
             if (chrome.runtime.lastError) {
-                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), 'error')
-                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
-                reject(chrome.runtime.lastError)
+                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message), 'error')
+                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
+                reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data)
             }
@@ -2476,9 +2476,9 @@ async function removeValue(name, area) {
     return new Promise((resolve, reject)=>{
         chrome.storage[area].remove(name, function(data) {
             if (chrome.runtime.lastError) {
-                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError), 'error')
-                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
-                reject(chrome.runtime.lastError)
+                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message), 'error')
+                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
+                reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data)
             }

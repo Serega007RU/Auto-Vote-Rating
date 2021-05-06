@@ -645,7 +645,7 @@ async function newWindow(project) {
         let window = await new Promise(resolve=>{
             chrome.windows.getCurrent(function(win) {
                 if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {
-                    console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError)
+                    console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError.message)
                 }
                 resolve(win)
             })
@@ -1885,9 +1885,9 @@ async function getLocalValue(name) {
     return new Promise((resolve, reject)=>{
         chrome.storage.local.get(name, function(data) {
             if (chrome.runtime.lastError) {
-                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
-                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
-                reject(chrome.runtime.lastError)
+                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError.message)
+                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
+                reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data[name])
             }
@@ -1898,9 +1898,9 @@ async function getValue(name) {
     return new Promise((resolve, reject)=>{
         chrome.storage[storageArea].get(name, function(data) {
             if (chrome.runtime.lastError) {
-                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
-                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
-                reject(chrome.runtime.lastError)
+                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError.message)
+                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
+                reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data[name])
             }
@@ -1911,9 +1911,9 @@ async function setValue(key, value) {
     return new Promise((resolve, reject)=>{
         chrome.storage[storageArea].set({[key]: value}, function(data) {
             if (chrome.runtime.lastError) {
-                sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
-                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
-                reject(chrome.runtime.lastError)
+                sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError.message)
+                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
+                reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data)
             }
