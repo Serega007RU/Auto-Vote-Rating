@@ -945,16 +945,16 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
     if (details.initiator == 'chrome-extension://' + chrome.runtime.id) {
         if (fetchProjects.has(details.requestId)) {
             let project = fetchProjects.get(details.requestId)
-            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED')) {
-                console.warn(getProjectPrefix(project, true) + details.error)
-                return
-            }
+//          if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED')) {
+//              console.warn(getProjectPrefix(project, true) + details.error)
+//              return
+//          }
             endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
         }
     } else if (details.type == 'main_frame') {
         if (openedProjects.has(details.tabId)) {
             let project = openedProjects.get(details.tabId)
-            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED')) {
+            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED')) {
                 console.warn(getProjectPrefix(project, true) + details.error)
                 return
             }
