@@ -1280,13 +1280,13 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     response.html = await response.text()
     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
     if (vk && host.includes('vk.com')) {
-        if (response.doc.querySelector('meta[http-equiv="content-type"]')?.content?.includes('windows-1251')) {
+        if (response.headers.get('Content-Type').includes('windows-1251')) {
             //Почему не UTF-8?
             response = await new Response(new TextDecoder('windows-1251').decode(await clone.arrayBuffer()))
             response.html = await response.text()
             response.doc = new DOMParser().parseFromString(response.html, 'text/html')
         } else {
-            console.warn(getProjectPrefix(project, true), 'Что-то не так с кодирвкой', response.doc.querySelector('meta[http-equiv="content-type"]')?.outerHTML)
+            console.warn(getProjectPrefix(project, true), 'Что-то не так с кодирвкой', response.headers.get('Content-Type'))
         }
     }
     if (vk && host.includes('vk.com')) {
@@ -1305,8 +1305,6 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         }
         endVote({errorAuthVK: text}, null, project)
         return false
-    } else {
-        
     }
     if (!host.includes(url)) {
         endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
