@@ -808,7 +808,6 @@ document.getElementById('AddVK').addEventListener('click', async () => {
 })
 
 async function addVK(repair) {
-    deleteVKCookies = false
     if (repair || !deleteVKCookies || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'VKontakte'))) {
         if (deleteVKCookies && !repair) {
             //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
