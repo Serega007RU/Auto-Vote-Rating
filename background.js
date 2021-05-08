@@ -870,8 +870,12 @@ async function silentVote(project) {
 async function checkResponseError(project, response, url, bypassCodes, vk) {
     let host = extractHostname(response.url)
     if (vk && host.includes('vk.com')) {
-        //Почему не UTF-8?
-        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+        if (response.headers.get('Content-Type').includes('windows-1251')) {
+            //Почему не UTF-8?
+            response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+        } else {
+            console.warn(getProjectPrefix(project, true), 'Что-то не так с кодирвкой', response.headers.get('Content-Type'))
+        }
     }
     response.html = await response.text()
     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
