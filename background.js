@@ -559,26 +559,27 @@ async function silentVote(project) {
                 }
 
                 if (response.doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
-                    //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
-                    //Берёт последние 30 символов
-                    let string = response.doc.querySelector('center').textContent.substring(response.doc.querySelector('center').textContent.length - 30)
-                    //Из полученного текста достаёт все цифры в Array List
-                    let numbers = string.match(/\d+/g).map(Number)
-                    let count = 0
-                    let hour = 0
-                    let min = 0
-                    let sec = 0
-                    for (let i in numbers) {
-                        if (count == 0) {
-                            hour = numbers[i]
-                        } else if (count == 1) {
-                            min = numbers[i]
-                        }
-                        count++
-                    }
-                    let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-                    let later = Date.now() + milliseconds
-                    endVote({later: later}, null, project)
+//                  //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
+//                  //Берёт последние 30 символов
+//                  let string = response.doc.querySelector('center').textContent.substring(response.doc.querySelector('center').textContent.length - 30)
+//                  //Из полученного текста достаёт все цифры в Array List
+//                  let numbers = string.match(/\d+/g).map(Number)
+//                  let count = 0
+//                  let hour = 0
+//                  let min = 0
+//                  let sec = 0
+//                  for (let i in numbers) {
+//                      if (count == 0) {
+//                          hour = numbers[i]
+//                      } else if (count == 1) {
+//                          min = numbers[i]
+//                      }
+//                      count++
+//                  }
+//                  let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+//                  let later = Date.now() + milliseconds
+//                  endVote({later: later}, null, project)
+                    endVote({later: true}, null, project)
                     return
                 } else if (response.doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
                     endVote({successfully: true}, null, project)
