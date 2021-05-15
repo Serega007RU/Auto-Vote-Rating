@@ -64,9 +64,14 @@ var closeTabs = true
 //Где храним настройки
 let storageArea = 'local'
 
+chrome.runtime.onSuspend.addListener(function(){
+    console.warn(chrome.i18n.getMessage('suspended'))
+})
+
 //Инициализация настроек расширения
 initializeConfig()
 async function initializeConfig() {
+    console.log(chrome.i18n.getMessage('start'))
     storageArea = await getLocalValue('storageArea')
     if (storageArea == null || storageArea == '') {
         storageArea = 'local'
