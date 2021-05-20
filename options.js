@@ -267,6 +267,35 @@ async function restoreOptions() {
 //Добавить проект в список проекта
 async function addProjectList(project, visually) {
     let listProject = document.getElementById(getProjectName(project) + 'List')
+    if (listProject == null) {//Генерация тела списка добавленных проектов для текущего рейтинга
+        let ul = document.createElement('ul')
+        ul.id = getProjectName(project) + 'Tab'
+        ul.classList.add('listcontent')
+        ul.style.display = 'none'
+        let div = document.createElement('div')
+        div.setAttribute('data-resource', 'notAdded')
+        div.textContent = chrome.i18n.getMessage('notAdded')
+        ul.append(div)
+        if (!(project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList)) {
+            let label = document.createElement('label')
+            label.setAttribute('data-resource', 'notAvaibledInSilent')
+            label.textContent = chrome.i18n.getMessage('notAvaibledInSilent')
+            let span = document.createElement('span')
+            span.classList.add('tooltip2')
+            let span2 = document.createElement('span')
+            span2.setAttribute('data-resource', 'warnSilentVoteTooltip')
+            span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
+            span2.classList.add('tooltip2text')
+            span.append(span2)
+            label.append(span)
+            ul.append(label)
+        }
+        let div2 = document.createElement('div')
+        div2.id = getProjectName(project) + 'List'
+        ul.append(div2)
+        listProject = div2
+        document.querySelector('div.projectsBlock > div.contentBlock').append(ul)
+    }
     listProject.parentElement.firstElementChild.style.display = 'none'
     let li = document.createElement('li')
     li.id = getProjectName(project) + '_' + project.id + '_' + project.nick
@@ -418,14 +447,14 @@ function updateProjectList(projects) {
     if (projects != null) {
         if (projects.length > 0) {
             const projectName = getProjectName(projects[0])
-            document.getElementById(projectName + 'List').parentNode.replaceChild(document.getElementById(projectName + 'List').cloneNode(false), document.getElementById(projectName + 'List'))
+            if (document.getElementById(projectName + 'List') != null) document.getElementById(projectName + 'List').parentNode.replaceChild(document.getElementById(projectName + 'List').cloneNode(false), document.getElementById(projectName + 'List'))
             for (const project of projects) {
                 addProjectList(project, true)
             }
         }
     } else {
         for (const item of allProjects) {
-            document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
+            if (document.getElementById(item + 'List') != null) document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
         }
         document.querySelector('div.buttonBlock').parentNode.replaceChild(document.querySelector('div.buttonBlock').cloneNode(false), document.querySelector('div.buttonBlock'))
         if (document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]') != null) {
