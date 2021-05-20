@@ -406,7 +406,6 @@ async function silentVote(project) {
             if (!await checkResponseError(project, response, 'topcraft.ru', null, true)) return
             let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
             response = await _fetch('https://topcraft.ru/projects/vote/', {
-                credentials: 'include',
                 'headers': {
                     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
                 },
@@ -433,7 +432,6 @@ async function silentVote(project) {
             if (!await checkResponseError(project, response, 'mctop.su', null, true)) return
             let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
             response = await _fetch('https://mctop.su/projects/vote/', {
-                credentials: 'include',
                 'headers': {
                     'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
                 },
