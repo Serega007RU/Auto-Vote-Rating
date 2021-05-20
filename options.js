@@ -1765,6 +1765,54 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('projectIDTooltip1').textContent = 'https://minecraft.buzz/server/'
         document.getElementById('projectIDTooltip2').textContent = '306'
         document.getElementById('projectIDTooltip3').textContent = '&tab=vote'
+    } else if (selectedTop.value == 'MinecraftServery') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftservery.eu/server/'
+        document.getElementById('projectIDTooltip2').textContent = '105'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'RPGParadize') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://www.rpg-paradize.com/?page=vote&vote='
+        document.getElementById('projectIDTooltip2').textContent = '113763'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'MinecraftServerListNet') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://www.minecraft-serverlist.net/vote/'
+        document.getElementById('projectIDTooltip2').textContent = '51076'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'MinecraftServerEu') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-server.eu/vote/index/'
+        document.getElementById('projectIDTooltip2').textContent = '1A73C'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'MinecraftKrant') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://www.minecraftkrant.nl/serverlijst/'
+        document.getElementById('projectIDTooltip2').textContent = 'torchcraft'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'TrackyServer') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://www.trackyserver.com/server/'
+        document.getElementById('projectIDTooltip2').textContent = 'anubismc-486999'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'MCListsOrg') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://mc-lists.org/'
+        document.getElementById('projectIDTooltip2').textContent = 'server-luxurycraft.1818'
+        document.getElementById('projectIDTooltip3').textContent = '/vote'
+    } else if (selectedTop.value == 'TopMCServersCom') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://topmcservers.com/server/'
+        document.getElementById('projectIDTooltip2').textContent = '17'
+        document.getElementById('projectIDTooltip3').textContent = '/vote'
+    } else if (selectedTop.value == 'BestServersCom') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://bestservers.com/server/'
+        document.getElementById('projectIDTooltip2').textContent = '1135'
+        document.getElementById('projectIDTooltip3').textContent = '/vote'
+    } else if (selectedTop.value == 'CraftListNet') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://craft-list.net/minecraft-server/'
+        document.getElementById('projectIDTooltip2').textContent = 'Advancius-Network'
+        document.getElementById('projectIDTooltip3').textContent = '/vote'
+    } else if (selectedTop.value == 'MinecraftServersListOrg') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://www.minecraft-servers-list.org/index.php?a=in&u='
+        document.getElementById('projectIDTooltip2').textContent = 'chromity'
+        document.getElementById('projectIDTooltip3').textContent = ''
+    } else if (selectedTop.value == 'ServerListe') {
+        document.getElementById('projectIDTooltip1').textContent = 'https://www.serverliste.net/vote/'
+        document.getElementById('projectIDTooltip2').textContent = '775'
+        document.getElementById('projectIDTooltip3').textContent = ''
     }
 
     if (selectedTop.value == 'Custom' || selectedTop.value == 'ServeurPrive' || selectedTop.value == 'TopGames' || selectedTop.value == 'MMoTopRU' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU') {
