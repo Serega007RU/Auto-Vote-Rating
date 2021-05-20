@@ -34,6 +34,18 @@ var allProjects = [
     'PixelmonServers',
     'QTop',
     'MinecraftBuzz',
+    'MinecraftServery',
+    'RPGParadize',
+    'MinecraftServerListNet',
+    'MinecraftServerEu',
+    'MinecraftKrant',
+    'TrackyServer',
+    'MCListsOrg',
+    'TopMCServersCom',
+    'BestServersCom',
+    'CraftListNet',
+    'MinecraftServersListOrg',
+    'ServerListe',
     'Custom'
 ]
 
@@ -353,6 +365,30 @@ async function newWindow(project) {
             url = 'http://q-top.ru/vote' + project.id
         else if (project.MinecraftBuzz)
             url = 'https://minecraft.buzz/server/' + project.id + '&tab=vote'
+        else if (project.MinecraftServery)
+            url = 'https://minecraftservery.eu/server/' + project.id
+        else if (project.RPGParadize)
+            url = 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id
+        else if (project.MinecraftServerListNet)
+            url = 'https://www.minecraft-serverlist.net/vote/' + project.id
+        else if (project.MinecraftServerEu)
+            url = 'https://minecraft-server.eu/vote/index/' + project.id
+        else if (project.MinecraftKrant)
+            url = 'https://www.minecraftkrant.nl/serverlijst/' + project.id
+        else if (project.TrackyServer)
+            url = 'https://www.trackyserver.com/server/' + project.id
+        else if (project.MCListsOrg)
+            url = 'https://mc-lists.org/' + project.id + '/vote'
+        else if (project.TopMCServersCom)
+            url = 'https://topmcservers.com/server/' + project.id + '/vote'
+        else if (project.BestServersCom)
+            url = 'https://bestservers.com/server/' + project.id + '/vote'
+        else if (project.CraftListNet)
+            url = 'https://craft-list.net/minecraft-server/' + project.id + '/vote'
+        else if (project.MinecraftServersListOrg)
+            url = 'https://www.minecraft-servers-list.org/index.php?a=in&u=' + project.id
+        else if (project.ServerListe)
+            url = 'https://www.serverliste.net/vote/' + project.id
         
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url: url, active: false}, function(tab_) {
@@ -1132,9 +1168,9 @@ async function endVote(request, sender, project) {
                 }
             }
         } else {
-            if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList) {
+            if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList || project.MCListsOrg) {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.MinecraftIpList || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList || project.CzechCraft) {
+            } else if (project.MinecraftIpList || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList || project.CzechCraft || project.TopMCServersCom || project.CraftListNet) {
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (project.ServeurPrive || project.TopGames) {
                 project.countVote = project.countVote + 1

@@ -34,6 +34,18 @@ var allProjects = [
     'PixelmonServers',
     'QTop',
     'MinecraftBuzz',
+    'MinecraftServery',
+    'RPGParadize',
+    'MinecraftServerListNet',
+    'MinecraftServerEu',
+    'MinecraftKrant',
+    'TrackyServer',
+    'MCListsOrg',
+    'TopMCServersCom',
+    'BestServersCom',
+    'CraftListNet',
+    'MinecraftServersListOrg',
+    'ServerListe',
     'Custom'
 ]
 
@@ -694,6 +706,42 @@ async function addProject(project, element) {
         } else if (project.MinecraftBuzz) {
             url = 'https://minecraft.buzz/server/' + project.id
             jsPath = '[href="server/' + project.id + '"]'
+        } else if (project.MinecraftServery) {
+            url = 'https://minecraftservery.eu/server/' + project.id
+            jsPath = 'div.container div.box h1.title'
+        } else if (project.RPGParadize) {
+            url = 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id
+            jsPath = 'div.div-box > h1'
+        } else if (project.MinecraftServerListNet) {
+            url = 'https://www.minecraft-serverlist.net/vote/' + project.id
+            jsPath = 'a.server-name'
+        } else if (project.MinecraftServerEu) {
+            url = 'https://minecraft-server.eu/server/index/' + project.id
+            jsPath = 'div.serverName'
+        } else if (project.MinecraftKrant) {
+            url = 'https://www.minecraftkrant.nl/serverlijst/' + project.id
+            jsPath = 'div.inner-title'
+        } else if (project.TrackyServer) {
+            url = 'https://www.trackyserver.com/server/' + project.id
+            jsPath = 'div.panel h1'
+        } else if (project.MCListsOrg) {
+            url = 'https://mc-lists.org/' + project.id + '/vote'
+            jsPath = 'div.header > div.ui.container'
+        } else if (project.TopMCServersCom) {
+            url = 'https://topmcservers.com/server/' + project.id
+            jsPath = '#serverPage > h1.header'
+        } else if (project.BestServersCom) {
+            url = 'https://bestservers.com/server/' + project.id + '/vote'
+            jsPath = 'a[href="/server/' + project.id + '"]'
+        } else if (project.CraftListNet) {
+            url = 'https://craft-list.net/minecraft-server/' + project.id
+            jsPath = 'div.serverpage-navigation-headername.header'
+        } else if (project.MinecraftServersListOrg) {
+            url = 'https://www.minecraft-servers-list.org/details/' + project.id + '/'
+            jsPath = 'div.card-header > h1'
+        } else if (project.ServerListe) {
+            url = 'https://www.serverliste.net/vote/' + project.id
+            jsPath = '#bar > h3'
         }
 
         let response
@@ -829,7 +877,7 @@ async function addProject(project, element) {
             let url2 = authVKUrls.get(getProjectName(project))
             let response2
             try {
-                response2 = await fetch(url2, {redirect: 'manual'})
+                response2 = await fetch(url2, {redirect: 'manual', credentials: 'include'})
             } catch (e) {
                 if (e == 'TypeError: Failed to fetch') {
                     createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error', null, element)
