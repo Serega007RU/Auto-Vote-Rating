@@ -1112,9 +1112,8 @@ async function endVote(request, sender, project) {
     //Если усё успешно
     let sendMessage = ''
     if (request.successfully || request.later) {
-        let time
+        let time = new Date()
         if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(),time.getMonth() + 1,0).getDate() != new Date().getDate())) {
-            time = new Date()
             if (project.timeoutHour) {
                 if (!project.timeoutMinute) project.timeoutMinute = 0
                 if (!project.timeoutSecond) project.timeoutSecond = 0
@@ -1136,7 +1135,6 @@ async function endVote(request, sender, project) {
                 }
             }
         } else {
-            time = new Date()
             //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
             let hour
             if (project.TopCraft || project.McTOP || project.MinecraftRating || project.MonitoringMinecraft || project.IonMc || project.QTop) {
@@ -1198,6 +1196,8 @@ async function endVote(request, sender, project) {
                 time.setUTCHours(time.getUTCHours() + 2)
             } else if (project.CraftList) {
                 time = new Date(request.successfully)
+            } else {
+                time.setUTCDate(time.getUTCDate() + 1)
             }
         }
 
