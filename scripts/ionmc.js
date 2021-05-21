@@ -31,12 +31,11 @@ async function vote(first) {
             }
             return
         }
-        if (first) {
-            return
-        }
+
+        if (first) return
+        
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
+        if (nick == null) return
         document.querySelector('input[name=nickname]').value = nick
         document.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div > form > div.flex.my-1 > div.w-2\\/5 > button').click()
     } catch (e) {

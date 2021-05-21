@@ -15,8 +15,7 @@ async function vote() {
         } else if (document.querySelector('input[name=login_player]') != null) {
             //Ввод ника и голосование
             const nick = await getNickName()
-            if (nick == null || nick == '')
-                return
+            if (nick == null) return
             document.querySelector('input[name=login_player]').value = nick
             document.querySelector('span[id=buttonrate]').click()
         } else if (document.querySelector('div[class=report]') != null) {

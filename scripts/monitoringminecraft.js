@@ -14,8 +14,7 @@ async function vote() {
         //Проверяет есть ли кнопка 'голосовать', если есть то голосует, если нет, ждёт когда страница полностью загрузица иначе отправляет ошибку
         if (document.querySelector('input[name=player]') != null) {
             const nick = await getNickName()
-            if (nick == null || nick == '')
-                return
+            if (nick == null) return
             document.querySelector('input[name=player]').value = nick
             document.querySelector('input[value=Голосовать]').click()
         } else if (document.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {

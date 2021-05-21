@@ -22,7 +22,7 @@ async function vote() {
         
         document.getElementById('captcha-button').click()
         const nick = await getNickName()
-        if (nick == null || nick == '') return
+        if (nick == null) return
         document.getElementById('web_server_vote_username').value = nick
         const timer = setInterval(()=>{
             try {

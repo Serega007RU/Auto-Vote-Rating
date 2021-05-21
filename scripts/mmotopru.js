@@ -43,8 +43,7 @@ async function vote(first) {
         }
         
         const project = await getProject()
-        if (project == null || project == '')
-            return
+        if (project == null) return
         
         //Отправка запроса на прохождение капчи (мы типо прошли капчу)
         await fetch('https://' + project.game + '.mmotop.ru/votes/quaptcha.json', {

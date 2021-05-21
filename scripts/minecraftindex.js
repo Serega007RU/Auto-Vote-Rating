@@ -39,7 +39,7 @@ async function vote() {
         }
 
         const nick = await getNickName()
-        if (nick == null || nick == '') return
+        if (nick == null) return
         triggerFocus(document.querySelector('#ign'))
         document.getElementById('ign').value = nick
         chrome.runtime.sendMessage({captcha: true})

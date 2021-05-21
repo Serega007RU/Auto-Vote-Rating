@@ -15,8 +15,7 @@ async function vote() {
             document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
             //Вводит никнейм
             const nick = await getNickName()
-            if (nick == null || nick == '')
-                return
+            if (nick == null) return
             document.querySelector('input[name=nick]').value = nick
             //Клик 'Голосовать' в окне голосования
             document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()

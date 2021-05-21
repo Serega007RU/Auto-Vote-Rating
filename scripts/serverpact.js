@@ -37,8 +37,7 @@ async function vote() {
             //Включаем кнопку отправки голоса
             document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > span > input').removeAttribute('disabled')
             const nick = await getNickName()
-            if (nick == null || nick == '')
-                return
+            if (nick == null) return
             //Вписываем ник в поле ввода
             document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > input').value = nick
             //Жмём кнопку отправки голоса

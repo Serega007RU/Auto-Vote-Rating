@@ -22,12 +22,11 @@ async function vote(first) {
                 return
             }
         }
-        if (first) {
-            return
-        }
+        
+        if (first) return
+
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
+        if (nick == null) return
         document.getElementById('vote_username').value = nick
         document.querySelector('input[name="commit"]').click()
     } catch (e) {

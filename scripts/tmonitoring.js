@@ -12,8 +12,7 @@ async function vote(first) {
             return
         }
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
+        if (nick == null) return
         if (document.getElementById("nickname") != null) {
             document.getElementById("nickname").value = nick
         } else {

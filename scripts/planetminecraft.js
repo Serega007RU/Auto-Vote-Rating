@@ -13,7 +13,7 @@ async function vote() {
             return
         }
         const nick = await getNickName()
-        if (document.querySelector('#submit_vote_form > input[name="mcname"]') != null) {
+        if (document.querySelector('#submit_vote_form > input[name="mcname"]') != null && nick != null) {
             document.querySelector('#submit_vote_form > input[name="mcname"]').value = nick
         } else {
             console.warn('Не удалось найти поле для никнейма, возможно это голосование без награды')

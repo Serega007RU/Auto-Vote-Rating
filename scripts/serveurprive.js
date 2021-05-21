@@ -51,12 +51,11 @@ async function vote(first) {
             chrome.runtime.sendMessage({successfully: true})
             return
         }
-        if (first) {
-            return
-        }
+        
+        if (first) return
+
         const nick = await getNickName()
-        if (nick == null)
-            return
+        if (nick == null) return
         document.querySelector('#c > div > div > div.bvt > form > input.pseudov').value = nick
         document.querySelector('#c > div > div > div.bvt > form > button').click()
     } catch (e) {

@@ -33,12 +33,11 @@ async function vote(first) {
             chrome.runtime.sendMessage({successfully: true})
             return
         }
-        if (first) {
-            return
-        }
+
+        if (first) return
+        
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
+        if (nick == null) return
         document.querySelector('#playercollector-nickname').value = nick
         document.querySelector('#w0 button[type=submit]').click()
     } catch (e) {

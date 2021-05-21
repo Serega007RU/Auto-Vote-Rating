@@ -4,7 +4,7 @@ setTimeout(()=>{vote()}, 3000)
 async function vote() {
     try {
         const nick = await getNickName()
-        if (nick == null || nick == '') return
+        if (nick == null) return
         document.getElementById('username').value = nick
         document.getElementById('btn').click()
     } catch (e) {

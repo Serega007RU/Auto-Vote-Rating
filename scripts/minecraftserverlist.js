@@ -16,8 +16,7 @@ async function vote() {
             return
         }
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
+        if (nick == null) return
         document.getElementById('ignn').value = nick
         document.querySelector('#voteform > input.buttonsmall.pointer.green.size10').click()
     } catch (e) {

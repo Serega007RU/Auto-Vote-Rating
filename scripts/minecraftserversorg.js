@@ -38,12 +38,11 @@ async function vote(first) {
             chrome.runtime.sendMessage({message: document.querySelector('#field-container > form > span').textContent})
             return
         }
-        if (first) {
-            return
-        }
+
+        if (first) return
+        
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
+        if (nick == null) return
         document.querySelector('#field-container > form > ul > li > input').value = nick
         document.querySelector('#field-container > form > button').click()
     } catch (e) {

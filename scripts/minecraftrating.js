@@ -38,8 +38,7 @@ async function vote() {
             chrome.runtime.sendMessage({successfully: true})
         } else if (document.querySelector('input[name=nick]') != null) {
             const nick = await getNickName()
-            if (nick == null || nick == '')
-                return
+            if (nick == null) return
             document.querySelector('input[name=nick]').value = nick
             document.querySelector('button[type=submit]').click()
         } else {

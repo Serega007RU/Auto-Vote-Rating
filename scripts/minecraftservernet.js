@@ -24,12 +24,11 @@ async function vote(first) {
             }
             return
         }
-        if (first) {
-            return
-        }
+        
+        if (first) return
+
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
+        if (nick == null) return
         document.getElementById('mc_user').value = nick
         document.getElementById('rate-10').click()
         document.querySelector('input[value="Confirm Vote"]').click()

@@ -36,11 +36,10 @@ async function vote(first) {
             return
         }
 
-        if (first) {
-            return
-        }
+        if (first) return
+        
         const nick = await getNickName()
-        if (nick == null || nick == '') return
+        if (nick == null) return
         document.getElementById('voteusername').value = nick
         document.querySelector('form[method="POST"] > input[type="submit"]').click()
     } catch (e) {

@@ -34,8 +34,7 @@ async function vote() {
                 clearInterval(this.check2)
             } else {
                 const nick = await getNickName()
-                if (nick == null || nick == '')
-                    return
+                if (nick == null) return
                 document.querySelector('input[name=nick]').value = nick
                 document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
             }

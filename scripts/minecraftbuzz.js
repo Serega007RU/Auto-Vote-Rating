@@ -12,9 +12,7 @@ async function vote(first) {
             return
         }
 
-        if (first) {
-            return
-        }
+        if (first) return
 
         const nick = await getNickName()
         if (nick == null) return

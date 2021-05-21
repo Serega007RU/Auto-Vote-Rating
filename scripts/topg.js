@@ -44,8 +44,7 @@ async function vote(first) {
         if (first) return
 
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
+        if (nick == null) return
         document.getElementById('game_user').value = nick
         document.querySelector('#vote button[type="submit"]').click()
 

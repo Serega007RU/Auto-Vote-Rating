@@ -24,8 +24,7 @@ async function vote() {
                     if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
                         clearInterval(timer)
                         const nick = await getNickName()
-                        if (nick == null || nick == '')
-                            return
+                        if (nick == null) return
                         document.getElementById('username').value = nick
                         document.getElementById('voteButton').click()
                     }

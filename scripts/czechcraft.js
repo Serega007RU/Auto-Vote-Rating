@@ -44,11 +44,10 @@ async function vote(first) {
             return
         }
 
-        if (first) {
-            return
-        }
+        if (first) return
+        
         const nick = await getNickName()
-        if (nick == null || nick == '') return
+        if (nick == null) return
         document.getElementById('username').value = nick
         document.getElementById('privacy').checked = true
         document.querySelector('form[method="post"] > button.button').click()

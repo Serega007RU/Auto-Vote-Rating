@@ -54,8 +54,7 @@ async function vote() {
         }
         await craft(document.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
         const nick = await getNickName()
-        if (nick == null || nick == '')
-            return
+        if (nick == null) return
         document.querySelector('#Content > form > input[type=text]').value = nick
         document.getElementById('votebutton').click()
     } catch (e) {
