@@ -2063,6 +2063,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
         }
         errorProxy.ip = currentProxy.ip
         if (errorProxy.count++ > 5) {
+            currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxy2')
             console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxy2'))
             if (!settings.disabledNotifError) {
                 sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxy2'))
