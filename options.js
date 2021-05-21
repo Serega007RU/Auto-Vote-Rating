@@ -1961,6 +1961,14 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('chooseGameListForge').required = false
     }
 
+    if (selectedTop.value == 'BestServersCom') {
+        document.getElementById('nick').required = false
+        document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
+    } else if (laterChoose == 'BestServersCom') {
+        document.getElementById('nick').required = true
+        if (selectedTop.value != 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
+    }
+
     if (selectedTop.value == 'TopG') {
         document.getElementById('urlGameTopG').removeAttribute('style')
         document.getElementById('chooseGameTopG').required = true
