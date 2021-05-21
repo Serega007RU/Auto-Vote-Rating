@@ -11,10 +11,10 @@ async function vote(first) {
             document.querySelector('span[data-target="#voteModal"]').click()
             return
         }
-        const nick = await getNickName()
-        if (nick == null) return
+        const project = await getProject()
+        if (project == null) return
         if (document.getElementById("nickname") != null) {
-            document.getElementById("nickname").value = nick
+            document.getElementById("nickname").value = project.nick
         } else {
             console.warn('[Auto Vote Minecraft Rating] Нет поля ввода никнейма')
         }
@@ -24,7 +24,7 @@ async function vote(first) {
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -37,7 +37,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 

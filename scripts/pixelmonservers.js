@@ -21,9 +21,9 @@ async function vote() {
         }
         
         document.getElementById('captcha-button').click()
-        const nick = await getNickName()
-        if (nick == null) return
-        document.getElementById('web_server_vote_username').value = nick
+        const project = await getProject()
+        if (project == null) return
+        document.getElementById('web_server_vote_username').value = project.nick
         const timer = setInterval(()=>{
             try {
                 if (document.getElementById('captcha-input').style.display != 'none') {
@@ -40,7 +40,7 @@ async function vote() {
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -53,7 +53,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 

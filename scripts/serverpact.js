@@ -36,10 +36,10 @@ async function vote() {
             document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.QapTcha > input[type=hidden]:nth-child(6)').value = ''
             //Включаем кнопку отправки голоса
             document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > span > input').removeAttribute('disabled')
-            const nick = await getNickName()
-            if (nick == null) return
+            const project = await getProject()
+            if (project == null) return
             //Вписываем ник в поле ввода
-            document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > input').value = nick
+            document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > input').value = project.nick
             //Жмём кнопку отправки голоса
             document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(1) > div.hidden-xs > div > form > div.input-group > span > input').click()
         }
@@ -48,7 +48,7 @@ async function vote() {
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -61,7 +61,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 

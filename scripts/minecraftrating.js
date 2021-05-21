@@ -37,9 +37,9 @@ async function vote() {
         } else if (document.querySelector('div.alert.alert-success') != null && document.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
             chrome.runtime.sendMessage({successfully: true})
         } else if (document.querySelector('input[name=nick]') != null) {
-            const nick = await getNickName()
-            if (nick == null) return
-            document.querySelector('input[name=nick]').value = nick
+            const project = await getProject()
+            if (project == null) return
+            document.querySelector('input[name=nick]').value = project.nick
             document.querySelector('button[type=submit]').click()
         } else {
             setTimeout(()=>chrome.runtime.sendMessage({message: 'Ошибка, input[name=nick] является null'}), 10000)
@@ -49,7 +49,7 @@ async function vote() {
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -62,7 +62,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 

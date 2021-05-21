@@ -52,9 +52,9 @@ async function vote() {
         }
 
         if (document.getElementById('playername') != null) {
-            const nick = await getNickName()
-            if (nick == null) return
-            document.getElementById('playername').value = nick
+            const project = await getProject()
+            if (project == null) return
+            document.getElementById('playername').value = project.nick
         }
 
         const timer = setInterval(function() {
@@ -79,7 +79,7 @@ async function vote() {
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -92,7 +92,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.game) && document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 

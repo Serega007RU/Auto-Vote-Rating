@@ -15,16 +15,16 @@ async function vote() {
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
-        const nick = await getNickName()
-        if (nick == null) return
-        document.getElementById('ignn').value = nick
+        const project = await getProject()
+        if (project == null) return
+        document.getElementById('ignn').value = project.nick
         document.querySelector('#voteform > input.buttonsmall.pointer.green.size10').click()
     } catch (e) {
         chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -37,7 +37,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 

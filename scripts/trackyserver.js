@@ -23,16 +23,17 @@ async function vote(first) {
         document.querySelector('a[data-target="#vote"]').click()
         
         if (first) return
-        const nick = await getNickName()
-        if (!nick) return
-        document.querySelector('input[name="username"]').value = nick
+        
+        const project = await getProject()
+        if (project == null) return
+        document.querySelector('input[name="username"]').value = project.nick
         document.querySelector('form.vote button[type="submit"]').click()
     } catch (e) {
         chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -45,7 +46,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 

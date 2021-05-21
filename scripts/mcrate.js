@@ -14,9 +14,9 @@ async function vote() {
             document.querySelector('a[class=vk_authorization]').click()
         } else if (document.querySelector('input[name=login_player]') != null) {
             //Ввод ника и голосование
-            const nick = await getNickName()
-            if (nick == null) return
-            document.querySelector('input[name=login_player]').value = nick
+            const project = await getProject()
+            if (project == null) return
+            document.querySelector('input[name=login_player]').value = project.nick
             document.querySelector('span[id=buttonrate]').click()
         } else if (document.querySelector('div[class=report]') != null) {
             if (document.querySelector('div[class=report]').textContent.includes('Ваш голос засчитан')) {
@@ -52,7 +52,7 @@ async function vote() {
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -65,7 +65,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 

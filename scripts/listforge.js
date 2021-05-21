@@ -88,8 +88,7 @@ async function vote(first) {
         }
 
         const project = await getProject()
-        if (project == null || project == '')
-            return
+        if (project == null) return
         
         //Если на странице есть hCaptcha и мы голосуем через Steam то ждём её решения
         if (document.querySelector('div.h-captcha') != null && first && project.nick && project.nick != '') {

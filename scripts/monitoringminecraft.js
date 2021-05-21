@@ -13,9 +13,9 @@ async function vote() {
         //document.cookie.split(';').forEach(function(c) { document.cookie = c.replace(/^ +/,"").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");})
         //Проверяет есть ли кнопка 'голосовать', если есть то голосует, если нет, ждёт когда страница полностью загрузица иначе отправляет ошибку
         if (document.querySelector('input[name=player]') != null) {
-            const nick = await getNickName()
-            if (nick == null) return
-            document.querySelector('input[name=player]').value = nick
+            const project = await getProject()
+            if (project == null) return
+            document.querySelector('input[name=player]').value = project.nick
             document.querySelector('input[value=Голосовать]').click()
         } else if (document.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
 //          //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
@@ -49,7 +49,7 @@ async function vote() {
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -62,7 +62,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
     

@@ -46,9 +46,9 @@ async function vote(first) {
 
         if (first) return
         
-        const nick = await getNickName()
-        if (nick == null) return
-        document.getElementById('username').value = nick
+        const project = await getProject()
+        if (project == null) return
+        document.getElementById('username').value = project.nick
         document.getElementById('privacy').checked = true
         document.querySelector('form[method="post"] > button.button').click()
     } catch (e) {
@@ -56,7 +56,7 @@ async function vote(first) {
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -69,7 +69,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 

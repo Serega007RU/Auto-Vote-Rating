@@ -18,10 +18,9 @@ async function vote() {
             //Клик 'Голосовать'
             document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
             //Вводит никнейм
-            const nick = await getNickName()
-            if (nick == null || nick == '')
-                return
-            document.querySelector('input[name=nick]').value = nick
+            const project = await getProject()
+            if (project == null) return
+            document.querySelector('input[name=nick]').value = project.nick
             //Клик 'Голосовать' в окне голосования
             document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
         } else {
@@ -33,9 +32,9 @@ async function vote() {
                 clearInterval(this.check)
                 clearInterval(this.check2)
             } else {
-                const nick = await getNickName()
-                if (nick == null) return
-                document.querySelector('input[name=nick]').value = nick
+                const project = await getProject()
+                if (project == null) return
+                document.querySelector('input[name=nick]').value = project.nick
                 document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
             }
         }
@@ -44,7 +43,7 @@ async function vote() {
     }
 }
 
-async function getNickName() {
+async function getProject() {
     const storageArea = await new Promise(resolve=>{
         chrome.storage.local.get('storageArea', data=>{
             resolve(data['storageArea'])
@@ -57,7 +56,7 @@ async function getNickName() {
     })
     for (const project of projects) {
         if (document.URL.includes(project.id)) {
-            return project.nick
+            return project
         }
     }
 
