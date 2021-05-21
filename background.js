@@ -1112,50 +1112,20 @@ async function endVote(request, sender, project) {
     //Если усё успешно
     let sendMessage = ''
     if (request.successfully || request.later) {
-        let time = new Date()
-        if (project.TopCraft || project.McTOP || project.MinecraftRating || project.MonitoringMinecraft || project.IonMc || project.QTop) {
-            //Топы на которых время сбрасывается в 00:00 по МСК
-            if (time.getUTCHours() > 21 || (time.getUTCHours() == 21 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
-                time.setUTCDate(time.getUTCDate() + 1)
+        let time
+        if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(),time.getMonth() + 1,0).getDate() != new Date().getDate())) {
+            time = new Date()
+            if (project.timeoutHour) {
+                if (!project.timeoutMinute) project.timeoutMinute = 0
+                if (!project.timeoutSecond) project.timeoutSecond = 0
+                if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
+                    time.setDate(time.getDate() + 1)
+                }
+                time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
+            } else {
+                time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
             }
-            time.setUTCHours(21, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.MCRate) {
-            if (time.getUTCHours() > 22 || (time.getUTCHours() == 22 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
-                time.setUTCDate(time.getUTCDate() + 1)
-            }
-            time.setUTCHours(22, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.MinecraftServerList || project.ServerList101) {
-            if (time.getUTCHours() > 23 || (time.getUTCHours() == 23 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
-                time.setUTCDate(time.getUTCDate() + 1)
-            }
-            time.setUTCHours(23, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.PlanetMinecraft || project.ListForge || project.MinecraftList) {
-            if (time.getUTCHours() > 5 || (time.getUTCHours() == 5 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
-                time.setUTCDate(time.getUTCDate() + 1)
-            }
-            time.setUTCHours(5, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.MinecraftServersOrg || project.MinecraftIndex || project.MinecraftBuzz || project.PixelmonServers) {
-            if (time.getUTCHours() > 0 || (time.getUTCHours() == 0 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
-                time.setUTCDate(time.getUTCDate() + 1)
-            }
-            time.setUTCHours(0, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.TopMinecraftServers) {
-            if (time.getUTCHours() > 4 || (time.getUTCHours() == 4 && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
-                time.setUTCDate(time.getUTCDate() + 1)
-            }
-            time.setUTCHours(4, (project.priority ? 0 : 10), 0, 0)
-        } else if (project.MMoTopRU) {
-            if (time.getUTCHours() > 20 || (time.getUTCHours() == 20 && time.getUTCMinutes() >= (project.priority ? 1 : 10))) {
-                time.setUTCDate(time.getUTCDate() + 1)
-            }
-            time.setUTCHours(20, (project.priority ? 1 : 10), 0, 0)
-        } else if (project.BotsForDiscord) {
-            if (time.getUTCHours() > 12 || (time.getUTCHours() == 12 && time.getUTCMinutes() >= (project.priority ? 1 : 10))) {
-                time.setUTCDate(time.getUTCDate() + 1)
-            }
-            time.setUTCHours(12, (project.priority ? 1 : 10), 0, 0)
-        }
-        if (request.later && Number.isInteger(request.later)) {
+        } else if (request.later && Number.isInteger(request.later)) {
             time = new Date(request.later)
             if (project.ServeurPrive || project.TopGames) {
                 project.countVote = project.countVote + 1
@@ -1166,7 +1136,34 @@ async function endVote(request, sender, project) {
                 }
             }
         } else {
-            if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList || project.MCListsOrg) {
+            time = new Date()
+            //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
+            let hour
+            if (project.TopCraft || project.McTOP || project.MinecraftRating || project.MonitoringMinecraft || project.IonMc || project.QTop) {
+                //Топы на которых время сбрасывается в 00:00 по МСК
+                hour = 21
+            } else if (project.MCRate) {
+                hour = 22
+            } else if (project.MinecraftServerList || project.ServerList101) {
+                hour = 23
+            } else if (project.PlanetMinecraft || project.ListForge || project.MinecraftList) {
+                hour = 5
+            } else if (project.MinecraftServersOrg || project.MinecraftIndex || project.MinecraftBuzz || project.PixelmonServers) {
+                hour = 0
+            } else if (project.TopMinecraftServers) {
+                hour = 4
+            } else if (project.MMoTopRU) {
+                hour = 20
+            } else if (project.BotsForDiscord) {
+                hour = 12
+            }
+            if (hour != null) {
+                if (time.getUTCHours() > hour || (time.getUTCHours() == hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+                    time.setUTCDate(time.getUTCDate() + 1)
+                }
+                time.setUTCHours(hour, (project.priority ? 0 : 10), 0, 0)
+            //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
+            } else if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList || project.MCListsOrg) {
                 time.setUTCHours(time.getUTCHours() + 12)
             } else if (project.MinecraftIpList || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList || project.CzechCraft || project.TopMCServersCom || project.CraftListNet) {
                 time.setUTCDate(time.getUTCDate() + 1)
@@ -1201,20 +1198,6 @@ async function endVote(request, sender, project) {
                 time.setUTCHours(time.getUTCHours() + 2)
             } else if (project.CraftList) {
                 time = new Date(request.successfully)
-            }
-        }
-
-        if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(),time.getMonth() + 1,0).getDate() != new Date().getDate())) {
-            time = new Date()
-            if (project.timeoutHour) {
-                if (!project.timeoutMinute) project.timeoutMinute = 0
-                if (!project.timeoutSecond) project.timeoutSecond = 0
-                if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
-                    time.setDate(time.getDate() + 1)
-                }
-                time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
-            } else {
-                time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
             }
         }
 
