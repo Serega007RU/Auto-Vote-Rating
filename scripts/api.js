@@ -38,6 +38,33 @@ try {
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             check = false
+            //Фикс CloudFlare если 2 проверки накладываются друг на друга
+            if (document.URL.includes('__cf_chl_jschl_tk__')) {
+
+                function removeURLParameter(url, parameter) {
+                    //prefer to use l.search if you have a location/link object
+                    var urlparts = url.split('?');   
+                    if (urlparts.length >= 2) {
+                
+                        var prefix = encodeURIComponent(parameter) + '=';
+                        var pars = urlparts[1].split(/[&;]/g);
+                
+                        //reverse iteration as may be destructive
+                        for (var i = pars.length; i-- > 0;) {    
+                            //idiom for string.startsWith
+                            if (pars[i].lastIndexOf(prefix, 0) !== -1) {  
+                                pars.splice(i, 1);
+                            }
+                        }
+                
+                        return urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : '');
+                    }
+                    return url;
+                }
+                
+                let url = removeURLParameter(document.URL, '__cf_chl_jschl_tk__')
+                document.location.replace(url)
+            }
         }
         //Если идёт проверка CloudFlare
         if (document.querySelector('#cf-content > h1 > span') != null) {

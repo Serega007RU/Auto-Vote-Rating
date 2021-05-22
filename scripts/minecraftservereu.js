@@ -1,4 +1,4 @@
-async function vote() {
+async function vote(first) {
     if (first == false) {
         console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
         return
