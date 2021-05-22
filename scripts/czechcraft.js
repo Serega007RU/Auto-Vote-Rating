@@ -1,10 +1,3 @@
-window.onmessage = function(e) {
-    if (e.data == 'vote') {
-        vote(false)
-    }
-}
-vote(true)
-
 async function vote(first) {
     try {
         if (document.querySelector('div.alert.alert-danger') != null) {
@@ -46,32 +39,11 @@ async function vote(first) {
 
         if (first) return
         
-        const project = await getProject()
-        if (project == null) return
+        const project = await getProject('CzechCraft')
         document.getElementById('username').value = project.nick
         document.getElementById('privacy').checked = true
         document.querySelector('form[method="post"] > button.button').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsCzechCraft', data=>{
-            resolve(data['AVMRprojectsCzechCraft'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

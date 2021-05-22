@@ -8,14 +8,13 @@ const toDataURL = url=>fetch(url).then(response=>response.blob()).then(blob=>new
 let currentRecept = {}
 let content = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-vote()
-async function vote() {
+async function vote(first) {
     if (document.URL.startsWith('chrome-extension://' + chrome.runtime.id)) return
+    if (first == false) {
+        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
+        return
+    }
     try {
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
         if (document.querySelector('#Content > div.Error') != null) {
             if (document.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
                 chrome.runtime.sendMessage({message: document.querySelector('#Content > div.Error').textContent})
@@ -53,33 +52,12 @@ async function vote() {
             return
         }
         await craft(document.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
-        const project = await getProject()
-        if (project == null) return
+        const project = await getProject('MinecraftIpList')
         document.querySelector('#Content > form > input[type=text]').value = project.nick
         document.getElementById('votebutton').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsMinecraftIpList', data=>{
-            resolve(data['AVMRprojectsMinecraftIpList'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
 
 function recalculate() {

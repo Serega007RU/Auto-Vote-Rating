@@ -1,6 +1,8 @@
-vote()
-
-function vote() {
+function vote(first) {
+    if (first == false) {
+        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
+        return
+    }
     try {
         if (document.URL.startsWith('https://discord.com/')) {
             const timer = setTimeout(()=>{//Да это костыль, а есть варинт по лучше?
@@ -51,12 +53,12 @@ function vote() {
                     }
                 }
             } catch (e) {
-                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+                throwError(e)
                 clearInterval(timer3)
             }
         }, 1000)
 
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
 }

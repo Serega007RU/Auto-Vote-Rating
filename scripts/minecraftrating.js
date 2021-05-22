@@ -1,7 +1,6 @@
-vote()
-async function vote() {
-    if (document.URL.includes('.vk')) {
-        chrome.runtime.sendMessage({errorAuthVK: true})
+async function vote(first) {
+    if (first == false) {
+        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
         return
     }
     try {
@@ -37,34 +36,13 @@ async function vote() {
         } else if (document.querySelector('div.alert.alert-success') != null && document.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
             chrome.runtime.sendMessage({successfully: true})
         } else if (document.querySelector('input[name=nick]') != null) {
-            const project = await getProject()
-            if (project == null) return
+            const project = await getProject('MinecraftRating')
             document.querySelector('input[name=nick]').value = project.nick
             document.querySelector('button[type=submit]').click()
         } else {
             setTimeout(()=>chrome.runtime.sendMessage({message: 'Ошибка, input[name=nick] является null'}), 10000)
         }
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsMinecraftRating', data=>{
-            resolve(data['AVMRprojectsMinecraftRating'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

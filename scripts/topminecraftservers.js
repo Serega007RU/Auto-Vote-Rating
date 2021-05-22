@@ -1,10 +1,9 @@
-vote()
-async function vote() {
+async function vote(first) {
+    if (first == false) {
+        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
+        return
+    }
     try {
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
         if (document.querySelector('body > div.container > div > div > div.alert.alert-danger') != null) {
             if (document.querySelector('body > div.container > div > div > div.alert.alert-danger').textContent.includes('already voted')) {
                 chrome.runtime.sendMessage({later: true})
@@ -23,38 +22,17 @@ async function vote() {
                 try {
                     if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
                         clearInterval(timer)
-                        const project = await getProject()
-                        if (project == null) return
+                        const project = await getProject('TopMinecraftServers')
                         document.getElementById('username').value = project.nick
                         document.getElementById('voteButton').click()
                     }
                 } catch (e) {
-                    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+                    throwError(e)
                     clearInterval(timer)
                 }
             }, 1000)
         }
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsTopMinecraftServers', data=>{
-            resolve(data['AVMRprojectsTopMinecraftServers'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

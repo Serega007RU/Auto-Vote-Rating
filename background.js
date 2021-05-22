@@ -923,7 +923,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         //Узнаём причину почему мы зависли на авторизации ВК
         let text
         if (response.doc.querySelector('div.oauth_form_access') != null) {
-            text = chrome.i18n.getMessage('oauthVK', response.doc.querySelector('div.oauth_form_access > b').textContent)
+            text = response.doc.querySelector('div.oauth_form_access').textContent.replace(response.doc.querySelector('div.oauth_access_items').textContent, '').trim()
         } else if (response.doc.querySelector('div.oauth_content > div') != null) {
             text = response.doc.querySelector('div.oauth_content > div').textContent
         } else if (response.doc.querySelector('#login_blocked_wrap') != null) {
@@ -971,6 +971,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
                 }
             }
         })
+        chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'})
     } else if (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/)) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {

@@ -1,14 +1,9 @@
-vote()
-async function vote() {
+async function vote(first) {
+    if (first == false) {
+        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
+        return
+    }
     try {
-        //Если идёт проверка CloudFlare
-        if (document.querySelector('#cf-content > h1 > span') != null) {
-            return
-        }
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
         //Если успешное авто-голосование
         if (document.querySelector('div[class="alert alert-success"]') != null || document.querySelector('div[class="alert alert-success m-t-2"]') != null) {
             chrome.runtime.sendMessage({
@@ -52,8 +47,7 @@ async function vote() {
         }
 
         if (document.getElementById('playername') != null) {
-            const project = await getProject()
-            if (project == null) return
+            const project = await getProject('TopGames', true)
             document.getElementById('playername').value = project.nick
         }
 
@@ -65,7 +59,7 @@ async function vote() {
                     clearInterval(timer)
                 }
             } catch (e) {
-                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+                throwError(e)
                 clearInterval(timer)
             }
         }, 1000)
@@ -75,26 +69,6 @@ async function vote() {
             return
         }
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsTopGames', data=>{
-            resolve(data['AVMRprojectsTopGames'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.game) && document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

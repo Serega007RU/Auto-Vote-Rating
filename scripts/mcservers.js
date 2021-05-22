@@ -1,14 +1,14 @@
-window.onmessage = function(e) {
-    if (e.data == 'vote') {
-        vote(false)
-    }
-}
 //Совместимость с Rocket Loader
 document.addEventListener('DOMContentLoaded', (event)=>{
-    vote(true)
+    vote()
 })
 
 async function vote(first) {
+    if (first == true) return
+    if (first == false) {
+        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
+        return
+    }
     try {
         if (document.querySelector('div.main-panel > p') != null) {
             if (document.querySelector('div.main-panel > p').textContent.includes('already voted')) {
@@ -34,31 +34,10 @@ async function vote(first) {
 
         if (first) return
         
-        const project = await getProject()
-        if (project == null) return
+        const project = await getProject('MCServers')
         document.getElementById('username').value = project.nick
         document.querySelector('form[method="POST"] > button[type="submit"]').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsMCServers', data=>{
-            resolve(data['AVMRprojectsMCServers'])
-        })
-    })
-    for (const project of projects) {
-        if (project.MCServers && document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

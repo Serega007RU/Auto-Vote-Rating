@@ -1,47 +1,5 @@
-try {
-    //Если мы находимся на странице авторизации Steam
-    if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
-        document.getElementById('imageLogin').click()
-        const timer2 = setInterval(()=>{
-            try {
-                if (document.getElementById('error_display').style.display != 'none') {
-                    chrome.runtime.sendMessage({message: document.getElementById('error_display').textContent})
-                    clearInterval(timer2)
-                } else if ((document.querySelector('div.newmodal') != null && document.querySelector('div.newmodal').style.display != 'none')
-                    || (document.querySelector('div.login_modal.loginAuthCodeModal') != null && document.querySelector('div.login_modal.loginAuthCodeModal').style.display != 'none')
-                    || (document.querySelector('div.login_modal.loginTwoFactorCodeModal') != null && document.querySelector('div.login_modal.loginTwoFactorCodeModal').style.display != 'none')
-                    || (document.querySelector('div.login_modal.loginIPTModal') != null && document.querySelector('div.login_modal.loginIPTModal').style.display != 'none')) {
-                        chrome.runtime.sendMessage({authSteam: true})
-                        clearInterval(timer2)
-                }
-            } catch (e) {
-                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
-                clearInterval(timer2)
-            }
-        }, 1000)
-    } else {
-        window.onmessage = function(e) {
-            if (e.data == 'vote') {
-                vote(false)
-            }
-        }
-        vote(true)
-    }
-} catch (e) {
-    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
-}
-
 async function vote(first) {
     try {
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
-        //Если мы находимся на странице проверки ReCaptcha
-        if (document.querySelector('body > iframe') != null && document.querySelector('body > iframe').src.startsWith('https://geo.captcha-delivery.com/captcha/')) {
-            return
-        }
-
         //Пилюля от жадности
         if (document.getElementById('adblock-notice') != null) document.getElementById('adblock-notice').remove()
         if (document.getElementById('adsense-notice') != null) document.getElementById('adsense-notice').remove()
@@ -88,9 +46,7 @@ async function vote(first) {
             return
         }
 
-        const project = await getProject()
-        if (project == null) return
-
+        const project = await getProject('ListForge', true)
         //Вводим ник если он существует
         if (document.getElementById('nickname') != null) {
             if (project.nick == null || project.nick == '') {
@@ -106,30 +62,10 @@ async function vote(first) {
                 document.querySelector('button[form="vote_form"]').click()
             }
         } else {
-            throw null
+            throw Error(null)
         }
         
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsListForge', data=>{
-            resolve(data['AVMRprojectsListForge'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.game) && document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

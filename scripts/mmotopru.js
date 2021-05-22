@@ -1,16 +1,5 @@
-window.onmessage = function(e) {
-    if (e.data == 'vote') {
-        vote(false)
-    }
-}
-vote(true)
-
 async function vote(first) {
     try {
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
         //MMoTopRU, что за костыли?
         if (document.querySelector('body > div') == null && document.querySelectorAll('body > script[type="text/javascript"]').length == 1) {
 //          chrome.runtime.sendMessage({emptySite: true})
@@ -42,8 +31,7 @@ async function vote(first) {
             return
         }
         
-        const project = await getProject()
-        if (project == null) return
+        const project = await getProject('MMoTopRU', true)
         
         //Отправка запроса на прохождение капчи (мы типо прошли капчу)
         await fetch('https://' + project.game + '.mmotop.ru/votes/quaptcha.json', {
@@ -80,26 +68,6 @@ async function vote(first) {
         document.getElementById('check_vote_form').click()
 
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsMMoTopRU', data=>{
-            resolve(data['AVMRprojectsMMoTopRU'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.game) && document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

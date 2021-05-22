@@ -1,10 +1,3 @@
-window.onmessage = function(e) {
-    if (e.data == 'vote') {
-        vote(false)
-    }
-}
-vote(true)
-
 async function vote(first) {
     try {
         if (document.querySelector('div.alert.alert-success') != null) {
@@ -73,12 +66,9 @@ async function vote(first) {
             document.querySelector('a.btn-vote').click()
         }
 
-        if (first) {
-            return
-        }
+        if (first) return
         
-        let project = await getProject()
-        if (project == null) return
+        let project = await getProject('CraftList')
         let hours = document.querySelector('#voteModal p.text-center').textContent.match(/\d+/g).map(Number)[0]
         const milliseconds = (hours * 60 * 60 * 1000)
         if (project.timeout == null || project.timeout != milliseconds) {
@@ -88,50 +78,6 @@ async function vote(first) {
         document.querySelector('input[name="nickName"]').value = project.nick
         document.querySelector('button.btn.btn-vote').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsCraftList', data=>{
-            resolve(data['AVMRprojectsCraftList'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-}
-
-async function setProject(project) {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsCraftList', data=>{
-            resolve(data['AVMRprojectsCraftList'])
-        })
-    })
-    for (let i in projects) {
-        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id)) {
-            projects[i] = project
-            break
-        }
-    }
-    await new Promise(resolve=>{
-        chrome.storage[storageArea].set({['AVMRprojectsCraftList']: projects}, data=>{
-            resolve(data)
-        })
-    })
 }

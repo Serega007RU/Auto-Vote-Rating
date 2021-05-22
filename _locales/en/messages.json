@@ -467,7 +467,7 @@
     }
   },
   "errorVoteNoNick2": {
-    "message": "Unexpected error, could not find the nickname. URL: $url$",
+    "message": "Unexpected error, could not find the project. URL: $url$",
     "placeholders": {
       "url": {
         "content": "$1"
@@ -780,14 +780,6 @@
     "message": "Exceeded the maximum number of voting attempts, $error$",
     "placeholders": {
       "error": {
-        "content": "$1"
-      }
-    }
-  },
-  "oauthVK": {
-    "message": "The $rating$ app requests access to your account.",
-    "placeholders": {
-      "rating": {
         "content": "$1"
       }
     }

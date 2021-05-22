@@ -432,7 +432,7 @@
     }
   },
   "errorVoteNoNick2": {
-    "message": "Непредвиденная ошибка, не удалось найти никнейм. URL: $url$",
+    "message": "Непредвиденная ошибка, не удалось найти проект. URL: $url$",
     "placeholders": {
       "url": {
         "content": "$1"
@@ -743,14 +743,6 @@
     "message": "Превышено максимальное кол-во попыток голосования, $error$",
     "placeholders": {
       "error": {
-        "content": "$1"
-      }
-    }
-  },
-  "oauthVK": {
-    "message": "Приложение $rating$ запрашивает доступ к вашему аккаунту.",
-    "placeholders": {
-      "rating": {
         "content": "$1"
       }
     }

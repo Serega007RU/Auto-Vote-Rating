@@ -1,21 +1,15 @@
-vote()
-async function vote() {
-    if (document.URL.includes('.vk')) {
-        chrome.runtime.sendMessage({errorAuthVK: true})
+async function vote(first) {
+    if (first == false) {
+        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
         return
     }
     try {
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
         //Если погльзователь уже авторизован в вк, сразу голосует
         if (document.querySelector('button[data-type=vote]') == null) {
             //Клик 'Голосовать'
             document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
             //Вводит никнейм
-            const project = await getProject()
-            if (project == null) return
+            const project = await getProject('TopCraft')
             document.querySelector('input[name=nick]').value = project.nick
             //Клик 'Голосовать' в окне голосования
             document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
@@ -27,35 +21,14 @@ async function vote() {
                 document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i').click()
                 clearInterval(timer)
             } else {
-                const project = await getProject()
-                if (project == null) return
+                const project = await getProject('TopCraft')
                 document.querySelector('input[name=nick]').value = project.nick
                 document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
             }
         }
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getProject() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsTopCraft', data=>{
-            resolve(data['AVMRprojectsTopCraft'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id)) {
-            return project
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
 
 const timer = setInterval(()=>{
@@ -75,7 +48,7 @@ const timer = setInterval(()=>{
             clearInterval(timer)
         }
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
         clearInterval(timer)
     }
 }, 1000)
