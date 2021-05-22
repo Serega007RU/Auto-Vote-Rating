@@ -66,7 +66,7 @@ async function vote(first) {
 
         const project = await getProject()
         if (project == null) return
-        if (document.querySelector('input[name="username"]') != null) {
+        if (document.querySelector('input[name="username"]') != null && document.querySelector('input[name="username"]').type != 'hidden') {
             if (project.nick == null || project.nick == '') {
                 chrome.runtime.sendMessage({requiredNick: true})
                 return
