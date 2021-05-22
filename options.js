@@ -1955,7 +1955,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('urlGame').removeAttribute('style')
         document.getElementById('chooseGameListForge').required = true
     } else if (laterChoose == 'ListForge') {
-        document.getElementById('nick').required = true
+        if (selectedTop.value != 'TopGG' && selectedTop.value != 'DiscordBotList' && selectedTop.value != 'BotsForDiscord') document.getElementById('nick').required = true
         if (selectedTop.value != 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('urlGame').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
@@ -1965,7 +1965,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('nick').required = false
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
     } else if (laterChoose == 'BestServersCom') {
-        document.getElementById('nick').required = true
+        if (selectedTop.value != 'TopGG' && selectedTop.value != 'DiscordBotList' && selectedTop.value != 'BotsForDiscord' && selectedTop.value != 'BestServersCom') document.getElementById('nick').required = true
         if (selectedTop.value != 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
     }
 
