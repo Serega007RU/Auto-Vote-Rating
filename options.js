@@ -2093,12 +2093,15 @@ async function createNotif(message, type, delay, element) {
     }
     notif.append(mesBlock)
     notif.style.visibility = 'hidden'
-    document.getElementById('notifBlock').append(notif)
+    document.getElementById('notifBlock2').append(notif)
 
     let allNotifH
     function calcAllNotifH() {
         allNotifH = 10
         document.querySelectorAll('#notifBlock > .notif').forEach((el)=> {
+            allNotifH = allNotifH + el.clientHeight + 10
+        })
+        document.querySelectorAll('#notifBlock2 > .notif').forEach((el)=> {
             allNotifH = allNotifH + el.clientHeight + 10
         })
     }
