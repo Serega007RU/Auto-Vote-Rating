@@ -25,21 +25,7 @@ try {
                 vote(false)
             }
         }
-        if (document.getElementById('vote-loading-block') != null) {
-            const timer1 = setInterval(()=>{
-                try {
-                    if (document.getElementById('vote-loading-block').style.display == 'none') {
-                        vote(true)
-                        clearInterval(timer1)
-                    }
-                } catch (e) {
-                    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
-                    clearInterval(timer1)
-                }
-            }, 1000)
-        } else {
-            vote(true)
-        }
+        vote(true)
     }
 } catch (e) {
     chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
@@ -57,9 +43,13 @@ async function vote(first) {
         }
 
         //Пилюля от жадности
-        if (document.getElementById('adblock-notice') != null) document.getElementById('adblock-notice').style.display = 'none'
+        if (document.getElementById('adblock-notice') != null) document.getElementById('adblock-notice').remove()
+        if (document.getElementById('adsense-notice') != null) document.getElementById('adsense-notice').remove()
+        if (document.getElementById('vote-loading-block') != null) document.getElementById('vote-loading-block').remove()
+        if (document.getElementById('blocked-notice') != null) document.getElementById('blocked-notice').remove()
+        if (document.getElementById('privacysettings-notice') != null) document.getElementById('privacysettings-notice').remove()
         if (document.getElementById('vote-form-block') != null) document.getElementById('vote-form-block').removeAttribute('style')
-        if (document.getElementById('blocked-notice') != null) document.getElementById('blocked-notice').style.display = 'none'
+        if (document.getElementById('vote-button-block') != null) document.getElementById('vote-button-block').removeAttribute('style')
 
         for (const el of document.querySelectorAll('div.alert.alert-info')) {
             if (el.textContent.includes('server has been removed')) {
@@ -75,47 +65,48 @@ async function vote(first) {
             }
         }
 
-        for (const el of document.querySelectorAll('div.alert.alert-danger')) {
-            if (el.offsetParent != null) {
-                if (el.textContent.includes('already voted')) {
-                    chrome.runtime.sendMessage({later: true})
-                    return
-                } else if (el.parentElement.href == null) {
-                    chrome.runtime.sendMessage({message: el.textContent.trim()})
-                    return
-                }
+        if (document.querySelector('div.alert.alert-danger') != null) {
+            if (document.querySelector('div.alert.alert-danger').textContent.includes('already voted')) {
+                chrome.runtime.sendMessage({later: true})
+                return
             }
+            chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent.trim()})
+            return
+        }
+
+        //Если на странице есть hCaptcha то мы ждём её решения
+        if (document.querySelector('div.h-captcha') != null && first) {
+            return
+        }
+
+        //Соглашаемся с Privacy Policy
+        document.getElementById('accept').checked = true
+
+        //Если требуется авторизация Steam
+        if (document.querySelector('form[name="steam_form"] > input[type="image"]') != null) {
+            document.querySelector('form[name="steam_form"] > input[type="image"]').click()
+            return
         }
 
         const project = await getProject()
         if (project == null) return
-        
-        //Если на странице есть hCaptcha и мы голосуем через Steam то ждём её решения
-        if (document.querySelector('div.h-captcha') != null && first && project.nick && project.nick != '') {
-            return
-        }
-        
-        //Соглашаемся с Privacy Policy
-        document.querySelectorAll('#accept').forEach(e=>{e.checked = true})
+
         //Вводим ник если он существует
-        if (document.getElementById('nickname') != null && project.nick && project.nick != '') {
+        if (document.getElementById('nickname') != null) {
+            if (project.nick == null || project.nick == '') {
+                chrome.runtime.sendMessage({requiredNick: true})
+                return
+            }
             document.getElementById('nickname').value = project.nick
             //Кликаем проголосовать, если нет hCaptcha
             if (document.getElementById('voteBtn') != null) {
                 document.getElementById('voteBtn').click()
             //Если hCaptcha
             } else {
-                document.querySelector('a.btn.btn-large.btn-primary.mt-1').click()
+                document.querySelector('button[form="vote_form"]').click()
             }
         } else {
-            //Если Steam
-            if (document.querySelector('form[name="steam_form"] > input[type="image"]') != null) {
-                document.querySelector('form[name="steam_form"] > input[type="image"]').click()
-            } else if (document.getElementById('nickname') != null) {
-                chrome.runtime.sendMessage({requiredNick: true})
-            } else {
-                chrome.runtime.sendMessage({errorVoteNoElement: true})
-            }
+            throw null
         }
         
     } catch (e) {
