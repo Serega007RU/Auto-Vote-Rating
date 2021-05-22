@@ -1031,6 +1031,10 @@ async function _fetch(url, options, project) {
     }
     chrome.webRequest.onBeforeRequest.addListener(listener, {urls: ['<all_urls>']})
 
+    if (!options) options = {}
+    //Поддержка для браузера Uran (Chrome версии 59+)
+    options.credentials = 'include'
+
     try {
         const response = await fetch(url, options)
         return response

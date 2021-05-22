@@ -776,9 +776,9 @@ async function addProject(project, element) {
         let response
         try {
             if (project.MinecraftIpList) {
-                response = await fetch(url, {'credentials': 'omit'})
+                response = await fetch(url, {credentials: 'omit'})
             } else {
-                response = await fetch(url)
+                response = await fetch(url, {credentials: 'include'})
             }
         } catch (e) {
             if (e == 'TypeError: Failed to fetch') {
