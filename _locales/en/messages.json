@@ -1067,29 +1067,11 @@
       }
     }
   },
-  "download": {
-    "message": "Download"
+  "update": {
+    "message": "Update"
   },
   "voteMode": {
     "message": "Force the voting mode to be set"
-  },
-  "updateInstr": {
-    "message": "Instructions for updating the extension"
-  },
-  "updateInstr2": {
-    "message": "Before updating, we recommend "
-  },
-  "updateInstr3": {
-    "message": " just in case you mess up."
-  },
-  "updateInstr4": {
-    "message": "Unzip the downloaded archive with the replacement files to the folder where you installed the extension (where you first unpacked the extension and installed it). After unpacking "
-  },
-  "updateInstr5": {
-    "message": "restart"
-  },
-  "updateInstr6": {
-    "message": " extension."
   },
   "updated": {
     "message": "Extension successfully updated to $version$",
@@ -1121,5 +1103,43 @@
   },
   "suspended": {
     "message": "Extension suspended"
+  },
+  "updating": {
+    "message": "Updating the extension"
+  },
+  "reloadExtension": {
+    "message": "Restart the extension"
+  },
+  "update1": {
+    "message": "Due to the limitations of the Chrome API, we can not determine in which folder you have installed the extension, specify in which folder you have installed the extension and then allow access to the specified folder"
+  },
+  "update2": {
+    "message": "We check whether you specified the correct folder location"
+  },
+  "update3": {
+    "message": "This extension is not installed in this folder, specify the folder that you specified when installing this extension ($error$)",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "update4": {
+    "message": "Download a backup copy of the extension settings in case the update fails"
+  },
+  "update5": {
+    "message": "We delete all files and folders of the extension for subsequent updates"
+  },
+  "update6": {
+    "message": "We turn to git for a list of new files"
+  },
+  "dowloading": {
+    "message": "Downloading "
+  },
+  "update7": {
+    "message": "If you have installed Chrome or Windows antivirus, you may notice a lags after the update, this is normal, antivirus software checks the downloaded files"
+  },
+  "update8": {
+    "message": "The extension has been updated successfully, restart the extension for the changes to take effect"
   }
 }

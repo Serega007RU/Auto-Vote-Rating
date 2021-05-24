@@ -321,37 +321,161 @@ async function restoreOptions() {
         }
     })
 
-    let response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/files/manifest.json/raw?ref=multivote')
-    let json = await response.json()
+    await checkUpdateAvailbe()
+}
+
+async function checkUpdateAvailbe() {
+    const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/files/manifest.json/raw?ref=multivote')
+    const json = await response.json()
     if (new Version(chrome.runtime.getManifest().version).compareTo(new Version(json.version)) == -1) {
-        let a = document.createElement('a')
-        a.target = 'blank_'
-        a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/archive/multivote/auto-vote-rating-multivote.zip'
-        a.textContent = chrome.i18n.getMessage('download')
-        createNotif([chrome.i18n.getMessage('updateAvailbe', json.version), document.createElement('br'), a], 'success', 60000)
-        a.addEventListener('click', ()=>{
-            toggleModal('addFastProject')
-            document.querySelector('[data-resource="fastAdd"]').textContent = chrome.i18n.getMessage('updateInstr')
-            let message = document.querySelector('#addFastProject > div.content > .message')
-            message.append(chrome.i18n.getMessage('updateInstr2'))
-            let exportSettings = document.createElement('a')
-            exportSettings.className = 'link'
-            exportSettings.textContent = chrome.i18n.getMessage('exportSettings')
-            message.append(exportSettings)
-            exportSettings.addEventListener('click', ()=>{document.getElementById('file-download').click()})
-            message.append(chrome.i18n.getMessage('updateInstr3'))
-            message.append(document.createElement('br'))
-            message.append(chrome.i18n.getMessage('updateInstr4'))
-            let reloadExtension = document.createElement('a')
-            reloadExtension.className = 'link'
-            reloadExtension.textContent = chrome.i18n.getMessage('updateInstr5')
-            message.append(reloadExtension)
-            reloadExtension.addEventListener('click', ()=>{chrome.runtime.reload()})
-            message.append(chrome.i18n.getMessage('updateInstr6'))
-        })
+        const button = document.createElement('button')
+        button.addEventListener('click', () => update())
+        button.textContent = chrome.i18n.getMessage('update')
+        createNotif([chrome.i18n.getMessage('updateAvailbe', json.version), document.createElement('br'), button], 'success', 60000)
     } else if (document.URL.endsWith('?updated')) {
         window.history.replaceState(null, null, 'options.html')
         createNotif(chrome.i18n.getMessage('updated', chrome.runtime.getManifest().version), 'success')
+    }
+}
+
+//Автоматизированное обновление расширения с git
+async function update() {
+    document.querySelector('[data-resource="fastAdd"]').textContent = chrome.i18n.getMessage('updating')
+    document.querySelector('#addFastProject .content .message').parentNode.replaceChild(document.querySelector('#addFastProject .content .message').cloneNode(false), document.querySelector('#addFastProject .content .message'))
+    document.querySelector('#addFastProject .content .events').parentNode.replaceChild(document.querySelector('#addFastProject .content .events').cloneNode(false), document.querySelector('#addFastProject .content .events'))
+    const message = document.querySelector('#addFastProject > div.content > .message')
+    const progress = document.createElement('progress')
+    const events = document.querySelector('#addFastProject > div.content > .events')
+    message.append(progress)
+    try {
+        alert(chrome.i18n.getMessage('update1'))
+        //Спрашиваем у пользователя папку где установлено расширение и получаем её
+        const dirHandle = await window.showDirectoryPicker()
+        if (!document.getElementById('addFastProject').className.includes('active')) toggleModal('addFastProject')
+        //Проверяем на соответствие манифеста
+        progress.before(chrome.i18n.getMessage('update2'))
+        progress.before(document.createElement('br'))
+        message.scrollTop = message.scrollHeight
+        let manifestHandle
+        try {
+             manifestHandle = await dirHandle.getFileHandle('manifest.json')
+        } catch (e) {
+            if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
+                throw Error(chrome.i18n.getMessage('update3', 'Not found manifest'))
+            } else {
+                throw e
+            }
+        }
+        const manifestFile = await manifestHandle.getFile()
+        const manifest = await manifestFile.text()
+        if (manifest != JSON.stringify(chrome.runtime.getManifest())) {
+            throw Error(chrome.i18n.getMessage('update3', 'Invalid manifest'))
+        }
+        //Также ещё проверим временным файлом в случае если у пользователя дубликат папки расширения. Засовываем в эту папку файл AVRtemp для проверки что пользователь указал дейсвительно правильную папку
+        const tempFileHandle = await dirHandle.getFileHandle('AVRtemp', {create: true})
+        //Проверяем дейсвительно ли это та папка?
+        await new Promise((resolve, reject)=>{
+            //Проверяем существует ли файл в AVRtemp в правильной папки расширения (этот метод даёт только изолированный доступ к папке расширения и мы можем только её читать чем мы и пользуемся)
+            chrome.runtime.getPackageDirectoryEntry(details=> {
+                details.getFile('AVRtemp', {}, file => resolve(file), error => reject(error))
+            })
+        }).catch(e=>{
+            if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
+                throw Error(chrome.i18n.getMessage('update3', 'Temporary file not found'))
+            } else {
+                throw e
+            }
+        }).finally(()=>{
+            dirHandle.removeEntry('AVRtemp')
+        })
+        
+        progress.before(chrome.i18n.getMessage('update4'))
+        progress.before(document.createElement('br'))
+        message.scrollTop = message.scrollHeight
+        document.getElementById('file-download').click()
+
+        //Удаляем все файлы для дальнейшего обновления
+        progress.before(chrome.i18n.getMessage('update5'))
+        progress.before(document.createElement('br'))
+        message.scrollTop = message.scrollHeight
+        for await (const entry of dirHandle.values()) {
+            await dirHandle.removeEntry(entry.name, {recursive: true})
+        }
+
+        //Обращаемся к git где все у нас файлы перечислены
+        progress.before(chrome.i18n.getMessage('update6'))
+        progress.before(document.createElement('br'))
+        message.scrollTop = message.scrollHeight
+        const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/tree?recursive=true&per_page=999&ref=multivote')
+        const json = await response.json()
+        progress.value = -1
+        progress.max = json.length
+        for (const file of json) {
+            progress.value = progress.value + 1
+            if (file.type == 'blob') {
+                progress.before(chrome.i18n.getMessage('dowloading') + file.path)
+                progress.before(document.createElement('br'))
+                message.scrollTop = message.scrollHeight
+                file.url = 'https://gitlab.com/api/v4/projects/19831620/repository/files/' + file.path.replaceAll('/', '%2F') + '/raw?ref=multivote'
+                await createFile(dirHandle, file.path.split('/'), file)
+            }
+        }
+        
+        //Создаёт поддиректории если их не существует и создаёт файл в нужной дирректории
+        async function createFile(rootDirEntry, folders, file) {
+            if (folders.length == 1) {
+                //Создаём файл
+                const newFileHandle = await rootDirEntry.getFileHandle(file.name, {create: true})
+                await writeURLToFile(newFileHandle, file.url)
+                return
+            }
+            //Фильтруем './' и '/' 
+            if (folders[0] == '.' || folders[0] == '') {
+                folders = folders.slice(1)
+            }
+            const dirEntry = await rootDirEntry.getDirectoryHandle(folders[0], {create: true})
+            if (folders.length) {//Если есть ещё поддиректории
+                createFile(dirEntry, folders.slice(1), file)
+            }
+        }
+        //Записывает в указанный файл содержимое из указанного URL
+        async function writeURLToFile(fileHandle, url) {
+            // Create a FileSystemWritableFileStream to write to.
+            const writable = await fileHandle.createWritable()
+            // Make an HTTP request for the contents.
+            const response = await fetch(url)
+            // Stream the response into the file.
+            await response.body.pipeTo(writable)
+            // pipeTo() closes the destination pipe by default, no need to close it.
+        }
+        progress.before(createMessage(chrome.i18n.getMessage('update7'), 'warn'))
+        progress.before(document.createElement('br'))
+        progress.before(createMessage(chrome.i18n.getMessage('update8'), 'success'))
+        progress.before(document.createElement('br'))
+        message.scrollTop = message.scrollHeight
+        const buttonReload = document.createElement('button')
+        buttonReload.classList.add('btn')
+        buttonReload.textContent = chrome.i18n.getMessage('reloadExtension')
+        document.querySelector('#addFastProject > div.content > .events').append(buttonReload)
+        buttonReload.addEventListener('click', ()=> {
+            chrome.runtime.reload()
+        })
+    } catch (e) {
+        if (document.getElementById('addFastProject').className.includes('active')) {
+            progress.before(createMessage(e, 'error'))
+            progress.before(document.createElement('br'))
+        } else {
+            createNotif(e, 'error')
+        }
+        message.scrollTop = message.scrollHeight
+        if (!progress.value) progress.value = 0
+        const buttonRetry = document.createElement('button')
+        buttonRetry.classList.add('btn')
+        buttonRetry.textContent = chrome.i18n.getMessage('retry')
+        events.append(buttonRetry)
+        buttonRetry.addEventListener('click', ()=> {
+            update()
+        })
     }
 }
 

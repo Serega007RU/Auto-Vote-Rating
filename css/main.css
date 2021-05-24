@@ -338,6 +338,10 @@ nav .logo img {
 	color: #fff;
 }
 
+#modals .modal#addFastProject .content .message progress {
+	width: 100%;
+}
+
 @media(max-width: 450px) {
     #modals .modal {
         width: calc(100% - 30px);
