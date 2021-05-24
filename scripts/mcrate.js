@@ -1,9 +1,5 @@
-vote()
-async function vote() {
-    if (document.URL.includes('.vk')) {
-        chrome.runtime.sendMessage({errorAuthVK: true})
-        return
-    }
+async function vote(first) {
+    if (first == false) return
     try {
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
@@ -14,10 +10,8 @@ async function vote() {
             document.querySelector('a[class=vk_authorization]').click()
         } else if (document.querySelector('input[name=login_player]') != null) {
             //Ввод ника и голосование
-            const nick = await getNickName()
-            if (nick == null || nick == '')
-                return
-            document.querySelector('input[name=login_player]').value = nick
+            const project = await getProject('MCRate')
+            document.querySelector('input[name=login_player]').value = project.nick
             document.querySelector('span[id=buttonrate]').click()
         } else if (document.querySelector('div[class=report]') != null) {
             if (document.querySelector('div[class=report]').textContent.includes('Ваш голос засчитан')) {
@@ -49,26 +43,6 @@ async function vote() {
             chrome.runtime.sendMessage({errorVoteNoElement: true})
         }
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getNickName() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsMCRate', data=>{
-            resolve(data['AVMRprojectsMCRate'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id)) {
-            return project.nick
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

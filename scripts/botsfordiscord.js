@@ -1,10 +1,3 @@
-window.onmessage = function(e) {
-    if (e.data == 'vote') {
-        vote(false)
-    }
-}
-vote(true)
-
 function vote(first) {
     try {
         if (document.URL.startsWith('https://discord.com/')) {
@@ -24,11 +17,6 @@ function vote(first) {
                     clearTimeout(timer)
                 }
             }
-            return
-        }
-
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
 
@@ -56,12 +44,10 @@ function vote(first) {
             return
         }
 
-        if (first)
-            return
+        if (first) return
         
         document.querySelector('button[type="submit"]').click()
-
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
 }

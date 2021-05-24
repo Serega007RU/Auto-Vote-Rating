@@ -472,7 +472,7 @@
     }
   },
   "errorVoteNoNick2": {
-    "message": "Unexpected error, could not find the nickname. URL: $url$",
+    "message": "Unexpected error, could not find the project. URL: $url$",
     "placeholders": {
       "url": {
         "content": "$1"
@@ -1115,5 +1115,11 @@
   },
   "tempNick": {
     "message": "Temporary nickname"
+  },
+  "start": {
+    "message": "Launching the extension"
+  },
+  "suspended": {
+    "message": "Extension suspended"
   }
 }

@@ -1,5 +1,5 @@
-vote()
-async function vote() {
+async function vote(first) {
+    if (first == false) return
     try {
         if (document.querySelector('#flashes').textContent.trim() != '') {
             if (document.querySelector('#flashes').textContent.includes('successfully voted')) {
@@ -21,9 +21,8 @@ async function vote() {
         }
         
         document.getElementById('captcha-button').click()
-        const nick = await getNickName()
-        if (nick == null || nick == '') return
-        document.getElementById('web_server_vote_username').value = nick
+        const project = await getProject('PixelmonServers')
+        document.getElementById('web_server_vote_username').value = project.nick
         const timer = setInterval(()=>{
             try {
                 if (document.getElementById('captcha-input').style.display != 'none') {
@@ -31,31 +30,11 @@ async function vote() {
                     clearInterval(timer)
                 }
             } catch (e) {
-                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+                throwError(e)
                 clearInterval(timer)
             }
         }, 1000)
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getNickName() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsPixelmonServers', data=>{
-            resolve(data['AVMRprojectsPixelmonServers'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id)) {
-            return project.nick
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }

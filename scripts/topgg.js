@@ -1,5 +1,5 @@
-vote()
-function vote() {
+function vote(first) {
+    if (first == false) return
     try {
         if (document.URL.startsWith('https://discord.com/')) {
             if (document.URL.includes('%20guilds')) {
@@ -19,11 +19,6 @@ function vote() {
                     clearTimeout(timer)
                 }
             }
-            return
-        }
-
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
             return
         }
 
@@ -61,12 +56,12 @@ function vote() {
                     clearInterval(timer2)
                 }
             } catch (e) {
-                chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+                throwError(e)
                 clearInterval(timer2)
             }
         }, 1000)
 
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
 }

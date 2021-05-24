@@ -411,18 +411,6 @@ cooldown проверки голосования по умолчанию изм�
 - Удалена поддержка мобильной версии на MinecraftIpList и ServerPact, им явно никто не пользуется, это требует permission webRequest и webRequestBlocking
 
 ## [Unreleased] Планируется:
-Добавить поддержку следующих рейтингов:    
-https://minecraftservery.eu/    
-https://www.rpg-paradize.com/ под вопросом, ждём ответа Germaiin#9506 на вопрос "а где поле для ввода никнейма?"    
-https://www.minecraft-serverlist.net/    
-https://minecraft-server.eu/ под вопросом, сайт не работает на момент проверки    
-https://www.minecraftkrant.nl/    
-https://www.trackyserver.com/    
-https://mc-lists.org/    
-https://topmcservers.com/    
-https://bestservers.com/    
-https://craft-list.net/    
-https://www.minecraft-servers-list.org/    
 Редактирование уже добавленного проекта    
 добавить все рейтинги которые поддерживает https://toplistvoter.com/ (скриншот на случай если сайт сдохнет: http://ipic.su/img/img7/fs/Snimok11.1607325493.png)   
 добавить все рейтинги которые поддерживает https://toplistbot.com/   

@@ -1,20 +1,5 @@
-window.onmessage = function(e) {
-    if (e.data == 'vote') {
-        vote(false)
-    }
-}
-vote(true)
-
 async function vote(first) {
     try {
-        //Если идёт проверка CloudFlare
-        if (document.querySelector('#cf-content > h1 > span') != null) {
-            return
-        }
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
         //Ессли есть ошибка
         if (document.querySelector('#c > div > div > div.bvt > p.alert.alert-danger') != null) {
             //Если не удалось пройти капчу
@@ -51,35 +36,13 @@ async function vote(first) {
             chrome.runtime.sendMessage({successfully: true})
             return
         }
-        if (first) {
-            return
-        }
-        const nick = await getNickName()
-        if (nick == null)
-            return
-        document.querySelector('#c > div > div > div.bvt > form > input.pseudov').value = nick
+        
+        if (first) return
+
+        const project = await getProject('ServeurPrive', true)
+        document.querySelector('#c > div > div > div.bvt > form > input.pseudov').value = project.nick
         document.querySelector('#c > div > div > div.bvt > form > button').click()
     } catch (e) {
-        chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+        throwError(e)
     }
-}
-
-async function getNickName() {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojectsServeurPrive', data=>{
-            resolve(data['AVMRprojectsServeurPrive'])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes((project.game == null ? 'minecraft' : project.game)) && document.URL.includes(project.id)) {
-            return project.nick
-        }
-    }
-
-    chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
 }
