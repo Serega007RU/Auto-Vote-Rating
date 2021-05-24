@@ -10,10 +10,7 @@ let content = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 async function vote(first) {
     if (document.URL.startsWith('chrome-extension://' + chrome.runtime.id)) return
-    if (first == false) {
-        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
-        return
-    }
+    if (first == false) return
     try {
         if (document.querySelector('#Content > div.Error') != null) {
             if (document.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {

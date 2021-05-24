@@ -1,8 +1,5 @@
 async function vote(first) {
-    if (first == false) {
-        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
-        return
-    }
+    if (first == false) return
     try {
         if (document.querySelector('body > div.container > div > div > div.alert.alert-danger') != null) {
             if (document.querySelector('body > div.container > div > div > div.alert.alert-danger').textContent.includes('already voted')) {

@@ -1,8 +1,5 @@
 async function vote(first) {
-    if (first == false) {
-        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
-        return
-    }
+    if (first == false) return
     try {
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {

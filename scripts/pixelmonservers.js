@@ -1,8 +1,5 @@
 async function vote(first) {
-    if (first == false) {
-        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
-        return
-    }
+    if (first == false) return
     try {
         if (document.querySelector('#flashes').textContent.trim() != '') {
             if (document.querySelector('#flashes').textContent.includes('successfully voted')) {

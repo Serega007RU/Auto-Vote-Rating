@@ -1,8 +1,5 @@
 async function vote(first) {
-    if (first == false) {
-        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
-        return
-    }
+    if (first == false) return
     try {
         if (document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && document.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
             chrome.runtime.sendMessage({successfully: true})

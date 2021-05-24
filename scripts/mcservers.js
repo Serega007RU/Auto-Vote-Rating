@@ -4,11 +4,7 @@ document.addEventListener('DOMContentLoaded', (event)=>{
 })
 
 async function vote(first) {
-    if (first == true) return
-    if (first == false) {
-        console.warn('[Auto Vote Rating] Произошёл повторный вызов функции vote(), сообщите разработчику расширения о данной ошибке')
-        return
-    }
+    if (first == true || first == false) return
     try {
         if (document.querySelector('div.main-panel > p') != null) {
             if (document.querySelector('div.main-panel > p').textContent.includes('already voted')) {
