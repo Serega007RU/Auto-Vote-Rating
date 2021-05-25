@@ -1149,5 +1149,8 @@
         "content": "$1"
       }
     }
+  },
+  "errorSelectSiteRating": {
+    "message": "The 'Rating Site' is specified incorrectly, select the one you need from the list"
   }
 }

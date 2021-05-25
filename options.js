@@ -1779,7 +1779,13 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
         blockButtons = true
     }
     let project = {}
-    project[document.getElementById('project').value] = true
+    const name = document.querySelector('#projectList > option[value="' + this.project.value + '"]')?.getAttribute('name')
+    if (name == null) {
+        createNotif(chrome.i18n.getMessage('errorSelectSiteRating'), 'error')
+        blockButtons = false
+        return
+    }
+    project[name] = true
     project.id = document.getElementById('id').value
     if (!project.TopGG && !project.DiscordBotList && !project.BotsForDiscord && document.getElementById('nick').value != '') {
         project.nick = document.getElementById('nick').value
