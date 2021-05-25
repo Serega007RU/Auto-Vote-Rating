@@ -1497,8 +1497,8 @@ async function fastAdd() {
 }
 
 function addCustom() {
-    if (document.querySelector('option[name="Custom"]').hidden) {
-        document.querySelector('option[name="Custom"]').hidden = false
+    if (document.querySelector('option[name="Custom"]').disabled) {
+        document.querySelector('option[name="Custom"]').disabled = false
     }
 
 //  if (document.getElementById('CustomButton') == null) {
@@ -1650,6 +1650,31 @@ selectedTop.addEventListener('change', function() {
     if (name == null) {
         this.value = ''
         document.getElementById('idSelector').style.display = 'none'
+        document.getElementById('label1').style.display = 'none'
+        document.getElementById('label2').style.display = 'none'
+        document.getElementById('label3').style.display = 'none'
+        document.getElementById('label4').style.display = 'none'
+        document.getElementById('label5').style.display = 'none'
+        document.getElementById('label6').style.display = 'none'
+        document.getElementById('label7').style.display = 'none'
+        document.getElementById('label8').style.display = 'none'
+        document.getElementById('label9').style.display = 'none'
+        document.getElementById('label10').style.display = 'none'
+        document.getElementById('countVote').required = false
+        document.getElementById('id').required = false
+        document.getElementById('ordinalWorld').required = false
+        document.getElementById('time').required = false
+        document.getElementById('hour').required = false
+        document.getElementById('nick').required = true
+        document.getElementById('nick').parentElement.removeAttribute('style')
+        document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
+        document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
+        if (laterChoose && (laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU')) {
+            document.getElementById('selectLang' + laterChoose).style.display = 'none'
+            document.getElementById('selectLang' + laterChoose).required = false
+            document.getElementById('chooseGame' + laterChoose).style.display = 'none'
+            document.getElementById('chooseGame' + laterChoose).required = false
+        }
         return
     }
     document.getElementById('idSelector').removeAttribute('style')
