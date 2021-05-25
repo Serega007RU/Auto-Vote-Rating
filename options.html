@@ -58,55 +58,55 @@
                         </div>
                         <div class="input-block">
                             <label data-resource="siteTop" for="project"></label>
-                            <select required id="project" class="select">
-                                <option data-resource="selectTop" value="" selected="" disabled=""></option>
-                                <option value="BestServersCom">BestServers.com</option>
-                                <option value="BotsForDiscord">BotsForDiscord.com</option>
-                                <option value="CraftList">CraftList.org</option>
-                                <option value="CraftListNet">Craft-List.net</option>
-                                <option value="CzechCraft">Czech-Craft.eu</option>
-                                <option value="DiscordBotList">DiscordBotList.com</option>
-                                <option value="HotMC">HotMC.ru</option>
-                                <option value="IonMc">IonMc.top</option>
-                                <option value="ListForge">ListForge.net (minecraft-mp.com)</option>
-                                <option value="MCServers">MC-Servers.com</option>
-                                <option value="MCRate">MCRate.su</option>
-                                <option value="MCServerList">MCServer-List.eu</option>
-                                <option value="MMoTopRU">MMoTop.ru</option>
-                                <option value="McTOP">McTOP.su</option>
-                                <option value="MinecraftIndex">Minecraft-Index.com</option>
-                                <option value="MinecraftKrant">MinecraftKrant.nl</option>
-                                <option value="MinecraftServerList">Minecraft-Server-List.com</option>
-                                <option value="MinecraftServerListNet">Minecraft-ServerList.net</option>
-                                <option value="MinecraftServersListOrg">Minecraft-Servers-List.org</option>
-                                <option value="MinecraftServerNet">Minecraft-Server.net</option>
-                                <option value="MinecraftServerEu">Minecraft-Server.eu</option>
-                                <option value="MinecraftBuzz">Minecraft.Buzz</option>
-                                <option value="MinecraftIpList">MinecraftIpList.com</option>
-                                <option value="MinecraftList">MinecraftList.org</option>
-                                <option value="MinecraftRating">MinecraftRating.ru</option>
-                                <option value="MinecraftServersBiz">MinecraftServers.biz</option>
-                                <option value="MinecraftServery">MinecraftServery.eu</option>
-                                <option value="MinecraftServersOrg">MinecraftServers.org</option>
-                                <option value="MonitoringMinecraft">MonitoringMinecraft.ru</option>
-                                <option value="PixelmonServers">PixelmonServers.com</option>
-                                <option value="PlanetMinecraft">PlanetMinecraft.com</option>
-                                <option value="QTop">Q-Top.ru</option>
-                                <option value="ServerList101">ServerList101.com</option>
-                                <option value="ServerListe">ServerListe.net</option>
-                                <option value="ServerPact">ServerPact.com</option>
-                                <option value="ServeurPrive">Serveur-Prive.net</option>
-                                <option value="TMonitoring">TMonitoring.com</option>
-                                <option value="TopCraft">TopCraft.ru</option>
-                                <option value="TopGames">Top-Games.net or Top-Serveurs.net</option>
-                                <option value="TopGG">Top.gg</option>
-                                <option value="TopG">TopG.org</option>
-                                <option value="TopMinecraftServers">TopMinecraftServers.org</option>
-                                <option value="TrackyServer">TrackyServer.com</option>
-                                <option value="MCListsOrg">MC-Lists.org</option>
-                                <option value="RPGParadize">RPG-Paradize.com</option>
-                                <option value="Custom" data-resource="Custom" hidden></option>
-                            </select>
+                            <input class="input" name="project" type="text" id="project" placeholder="selectTop" list="projectList" class="input" required>
+                            <datalist id="projectList">
+                                <option name="BestServersCom" value="BestServers.com"></option>
+                                <option name="BotsForDiscord" value="BotsForDiscord.com"></option>
+                                <option name="CraftList" value="CraftList.org"></option>
+                                <option name="CraftListNet" value="Craft-List.net"></option>
+                                <option name="CzechCraft" value="Czech-Craft.eu"></option>
+                                <option name="DiscordBotList" value="DiscordBotList.com"></option>
+                                <option name="HotMC" value="HotMC.ru"></option>
+                                <option name="IonMc" value="IonMc.top"></option>
+                                <option name="ListForge" value="ListForge.net"> or Minecraft-MP.com</option>
+                                <option name="MCServers" value="MC-Servers.com"></option>
+                                <option name="MCRate" value="MCRate.su"></option>
+                                <option name="MCServerList" value="MCServer-List.eu"></option>
+                                <option name="MMoTopRU" value="MMoTop.ru"></option>
+                                <option name="McTOP" value="McTOP.su"></option>
+                                <option name="MinecraftIndex" value="Minecraft-Index.com"></option>
+                                <option name="MinecraftKrant" value="MinecraftKrant.nl"></option>
+                                <option name="MinecraftServerList" value="Minecraft-Server-List.com"></option>
+                                <option name="MinecraftServerListNet" value="Minecraft-ServerList.net"></option>
+                                <option name="MinecraftServersListOrg" value="Minecraft-Servers-List.org"></option>
+                                <option name="MinecraftServerNet" value="Minecraft-Server.net"></option>
+                                <option name="MinecraftServerEu" value"Minecraft-Server.eu"></option>
+                                <option name="MinecraftBuzz" value="Minecraft.Buzz"></option>
+                                <option name="MinecraftIpList" value="MinecraftIpList.com"></option>
+                                <option name="MinecraftList" value="MinecraftList.org"></option>
+                                <option name="MinecraftRating" value="MinecraftRating.ru"></option>
+                                <option name="MinecraftServersBiz" value="MinecraftServers.biz"></option>
+                                <option name="MinecraftServery" value="MinecraftServery.eu"></option>
+                                <option name="MinecraftServersOrg" value="MinecraftServers.org"></option>
+                                <option name="MonitoringMinecraft" value="MonitoringMinecraft.ru"></option>
+                                <option name="PixelmonServers" value="PixelmonServers.com"></option>
+                                <option name="PlanetMinecraft" value="PlanetMinecraft.com"></option>
+                                <option name="QTop" value="Q-Top.ru"></option>
+                                <option name="ServerList101" value="ServerList101.com"></option>
+                                <option name="ServerListe" value="ServerListe.net"></option>
+                                <option name="ServerPact" value="ServerPact.com"></option>
+                                <option name="ServeurPrive" value="Serveur-Prive.net"></option>
+                                <option name="TMonitoring" value="TMonitoring.com"></option>
+                                <option name="TopCraft" value="TopCraft.ru"></option>
+                                <option name="TopGames" value="Top-Games.net">or Top-Serveurs.net</option>
+                                <option name="TopGG" value="Top.gg"></option>
+                                <option name="TopG" value="TopG.org"></option>
+                                <option name="TopMinecraftServers" value="TopMinecraftServers.org"></option>
+                                <option name="TrackyServer" value="TrackyServer.com"></option>
+                                <option name="MCListsOrg" value="MC-Lists.org"></option>
+                                <option name="RPGParadize" value="RPG-Paradize.com"></option>
+                                <option name="Custom" value="Custom" data-resource="Custom" disabled></option>
+                            </datalist>
                         </div>
                         <!--Custom-->
                         <div style="display: none;" id="label6" class="input-block">

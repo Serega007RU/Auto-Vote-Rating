@@ -1141,5 +1141,13 @@
   },
   "update8": {
     "message": "The extension has been updated successfully, restart the extension for the changes to take effect"
+  },
+  "errordb": {
+    "message": "Error with the database $db$",
+    "placeholders": {
+      "db": {
+        "content": "$1"
+      }
+    }
   }
 }
