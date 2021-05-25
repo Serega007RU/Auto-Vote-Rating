@@ -795,5 +795,13 @@
   },
   "suspended": {
     "message": "Extension suspended"
+  },
+  "errordb": {
+    "message": "Error with the database $db$",
+    "placeholders": {
+      "db": {
+        "content": "$1"
+      }
+    }
   }
 }
