@@ -2852,7 +2852,6 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
 
 document.getElementById('logs-download').addEventListener('click', ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))
-
     const openRequest = indexedDB.open('logs', 1)
     openRequest.onupgradeneeded = function() {
         // срабатывает, если на клиенте нет базы данных
@@ -2891,6 +2890,44 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
             openPoput(anchor.href)
             
             createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
+        }
+    }
+})
+
+//Сколько использовано места на логи
+usageLogs()
+async function usageLogs() {
+    const quota = await navigator.storage.estimate()
+    const usage = quota.usageDetails.indexedDB / (1024 * 1024)
+    document.querySelector('span[data-resource="clearLogs"]').textContent = chrome.i18n.getMessage('clearLogs') + ' (' + usage.toFixed(3) + ' Mib)'
+}
+//Очистка логов
+document.getElementById('logs-clear').addEventListener('click', ()=>{
+    createNotif(chrome.i18n.getMessage('clearingLogs'))
+    const openRequest = indexedDB.open('logs', 1)
+    openRequest.onupgradeneeded = function() {
+        // срабатывает, если на клиенте нет базы данных
+        // ...выполнить инициализацию...
+        openRequest.result.createObjectStore('logs', {autoIncrement: true})
+        //Удаляем старые логи из localStorage
+        if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
+    }
+    openRequest.onerror = function() {
+        createNotif(chrome.i18n.getMessage('errordb', 'logs') + ' ' + openRequest.error, 'e')
+    }
+    openRequest.onsuccess = function() {
+        const db = openRequest.result
+        db.onerror = function(event) {
+            let request = event.target; // запрос, в котором произошла ошибка
+            createNotif(chrome.i18n.getMessage('errordb', 'logs') + ' ' + request.error, 'e');
+        }
+        // продолжить работу с базой данных, используя объект db
+        const transaction = db.transaction('logs', 'readwrite')
+        const logs = transaction.objectStore('logs')
+        const request = logs.clear()
+        request.onsuccess = function() {
+            createNotif(chrome.i18n.getMessage('clearedLogs'), 'success')
+            usageLogs()
         }
     }
 })
