@@ -1225,16 +1225,46 @@ document.getElementById('file-download').addEventListener('click', ()=>{
 document.getElementById('logs-download').addEventListener('click', ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))
 
-    let blob = new Blob([localStorage.consoleHistory],{type: 'text/plain;charset=UTF-8;'})
-    let anchor = document.createElement('a')
-
-    anchor.download = 'console_history.txt'
-    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
-    anchor.dataset.downloadurl = ['text/plain;charset=UTF-8;', anchor.download, anchor.href].join(':')
-    
-    openPoput(anchor.href)
-
-    createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
+    const openRequest = indexedDB.open('logs', 1)
+    openRequest.onupgradeneeded = function() {
+        // срабатывает, если на клиенте нет базы данных
+        // ...выполнить инициализацию...
+        openRequest.result.createObjectStore('logs', {autoIncrement: true})
+        //Удаляем старые логи из localStorage
+        if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
+    }
+    openRequest.onerror = function() {
+        createNotif(chrome.i18n.getMessage('errordb', 'logs') + ' ' + openRequest.error, 'e')
+    }
+    openRequest.onsuccess = function() {
+        const db = openRequest.result
+        db.onerror = function(event) {
+            let request = event.target; // запрос, в котором произошла ошибка
+            createNotif(chrome.i18n.getMessage('errordb', 'logs') + ' ' + request.error, 'e');
+        }
+        // продолжить работу с базой данных, используя объект db
+        const transaction = db.transaction('logs', 'readonly')
+        const logs = transaction.objectStore('logs')
+        const request = logs.getAll()
+        request.onsuccess = function() {
+            let text
+            for (const log of request.result) {
+                text += log
+                text += '\n'
+            }
+            
+            let blob = new Blob([text],{type: 'text/plain;charset=UTF-8;'})
+            let anchor = document.createElement('a')
+            
+            anchor.download = 'console_history.txt'
+            anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
+            anchor.dataset.downloadurl = ['text/plain;charset=UTF-8;', anchor.download, anchor.href].join(':')
+            
+            openPoput(anchor.href)
+            
+            createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
+        }
+    }
 })
 
 //Слушатель на импорт настроек

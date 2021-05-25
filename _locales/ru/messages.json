@@ -758,5 +758,13 @@
   },
   "suspended": {
     "message": "Расширение приостановлено"
+  },
+  "errordb": {
+    "message": "Ошибка с базой данных $db$",
+    "placeholders": {
+      "db": {
+        "content": "$1"
+      }
+    }
   }
 }
