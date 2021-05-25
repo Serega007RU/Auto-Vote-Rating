@@ -769,5 +769,14 @@
   },
   "errorSelectSiteRating": {
     "message": "Неверно указан 'Сайт рейтинга', выберите нужный из списка"
+  },
+  "clearLogs": {
+    "message": "Очистить логи"
+  },
+  "clearingLogs": {
+    "message": "Очищаем логи"
+  },
+  "clearedLogs": {
+    "message": "Логи успешно очищены"
   }
 }

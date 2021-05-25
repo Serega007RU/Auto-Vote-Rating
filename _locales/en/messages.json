@@ -806,5 +806,14 @@
   },
   "errorSelectSiteRating": {
     "message": "The 'Rating Site' is specified incorrectly, select the one you need from the list"
+  },
+  "clearLogs": {
+    "message": "Clear logs"
+  },
+  "clearingLogs": {
+    "message": "Clearing the logs"
+  },
+  "clearedLogs": {
+    "message": "Logs cleared successfully"
   }
 }
