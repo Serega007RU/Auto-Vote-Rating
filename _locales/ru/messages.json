@@ -1143,7 +1143,20 @@
       "rating": {
         "content": "$2"
       }
-
     }
+  },
+  "autoAuthVKStart": {
+    "message": "Автоматически разрешаю доступ к аккаунту $rating$",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
+  "autoAuthVK": {
+    "message": "Автоматически разрешать доступ к аккаунту ВК рейтингам"
+  },
+  "confirmAutoAuthVK": {
+    "message": "Вы согласны передавать личную информацию и адрес электронной почты от последующих добавляемых аккаунтов рейтингам? (TopCraft, McTOP, MCRate, MinecraftRating, MonitoringMinecraft и QTop)"
   }
 }

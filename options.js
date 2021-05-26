@@ -268,6 +268,17 @@ async function restoreOptions() {
                     document.getElementById('label8').style.display = 'none'
                 }
                 _return = true
+            } else if (this.id == 'autoAuthVK') {
+                if (this.checked && confirm(chrome.i18n.getMessage('confirmAutoAuthVK'))) {
+                    settings.autoAuthVK = this.checked
+                } else if (this.checked) {
+                    this.checked = false
+                    _return = true
+                } else {
+                    settings.autoAuthVK = this.checked
+                }
+            } else if (this.id == 'antiBanVK') {
+                settings.antiBanVK = this.checked
             }
             if (!_return) await setValue('AVMRsettings', settings)
             blockButtons = false
@@ -310,6 +321,8 @@ async function restoreOptions() {
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
     document.getElementById('useProxyOnUnProxyTop').checked = settings.useProxyOnUnProxyTop
+    document.getElementById('antiBanVK').checked = settings.antiBanVK
+    document.getElementById('autoAuthVK').checked = settings.autoAuthVK
     if (settings.stopVote > Date.now()) {
         document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
     }
@@ -1249,22 +1262,31 @@ async function checkAuthVK(VK) {
         }
 
         if (response2.ok) {
-            let a = document.createElement('a')
-            a.href = '#'
-            a.classList.add('link')
-            a.id = 'authvk' + key
-            a.textContent = key
-            a.addEventListener('click', function() {
-                openPoput(value, function () {
-                    if (document.getElementById('notAuthVK') != null) {
-                        removeNotif(document.getElementById('notAuthVK').parentElement.parentElement)
-                    }
-                    checkAuthVK(VK)
+            if (document.getElementById('autoAuthVK').checked) {
+                createNotif(chrome.i18n.getMessage('autoAuthVKStart', key))
+                response2.html = await response2.text()
+                response2.doc = new DOMParser().parseFromString(response2.html, 'text/html')
+                const text = response2.doc.querySelector('head > script:nth-child(9)').text
+                const url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
+                response2 = await fetch(url)
+            } else {
+                let a = document.createElement('a')
+                a.href = '#'
+                a.classList.add('link')
+                a.id = 'authvk' + key
+                a.textContent = key
+                a.addEventListener('click', function() {
+                    openPoput(value, function () {
+                        if (document.getElementById('notAuthVK') != null) {
+                            removeNotif(document.getElementById('notAuthVK').parentElement.parentElement)
+                        }
+                        checkAuthVK(VK)
+                    })
                 })
-            })
-            authStatus.push(a)
-            authStatus.push(' ')
-            needReturn = true
+                authStatus.push(a)
+                authStatus.push(' ')
+                needReturn = true
+            }
         } else if (response2.status != 0) {
             createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error')
             needReturn = true

@@ -1186,5 +1186,19 @@
         "content": "$2"
       }
     }
+  },
+  "autoAuthVKStart": {
+    "message": "I automatically allow access to account $rating$",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
+  "autoAuthVK": {
+    "message": "Automatically allow access to your VK account ratings"
+  },
+  "confirmAutoAuthVK": {
+    "message": "Do you agree to transfer personal information and email address from subsequent added accounts to ratings? (TopCraft, McTOP, MCRate, MinecraftRating, MonitoringMinecraft, and QTop)"
   }
 }
