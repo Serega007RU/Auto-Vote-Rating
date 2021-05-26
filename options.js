@@ -366,24 +366,24 @@ async function update() {
         const dirHandle = await window.showDirectoryPicker()
         if (!document.getElementById('addFastProject').className.includes('active')) toggleModal('addFastProject')
         //Проверяем на соответствие манифеста
-        progress.before(chrome.i18n.getMessage('update2'))
-        progress.before(document.createElement('br'))
-        message.scrollTop = message.scrollHeight
-        let manifestHandle
-        try {
-             manifestHandle = await dirHandle.getFileHandle('manifest.json')
-        } catch (e) {
-            if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
-                throw Error(chrome.i18n.getMessage('update3', 'Not found manifest'))
-            } else {
-                throw e
-            }
-        }
-        const manifestFile = await manifestHandle.getFile()
-        const manifest = await manifestFile.text()
-        if (manifest != JSON.stringify(chrome.runtime.getManifest())) {
-            throw Error(chrome.i18n.getMessage('update3', 'Invalid manifest'))
-        }
+//      progress.before(chrome.i18n.getMessage('update2'))
+//      progress.before(document.createElement('br'))
+//      message.scrollTop = message.scrollHeight
+//      let manifestHandle
+//      try {
+//           manifestHandle = await dirHandle.getFileHandle('manifest.json')
+//      } catch (e) {
+//          if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
+//              throw Error(chrome.i18n.getMessage('update3', 'Not found manifest'))
+//          } else {
+//              throw e
+//          }
+//      }
+//      const manifestFile = await manifestHandle.getFile()
+//      const manifest = await manifestFile.text()
+//      if (manifest != JSON.stringify(chrome.runtime.getManifest())) {
+//          throw Error(chrome.i18n.getMessage('update3', 'Invalid manifest'))
+//      }
         //Также ещё проверим временным файлом в случае если у пользователя дубликат папки расширения. Засовываем в эту папку файл AVRtemp для проверки что пользователь указал дейсвительно правильную папку
         const tempFileHandle = await dirHandle.getFileHandle('AVRtemp', {create: true})
         //Проверяем дейсвительно ли это та папка?
