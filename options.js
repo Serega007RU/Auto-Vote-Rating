@@ -1059,7 +1059,7 @@ async function addVK(repair) {
             for (let vkontakte of VKs) {
                 if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
                     createNotif(chrome.i18n.getMessage('added'), 'success')
-                    await checkAuthVK()
+                    await checkAuthVK(vkontakte)
                     return
                 }
             }
@@ -1095,7 +1095,7 @@ async function addVK(repair) {
             createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
         }
 
-        await checkAuthVK()
+        await checkAuthVK(VK)
     }
 }
 
@@ -1226,7 +1226,7 @@ async function addBorealis(repair) {
 }
 
 //Проверяем авторизацию на всех Майнкрафт рейтингах где есть авторизация ВКонтакте и если пользователь не авторизован - предлагаем ему авторизоваться
-async function checkAuthVK() {
+async function checkAuthVK(VK) {
     document.querySelector('#notifBlock ')
     createNotif(chrome.i18n.getMessage('checkAuthVK'))
     let authStatus = []
@@ -1259,7 +1259,7 @@ async function checkAuthVK() {
                     if (document.getElementById('notAuthVK') != null) {
                         removeNotif(document.getElementById('notAuthVK').parentElement.parentElement)
                     }
-                    checkAuthVK()
+                    checkAuthVK(VK)
                 })
             })
             authStatus.push(a)
@@ -1268,6 +1268,53 @@ async function checkAuthVK() {
         } else if (response2.status != 0) {
             createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error')
             needReturn = true
+        }
+
+        if (!needReturn && (key == 'TopCraft' || key == 'McTOP') && document.getElementById('antiBanVK').checked && VK['password' + key] == null) {
+            try {
+                let url
+                if (key == 'TopCraft') {
+                    url = 'topcraft.ru'
+                } else if (key == 'McTOP') {
+                    url = 'mctop.su'
+                }
+                createNotif(chrome.i18n.getMessage('antiBanVKStart', key))
+                let response = await fetch('https://' + url + '/accounts/vk/login/?process=login')
+                response.html = await response.text()
+                response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+                const csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
+                function makeid(length) {
+                    const result = []
+                    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+                    const charactersLength = characters.length
+                    for (let i = 0; i < length; i++ ) {
+                        result.push(characters.charAt(Math.floor(Math.random() * charactersLength)))
+                    }
+                    return result.join('')
+                }
+                const password = makeid(15)
+                response = await fetch('https://' + url + '/account/profile/', {
+                    'headers': {
+                        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    'body': 'csrfmiddlewaretoken=' + csrftoken + '&type=password&password-password1=' + password + '&password-password2=' + password,
+                    'method': 'POST'
+                })
+                response.html = await response.text()
+                response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+                VK.numberId = Number(response.doc.getElementById('id_profile-vk').value.replace('http://vk.com/id', ''))
+                VK['password' + key] = password
+                for (_vk in VKs) {
+                    if (VK.id == VKs[_vk].id) {
+                        VKs[_vk] = VK
+                        break
+                    }
+                }
+                await setValue('AVMRVKs', VKs)
+                createNotif(chrome.i18n.getMessage('antiBanVKEnd', [password, key]), 'success')
+            } catch (e) {
+                createNotif(e, 'error')
+            }
         }
     }
     if (needReturn) {

@@ -1161,5 +1161,30 @@
   },
   "clearedLogs": {
     "message": "Logs cleared successfully"
+  },
+  "antiBanVK": {
+    "message": "Register an account on TopCraft and McTOP"
+  },
+  "antiBanVKTooltip": {
+    "message": "Sets the password for the account on TopCraft and McTOP after logging in to the VK. After that, when voting on the specified ratings, authorization is not carried out through the VK but using the set password, which allows you to vote on the specified ratings even when the VK account is in the bath. Do not delete your VK account from the extension if it is banned and if you vote on the specified ratings, the extension will continue to use it"
+  },
+  "antiBanVKStart": {
+    "message": "We begin to set the password on $rating$",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
+  "antiBanVKEnd": {
+    "message": "The password $password$ was successfully set to $rating$",
+    "placeholders": {
+      "password": {
+        "content": "$1"
+      },
+      "rating": {
+        "content": "$2"
+      }
+    }
   }
 }
