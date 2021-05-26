@@ -1200,5 +1200,8 @@
   },
   "confirmAutoAuthVK": {
     "message": "Do you agree to transfer personal information and email address from subsequent added accounts to ratings? (TopCraft, McTOP, MCRate, MinecraftRating, MonitoringMinecraft, and QTop)"
+  },
+  "tryManuallyUpdate": {
+    "message": "If the error persists, try updating the extension manually"
   }
 }

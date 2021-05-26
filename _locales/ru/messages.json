@@ -1158,5 +1158,8 @@
   },
   "confirmAutoAuthVK": {
     "message": "Вы согласны передавать личную информацию и адрес электронной почты от последующих добавляемых аккаунтов рейтингам? (TopCraft, McTOP, MCRate, MinecraftRating, MonitoringMinecraft и QTop)"
+  },
+  "tryManuallyUpdate": {
+    "message": "Если ошибка повторяется, попробуй обновить расширение вручную"
   }
 }

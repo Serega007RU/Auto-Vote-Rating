@@ -477,6 +477,15 @@ async function update() {
         if (document.getElementById('addFastProject').className.includes('active')) {
             progress.before(createMessage(e, 'error'))
             progress.before(document.createElement('br'))
+            progress.before(chrome.i18n.getMessage('tryManuallyUpdate'))
+            progress.before(' ')
+            let a = document.createElement('a')
+            a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/tree/multivote'
+            a.target = 'blank_'
+            a.textContent = 'https://gitlab.com/Serega007/auto-vote-rating/-/tree/multivote'
+            a.className = 'link'
+            progress.before(a)
+            progress.before(document.createElement('br'))
         } else {
             createNotif(e, 'error')
         }
