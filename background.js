@@ -951,8 +951,9 @@ async function silentVote(project) {
             let response
             if (currentVK != null && currentVK['AuthURLMinecraftRating' + project.id] != null) {
                 response = await _fetch(currentVK['AuthURLMinecraftRating' + project.id].replace('Serega007', project.nick), null, project)
+            } else {
+                response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
             }
-            response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
             if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
                 if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {

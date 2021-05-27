@@ -1534,17 +1534,15 @@ async function checkAuthVK(VK) {
                     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
                     const text = response.doc.querySelector('head > script:nth-child(9)').text
                     url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
-                    if (document.getElementById('antiBan2VK').checked) {
-                        if (id) {
-                            VK['AuthURL' + key + id] = url
-                        } else {
-                            VK['AuthURL' + key] = url
-                        }
-                        for (_vk in VKs) {
-                            if (VK.id == VKs[_vk].id) {
-                                VKs[_vk] = VK
-                                break
-                            }
+                    if (id) {
+                        VK['AuthURL' + key + id] = url
+                    } else {
+                        VK['AuthURL' + key] = url
+                    }
+                    for (_vk in VKs) {
+                        if (VK.id == VKs[_vk].id) {
+                            VKs[_vk] = VK
+                            break
                         }
                     }
                 }
