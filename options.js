@@ -339,6 +339,12 @@ async function restoreOptions() {
     document.getElementById('antiBanVK').checked = settings.antiBanVK
     document.getElementById('antiBan2VK').checked = settings.antiBan2VK
     document.getElementById('saveVKCredentials').checked = settings.saveVKCredentials
+    if (settings.antiBanVK != null) {
+        document.querySelector('div.antiBanVK').removeAttribute('style')
+    }
+    if (settings.antiBan2VK != null) {
+        document.querySelector('div.antiBan2VK').removeAttribute('style')
+    }
     if (settings.clearVKCookies != null) document.getElementById('clearVKCookies').checked = settings.clearVKCookies
     document.getElementById('autoAuthVK').checked = settings.autoAuthVK
     if (settings.stopVote > Date.now()) {
@@ -1482,7 +1488,8 @@ async function checkAuthVK(VK) {
                     }
                     return result.join('')
                 }
-                const password = makeid(15)
+                let password = makeid(15)
+                if (settings.singlePassword) password = settings.singlePassword
                 response = await fetch('https://' + url + '/account/profile/', {
                     'headers': {
                         'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -1518,7 +1525,7 @@ async function checkAuthVK(VK) {
                     for (const project of projectsMinecraftRating) {
                         if (skip[project.id] != null) continue
                         skip[project.id] = true
-                        await addUrl('https://oauth.vk.com/authorize?client_id=5216838&redirect_uri=https%3A%2F%2Fminecraftrating.ru%2Fprojects%2F' + project.id + '%2F&state=Serega007&response_type=code&scope=4259840', project.id)
+                        await addUrl('https://oauth.vk.com/authorize?client_id=5216838&redirect_uri=https%3A%2F%2Fminecraftrating.ru%2Fprojects%2F' + project.id + '%2F&state=Ser.ga007&response_type=code&scope=4259840', project.id)
                     }
                 } else if (key == 'MonitoringMinecraft') {
                     const skip = {}
@@ -1534,6 +1541,7 @@ async function checkAuthVK(VK) {
                     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
                     const text = response.doc.querySelector('head > script:nth-child(9)').text
                     url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
+                    await fetch(url)
                     if (id) {
                         VK['AuthURL' + key + id] = url
                     } else {

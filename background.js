@@ -950,7 +950,9 @@ async function silentVote(project) {
         if (project.MinecraftRating) {
             let response
             if (currentVK != null && currentVK['AuthURLMinecraftRating' + project.id] != null) {
-                response = await _fetch(currentVK['AuthURLMinecraftRating' + project.id].replace('Serega007', project.nick), null, project)
+                response = await _fetch(currentVK['AuthURLMinecraftRating' + project.id], null, project)
+                if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
+                response = await _fetch('https://minecraftrating.ru/projects/' + project.id + '/?code=' + response.url.substring(response.url.indexOf('code='), response.url.indexOf('&state')).replace('code=', '') + '&state=' + project.nick, null, project)
             } else {
                 response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
             }
@@ -1377,6 +1379,8 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
             text = response.doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + response.doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
         } else if (response.doc.querySelector('div.login_blocked_panel') != null) {
             text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
+        } else if (response.html.length < 500) {
+            text = response.html
         } else {
             text = 'null'
         }
@@ -1457,6 +1461,17 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
         }
     }
 }, {urls: ['<all_urls>']})
+
+// chrome.webRequest.onBeforeRequest.addListener(function (details) {
+//     if (details.initiator == 'chrome-extension://' + chrome.runtime.id && fetchProjects.has(details.requestId)) {
+//         const project = fetchProjects.get(details.requestId)
+//         if (project['AuthURL' + getProjectName(project)] != null || project['AuthURL' + getProjectName(project) + project.id] != null) {
+//             if (details.url.includes('Ser.ga007')) {
+//                 return {cancel: true}
+//             }
+//         }
+//     }
+// }, {urls: ['<all_urls>']}, ["blocking"])
 
 async function _fetch(url, options, project) {
     let listener
