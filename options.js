@@ -54,8 +54,6 @@ var generalStats = {}
 var disableCheckProjects = false
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 var returnAdd
-//Удалять ли куки ВКонтакте?
-var deleteVKCookies = true
 //Где храним настройки
 let storageArea = 'local'
 //Блокировать ли кнопки которые требуют времени на выполнение?
@@ -69,6 +67,9 @@ var authVKUrls = new Map([
     ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
     ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&response_type=token&redirect_uri=close.html']
 ])
+
+const svgInfo = document.createElement('img')
+svgInfo.src = 'images/icons/info.svg'
 
 const svgRepair = document.createElement('img')
 svgRepair.src = 'images/icons/repair.svg'
@@ -279,6 +280,17 @@ async function restoreOptions() {
                 }
             } else if (this.id == 'antiBanVK') {
                 settings.antiBanVK = this.checked
+            } else if (this.id == 'clearVKCookies') {
+                settings.clearVKCookies = this.checked
+            } else if (this.id == 'saveVKCredentials') {
+                if (this.checked && confirm(chrome.i18n.getMessage('confirmSaveVKCredentials'))) {
+                    settings.saveVKCredentials = this.checked
+                } else if (this.checked) {
+                    this.checked = false
+                    _return = true
+                } else {
+                    settings.saveVKCredentials = this.checked
+                }
             }
             if (!_return) await setValue('AVMRsettings', settings)
             blockButtons = false
@@ -322,6 +334,8 @@ async function restoreOptions() {
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
     document.getElementById('useProxyOnUnProxyTop').checked = settings.useProxyOnUnProxyTop
     document.getElementById('antiBanVK').checked = settings.antiBanVK
+    document.getElementById('saveVKCredentials').checked = settings.saveVKCredentials
+    if (settings.clearVKCookies != null) document.getElementById('clearVKCookies').checked = settings.clearVKCookies
     document.getElementById('autoAuthVK').checked = settings.autoAuthVK
     if (settings.stopVote > Date.now()) {
         document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
@@ -660,9 +674,10 @@ async function addVKList(VK, visually) {
     div.textContent = VK.name+' – '+VK.id
     mesBlock.append(div)
 
+    let infoBtn = svgInfo.cloneNode(true)
+    contBlock.append(infoBtn)
     let repairBtn = svgRepair.cloneNode(true)
     contBlock.append(repairBtn)
-
     let delBtn = svgDelete.cloneNode(true)
     contBlock.append(delBtn)
 
@@ -704,6 +719,17 @@ async function addVKList(VK, visually) {
         }
         await addVK(true)
         blockButtons = false
+    })
+    infoBtn.addEventListener('click', function() {
+        document.querySelector('#info .content .message').parentNode.replaceChild(document.querySelector('#info .content .message').cloneNode(false), document.querySelector('#info .content .message'))
+        document.querySelector('#info .content .events').parentNode.replaceChild(document.querySelector('#info .content .events').cloneNode(false), document.querySelector('#info .content .events'))
+        toggleModal('info')
+        const message = document.querySelector('#info > div.content > .message')
+        for (const [key, value] of Object.entries(VK)) {
+            if (key == 'cookies') continue
+            message.append(key + ': ' + JSON.stringify(value, null, '\t'))
+            message.append(document.createElement('br'))
+        }
     })
     if (visually) {
         document.querySelector('#VKButton > span').textContent = VKs.length
@@ -997,6 +1023,16 @@ document.getElementById('AddVK').addEventListener('click', async () => {
 //Слушатель кнопки 'Импорт' на MultiVote VKontakte
 //Слушатель на импорт прокси листа
 document.getElementById('importVK').addEventListener('change', (evt) => {
+    if (!document.getElementById('autoAuthVK').checked) {
+        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('autoAuthVK') + '"', 'error')
+        document.getElementById('importVK').value = ''
+        return
+    }
+    if (!document.getElementById('clearVKCookies').checked) {
+        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('clearVKCookies') + '"', 'error')
+        document.getElementById('importVK').value = ''
+        return
+    }
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (evt.target.files.length == 0) return
@@ -1028,11 +1064,12 @@ document.getElementById('importVK').addEventListener('change', (evt) => {
     } catch (e) {
         createNotif(e, 'error')
     }
+    document.getElementById('importVK').value = ''
 }, false)
 
 async function addVK(repair, imp) {
-    if (repair || !deleteVKCookies || imp || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'VKontakte'))) {
-        if ((deleteVKCookies && !repair) || imp) {
+    if (repair || !document.getElementById('clearVKCookies').checked || imp || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'VKontakte'))) {
+        if ((document.getElementById('clearVKCookies').checked && !repair) || imp) {
             //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
             createNotif(chrome.i18n.getMessage('deletingAllAcc', 'VK'))
             
@@ -1177,6 +1214,11 @@ async function addVK(repair, imp) {
         if (repair) {
             for (_vk in VKs) {
                 if (VK.id == VKs[_vk].id) {
+                    for (const obj of Object.keys(VKs[_vk])) {//Совмещает данные со старым аккаунтом при этом перезаписывает новые данные если как такое были получены
+                        if (VK[obj] == null) {
+                            VK[obj] = VKs[_vk][obj]
+                        }
+                    }
                     VKs[_vk] = VK
                     break
                 }
@@ -1206,8 +1248,8 @@ document.getElementById('AddBorealis').addEventListener('click', async () => {
 })
 
 async function addBorealis(repair) {
-    if (repair || !deleteVKCookies || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
-        if (deleteVKCookies && !repair) {
+    if (repair || !document.getElementById('clearVKCookies').checked || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
+        if (document.getElementById('clearVKCookies').checked && !repair) {
             //Удаление всех куки и вкладок Borealis перед добавлением нового аккаунта Borealis
             createNotif(chrome.i18n.getMessage('deletingAllAcc', 'Borealis'))
             
@@ -1220,7 +1262,7 @@ async function addBorealis(repair) {
                 })
             })
 
-            if (deleteVKCookies) {
+            if (document.getElementById('clearVKCookies').checked) {
                 let cookies = await new Promise(resolve => {
                     chrome.cookies.getAll({domain: '.borealis.su'}, function(cookies) {
                         resolve(cookies)

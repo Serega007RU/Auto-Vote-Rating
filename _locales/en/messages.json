@@ -1203,5 +1203,17 @@
   },
   "tryManuallyUpdate": {
     "message": "If the error persists, try updating the extension manually"
+  },
+  "importVKRequred": {
+    "message": "You didn't check the box next to it "
+  },
+  "clearVKCookies": {
+    "message": "Clear VKontakte cookies before logging in"
+  },
+  "saveVKCredentials": {
+    "message": "Save your VK account username and password for a note"
+  },
+  "confirmSaveVKCredentials": {
+    "message": "Do you really want to save the username and password you entered for your account? This data will be stored in an unencrypted form and can be stolen by a third-party program (virus or Trojan))"
   }
 }

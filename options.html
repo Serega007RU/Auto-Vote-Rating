@@ -32,7 +32,7 @@
                     <div data-resource="optionsButton"></div>
                 </button>
                 <button class="tablinks" id="helpTab" data-tab="help">
-                    <img src="images/icons/helpBtn.svg" alt="helpBtn">
+                    <img src="images/icons/info.svg" alt="helpBtn">
                     <div data-resource="help"></div>
                 </button>
                 <button class="tablinks" id="multivoteTab" data-tab="multivote">
@@ -691,6 +691,14 @@
 						    	<input class="checkbox" id="autoAuthVK" type="checkbox" name="checkbox" />
 						    	<label data-resource="autoAuthVK" for="autoAuthVK"></label>
 						    </div>
+						    <div class="check-block">
+						    	<input class="checkbox" id="clearVKCookies" type="checkbox" name="checkbox" checked="true"/>
+						    	<label data-resource="clearVKCookies" for="clearVKCookies"></label>
+						    </div>
+						    <div class="check-block">
+						    	<input class="checkbox" id="saveVKCredentials" type="checkbox" name="checkbox" checked="true"/>
+						    	<label data-resource="saveVKCredentials" for="saveVKCredentials"></label>
+						    </div>
 						    <div class="inputEl">
 						    	<button class="submitBtn" data-resource="addButton" id="AddVK"></button>
 						    </div>
@@ -855,6 +863,16 @@
             <div class="modal" id="addFastProject">
                 <div class="head">
                     <h3 data-resource="fastAdd"></h3>
+                    <div class="close"></div>
+                </div>
+                <div class="content">
+                    <div class="message"></div>
+                    <div class="events"></div>
+                </div>
+            </div>
+            <div class="modal" id="info">
+                <div class="head">
+                    <h3>Info</h3>
                     <div class="close"></div>
                 </div>
                 <div class="content">
