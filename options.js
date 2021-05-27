@@ -994,9 +994,45 @@ document.getElementById('AddVK').addEventListener('click', async () => {
     blockButtons = false
 })
 
-async function addVK(repair) {
-    if (repair || !deleteVKCookies || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'VKontakte'))) {
-        if (deleteVKCookies && !repair) {
+//Слушатель кнопки 'Импорт' на MultiVote VKontakte
+//Слушатель на импорт прокси листа
+document.getElementById('importVK').addEventListener('change', (evt) => {
+    createNotif(chrome.i18n.getMessage('importing'))
+    try {
+        if (evt.target.files.length == 0) return
+        let file = evt.target.files[0]
+        var reader = new FileReader()
+        reader.onload = (function(theFile) {
+            return async function(e) {
+                try {
+                    let VKList = e.target.result
+                    for (let VKString of VKList.split(/\n/g)) {
+                        VKString = VKString.replace(/(?:\r\n|\r|\n)/g, '')
+                        if (VKString == null || VKString == '') {
+                            continue
+                        }
+                        const vk_string = VKString.split(':')
+                        await addVK(false, {login: vk_string[0], password: vk_string[1]})
+                    }
+                    
+                    await setValue('VKs', VKs)
+
+                    createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
+                } catch (e) {
+                    createNotif(e, 'error')
+                }
+            }
+        })(file)
+        reader.readAsText(file)
+        document.getElementById('importVK').value = ''
+    } catch (e) {
+        createNotif(e, 'error')
+    }
+}, false)
+
+async function addVK(repair, imp) {
+    if (repair || !deleteVKCookies || imp || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'VKontakte'))) {
+        if ((deleteVKCookies && !repair) || imp) {
             //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
             createNotif(chrome.i18n.getMessage('deletingAllAcc', 'VK'))
             
@@ -1024,10 +1060,45 @@ async function addVK(repair) {
         createNotif(chrome.i18n.getMessage('openPopupAcc', 'VK'))
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
-        await new Promise(resolve => {
+        await new Promise(async (resolve)=> {
             openPoput('https://oauth.vk.com/authorize?client_id=-1&display=widget&redirect_uri=close.html&widget=4', function () {
                 resolve()
             })
+            if (imp) {
+                let tabID = await new Promise(resolve=>{
+                    chrome.tabs.query({active: true}, function(tabs) {
+                        for (const tab of tabs) {
+                            if (tab.pendingUrl == 'https://oauth.vk.com/authorize?client_id=-1&display=widget&redirect_uri=close.html&widget=4') {
+                                resolve(tab.id)
+                            }
+                        }
+                    })
+                })
+                function onUpdated(tabId, changeInfo, tab) {
+                    if (tabID == tabId) {
+                        if (changeInfo.status && changeInfo.status == 'complete') {
+                            let code = `
+                                if (document.querySelector('input[name="email"]') != null) {
+                                    document.querySelector('input[name="email"]').value = '` + imp.login + `'
+                                    document.querySelector('input[name="pass"]').value = '` + imp.password + `'
+                                    if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) document.getElementById('install_allow').click()
+                                }
+                            `
+                            chrome.tabs.executeScript(tabID, {code}, function(result) {
+                                if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
+                            })
+                        }
+                    }
+                }
+                function onRemoved(tabId, removeInfo) {
+                    if (tabID == tabId) {
+                        chrome.tabs.onUpdated.removeListener(onUpdated)
+                        chrome.tabs.onRemoved.removeListener(onRemoved)
+                    }
+                }
+                chrome.tabs.onUpdated.addListener(onUpdated)
+                chrome.tabs.onRemoved.addListener(onRemoved)
+            }
         })
 
         //После закрытия окна авторизации попытка добавить аккаунт ВКонтакте
