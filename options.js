@@ -58,6 +58,7 @@ var returnAdd
 let storageArea = 'local'
 //Блокировать ли кнопки которые требуют времени на выполнение?
 let blockButtons = false
+let currentVKCredentials = {}
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -280,6 +281,8 @@ async function restoreOptions() {
                 }
             } else if (this.id == 'antiBanVK') {
                 settings.antiBanVK = this.checked
+            } else if (this.id == 'antiBan2VK') {
+                settings.antiBan2VK = this.checked
             } else if (this.id == 'clearVKCookies') {
                 settings.clearVKCookies = this.checked
             } else if (this.id == 'saveVKCredentials') {
@@ -334,6 +337,7 @@ async function restoreOptions() {
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
     document.getElementById('useProxyOnUnProxyTop').checked = settings.useProxyOnUnProxyTop
     document.getElementById('antiBanVK').checked = settings.antiBanVK
+    document.getElementById('antiBan2VK').checked = settings.antiBan2VK
     document.getElementById('saveVKCredentials').checked = settings.saveVKCredentials
     if (settings.clearVKCookies != null) document.getElementById('clearVKCookies').checked = settings.clearVKCookies
     document.getElementById('autoAuthVK').checked = settings.autoAuthVK
@@ -1040,6 +1044,7 @@ document.getElementById('importVK').addEventListener('change', (evt) => {
         var reader = new FileReader()
         reader.onload = (function(theFile) {
             return async function(e) {
+                fastNotif = true
                 try {
                     let VKList = e.target.result
                     for (let VKString of VKList.split(/\n/g)) {
@@ -1056,6 +1061,8 @@ document.getElementById('importVK').addEventListener('change', (evt) => {
                     createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
                 } catch (e) {
                     createNotif(e, 'error')
+                } finally {
+                    fastNotif = false
                 }
             }
         })(file)
@@ -1067,7 +1074,15 @@ document.getElementById('importVK').addEventListener('change', (evt) => {
     document.getElementById('importVK').value = ''
 }, false)
 
+window.onmessage = function (e) {
+    if (e.data.VKCredentials) {
+        currentVKCredentials.login = e.data.login
+        currentVKCredentials.password = e.data.password
+    }
+}
+
 async function addVK(repair, imp) {
+    currentVKCredentials = {}
     if (repair || !document.getElementById('clearVKCookies').checked || imp || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'VKontakte'))) {
         if ((document.getElementById('clearVKCookies').checked && !repair) || imp) {
             //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
@@ -1101,7 +1116,7 @@ async function addVK(repair, imp) {
             openPoput('https://oauth.vk.com/authorize?client_id=-1&display=widget&redirect_uri=close.html&widget=4', function () {
                 resolve()
             })
-            if (imp) {
+            if (imp || document.getElementById('saveVKCredentials').checked) {
                 let tabID = await new Promise(resolve=>{
                     chrome.tabs.query({active: true}, function(tabs) {
                         for (const tab of tabs) {
@@ -1114,13 +1129,25 @@ async function addVK(repair, imp) {
                 function onUpdated(tabId, changeInfo, tab) {
                     if (tabID == tabId) {
                         if (changeInfo.status && changeInfo.status == 'complete') {
-                            let code = `
-                                if (document.querySelector('input[name="email"]') != null) {
-                                    document.querySelector('input[name="email"]').value = '` + imp.login + `'
-                                    document.querySelector('input[name="pass"]').value = '` + imp.password + `'
-                                    if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) document.getElementById('install_allow').click()
-                                }
-                            `
+                            let code
+                            if (imp) {
+                                code = `
+                                    if (document.querySelector('input[name="email"]') != null) {
+                                        document.querySelector('input[name="email"]').value = '` + imp.login + `'
+                                        document.querySelector('input[name="pass"]').value = '` + imp.password + `'
+                                        if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) document.getElementById('install_allow').click()
+                                    }
+                                `
+                            } else if (document.getElementById('saveVKCredentials').checked) {
+                                code = `
+                                    document.querySelector('#install_allow').addEventListener('click', function () {
+                                        const credentials = {VKCredentials: true}
+                                        credentials.login = document.querySelector('input[name="email"]').value
+                                        credentials.password = document.querySelector('input[name="pass"]').value
+                                        window.opener.postMessage(credentials, '*')
+                                    })
+                                `
+                            }
                             chrome.tabs.executeScript(tabID, {code}, function(result) {
                                 if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
                             })
@@ -1172,6 +1199,15 @@ async function addVK(repair, imp) {
             return
         }
         let VK = {}
+        if (document.getElementById('saveVKCredentials').checked) {
+            if (imp) {
+                VK.login = imp.login
+                VK.password = imp.password
+            } else if (currentVKCredentials.login) {
+                VK.login = currentVKCredentials.login
+                VK.password = currentVKCredentials.password
+            }
+        }
         try {
             if (doc.querySelector('#login_blocked_wrap') != null) {
                 let text = doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
@@ -1390,6 +1426,16 @@ async function checkAuthVK(VK) {
                 response2.doc = new DOMParser().parseFromString(response2.html, 'text/html')
                 const text = response2.doc.querySelector('head > script:nth-child(9)').text
                 const url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
+                if (document.getElementById('antiBan2VK').checked) {
+                    VK['AuthURL' + key] = url
+                    for (_vk in VKs) {
+                        if (VK.id == VKs[_vk].id) {
+                            VKs[_vk] = VK
+                            break
+                        }
+                    }
+                    await setValue('AVMRVKs', VKs)
+                }
                 response2 = await fetch(url)
             } else {
                 let a = document.createElement('a')
@@ -1456,6 +1502,54 @@ async function checkAuthVK(VK) {
                 }
                 await setValue('AVMRVKs', VKs)
                 createNotif(chrome.i18n.getMessage('antiBanVKEnd', [password, key]), 'success')
+            } catch (e) {
+                createNotif(e, 'error')
+            }
+        }
+        if (!needReturn && (key == 'TopCraft' || key == 'McTOP' || key == 'MinecraftRating' || key == 'MonitoringMinecraft') && document.getElementById('antiBan2VK').checked && VK['AuthURL' + key] == null) {
+            try {
+                createNotif(chrome.i18n.getMessage('antiBan2VKStart', key))
+                if (key == 'TopCraft') {
+                    await addUrl('https://oauth.vk.com/authorize?auth_type=reauthenticate&state=zpacb16WVMTC&redirect_uri=http%3A%2F%2Ftopcraft.ru%2Faccounts%2Fvk%2Flogin%2Fcallback%2F&response_type=code&client_id=5128935&scope=4259840')
+                } else if (key == 'McTOP') {
+                     await addUrl('https://oauth.vk.com/authorize?auth_type=reauthenticate&state=PYgCjtBwgllH&redirect_uri=http%3A%2F%2Fmctop.su%2Faccounts%2Fvk%2Flogin%2Fcallback%2F&response_type=code&client_id=5113650&scope=4259840')
+                } else if (key == 'MinecraftRating') {
+                    const skip = {}
+                    for (const project of projectsMinecraftRating) {
+                        if (skip[project.id] != null) continue
+                        skip[project.id] = true
+                        await addUrl('https://oauth.vk.com/authorize?client_id=5216838&redirect_uri=https%3A%2F%2Fminecraftrating.ru%2Fprojects%2F' + project.id + '%2F&state=Serega007&response_type=code&scope=4259840', project.id)
+                    }
+                } else if (key == 'MonitoringMinecraft') {
+                    const skip = {}
+                    for (const project of projectsMonitoringMinecraft) {
+                        if (skip[project.id] != null) continue
+                        skip[project.id] = true
+                        await addUrl('https://oauth.vk.com/authorize?client_id=3697128&scope=4259840&response_type=code&redirect_uri=https%3A%2F%2Fmonitoringminecraft.ru%2Ftop%2F' + project.id + '%2Fvote', project.id)
+                    }
+                }
+                async function addUrl(url, id) {
+                    let response = await fetch(url)
+                    response.html = await response.text()
+                    response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+                    const text = response.doc.querySelector('head > script:nth-child(9)').text
+                    url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
+                    if (document.getElementById('antiBan2VK').checked) {
+                        if (id) {
+                            VK['AuthURL' + key + id] = url
+                        } else {
+                            VK['AuthURL' + key] = url
+                        }
+                        for (_vk in VKs) {
+                            if (VK.id == VKs[_vk].id) {
+                                VKs[_vk] = VK
+                                break
+                            }
+                        }
+                    }
+                }
+                await setValue('AVMRVKs', VKs)
+                createNotif(chrome.i18n.getMessage('antiBan2VKEnd', key))
             } catch (e) {
                 createNotif(e, 'error')
             }
@@ -4032,6 +4126,7 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
 })
 
 //notifications
+let fastNotif = false
 async function createNotif(message, type, delay, element) {
     if (!type) type = 'hint'
     console.log('['+type+']', message)
@@ -4048,12 +4143,14 @@ async function createNotif(message, type, delay, element) {
         }
         return
     }
+    if (fastNotif && type == 'hint') return
     let notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
     if (!delay) {
         if (type == 'error') delay = 30000
         else delay = 5000
     }
+    if (fastNotif) delay = 3000
 
     if (type != 'hint') {
         let imgBlock = document.createElement('img')

@@ -396,6 +396,7 @@ nav .logo img {
 .contentBlock .listcontent li img[src="images/icons/repair.svg"],
 .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
 	margin-right: 10px;
+	margin-left: 10px;
 }
 
 .contentBlock .listcontent li .message {
@@ -426,6 +427,10 @@ nav .logo img {
 }
 
 .projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
+	background: #1a7bee;
+}
+
+.contentBlock .listcontent li img[src="images/icons/info.svg"]:hover {
 	background: #1a7bee;
 }
 
@@ -635,6 +640,7 @@ nav .logo img {
     .contentBlock .listcontent li img[src="images/icons/repair.svg"],
     .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
     	margin-right: 0;
+    	margin-left: 0;
     	margin-bottom: 5px;
     }
 

@@ -816,6 +816,14 @@ async function silentVote(project) {
                     'body': 'csrfmiddlewaretoken=' + csrftoken + '&login=' + currentVK.id + currentVK.numberId + '&password=' + currentVK.passwordTopCraft,
                     'method': 'POST'
                 }, project)
+                //Мне лень это делать, патом сделаю
+//             } else if (currentVK != null && currentVK.AuthURLTopCraft != null) {
+//                 response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login', null, project)
+//                 let host = extractHostname(response.url)
+//                 if (host.includes('vk.com')) {
+//                     let response2 = await _fetch(currentVK.AuthURLTopCraft, null, project)
+//                     if (!await checkResponseError(project, response2, 'topcraft.ru', null, true)) return
+//                 }
             } else {
                 response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
             }
@@ -940,7 +948,11 @@ async function silentVote(project) {
         } else
 
         if (project.MinecraftRating) {
-            let response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
+            let response
+            if (currentVK != null && currentVK['AuthURLMinecraftRating' + project.id] != null) {
+                response = await _fetch(currentVK['AuthURLMinecraftRating' + project.id].replace('Serega007', project.nick), null, project)
+            }
+            response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
             if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
                 if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {

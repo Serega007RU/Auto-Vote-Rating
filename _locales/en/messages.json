@@ -1166,7 +1166,7 @@
     "message": "Register an account on TopCraft and McTOP"
   },
   "antiBanVKTooltip": {
-    "message": "Sets the password for the account on TopCraft and McTOP after logging in to the VK. After that, when voting on the specified ratings, authorization is not carried out through the VK but using the set password, which allows you to vote on the specified ratings even when the VK account is in the bath. Do not delete your VK account from the extension if it is banned and if you vote on the specified ratings, the extension will continue to use it"
+    "message": "Sets the password for the account on TopCraft and McTOP after logging in to the VK. After that, when voting on the specified ratings, authorization is not carried out through the VK but using the set password, which allows you to vote on the specified ratings even when the VK account is in the ban. Do not delete your VK account from the extension if it is banned and if you vote on the specified ratings, the extension will continue to use it"
   },
   "antiBanVKStart": {
     "message": "We begin to set the password on $rating$",
@@ -1184,6 +1184,28 @@
       },
       "rating": {
         "content": "$2"
+      }
+    }
+  },
+  "antiBan2VK": {
+    "message": "Remember the authorization URL"
+  },
+  "antiBan2VKTooltip": {
+    "message": "Remembers the authorization URL for TopCraft, McTOP, MinecraftRating, and MonitoringMinecraft after the VK authorization. After that, when voting on the specified ratings, authorization takes place at this URL, which allows you to vote even when the VK account is in the ban. Add the projects you need to the list of added projects before, otherwise after the ban on MinecraftRating and MonitoringMinecraft, you will not be able to vote. Do not delete your VK account from the extension if it is banned and if you vote on the specified ratings, the extension will continue to use it"
+  },
+  "antiBan2VKStart": {
+    "message": "Starting to remember the URL on $rating$",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
+  "antiBan2VKEnd": {
+    "message": "URL saved successfully on $rating$",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
       }
     }
   },
@@ -1215,5 +1237,8 @@
   },
   "confirmSaveVKCredentials": {
     "message": "Do you really want to save the username and password you entered for your account? This data will be stored in an unencrypted form and can be stolen by a third-party program (virus or Trojan))"
+  },
+  "importVK": {
+    "message": "Import by login:password"
   }
 }
