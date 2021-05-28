@@ -1469,16 +1469,16 @@ async function checkAuthVK(VK) {
                 response2.doc = new DOMParser().parseFromString(response2.html, 'text/html')
                 const text = response2.doc.querySelector('head > script:nth-child(9)').text
                 const url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
-                if (document.getElementById('antiBan2VK').checked) {
-                    VK['AuthURL' + key] = url
-                    for (_vk in VKs) {
-                        if (VK.id == VKs[_vk].id) {
-                            VKs[_vk] = VK
-                            break
-                        }
-                    }
-                    await setValue('AVMRVKs', VKs)
-                }
+//              if (document.getElementById('antiBan2VK').checked) {
+//                  VK['AuthURL' + key] = url
+//                  for (_vk in VKs) {
+//                      if (VK.id == VKs[_vk].id) {
+//                          VKs[_vk] = VK
+//                          break
+//                      }
+//                  }
+//                  await setValue('AVMRVKs', VKs)
+//              }
                 response2 = await fetch(url)
             } else {
                 let a = document.createElement('a')
