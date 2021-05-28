@@ -1298,6 +1298,7 @@ async function addVK(repair, imp) {
                             VK[obj] = VKs[_vk][obj]
                         }
                     }
+                    delete VK.notWorking
                     VKs[_vk] = VK
                     break
                 }

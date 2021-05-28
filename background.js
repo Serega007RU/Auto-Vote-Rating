@@ -226,7 +226,7 @@ async function checkOpen(project) {
     }
     if (settings.useMultiVote) {
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
-        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && currentVK != null) {
+        if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop)) {
             let usedProjects = getTopFromList(currentVK, project)
             for (let usedProject of usedProjects) {
                 if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
@@ -247,7 +247,7 @@ async function checkOpen(project) {
         }
 
         //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
-        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && currentVK == null) {
+        if (currentVK == null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop)) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
             for (let vkontakte of VKs) {
@@ -1853,7 +1853,7 @@ async function endVote(request, sender, project) {
         }
         if (settings.useMultiVote && queueProjects.size == 0) {
             if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
-            await clearProxy()
+            if (currentProxy != null) clearProxy()
             currentProxy = null
             currentVK = null
         }
