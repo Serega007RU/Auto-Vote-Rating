@@ -251,8 +251,14 @@ async function checkOpen(project) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
             for (let vkontakte of VKs) {
-                if (vkontakte.notWorking)
-                    continue
+                if (vkontakte.notWorking) {
+                    let _continue = true
+                    if (project.TopCraft && (project.passwordTopCraft || project.AuthURLTopCraft)) _continue = false
+                    if (project.McTOP && (project.passwordMcTOP || project.AuthURLMcTOP)) _continue = false
+                    if (project.MinecraftRating && project['AuthURLMinecraftRating' + project.id] != null) _continue = false
+                    if (project.MonitoringMinecraft && project['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
+                    if (_continue) continue
+                }
                 let usedProjects = getTopFromList(vkontakte, project)
                 let used = false
                 for (let usedProject of usedProjects) {
@@ -1362,8 +1368,6 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         if (response.headers.get('Content-Type').includes('windows-1251')) {
             //Почему не UTF-8?
             response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
-        } else {
-            console.warn(getProjectPrefix(project, true), 'Что-то не так с кодирвкой', response.headers.get('Content-Type'))
         }
     }
     response.html = await response.text()

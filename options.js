@@ -1236,8 +1236,6 @@ async function addVK(repair, imp) {
             response = await new Response(new TextDecoder('windows-1251').decode(await clone.arrayBuffer()))
             html = await response.text()
             doc = new DOMParser().parseFromString(html, 'text/html')
-        } else {
-            createNotif('Что-то не так с кодирвкой ' + response.headers.get('Content-Type'), 'warn')
         }
         if (doc.querySelector('#index_login_button') != null) {
             createNotif(chrome.i18n.getMessage('notAuthAcc', 'VK'), 'error')
@@ -2100,8 +2098,11 @@ async function checkProxy(proxy, scheme) {
 }
 
 //Слушатель кнопки "Добавить"
-document.getElementById('addProject').addEventListener('submit', async()=>{
+document.getElementById('addProject').addEventListener('submit', ()=> {
     event.preventDefault()
+    addProjectButton()
+})
+async function addProjectButton() {
     if (blockButtons) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
@@ -2188,7 +2189,7 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
         await addProject(project, null)
     }
     blockButtons = false
-})
+}
 
 //Слушатель кнопки "Установить" на кулдауне
 document.getElementById('timeout').addEventListener('submit', async ()=>{

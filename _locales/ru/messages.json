@@ -1200,10 +1200,10 @@
     "message": "Импорт по логин:пароль"
   },
   "importSettingsVK": {
-    "message": "Импортировать ВК через экспортированные настройки"
+    "message": "Добавить ВК через экспортированные настройки"
   },
   "importingSettingVKEnd": {
-    "message": "Импортировано $count$ аккаунтов ВК",
+    "message": "Добавить $count$ аккаунтов ВК",
     "placeholders": {
       "count": {
         "content": "$1"
