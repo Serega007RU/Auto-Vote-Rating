@@ -1240,5 +1240,16 @@
   },
   "importVK": {
     "message": "Import by login:password"
+  },
+  "importSettingsVK": {
+    "message": "Import VK via exported settings"
+  },
+  "importingSettingVKEnd": {
+    "message": "Imported $count$ of VK accounts",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

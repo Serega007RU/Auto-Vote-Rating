@@ -1031,7 +1031,6 @@ document.getElementById('AddVK').addEventListener('click', async () => {
 })
 
 //Слушатель кнопки 'Импорт' на MultiVote VKontakte
-//Слушатель на импорт прокси листа
 document.getElementById('importVK').addEventListener('change', (evt) => {
     if (!document.getElementById('autoAuthVK').checked) {
         createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('autoAuthVK') + '"', 'error')
@@ -1078,6 +1077,46 @@ document.getElementById('importVK').addEventListener('change', (evt) => {
         createNotif(e, 'error')
     }
     document.getElementById('importVK').value = ''
+}, false)
+
+document.getElementById('importSettingsVK').addEventListener('change', (evt) => {
+    createNotif(chrome.i18n.getMessage('importing'))
+    try {
+        if (evt.target.files.length == 0) return
+        let file = evt.target.files[0]
+        var reader = new FileReader()
+        reader.onload = (function(theFile) {
+            return async function(e) {
+                try {
+                    const VKList = JSON.parse(e.target.result)
+                    let count = 0
+                    for (const VK of VKList.VKs) {
+                        let _continue = false
+                        for (const _vk of VKs) {
+                            if (_vk.id == VK.id) {
+                                _continue = true
+                                break
+                            }
+                        }
+                        if (_continue) continue
+                        VKs.push(VK)
+                        count++
+                    }
+                    
+                    await setValue('AVMRVKs', VKs)
+
+                    createNotif(chrome.i18n.getMessage('importingSettingVKEnd', String(count)), 'success')
+                } catch (e) {
+                    createNotif(e, 'error')
+                }
+            }
+        })(file)
+        reader.readAsText(file)
+        document.getElementById('importVK').value = ''
+    } catch (e) {
+        createNotif(e, 'error')
+    }
+    document.getElementById('importSettingsVK').value = ''
 }, false)
 
 window.onmessage = function (e) {

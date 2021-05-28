@@ -1198,5 +1198,16 @@
   },
   "importVK": {
     "message": "Импорт по логин:пароль"
+  },
+  "importSettingsVK": {
+    "message": "Импортировать ВК через экспортированные настройки"
+  },
+  "importingSettingVKEnd": {
+    "message": "Импортировано $count$ аккаунтов ВК",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }
