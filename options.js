@@ -292,6 +292,21 @@ async function restoreOptions() {
                 } else {
                     settings.saveVKCredentials = this.checked
                 }
+            } else if (this.id == 'importNicks') {
+                if (this.checked) {
+                    document.querySelector('label[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNicks')
+                    document.getElementById('nick').required = false
+                    document.getElementById('nick').style.display = 'none'
+                    document.getElementById('importNicksFile').required = true
+                    document.getElementById('importNicksFile').parentElement.removeAttribute('style')
+                } else {
+                    document.querySelector('label[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
+                    document.getElementById('nick').required = true
+                    document.getElementById('nick').removeAttribute('style')
+                    document.getElementById('importNicksFile').required = false
+                    document.getElementById('importNicksFile').parentElement.style.display = 'none'
+                }
+                _return = true
             }
             if (!_return) await setValue('AVMRsettings', settings)
             blockButtons = false
@@ -2778,14 +2793,39 @@ async function addProject(project, element) {
 //      project.randomize = true
 //      random = true
 //  }
-
-    await addProjectList(project, false)
+    
+    let countNicks = 0
+    if (document.getElementById('importNicks').checked) {
+        const file = document.getElementById('importNicksFile').files[0]
+        const data = await new Response(file).text()
+        const nicks = data.split('\n')
+        for (let nick of data.split(/\n/g)) {
+            nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
+            let _continue = false
+            project.nick = nick
+            await forLoopAllProjects(function(proj) {
+                if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick) {
+            	    _continue = true
+            	    return
+                }
+            })
+            if (_continue) continue
+            countNicks++
+            await addProjectList(project)
+        }
+    } else {
+        await addProjectList(project)
+    }
 
     /*f (random) {
         createNotif('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
     } else*/
     let array = []
-    array.push(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL)
+    if (document.getElementById('importNicks').checked) {
+        array.push(chrome.i18n.getMessage('addSuccessNicks', String(countNicks)) + ' ' + projectURL)
+    } else {
+        array.push(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL)
+    }
 //  if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote && !element) {
 //      const messageWSV = chrome.i18n.getMessage('warnSilentVote', getProjectName(project))
 //      const span = document.createElement('span')
@@ -3931,6 +3971,7 @@ selectedTop.addEventListener('change', function() {
     if (name == 'Custom' || name == 'ServeurPrive' || name == 'TopGames' || name == 'MMoTopRU' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU') {
         document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
+        document.getElementById('importNicks').disabled = false
 
         idSelector.removeAttribute('style')
 
@@ -3988,6 +4029,8 @@ selectedTop.addEventListener('change', function() {
 
             document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('name')
             document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterName')
+            if (document.getElementById('importNicks').checked) document.getElementById('importNicks').click()
+            document.getElementById('importNicks').disabled = true
 //          document.getElementById('nick').required = true
 
             selectedTop.after(' ')
@@ -4028,9 +4071,12 @@ selectedTop.addEventListener('change', function() {
     if (name == 'TopGG' || name == 'DiscordBotList' || name == 'BotsForDiscord') {
         document.getElementById('nick').required = false
         document.getElementById('nick').parentElement.style.display = 'none'
+        if (document.getElementById('importNicks').checked) document.getElementById('importNicks').click()
+        document.getElementById('importNicks').disabled = true
     } else if (laterChoose == 'TopGG' || laterChoose == 'DiscordBotList' || laterChoose == 'BotsForDiscord') {
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
+        document.getElementById('importNicks').disabled = false
     }
     
     if (name == 'ListForge') {

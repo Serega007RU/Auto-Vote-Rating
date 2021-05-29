@@ -247,6 +247,14 @@
   "addSuccess": {
     "message": "Успешно добавлен"
   },
+  "addSuccessNicks": {
+    "message": "Успешно добавлено $count$ ников",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
   "warnSilentVote": {
     "message": "Обращаем ваше внимание что $top$ недоступен в режиме тихого голосования",
     "placeholders": {
@@ -1187,5 +1195,11 @@
         "content": "$1"
       }
     }
+  },
+  "importNicks": {
+    "message": "Импортировать ники"
+  },
+  "yourNicks": {
+    "message": "Ваши ники"
   }
 }

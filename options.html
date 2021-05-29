@@ -55,6 +55,9 @@
                         <div class="input-block">
                             <label data-resource="yourNick" for="nick"></label>
                             <input class="input" name="nick" id="nick" required placeholder="enterNick" type="text">
+                            <div class="input-block" style="display: none">
+                                <input id="importNicksFile" type="file" accept=".txt"/>
+                            </div>
                         </div>
                         <div class="input-block">
                             <label data-resource="siteTop" for="project"></label>
@@ -544,6 +547,10 @@
                         <div class="check-block">
                             <input class="checkbox" id="voteMode" type="checkbox" name="checkbox"/>
                             <label data-resource="voteMode" for="voteMode"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="importNicks" type="checkbox" name="checkbox"/>
+                            <label data-resource="importNicks" for="importNicks"></label>
                         </div>
                     </div>
                 </form>

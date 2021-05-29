@@ -287,6 +287,14 @@
   "addSuccess": {
     "message": "Successfully added"
   },
+  "addSuccessNicks": {
+    "message": "Successfully added $count$ nicknames",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
   "warnSilentVote": {
     "message": "Please note that $top$ is not available in silent voting mode",
     "placeholders": {
@@ -1229,5 +1237,11 @@
         "content": "$1"
       }
     }
+  },
+  "importNicks": {
+    "message": "Import nicknames"
+  },
+  "yourNicks": {
+    "message": "Your nicknames"
   }
 }
