@@ -1391,13 +1391,17 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
             text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
         } else if (response.html.length < 500) {
             text = response.html
+            if (text.includes('Security Error') && currentVK != null && (currentVK['AuthURL' + getProjectName(project)] != null || currentVK['AuthURL' + getProjectName(project) + project.id] != null)) {
+                delete currentVK['AuthURL' + getProjectName(project)]
+                delete currentVK['AuthURL' + getProjectName(project) + project.id]
+            }
         } else {
             text = 'null'
         }
         endVote({errorAuthVK: text}, null, project)
         return false
     }
-    if (!host.includes(url)) {
+    if (!host.includes(url) && !response.url.startsWith('data:text/plain')) {
         endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
         return false
     }
@@ -1472,16 +1476,17 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
     }
 }, {urls: ['<all_urls>']})
 
-// chrome.webRequest.onBeforeRequest.addListener(function (details) {
-//     if (details.initiator == 'chrome-extension://' + chrome.runtime.id && fetchProjects.has(details.requestId)) {
-//         const project = fetchProjects.get(details.requestId)
-//         if (project['AuthURL' + getProjectName(project)] != null || project['AuthURL' + getProjectName(project) + project.id] != null) {
-//             if (details.url.includes('Ser.ga007')) {
-//                 return {cancel: true}
-//             }
-//         }
-//     }
-// }, {urls: ['<all_urls>']}, ["blocking"])
+//Блокировка redirect запросов для антибан и вывод результата в url через data:text
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
+    if (details.initiator == 'chrome-extension://' + chrome.runtime.id && fetchProjects.has(details.requestId)) {
+        const project = fetchProjects.get(details.requestId)
+        if (project.MinecraftRating && currentVK != null && currentVK['AuthURLMinecraftRating' + project.id] != null) {
+            if (details.url.includes('code=') && details.url.includes('state=')) {
+                return {redirectUrl: 'data:text/plain;charset=utf-8,' + details.url}
+            }
+        }
+    }
+}, {urls: ['<all_urls>']}, ['blocking'])
 
 async function _fetch(url, options, project) {
     let listener

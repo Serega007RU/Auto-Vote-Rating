@@ -59,6 +59,7 @@ let storageArea = 'local'
 //Блокировать ли кнопки которые требуют времени на выполнение?
 let blockButtons = false
 let currentVKCredentials = {}
+let blockRedirect = false
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -1554,32 +1555,29 @@ async function checkAuthVK(VK) {
         if (!needReturn && (key == 'TopCraft' || key == 'McTOP' || key == 'MinecraftRating' || key == 'MonitoringMinecraft') && document.getElementById('antiBan2VK').checked && VK['AuthURL' + key] == null) {
             try {
                 createNotif(chrome.i18n.getMessage('antiBan2VKStart', key))
+                blockRedirect = true
                 if (key == 'TopCraft') {
-                    await addUrl('https://oauth.vk.com/authorize?auth_type=reauthenticate&state=zpacb16WVMTC&redirect_uri=http%3A%2F%2Ftopcraft.ru%2Faccounts%2Fvk%2Flogin%2Fcallback%2F&response_type=code&client_id=5128935&scope=4259840')
+                    await addUrl('https://oauth.vk.com/authorize?auth_type=reauthenticate&state=zpacb16WVMTC&redirect_uri=http%3A%2F%2Ftopcraft.ru%2Faccounts%2Fvk%2Flogin%2Fcallback%2F&response_type=code&client_id=5128935&scope=email')
                 } else if (key == 'McTOP') {
-                     await addUrl('https://oauth.vk.com/authorize?auth_type=reauthenticate&state=PYgCjtBwgllH&redirect_uri=http%3A%2F%2Fmctop.su%2Faccounts%2Fvk%2Flogin%2Fcallback%2F&response_type=code&client_id=5113650&scope=4259840')
+                     await addUrl('https://oauth.vk.com/authorize?auth_type=reauthenticate&state=PYgCjtBwgllH&redirect_uri=http%3A%2F%2Fmctop.su%2Faccounts%2Fvk%2Flogin%2Fcallback%2F&response_type=code&client_id=5113650&scope=email')
                 } else if (key == 'MinecraftRating') {
                     const skip = {}
                     for (const project of projectsMinecraftRating) {
                         if (skip[project.id] != null) continue
                         skip[project.id] = true
-                        await addUrl('https://oauth.vk.com/authorize?client_id=5216838&redirect_uri=https%3A%2F%2Fminecraftrating.ru%2Fprojects%2F' + project.id + '%2F&state=Ser.ga007&response_type=code&scope=4259840', project.id)
+                        await addUrl('https://oauth.vk.com/authorize?client_id=5216838&redirect_uri=https%3A%2F%2Fminecraftrating.ru%2Fprojects%2F' + project.id + '%2F&state=Ser.ga007&response_type=code', project.id)
                     }
                 } else if (key == 'MonitoringMinecraft') {
                     const skip = {}
                     for (const project of projectsMonitoringMinecraft) {
                         if (skip[project.id] != null) continue
                         skip[project.id] = true
-                        await addUrl('https://oauth.vk.com/authorize?client_id=3697128&scope=4259840&response_type=code&redirect_uri=https%3A%2F%2Fmonitoringminecraft.ru%2Ftop%2F' + project.id + '%2Fvote', project.id)
+                        await addUrl('https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=code&redirect_uri=https%3A%2F%2Fmonitoringminecraft.ru%2Ftop%2F' + project.id + '%2Fvote', project.id)
                     }
                 }
                 async function addUrl(url, id) {
                     let response = await fetch(url)
-                    response.html = await response.text()
-                    response.doc = new DOMParser().parseFromString(response.html, 'text/html')
-                    const text = response.doc.querySelector('head > script:nth-child(9)').text
-                    url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
-                    await fetch(url)
+                    url = response.url.replace('data:text/plain;charset=utf-8,', '')
                     if (id) {
                         VK['AuthURL' + key + id] = url
                     } else {
@@ -1596,6 +1594,8 @@ async function checkAuthVK(VK) {
                 createNotif(chrome.i18n.getMessage('antiBan2VKEnd', key))
             } catch (e) {
                 createNotif(e, 'error')
+            } finally {
+                blockRedirect = false
             }
         }
     }
@@ -1606,6 +1606,13 @@ async function checkAuthVK(VK) {
     }
     createNotif(chrome.i18n.getMessage('authOK'), 'success')
 }
+
+//Блокировка redirect запросов для антибан и вывод результата в url через data:text
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
+    if (blockRedirect && details.initiator == 'chrome-extension://' + chrome.runtime.id && details.url.startsWith('https://login.vk.com/')) {
+        return {redirectUrl: 'data:text/plain;charset=utf-8,' + details.url}
+    }
+}, {urls: ['<all_urls>']}, ['blocking'])
 
 // //Слушатель кнопки 'Удалить куки' на MultiVote VKontakte
 // document.getElementById('deleteAllVKCookies').addEventListener('click', async () => {
