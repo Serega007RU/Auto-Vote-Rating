@@ -1187,28 +1187,6 @@
       }
     }
   },
-  "antiBan2VK": {
-    "message": "Remember the authorization URL"
-  },
-  "antiBan2VKTooltip": {
-    "message": "Remembers the authorization URL for TopCraft, McTOP, MinecraftRating, and MonitoringMinecraft after the VK authorization. After that, when voting on the specified ratings, authorization takes place at this URL, which allows you to vote even when the VK account is in the ban. Add the projects you need to the list of added projects before, otherwise after the ban on MinecraftRating and MonitoringMinecraft, you will not be able to vote. Do not delete your VK account from the extension if it is banned and if you vote on the specified ratings, the extension will continue to use it"
-  },
-  "antiBan2VKStart": {
-    "message": "Starting to remember the URL on $rating$",
-    "placeholders": {
-      "rating": {
-        "content": "$1"
-      }
-    }
-  },
-  "antiBan2VKEnd": {
-    "message": "URL saved successfully on $rating$",
-    "placeholders": {
-      "rating": {
-        "content": "$1"
-      }
-    }
-  },
   "autoAuthVKStart": {
     "message": "I automatically allow access to account $rating$",
     "placeholders": {

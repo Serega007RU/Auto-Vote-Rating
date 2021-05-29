@@ -234,10 +234,8 @@ async function checkOpen(project) {
                 }
             }
             if (currentVK.notWorking) {
-                if (project.TopCraft && (!(vkontakte.passwordTopCraft || vkontakte.AuthURLTopCraft))) return
-                if (project.McTOP && (!(vkontakte.passwordMcTOP || project.AuthURLMcTOP))) return
-                if (project.MinecraftRating && vkontakte['AuthURLMinecraftRating' + project.id] == null) return
-                if (project.MonitoringMinecraft && vkontakte['AuthURLMonitoringMinecraft' + project.id] == null) return
+                if (project.TopCraft && !currentVK.passwordTopCraft) return
+                if (project.McTOP && !currentVK.passwordMcTOP) return
             }
         }
         if (currentProxy != null) {
@@ -828,14 +826,6 @@ async function silentVote(project) {
                     'body': 'csrfmiddlewaretoken=' + csrftoken + '&login=' + currentVK.id + currentVK.numberId + '&password=' + currentVK.passwordTopCraft,
                     'method': 'POST'
                 }, project)
-                //Мне лень это делать, патом сделаю
-//             } else if (currentVK != null && currentVK.AuthURLTopCraft != null) {
-//                 response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login', null, project)
-//                 let host = extractHostname(response.url)
-//                 if (host.includes('vk.com')) {
-//                     let response2 = await _fetch(currentVK.AuthURLTopCraft, null, project)
-//                     if (!await checkResponseError(project, response2, 'topcraft.ru', null, true)) return
-//                 }
             } else {
                 response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
             }
@@ -960,14 +950,7 @@ async function silentVote(project) {
         } else
 
         if (project.MinecraftRating) {
-            let response
-            if (currentVK != null && currentVK['AuthURLMinecraftRating' + project.id] != null) {
-                response = await _fetch(currentVK['AuthURLMinecraftRating' + project.id], null, project)
-                if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
-                response = await _fetch('https://minecraftrating.ru/projects/' + project.id + '/?code=' + response.url.substring(response.url.indexOf('code='), response.url.indexOf('&state')).replace('code=', '') + '&state=' + project.nick, null, project)
-            } else {
-                response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
-            }
+            let response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
             if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
                 if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
@@ -1475,18 +1458,6 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
         }
     }
 }, {urls: ['<all_urls>']})
-
-//Блокировка redirect запросов для антибан и вывод результата в url через data:text
-chrome.webRequest.onBeforeRequest.addListener(function(details) {
-    if (details.initiator == 'chrome-extension://' + chrome.runtime.id && fetchProjects.has(details.requestId)) {
-        const project = fetchProjects.get(details.requestId)
-        if (project.MinecraftRating && currentVK != null && currentVK['AuthURLMinecraftRating' + project.id] != null) {
-            if (details.url.includes('code=') && details.url.includes('state=')) {
-                return {redirectUrl: 'data:text/plain;charset=utf-8,' + details.url}
-            }
-        }
-    }
-}, {urls: ['<all_urls>']}, ['blocking'])
 
 async function _fetch(url, options, project) {
     let listener

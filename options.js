@@ -59,7 +59,6 @@ let storageArea = 'local'
 //Блокировать ли кнопки которые требуют времени на выполнение?
 let blockButtons = false
 let currentVKCredentials = {}
-let blockRedirect = false
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -282,8 +281,6 @@ async function restoreOptions() {
                 }
             } else if (this.id == 'antiBanVK') {
                 settings.antiBanVK = this.checked
-            } else if (this.id == 'antiBan2VK') {
-                settings.antiBan2VK = this.checked
             } else if (this.id == 'clearVKCookies') {
                 settings.clearVKCookies = this.checked
             } else if (this.id == 'saveVKCredentials') {
@@ -329,6 +326,7 @@ async function restoreOptions() {
     }
     if (storageArea == 'sync') {
         document.getElementById('enableSyncStorage').checked = true
+        document.querySelector('div.enableSyncStorage').removeAttribute('style')
     }
     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
@@ -338,13 +336,9 @@ async function restoreOptions() {
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
     document.getElementById('useProxyOnUnProxyTop').checked = settings.useProxyOnUnProxyTop
     document.getElementById('antiBanVK').checked = settings.antiBanVK
-    document.getElementById('antiBan2VK').checked = settings.antiBan2VK
     document.getElementById('saveVKCredentials').checked = settings.saveVKCredentials
     if (settings.antiBanVK != null) {
         document.querySelector('div.antiBanVK').removeAttribute('style')
-    }
-    if (settings.antiBan2VK != null) {
-        document.querySelector('div.antiBan2VK').removeAttribute('style')
     }
     if (settings.clearVKCookies != null) document.getElementById('clearVKCookies').checked = settings.clearVKCookies
     document.getElementById('autoAuthVK').checked = settings.autoAuthVK
@@ -1361,7 +1355,7 @@ async function addBorealis(repair) {
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
         await new Promise(resolve => {
-            openPoput('https://borealis.su/', function () {
+            openPoput('https://borealis.su/index.php?do=register', function () {
                 resolve()
             })
         })
@@ -1471,16 +1465,6 @@ async function checkAuthVK(VK) {
                 response2.doc = new DOMParser().parseFromString(response2.html, 'text/html')
                 const text = response2.doc.querySelector('head > script:nth-child(9)').text
                 const url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
-//              if (document.getElementById('antiBan2VK').checked) {
-//                  VK['AuthURL' + key] = url
-//                  for (_vk in VKs) {
-//                      if (VK.id == VKs[_vk].id) {
-//                          VKs[_vk] = VK
-//                          break
-//                      }
-//                  }
-//                  await setValue('AVMRVKs', VKs)
-//              }
                 response2 = await fetch(url)
             } else {
                 let a = document.createElement('a')
@@ -1552,52 +1536,6 @@ async function checkAuthVK(VK) {
                 createNotif(e, 'error')
             }
         }
-        if (!needReturn && (key == 'TopCraft' || key == 'McTOP' || key == 'MinecraftRating' || key == 'MonitoringMinecraft') && document.getElementById('antiBan2VK').checked && VK['AuthURL' + key] == null) {
-            try {
-                createNotif(chrome.i18n.getMessage('antiBan2VKStart', key))
-                blockRedirect = true
-                if (key == 'TopCraft') {
-                    await addUrl('https://oauth.vk.com/authorize?auth_type=reauthenticate&state=zpacb16WVMTC&redirect_uri=http%3A%2F%2Ftopcraft.ru%2Faccounts%2Fvk%2Flogin%2Fcallback%2F&response_type=code&client_id=5128935&scope=email')
-                } else if (key == 'McTOP') {
-                     await addUrl('https://oauth.vk.com/authorize?auth_type=reauthenticate&state=PYgCjtBwgllH&redirect_uri=http%3A%2F%2Fmctop.su%2Faccounts%2Fvk%2Flogin%2Fcallback%2F&response_type=code&client_id=5113650&scope=email')
-                } else if (key == 'MinecraftRating') {
-                    const skip = {}
-                    for (const project of projectsMinecraftRating) {
-                        if (skip[project.id] != null) continue
-                        skip[project.id] = true
-                        await addUrl('https://oauth.vk.com/authorize?client_id=5216838&redirect_uri=https%3A%2F%2Fminecraftrating.ru%2Fprojects%2F' + project.id + '%2F&state=Ser.ga007&response_type=code', project.id)
-                    }
-                } else if (key == 'MonitoringMinecraft') {
-                    const skip = {}
-                    for (const project of projectsMonitoringMinecraft) {
-                        if (skip[project.id] != null) continue
-                        skip[project.id] = true
-                        await addUrl('https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=code&redirect_uri=https%3A%2F%2Fmonitoringminecraft.ru%2Ftop%2F' + project.id + '%2Fvote', project.id)
-                    }
-                }
-                async function addUrl(url, id) {
-                    let response = await fetch(url)
-                    url = response.url.replace('data:text/plain;charset=utf-8,', '')
-                    if (id) {
-                        VK['AuthURL' + key + id] = url
-                    } else {
-                        VK['AuthURL' + key] = url
-                    }
-                    for (_vk in VKs) {
-                        if (VK.id == VKs[_vk].id) {
-                            VKs[_vk] = VK
-                            break
-                        }
-                    }
-                }
-                await setValue('AVMRVKs', VKs)
-                createNotif(chrome.i18n.getMessage('antiBan2VKEnd', key))
-            } catch (e) {
-                createNotif(e, 'error')
-            } finally {
-                blockRedirect = false
-            }
-        }
     }
     if (needReturn) {
         authStatus.push(chrome.i18n.getMessage('notAcceptAuth'))
@@ -1606,13 +1544,6 @@ async function checkAuthVK(VK) {
     }
     createNotif(chrome.i18n.getMessage('authOK'), 'success')
 }
-
-//Блокировка redirect запросов для антибан и вывод результата в url через data:text
-chrome.webRequest.onBeforeRequest.addListener(function(details) {
-    if (blockRedirect && details.initiator == 'chrome-extension://' + chrome.runtime.id && details.url.startsWith('https://login.vk.com/')) {
-        return {redirectUrl: 'data:text/plain;charset=utf-8,' + details.url}
-    }
-}, {urls: ['<all_urls>']}, ['blocking'])
 
 // //Слушатель кнопки 'Удалить куки' на MultiVote VKontakte
 // document.getElementById('deleteAllVKCookies').addEventListener('click', async () => {
