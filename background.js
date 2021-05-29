@@ -233,6 +233,12 @@ async function checkOpen(project) {
                     return
                 }
             }
+            if (currentVK.notWorking) {
+                if (project.TopCraft && (!(vkontakte.passwordTopCraft || vkontakte.AuthURLTopCraft))) return
+                if (project.McTOP && (!(vkontakte.passwordMcTOP || project.AuthURLMcTOP))) return
+                if (project.MinecraftRating && vkontakte['AuthURLMinecraftRating' + project.id] == null) return
+                if (project.MonitoringMinecraft && vkontakte['AuthURLMonitoringMinecraft' + project.id] == null) return
+            }
         }
         if (currentProxy != null) {
             if (!settings.useProxyOnUnProxyTop && (project.TopCraft || project.McTOP || project.MinecraftRating)) {
@@ -253,10 +259,10 @@ async function checkOpen(project) {
             for (let vkontakte of VKs) {
                 if (vkontakte.notWorking) {
                     let _continue = true
-                    if (project.TopCraft && (project.passwordTopCraft || project.AuthURLTopCraft)) _continue = false
-                    if (project.McTOP && (project.passwordMcTOP || project.AuthURLMcTOP)) _continue = false
-                    if (project.MinecraftRating && project['AuthURLMinecraftRating' + project.id] != null) _continue = false
-                    if (project.MonitoringMinecraft && project['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
+                    if (project.TopCraft && (vkontakte.passwordTopCraft || vkontakte.AuthURLTopCraft)) _continue = false
+                    if (project.McTOP && (vkontakte.passwordMcTOP || project.AuthURLMcTOP)) _continue = false
+                    if (project.MinecraftRating && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
+                    if (project.MonitoringMinecraft && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
                     if (_continue) continue
                 }
                 let usedProjects = getTopFromList(vkontakte, project)
@@ -1857,7 +1863,7 @@ async function endVote(request, sender, project) {
             currentProxy = null
             currentVK = null
         }
-    }, settings.useMultiVote && settings.cooldown < 10000 && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) ? 0 : 10000)
+    }, settings.useMultiVote && settings.cooldown < 5000 && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) ? 0 : 5000)
 }
 
 //Отправитель уведомлений

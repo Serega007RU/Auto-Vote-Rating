@@ -2390,6 +2390,45 @@ document.getElementById('FormAddNicksBorealis').addEventListener('submit', async
     createNotif('Успешно добавлены никнеймы Borealis', 'success')
 })
 
+document.getElementById('AddNicksAccBorealis').addEventListener('click', async ()=>{
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    if (settings.stopVote < Date.now()) {
+        document.getElementById('stopVote').click()
+    }
+    createNotif(chrome.i18n.getMessage('adding'))
+    let array = [{top: 'TopCraft', id: '7126'}, {top: 'McTOP', id: '2241'}, {top: 'MinecraftRating', id: 'borealis'}]
+    for (const borealisAcc of borealisAccounts) {
+        for (let arr of array) {
+            let project = {
+                [arr.top]: true,
+                id: arr.id,
+                name: 'borealis',
+                nick: borealisAcc.nick,
+                stats: {
+                    added: Date.now()
+                },
+                time: null
+            }
+            _continue = false
+            await forLoopAllProjects(function(proj) {
+                if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick) {
+            	    _continue = true
+            	    return
+                }
+            })
+            if (_continue) continue
+            await addProjectList(project)
+        }
+    }
+    blockButtons = false
+    createNotif('Успешно добавлены никнеймы Borealis', 'success')
+})
+
 async function addProject(project, element) {
     createNotif(chrome.i18n.getMessage('adding'), null, null, element)
 

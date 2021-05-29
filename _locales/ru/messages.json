@@ -1203,7 +1203,7 @@
     "message": "Добавить ВК через экспортированные настройки"
   },
   "importingSettingVKEnd": {
-    "message": "Добавить $count$ аккаунтов ВК",
+    "message": "Добавлено $count$ аккаунтов ВК",
     "placeholders": {
       "count": {
         "content": "$1"
