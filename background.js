@@ -1374,17 +1374,13 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
             text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
         } else if (response.html.length < 500) {
             text = response.html
-            if (text.includes('Security Error') && currentVK != null && (currentVK['AuthURL' + getProjectName(project)] != null || currentVK['AuthURL' + getProjectName(project) + project.id] != null)) {
-                delete currentVK['AuthURL' + getProjectName(project)]
-                delete currentVK['AuthURL' + getProjectName(project) + project.id]
-            }
         } else {
             text = 'null'
         }
         endVote({errorAuthVK: text}, null, project)
         return false
     }
-    if (!host.includes(url) && !response.url.startsWith('data:text/plain')) {
+    if (!host.includes(url)) {
         endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
         return false
     }
