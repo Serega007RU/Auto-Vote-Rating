@@ -481,7 +481,7 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
     let project = {}
     let name
     if (document.querySelector('#projectList > option[value="' + this.project.value + '"]') != null) {
-        name = document.querySelector('#projectList > option[value="' + this.project.value + '"]').getProjectName('name')
+        name = document.querySelector('#projectList > option[value="' + this.project.value + '"]').getAttribute('name')
     }
     if (name == null) {
         createNotif(chrome.i18n.getMessage('errorSelectSiteRating'), 'error')
