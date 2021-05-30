@@ -479,7 +479,10 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
         blockButtons = true
     }
     let project = {}
-    const name = document.querySelector('#projectList > option[value="' + this.project.value + '"]')?.getAttribute('name')
+    let name
+    if (document.querySelector('#projectList > option[value="' + this.project.value + '"]') != null) {
+        name = document.querySelector('#projectList > option[value="' + this.project.value + '"]').getProjectName('name')
+    }
     if (name == null) {
         createNotif(chrome.i18n.getMessage('errorSelectSiteRating'), 'error')
         blockButtons = false
@@ -1719,7 +1722,10 @@ var selectedTop = document.getElementById('project')
 var laterChoose
 selectedTop.addEventListener('change', function() {
     document.getElementById('id').value = ''
-    const name = document.querySelector('#projectList > option[value="' + this.value + '"]')?.getAttribute('name')
+    let name
+    if (document.querySelector('#projectList > option[value="' + this.project.value + '"]') != null) {
+        name = document.querySelector('#projectList > option[value="' + this.project.value + '"]').getAttribute('name')
+    }
     if (name == null) {
         this.value = ''
         document.getElementById('idSelector').style.display = 'none'
