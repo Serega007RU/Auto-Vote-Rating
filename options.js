@@ -2297,7 +2297,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                     doc = new DOMParser().parseFromString(html, 'text/html')
                     createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + coin + ' бореалисиков')
                 } else {
-                    createNotif('На ' + acc.nick + ' 0 бореаликов', 'warn')
+                    createNotif('На ' + acc.nick + ' 0 бореаликов', 'warn', 3000)
                 }
             }
             
@@ -2323,7 +2323,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                     doc = new DOMParser().parseFromString(html, 'text/html')
                     createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + vote + ' голосов')
                 } else {
-                    createNotif('На ' + acc.nick + ' 0 голосов', 'warn')
+                    createNotif('На ' + acc.nick + ' 0 голосов', 'warn', 3000)
                 }
             }
 		} catch(e) {

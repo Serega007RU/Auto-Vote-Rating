@@ -821,11 +821,20 @@ async function silentVote(project) {
                 const csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
                 response = await _fetch('https://topcraft.ru/accounts/login/', {
                     'headers': {
-                        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'x-requested-with': 'XMLHttpRequest'
                     },
                     'body': 'csrfmiddlewaretoken=' + csrftoken + '&login=' + currentVK.id + currentVK.numberId + '&password=' + currentVK.passwordTopCraft,
                     'method': 'POST'
                 }, project)
+                if (!await checkResponseError(project, response, 'topcraft.ru', [400], true)) {
+                    if (response.html.includes('Имя пользователя и/или пароль не верны')) {
+                        endVote({message: 'Имя пользователя и/или пароль не верны, passwordTopCraft: ' + currentVK.passwordTopCraft}, null, project)
+                        delete currentVK.passwordTopCraft
+                    }
+                    return
+                }
+                response = await _fetch('https://topcraft.ru/', null, project)
             } else {
                 response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
             }
@@ -861,11 +870,20 @@ async function silentVote(project) {
                 const csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
                 response = await _fetch('https://mctop.su/accounts/login/', {
                     'headers': {
-                        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'x-requested-with': 'XMLHttpRequest'
                     },
                     'body': 'csrfmiddlewaretoken=' + csrftoken + '&login=' + currentVK.id + currentVK.numberId + '&password=' + currentVK.passwordMcTOP,
                     'method': 'POST'
                 }, project)
+                if (!await checkResponseError(project, response, 'mctop.su', [400], true)) {
+                    if (response.html.includes('Имя пользователя и/или пароль не верны')) {
+                        endVote({message: 'Имя пользователя и/или пароль не верны, passwordMcTOP: ' + currentVK.passwordMcTOP}, null, project)
+                        delete currentVK.passwordMcTOP
+                    }
+                    return
+                }
+                response = await _fetch('https://mctop.su/', null, project)
             } else {
                 response = await _fetch('https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
             }
