@@ -1337,8 +1337,23 @@ document.getElementById('AddBorealis').addEventListener('click', async () => {
     blockButtons = false
 })
 
+// let accpass = []
+// var codeBorealis = ``
+// for (let acc of accpass) {
+//     acc = acc.split(':')
+//     codeBorealis = `
+//         if (document.querySelector("#midside > div.clr.berrors") != null) {
+//             window.close()
+//         }
+//         document.getElementById('login_name').value = "` + acc[0] + `"
+//         document.getElementById('login_password').value = "` + acc[1] + `"
+//         document.querySelector('button[data-callback="executeLogin"]').click()
+//     `
+//     await addBorealis()
+// }
+
 async function addBorealis(repair) {
-    if (repair || !document.getElementById('clearVKCookies').checked || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
+    if (repair || !document.getElementById('clearVKCookies').checked || true || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
         if (document.getElementById('clearVKCookies').checked && !repair) {
             //Удаление всех куки и вкладок Borealis перед добавлением нового аккаунта Borealis
             createNotif(chrome.i18n.getMessage('deletingAllAcc', 'Borealis'))
@@ -1369,10 +1384,36 @@ async function addBorealis(repair) {
         createNotif(chrome.i18n.getMessage('openPopupAcc', 'Borealis'))
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
-        await new Promise(resolve => {
+        await new Promise(async(resolve) => {
             openPoput('https://borealis.su/index.php?do=register', function () {
                 resolve()
             })
+//             let tabID = await new Promise(resolve=>{
+//                 chrome.tabs.query({active: true}, function(tabs) {
+//                     for (const tab of tabs) {
+//                         if (tab.pendingUrl == 'https://borealis.su/index.php?do=register') {
+//                             resolve(tab.id)
+//                         }
+//                     }
+//                 })
+//             })
+//             function onUpdated(tabId, changeInfo, tab) {
+//                 if (tabID == tabId) {
+//                     if (changeInfo.status && changeInfo.status == 'complete') {
+//                         chrome.tabs.executeScript(tabID, {code: codeBorealis}, function(result) {
+//                             if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
+//                         })
+//                     }
+//                 }
+//             }
+//             function onRemoved(tabId, removeInfo) {
+//                 if (tabID == tabId) {
+//                     chrome.tabs.onUpdated.removeListener(onUpdated)
+//                     chrome.tabs.onRemoved.removeListener(onRemoved)
+//                 }
+//             }
+//             chrome.tabs.onUpdated.addListener(onUpdated)
+//             chrome.tabs.onRemoved.addListener(onRemoved)
         })
 
         //После закрытия окна авторизации попытка добавить аккаунт Borealis
