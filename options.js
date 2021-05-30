@@ -1723,8 +1723,8 @@ var laterChoose
 selectedTop.addEventListener('change', function() {
     document.getElementById('id').value = ''
     let name
-    if (document.querySelector('#projectList > option[value="' + this.project.value + '"]') != null) {
-        name = document.querySelector('#projectList > option[value="' + this.project.value + '"]').getAttribute('name')
+    if (document.querySelector('#projectList > option[value="' + this.value + '"]') != null) {
+        name = document.querySelector('#projectList > option[value="' + this.value + '"]').getAttribute('name')
     }
     if (name == null) {
         this.value = ''
