@@ -135,7 +135,7 @@ async function setProject(project) {
 
 function throwError(error) {
     let message
-    if (error?.message == 'errorVoteNoNick2') {
+    if (error.message == 'errorVoteNoNick2') {
         chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
         return
     } else if (error.stack) {
