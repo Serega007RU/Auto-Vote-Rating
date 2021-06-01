@@ -225,6 +225,12 @@ async function checkOpen(project) {
         }
     }
     if (settings.useMultiVote) {
+        if (queueProjects.size == 0 && (currentVK != null || currentProxy != null)) {
+            if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
+            if (currentProxy != null) clearProxy()
+            currentProxy = null
+            currentVK = null
+        }
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
         if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop)) {
             let usedProjects = getTopFromList(currentVK, project)
@@ -1847,7 +1853,7 @@ async function endVote(request, sender, project) {
                 queueProjects.delete(value)
             }
         }
-        if (settings.useMultiVote && queueProjects.size == 0) {
+        if (settings.useMultiVote && queueProjects.size == 0 && (currentVK != null || currentProxy != null)) {
             if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
             if (currentProxy != null) clearProxy()
             currentProxy = null
