@@ -886,7 +886,7 @@ async function silentVote(project) {
                 if (response.doc.querySelector('.errorlist') != null) {
                     if (response.doc.querySelector('.errorlist').textContent.includes('Имя пользователя и/или пароль не верны')) {
                         endVote({message: response.doc.querySelector('.errorlist').textContent + ' passwordMcTOP: ' + currentVK.passwordMcTOP}, null, project)
-                        delete currentVK.passwordTopCraft
+                        delete currentVK.passwordMcTOP
                     } else {
                         endVote({message: response.doc.querySelector('.errorlist').textContent}, null, project)
                     }
