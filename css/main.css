@@ -224,6 +224,10 @@ nav .logo img {
 	height: 300px;
 }
 
+#modals .modal#updateVersion {
+	height: 230px;
+}
+
 #modals .modal.active {
 	transition: .3s;
     transform: scale(1)
@@ -285,6 +289,10 @@ nav .logo img {
 	margin-top: 5px;
 }
 
+#modals .modal#updateVersion .content .message {
+	height: 105px;
+}
+
 #modals .modal .content .message table {
 	width: 100%;
 }
@@ -338,8 +346,8 @@ nav .logo img {
 	color: #fff;
 }
 
-#modals .modal#addFastProject .content .message progress {
-	width: 100%;
+#modals .modal#updateVersion .content .events progress {
+	margin: auto 0;
 }
 
 @media(max-width: 450px) {
@@ -504,6 +512,10 @@ nav .logo img {
 	font-size: 16px;
 }
 
+#importNicksFile {
+	color: #fff;
+}
+
 #addProject {
 	margin-top: 20px;
 	display: grid;
@@ -523,6 +535,14 @@ nav .logo img {
 	justify-content: space-between;
 }
 
+.multivoteBlock .checkboxesBlock {
+	display: grid;
+	grid-column-gap: 20px;
+	width: 100%;
+	grid-template-columns: repeat(2, 1fr);
+	justify-content: space-between;
+}
+
 .bottomLabel {
 	display: flex;
 	justify-content: space-between;
@@ -533,12 +553,6 @@ nav .logo img {
 	margin-bottom: 20px;
 	grid-gap: 20px;
 	grid-template-columns: 7fr 2fr;
-}
-
-#sendBorealis {
-	padding-top: 15px;
-    border-top: 1px #5A5A5C solid;
-    border-bottom: 1px #5A5A5C solid;
 }
 
 #BorealisTab > .inputEl {
@@ -552,12 +566,12 @@ nav .logo img {
 	grid-template-columns: 7fr 2fr;
 }
 
-#FormAddNicksBorealis {
+/*#FormAddNicksBorealis {
     display: inline-grid;
     margin-bottom: 21px;
     grid-gap: 38px;
     grid-template-columns: 1fr 2fr;
-}
+}*/
 
 .importProxyBtns,
 #addProxy {
@@ -766,6 +780,13 @@ nav .logo img {
 #authvk > img {
 	width: 15px;
 	height: 15px;
+}
+
+#updateBtn {
+	padding: 8px 12px;
+	font-size: 15px;
+	display: inline-flex;
+	margin: 10px auto;
 }
 
 .link {

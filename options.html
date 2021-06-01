@@ -691,26 +691,28 @@
 					</div>
 					<div class="contentBlock">
 						<ul class="listcontent" id="VKTab" style="display: none;">
-						    <div class="check-block antiBanVK" style="display: none;">
-						    	<input class="checkbox" id="antiBanVK" type="checkbox" name="checkbox" />
-						    	<label data-resource="antiBanVK" for="antiBanVK">
-                                    <span class="tooltip1">
-                                        <span data-resource="antiBanVKTooltip" class="tooltip1text"></span>
-                                    </span>
-						    	</label>
-						    </div>
-						    <div class="check-block">
-						    	<input class="checkbox" id="autoAuthVK" type="checkbox" name="checkbox" />
-						    	<label data-resource="autoAuthVK" for="autoAuthVK"></label>
-						    </div>
-						    <div class="check-block">
-						    	<input class="checkbox" id="clearVKCookies" type="checkbox" name="checkbox" checked="true"/>
-						    	<label data-resource="clearVKCookies" for="clearVKCookies"></label>
-						    </div>
-						    <div class="check-block">
-						    	<input class="checkbox" id="saveVKCredentials" type="checkbox" name="checkbox" checked="true"/>
-						    	<label data-resource="saveVKCredentials" for="saveVKCredentials"></label>
-						    </div>
+						    <div class="checkboxesBlock">
+                                <div class="check-block">
+                                    <input class="checkbox" id="autoAuthVK" type="checkbox" name="checkbox" />
+                                    <label data-resource="autoAuthVK" for="autoAuthVK"></label>
+                                </div>
+                                <div class="check-block">
+                                    <input class="checkbox" id="clearVKCookies" type="checkbox" name="checkbox" checked="true"/>
+                                    <label data-resource="clearVKCookies" for="clearVKCookies"></label>
+                                </div>
+                                <div class="check-block">
+                                    <input class="checkbox" id="saveVKCredentials" type="checkbox" name="checkbox" checked="true"/>
+                                    <label data-resource="saveVKCredentials" for="saveVKCredentials"></label>
+                                </div>
+                                <div class="check-block antiBanVK" style="display: none;">
+                                    <input class="checkbox" id="antiBanVK" type="checkbox" name="checkbox" />
+                                    <label data-resource="antiBanVK" for="antiBanVK">
+                                        <span class="tooltip1">
+                                            <span data-resource="antiBanVKTooltip" class="tooltip1text"></span>
+                                        </span>
+                                    </label>
+                                </div>                  
+                            </div>
 						    <div class="inputEl">
 						    	<button class="submitBtn" data-resource="addButton" id="AddVK"></button>
             		            <label class="file" for="importVK" class="importVK">
@@ -796,13 +798,11 @@
             		        <div id="ProxyList"></div>
             		     </ul>
 						<ul class="listcontent" id="BorealisTab" style="display: none;">
-						    Данный функционал реализован по просьбе SkillsMr
-						    <br><br>
+						    <!-- <div>Данный функционал реализован по просьбе SkillsMr</div>
                             <form id="FormAddNicksBorealis">
                                 <input id="countNicksBorealis" type="number" name="number" class="input" placeholder="На сколько аккаунтов?" required>
                                 <button class="submitBtn" id="AddNicksBorealis">Добавить никнеймы по коду голосования</button>
-                            </form>
-                            <button id="AddNicksAccBorealis">Добавить никнеймы по добавленным аккаунтам</button>
+                            </form> -->
 						    <form id="sendBorealis">
                                 <div class="label-block">
             		            	<label for="sendBorealisNick">Никнейм
@@ -823,6 +823,7 @@
             		        </form>
 						    <div class="inputEl">
 						    	<button class="submitBtn" data-resource="addButton" id="AddBorealis"></button>
+                                <button class="submitBtn" id="AddNicksAccBorealis">Добавить никнеймы по добавленным аккаунтам</button>
 						    </div>
 							<div id="BorealisList"></div>
 						</ul>
@@ -888,9 +889,21 @@
                     <div class="events"></div>
                 </div>
             </div>
+            <!-- Info -->
             <div class="modal" id="info">
                 <div class="head">
                     <h3>Info</h3>
+                    <div class="close"></div>
+                </div>
+                <div class="content">
+                    <div class="message"></div>
+                    <div class="events"></div>
+                </div>
+            </div>
+            <!-- Обновление версии программы -->
+            <div class="modal" id="updateVersion">
+                <div class="head">
+                    <h3 data-resource="updating"></h3>
                     <div class="close"></div>
                 </div>
                 <div class="content">
