@@ -1353,7 +1353,7 @@ document.getElementById('AddBorealis').addEventListener('click', async () => {
 // }
 
 async function addBorealis(repair) {
-    if (repair || !document.getElementById('clearVKCookies').checked || true || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
+    if (repair || !document.getElementById('clearVKCookies').checked || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
         if (document.getElementById('clearVKCookies').checked && !repair) {
             //Удаление всех куки и вкладок Borealis перед добавлением нового аккаунта Borealis
             createNotif(chrome.i18n.getMessage('deletingAllAcc', 'Borealis'))
