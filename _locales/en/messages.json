@@ -1246,5 +1246,11 @@
   },
   "ChangeLog": {
     "message": "What's new"
+  },
+  "deleteAll": {
+    "message": "Delete All"
+  },
+  "deleteAllRating": {
+    "message": "Do you really want to delete all the added projects on this rating?"
   }
 }
