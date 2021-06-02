@@ -2420,9 +2420,13 @@ document.getElementById('AddNicksAccBorealis').addEventListener('click', async (
                 }
             })
             if (_continue) continue
-            await addProjectList(project)
+            getProjectList(project).push(project)
         }
     }
+    for (let arr of array) {
+        await setValue('AVMRprojects' + arr.top, window['projects' + arr.top])
+    }
+    updateProjectList()
     blockButtons = false
     createNotif('Успешно добавлены никнеймы Borealis', 'success')
 })
@@ -2856,8 +2860,10 @@ async function addProject(project, element) {
             })
             if (_continue) continue
             countNicks++
-            await addProjectList(project)
+            getProjectList(project).push(project)
         }
+        await setValue('AVMRprojects' + getProjectName(project), window['projects' + getProjectName(project)])
+        updateProjectList()
     } else {
         await addProjectList(project)
     }
