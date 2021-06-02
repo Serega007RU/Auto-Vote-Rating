@@ -293,6 +293,17 @@ async function addProjectList(project, visually) {
         let div2 = document.createElement('div')
         div2.id = getProjectName(project) + 'List'
         ul.append(div2)
+        const button = document.createElement('button')
+        button.className = 'submitBtn redBtn'
+        button.textContent = chrome.i18n.getMessage('deleteAll')
+        button.addEventListener('click', async function () {
+            if (confirm(chrome.i18n.getMessage('deleteAllRating'))) {
+                window['projects' + getProjectName(project)] = []
+                await setValue('AVMRprojects' + getProjectName(project), window['projects' + getProjectName(project)])
+                updateProjectList()
+            }
+        })
+        ul.append(button)
         listProject = div2
         document.querySelector('div.projectsBlock > div.contentBlock').append(ul)
     }
@@ -443,7 +454,7 @@ async function removeProjectList(project, visually) {
 }
 
 //Перезагрузка списка проектов
-function updateProjectList(projects) {
+    function updateProjectList(projects) {
     if (projects != null) {
         if (projects.length > 0) {
             const projectName = getProjectName(projects[0])
