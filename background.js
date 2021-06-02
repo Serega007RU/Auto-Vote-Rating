@@ -1358,7 +1358,7 @@ async function silentVote(project) {
         } else
 
         if (project.Custom) {
-            let response = await _fetch(project.responseURL, project.id, project)
+            let response = await _fetch(project.responseURL, {...project.id}, project)
             await response.text()
             if (response.ok) {
                 endVote({successfully: true}, null, project)
