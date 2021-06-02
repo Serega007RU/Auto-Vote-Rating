@@ -1201,5 +1201,8 @@
   },
   "yourNicks": {
     "message": "Ваши ники"
+  },
+  "ChangeLog": {
+    "message": "Что нового"
   }
 }

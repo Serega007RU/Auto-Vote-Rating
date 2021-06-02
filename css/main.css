@@ -48,7 +48,7 @@ nav div.navigation > button img {
 
 nav div.navigation > button.active {
 	opacity: 1;
- 	background: #1a7bee;
+	background: #1a7bee;
 }
 
 nav .logo {
@@ -228,6 +228,121 @@ nav .logo img {
 	height: 230px;
 }
 
+#modals .modal#ChangeLog {
+	height: 400px;
+	width: 600px;
+}
+#modals .modal#ChangeLog .content .message {
+	max-height: 310px;
+}
+
+
+/* ChangeLog css */
+ul li, ol li {
+    margin-top: .6rem;
+}
+
+.label.label-rounded {
+    border-radius: 5rem;
+    padding-left: .4rem;
+    padding-right: .4rem;
+}
+h4,.h4 {
+    font-size: 1.2rem;
+}
+ul,ol {
+    margin: 0.8rem 0px .8rem 0.8rem;
+    padding: 0px;
+}
+small {
+    font-size: 80%;
+    font-weight: 400
+}
+
+.timeline .timeline-item {
+    display: flex;
+    margin-bottom: 1.2rem;
+    position: relative;
+}
+
+.timeline .timeline-item::before {
+    background: #e7e9ed;
+    content: "";
+    height: 100%;
+    left: 11px;
+    position: absolute;
+    top: 1.25rem;
+    width: 2px;
+}
+
+.timeline .timeline-item .timeline-content {
+    flex: auto;
+    padding: 2px 0 2px .8rem
+}
+
+.timeline .timeline-item .timeline-icon {
+    border-radius: 50%;
+    color: #fff;
+    display: block;
+    height: 1.2rem;
+    text-align: center;
+    width: 1.2rem;
+}
+
+.timeline .timeline-item .timeline-icon::before {
+    border: .2rem solid #5755d9;
+    border-radius: 50%;
+    content: "";
+    display: block;
+    height: .3rem;
+    left: .4rem;
+    position: absolute;
+    top: .3rem;
+    width: .3rem;
+}
+
+.tag-added {
+    background: #32b643;
+}
+
+.tag-performance {
+    background: #ff1493
+}
+
+.tag-changed {
+    background: #ffb700
+}
+
+.tag-deprecated {
+    background: #acb3c2
+}
+
+.tag-removed {
+    background: #2176ff
+}
+
+.tag-fixed {
+    background: #a1548b
+}
+
+.tag-security {
+    background: #e85600
+}
+
+.changes>li,.changes-entry>ul>li {
+    list-style: none;
+}
+
+.experimental ul {
+    margin: .4em
+}
+
+ul {
+    list-style: disc inside;
+}
+/* Конец ChangeLog css */
+
+
 #modals .modal.active {
 	transition: .3s;
     transform: scale(1)
@@ -278,10 +393,10 @@ nav .logo img {
 
 #modals .modal .content .message {
 	overflow-y: auto;
-    font-size: 15px;
-    color: #fff;
-    padding: 5px;
-    margin: 20px auto;
+	font-size: 15px;
+	color: #fff;
+	padding: 5px;
+	margin: 20px auto;
 	max-height: 240px;
 }
 

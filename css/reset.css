@@ -139,7 +139,8 @@ textarea {
     font-size: 100%;
     margin: 0;
     vertical-align: baseline;
-    *vertical-align: middle;
+    *
+    vertical-align: middle;
 }
 
 button,
