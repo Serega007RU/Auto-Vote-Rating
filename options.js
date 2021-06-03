@@ -371,10 +371,10 @@ async function restoreOptions() {
     await checkUpdateAvailbe()
 }
 
-async function checkUpdateAvailbe() {
+async function checkUpdateAvailbe(forced) {
     const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/files/manifest.json/raw?ref=multivote')
     const json = await response.json()
-    if (new Version(chrome.runtime.getManifest().version).compareTo(new Version(json.version)) == -1) {
+    if (forced || new Version(chrome.runtime.getManifest().version).compareTo(new Version(json.version)) == -1) {
         const button = document.createElement('button')
         button.classList.add('btn')
         button.id = 'updateBtn'
@@ -2282,7 +2282,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
 		    response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
             html = await response.text()
 		    if (html.length < 250) {
-		    	createNotif(acc.nick + ' ' + html, 'error')
+		    	createNotif(acc.nick + ' ' + html, 'error', 3000)
 		    	continue
 		    }
             doc = new DOMParser().parseFromString(html, 'text/html')
@@ -2306,13 +2306,13 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
 		            response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
                     html = await response.text()
 		            if (html.length < 250) {
-		            	createNotif(acc.nick + ' ' + html, 'error')
+		            	createNotif(acc.nick + ' ' + html, 'error', 3000)
 		            	continue
 		            }
                     doc = new DOMParser().parseFromString(html, 'text/html')
-                    createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + coin + ' бореалисиков')
+                    createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + coin + ' бореалисиков', 'hint', 1000)
                 } else {
-                    createNotif('На ' + acc.nick + ' 0 бореаликов', 'warn', 3000)
+                    createNotif('На ' + acc.nick + ' 0 бореаликов', 'warn', 2000)
                 }
             }
             
@@ -2332,20 +2332,20 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
 		            response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
                     html = await response.text()
 		            if (html.length < 250) {
-		            	createNotif(acc.nick + ' ' + html, 'error')
+		            	createNotif(acc.nick + ' ' + html, 'error', 3000)
 		            	continue
 		            }
                     doc = new DOMParser().parseFromString(html, 'text/html')
-                    createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + vote + ' голосов')
+                    createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + vote + ' голосов', 'hint', 1000)
                 } else {
-                    createNotif('На ' + acc.nick + ' 0 голосов', 'warn', 3000)
+                    createNotif('На ' + acc.nick + ' 0 голосов', 'warn', 2000)
                 }
             }
 		} catch(e) {
-			createNotif(acc.nick + ' ' + e, 'error')
+			createNotif(acc.nick + ' ' + e, 'error', 3000)
 		}
     }
-    createNotif('Всё передано, в сумме было передано ' + coins + ' бореаликов и ' + votes + ' голосов', 'success')
+    createNotif('Всё передано, в сумме было передано ' + coins + ' бореаликов и ' + votes + ' голосов', 'success', 7000)
     blockButtons = false
 })
 
@@ -4343,7 +4343,7 @@ async function createNotif(message, type, delay, element) {
     if (type != 'hint') timer = new Timer(()=> removeNotif(notif), delay)
 
     if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
-        setTimeout(()=> removeNotif(notif.previousElementSibling), 3000)
+        setTimeout(()=> removeNotif(notif.previousElementSibling), delay >= 3000 ? 3000 : delay)
     }
 
     notif.addEventListener('click', (e)=> {
