@@ -125,10 +125,12 @@ async function initializeConfig() {
     }
 
     let cooldown = 1000
-    if (settings && settings.cooldown && Number.isInteger(settings.cooldown))
-        cooldown = settings.cooldown
+    if (settings && settings.cooldown && Number.isInteger(settings.cooldown)) cooldown = settings.cooldown
 
     if (settings && !settings.disabledCheckTime) checkTime()
+    
+    //Да да, целую минуту ждём перед запуском расширения, больше никак не понять когда закончилась синхронизация браузера
+    if (storageArea == 'sync') await wait(60000)
 
     if (settings && settings.useMultiVote) {
         chrome.proxy.settings.get({}, async function(config) {
