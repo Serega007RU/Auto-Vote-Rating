@@ -2250,7 +2250,7 @@ async function createNotif(message, type, delay, element) {
     if (type != 'hint') timer = new Timer(()=> removeNotif(notif), delay)
 
     if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
-        setTimeout(()=> removeNotif(notif.previousElementSibling), 3000)
+        setTimeout(()=> removeNotif(notif.previousElementSibling), delay >= 3000 ? 3000 : delay)
     }
 
     notif.addEventListener('click', (e)=> {
