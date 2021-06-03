@@ -916,84 +916,131 @@
                         		<div class="changes timeline-content">
                         			<div class="changes-entry">
                         				<ul>
-                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
-                        						Add a test for template variable overwrite
-                        					</li>
-                        					<li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
-                        						<code>Update to Go</code> 1.11
-                        					</li>
-                        				</ul>
-                        				<ul>
                         					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
-                        						Space between <code>ul</code> elements
+                        						Исправление неверного выставления времени следующего голосования на MonitoringMinecraft
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлено логирование о старте или приостановке расширения
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлено в поддержку 12 рейтингов
                         					</li>
                         					<li><span class="label label-rounded text-light text-capitalize tag-performance">Performance</span>
-                        						It is now 1337 times faster
-                        					</li>
-                        				</ul>
-                        			</div>
-                        		</div>
-                        	</div>
-                        	<div class="timeline-item">
-                        		<div class="timeline-left">
-                        			<div class="timeline-icon"></div>
-                        		</div>
-                        		<div class="changes timeline-content">
-                        			<h4>
-                        				v1.16 Multiline example
-                        			</h4>
-                        			<small>released on 20189-09-02</small>
-                        			<div class="changes-entry">
-                        				<ul>
-                        					<li>
-                        						<span class="label label-rounded text-light text-capitalize tag-added">Added</span>
-                        						Multiline entry:
-                        						<ul>
-                        							<li>Section 1</li>
-                        							<li>
-                        								Section 2
-                        								<ul>
-                        									<li>Sub-section 1</li>
-                        									<li>Sub-section 2</li>
-                        								</ul>
-                        							</li>
-                        						</ul>
-                        					</li>
-                        					<li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
-                        						Include language code in REF_NOT_FOUND errors
-                        					</li>
-                        				</ul>
-                        			</div>
-                        		</div>
-                        	</div>
-                        	<div class="timeline-item">
-                        		<div class="timeline-left">
-                        			<div class="timeline-icon"></div>
-                        		</div>
-                        		<div class="changes timeline-content">
-                        			<h4>
-                        				v1.15 Xenial Xerus
-                        			</h4>
-                        			<small>released on 2018-09-02</small>
-                        			<div class="changes-entry">
-                        				<ul>
-                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
-                        						Add a test for template variable overwrite
-                        					</li>
-                        					<li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
-                        						Include language code in REF_NOT_FOUND errors
-                        					</li>
-                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
-                        						Improve minifier MIME type resolution
+                        						Оптимизация просчёта времени следующего голосования
                         					</li>
                         					<li><span class="label label-rounded text-light text-capitalize tag-deprecated">Deprecated</span>
-                        						Set GO111MODULE=on for mage install
+                        						Импорт NordVPN скрыт так как работает не адекватно (или вовсе не работает)
                         					</li>
-                        					<li><span class="label label-rounded text-light text-capitalize tag-removed">Removed</span>
-                        						Add instruction to install PostCSS when missing
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Прокси теперь помечаются как не рабочий если произошла ошибка авторизации прокси
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Попытка исправить фантомные ошибки ListForge
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-performance">Performance</span>
+                        						Оптимизация кода (режима эмуляции)
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Добавлен фикс CloudFlare если 2 проверки CloudFlare накладываются друг на друга (для корректной работы Accessibility или Privacy Pass)
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Исправление критических ошибок для старых версий браузеров (Chrome 59+) (ошибки авторизации и неверное отображение уведомлений в настройках)
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Исправление ошибки An invalid form control with name='nick' is not focusable.
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлена возможность автоматизированного обновления распакованного расширения (для Opera (и возможно FireFox) не работает)
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						В выборе рейтинга добавлена возможность поиска (уже слишком много рейтингов 40+)
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                        						По просьбе Kitulous#3691 логирование перенесено из localStorage в IndexedDB
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Исправлена проблема игнорирования ошибки 'Вы уже голосовали' когда ВК уже использовался но попытка ещё 1 оставалась
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлена возможность очистки логов по кнопке
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлена возможность автоматического разрешения доступа к аккаунту ВК рейтингам
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлена возможность импорта большого кол-ва аккаунтов ВК (по логину/паролю и по экспортированным настройкам)
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлена возможность сохранения логина/пароля от аккаунта ВКонтакте
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлена возможность отключить очистку куки ВКонтакте перед добавлением
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлена возможность импортировать никнеймы в большом количестве
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Попытка исправить ошибку голосования вне очереди (это когда начиналось голосование одного проекта, и во время этого голосования начиналось голосование другого проекта с применением куки другого ВКонтакте что приводило к ошибки авторизации ВК)
                         					</li>
                         					<li><span class="label label-rounded text-light text-capitalize tag-security">Security</span>
-                        						Update snapcraft build config to Go 1.11
+                        						Для авторизации через Discord обрезано предоставление ненужных прав (нефиг воровать личные данные)
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Реализована возможность удалить все добавленные проекты на рейтинг
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                        						Добавлен вот этот ChangeLog (что вы сейчас и смотрите :D)
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-removed">Removed</span>
+                        						"Любезный" Bartolomeo пофиксил возможность голосования по коду, что соответственно этот фукнционал был удалён из расширения
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Попытка исправить проблемы с синхронизацией настроек с облаком (не для MultiVote)
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						И ещё куча мелких правок и исправлений ошибок
+                        					</li>
+                        				</ul>
+                        			</div>
+                        		</div>
+                        	</div>
+                        	<div class="timeline-item">
+                        		<div class="timeline-left">
+                        			<div class="timeline-icon"></div>
+                        		</div>
+                        		<div class="changes timeline-content">
+                        			<h4>
+                        				v5.0.0.9 HotFix
+                        			</h4>
+                        			<small>released on 08.05.2021</small>
+                        			<div class="changes-entry">
+                        				<ul>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Удаление отладочного кода при добавление аккаунта ВКонтакте
+                        					</li>
+                        				</ul>
+                        			</div>
+                        		</div>
+                        	</div>
+                        	<div class="timeline-item">
+                        		<div class="timeline-left">
+                        			<div class="timeline-icon"></div>
+                        		</div>
+                        		<div class="changes timeline-content">
+                        			<h4>
+                        				v5.0.0.8
+                        			</h4>
+                        			<small>released on 05.05.2021</small>
+                        			<div class="changes-entry">
+                        				<ul>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Ошибки при сохранении настроек теперь правильно показывается
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Попытка исправить ошибки с кодировкой ВКонтакте
+                        					</li>
+                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                        						Исправление ошибок sendBorealis
                         					</li>
                         				</ul>
                         			</div>

@@ -384,6 +384,7 @@ async function checkUpdateAvailbe(forced) {
     } else if (document.URL.endsWith('?updated')) {
         window.history.replaceState(null, null, 'options.html')
         createNotif(chrome.i18n.getMessage('updated', chrome.runtime.getManifest().version), 'success')
+        toggleModal('ChangeLog')
     }
 }
 
@@ -396,7 +397,7 @@ async function update() {
     const events = document.querySelector('#updateVersion > div.content > .events')
     events.append(progress)
     try {
-        alert(chrome.i18n.getMessage('update1'))
+        createNotif(chrome.i18n.getMessage('update1'), 'hint', 1000)
         //Спрашиваем у пользователя папку где установлено расширение и получаем её
         const dirHandle = await window.showDirectoryPicker()
         if (!document.getElementById('updateVersion').className.includes('active')) toggleModal('updateVersion')
