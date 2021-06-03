@@ -1266,7 +1266,7 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
         const logs = transaction.objectStore('logs')
         const request = logs.getAll()
         request.onsuccess = function() {
-            let text
+            let text = ''
             for (const log of request.result) {
                 text += log
                 text += '\n'
