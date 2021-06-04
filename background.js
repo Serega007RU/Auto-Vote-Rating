@@ -76,9 +76,11 @@ var closeTabs = true
 //Где храним настройки
 let storageArea = 'local'
 
-chrome.runtime.onSuspend.addListener(function(){
-    console.warn(chrome.i18n.getMessage('suspended'))
-})
+if (chrome.runtime.onSuspend) {
+    chrome.runtime.onSuspend.addListener(function(){
+        console.warn(chrome.i18n.getMessage('suspended'))
+    })
+}
 
 //Инициализация настроек расширения
 initializeConfig()
