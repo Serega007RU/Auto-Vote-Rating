@@ -1487,7 +1487,10 @@ async function addBorealis(repair, imp) {
                 if (imp.auth) {
                     code = `
                         if (document.querySelector("#midside > div.clr.berrors") != null) {
-                            window.close()
+//                          window.close()
+                            if (!document.querySelector("#midside > div.clr.berrors").textContent.includes('Ошибка')) {
+                                window.close()
+                            }
                         }
                         document.getElementById('login_name').value = "` + imp.login + `"
                         document.getElementById('login_password').value = "` + imp.password + `"
@@ -1495,14 +1498,17 @@ async function addBorealis(repair, imp) {
                     `
                 } else if (imp.reg) {
                     codeBorealis = `
-	                    setInterval(()=>{
-	                	    if (document.getElementById('result-registration').textContent.includes('уже зарегистрировано')) {
-	                		    window.close()
-	                		}
-	                	}, 100)
+// 	                    setInterval(()=>{
+// 	                	    if (document.getElementById('result-registration').textContent.includes('уже зарегистрировано')) {
+// 	                		    window.close()
+// 	                		}
+// 	                	}, 100)
 	                    if (document.getElementById('loginbtn') != null) window.close()
                         if (document.querySelector("#midside > div.clr.berrors") != null) {
-                            window.close()
+//                          window.close()
+                            if (!document.querySelector("#midside > div.clr.berrors").textContent.includes('Ошибка')) {
+                                window.close()
+                            }
                         }
 	                	document.getElementById('name').scrollIntoView()
                         document.getElementById('name').value = "` + imp.login + `"
