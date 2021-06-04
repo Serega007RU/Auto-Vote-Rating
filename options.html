@@ -821,10 +821,31 @@
             		            	<button type="submit" class="justBtn">Отправить</button>
             		            </div>
             		        </form>
+						    <div class="checkboxesBlock">
+                                <div class="check-block">
+                                    <input class="checkbox" id="clearBorealisCookies" type="checkbox" name="checkbox" checked="true"/>
+                                    <label data-resource="clearVKCookies" for="clearBorealisCookies"></label>
+                                </div>
+                                <div class="check-block">
+                                    <input class="checkbox" id="saveBorealisCredentials" type="checkbox" name="checkbox"/>
+                                    <label data-resource="saveVKCredentials" for="saveBorealisCredentials"></label>
+                                </div>             
+                            </div>
 						    <div class="inputEl">
 						    	<button class="submitBtn" data-resource="addButton" id="AddBorealis"></button>
-                                <button class="submitBtn" id="AddNicksAccBorealis">Добавить никнеймы по добавленным аккаунтам</button>
+            		            <label class="file" for="importBorealis" class="importVK">
+            		                <span data-resource="importVK"></span>
+            		                <img src="images/icons/importBtn.svg" alt="importBtn">
+            		            </label>
+            		            <input id="importBorealis" type="file" accept=".txt">
+            		            <label class="file" for="importRegBorealis" class="importVK">
+            		                <span data-resource="importRegBorealis"></span>
+            		                <img src="images/icons/importBtn.svg" alt="importBtn">
+            		            </label>
+            		            <input id="importRegBorealis" type="file" accept=".json">
+                                
 						    </div>
+                            <button class="submitBtn" id="AddNicksAccBorealis">Добавить никнеймы по добавленным аккаунтам</button>
 							<div id="BorealisList"></div>
 						</ul>
 					</div>
@@ -968,13 +989,13 @@
                         						Добавлена возможность автоматического разрешения доступа к аккаунту ВК рейтингам
                         					</li>
                         					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
-                        						Добавлена возможность импорта большого кол-ва аккаунтов ВК (по логину/паролю и по экспортированным настройкам)
+                        						Добавлена возможность импорта большого кол-ва аккаунтов (по логину/паролю и по экспортированным настройкам), также возможность регистрации аккаунтов (кроме ВКонтакте)
                         					</li>
                         					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
-                        						Добавлена возможность сохранения логина/пароля от аккаунта ВКонтакте
+                        						Добавлена возможность сохранения логина/пароля от добавляемого аккаунта
                         					</li>
                         					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
-                        						Добавлена возможность отключить очистку куки ВКонтакте перед добавлением
+                        						Добавлена возможность отключить очистку куки перед добавлением аккаунта
                         					</li>
                         					<li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
                         						Добавлена возможность импортировать никнеймы в большом количестве

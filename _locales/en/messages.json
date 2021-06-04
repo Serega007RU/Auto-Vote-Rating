@@ -1225,7 +1225,7 @@
     "message": "Do you really want to save the username and password you entered for your account? This data will be stored in an unencrypted form and can be stolen by a third-party program (virus or Trojan))"
   },
   "importVK": {
-    "message": "Import by login:password"
+    "message": "Add by login:password"
   },
   "importSettingsVK": {
     "message": "Add VK via exported settings"
@@ -1252,5 +1252,8 @@
   },
   "deleteAllRating": {
     "message": "Do you really want to delete all the added projects on this rating?"
+  },
+  "importRegBorealis": {
+    "message": "Register by login: password"
   }
 }

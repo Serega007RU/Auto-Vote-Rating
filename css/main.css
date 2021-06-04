@@ -239,7 +239,8 @@ nav .logo img {
 
 /* ChangeLog css */
 ul li, ol li {
-    margin-top: .6rem;
+    margin-top: .4rem;
+    line-height: 1.5;
 }
 
 .label.label-rounded {
@@ -687,6 +688,10 @@ ul {
     grid-gap: 38px;
     grid-template-columns: 1fr 2fr;
 }*/
+
+#AddNicksAccBorealis {
+	display: initial;
+}
 
 .importProxyBtns,
 #addProxy {

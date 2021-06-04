@@ -59,6 +59,7 @@ let storageArea = 'local'
 //Блокировать ли кнопки которые требуют времени на выполнение?
 let blockButtons = false
 let currentVKCredentials = {}
+let currentBorealisCredentials = {}
 
 var authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -283,6 +284,8 @@ async function restoreOptions() {
                 settings.antiBanVK = this.checked
             } else if (this.id == 'clearVKCookies') {
                 settings.clearVKCookies = this.checked
+            } else if (this.id == 'clearBorealisCookies') {
+                settings.clearBorealisCookies = this.checked
             } else if (this.id == 'saveVKCredentials') {
                 if (this.checked && confirm(chrome.i18n.getMessage('confirmSaveVKCredentials'))) {
                     settings.saveVKCredentials = this.checked
@@ -291,6 +294,15 @@ async function restoreOptions() {
                     _return = true
                 } else {
                     settings.saveVKCredentials = this.checked
+                }
+            } else if (this.id == 'saveBorealisCredentials') {
+                if (this.checked && confirm(chrome.i18n.getMessage('confirmSaveVKCredentials'))) {
+                    settings.saveBorealisCredentials = this.checked
+                } else if (this.checked) {
+                    this.checked = false
+                    _return = true
+                } else {
+                    settings.saveBorealisCredentials = this.checked
                 }
             } else if (this.id == 'importNicks') {
                 if (this.checked) {
@@ -352,10 +364,12 @@ async function restoreOptions() {
     document.getElementById('useProxyOnUnProxyTop').checked = settings.useProxyOnUnProxyTop
     document.getElementById('antiBanVK').checked = settings.antiBanVK
     document.getElementById('saveVKCredentials').checked = settings.saveVKCredentials
+    document.getElementById('saveBorealisCredentials').checked = settings.saveBorealisCredentials
     if (settings.antiBanVK != null) {
         document.querySelector('div.antiBanVK').removeAttribute('style')
     }
     if (settings.clearVKCookies != null) document.getElementById('clearVKCookies').checked = settings.clearVKCookies
+    if (settings.clearBorealisCookies != null) document.getElementById('clearBorealisCookies').checked = settings.clearBorealisCookies
     document.getElementById('autoAuthVK').checked = settings.autoAuthVK
     if (settings.stopVote > Date.now()) {
         document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
@@ -615,7 +629,7 @@ async function addProjectList(project, visually) {
     contDiv.classList.add('message')
 
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '') + (project.borealisNickExpires ? ' (' + chrome.i18n.getMessage('tempNick') + ')' : '')
+    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')/* + (project.borealisNickExpires ? ' (' + chrome.i18n.getMessage('tempNick') + ')' : '')*/
     contDiv.append(nameProjectMes)
 
     if (project.error) {
@@ -787,9 +801,10 @@ async function addBorealisList(acc, visually) {
     div.textContent = acc.nick
     mesBlock.append(div)
 
+    let infoBtn = svgInfo.cloneNode(true)
+    contBlock.append(infoBtn)
     let repairBtn = svgRepair.cloneNode(true)
     contBlock.append(repairBtn)
-
     let delBtn = svgDelete.cloneNode(true)
     contBlock.append(delBtn)
 
@@ -831,6 +846,17 @@ async function addBorealisList(acc, visually) {
         }
         await addBorealis(true)
         blockButtons = false
+    })
+    infoBtn.addEventListener('click', function() {
+        document.querySelector('#info .content .message').parentNode.replaceChild(document.querySelector('#info .content .message').cloneNode(false), document.querySelector('#info .content .message'))
+        document.querySelector('#info .content .events').parentNode.replaceChild(document.querySelector('#info .content .events').cloneNode(false), document.querySelector('#info .content .events'))
+        toggleModal('info')
+        const message = document.querySelector('#info > div.content > .message')
+        for (const [key, value] of Object.entries(acc)) {
+            if (key == 'cookies') continue
+            message.append(key + ': ' + JSON.stringify(value, null, '\t'))
+            message.append(document.createElement('br'))
+        }
     })
     if (visually) {
         document.querySelector('#BorealisButton > span').textContent = borealisAccounts.length
@@ -1142,10 +1168,71 @@ document.getElementById('importSettingsVK').addEventListener('change', (evt) => 
     document.getElementById('importSettingsVK').value = ''
 }, false)
 
+//Слушатель на добавление аккаунтов Borealis по логин:пароль
+document.getElementById('importBorealis').addEventListener('change', async (evt) => {
+    if (!document.getElementById('clearBorealisCookies').checked) {
+        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('clearVKCookies') + '"', 'error')
+        document.getElementById('importBorealis').value = ''
+        return
+    }
+    if (evt.target.files.length == 0) return
+    createNotif(chrome.i18n.getMessage('importing'))
+    try {
+        const file = evt.target.files[0]
+        const data = await new Response(file).text()
+        const nicks = data.split('\n')
+        fastNotif = true
+        for (let nick of nicks.split(/\n/g)) {
+            nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
+            if (nick == null || nick == '') continue
+            nick = nick.split(':')
+            await addBorealis(false, {auth: true, login: nick[0], password: nick[1]})
+        }
+        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
+    } catch (e) {
+        createNotif(e, 'error')
+    } finally {
+        fastNotif = false
+        document.getElementById('importBorealis').value = ''
+    }
+}, false)
+
+//Слушатель на регистрацию аккаунтов Borealis по логин:пароль
+document.getElementById('importRegBorealis').addEventListener('change', async (evt) => {
+    if (!document.getElementById('clearBorealisCookies').checked) {
+        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('clearVKCookies') + '"', 'error')
+        document.getElementById('importRegBorealis').value = ''
+        return
+    }
+    if (evt.target.files.length == 0) return
+    createNotif(chrome.i18n.getMessage('importing'))
+    try {
+        const file = evt.target.files[0]
+        const data = await new Response(file).text()
+        const nicks = data.split('\n')
+        fastNotif = true
+        for (let nick of nicks.split(/\n/g)) {
+            nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
+            if (nick == null || nick == '') continue
+            nick = nick.split(':')
+            await addBorealis(false, {reg: true, login: nick[0], password: nick[1]})
+        }
+        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
+    } catch (e) {
+        createNotif(e, 'error')
+    } finally {
+        fastNotif = false
+        document.getElementById('importRegBorealis').value = ''
+    }
+}, false)
+
 window.onmessage = function (e) {
     if (e.data.VKCredentials) {
         currentVKCredentials.login = e.data.login
         currentVKCredentials.password = e.data.password
+    } else if (e.data.BorealisCredentials) {
+        currentBorealisCredentials.login = e.data.login
+        currentBorealisCredentials.password = e.data.password
     }
 }
 
@@ -1194,28 +1281,28 @@ async function addVK(repair, imp) {
                         }
                     })
                 })
+                let code
+                if (imp) {
+                    code = `
+                        if (document.querySelector('input[name="email"]') != null) {
+                            document.querySelector('input[name="email"]').value = '` + imp.login + `'
+                            document.querySelector('input[name="pass"]').value = '` + imp.password + `'
+                            if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) document.getElementById('install_allow').click()
+                        }
+                    `
+                } else if (document.getElementById('saveVKCredentials').checked) {
+                    code = `
+                        document.querySelector('#install_allow').addEventListener('click', function () {
+                            const credentials = {VKCredentials: true}
+                            credentials.login = document.querySelector('input[name="email"]').value
+                            credentials.password = document.querySelector('input[name="pass"]').value
+                            window.opener.postMessage(credentials, '*')
+                        })
+                    `
+                }
                 function onUpdated(tabId, changeInfo, tab) {
                     if (tabID == tabId) {
                         if (changeInfo.status && changeInfo.status == 'complete') {
-                            let code
-                            if (imp) {
-                                code = `
-                                    if (document.querySelector('input[name="email"]') != null) {
-                                        document.querySelector('input[name="email"]').value = '` + imp.login + `'
-                                        document.querySelector('input[name="pass"]').value = '` + imp.password + `'
-                                        if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) document.getElementById('install_allow').click()
-                                    }
-                                `
-                            } else if (document.getElementById('saveVKCredentials').checked) {
-                                code = `
-                                    document.querySelector('#install_allow').addEventListener('click', function () {
-                                        const credentials = {VKCredentials: true}
-                                        credentials.login = document.querySelector('input[name="email"]').value
-                                        credentials.password = document.querySelector('input[name="pass"]').value
-                                        window.opener.postMessage(credentials, '*')
-                                    })
-                                `
-                            }
                             chrome.tabs.executeScript(tabID, {code}, function(result) {
                                 if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
                             })
@@ -1350,24 +1437,9 @@ document.getElementById('AddBorealis').addEventListener('click', async () => {
     blockButtons = false
 })
 
-// let accpass = []
-// var codeBorealis = ``
-// for (let acc of accpass) {
-//     acc = acc.split(':')
-//     codeBorealis = `
-//         if (document.querySelector("#midside > div.clr.berrors") != null) {
-//             window.close()
-//         }
-//         document.getElementById('login_name').value = "` + acc[0] + `"
-//         document.getElementById('login_password').value = "` + acc[1] + `"
-//         document.querySelector('button[data-callback="executeLogin"]').click()
-//     `
-//     await addBorealis()
-// }
-
-async function addBorealis(repair) {
-    if (repair || !document.getElementById('clearVKCookies').checked || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
-        if (document.getElementById('clearVKCookies').checked && !repair) {
+async function addBorealis(repair, imp) {
+    if (repair || !document.getElementById('clearVKCookies').checked || imp || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
+        if ((document.getElementById('clearVKCookies').checked && !repair) || imp) {
             //Удаление всех куки и вкладок Borealis перед добавлением нового аккаунта Borealis
             createNotif(chrome.i18n.getMessage('deletingAllAcc', 'Borealis'))
             
@@ -1401,32 +1473,73 @@ async function addBorealis(repair) {
             openPoput('https://borealis.su/index.php?do=register', function () {
                 resolve()
             })
-//             let tabID = await new Promise(resolve=>{
-//                 chrome.tabs.query({active: true}, function(tabs) {
-//                     for (const tab of tabs) {
-//                         if (tab.pendingUrl == 'https://borealis.su/index.php?do=register') {
-//                             resolve(tab.id)
-//                         }
-//                     }
-//                 })
-//             })
-//             function onUpdated(tabId, changeInfo, tab) {
-//                 if (tabID == tabId) {
-//                     if (changeInfo.status && changeInfo.status == 'complete') {
-//                         chrome.tabs.executeScript(tabID, {code: codeBorealis}, function(result) {
-//                             if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
-//                         })
-//                     }
-//                 }
-//             }
-//             function onRemoved(tabId, removeInfo) {
-//                 if (tabID == tabId) {
-//                     chrome.tabs.onUpdated.removeListener(onUpdated)
-//                     chrome.tabs.onRemoved.removeListener(onRemoved)
-//                 }
-//             }
-//             chrome.tabs.onUpdated.addListener(onUpdated)
-//             chrome.tabs.onRemoved.addListener(onRemoved)
+            let tabID = await new Promise(resolve=>{
+                chrome.tabs.query({active: true}, function(tabs) {
+                    for (const tab of tabs) {
+                        if (tab.pendingUrl == 'https://borealis.su/index.php?do=register') {
+                            resolve(tab.id)
+                        }
+                    }
+                })
+            })
+            let code
+            if (imp) {
+                if (imp.auth) {
+                    code = `
+                        if (document.querySelector("#midside > div.clr.berrors") != null) {
+                            window.close()
+                        }
+                        document.getElementById('login_name').value = "` + imp.login + `"
+                        document.getElementById('login_password').value = "` + imp.password + `"
+                        document.querySelector('button[data-callback="executeLogin"]').click()
+                    `
+                } else if (imp.reg) {
+                    codeBorealis = `
+	                    setInterval(()=>{
+	                	    if (document.getElementById('result-registration').textContent.includes('уже зарегистрировано')) {
+	                		    window.close()
+	                		}
+	                	}, 100)
+	                    if (document.getElementById('loginbtn') != null) window.close()
+                        if (document.querySelector("#midside > div.clr.berrors") != null) {
+                            window.close()
+                        }
+	                	document.getElementById('name').scrollIntoView()
+                        document.getElementById('name').value = "` + imp.login + `"
+                        document.querySelector('input[value="Проверить имя"]').click()
+                        document.querySelector('input[name="password1"]').value = "` + imp.password + `"
+                        document.querySelector('input[name="password2"]').value = "` + imp.password + `"
+                        document.querySelector('input[name="email"]').value = "` + imp.login + `@gmail.com"
+                        document.getElementById('rules').checked = true
+                    `
+                }
+            } else if (document.getElementById('saveBorealisCredentials').checked) {
+                code = `
+                    document.querySelector('button[data-callback="executeLogin"]').addEventListener('click', function () {
+                        const credentials = {BorealisCredentials: true}
+                        credentials.login = document.getElementById('login_name').value
+                        credentials.password = document.getElementById('login_password').value
+                        window.opener.postMessage(credentials, '*')
+                    })
+                `
+            }
+            function onUpdated(tabId, changeInfo, tab) {
+                if (tabID == tabId) {
+                    if (changeInfo.status && changeInfo.status == 'complete') {
+                        chrome.tabs.executeScript(tabID, {code: codeBorealis}, function(result) {
+                            if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
+                        })
+                    }
+                }
+            }
+            function onRemoved(tabId, removeInfo) {
+                if (tabID == tabId) {
+                    chrome.tabs.onUpdated.removeListener(onUpdated)
+                    chrome.tabs.onRemoved.removeListener(onRemoved)
+                }
+            }
+            chrome.tabs.onUpdated.addListener(onUpdated)
+            chrome.tabs.onRemoved.addListener(onRemoved)
         })
 
         //После закрытия окна авторизации попытка добавить аккаунт Borealis
@@ -1456,6 +1569,15 @@ async function addBorealis(repair) {
             return
         }
         let acc = {}
+        if (document.getElementById('saveBorealisCredentials').checked) {
+            if (imp) {
+                acc.login = imp.login
+                acc.password = imp.password
+            } else if (currentBorealisCredentials.login) {
+                acc.login = currentBorealisCredentials.login
+                acc.password = currentBorealisCredentials.password
+            }
+        }
         try {
             acc.nick = doc.querySelector('div.userinfo-pos > div.rcol2 a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '').replace('https://borealis.su/user/', '').replace('/', '')
         } catch(e) {
@@ -2862,6 +2984,7 @@ async function addProject(project, element) {
         const nicks = data.split('\n')
         for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
+            if (nick == null || nick == '') continue
             let _continue = false
             project.nick = nick
             await forLoopAllProjects(function(proj) {
@@ -4253,8 +4376,8 @@ function toggleModal(modalID) {
 
 modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     let activeModal = modalsBlock.querySelector('.modal.active')
-    if (activeModal.id == 'stats') {
-        toggleModal('stats')
+    if (activeModal.id == 'stats' || activeModal.id == 'info') {
+        toggleModal(activeModal.id)
         return
     }
     activeModal.style.transform = 'scale(1.1)'
