@@ -951,20 +951,22 @@ async function addProject(project, element) {
                 text.textContent = chrome.i18n.getMessage('authButton')
                 button.append(text)
                 createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
-                button.addEventListener('click', async function() {
+                button.addEventListener('click', function() {
                     if (element != null) {
-                        await openPopup(url2)
-                        document.location.reload(true)
+                        openPopup(url2, function() {
+                            document.location.reload(true)
+                        })
                     } else {
-                        await openPopup(url)
-                        if (blockButtons) {
-                            createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-                            return
-                        } else {
-                            blockButtons = true
-                        }
-                        await addProject(project, element)
-                        blockButtons = false
+                        openPopup(url2, async function() {
+                            if (blockButtons) {
+                                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+                                return
+                            } else {
+                                blockButtons = true
+                            }
+                            await addProject(project, element)
+                            blockButtons = false
+                        })
                     }
                 })
                 return
@@ -1608,17 +1610,27 @@ function addCustom() {
     }
 }
 
-async function openPopup(url) {
+async function openPopup(url, onClose) {
     const width = 655
     const height = 430
     const left = parseInt(Math.max(0, (screen.width - width) / 2) + (screen.availLeft | 0))
         , top = parseInt(Math.max(0, (screen.height - height) / 2) + (screen.availTop | 0))
-    return new Promise(resolve=>{
+    const tabID = await new Promise(resolve=>{
         //FireFox почему-то не поддерживает параметр setSelfAsOpener
-        chrome.windows.create({type: 'popup', url, /*setSelfAsOpener: true,*/ top, left, width, height}, function (details) {
+        chrome.windows.create({type: 'popup', url, setSelfAsOpener: true, top, left, width, height}, function (details) {
             resolve(details.tabs[0].id)
         })
     })
+    if (onClose) {
+        function onRemoved(tabId, removeInfo) {
+            if (tabID == tabId) {
+                onClose()
+                chrome.tabs.onRemoved.removeListener(onRemoved)
+            }
+        }
+        chrome.tabs.onRemoved.addListener(onRemoved)
+    }
+    return tabID
 }
 
 document.addEventListener('DOMContentLoaded', async()=>{
