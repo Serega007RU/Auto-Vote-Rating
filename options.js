@@ -1615,9 +1615,13 @@ async function openPopup(url, onClose) {
     const height = 430
     const left = parseInt(Math.max(0, (screen.width - width) / 2) + (screen.availLeft | 0))
         , top = parseInt(Math.max(0, (screen.height - height) / 2) + (screen.availTop | 0))
+    let close = 'setSelfAsOpener'
+    if (!chrome.app) {//Костыль с FireFox
+        //FireFox зачем-то решил это называть allowScriptsToClose когда в Chrome это называется setSelfAsOpener, как же это "удобно"
+        close = 'allowScriptsToClose'
+    }
     const tabID = await new Promise(resolve=>{
-        //FireFox почему-то не поддерживает параметр setSelfAsOpener
-        chrome.windows.create({type: 'popup', url, setSelfAsOpener: true, top, left, width, height}, function (details) {
+        chrome.windows.create({type: 'popup', url, [close]: true, top, left, width, height}, function (details) {
             resolve(details.tabs[0].id)
         })
     })
