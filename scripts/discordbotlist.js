@@ -25,16 +25,31 @@ function vote(first) {
             return
         }
 
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
+        const timer4 = setInterval(()=>{
+            try {
+                if (document.querySelector('div.main-content') != null && document.querySelector('div.main-content').textContent == 'Logging you in...') {
+                    //Фикс (костыль) зависания авторизации
+                    if (document.title == '| Discord Bot List') {
+                        document.location.reload()
+                        clearInterval(timer4)
+                    }
+                    return
+                }
+                document.querySelector('button.btn.btn-blurple').click()
+                clearInterval(timer4)
+            } catch (e) {
+                throwError(e)
+                clearInterval(timer4)
+            }
+        }, 1000)
 
-        if (document.querySelector('div.main-content') != null && document.querySelector('div.main-content').textContent == 'Logging you in...') {
-            return
-        }
-
-        document.querySelector('button.btn.btn-blurple').click()
+        const timer5 = setInterval(()=>{
+            //Фикс (костыль) зависания redirect
+            if (document.location.pathname == '/auth') {
+                document.location.replace(document.URL)
+                clearInterval(timer5)
+            }
+        }, 1000)
         
         const timer3 = setInterval(()=>{
             try {
