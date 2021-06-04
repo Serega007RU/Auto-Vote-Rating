@@ -1182,9 +1182,8 @@ document.getElementById('importBorealis').addEventListener('change', async (evt)
     try {
         const file = evt.target.files[0]
         const data = await new Response(file).text()
-        const nicks = data.split('\n')
         fastNotif = true
-        for (let nick of nicks.split(/\n/g)) {
+        for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
             if (nick == null || nick == '') continue
             nick = nick.split(':')
@@ -1211,9 +1210,8 @@ document.getElementById('importRegBorealis').addEventListener('change', async (e
     try {
         const file = evt.target.files[0]
         const data = await new Response(file).text()
-        const nicks = data.split('\n')
         fastNotif = true
-        for (let nick of nicks.split(/\n/g)) {
+        for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
             if (nick == null || nick == '') continue
             nick = nick.split(':')
@@ -2983,7 +2981,6 @@ async function addProject(project, element) {
     if (document.getElementById('importNicks').checked) {
         const file = document.getElementById('importNicksFile').files[0]
         const data = await new Response(file).text()
-        const nicks = data.split('\n')
         for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
             if (nick == null || nick == '') continue
