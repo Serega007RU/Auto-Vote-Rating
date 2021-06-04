@@ -376,11 +376,13 @@ async function restoreOptions() {
     }
     if (settings.enableCustom || projectsCustom.length > 0) addCustom()
     //Для FireFox почему-то не доступно это API
-    chrome.notifications.getPermissionLevel(function(callback) {
-        if (callback != 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
-            createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
-        }
-    })
+    if (chrome.notifications.getPermissionLevel != null) {
+        chrome.notifications.getPermissionLevel(function(callback) {
+            if (callback != 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
+                createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
+            }
+        })
+    }
 
     await checkUpdateAvailbe()
 }
@@ -3433,6 +3435,8 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
 usageLogs()
 async function usageLogs() {
     const quota = await navigator.storage.estimate()
+    //На FireFox почему-то не поддерживается это API
+    if (quota.usageDetails == null) return
     const usage = quota.usageDetails.indexedDB / (1024 * 1024)
     document.querySelector('span[data-resource="clearLogs"]').textContent = chrome.i18n.getMessage('clearLogs') + ' (' + usage.toFixed(3) + ' Mib)'
 }
