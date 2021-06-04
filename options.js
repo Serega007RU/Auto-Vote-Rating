@@ -951,22 +951,20 @@ async function addProject(project, element) {
                 text.textContent = chrome.i18n.getMessage('authButton')
                 button.append(text)
                 createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
-                button.addEventListener('click', function() {
+                button.addEventListener('click', async function() {
                     if (element != null) {
-                        openPoput(url2, function() {
-                            document.location.reload(true)
-                        })
+                        await openPopup(url2)
+                        document.location.reload(true)
                     } else {
-                        openPoput(url2, async function() {
-                            if (blockButtons) {
-                                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-                                return
-                            } else {
-                                blockButtons = true
-                            }
-                            await addProject(project, element)
-                            blockButtons = false
-                        })
+                        await openPopup(url)
+                        if (blockButtons) {
+                            createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+                            return
+                        } else {
+                            blockButtons = true
+                        }
+                        await addProject(project, element)
+                        blockButtons = false
                     }
                 })
                 return
@@ -1281,7 +1279,7 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
             anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
             anchor.dataset.downloadurl = ['text/plain;charset=UTF-8;', anchor.download, anchor.href].join(':')
             
-            openPoput(anchor.href)
+            openPopup(anchor.href)
             
             createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
         }
@@ -1610,23 +1608,17 @@ function addCustom() {
     }
 }
 
-var poput
-function openPoput(url, reload) {
-    let popupBoxWidth = 655
-    let popupBoxHeight = 430
-    let width, height
-    //if (browser.safari) popupBoxHeight += 45;/* safari popup window panel height, hardcoded to avoid popup jump */
-    let left = Math.max(0, (screen.width - popupBoxWidth) / 2) + (screen.availLeft | 0)
-      , top = Math.max(0, (screen.height - popupBoxWidth) / 2) + (screen.availTop | 0)
-    poput = window.open(url, 'vk_openapi', 'width=' + popupBoxWidth + ',height=' + popupBoxHeight + ',left=' + left + ',top=' + top + ',menubar=0,toolbar=0,location=0,status=0')
-    if (poput) {
-//      poput.focus()
-        if (reload) {
-            (function check() {
-                !poput || poput.closed ? reload() : setTimeout(check, 500)
-            })()
-        }
-    }
+async function openPopup(url) {
+    const width = 655
+    const height = 430
+    const left = parseInt(Math.max(0, (screen.width - width) / 2) + (screen.availLeft | 0))
+        , top = parseInt(Math.max(0, (screen.height - height) / 2) + (screen.availTop | 0))
+    return new Promise(resolve=>{
+        //FireFox почему-то не поддерживает параметр setSelfAsOpener
+        chrome.windows.create({type: 'popup', url, /*setSelfAsOpener: true,*/ top, left, width, height}, function (details) {
+            resolve(details.tabs[0].id)
+        })
+    })
 }
 
 document.addEventListener('DOMContentLoaded', async()=>{
