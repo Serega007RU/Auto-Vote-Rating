@@ -2534,44 +2534,27 @@ async function addProject(project, element) {
     }
 
     await forLoopAllProjects(function(proj) {
-        if (settings.useMultiVote) {
-            if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick && !project.Custom) {
-                const message = chrome.i18n.getMessage('alreadyAdded')
-                if (!secondBonusText) {
-                    createNotif(message, 'success', null, element)
-                } else {
-                    createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
-                }
-                returnAdd = true
-                return
-            } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
-                createNotif(chrome.i18n.getMessage('alreadyAdded'), 'success', null, element)
-                returnAdd = true
-                return
+        if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom && (settings.useMultiVote ? proj.nick == project.nick : true)) {
+            const message = chrome.i18n.getMessage('alreadyAdded')
+            if (!secondBonusText) {
+                createNotif(message, 'success', null, element)
+            } else {
+                createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
             }
-        } else {
-            if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom) {
-                const message = chrome.i18n.getMessage('alreadyAdded')
-                if (!secondBonusText) {
-                    createNotif(message, 'success', null, element)
-                } else {
-                    createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
-                }
-                returnAdd = true
-                return
-            } else if (((proj.MCRate && project.MCRate) || (proj.ServerPact && project.ServerPact) || (proj.MinecraftServersOrg && project.MinecraftServersOrg) || (proj.HotMC && project.HotMC) || (proj.MMoTopRU && project.MMoTopRU && proj.game == project.game)) && proj.nick == project.nick && !disableCheckProjects) {
-                createNotif(chrome.i18n.getMessage('oneProject', getProjectName(proj)), 'error', null, element)
-                returnAdd = true
-                return
-            } else if (proj.MinecraftIpList && project.MinecraftIpList && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
-                createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
-                returnAdd = true
-                return
-            } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
-                createNotif(chrome.i18n.getMessage('alreadyAdded'), 'success', null, element)
-                returnAdd = true
-                return
-            }
+            returnAdd = true
+            return
+        } else if (((proj.MCRate && project.MCRate) || (proj.ServerPact && project.ServerPact) || (proj.MinecraftServersOrg && project.MinecraftServersOrg) || (proj.HotMC && project.HotMC) || (proj.MMoTopRU && project.MMoTopRU && proj.game == project.game)) /*&& proj.nick == project.nick*/ && !disableCheckProjects && (settings.useMultiVote ? proj.id != project.id : true)) {
+            createNotif(chrome.i18n.getMessage('oneProject', getProjectName(proj)), 'error', null, element)
+            returnAdd = true
+            return
+        } else if (proj.MinecraftIpList && project.MinecraftIpList && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
+            createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
+            returnAdd = true
+            return
+        } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
+            createNotif(chrome.i18n.getMessage('alreadyAdded'), 'success', null, element)
+            returnAdd = true
+            return
         }
     })
     if (returnAdd) {
