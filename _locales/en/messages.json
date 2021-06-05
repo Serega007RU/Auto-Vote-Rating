@@ -660,8 +660,8 @@
   "privacyPass2": {
     "message": " extension to get 5 free captcha passes for hCaptcha"
   },
-  "deleteAll": {
-    "message": "Delete all"
+  "deleteAllProxies": {
+    "message": "Delete all proxies"
   },
   "deleteNotWorking": {
     "message": "Delete non-working proxies"

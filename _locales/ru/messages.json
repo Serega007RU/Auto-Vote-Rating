@@ -620,7 +620,7 @@
   "privacyPass2": {
     "message": " что б при первом прохождении капчи получить 5 бесплатных прохождении капч для hCaptcha"
   },
-  "deleteAll": {
+  "deleteAllProxies": {
     "message": "Удалить все прокси"
   },
   "deleteNotWorking": {
