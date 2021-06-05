@@ -1267,21 +1267,9 @@ async function addVK(repair, imp) {
         createNotif(chrome.i18n.getMessage('openPopupAcc', 'VK'))
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
-        await new Promise(async (resolve)=> {
-            openPoput('https://oauth.vk.com/authorize?client_id=-1&display=widget&redirect_uri=close.html&widget=4', function () {
-                resolve()
-            })
+        await new Promise(resolve=> {
+            let code = null
             if (imp || document.getElementById('saveVKCredentials').checked) {
-                let tabID = await new Promise(resolve=>{
-                    chrome.tabs.query({active: true}, function(tabs) {
-                        for (const tab of tabs) {
-                            if (tab.pendingUrl == 'https://oauth.vk.com/authorize?client_id=-1&display=widget&redirect_uri=close.html&widget=4') {
-                                resolve(tab.id)
-                            }
-                        }
-                    })
-                })
-                let code
                 if (imp) {
                     code = `
                         if (document.querySelector('input[name="email"]') != null) {
@@ -1300,24 +1288,8 @@ async function addVK(repair, imp) {
                         })
                     `
                 }
-                function onUpdated(tabId, changeInfo, tab) {
-                    if (tabID == tabId) {
-                        if (changeInfo.status && changeInfo.status == 'complete') {
-                            chrome.tabs.executeScript(tabID, {code}, function(result) {
-                                if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
-                            })
-                        }
-                    }
-                }
-                function onRemoved(tabId, removeInfo) {
-                    if (tabID == tabId) {
-                        chrome.tabs.onUpdated.removeListener(onUpdated)
-                        chrome.tabs.onRemoved.removeListener(onRemoved)
-                    }
-                }
-                chrome.tabs.onUpdated.addListener(onUpdated)
-                chrome.tabs.onRemoved.addListener(onRemoved)
             }
+            openPopup('https://oauth.vk.com/authorize?client_id=-1&display=widget&redirect_uri=close.html&widget=4', resolve, code)
         })
 
         //После закрытия окна авторизации попытка добавить аккаунт ВКонтакте
@@ -1469,20 +1441,8 @@ async function addBorealis(repair, imp) {
         createNotif(chrome.i18n.getMessage('openPopupAcc', 'Borealis'))
         
         //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
-        await new Promise(async(resolve) => {
-            openPoput('https://borealis.su/index.php?do=register', function () {
-                resolve()
-            })
-            let tabID = await new Promise(resolve=>{
-                chrome.tabs.query({active: true}, function(tabs) {
-                    for (const tab of tabs) {
-                        if (tab.pendingUrl == 'https://borealis.su/index.php?do=register') {
-                            resolve(tab.id)
-                        }
-                    }
-                })
-            })
-            let code
+        await new Promise(resolve => {
+            let code = null
             if (imp) {
                 if (imp.auth) {
                     code = `
@@ -1529,23 +1489,7 @@ async function addBorealis(repair, imp) {
                     })
                 `
             }
-            function onUpdated(tabId, changeInfo, tab) {
-                if (tabID == tabId) {
-                    if (changeInfo.status && changeInfo.status == 'complete') {
-                        chrome.tabs.executeScript(tabID, {code: codeBorealis}, function(result) {
-                            if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
-                        })
-                    }
-                }
-            }
-            function onRemoved(tabId, removeInfo) {
-                if (tabID == tabId) {
-                    chrome.tabs.onUpdated.removeListener(onUpdated)
-                    chrome.tabs.onRemoved.removeListener(onRemoved)
-                }
-            }
-            chrome.tabs.onUpdated.addListener(onUpdated)
-            chrome.tabs.onRemoved.addListener(onRemoved)
+            openPopup('https://borealis.su/index.php?do=register', resolve, code)
         })
 
         //После закрытия окна авторизации попытка добавить аккаунт Borealis
@@ -1670,7 +1614,7 @@ async function checkAuthVK(VK) {
                 a.id = 'authvk' + key
                 a.textContent = key
                 a.addEventListener('click', function() {
-                    openPoput(value, function () {
+                    openPopup(value, function () {
                         if (document.getElementById('notAuthVK') != null) {
                             removeNotif(document.getElementById('notAuthVK').parentElement.parentElement)
                         }
@@ -3792,7 +3736,7 @@ function addCustom() {
     }
 }
 
-async function openPopup(url, onClose) {
+async function openPopup(url, onClose, code) {
     const width = 655
     const height = 430
     const left = parseInt(Math.max(0, (screen.width - width) / 2) + (screen.availLeft | 0))
@@ -3807,13 +3751,26 @@ async function openPopup(url, onClose) {
             resolve(details.tabs[0].id)
         })
     })
+    if (code) {
+        function onUpdated(tabId, changeInfo, tab) {
+            if (tabID == tabId) {
+                if (changeInfo.status && changeInfo.status == 'complete') {
+                    chrome.tabs.executeScript(tabID, {code}, function(result) {
+                        if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
+                    })
+                }
+            }
+        }
+    }
     if (onClose) {
         function onRemoved(tabId, removeInfo) {
             if (tabID == tabId) {
                 onClose()
+                if (code) chrome.tabs.onUpdated.removeListener(onUpdated)
                 chrome.tabs.onRemoved.removeListener(onRemoved)
             }
         }
+        if (code) chrome.tabs.onUpdated.addListener(onUpdated)
         chrome.tabs.onRemoved.addListener(onRemoved)
     }
     return tabID
