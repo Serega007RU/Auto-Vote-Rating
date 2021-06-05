@@ -617,11 +617,11 @@ async function addProject(project, element) {
             }
             returnAdd = true
             return
-        } else if (((proj.MCRate && project.MCRate) || (proj.ServerPact && project.ServerPact) || (proj.MinecraftServersOrg && project.MinecraftServersOrg) || (proj.HotMC && project.HotMC) || (proj.MMoTopRU && project.MMoTopRU && proj.game == project.game)) && proj.nick == project.nick && !disableCheckProjects) {
+        } else if (((proj.MCRate && project.MCRate) || (proj.ServerPact && project.ServerPact) || (proj.MinecraftServersOrg && project.MinecraftServersOrg) || (proj.HotMC && project.HotMC) || (proj.MMoTopRU && project.MMoTopRU && proj.game == project.game)) /*&& proj.nick == project.nick*/ && !disableCheckProjects) {
             createNotif(chrome.i18n.getMessage('oneProject', getProjectName(proj)), 'error', null, element)
             returnAdd = true
             return
-        } else if (proj.MinecraftIpList && project.MinecraftIpList && proj.nick && project.nick && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
+        } else if (proj.MinecraftIpList && project.MinecraftIpList && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
             createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
             returnAdd = true
             return
