@@ -833,5 +833,8 @@
   },
   "syncStorage": {
     "message": "Cloud"
+  },
+  "notGrantUrl": {
+    "message": "You did not grant the extension access to this rating, adding it is not possible"
   }
 }
