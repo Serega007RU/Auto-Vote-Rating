@@ -1457,7 +1457,7 @@ async function addBorealis(repair, imp) {
                         document.querySelector('button[data-callback="executeLogin"]').click()
                     `
                 } else if (imp.reg) {
-                    codeBorealis = `
+                    code = `
 // 	                    setInterval(()=>{
 // 	                	    if (document.getElementById('result-registration').textContent.includes('уже зарегистрировано')) {
 // 	                		    window.close()
