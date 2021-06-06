@@ -784,5 +784,17 @@
   },
   "deleteAllRating": {
     "message": "Вы действительно хотите удалить все добавленные проекты на этот рейтинг?"
+  },
+  "conflictSync": {
+    "message": "Конфликт настроек"
+  },
+  "conflictSyncMessage": {
+    "message": "В облаке уже есть настройки, какие настройки использовать?"
+  },
+  "localStorage": {
+    "message": "Локальные"
+  },
+  "syncStorage": {
+    "message": "Облачные"
   }
 }

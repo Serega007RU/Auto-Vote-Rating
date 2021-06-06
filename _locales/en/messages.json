@@ -821,5 +821,17 @@
   },
   "deleteAllRating": {
     "message": "Do you really want to delete all the added projects on this rating?"
+  },
+  "conflictSync": {
+    "message": "Settings conflict"
+  },
+  "conflictSyncMessage": {
+    "message": "There are already settings in the cloud, which settings should we use?"
+  },
+  "localStorage": {
+    "message": "Local"
+  },
+  "syncStorage": {
+    "message": "Cloud"
   }
 }

@@ -203,8 +203,15 @@ async function restoreOptions() {
                 }
                 _return = true
             } else if (this.id == 'enableSyncStorage') {
+                _return = true
                 let oldStorageArea = storageArea
                 if (this.checked) {
+                    if (await getValue('AVMRsettings', 'sync') != null) {
+                        toggleModal('conflictSync')
+                        this.checked = false
+                        blockButtons = false
+                        return
+                    }
                     storageArea = 'sync'
                     createNotif(chrome.i18n.getMessage('settingsSyncCopy'))
                 } else {
@@ -226,7 +233,6 @@ async function restoreOptions() {
                 } else {
                     createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success');
                 }
-                _return = true
             } else if (this.id == 'voteMode') {
                 if (this.checked) {
                     document.getElementById('label8').removeAttribute('style')
@@ -1151,7 +1157,7 @@ async function getValue(name, area) {
         chrome.storage[area].get(name, function(data) {
             if (chrome.runtime.lastError) {
                 createNotif(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message), 'error')
-                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
+//              console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
                 reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data[name])
@@ -1167,7 +1173,7 @@ async function setValue(key, value, area) {
         chrome.storage[area].set({[key]: value}, function(data) {
             if (chrome.runtime.lastError) {
                 createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message), 'error')
-                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
+//              console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
                 reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data)
@@ -1183,7 +1189,7 @@ async function removeValue(name, area) {
         chrome.storage[area].remove(name, function(data) {
             if (chrome.runtime.lastError) {
                 createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message), 'error')
-                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
+//              console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
                 reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data)
@@ -1729,6 +1735,17 @@ document.getElementById('generalStats').addEventListener('click', ()=> {
     document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = generalStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
     document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsInstalled')
     document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = generalStats.added ? new Date(generalStats.added).toLocaleString().replace(',', '') : 'None'
+})
+
+document.getElementById('localStorage').addEventListener('click', async ()=>{
+    toggleModal('conflictSync')
+    await removeValue('AVMRsettings', 'sync')
+    document.getElementById('enableSyncStorage').click()
+})
+document.getElementById('syncStorage').addEventListener('click', async ()=>{
+    toggleModal('conflictSync')
+    await setValue('storageArea', 'sync')
+    document.location.reload()
 })
 
 //Генерация поля ввода ID

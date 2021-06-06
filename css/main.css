@@ -224,6 +224,10 @@ nav .logo img {
 	height: 300px;
 }
 
+#modals .modal#conflictSync {
+	height: 150px;
+}
+
 #modals .modal.active {
 	transition: .3s;
     transform: scale(1)

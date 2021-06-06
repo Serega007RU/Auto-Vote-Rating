@@ -711,6 +711,24 @@
                     <div class="events"></div>
                 </div>
             </div>
+            <!-- Если в облаке уже есть сохранённые настройки -->
+            <div class="modal" id="conflictSync">
+                <div class="head">
+                    <h3 data-resource="conflictSync"></h3>
+                    <div class="close"></div>
+                </div>
+                <div class="content">
+                    <div class="message" data-resource="conflictSyncMessage"></div>
+                    <div class="events">
+                        <button id="localStorage" data-resource="localStorage">
+                            <img src="images/icons/hard-drive.svg" alt="importBtn">
+                        </button>
+                        <button id="syncStorage" data-resource="syncStorage">
+                            <img src="images/icons/cloud.svg" alt="importBtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
             <!-- Статистика -->
             <div class="modal" id="stats">
                 <div class="head">

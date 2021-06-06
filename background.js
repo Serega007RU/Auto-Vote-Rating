@@ -85,9 +85,13 @@ if (chrome.runtime.onSuspend) {
 //Инициализация настроек расширения
 initializeConfig()
 async function initializeConfig() {
-    storageArea = await getLocalValue('storageArea')
+    storageArea = await getValue('storageArea', 'local')
     if (storageArea == null || storageArea == '') {
-        storageArea = 'local'
+        if (await getValue('AVMRsettings', 'sync') != null) {
+            storageArea = 'sync'
+        } else {
+            storageArea = 'local'
+        }
         await setValue('storageArea', storageArea)
     }
     for (const item of allProjects) {
@@ -1390,39 +1394,32 @@ async function removeCookie(url, name) {
 }
 
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
-async function getLocalValue(name) {
+async function getValue(name, area) {
+    if (!area) {
+        area = storageArea
+    }
     return new Promise((resolve, reject)=>{
-        chrome.storage.local.get(name, function(data) {
+        chrome.storage[area].get(name, function(data) {
             if (chrome.runtime.lastError) {
-                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError.message)
-                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
-                reject(chrome.runtime.lastError.message)
+                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
+                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
+                reject(chrome.runtime.lastError)
             } else {
                 resolve(data[name])
             }
         })
     })
 }
-async function getValue(name) {
+async function setValue(key, value, area) {
+    if (!area) {
+        area = storageArea
+    }
     return new Promise((resolve, reject)=>{
-        chrome.storage[storageArea].get(name, function(data) {
+        chrome.storage[area].set({[key]: value}, function(data) {
             if (chrome.runtime.lastError) {
-                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError.message)
-                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
-                reject(chrome.runtime.lastError.message)
-            } else {
-                resolve(data[name])
-            }
-        })
-    })
-}
-async function setValue(key, value) {
-    return new Promise((resolve, reject)=>{
-        chrome.storage[storageArea].set({[key]: value}, function(data) {
-            if (chrome.runtime.lastError) {
-                sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError.message)
-                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
-                reject(chrome.runtime.lastError.message)
+                sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
+                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
+                reject(chrome.runtime.lastError)
             } else {
                 resolve(data)
             }
