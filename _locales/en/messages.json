@@ -836,5 +836,11 @@
   },
   "notGrantUrl": {
     "message": "You did not grant the extension access to this rating, adding it is not possible"
+  },
+  "grantUrl": {
+    "message": "Grant the extension access to this rating"
+  },
+  "grant": {
+    "message": "Grant"
   }
 }

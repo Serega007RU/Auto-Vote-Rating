@@ -809,13 +809,28 @@ async function addProject(project, element) {
         origins.push('*://*.vk.com/*')
     }
     
-    let granted
-    if (chrome.app) {//Костыль с FireFox, FireFox не позволяет запросить разрешение через await Promise, иначе выдаёт ошибку "Error: permissions.request may only be called from a user input handler", подробнее тут https://stackoverflow.com/questions/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input/
-        granted = await new Promise(resolve=>{
-            chrome.permissions.contains({origins}, resolve)
-        })
-    }
+    let granted = await new Promise(resolve=>{
+        chrome.permissions.contains({origins}, resolve)
+    })
     if (!granted) {
+        if (!chrome.app) {//Костыль для FireFox, что бы запросить права нужно что бы пользователь обязатльно кликнул
+            const button = document.createElement('button')
+            button.textContent = chrome.i18n.getMessage('grant')
+            button.classList.add('submitBtn')
+            button.addEventListener('click', async ()=>{
+                granted = await new Promise(resolve=>{
+                    chrome.permissions.request({origins}, resolve)
+                })
+                if (!granted) {
+                    createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
+                    return
+                } else {
+                    addProject(project, element)
+                }
+            })
+            createNotif([chrome.i18n.getMessage('grantUrl'), button])
+            return
+        }
         granted = await new Promise(resolve=>{
             chrome.permissions.request({origins}, resolve)
         })
