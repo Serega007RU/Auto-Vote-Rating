@@ -2164,6 +2164,7 @@ selectedTop.addEventListener('change', function() {
 
     laterChoose = name
 })
+selectedTop.dispatchEvent(new Event('change'))
 
 //Слушатель на выбор типа timeout для Custom
 document.getElementById('selectTime').addEventListener('change', function() {
@@ -2187,7 +2188,9 @@ elements.forEach(function(el) {
     el.prepend(chrome.i18n.getMessage(el.getAttribute('data-resource')))
 })
 document.querySelectorAll('[placeholder]').forEach(function(el) {
-    el.placeholder = chrome.i18n.getMessage(el.placeholder)
+    const message = chrome.i18n.getMessage(el.placeholder)
+    if (!message || message == '') return
+    el.placeholder = message
 })
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
