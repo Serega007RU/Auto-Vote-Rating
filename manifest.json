@@ -32,12 +32,6 @@
 		"webRequest",
 		"webRequestBlocking",
 		"proxy",
-		"https://api.cifrazia.com/",
-		"https://*.hcaptcha.com/captcha/*",
-		"https://www.google.com/recaptcha/*",
-		"https://www.recaptcha.net/recaptcha/*"
-	],
-	"optional_permissions": [
 		"<all_urls>"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
