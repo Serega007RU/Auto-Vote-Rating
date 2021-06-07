@@ -234,8 +234,15 @@ async function restoreOptions() {
                 }
                 _return = true
             } else if (this.id == 'enableSyncStorage') {
+                _return = true
                 let oldStorageArea = storageArea
                 if (this.checked) {
+                    if (await getValue('AVMRsettings', 'sync') != null) {
+                        toggleModal('conflictSync')
+                        this.checked = false
+                        blockButtons = false
+                        return
+                    }
                     storageArea = 'sync'
                     createNotif(chrome.i18n.getMessage('settingsSyncCopy'))
                 } else {
@@ -263,7 +270,6 @@ async function restoreOptions() {
                 } else {
                     createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success');
                 }
-                _return = true
             } else if (this.id == 'voteMode') {
                 if (this.checked) {
                     document.getElementById('label8').removeAttribute('style')
@@ -2563,163 +2569,205 @@ async function addProject(project, element) {
         return
     }
     let projectURL = ''
+    let url
+    let jsPath
+    if (project.TopCraft) {
+        url = 'https://topcraft.ru/servers/' + project.id + '/'
+        jsPath = '#project-about > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
+    } else if (project.McTOP) {
+        url = 'https://mctop.su/servers/' + project.id + '/'
+        jsPath = '#project-about > div.row > div:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
+    } else if (project.MCRate) {
+        url = 'http://mcrate.su/project/' + project.id
+        jsPath = '#button-circle > a'
+    } else if (project.MinecraftRating) {
+        url = 'https://minecraftrating.ru/projects/' + project.id + '/'
+        jsPath = 'table[class="table server-table"] > tbody > tr:nth-child(2) > td:nth-child(2) > a'
+    } else if (project.MonitoringMinecraft) {
+        url = 'https://monitoringminecraft.ru/top/' + project.id + '/'
+        jsPath = '#page > div.box.visible.main > div.left > table > tbody > tr:nth-child(1) > td.wid > noindex > a'
+    } else if (project.IonMc) {
+        url = 'https://ionmc.top/projects/' + project.id + '/vote'
+        jsPath = '#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.mx-2.-mt-1.mb-1.sm\\:mx-5.sm\\:my-2 > ul > li:nth-child(2) > a'
+    } else if (project.MinecraftServersOrg) {
+        url = 'https://minecraftservers.org/server/' + project.id
+        jsPath = '#left > div > h1'
+    } else if (project.ServeurPrive) {
+        if (project.lang == 'en') {
+            url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
+        } else {
+            url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
+        }
+        jsPath = '#t > div > div > h2'
+    } else if (project.PlanetMinecraft) {
+        url = 'https://www.planetminecraft.com/server/' + project.id + '/'
+        jsPath = '#resource-title-text'
+    } else if (project.TopG) {
+        url = 'https://topg.org/' + project.game + '/server-' + project.id
+        jsPath = 'div.sheader'
+    } else if (project.ListForge) {
+        url = 'https://' + project.game + '/server/' + project.id + '/vote/'
+        jsPath = 'head > title'
+    } else if (project.MinecraftServerList) {
+        url = 'https://minecraft-server-list.com/server/' + project.id + '/'
+        jsPath = '#site-wrapper > section > div.hfeed > span > div.serverdatadiv > table > tbody > tr:nth-child(5) > td > a'
+    } else if (project.ServerPact) {
+        url = 'https://www.serverpact.com/vote-' + project.id + '/'
+        jsPath = 'body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(2) > div > div.panel-body > table > tbody > tr:nth-child(6) > td:nth-child(2) > a'
+    } else if (project.MinecraftIpList) {
+        url = 'https://minecraftiplist.com/server/-' + project.id + '/'
+        jsPath = '#addr > span:nth-child(3)'
+    } else if (project.TopMinecraftServers) {
+        url = 'https://topminecraftservers.org/server/' + project.id
+        jsPath = 'body > div.container > div > div > div > div.col-md-8 > h1'
+    } else if (project.MinecraftServersBiz) {
+        url = 'https://minecraftservers.biz/' + project.id + '/'
+        jsPath = 'table[class="table table-hover table-striped"] > tbody > tr:nth-child(4) > td:nth-child(2)'
+    } else if (project.HotMC) {
+        url = 'https://hotmc.ru/minecraft-server-' + project.id
+        jsPath = 'div[class="text-server"] > h1'
+    } else if (project.MinecraftServerNet) {
+        url = 'https://minecraft-server.net/details/' + project.id + '/'
+        jsPath = 'div.card-header > h1'
+    } else if (project.TopGames) {
+        if (project.lang == 'fr') {
+            url = 'https://top-serveurs.net/' + project.game + '/' + project.id
+        } else if (project.lang == 'en') {
+            url = 'https://top-games.net/' + project.game + '/' + project.id
+        } else {
+            url = 'https://' + project.lang + '.top-games.net/' + project.game + '/' + project.id
+        }
+        jsPath = 'body > div.game-jumbotron > div > div > h1'
+    } else if (project.TMonitoring) {
+        url = 'https://tmonitoring.com/server/' + project.id + '/'
+        jsPath = 'div[class="info clearfix"] > div.pull-left > h1'
+    } else if (project.TopGG) {
+        url = 'https://top.gg/' + project.game + '/' + project.id + '/vote'
+        jsPath = '#entity-title'
+    } else if (project.DiscordBotList) {
+        url = 'https://discordbotlist.com/bots/' + project.id
+        jsPath = 'h1[class="bot-name"]'
+    } else if (project.BotsForDiscord) {
+        url = 'https://botsfordiscord.com/bot/' + project.id + '/vote'
+        jsPath = 'h2[class="subtitle"] > b'
+    } else if (project.MMoTopRU) {
+        if (project.lang == 'ru') {
+            url = 'https://' + project.game + '.mmotop.ru/servers/' + project.id
+        } else {
+            url = 'https://' + project.game + '.mmotop.ru/' + project.lang + '/' + 'servers/' + project.id
+        }
+        jsPath = '#site-link'
+    } else if (project.MCServers) {
+        url = 'https://mc-servers.com/details/' + project.id + '/'
+        jsPath = 'a[href="/details/' + project.id + '"]'
+    } else if (project.MinecraftList) {
+        url = 'https://minecraftlist.org/server/' + project.id
+        jsPath = 'h1'
+    } else if (project.MinecraftIndex) {
+        url = 'https://www.minecraft-index.com/' + project.id
+        jsPath = 'h3.stitle'
+    } else if (project.ServerList101) {
+        url = 'https://serverlist101.com/server/' + project.id + '/'
+        jsPath = 'li > h1'
+    } else if (project.MCServerList) {
+        url = 'https://api.mcserver-list.eu/server/?id=' + project.id
+
+    } else if (project.CraftList) {
+        url = 'https://craftlist.org/' + project.id
+        jsPath = 'main h1'
+    } else if (project.CzechCraft) {
+        url = 'https://czech-craft.eu/server/' + project.id + '/'
+        jsPath = 'a.server-name'
+    } else if (project.PixelmonServers) {
+        url = 'https://pixelmonservers.com/server/' + project.id + '/vote'
+        jsPath = '#title'
+    } else if (project.QTop) {
+        url = 'http://q-top.ru/vote' + project.id
+        jsPath = 'a[href="profile' + project.id + '"]'
+    } else if (project.MinecraftBuzz) {
+        url = 'https://minecraft.buzz/server/' + project.id
+        jsPath = '[href="server/' + project.id + '"]'
+    } else if (project.MinecraftServery) {
+        url = 'https://minecraftservery.eu/server/' + project.id
+        jsPath = 'div.container div.box h1.title'
+    } else if (project.RPGParadize) {
+        url = 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id
+        jsPath = 'div.div-box > h1'
+    } else if (project.MinecraftServerListNet) {
+        url = 'https://www.minecraft-serverlist.net/vote/' + project.id
+        jsPath = 'a.server-name'
+    } else if (project.MinecraftServerEu) {
+        url = 'https://minecraft-server.eu/server/index/' + project.id
+        jsPath = 'div.serverName'
+    } else if (project.MinecraftKrant) {
+        url = 'https://www.minecraftkrant.nl/serverlijst/' + project.id
+        jsPath = 'div.inner-title'
+    } else if (project.TrackyServer) {
+        url = 'https://www.trackyserver.com/server/' + project.id
+        jsPath = 'div.panel h1'
+    } else if (project.MCListsOrg) {
+        url = 'https://mc-lists.org/' + project.id + '/vote'
+        jsPath = 'div.header > div.ui.container'
+    } else if (project.TopMCServersCom) {
+        url = 'https://topmcservers.com/server/' + project.id
+        jsPath = '#serverPage > h1.header'
+    } else if (project.BestServersCom) {
+        url = 'https://bestservers.com/server/' + project.id + '/vote'
+        jsPath = 'a[href="/server/' + project.id + '"]'
+    } else if (project.CraftListNet) {
+        url = 'https://craft-list.net/minecraft-server/' + project.id
+        jsPath = 'div.serverpage-navigation-headername.header'
+    } else if (project.MinecraftServersListOrg) {
+        url = 'https://www.minecraft-servers-list.org/details/' + project.id + '/'
+        jsPath = 'div.card-header > h1'
+    } else if (project.ServerListe) {
+        url = 'https://www.serverliste.net/vote/' + project.id
+        jsPath = '#bar > h3'
+    } else if (project.Custom) {
+        url = project.responseURL
+    }
+    
+    const origins = []
+    let url2 = url.replace('http://', '*://')
+    url2 = url2.replace('https://', '*://')
+    origins.push(url2)
+    if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
+        origins.push('*://*.vk.com/*')
+    }
+    
+    let granted = await new Promise(resolve=>{
+        chrome.permissions.contains({origins}, resolve)
+    })
+    if (!granted) {
+        if (!chrome.app) {//Костыль для FireFox, что бы запросить права нужно что бы пользователь обязатльно кликнул
+            const button = document.createElement('button')
+            button.textContent = chrome.i18n.getMessage('grant')
+            button.classList.add('submitBtn')
+            button.addEventListener('click', async ()=>{
+                granted = await new Promise(resolve=>{
+                    chrome.permissions.request({origins}, resolve)
+                })
+                if (!granted) {
+                    createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
+                    return
+                } else {
+                    addProject(project, element)
+                }
+            })
+            createNotif([chrome.i18n.getMessage('grantUrl'), button])
+            return
+        }
+        granted = await new Promise(resolve=>{
+            chrome.permissions.request({origins}, resolve)
+        })
+        if (!granted) {
+            createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
+            return
+        }
+    }
+
     if (!(disableCheckProjects || project.Custom)) {
         createNotif(chrome.i18n.getMessage('checkHasProject'), null, null, element)
-        let url
-        let jsPath
-        if (project.TopCraft) {
-            url = 'https://topcraft.ru/servers/' + project.id + '/'
-            jsPath = '#project-about > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
-        } else if (project.McTOP) {
-            url = 'https://mctop.su/servers/' + project.id + '/'
-            jsPath = '#project-about > div.row > div:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
-        } else if (project.MCRate) {
-            url = 'http://mcrate.su/project/' + project.id
-            jsPath = '#button-circle > a'
-        } else if (project.MinecraftRating) {
-            url = 'https://minecraftrating.ru/projects/' + project.id + '/'
-            jsPath = 'table[class="table server-table"] > tbody > tr:nth-child(2) > td:nth-child(2) > a'
-        } else if (project.MonitoringMinecraft) {
-            url = 'https://monitoringminecraft.ru/top/' + project.id + '/'
-            jsPath = '#page > div.box.visible.main > div.left > table > tbody > tr:nth-child(1) > td.wid > noindex > a'
-        } else if (project.IonMc) {
-            url = 'https://ionmc.top/projects/' + project.id + '/vote'
-            jsPath = '#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.mx-2.-mt-1.mb-1.sm\\:mx-5.sm\\:my-2 > ul > li:nth-child(2) > a'
-        } else if (project.MinecraftServersOrg) {
-            url = 'https://minecraftservers.org/server/' + project.id
-            jsPath = '#left > div > h1'
-        } else if (project.ServeurPrive) {
-            if (project.lang == 'en') {
-                url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
-            } else {
-                url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
-            }
-            jsPath = '#t > div > div > h2'
-        } else if (project.PlanetMinecraft) {
-            url = 'https://www.planetminecraft.com/server/' + project.id + '/'
-            jsPath = '#resource-title-text'
-        } else if (project.TopG) {
-            url = 'https://topg.org/' + project.game + '/server-' + project.id
-            jsPath = 'div.sheader'
-        } else if (project.ListForge) {
-            url = 'https://' + project.game + '/server/' + project.id + '/vote/'
-            jsPath = 'head > title'
-        } else if (project.MinecraftServerList) {
-            url = 'https://minecraft-server-list.com/server/' + project.id + '/'
-            jsPath = '#site-wrapper > section > div.hfeed > span > div.serverdatadiv > table > tbody > tr:nth-child(5) > td > a'
-        } else if (project.ServerPact) {
-            url = 'https://www.serverpact.com/vote-' + project.id + '/'
-            jsPath = 'body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(2) > div > div.panel-body > table > tbody > tr:nth-child(6) > td:nth-child(2) > a'
-        } else if (project.MinecraftIpList) {
-            url = 'https://minecraftiplist.com/server/-' + project.id + '/'
-            jsPath = '#addr > span:nth-child(3)'
-        } else if (project.TopMinecraftServers) {
-            url = 'https://topminecraftservers.org/server/' + project.id
-            jsPath = 'body > div.container > div > div > div > div.col-md-8 > h1'
-        } else if (project.MinecraftServersBiz) {
-            url = 'https://minecraftservers.biz/' + project.id + '/'
-            jsPath = 'table[class="table table-hover table-striped"] > tbody > tr:nth-child(4) > td:nth-child(2)'
-        } else if (project.HotMC) {
-            url = 'https://hotmc.ru/minecraft-server-' + project.id
-            jsPath = 'div[class="text-server"] > h1'
-        } else if (project.MinecraftServerNet) {
-            url = 'https://minecraft-server.net/details/' + project.id + '/'
-            jsPath = 'div.card-header > h1'
-        } else if (project.TopGames) {
-            if (project.lang == 'fr') {
-                url = 'https://top-serveurs.net/' + project.game + '/' + project.id
-            } else if (project.lang == 'en') {
-                url = 'https://top-games.net/' + project.game + '/' + project.id
-            } else {
-                url = 'https://' + project.lang + '.top-games.net/' + project.game + '/' + project.id
-            }
-            jsPath = 'body > div.game-jumbotron > div > div > h1'
-        } else if (project.TMonitoring) {
-            url = 'https://tmonitoring.com/server/' + project.id + '/'
-            jsPath = 'div[class="info clearfix"] > div.pull-left > h1'
-        } else if (project.TopGG) {
-            url = 'https://top.gg/' + project.game + '/' + project.id + '/vote'
-            jsPath = '#entity-title'
-        } else if (project.DiscordBotList) {
-            url = 'https://discordbotlist.com/bots/' + project.id
-            jsPath = 'h1[class="bot-name"]'
-        } else if (project.BotsForDiscord) {
-            url = 'https://botsfordiscord.com/bot/' + project.id + '/vote'
-            jsPath = 'h2[class="subtitle"] > b'
-        } else if (project.MMoTopRU) {
-            if (project.lang == 'ru') {
-                url = 'https://' + project.game + '.mmotop.ru/servers/' + project.id
-            } else {
-                url = 'https://' + project.game + '.mmotop.ru/' + project.lang + '/' + 'servers/' + project.id
-            }
-            jsPath = '#site-link'
-        } else if (project.MCServers) {
-            url = 'https://mc-servers.com/details/' + project.id + '/'
-            jsPath = 'a[href="/details/' + project.id + '"]'
-        } else if (project.MinecraftList) {
-            url = 'https://minecraftlist.org/server/' + project.id
-            jsPath = 'h1'
-        } else if (project.MinecraftIndex) {
-            url = 'https://www.minecraft-index.com/' + project.id
-            jsPath = 'h3.stitle'
-        } else if (project.ServerList101) {
-            url = 'https://serverlist101.com/server/' + project.id + '/'
-            jsPath = 'li > h1'
-        } else if (project.MCServerList) {
-            url = 'https://api.mcserver-list.eu/server/?id=' + project.id
-
-        } else if (project.CraftList) {
-            url = 'https://craftlist.org/' + project.id
-            jsPath = 'main h1'
-        } else if (project.CzechCraft) {
-            url = 'https://czech-craft.eu/server/' + project.id + '/'
-            jsPath = 'a.server-name'
-        } else if (project.PixelmonServers) {
-            url = 'https://pixelmonservers.com/server/' + project.id + '/vote'
-            jsPath = '#title'
-        } else if (project.QTop) {
-            url = 'http://q-top.ru/vote' + project.id
-            jsPath = 'a[href="profile' + project.id + '"]'
-        } else if (project.MinecraftBuzz) {
-            url = 'https://minecraft.buzz/server/' + project.id
-            jsPath = '[href="server/' + project.id + '"]'
-        } else if (project.MinecraftServery) {
-            url = 'https://minecraftservery.eu/server/' + project.id
-            jsPath = 'div.container div.box h1.title'
-        } else if (project.RPGParadize) {
-            url = 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id
-            jsPath = 'div.div-box > h1'
-        } else if (project.MinecraftServerListNet) {
-            url = 'https://www.minecraft-serverlist.net/vote/' + project.id
-            jsPath = 'a.server-name'
-        } else if (project.MinecraftServerEu) {
-            url = 'https://minecraft-server.eu/server/index/' + project.id
-            jsPath = 'div.serverName'
-        } else if (project.MinecraftKrant) {
-            url = 'https://www.minecraftkrant.nl/serverlijst/' + project.id
-            jsPath = 'div.inner-title'
-        } else if (project.TrackyServer) {
-            url = 'https://www.trackyserver.com/server/' + project.id
-            jsPath = 'div.panel h1'
-        } else if (project.MCListsOrg) {
-            url = 'https://mc-lists.org/' + project.id + '/vote'
-            jsPath = 'div.header > div.ui.container'
-        } else if (project.TopMCServersCom) {
-            url = 'https://topmcservers.com/server/' + project.id
-            jsPath = '#serverPage > h1.header'
-        } else if (project.BestServersCom) {
-            url = 'https://bestservers.com/server/' + project.id + '/vote'
-            jsPath = 'a[href="/server/' + project.id + '"]'
-        } else if (project.CraftListNet) {
-            url = 'https://craft-list.net/minecraft-server/' + project.id
-            jsPath = 'div.serverpage-navigation-headername.header'
-        } else if (project.MinecraftServersListOrg) {
-            url = 'https://www.minecraft-servers-list.org/details/' + project.id + '/'
-            jsPath = 'div.card-header > h1'
-        } else if (project.ServerListe) {
-            url = 'https://www.serverliste.net/vote/' + project.id
-            jsPath = '#bar > h3'
-        }
 
         let response
         try {
@@ -3119,7 +3167,7 @@ async function getValue(name, area) {
         chrome.storage[area].get(name, function(data) {
             if (chrome.runtime.lastError) {
                 createNotif(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message), 'error')
-                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
+//              console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
                 reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data[name])
@@ -3135,7 +3183,7 @@ async function setValue(key, value, area) {
         chrome.storage[area].set({[key]: value}, function(data) {
             if (chrome.runtime.lastError) {
                 createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message), 'error')
-                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
+//              console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
                 reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data)
@@ -3151,7 +3199,7 @@ async function removeValue(name, area) {
         chrome.storage[area].remove(name, function(data) {
             if (chrome.runtime.lastError) {
                 createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message), 'error')
-                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
+//              console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
                 reject(chrome.runtime.lastError.message)
             } else {
                 resolve(data)
@@ -3866,6 +3914,17 @@ document.getElementById('generalStats').addEventListener('click', ()=> {
     document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = generalStats.added ? new Date(generalStats.added).toLocaleString().replace(',', '') : 'None'
 })
 
+document.getElementById('localStorage').addEventListener('click', async ()=>{
+    toggleModal('conflictSync')
+    await removeValue('AVMRsettings', 'sync')
+    document.getElementById('enableSyncStorage').click()
+})
+document.getElementById('syncStorage').addEventListener('click', async ()=>{
+    toggleModal('conflictSync')
+    await setValue('storageArea', 'sync', 'local')
+    document.location.reload()
+})
+
 //Генерация поля ввода ID
 var selectedTop = document.getElementById('project')
 
@@ -4261,6 +4320,7 @@ selectedTop.addEventListener('change', function() {
 
     laterChoose = name
 })
+selectedTop.dispatchEvent(new Event('change'))
 
 //Слушатель на выбор типа timeout для Custom
 document.getElementById('selectTime').addEventListener('change', function() {
@@ -4300,8 +4360,9 @@ elements.forEach(function(el) {
     el.prepend(chrome.i18n.getMessage(el.getAttribute('data-resource')))
 })
 document.querySelectorAll('[placeholder]').forEach(function(el) {
-    const text = chrome.i18n.getMessage(el.placeholder)
-    if (text != '') el.placeholder = el.placeholder = text
+    const message = chrome.i18n.getMessage(el.placeholder)
+    if (!message || message == '') return
+    el.placeholder = message
 })
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
 

@@ -1255,5 +1255,26 @@
   },
   "importRegBorealis": {
     "message": "Register by login: password"
+  },
+  "conflictSync": {
+    "message": "Settings conflict"
+  },
+  "conflictSyncMessage": {
+    "message": "There are already settings in the cloud, which settings should we use?"
+  },
+  "localStorage": {
+    "message": "Local"
+  },
+  "syncStorage": {
+    "message": "Cloud"
+  },
+  "notGrantUrl": {
+    "message": "You did not grant the extension access to this rating, adding it is not possible"
+  },
+  "grantUrl": {
+    "message": "Grant the extension access to this rating"
+  },
+  "grant": {
+    "message": "Grant"
   }
 }
