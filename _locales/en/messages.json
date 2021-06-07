@@ -1090,7 +1090,7 @@
     }
   },
   "useProxyOnUnProxyTop": {
-    "message": "Use a proxy on ratings where no proxy is used (TopCraft, McTOP и MinecraftRating)"
+    "message": "Use a proxy on ratings where no proxy is used (TopCraft, McTOP and MinecraftRating)"
   },
   "reAddSuccess": {
     "message": "Successfully re-added"
@@ -1216,10 +1216,10 @@
     "message": "You didn't check the box next to it "
   },
   "clearVKCookies": {
-    "message": "Clear VKontakte cookies before logging in"
+    "message": "Clear cookies before logging in"
   },
   "saveVKCredentials": {
-    "message": "Save your VK account username and password for a note"
+    "message": "Save your account username and password for a note"
   },
   "confirmSaveVKCredentials": {
     "message": "Do you really want to save the username and password you entered for your account? This data will be stored in an unencrypted form and can be stolen by a third-party program (virus or Trojan))"
