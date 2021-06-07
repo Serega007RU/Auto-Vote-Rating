@@ -802,15 +802,19 @@ async function addProject(project, element) {
     }
     
     const origins = []
+    const permissions = []
     let url2 = url.replace('http://', '*://')
     url2 = url2.replace('https://', '*://')
     origins.push(url2)
     if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
         origins.push('*://*.vk.com/*')
     }
+    if (project.MonitoringMinecraft) {
+        permissions.push('cookies')
+    }
     
     let granted = await new Promise(resolve=>{
-        chrome.permissions.contains({origins}, resolve)
+        chrome.permissions.contains({origins, permissions}, resolve)
     })
     if (!granted) {
         if (!chrome.app) {//Костыль для FireFox, что бы запросить права нужно что бы пользователь обязатльно кликнул
@@ -819,7 +823,7 @@ async function addProject(project, element) {
             button.classList.add('submitBtn')
             button.addEventListener('click', async ()=>{
                 granted = await new Promise(resolve=>{
-                    chrome.permissions.request({origins}, resolve)
+                    chrome.permissions.request({origins, permissions}, resolve)
                 })
                 if (!granted) {
                     createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
@@ -832,7 +836,7 @@ async function addProject(project, element) {
             return
         }
         granted = await new Promise(resolve=>{
-            chrome.permissions.request({origins}, resolve)
+            chrome.permissions.request({origins, permissions}, resolve)
         })
         if (!granted) {
             createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)

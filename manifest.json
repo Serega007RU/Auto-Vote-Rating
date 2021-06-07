@@ -24,7 +24,6 @@
 		"128": "images/icon128.png"
 	},
 	"permissions": [
-		"cookies",
 		"storage",
 		"notifications",
 		"background",
@@ -36,6 +35,7 @@
 		"https://www.recaptcha.net/recaptcha/*"
 	],
 	"optional_permissions": [
+	    "cookies",
 		"<all_urls>"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
