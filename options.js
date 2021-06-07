@@ -400,7 +400,7 @@ async function checkUpdateAvailbe(forced) {
         const button = document.createElement('button')
         button.classList.add('btn')
         button.id = 'updateBtn'
-        button.addEventListener('click', () => update())
+        button.addEventListener('click', () => update(json.version))
         button.textContent = chrome.i18n.getMessage('update')
         createNotif([chrome.i18n.getMessage('updateAvailbe', json.version), button], 'success', 60000)
     } else if (document.URL.endsWith('?updated')) {
@@ -411,12 +411,20 @@ async function checkUpdateAvailbe(forced) {
 }
 
 //Автоматизированное обновление расширения с git
-async function update() {
+async function update(version) {
+    if (window.opr) {//Если мы на Opera
+        
+        return
+    }
+    if (!chrome.app) {//Если мы на FireFox
+        window.open('https://noamidash.ml/auto_vote_rating-' + version + '-an+fx.xpi')
+        return
+    }
     document.querySelector('#updateVersion .content .message').parentNode.replaceChild(document.querySelector('#updateVersion .content .message').cloneNode(false), document.querySelector('#updateVersion .content .message'))
     document.querySelector('#updateVersion .content .events').parentNode.replaceChild(document.querySelector('#updateVersion .content .events').cloneNode(false), document.querySelector('#updateVersion .content .events'))
     const message = document.querySelector('#updateVersion > div.content > .message')
-    const progress = document.createElement('progress')
     const events = document.querySelector('#updateVersion > div.content > .events')
+    const progress = document.createElement('progress')
     events.append(progress)
     try {
         createNotif(chrome.i18n.getMessage('update1'), 'hint', 1000)
