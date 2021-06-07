@@ -1381,7 +1381,7 @@ document.getElementById('logs-clear').addEventListener('click', ()=>{
 })
 
 //Слушатель на импорт настроек
-document.getElementById('file-upload').addEventListener('change', (evt)=>{
+document.getElementById('file-upload').addEventListener('change', async (evt)=>{
     if (blockButtons) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
@@ -1389,54 +1389,44 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (evt.target.files.length == 0) return
-        let file = evt.target.files[0]
-        let reader = new FileReader()
-        reader.onload = (function(theFile) {
-            return async function(e) {
-                try {
-                    var allSetting = JSON.parse(e.target.result)
-                    for (const item of allProjects) {
-                        window['projects' + item] = allSetting['projects' + item]
-                    }
-                    settings = allSetting.settings
-                    generalStats = allSetting.generalStats
+        const file = evt.target.files[0]
+        const data = await new Response(file).json()
+        for (const item of allProjects) {
+            window['projects' + item] = data['projects' + item]
+        }
+        settings = data.settings
+        generalStats = data.generalStats
 
-                    await checkUpdateConflicts(false)
+        await checkUpdateConflicts(false)
 
-                    for (const item of allProjects) {
-                        await setValue('AVMRprojects' + item, window['projects' + item])
-                    }
-                    await setValue('AVMRsettings', settings)
-                    await setValue('generalStats', generalStats)
+        for (const item of allProjects) {
+            await setValue('AVMRprojects' + item, window['projects' + item])
+        }
+        await setValue('AVMRsettings', settings)
+        await setValue('generalStats', generalStats)
 
-                    document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
-                    document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
-                    document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
-                    document.getElementById('disabledNotifError').checked = settings.disabledNotifError
-                    document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
-                    document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
-                    document.getElementById('cooldown').value = settings.cooldown
-                    if (settings.enabledSilentVote) {
-                        document.getElementById('enabledSilentVote').value = 'enabled'
-                    } else {
-                        document.getElementById('enabledSilentVote').value = 'disabled'
-                    }
-                    if (settings.enableCustom) addCustom()
+        document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
+        document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
+        document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
+        document.getElementById('disabledNotifError').checked = settings.disabledNotifError
+        document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
+        document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
+        document.getElementById('cooldown').value = settings.cooldown
+        if (settings.enabledSilentVote) {
+            document.getElementById('enabledSilentVote').value = 'enabled'
+        } else {
+            document.getElementById('enabledSilentVote').value = 'disabled'
+        }
+        if (settings.enableCustom) addCustom()
 
-                    await updateProjectList()
+        await updateProjectList()
 
-                    createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
-                } catch (e) {
-                    console.error(e)
-                    createNotif(e, 'error')
-                }
-            }
-        })(file)
-        reader.readAsText(file)
-        document.getElementById('file-upload').value = ''
+        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
     } catch (e) {
         console.error(e)
         createNotif(e, 'error')
+    } finally {
+        document.getElementById('file-upload').value = ''
     }
 }, false)
 
