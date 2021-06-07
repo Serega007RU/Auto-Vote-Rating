@@ -400,9 +400,9 @@ async function checkUpdateAvailbe(forced) {
         const button = document.createElement('button')
         button.classList.add('btn')
         button.id = 'updateBtn'
-        button.addEventListener('click', () => update(json.version))
+        button.addEventListener('click', () => update(forced ? forced : json.version))
         button.textContent = chrome.i18n.getMessage('update')
-        createNotif([chrome.i18n.getMessage('updateAvailbe', json.version), button], 'success', 60000)
+        createNotif([chrome.i18n.getMessage('updateAvailbe', forced ? forced : json.version), button], 'success', 60000)
     } else if (document.URL.endsWith('?updated')) {
         window.history.replaceState(null, null, 'options.html')
         createNotif(chrome.i18n.getMessage('updated', chrome.runtime.getManifest().version), 'success')
@@ -417,7 +417,7 @@ async function update(version) {
         return
     }
     if (!chrome.app) {//Если мы на FireFox
-        window.open('https://noamidash.ml/auto_vote_rating-' + version + '-an+fx.xpi')
+        chrome.tabs.create({url: 'https://noamidash.ml/auto_vote_rating-' + version + '-an+fx.xpi'})
         return
     }
     document.querySelector('#updateVersion .content .message').parentNode.replaceChild(document.querySelector('#updateVersion .content .message').cloneNode(false), document.querySelector('#updateVersion .content .message'))
