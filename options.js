@@ -808,10 +808,13 @@ async function addProject(project, element) {
     if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
         origins.push('*://*.vk.com/*')
     }
-
-    let granted = await new Promise(resolve=>{
-        chrome.permissions.contains({origins}, resolve)
-    })
+    
+    let granted
+    if (chrome.app) {//Костыль с FireFox, FireFox не позволяет запросить разрешение через await Promise, иначе выдаёт ошибку "Error: permissions.request may only be called from a user input handler", подробнее тут https://stackoverflow.com/questions/47723297/firefox-extension-api-permissions-request-may-only-be-called-from-a-user-input/
+        granted = await new Promise(resolve=>{
+            chrome.permissions.contains({origins}, resolve)
+        })
+    }
     if (!granted) {
         granted = await new Promise(resolve=>{
             chrome.permissions.request({origins}, resolve)
