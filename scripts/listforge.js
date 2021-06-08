@@ -8,6 +8,7 @@ async function vote(first) {
         if (document.getElementById('privacysettings-notice') != null) document.getElementById('privacysettings-notice').remove()
         if (document.getElementById('vote-form-block') != null) document.getElementById('vote-form-block').removeAttribute('style')
         if (document.getElementById('vote-button-block') != null) document.getElementById('vote-button-block').removeAttribute('style')
+        if (document.querySelector('a[href="/servers/premium/"]') != null) document.querySelector('a[href="/servers/premium/"]').remove()
 
         for (const el of document.querySelectorAll('div.alert.alert-info')) {
             if (el.textContent.includes('server has been removed')) {
