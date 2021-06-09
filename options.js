@@ -1,54 +1,3 @@
-//Список проектов
-var allProjects = [
-    'TopCraft',
-    'McTOP',
-    'MCRate',
-    'MinecraftRating',
-    'MonitoringMinecraft',
-    'IonMc',
-    'MinecraftServersOrg',
-    'ServeurPrive',
-    'PlanetMinecraft',
-    'TopG',
-    'ListForge',
-    'MinecraftServerList',
-    'ServerPact',
-    'MinecraftIpList',
-    'TopMinecraftServers',
-    'MinecraftServersBiz',
-    'HotMC',
-    'MinecraftServerNet',
-    'TopGames',
-    'TMonitoring',
-    'TopGG',
-    'DiscordBotList',
-    'BotsForDiscord',
-    'MMoTopRU',
-    'MCServers',
-    'MinecraftList',
-    'MinecraftIndex',
-    'ServerList101',
-    'MCServerList',
-    'CraftList',
-    'CzechCraft',
-    'PixelmonServers',
-    'QTop',
-    'MinecraftBuzz',
-    'MinecraftServery',
-    'RPGParadize',
-    'MinecraftServerListNet',
-    'MinecraftServerEu',
-    'MinecraftKrant',
-    'TrackyServer',
-    'MCListsOrg',
-    'TopMCServersCom',
-    'BestServersCom',
-    'CraftListNet',
-    'MinecraftServersListOrg',
-    'ServerListe',
-    'Custom'
-]
-
 var settings
 var generalStats = {}
 //Хранит значение отключения проверки на совпадение проектов
@@ -94,7 +43,7 @@ async function restoreOptions() {
         storageArea = 'local'
         await setValue('storageArea', storageArea, 'local')
     }
-    for (const item of allProjects) {
+    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
         window['projects' + item] = await getValue('AVMRprojects' + item)
     }
     settings = await getValue('AVMRsettings')
@@ -106,7 +55,7 @@ async function restoreOptions() {
     if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
         createNotif(chrome.i18n.getMessage('firstSettings'))
         
-        for (const item of allProjects) {
+        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
             window['projects' + item] = []
             await setValue('AVMRprojects' + item, window['projects' + item])
         }
@@ -219,7 +168,7 @@ async function restoreOptions() {
                     createNotif(chrome.i18n.getMessage('settingsSyncCopyLocal'))
                 }
                 await setValue('storageArea', storageArea, 'local')
-                for (const item of allProjects) {
+                for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
                     await setValue('AVMRprojects' + item, window['projects' + item])
                     await removeValue('AVMRprojects' + item, oldStorageArea)
                 }
@@ -400,8 +349,8 @@ async function addProjectList(project, visually) {
         let button = document.createElement('button')
         button.setAttribute('class', 'selectsite')
         button.setAttribute('id', getProjectName(project) + 'Button')
-        button.style.order = allProjects.indexOf(getProjectName(project))
-        button.textContent = getFullProjectName(project)
+        button.style.order = Object.keys(chrome.extension.getBackgroundPage().allProjects).indexOf(getProjectName(project))
+        button.textContent = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('URL')
 
         let count = document.createElement('span')
         count.textContent = getProjectList(project).length
@@ -472,7 +421,7 @@ async function removeProjectList(project, visually) {
             }
         }
     } else {
-        for (const item of allProjects) {
+        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
             if (document.getElementById(item + 'List') != null) document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
         }
         document.querySelector('div.buttonBlock').parentNode.replaceChild(document.querySelector('div.buttonBlock').cloneNode(false), document.querySelector('div.buttonBlock'))
@@ -643,169 +592,13 @@ async function addProject(project, element) {
         return
     }
     let projectURL = ''
-    let url
-    let jsPath
-    if (project.TopCraft) {
-        url = 'https://topcraft.ru/servers/' + project.id + '/'
-        jsPath = '#project-about > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
-    } else if (project.McTOP) {
-        url = 'https://mctop.su/servers/' + project.id + '/'
-        jsPath = '#project-about > div.row > div:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
-    } else if (project.MCRate) {
-        url = 'http://mcrate.su/project/' + project.id
-        jsPath = '#button-circle > a'
-    } else if (project.MinecraftRating) {
-        url = 'https://minecraftrating.ru/projects/' + project.id + '/'
-        jsPath = 'table[class="table server-table"] > tbody > tr:nth-child(2) > td:nth-child(2) > a'
-    } else if (project.MonitoringMinecraft) {
-        url = 'https://monitoringminecraft.ru/top/' + project.id + '/'
-        jsPath = '#page > div.box.visible.main > div.left > table > tbody > tr:nth-child(1) > td.wid > noindex > a'
-    } else if (project.IonMc) {
-        url = 'https://ionmc.top/projects/' + project.id + '/vote'
-        jsPath = '#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.mx-2.-mt-1.mb-1.sm\\:mx-5.sm\\:my-2 > ul > li:nth-child(2) > a'
-    } else if (project.MinecraftServersOrg) {
-        url = 'https://minecraftservers.org/server/' + project.id
-        jsPath = '#left > div > h1'
-    } else if (project.ServeurPrive) {
-        if (project.lang == 'en') {
-            url = 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
-        } else {
-            url = 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
-        }
-        jsPath = '#t > div > div > h2'
-    } else if (project.PlanetMinecraft) {
-        url = 'https://www.planetminecraft.com/server/' + project.id + '/'
-        jsPath = '#resource-title-text'
-    } else if (project.TopG) {
-        url = 'https://topg.org/' + project.game + '/server-' + project.id
-        jsPath = 'div.sheader'
-    } else if (project.ListForge) {
-        url = 'https://' + project.game + '/server/' + project.id + '/vote/'
-        jsPath = 'head > title'
-    } else if (project.MinecraftServerList) {
-        url = 'https://minecraft-server-list.com/server/' + project.id + '/'
-        jsPath = '#site-wrapper > section > div.hfeed > span > div.serverdatadiv > table > tbody > tr:nth-child(5) > td > a'
-    } else if (project.ServerPact) {
-        url = 'https://www.serverpact.com/vote-' + project.id + '/'
-        jsPath = 'body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(2) > div > div.panel-body > table > tbody > tr:nth-child(6) > td:nth-child(2) > a'
-    } else if (project.MinecraftIpList) {
-        url = 'https://minecraftiplist.com/server/-' + project.id + '/'
-        jsPath = '#addr > span:nth-child(3)'
-    } else if (project.TopMinecraftServers) {
-        url = 'https://topminecraftservers.org/server/' + project.id
-        jsPath = 'body > div.container > div > div > div > div.col-md-8 > h1'
-    } else if (project.MinecraftServersBiz) {
-        url = 'https://minecraftservers.biz/' + project.id + '/'
-        jsPath = 'table[class="table table-hover table-striped"] > tbody > tr:nth-child(4) > td:nth-child(2)'
-    } else if (project.HotMC) {
-        url = 'https://hotmc.ru/minecraft-server-' + project.id
-        jsPath = 'div[class="text-server"] > h1'
-    } else if (project.MinecraftServerNet) {
-        url = 'https://minecraft-server.net/details/' + project.id + '/'
-        jsPath = 'div.card-header > h1'
-    } else if (project.TopGames) {
-        if (project.lang == 'fr') {
-            url = 'https://top-serveurs.net/' + project.game + '/' + project.id
-        } else if (project.lang == 'en') {
-            url = 'https://top-games.net/' + project.game + '/' + project.id
-        } else {
-            url = 'https://' + project.lang + '.top-games.net/' + project.game + '/' + project.id
-        }
-        jsPath = 'body > div.game-jumbotron > div > div > h1'
-    } else if (project.TMonitoring) {
-        url = 'https://tmonitoring.com/server/' + project.id + '/'
-        jsPath = 'div[class="info clearfix"] > div.pull-left > h1'
-    } else if (project.TopGG) {
-        url = 'https://top.gg/' + project.game + '/' + project.id + '/vote'
-        jsPath = '#entity-title'
-    } else if (project.DiscordBotList) {
-        url = 'https://discordbotlist.com/bots/' + project.id
-        jsPath = 'h1[class="bot-name"]'
-    } else if (project.BotsForDiscord) {
-        url = 'https://botsfordiscord.com/bot/' + project.id + '/vote'
-        jsPath = 'h2[class="subtitle"] > b'
-    } else if (project.MMoTopRU) {
-        if (project.lang == 'ru') {
-            url = 'https://' + project.game + '.mmotop.ru/servers/' + project.id
-        } else {
-            url = 'https://' + project.game + '.mmotop.ru/' + project.lang + '/' + 'servers/' + project.id
-        }
-        jsPath = '#site-link'
-    } else if (project.MCServers) {
-        url = 'https://mc-servers.com/details/' + project.id + '/'
-        jsPath = 'a[href="/details/' + project.id + '"]'
-    } else if (project.MinecraftList) {
-        url = 'https://minecraftlist.org/server/' + project.id
-        jsPath = 'h1'
-    } else if (project.MinecraftIndex) {
-        url = 'https://www.minecraft-index.com/' + project.id
-        jsPath = 'h3.stitle'
-    } else if (project.ServerList101) {
-        url = 'https://serverlist101.com/server/' + project.id + '/'
-        jsPath = 'li > h1'
-    } else if (project.MCServerList) {
-        url = 'https://api.mcserver-list.eu/server/?id=' + project.id
+    const url = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('pageURL', project)
+    const jsPath = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('jsPath', project)
+    const domain = getDomainWithoutSubdomain(url)
 
-    } else if (project.CraftList) {
-        url = 'https://craftlist.org/' + project.id
-        jsPath = 'main h1'
-    } else if (project.CzechCraft) {
-        url = 'https://czech-craft.eu/server/' + project.id + '/'
-        jsPath = 'a.server-name'
-    } else if (project.PixelmonServers) {
-        url = 'https://pixelmonservers.com/server/' + project.id + '/vote'
-        jsPath = '#title'
-    } else if (project.QTop) {
-        url = 'http://q-top.ru/vote' + project.id
-        jsPath = 'a[href="profile' + project.id + '"]'
-    } else if (project.MinecraftBuzz) {
-        url = 'https://minecraft.buzz/server/' + project.id
-        jsPath = '[href="server/' + project.id + '"]'
-    } else if (project.MinecraftServery) {
-        url = 'https://minecraftservery.eu/server/' + project.id
-        jsPath = 'div.container div.box h1.title'
-    } else if (project.RPGParadize) {
-        url = 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id
-        jsPath = 'div.div-box > h1'
-    } else if (project.MinecraftServerListNet) {
-        url = 'https://www.minecraft-serverlist.net/vote/' + project.id
-        jsPath = 'a.server-name'
-    } else if (project.MinecraftServerEu) {
-        url = 'https://minecraft-server.eu/server/index/' + project.id
-        jsPath = 'div.serverName'
-    } else if (project.MinecraftKrant) {
-        url = 'https://www.minecraftkrant.nl/serverlijst/' + project.id
-        jsPath = 'div.inner-title'
-    } else if (project.TrackyServer) {
-        url = 'https://www.trackyserver.com/server/' + project.id
-        jsPath = 'div.panel h1'
-    } else if (project.MCListsOrg) {
-        url = 'https://mc-lists.org/' + project.id + '/vote'
-        jsPath = 'div.header > div.ui.container'
-    } else if (project.TopMCServersCom) {
-        url = 'https://topmcservers.com/server/' + project.id
-        jsPath = '#serverPage > h1.header'
-    } else if (project.BestServersCom) {
-        url = 'https://bestservers.com/server/' + project.id + '/vote'
-        jsPath = 'a[href="/server/' + project.id + '"]'
-    } else if (project.CraftListNet) {
-        url = 'https://craft-list.net/minecraft-server/' + project.id
-        jsPath = 'div.serverpage-navigation-headername.header'
-    } else if (project.MinecraftServersListOrg) {
-        url = 'https://www.minecraft-servers-list.org/details/' + project.id + '/'
-        jsPath = 'div.card-header > h1'
-    } else if (project.ServerListe) {
-        url = 'https://www.serverliste.net/vote/' + project.id
-        jsPath = '#bar > h3'
-    } else if (project.Custom) {
-        url = project.responseURL
-    }
-    
     const origins = []
     const permissions = []
-    let url2 = url.replace('http://', '*://')
-    url2 = url2.replace('https://', '*://')
-    origins.push(url2)
+    origins.push('*://*.' + domain + '/*')
     if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
         origins.push('*://*.vk.com/*')
     }
@@ -1165,10 +958,6 @@ function getProjectName(project) {
     return Object.keys(project)[0]
 }
 
-function getFullProjectName(project) {
-    return (document.querySelector('#projectList > option[name="' + getProjectName(project) + '"]')).value
-}
-
 function getProjectList(project) {
     return window['projects' + getProjectName(project)]
 }
@@ -1192,6 +981,14 @@ function extractHostname(url) {
 //  hostname = hostname.replace(/\s+/g, '')
 
     return hostname
+}
+const getDomainWithoutSubdomain = url => {
+  const urlParts = new URL(url).hostname.split('.')
+
+  return urlParts
+    .slice(0)
+    .slice(-(urlParts.length === 4 ? 3 : 2))
+    .join('.')
 }
 
 //Асинхронно достаёт/сохраняет настройки в chrome.storage
@@ -1268,7 +1065,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
 })
 
 async function forLoopAllProjects(fuc) {
-    for (const item of allProjects) {
+    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
         for (let proj of window['projects' + item]) {
             await fuc(proj)
         }
@@ -1282,7 +1079,7 @@ document.getElementById('file-download').addEventListener('click', ()=>{
         settings,
         generalStats
     }
-    for (const item of allProjects) {
+    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
         allSetting['projects' + item] = window['projects' + item]
     }
     let text = JSON.stringify(allSetting, null, '\t')
@@ -1391,7 +1188,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         if (evt.target.files.length == 0) return
         const file = evt.target.files[0]
         const data = await new Response(file).json()
-        for (const item of allProjects) {
+        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
             window['projects' + item] = data['projects' + item]
         }
         settings = data.settings
@@ -1399,7 +1196,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
 
         await checkUpdateConflicts(false)
 
-        for (const item of allProjects) {
+        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
             await setValue('AVMRprojects' + item, window['projects' + item])
         }
         await setValue('AVMRsettings', settings)
@@ -1449,7 +1246,7 @@ async function checkUpdateConflicts(save) {
         if (save) await setValue('generalStats', generalStats)
     }
 
-    for (const item of allProjects) {
+    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
         if (window['projects' + item] == null || !(typeof window['projects' + item][Symbol.iterator] === 'function')) {
             if (!updated) {
                 createNotif(chrome.i18n.getMessage('settingsUpdate'))
@@ -1843,192 +1640,11 @@ selectedTop.addEventListener('change', function() {
     }
 
     document.getElementById('id').required = true
-    
-    if (name == 'TopCraft') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://topcraft.ru/servers/'
-        document.getElementById('projectIDTooltip2').textContent = '10496'
-        document.getElementById('projectIDTooltip3').textContent = '/'
-    } else if (name == 'McTOP') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://mctop.su/servers/'
-        document.getElementById('projectIDTooltip2').textContent = '5231'
-        document.getElementById('projectIDTooltip3').textContent = '/'
-    } else if (name == 'MCRate') {
-        document.getElementById('projectIDTooltip1').textContent = 'http://mcrate.su/rate/'
-        document.getElementById('projectIDTooltip2').textContent = '4396'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MinecraftRating') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftrating.ru/projects/'
-        document.getElementById('projectIDTooltip2').textContent = 'cubixworld'
-        document.getElementById('projectIDTooltip3').textContent = '/'
-    } else if (name == 'MonitoringMinecraft') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://monitoringminecraft.ru/top/'
-        document.getElementById('projectIDTooltip2').textContent = 'gg'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'IonMc') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://ionmc.top/projects/'
-        document.getElementById('projectIDTooltip2').textContent = '80'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'MinecraftServersOrg') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftservers.org/vote/'
-        document.getElementById('projectIDTooltip2').textContent = '25531'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'ServeurPrive') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://serveur-prive.net/minecraft/'
-        document.getElementById('projectIDTooltip2').textContent = 'gommehd-net-4932'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'PlanetMinecraft') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://www.planetminecraft.com/server/'
-        document.getElementById('projectIDTooltip2').textContent = 'legends-evolved'
-        document.getElementById('projectIDTooltip3').textContent = '/vote/'
-    } else if (name == 'TopG') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://topg.org/minecraft-servers/server-'
-        document.getElementById('projectIDTooltip2').textContent = '405637'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'ListForge') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-mp.com/server/'
-        document.getElementById('projectIDTooltip2').textContent = '81821'
-        document.getElementById('projectIDTooltip3').textContent = '/vote/'
-    } else if (name == 'MinecraftServerList') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-server-list.com/server/'
-        document.getElementById('projectIDTooltip2').textContent = '292028'
-        document.getElementById('projectIDTooltip3').textContent = '/vote/'
-    } else if (name == 'ServerPact') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://www.serverpact.com/vote-'
-        document.getElementById('projectIDTooltip2').textContent = '26492123'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MinecraftIpList') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftiplist.com/index.php?action=vote&listingID='
-        document.getElementById('projectIDTooltip2').textContent = '2576'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'TopMinecraftServers') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://topminecraftservers.org/vote/'
-        document.getElementById('projectIDTooltip2').textContent = '9126'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MinecraftServersBiz') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftservers.biz/'
-        document.getElementById('projectIDTooltip2').textContent = 'servers/145999'
-        document.getElementById('projectIDTooltip3').textContent = '/'
-    } else if (name == 'HotMC') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://hotmc.ru/vote-'
-        document.getElementById('projectIDTooltip2').textContent = '199493'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MinecraftServerNet') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-server.net/vote/'
-        document.getElementById('projectIDTooltip2').textContent = 'TitanicFreak'
-        document.getElementById('projectIDTooltip3').textContent = '/'
-    } else if (name == 'TopGames') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://top-serveurs.net/minecraft/'
-        document.getElementById('projectIDTooltip2').textContent = 'icesword-pvpfaction-depuis-2014-crack-on'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'TMonitoring') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://tmonitoring.com/server/'
-        document.getElementById('projectIDTooltip2').textContent = 'qoobworldru'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'TopGG') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://top.gg/bot/'
-        document.getElementById('projectIDTooltip2').textContent = '270904126974590976'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'DiscordBotList') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://discordbotlist.com/bots/'
-        document.getElementById('projectIDTooltip2').textContent = 'dank-memer'
-        document.getElementById('projectIDTooltip3').textContent = '/upvote'
-    } else if (name == 'BotsForDiscord') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://botsfordiscord.com/bot/'
-        document.getElementById('projectIDTooltip2').textContent = '469610550159212554'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'MMoTopRU') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://pw.mmotop.ru/servers/'
-        document.getElementById('projectIDTooltip2').textContent = '25895'
-        document.getElementById('projectIDTooltip3').textContent = '/votes/new'
-    } else if (name == 'MCServers') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://mc-servers.com/mcvote/'
-        document.getElementById('projectIDTooltip2').textContent = '1890'
-        document.getElementById('projectIDTooltip3').textContent = '/'
-    } else if (name == 'MinecraftList') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftlist.org/vote/'
-        document.getElementById('projectIDTooltip2').textContent = '11227'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MinecraftIndex') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://www.minecraft-index.com/'
-        document.getElementById('projectIDTooltip2').textContent = '33621-extremecraft-net'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'ServerList101') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://serverlist101.com/server/'
-        document.getElementById('projectIDTooltip2').textContent = '1547'
-        document.getElementById('projectIDTooltip3').textContent = '/vote/'
-    } else if (name == 'MCServerList') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://mcserver-list.eu/hlasovat/?id='
-        document.getElementById('projectIDTooltip2').textContent = '307'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'CraftList') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://craftlist.org/'
-        document.getElementById('projectIDTooltip2').textContent = 'basicland'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'CzechCraft') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://czech-craft.eu/server/'
-        document.getElementById('projectIDTooltip2').textContent = 'trenend'
-        document.getElementById('projectIDTooltip3').textContent = '/vote/'
-    } else if (name == 'PixelmonServers') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://pixelmonservers.com/server/'
-        document.getElementById('projectIDTooltip2').textContent = '8IO9idMv'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'QTop') {
-        document.getElementById('projectIDTooltip1').textContent = 'http://q-top.ru/vote'
-        document.getElementById('projectIDTooltip2').textContent = '1549'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MinecraftBuzz') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft.buzz/server/'
-        document.getElementById('projectIDTooltip2').textContent = '306'
-        document.getElementById('projectIDTooltip3').textContent = '&tab=vote'
-    } else if (name == 'MinecraftServery') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraftservery.eu/server/'
-        document.getElementById('projectIDTooltip2').textContent = '105'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'RPGParadize') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://www.rpg-paradize.com/?page=vote&vote='
-        document.getElementById('projectIDTooltip2').textContent = '113763'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MinecraftServerListNet') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://www.minecraft-serverlist.net/vote/'
-        document.getElementById('projectIDTooltip2').textContent = '51076'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MinecraftServerEu') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://minecraft-server.eu/vote/index/'
-        document.getElementById('projectIDTooltip2').textContent = '1A73C'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MinecraftKrant') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://www.minecraftkrant.nl/serverlijst/'
-        document.getElementById('projectIDTooltip2').textContent = 'torchcraft'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'TrackyServer') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://www.trackyserver.com/server/'
-        document.getElementById('projectIDTooltip2').textContent = 'anubismc-486999'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'MCListsOrg') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://mc-lists.org/'
-        document.getElementById('projectIDTooltip2').textContent = 'server-luxurycraft.1818'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'TopMCServersCom') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://topmcservers.com/server/'
-        document.getElementById('projectIDTooltip2').textContent = '17'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'BestServersCom') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://bestservers.com/server/'
-        document.getElementById('projectIDTooltip2').textContent = '1135'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'CraftListNet') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://craft-list.net/minecraft-server/'
-        document.getElementById('projectIDTooltip2').textContent = 'Advancius-Network'
-        document.getElementById('projectIDTooltip3').textContent = '/vote'
-    } else if (name == 'MinecraftServersListOrg') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://www.minecraft-servers-list.org/index.php?a=in&u='
-        document.getElementById('projectIDTooltip2').textContent = 'chromity'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    } else if (name == 'ServerListe') {
-        document.getElementById('projectIDTooltip1').textContent = 'https://www.serverliste.net/vote/'
-        document.getElementById('projectIDTooltip2').textContent = '775'
-        document.getElementById('projectIDTooltip3').textContent = ''
-    }
+
+    const exampleURL = chrome.extension.getBackgroundPage().allProjects[name]('exampleURL')
+    document.getElementById('projectIDTooltip1').textContent = exampleURL[0]
+    document.getElementById('projectIDTooltip2').textContent = exampleURL[1]
+    document.getElementById('projectIDTooltip3').textContent = exampleURL[2]
 
     if (name == 'Custom' || name == 'ServeurPrive' || name == 'TopGames' || name == 'MMoTopRU' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU') {
         document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
@@ -2190,6 +1806,22 @@ document.getElementById('selectTime').addEventListener('change', function() {
 
     }
 })
+
+generateDataList()
+function generateDataList() {
+    const datalist = document.getElementById('projectList')
+    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
+        const url = chrome.extension.getBackgroundPage().allProjects[item]('URL')
+        const option = document.createElement('option')
+        option.setAttribute('name', item)
+        option.value = url
+        datalist.append(option)
+    }
+    document.querySelector('option[name="ListForge"]').textContent = 'or Minecraft-MP.com'
+    document.querySelector('option[name="TopGames"]').textContent = 'or Top-Serveurs.net'
+    document.querySelector('option[name="Custom"]').textContent = chrome.i18n.getMessage('Custom')
+    document.querySelector('option[name="Custom"]').disabled = true
+}
 
 //Локализация
 let elements = document.querySelectorAll('[data-resource]')
