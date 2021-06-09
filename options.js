@@ -2736,15 +2736,19 @@ async function addProject(project, element) {
     }
     
     const origins = []
+    const permissions = []
     let url2 = url.replace('http://', '*://')
     url2 = url2.replace('https://', '*://')
     origins.push(url2)
     if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
         origins.push('*://*.vk.com/*')
     }
+    if (project.MonitoringMinecraft) {
+        permissions.push('cookies')
+    }
     
     let granted = await new Promise(resolve=>{
-        chrome.permissions.contains({origins}, resolve)
+        chrome.permissions.contains({origins, permissions}, resolve)
     })
     if (!granted) {
         if (!chrome.app) {//Костыль для FireFox, что бы запросить права нужно что бы пользователь обязатльно кликнул
@@ -2753,7 +2757,7 @@ async function addProject(project, element) {
             button.classList.add('submitBtn')
             button.addEventListener('click', async ()=>{
                 granted = await new Promise(resolve=>{
-                    chrome.permissions.request({origins}, resolve)
+                    chrome.permissions.request({origins, permissions}, resolve)
                 })
                 if (!granted) {
                     createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
@@ -2766,7 +2770,7 @@ async function addProject(project, element) {
             return
         }
         granted = await new Promise(resolve=>{
-            chrome.permissions.request({origins}, resolve)
+            chrome.permissions.request({origins, permissions}, resolve)
         })
         if (!granted) {
             createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
@@ -3458,7 +3462,7 @@ document.getElementById('logs-clear').addEventListener('click', ()=>{
 })
 
 //Слушатель на импорт настроек
-document.getElementById('file-upload').addEventListener('change', (evt)=>{
+document.getElementById('file-upload').addEventListener('change', async (evt)=>{
     if (blockButtons) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
@@ -3466,62 +3470,52 @@ document.getElementById('file-upload').addEventListener('change', (evt)=>{
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (evt.target.files.length == 0) return
-        let file = evt.target.files[0]
-        let reader = new FileReader()
-        reader.onload = (function(theFile) {
-            return async function(e) {
-                try {
-                    var allSetting = JSON.parse(e.target.result)
-                    for (const item of allProjects) {
-                        window['projects' + item] = allSetting['projects' + item]
-                    }
-                    settings = allSetting.settings
-                    generalStats = allSetting.generalStats
-                    VKs = allSetting.VKs
-                    borealisAccounts = allSetting.borealisAccounts
-                    proxies = allSetting.proxies
+        const file = evt.target.files[0]
+        const data = await new Response(file).json()
+        for (const item of allProjects) {
+            window['projects' + item] = data['projects' + item]
+        }
+        settings = data.settings
+        generalStats = data.generalStats
+        VKs = data.VKs
+        borealisAccounts = data.borealisAccounts
+        proxies = data.proxies
 
-                    await checkUpdateConflicts(false)
+        await checkUpdateConflicts(false)
 
-                    for (const item of allProjects) {
-                        await setValue('AVMRprojects' + item, window['projects' + item])
-                    }
-                    await setValue('AVMRsettings', settings)
-                    await setValue('generalStats', generalStats)
-                    await setValue('AVMRVKs', VKs)
-                    await setValue('borealisAccounts', borealisAccounts)
-                    await setValue('AVMRproxies', proxies)
+        for (const item of allProjects) {
+            await setValue('AVMRprojects' + item, window['projects' + item])
+        }
+        await setValue('AVMRsettings', settings)
+        await setValue('generalStats', generalStats)
+        await setValue('AVMRVKs', VKs)
+        await setValue('borealisAccounts', borealisAccounts)
+        await setValue('AVMRproxies', proxies)
 
-                    document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
-                    document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
-                    document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
-                    document.getElementById('disabledNotifError').checked = settings.disabledNotifError
-                    document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
-                    document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
-                    document.getElementById('cooldown').value = settings.cooldown
-                    if (settings.enabledSilentVote) {
-                        document.getElementById('enabledSilentVote').value = 'enabled'
-                    } else {
-                        document.getElementById('enabledSilentVote').value = 'disabled'
-                    }
-                    document.getElementById('useMultiVote').checked = settings.useMultiVote
-                    document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
-                    if (settings.enableCustom) addCustom()
+        document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
+        document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
+        document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
+        document.getElementById('disabledNotifError').checked = settings.disabledNotifError
+        document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
+        document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
+        document.getElementById('cooldown').value = settings.cooldown
+        if (settings.enabledSilentVote) {
+            document.getElementById('enabledSilentVote').value = 'enabled'
+        } else {
+            document.getElementById('enabledSilentVote').value = 'disabled'
+        }
+        document.getElementById('useMultiVote').checked = settings.useMultiVote
+        document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
+        if (settings.enableCustom) addCustom()
 
-                    await updateProjectList()
+        await updateProjectList()
 
-                    createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
-                } catch (e) {
-                    console.error(e)
-                    createNotif(e, 'error')
-                }
-            }
-        })(file)
-        reader.readAsText(file)
-        document.getElementById('file-upload').value = ''
+        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
     } catch (e) {
         console.error(e)
         createNotif(e, 'error')
+    } finally {
+        document.getElementById('file-upload').value = ''
     }
 }, false)
 
@@ -3775,9 +3769,9 @@ function addCustom() {
     }
 }
 
-async function openPopup(url, onClose, code) {
-    const width = 655
-    const height = 430
+async function openPopup(url, onClose) {
+    const width = 700
+    const height = 500
     const left = parseInt(Math.max(0, (screen.width - width) / 2) + (screen.availLeft | 0))
         , top = parseInt(Math.max(0, (screen.height - height) / 2) + (screen.availTop | 0))
     let close = 'setSelfAsOpener'
