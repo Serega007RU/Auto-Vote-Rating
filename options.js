@@ -1450,8 +1450,8 @@ function addCustom() {
 }
 
 async function openPopup(url, onClose) {
-    const width = 655
-    const height = 430
+    const width = 700
+    const height = 500
     const left = parseInt(Math.max(0, (screen.width - width) / 2) + (screen.availLeft | 0))
         , top = parseInt(Math.max(0, (screen.height - height) / 2) + (screen.availTop | 0))
     let close = 'setSelfAsOpener'
