@@ -594,48 +594,8 @@ async function addProject(project, element) {
     let projectURL = ''
     const url = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('pageURL', project)
     const jsPath = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('jsPath', project)
-    const domain = getDomainWithoutSubdomain(url)
 
-    const origins = []
-    const permissions = []
-    origins.push('*://*.' + domain + '/*')
-    if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
-        origins.push('*://*.vk.com/*')
-    }
-    if (project.MonitoringMinecraft) {
-        permissions.push('cookies')
-    }
-    
-    let granted = await new Promise(resolve=>{
-        chrome.permissions.contains({origins, permissions}, resolve)
-    })
-    if (!granted) {
-        if (!chrome.app) {//Костыль для FireFox, что бы запросить права нужно что бы пользователь обязатльно кликнул
-            const button = document.createElement('button')
-            button.textContent = chrome.i18n.getMessage('grant')
-            button.classList.add('submitBtn')
-            button.addEventListener('click', async ()=>{
-                granted = await new Promise(resolve=>{
-                    chrome.permissions.request({origins, permissions}, resolve)
-                })
-                if (!granted) {
-                    createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
-                    return
-                } else {
-                    addProject(project, element)
-                }
-            })
-            createNotif([chrome.i18n.getMessage('grantUrl'), button])
-            return
-        }
-        granted = await new Promise(resolve=>{
-            chrome.permissions.request({origins, permissions}, resolve)
-        })
-        if (!granted) {
-            createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
-            return
-        }
-    }
+    if (!await checkPermissions([project])) return
 
     if (!(disableCheckProjects || project.Custom)) {
         createNotif(chrome.i18n.getMessage('checkHasProject'), null, null, element)
@@ -944,6 +904,60 @@ function addProjectsBonus(project, element) {
     }
 }
 
+async function checkPermissions(projects, element) {
+    const origins = []
+    const permissions = []
+    for (const project of projects) {
+        const url = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('pageURL', project)
+        const domain = getDomainWithoutSubdomain(url)
+        if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
+        if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
+            if (!origins.includes('*://*.vk.com/*')) origins.push('*://*.vk.com/*')
+        }
+        if (project.MonitoringMinecraft) {
+            if (!permissions.includes('cookies')) permissions.push('cookies')
+        }
+    }
+    
+    let granted = await new Promise(resolve=>{
+        chrome.permissions.contains({origins, permissions}, resolve)
+    })
+    if (!granted) {
+        if (element != null || !chrome.app) {//Костыль для FireFox, что бы запросить права нужно что бы пользователь обязатльно кликнул
+            const button = document.createElement('button')
+            button.textContent = chrome.i18n.getMessage('grant')
+            button.classList.add('submitBtn')
+            createNotif([chrome.i18n.getMessage('grantUrl'), button], null, null, element)
+            granted = await new Promise(resolve=>{
+                button.addEventListener('click', async ()=>{
+                    granted = await new Promise(resolve=>{
+                        chrome.permissions.request({origins, permissions}, resolve)
+                    })
+                    if (element == null) removeNotif(button.parentElement.parentElement)
+                    if (!granted) {
+                        createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
+                        resolve(false)
+                    } else {
+                        if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', null, element)
+                        resolve(true)
+                    }
+                })
+            })
+            return granted
+        } else {
+            granted = await new Promise(resolve=>{
+                chrome.permissions.request({origins, permissions}, resolve)
+            })
+            if (!granted) {
+                createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
+                return false
+            }
+        }
+    }
+    if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', null, element)
+    return true
+}
+
 async function setCoolDown() {
     if (settings.cooldown && settings.cooldown == document.getElementById('cooldown').valueAsNumber)
         return
@@ -1188,6 +1202,11 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         if (evt.target.files.length == 0) return
         const file = evt.target.files[0]
         const data = await new Response(file).json()
+        let projects = []
+        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
+            projects = projects.concat(data['projects' + item])
+        }
+        if (!await checkPermissions(projects)) return
         for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
             window['projects' + item] = data['projects' + item]
         }
@@ -1315,8 +1334,8 @@ function getUrlProjects() {
 
 //Достаёт все указанные аргументы из URL
 function getUrlVars() {
-    let vars = {}
-    let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+    const vars = {}
+    const parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         vars[key] = value
     })
     return vars
@@ -1326,21 +1345,21 @@ function getUrlVars() {
 async function fastAdd() {
     if (window.location.href.includes('addFastProject')) {
         toggleModal('addFastProject')
-        let vars = getUrlVars()
+        const vars = getUrlVars()
         if (vars['name'] != null) document.querySelector('[data-resource="fastAdd"]').textContent = getUrlVars()['name']
             
-        let listFastAdd = document.querySelector('#addFastProject > div.content > .message')
+        const listFastAdd = document.querySelector('#addFastProject > div.content > .message')
         listFastAdd.textContent = ''
 
         if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] == 'true') {
             settings.disabledNotifInfo = true
             await setValue('AVMRsettings', settings)
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
-            let html = document.createElement('div')
+            const html = document.createElement('div')
             html.classList.add('fastAddEl')
             html.append(svgSuccess.cloneNode(true))
-            let div = document.createElement('div')
-            let p = document.createElement('p')
+            const div = document.createElement('div')
+            const p = document.createElement('p')
             p.textContent = chrome.i18n.getMessage('disableNotifInfo')
             div.append(p)
 
@@ -1351,11 +1370,11 @@ async function fastAdd() {
             settings.disabledNotifWarn = true
             await setValue('AVMRsettings', settings)
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
-            let html = document.createElement('div')
+            const html = document.createElement('div')
             html.classList.add('fastAddEl')
             html.append(svgSuccess.cloneNode(true))
-            let div = document.createElement('div')
-            let p = document.createElement('p')
+            const div = document.createElement('div')
+            const p = document.createElement('p')
             p.textContent = chrome.i18n.getMessage('disableNotifWarn')
             div.append(p)
 
@@ -1366,26 +1385,49 @@ async function fastAdd() {
             settings.disabledNotifStart = true
             await setValue('AVMRsettings', settings)
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
-            let html = document.createElement('div')
+            const html = document.createElement('div')
             html.classList.add('fastAddEl')
             html.append(svgSuccess.cloneNode(true))
-            let div = document.createElement('div')
-            let p = document.createElement('p')
+            const div = document.createElement('div')
+            const p = document.createElement('p')
             p.textContent = chrome.i18n.getMessage('disableNotifStart')
             div.append(p)
-
             html.append(div)
             listFastAdd.append(html)
         }
+        
+        const projects = getUrlProjects()
+        const html2 = document.createElement('div')
+        html2.classList.add('fastAddEl')
+        html2.append(svgFail.cloneNode(true))
+        const div2 = document.createElement('div')
+        const p2 = document.createElement('p')
+        p2.textContent = chrome.i18n.getMessage('permissions')
+        const status2 = document.createElement('span')
+        p2.append(document.createElement('br'))
+        p2.append(status2)
+        div2.append(p2)
+        html2.append(div2)
+        listFastAdd.append(html2)
+        if (!await checkPermissions(projects, status2)) {
+            const buttonRetry = document.createElement('button')
+            buttonRetry.classList.add('btn')
+            buttonRetry.textContent = chrome.i18n.getMessage('retry')
+            document.querySelector('#addFastProject > div.content > .events').append(buttonRetry)
+            buttonRetry.addEventListener('click', ()=> {
+                document.location.reload(true)
+            })
+            return
+        }
 
-        for (const project of getUrlProjects()) {
-            let html = document.createElement('div')
+        for (const project of projects) {
+            const html = document.createElement('div')
             html.classList.add('fastAddEl')
             html.setAttribute('div', getProjectName(project)+'–'+project.nick+'–'+project.id)
             html.appendChild(svgFail.cloneNode(true))
 
-            let div = document.createElement('div')
-            let p = document.createElement('p')
+            const div = document.createElement('div')
+            const p = document.createElement('p')
             p.textContent = getProjectName(project)+' – '+project.nick+' – '+project.id
             const status = document.createElement('span')
             p.append(document.createElement('br'))
@@ -1398,7 +1440,7 @@ async function fastAdd() {
         }
 
         if (document.querySelector('#addFastProject img[src="images/icons/error.svg"]') != null) {
-            let buttonRetry = document.createElement('button')
+            const buttonRetry = document.createElement('button')
             buttonRetry.classList.add('btn')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
             document.querySelector('#addFastProject > div.content > .events').append(buttonRetry)
@@ -1406,7 +1448,7 @@ async function fastAdd() {
                 document.location.reload(true)
             })
         } else if (document.querySelector('#addFastProject > div.content > div.message').childElementCount > 0) {
-            let successFastAdd = document.createElement('div')
+            const successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
             successFastAdd.append(chrome.i18n.getMessage('successFastAdd'))
             successFastAdd.append(document.createElement('br'))
@@ -1416,7 +1458,7 @@ async function fastAdd() {
             return
         }
 
-        let buttonClose = document.createElement('button')
+        const buttonClose = document.createElement('button')
         buttonClose.classList.add('btn', 'redBtn')
         buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
         document.querySelector('#addFastProject > div.content > .events').append(buttonClose)
@@ -1974,14 +2016,13 @@ async function createNotif(message, type, delay, element) {
             notif.querySelector('.progress div').style.animationPlayState = 'running'
         }
     })
-
-    function removeNotif(elem) {
-        if (!elem) return
-        elem.classList.remove('show')
-        elem.classList.add('hide')
-        setTimeout(()=> elem.classList.add('hidden'), 500)
-        setTimeout(()=> elem.remove(), 1000)
-    }
+}
+function removeNotif(elem) {
+    if (!elem) return
+    elem.classList.remove('show')
+    elem.classList.add('hide')
+    setTimeout(()=> elem.classList.add('hidden'), 500)
+    setTimeout(()=> elem.remove(), 1000)
 }
 
 let Timer = function(callback, delay) {
