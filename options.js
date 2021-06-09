@@ -363,7 +363,7 @@ async function checkUpdateAvailbe(forced) {
 //Автоматизированное обновление расширения с git
 async function update(version) {
     if (window.opr) {//Если мы на Opera
-        
+        chrome.tabs.create({url: 'https://noamidash.ml/auto_vote_rating-' + version + '-opera.crx'})
         return
     }
     if (!chrome.app) {//Если мы на FireFox
