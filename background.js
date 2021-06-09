@@ -1856,8 +1856,8 @@ async function endVote(request, sender, project) {
     }
     await setValue('generalStats', generalStats)
     await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
-
-    setTimeout(async ()=>{
+    
+    function removeQueue() {
         for (const value of queueProjects) {
             if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
                 queueProjects.delete(value)
@@ -1869,7 +1869,14 @@ async function endVote(request, sender, project) {
             currentProxy = null
             currentVK = null
         }
-    }, settings.useMultiVote && settings.cooldown < 10000 /*&& (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))*/ ? 0 : 10000)
+    }
+    if (settings.useMultiVote && settings.cooldown < 10000 /*&& (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))*/) {
+        removeQueue()
+    } else {
+        setTimeout(()=>{
+            removeQueue()
+        }, 10000)
+    }
 }
 
 //Отправитель уведомлений
