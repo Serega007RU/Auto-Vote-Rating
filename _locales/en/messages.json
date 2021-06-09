@@ -1269,12 +1269,21 @@
     "message": "Cloud"
   },
   "notGrantUrl": {
-    "message": "You did not grant the extension access to this rating, adding it is not possible"
+    "message": "You did not grant the extension access to rating(s), adding it is not possible"
   },
   "grantUrl": {
-    "message": "Grant the extension access to this rating"
+    "message": "Grant the extension access to rating(s)"
   },
   "grant": {
     "message": "Grant"
+  },
+  "permissions": {
+    "message": "Permissions"
+  },
+  "granted": {
+    "message": "Granted"
+  },
+  "notgranted": {
+    "message": "Not granted"
   }
 }
