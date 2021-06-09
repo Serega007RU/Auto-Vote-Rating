@@ -3609,7 +3609,7 @@ function addCustom() {
     }
 }
 
-async function openPopup(url, onClose) {
+async function openPopup(url, onClose, code) {
     const width = 700
     const height = 500
     const left = parseInt(Math.max(0, (screen.width - width) / 2) + (screen.availLeft | 0))
