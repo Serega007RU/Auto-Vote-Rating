@@ -189,9 +189,9 @@ var allProjects = {
             }
         case 'pageURL':
             if (project.lang == 'ru') {
-                url = 'https://' + project.game + '.mmotop.ru/servers/' + project.id
+                return 'https://' + project.game + '.mmotop.ru/servers/' + project.id
             } else {
-                url = 'https://' + project.game + '.mmotop.ru/' + project.lang + '/' + 'servers/' + project.id
+                return 'https://' + project.game + '.mmotop.ru/' + project.lang + '/' + 'servers/' + project.id
             }
         case 'jsPath': return '#site-link'
         case 'exampleURL': return ['https://pw.mmotop.ru/servers/', '25895', '/votes/new']
