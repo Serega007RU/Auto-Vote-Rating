@@ -1160,7 +1160,11 @@ chrome.webRequest.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
     if (details.frameId == 0 && details.type == 'main_frame') {
-        console.log(details)
+        if (details.statusCode < 200 || details.statusCode > 299) {
+            const sender = {tab: {id: details.tabId}}
+            endVote({errorVote: String(details.statusCode)}, sender, project)
+            return
+        }
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'}, function() {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
@@ -1173,7 +1177,6 @@ chrome.webRequest.onCompleted.addListener(function(details) {
         })
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'})
     } else if (details.frameId != 0 && details.type == 'sub_frame' && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/))) {
-        console.log(details)
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
@@ -1204,11 +1207,7 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
                 console.warn(getProjectPrefix(project, true) + details.error)
                 return
             }
-            let sender = {
-                tab: {
-                    id: details.tabId
-                }
-            }
+            const sender = {tab: {id: details.tabId}}
             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
         }
     }
