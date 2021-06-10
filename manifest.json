@@ -27,7 +27,6 @@
 		"storage",
 		"notifications",
 		"background",
-		"webNavigation",
 		"webRequest",
 		"https://api.cifrazia.com/",
 		"https://*.hcaptcha.com/captcha/*",

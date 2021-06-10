@@ -420,7 +420,7 @@ async function initializeConfig() {
     if (settings && !settings.disabledCheckTime) checkTime()
     
     //Да да, целую минуту ждём перед запуском расширения, больше никак не понять когда закончилась синхронизация браузера
-    if (storageArea == 'sync') await wait(60000)
+//     if (storageArea == 'sync') await wait(60000)
 
     //Проверка на голосование
     setInterval(async()=>{
@@ -1156,10 +1156,11 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
 }
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
-chrome.webNavigation.onCompleted.addListener(function(details) {
+chrome.webRequest.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
-    if (details.frameId == 0) {
+    if (details.frameId == 0 && details.type == 'main_frame') {
+        console.log(details)
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'}, function() {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
@@ -1171,7 +1172,8 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             }
         })
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'})
-    } else if (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/)) {
+    } else if (details.frameId != 0 && details.type == 'sub_frame' && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/))) {
+        console.log(details)
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
@@ -1183,7 +1185,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
             }
         })
     }
-})
+}, {urls: ['<all_urls>']})
 
 chrome.webRequest.onErrorOccurred.addListener(function(details) {
     if (details.initiator == 'chrome-extension://' + chrome.runtime.id) {
