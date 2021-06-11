@@ -27,7 +27,6 @@
 		"storage",
 		"notifications",
 		"background",
-		"webNavigation",
 		"webRequest",
 		"webRequestBlocking",
 		"proxy",

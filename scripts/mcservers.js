@@ -1,10 +1,10 @@
 //Совместимость с Rocket Loader
-document.addEventListener('DOMContentLoaded', (event)=>{
-    vote()
-})
+// document.addEventListener('DOMContentLoaded', (event)=>{
+//     vote()
+// })
 
 async function vote(first) {
-    if (first == true || first == false) return
+//  if (first == true || first == false) return
     try {
         if (document.querySelector('div.main-panel > p') != null) {
             if (document.querySelector('div.main-panel > p').textContent.includes('already voted')) {

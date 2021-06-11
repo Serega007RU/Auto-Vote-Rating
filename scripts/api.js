@@ -79,6 +79,8 @@ try {
             window.onmessage = function(e) {
                 if (e.data == 'vote') {
                     vote(false)
+                } else if (e.data == 'voteReady') {
+                    vote()
                 }
             }
             vote(true)
