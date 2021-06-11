@@ -2732,16 +2732,17 @@ async function addProject(project, element) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
             if (nick == null || nick == '') continue
             let _continue = false
-            project.nick = nick
+            const project2 = Object.assign({}, project)
+            project2.nick = nick
             await forLoopAllProjects(function(proj) {
-                if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick) {
+                if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project2.id) && proj.nick == project2.nick) {
             	    _continue = true
             	    return
                 }
             })
             if (_continue) continue
             countNicks++
-            getProjectList(project).push(project)
+            getProjectList(project2).push(project2)
         }
         await setValue('AVMRprojects' + getProjectName(project), window['projects' + getProjectName(project)])
         updateProjectList()
