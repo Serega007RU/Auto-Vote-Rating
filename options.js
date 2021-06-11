@@ -1204,7 +1204,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         const data = await new Response(file).json()
         let projects = []
         for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-            projects = projects.concat(data['projects' + item])
+            if (data['projects' + item] != null) projects = projects.concat(data['projects' + item])
         }
         if (!await checkPermissions(projects)) return
         for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
