@@ -32,7 +32,7 @@
 		"webNavigation",
 		"proxy",
 		"cookies",
-		"<all_urls>""
+		"<all_urls>"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
 	"version": "5.1.0.4",
