@@ -420,7 +420,7 @@ async function initializeConfig() {
     if (settings && !settings.disabledCheckTime) checkTime()
     
     //Да да, целую минуту ждём перед запуском расширения, больше никак не понять когда закончилась синхронизация браузера
-//  if (storageArea == 'sync') await wait(60000)
+    if (storageArea == 'sync') await wait(60000)
 
     //Проверка на голосование
     setInterval(async()=>{
