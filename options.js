@@ -460,6 +460,8 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
     project.id = document.getElementById('id').value
     if (project.rating != 'TopGG' && project.rating != 'DiscordBotList' && project.rating != 'BotsForDiscord' && document.getElementById('nick').value != '') {
         project.nick = document.getElementById('nick').value
+    } else {
+        project.nick = ''
     }
     project.stats = {
         successVotes: 0,
@@ -1160,6 +1162,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
                         project.body = project.id
                         delete project.id
                     }
+                    if (project.nick == null) project.nick = ''
                     if (project.stats.successVotes == null) project.stats.successVotes = 0
                     if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
                     if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0

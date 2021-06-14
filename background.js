@@ -1316,7 +1316,7 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
         project.error = message
         delete project.nextAttempt
         openedProjects.delete(sender.tab.id)
-        openedProjects.set(sender.tab.id, request.project)
+        openedProjects.set(sender.tab.id, project)
         await updateProject(project)
     } else if (request.changeProject) {
         openedProjects.delete(sender.tab.id)
