@@ -797,10 +797,13 @@
     "message": "Extension suspended"
   },
   "errordb": {
-    "message": "Error with the database $db$",
+    "message": "Error with the database $db$ $error$",
     "placeholders": {
       "db": {
         "content": "$1"
+      },
+      "error": {
+        "content": "$2"
       }
     }
   },
@@ -851,5 +854,8 @@
   },
   "notgranted": {
     "message": "Not granted"
+  },
+  "oldSettings": {
+    "message": "Old type settings were found (chrome.storage), I convert them to the new type (IndexedDB)"
   }
 }

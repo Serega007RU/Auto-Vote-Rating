@@ -1,3 +1,10 @@
+var proj
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.sendProject) {
+        proj = request.project
+    }
+})
+
 try {
     //Если мы находимся на странице авторизации Steam
     if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
@@ -90,49 +97,16 @@ try {
     throwError(e)
 }
 
-async function getProject(name, game) {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
+async function getProject() {
+    if (proj == null) {
+        return await new Promise(resolve => {
+            setInterval(()=>{
+                if (proj != null) resolve(proj)
+            }, 1000)
         })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojects' + name, data=>{
-            resolve(data['AVMRprojects' + name])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id) && (game == null || document.URL.includes(project.game))) {
-            return project
-        }
+    } else {
+        return proj
     }
-
-    throw Error('errorVoteNoNick2')
-}
-
-async function setProject(project) {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    let name = Object.keys(project)[0]
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojects' + name, data=>{
-            resolve(data['AVMRprojects' + name])
-        })
-    })
-    for (let i in projects) {
-        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id)) {
-            projects[i] = project
-            break
-        }
-    }
-    await new Promise(resolve=>{
-        chrome.storage[storageArea].set({['AVMRprojects' + name]: projects}, data=>{
-            resolve(data)
-        })
-    })
 }
 
 function throwError(error) {

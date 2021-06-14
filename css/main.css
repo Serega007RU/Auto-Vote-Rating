@@ -574,7 +574,7 @@ nav .logo img {
 	margin: auto 0;
 }
 
-[data-resource="notAdded"] {
+[data-resource="notAdded"], [data-resource="load"] {
 	font-size: 14px;
 	display: block;
 	text-align: center;

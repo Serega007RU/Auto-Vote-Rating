@@ -760,10 +760,13 @@
     "message": "Расширение приостановлено"
   },
   "errordb": {
-    "message": "Ошибка с базой данных $db$",
+    "message": "Ошибка с базой данных $db$, $error$",
     "placeholders": {
       "db": {
         "content": "$1"
+      },
+      "error": {
+        "content": "$2"
       }
     }
   },
@@ -814,5 +817,8 @@
   },
   "notgranted": {
     "message": "Не предоставлены"
+  },
+  "oldSettings": {
+    "message": "Обнаружены настройки старого типа (chrome.storage), конвертирую их в новый тип (IndexedDB)"
   }
 }
