@@ -226,6 +226,7 @@ function generateBtnListRating(rating, count) {
                 const cursor = event.target.result
                 if (cursor) {
                     projectsStore.delete(cursor.primaryKey)
+                    chrome.alarms.clear(String(cursor.primaryKey))
                     cursor.continue()
                 } else {
                     document.getElementById(rating + 'Tab').remove()
