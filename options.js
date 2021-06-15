@@ -92,6 +92,8 @@ async function addProjectList(project, projectID) {
 
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent)
         document.querySelector('#' + project.rating + 'Button > span').textContent = count + 1
+
+        chrome.extension.getBackgroundPage().checkOpen(project)
     }
     
     const listProject = document.getElementById(project.rating + 'List')
@@ -284,6 +286,7 @@ async function removeProjectList(project, projectID) {
             chrome.tabs.remove(key)
         }
     }
+    chrome.alarms.clear(String(projectID))
 }
 
 //Перезагрузка списка проектов
@@ -611,19 +614,6 @@ async function addProject(project, element) {
                 createNotif(chrome.i18n.getMessage('oneProject', project.rating), 'error', null, element)
                 return
             }
-        }
-    } else if (project.rating == 'Custom') {
-        projects = db.transaction('projects').objectStore('projects').index('rating, nick')
-        found = await new Promise((resolve, reject) => {
-            const request = projects.count([project.rating, project.nick])
-            request.onsuccess = function (event) {
-                resolve(event.target.result)
-            }
-            request.onerror = reject
-        })
-        if (found > 0) {
-            createNotif(chrome.i18n.getMessage('alreadyAdded'), 'success', null, element)
-            return
         }
     }
 
@@ -1199,6 +1189,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         chrome.extension.getBackgroundPage().settings = data.settings
         generalStats = data.generalStats
         chrome.extension.getBackgroundPage().generalStats = data.generalStats
+        chrome.extension.getBackgroundPage().reloadAllAlarms()
         await restoreOptions()
 
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')

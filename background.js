@@ -404,7 +404,6 @@ async function initializeConfig() {
         const ratings = openRequest.result.createObjectStore('projects', {autoIncrement: true})
         ratings.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
         ratings.createIndex('rating, id', ['rating', 'id'])
-        ratings.createIndex('rating, nick', ['rating', 'nick'])
         ratings.createIndex('rating', 'rating')
         openRequest.result.createObjectStore('other')
         const other = openRequest.transaction.objectStore('other')
@@ -473,9 +472,9 @@ async function initializeConfig() {
 //  if (storageArea == 'sync') await wait(60000)
 
     //Проверка на голосование
-    setInterval(async()=>{
-        await checkVote()
-    }, cooldown)
+//  setInterval(async()=>{
+//      await checkVote()
+//  }, cooldown)
 }
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
@@ -497,6 +496,17 @@ async function checkVote() {
         return
     }
     
+    //Старый метод
+//  const projects = await new Promise(resolve=> db.transaction('projects').objectStore('projects').getAll().onsuccess = event => resolve(event.target.result))
+    
+//  for (const project of projects) {
+//      if (project.time == null || project.time < Date.now()) {
+//          await checkOpen(project)
+//      }
+//  }
+    
+//  check = true
+
     const request = db.transaction('projects').objectStore('projects').openCursor()
     request.onsuccess = function(event) {
         const cursor = event.target.result
@@ -521,6 +531,23 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
     }
 })
 
+async function reloadAllAlarms() {
+    await new Promise(resolve => chrome.alarms.clearAll(resolve))
+    const request = db.transaction('projects').objectStore('projects').openCursor()
+    const times = []
+    request.onsuccess = function(event) {
+        const cursor = event.target.result
+        if (cursor) {
+            const project = cursor.value
+            if (project.time != null && project.time > Date.now() && times.indexOf(project.time) == -1) {
+                chrome.alarms.create(String(cursor.primaryKey), {when: project.time})
+                times.push(project.time)
+            }
+            cursor.continue()
+        }
+    }
+}
+
 window.addEventListener('online', ()=> {
     online = true
     checkVote()
@@ -529,7 +556,7 @@ window.addEventListener('offline', ()=> {
     online = false
 })
 
-async function checkOpen(project, projectID) {
+async function checkOpen(project) {
     //Если нет подключения к интернету
     if (!settings.disabledCheckInternet) {
         if (!navigator.onLine && online) {
@@ -607,11 +634,11 @@ async function checkOpen(project, projectID) {
         }
     }
 
-    await newWindow(project, projectID)
+    await newWindow(project)
 }
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
-async function newWindow(project, projectID) {
+async function newWindow(project) {
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
         project.stats.monthSuccessVotes = 0
@@ -637,7 +664,7 @@ async function newWindow(project, projectID) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
-        silentVote(project, projectID)
+        silentVote(project)
     } else {
         let window = await new Promise(resolve=>{
             chrome.windows.getCurrent(function(win) {
@@ -663,11 +690,11 @@ async function newWindow(project, projectID) {
                 resolve(tab_)
             })
         })
-        openedProjects.set(tab.id, {project, projectID})
+        openedProjects.set(tab.id, project)
     }
 }
 
-async function silentVote(project, projectID) {
+async function silentVote(project) {
     try {
         if (project.rating == 'TopCraft') {
             let response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
@@ -1530,8 +1557,26 @@ async function endVote(request, sender, project) {
     }
     
     await updateGeneralStats()
-//  if (project.time != null) chrome.alarms.create(String(projectID), {when: project.time})
-    await updateProject(project)
+    const projectID = await updateProject(project)
+    
+    if (project.time != null && project.time > Date.now()) {
+        let create = true
+        await new Promise(resolve => {
+            chrome.alarms.getAll(function(alarms) {
+                for (const alarm of alarms) {
+                    if (alarm.scheduledTime == project.time) {
+                        create = false
+                        resolve()
+                        break
+                    }
+                }
+                resolve()
+            })
+        })
+        if (create) {
+            chrome.alarms.create(String(projectID), {when: project.time})
+        }
+    }
 
     function removeQueue() {
         for (const value of queueProjects) {
@@ -1658,12 +1703,7 @@ async function updateGeneralStats() {
 }
 
 async function updateProject(project) {
-    const projectID = await new Promise((resolve, reject) => {
-        const index = db.transaction('projects').objectStore('projects').index('rating, id, nick')
-        const request = index.getKey([project.rating, project.id, project.nick])
-        request.onsuccess = event => resolve(event.target.result)
-        request.onerror = reject
-    })
+    const projectID = await getProjectID(project)
     if (projectID != null) {
         await new Promise((resolve, reject) => {
             const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, projectID)
@@ -1671,11 +1711,19 @@ async function updateProject(project) {
             request.onerror = reject
         })
         chrome.runtime.sendMessage({updateProject: true, project, projectID})
-        return true
     } else {
         console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
-        return false
     }
+    return projectID
+}
+
+async function getProjectID(project) {
+    return await new Promise((resolve, reject) => {
+        const index = db.transaction('projects').objectStore('projects').index('rating, id, nick')
+        const request = index.getKey([project.rating, project.id, project.nick])
+        request.onsuccess = event => resolve(event.target.result)
+        request.onerror = reject
+    })
 }
 
 function extractHostname(url) {
@@ -1808,6 +1856,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         await removeValue('AVMRsettings')
         await removeValue('generalStats')
         await removeValue('storageArea', 'local')
+        await reloadAllAlarms()
         console.log(chrome.i18n.getMessage('importingEnd'))
     }
 })
