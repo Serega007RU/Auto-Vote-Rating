@@ -458,7 +458,10 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
     }
     project.rating = name
     project.id = document.getElementById('id').value
-    if (project.rating != 'TopGG' && project.rating != 'DiscordBotList' && project.rating != 'BotsForDiscord' && document.getElementById('nick').value != '') {
+    if (project.rating == 'Custom') {
+        project.id = document.getElementById('nick').value
+        project.nick = ''
+    } else if (project.rating != 'TopGG' && project.rating != 'DiscordBotList' && project.rating != 'BotsForDiscord' && document.getElementById('nick').value != '') {
         project.nick = document.getElementById('nick').value
     } else {
         project.nick = ''
@@ -1161,6 +1164,8 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
                     if (item == 'Custom') {
                         project.body = project.id
                         delete project.id
+                        project.id = project.nick
+                        project.nick = ''
                     }
                     if (project.nick == null) project.nick = ''
                     if (project.stats.successVotes == null) project.stats.successVotes = 0

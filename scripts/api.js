@@ -102,7 +102,7 @@ async function getProject() {
         return await new Promise(resolve => {
             setInterval(()=>{
                 if (proj != null) resolve(proj)
-            }, 1000)
+            }, 100)
         })
     } else {
         return proj

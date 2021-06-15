@@ -385,7 +385,7 @@ var check = true
 var closeTabs = true
 
 //Где храним настройки
-let storageArea = 'local'
+// let storageArea = 'local'
 
 if (chrome.runtime.onSuspend) {
     chrome.runtime.onSuspend.addListener(function(){
@@ -497,18 +497,39 @@ async function checkVote() {
         return
     }
     
-    const projects = await new Promise(resolve=> db.transaction('projects').objectStore('projects').getAll().onsuccess = event => resolve(event.target.result))
-
-    for (const project of projects) {
-        if (project.time == null || project.time < Date.now()) {
-            await checkOpen(project)
+    const request = db.transaction('projects').objectStore('projects').openCursor()
+    request.onsuccess = function(event) {
+        const cursor = event.target.result
+        if (cursor) {
+            const project = cursor.value
+            if (project.time == null || project.time < Date.now()) {
+                checkOpen(project, cursor.primaryKey)
+            }
+            cursor.continue()
+        } else {
+            check = true
         }
     }
-
-    check = true
 }
 
-async function checkOpen(project) {
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    const projectID = Number(alarm.name)
+    db.transaction('projects').objectStore('projects').get(projectID).onsuccess = event => {
+        if (event.target.result) {
+            checkOpen(event.target.result, projectID)
+        }
+    }
+})
+
+window.addEventListener('online', ()=> {
+    online = true
+    checkVote()
+})
+window.addEventListener('offline', ()=> {
+    online = false
+})
+
+async function checkOpen(project, projectID) {
     //Если нет подключения к интернету
     if (!settings.disabledCheckInternet) {
         if (!navigator.onLine && online) {
@@ -546,8 +567,8 @@ async function checkOpen(project) {
     queueProjects.add(project)
 
     //Если эта вкладка была уже открыта, он закрывает её
-    for (let[key,value] of openedProjects.entries()) {
-        if (value.nick == project.nick && value.id == project.id && project.rating == value.rating) {
+    for (const[key,value] of openedProjects.entries()) {
+        if (project.nick == value.nick && project.id == value.id && project.rating == value.rating) {
             openedProjects.delete(key)
             if (closeTabs) {
                 chrome.tabs.remove(key, function() {
@@ -586,11 +607,11 @@ async function checkOpen(project) {
         }
     }
 
-    await newWindow(project)
+    await newWindow(project, projectID)
 }
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
-async function newWindow(project) {
+async function newWindow(project, projectID) {
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
         project.stats.monthSuccessVotes = 0
@@ -616,7 +637,7 @@ async function newWindow(project) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
-        silentVote(project)
+        silentVote(project, projectID)
     } else {
         let window = await new Promise(resolve=>{
             chrome.windows.getCurrent(function(win) {
@@ -642,11 +663,11 @@ async function newWindow(project) {
                 resolve(tab_)
             })
         })
-        openedProjects.set(tab.id, project)
+        openedProjects.set(tab.id, {project, projectID})
     }
 }
 
-async function silentVote(project) {
+async function silentVote(project, projectID) {
     try {
         if (project.rating == 'TopCraft') {
             let response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
@@ -1344,27 +1365,12 @@ async function endVote(request, sender, project) {
         openedProjects.delete(sender.tab.id)
     } else if (!project) return
 
-    for (let[key,value] of fetchProjects.entries()) {
+    for (const[key,value] of fetchProjects.entries()) {
         if (value.nick == project.nick && value.id == project.id && project.rating == value.rating) {
             fetchProjects.delete(key)
         }
     }
 
-    if (settings.cooldown < 10000) {
-        setTimeout(()=>{
-            for (let value of queueProjects) {
-                if (value.nick == project.nick && value.id == project.id && project.rating == value.rating) {
-                    queueProjects.delete(value)
-                }
-            }
-        }, 10000)
-    } else {
-        for (let value of queueProjects) {
-            if (value.nick == project.nick && value.id == project.id && project.rating == value.rating) {
-                queueProjects.delete(value)
-            }
-        }
-    }
     delete project.nextAttempt
 
     //Если усё успешно
@@ -1524,7 +1530,24 @@ async function endVote(request, sender, project) {
     }
     
     await updateGeneralStats()
+//  if (project.time != null) chrome.alarms.create(String(projectID), {when: project.time})
     await updateProject(project)
+
+    function removeQueue() {
+        for (const value of queueProjects) {
+            if (project.nick == value.nick && project.id == value.id && project.rating == value.rating) {
+                queueProjects.delete(value)
+            }
+        }
+        checkVote()
+    }
+    if (settings.cooldown >= 10000) {
+        removeQueue()
+    } else {
+        setTimeout(()=>{
+            removeQueue()
+        }, 10000)
+    }
 }
 
 //Отправитель уведомлений
@@ -1676,6 +1699,116 @@ function extractHostname(url) {
 chrome.runtime.onInstalled.addListener(async function(details) {
     if (details.reason == 'install') {
         window.open('options.html?installed')
+    } else if (details.reason == 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) == -1) {
+        let storageArea = 'local'
+        //Асинхронно достаёт/сохраняет настройки в chrome.storage
+        async function getValue(name, area) {
+            if (!area) {
+                area = storageArea
+            }
+            return new Promise((resolve, reject)=>{
+                chrome.storage[area].get(name, function(data) {
+                    if (chrome.runtime.lastError) {
+                        sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
+                        console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
+                        reject(chrome.runtime.lastError)
+                    } else {
+                        resolve(data[name])
+                    }
+                })
+            })
+        }
+        async function setValue(key, value, area) {
+            if (!area) {
+                area = storageArea
+            }
+            return new Promise((resolve, reject)=>{
+                chrome.storage[area].set({[key]: value}, function(data) {
+                    if (chrome.runtime.lastError) {
+                        sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
+                        console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
+                        reject(chrome.runtime.lastError)
+                    } else {
+                        resolve(data)
+                    }
+                })
+            })
+        }
+        async function removeValue(name, area) {
+            if (!area) {
+                area = storageArea
+            }
+            return new Promise((resolve, reject)=>{
+                chrome.storage[area].remove(name, function(data) {
+                    if (chrome.runtime.lastError) {
+                        sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
+                        console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
+                        reject(chrome.runtime.lastError.message)
+                    } else {
+                        resolve(data)
+                    }
+                })
+            })
+        }
+        storageArea = await getValue('storageArea', 'local')
+        if (storageArea == null || storageArea == '') {
+            if (await getValue('AVMRsettings', 'sync') != null) {
+                storageArea = 'sync'
+            } else {
+                storageArea = 'local'
+            }
+        }
+        const oldSettings = await getValue('AVMRsettings')
+        if (oldSettings == null) return
+        const oldGeneralStats = await getValue('generalStats')
+        
+        console.log(chrome.i18n.getMessage('oldSettings'))
+        const projects = []
+        for (const item of Object.keys(allProjects)) {
+            const list = await getValue('AVMRprojects' + item)
+            if (list) {
+                for (const project of list) {
+                    delete project[item]
+                    project.rating = item
+                    if (item == 'Custom') {
+                        project.body = project.id
+                        delete project.id
+                        project.id = project.nick
+                        project.nick = ''
+                    }
+                    if (project.nick == null) project.nick = ''
+                    if (project.stats.successVotes == null) project.stats.successVotes = 0
+                    if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
+                    if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
+                    if (project.stats.errorVotes == null) project.stats.errorVotes = 0
+                    if (project.stats.laterVotes == null) project.stats.laterVotes = 0
+                    projects.push(project)
+                }
+            }
+        }
+        if (!db) {
+            await new Promise(resolve => {//Да это странно выглядит
+                setInterval(() => {
+                    if (db) {
+                        resolve()
+                    }
+                }, 1000)
+            })
+        }
+        const projectsts = db.transaction(['projects', 'other'], 'readwrite')
+        projectsts.objectStore('projects').clear()
+        for (const project of projects) {
+            projectsts.objectStore('projects').add(project)
+        }
+        projectsts.objectStore('other').put(oldSettings, 'settings')
+        projectsts.objectStore('other').put(oldGeneralStats, 'generalStats')
+        for (const item of Object.keys(allProjects)) {
+            await removeValue('AVMRprojects' + item)
+        }
+        await removeValue('AVMRsettings')
+        await removeValue('generalStats')
+        await removeValue('storageArea', 'local')
+        console.log(chrome.i18n.getMessage('importingEnd'))
     }
 })
 
