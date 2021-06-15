@@ -132,7 +132,7 @@ async function addProjectList(project, projectID) {
     contDiv.classList.add('message')
     
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.rating == 'Custom' ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.rating == 'Custom' ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.rating == 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
+    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.rating == 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
     contDiv.append(nameProjectMes)
     
     if (project.error) {
@@ -164,7 +164,7 @@ async function addProjectList(project, projectID) {
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', function() {
         toggleModal('stats')
-        document.getElementById('statsSubtitle').textContent = project.rating + ' – ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.rating == 'Custom' ? '' : ' – ' + (project.name != null ? project.name : project.id))
+        document.getElementById('statsSubtitle').textContent = project.rating + (project.nick != null && project.nick != '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
         document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
         document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes
         document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.lastMonthSuccessVotes
@@ -198,7 +198,7 @@ function generateBtnListRating(rating, count) {
 //  div.setAttribute('data-resource', 'notAdded')
 //  div.textContent = chrome.i18n.getMessage('notAdded')
 //  ul.append(div)
-    if (!(rating == 'TopCraft' || rating == 'McTOP' || rating == 'MCRate' || rating == 'MinecraftRating' || rating == 'MonitoringMinecraft' || rating == 'ServerPact' || rating == 'MinecraftIpList' || rating == 'MCServerList')) {
+    if (!(rating == 'TopCraft' || rating == 'McTOP' || rating == 'MCRate' || rating == 'MinecraftRating' || rating == 'MonitoringMinecraft' || rating == 'ServerPact' || rating == 'MinecraftIpList' || rating == 'MCServerList' || rating == 'Custom')) {
         const label = document.createElement('label')
         label.setAttribute('data-resource', 'notAvaibledInSilent')
         label.textContent = chrome.i18n.getMessage('notAvaibledInSilent')
