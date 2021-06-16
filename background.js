@@ -475,6 +475,7 @@ async function initializeConfig() {
 //  setInterval(async()=>{
 //      await checkVote()
 //  }, cooldown)
+    checkVote()
 }
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
@@ -651,8 +652,25 @@ async function newWindow(project) {
     }
     generalStats.lastAttemptVote = Date.now()
     await updateGeneralStats()
-    await updateProject(project)
-
+    const projectID = await updateProject(project)
+    
+    let create = true
+    await new Promise(resolve => {
+        chrome.alarms.getAll(function(alarms) {
+            for (const alarm of alarms) {
+                if (alarm.scheduledTime == project.time) {
+                    create = false
+                    resolve()
+                    break
+                }
+            }
+            resolve()
+        })
+    })
+    if (create) {
+        chrome.alarms.create(String(projectID), {when: project.nextAttempt})
+    }
+    
     let silentVoteMode = false
     if (project.rating == 'Custom') {
         silentVoteMode = true
