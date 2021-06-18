@@ -1,8 +1,3 @@
-let db
-const allProjects = chrome.extension.getBackgroundPage().allProjects
-
-let settings = chrome.extension.getBackgroundPage().settings
-let generalStats = chrome.extension.getBackgroundPage().generalStats
 //Нужно ли return если обнаружило ошибку при добавлении проекта
 let returnAdd
 //Где храним настройки
@@ -26,19 +21,7 @@ const svgSuccess = document.createElement('img')
 svgSuccess.src = 'images/icons/success.svg'
 
 document.addEventListener('DOMContentLoaded', async()=>{
-    const openRequest = indexedDB.open('avr', 1)
-    db = await new Promise((resolve, reject) => {
-        openRequest.onerror = function() {
-            createNotif(chrome.i18n.getMessage('errordb', ['avr', openRequest.error]), 'error')
-            reject(openRequest.error)
-        }
-        openRequest.onsuccess = function() {
-            resolve(openRequest.result)
-        }
-    })
-    db.onerror = function(event) {
-        createNotif(chrome.i18n.getMessage('errordb', ['avr', event.target.error]), 'error')
-    }
+    await initializeConfig()
 
     await restoreOptions()
     
@@ -948,6 +931,9 @@ async function checkPermissions(projects, element) {
         if (project.rating == 'TopCraft' || project.rating == 'McTOP' || project.rating == 'MCRate' || project.rating == 'MinecraftRating' || project.rating == 'MonitoringMinecraft' || project.rating == 'QTop') {
             if (!origins.includes('*://*.vk.com/*')) origins.push('*://*.vk.com/*')
         }
+        if (project.rating == 'TopGG' || project.rating == 'DiscordBotList' || project.rating == 'BotsForDiscord') {
+            if (!origins.includes('https://discord.com/oauth2/*')) origins.push('https://discord.com/oauth2/*')
+        }
         if (project.rating == 'MonitoringMinecraft') {
             if (!permissions.includes('cookies')) permissions.push('cookies')
         }
@@ -1187,9 +1173,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         })
         
         settings = data.settings
-        chrome.extension.getBackgroundPage().settings = data.settings
         generalStats = data.generalStats
-        chrome.extension.getBackgroundPage().generalStats = data.generalStats
         chrome.extension.getBackgroundPage().reloadAllAlarms()
         await restoreOptions()
 

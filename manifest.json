@@ -4,6 +4,7 @@
 	"author": "Serega007",
 	"background": {
 		"scripts": [
+		    "main.js",
 			"background.js",
 			"scripts/minecraftiplist.js"
 		],
@@ -27,8 +28,8 @@
 		"storage",
 		"notifications",
 		"background",
-		"webRequest",
 		"webNavigation",
+		"webRequest",
 		"alarms",
 		"https://api.cifrazia.com/",
 		"https://*.hcaptcha.com/captcha/*",
