@@ -557,8 +557,12 @@ async function checkOpen(project) {
                 }
             }
             if (currentVK.notWorking) {
-                if (project.TopCraft && !currentVK.passwordTopCraft) return
-                if (project.McTOP && !currentVK.passwordMcTOP) return
+                let _return = true
+                if (project.TopCraft && (currentVK.passwordTopCraft || project.AuthURLTopCraft)) _return = false
+                if (project.McTOP && (currentVK.passwordMcTOP || project.AuthURLMcTOP)) _return = false
+                if (project.MinecraftRating && currentVK['AuthURLMinecraftRating' + project.id] != null) _return = false
+                if (project.MonitoringMinecraft && currentVK['AuthURLMonitoringMinecraft' + project.id] != null) _return = false
+                if (_return) return
             }
         }
         if (currentProxy != null) {
