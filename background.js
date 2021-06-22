@@ -1663,7 +1663,7 @@ chrome.webNavigation.onCompleted.addListener(function(details) {
 chrome.webRequest.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
-    if (details.type == 'main_frame' && (details.statusCode < 200 || details.statusCode > 299)) {
+    if (details.type == 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode != 503 && details.statusCode != 403/*Игнорируем проверку CloudFlare*/) {
         const sender = {tab: {id: details.tabId}}
         endVote({errorVote: String(details.statusCode)}, sender, project)
     }
