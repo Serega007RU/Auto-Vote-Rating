@@ -1600,6 +1600,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('label8').style.display = 'none'
         document.getElementById('label9').style.display = 'none'
         document.getElementById('label10').style.display = 'none'
+        document.getElementById('idGame').style.display = 'none'
         document.getElementById('countVote').required = false
         document.getElementById('id').required = false
         document.getElementById('ordinalWorld').required = false
