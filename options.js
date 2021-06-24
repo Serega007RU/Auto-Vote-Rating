@@ -76,7 +76,7 @@ async function addProjectList(project, projectID) {
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent)
         document.querySelector('#' + project.rating + 'Button > span').textContent = count + 1
 
-        chrome.extension.getBackgroundPage().checkOpen(project)
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkOpen(project)
     }
     
     const listProject = document.getElementById(project.rating + 'List')
@@ -87,7 +87,7 @@ async function addProjectList(project, projectID) {
     let text = chrome.i18n.getMessage('soon')
     if (!(project.time == null || project.time == '') && Date.now() < project.time) {
         text = new Date(project.time).toLocaleString().replace(',', '')
-    } else {
+    } else if (chrome.extension.getBackgroundPage()) {
         const queueProjects = chrome.extension.getBackgroundPage().queueProjects
         for (const value of queueProjects) {
             if (value.rating == project.rating) {
@@ -146,17 +146,25 @@ async function addProjectList(project, projectID) {
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', function() {
-        toggleModal('stats')
-        document.getElementById('statsSubtitle').textContent = project.rating + (project.nick != null && project.nick != '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
-        document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
-        document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes
-        document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.lastMonthSuccessVotes
-        document.querySelector('td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = project.stats.errorVotes
-        document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = project.stats.laterVotes
-        document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = project.stats.lastSuccessVote ? new Date(project.stats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
-        document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = project.stats.lastAttemptVote ? new Date(project.stats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
-        document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = project.stats.added ? new Date(project.stats.added).toLocaleString().replace(',', '') : 'None'
+        updateModalStats(project, projectID)
     })
+    if (document.getElementById('stats').classList.contains('active') && document.getElementById('stats' + projectID) != null) {
+        updateModalStats(request.project, request.projectID)
+    }
+}
+
+function updateModalStats(project, projectID) {
+    toggleModal('stats')
+    document.querySelector('.statsSubtitle').textContent = project.rating + (project.nick != null && project.nick != '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
+    document.querySelector('.statsSubtitle').id = 'stats' + projectID
+    document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
+    document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes
+    document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.lastMonthSuccessVotes
+    document.querySelector('td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = project.stats.errorVotes
+    document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = project.stats.laterVotes
+    document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = project.stats.lastSuccessVote ? new Date(project.stats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
+    document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = project.stats.lastAttemptVote ? new Date(project.stats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
+    document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = project.stats.added ? new Date(project.stats.added).toLocaleString().replace(',', '') : 'None'
 }
 
 function generateBtnListRating(rating, count) {
@@ -258,6 +266,9 @@ async function removeProjectList(project, projectID) {
         request.onerror = reject
     })
 
+    chrome.alarms.clear(String(projectID))
+    
+    if (!chrome.extension.getBackgroundPage()) return
     for (const value of chrome.extension.getBackgroundPage().queueProjects) {
         if (value.nick == project.nick && value.id == project.id && value.rating == project.rating) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
@@ -270,7 +281,6 @@ async function removeProjectList(project, projectID) {
             chrome.tabs.remove(key)
         }
     }
-    chrome.alarms.clear(String(projectID))
 }
 
 //Перезагрузка списка проектов
@@ -419,6 +429,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 request.onsuccess = resolve
                 request.onerror = reject
             })
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         }
         blockButtons = false
     })
@@ -979,14 +990,14 @@ async function checkPermissions(projects, element) {
 }
 
 async function setCoolDown() {
-    if (settings.cooldown && settings.cooldown == document.getElementById('cooldown').valueAsNumber)
-        return
+    if (settings.cooldown && settings.cooldown == document.getElementById('cooldown').valueAsNumber) return
     settings.cooldown = document.getElementById('cooldown').valueAsNumber
     await new Promise((resolve, reject) => {
         const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
         request.onsuccess = resolve
         request.onerror = reject
     })
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
         chrome.runtime.reload()
     }
@@ -1024,6 +1035,7 @@ const getDomainWithoutSubdomain = url => {
 //Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))
+    generalStats = await new Promise(resolve => db.transaction('other').objectStore('other').get('generalStats').onsuccess = (event) => resolve(event.target.result))
     const allSetting = {
         settings,
         generalStats
@@ -1174,7 +1186,13 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         
         settings = data.settings
         generalStats = data.generalStats
-        chrome.extension.getBackgroundPage().reloadAllAlarms()
+        if (chrome.extension.getBackgroundPage()) {
+            chrome.extension.getBackgroundPage().settings = settings
+            chrome.extension.getBackgroundPage().generalStats = generalStats
+            chrome.extension.getBackgroundPage().reloadAllAlarms()
+            chrome.extension.getBackgroundPage().checkVote()
+        }
+
         await restoreOptions()
 
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
@@ -1205,6 +1223,7 @@ modeVote.addEventListener('change', async function() {
         request.onsuccess = resolve
         request.onerror = reject
     })
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     blockButtons = false
 })
 
@@ -1279,6 +1298,7 @@ async function fastAdd() {
                 request.onsuccess = resolve
                 request.onerror = reject
             })
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1298,6 +1318,7 @@ async function fastAdd() {
                 request.onsuccess = resolve
                 request.onerror = reject
             })
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1317,6 +1338,7 @@ async function fastAdd() {
                 request.onsuccess = resolve
                 request.onerror = reject
             })
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1421,6 +1443,7 @@ function addCustom() {
     if (!settings.enableCustom) {
         settings.enableCustom = true
         db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     }
 }
 
@@ -1526,10 +1549,13 @@ if (document.getElementById('CustomButton')) {
 }
 
 //Слушатель закрытия модалки статистики и её сброс
-document.querySelector('#stats .close').addEventListener('click', ()=> {
+document.querySelector('#stats .close').addEventListener('click', resetModalStats)
+//Сброс модалки статистики
+function resetModalStats() {
     if (document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent != '') {
-        document.getElementById('statsSubtitle').firstChild.remove()
-        document.getElementById('statsSubtitle').append('\u00A0')
+        document.querySelector('.statsSubtitle').firstChild.remove()
+        document.querySelector('.statsSubtitle').append('\u00A0')
+        document.querySelector('.statsSubtitle').removeAttribute('id')
         document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = ''
@@ -1537,16 +1563,17 @@ document.querySelector('#stats .close').addEventListener('click', ()=> {
         document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = ''
-        document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsAdded')
+        document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = ''
     }
-})
+}
 
 
 //Слушатель общей статистики и вывод её в модалку
-document.getElementById('generalStats').addEventListener('click', ()=> {
+document.getElementById('generalStats').addEventListener('click', async()=> {
     // document.getElementById('modalStats').click()
     toggleModal('stats')
-    document.getElementById('statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
+    document.querySelector('.statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
+    generalStats = await new Promise(resolve => db.transaction('other').objectStore('other').get('generalStats').onsuccess = (event) => resolve(event.target.result))
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = generalStats.successVotes
     document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.monthSuccessVotes
     document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.lastMonthSuccessVotes
@@ -1861,7 +1888,7 @@ function toggleModal(modalID) {
 modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     const activeModal = modalsBlock.querySelector('.modal.active')
     if (activeModal.id == 'stats') {
-        toggleModal('stats')
+        document.querySelector('#stats .close').click()
         return
     }
     activeModal.style.transform = 'scale(1.1)'
