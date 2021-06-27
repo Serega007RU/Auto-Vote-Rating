@@ -14,12 +14,8 @@ function vote(first) {
                 const timer = setTimeout(()=>{//Да это костыль, а есть варинт по лучше?
                     chrome.runtime.sendMessage({discordLogIn: true})
                 }, 10000)
-                window.onbeforeunload = function(e) {
-                    clearTimeout(timer)
-                }
-                window.onunload = function(e) {
-                    clearTimeout(timer)
-                }
+                window.onbeforeunload = ()=> clearTimeout(timer)
+                window.onunload = ()=> clearTimeout(timer)
             }
             return
         }

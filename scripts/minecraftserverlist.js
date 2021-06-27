@@ -1,8 +1,8 @@
 //Совместимость с Rocket Loader
-document.addEventListener('DOMContentLoaded', (event)=>{
+document.addEventListener('DOMContentLoaded', ()=>{
     const timer = setInterval(()=>{
         //Ожидаем загрузки reCAPTCHA
-        if (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value && document.getElementById('g-recaptcha-response').value != '') {
+        if (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value && document.getElementById('g-recaptcha-response').value !== '') {
             vote()
             clearInterval(timer)
         }
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', (event)=>{
 })
 
 async function vote(first) {
-    if (first == true || first == false) return
+    if (first === true || first === false) return
     try {
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {

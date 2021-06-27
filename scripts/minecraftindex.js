@@ -1,5 +1,5 @@
 async function vote(first) {
-    if (first == false) return
+    if (first === false) return
     try {
         if (document.querySelector('div.alert.alert-danger.centered') != null) {
             if (document.querySelector('div.alert.alert-danger.centered').textContent.includes("CAPTCHA")) {
@@ -18,9 +18,9 @@ async function vote(first) {
                 let min = 0
                 let sec = 0
                 for (const i in numbers) {
-                    if (count == 0) {
+                    if (count === 0) {
                         hour = numbers[i]
-                    } else if (count == 1) {
+                    } else if (count === 1) {
                         min = numbers[i]
                     }
                     count++
@@ -1833,7 +1833,7 @@ let scripts = document.getElementsByTagName('script');
 for (let i = 0; i < scripts.length; ++i) {
   if (scripts[i].src.indexOf('solvemedia.com') > -1) {
     document.body.addEventListener('keydown', function handler(event) {
-      if (event.target.id.indexOf('adcopy_response') == 0) {
+      if (event.target.id.indexOf('adcopy_response') === 0) {
         this.removeEventListener(event.type, handler);
 
         let input = event.target;

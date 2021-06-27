@@ -1,5 +1,5 @@
 async function vote(first) {
-    if (first == false) return
+    if (first === false) return
     try {
         if (document.querySelector('body > div.container > div > div > div.alert.alert-danger') != null) {
             if (document.querySelector('body > div.container > div > div > div.alert.alert-danger').textContent.includes('already voted')) {
@@ -17,7 +17,7 @@ async function vote(first) {
             //Ожидание загрузки reCATPCHA
             const timer = setInterval(async ()=>{
                 try {
-                    if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value != '') {
+                    if (document.querySelector('input[name="token"]') != null && document.querySelector('input[name="token"]').value !== '') {
                         clearInterval(timer)
                         const project = await getProject('TopMinecraftServers')
                         document.getElementById('username').value = project.nick

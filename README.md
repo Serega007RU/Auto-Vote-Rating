@@ -9,5 +9,6 @@ List of sites that the extension supports: [TopCraft.ru](http://topcraft.ru/), [
 Here is a short guide how to install an unpacked extension on Google Chrome or Chromium-based browsers
 1. Unzip the archive to any convenient location
 2. Open the "Extensions" page (`chrome://extensions/`) in the browser and turn on the "Developer mode"
+   
 ![](https://i.imgur.com/iQ4DXVu.png)
 3. Click on the "Load unpacked" button and select the directory where you unpacked the archive.

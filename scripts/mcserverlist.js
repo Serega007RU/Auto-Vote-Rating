@@ -12,7 +12,7 @@ function vote() {
 
 const timer = setInterval(()=>{
     try {
-        if (document.querySelector('div.alert.alert-danger') != null && document.querySelector('div.alert.alert-danger').textContent != '') {
+        if (document.querySelector('div.alert.alert-danger') != null && document.querySelector('div.alert.alert-danger').textContent !== '') {
             if (document.querySelector('div.alert.alert-danger').textContent.includes('Již jsi hlasoval vrať se znovu za 2 hodiny')) {
                 chrome.runtime.sendMessage({later: true})
             } else {
@@ -20,9 +20,8 @@ const timer = setInterval(()=>{
             }
             clearInterval(timer)
         }
-        if (document.querySelector('div.alert.alert-success') != null && document.querySelector('div.alert.alert-danger').textContent != '') {
+        if (document.querySelector('div.alert.alert-success') != null && document.querySelector('div.alert.alert-danger').textContent !== '') {
             chrome.runtime.sendMessage({successfully: true})
-            return
         }
     } catch (e) {
         throwError(e)

@@ -50,7 +50,7 @@ async function vote(first) {
         const project = await getProject('ListForge', true)
         //Вводим ник если он существует
         if (document.getElementById('nickname') != null) {
-            if (project.nick == null || project.nick == '') {
+            if (project.nick == null || project.nick === '') {
                 chrome.runtime.sendMessage({requiredNick: true})
                 return
             }
@@ -63,6 +63,7 @@ async function vote(first) {
                 document.querySelector('button[form="vote_form"]').click()
             }
         } else {
+            // noinspection ExceptionCaughtLocallyJS
             throw Error(null)
         }
         

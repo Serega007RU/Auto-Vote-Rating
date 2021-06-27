@@ -23,8 +23,8 @@ async function vote(first) {
         if (first) return
 
         const project = await getProject('BestServersCom')
-        if (document.querySelector('input[name="username"]') != null && document.querySelector('input[name="username"]').type != 'hidden') {
-            if (project.nick == null || project.nick == '') {
+        if (document.querySelector('input[name="username"]') != null && document.querySelector('input[name="username"]').type !== 'hidden') {
+            if (project.nick == null || project.nick === '') {
                 chrome.runtime.sendMessage({requiredNick: true})
                 return
             }

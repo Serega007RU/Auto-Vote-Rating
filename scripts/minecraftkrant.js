@@ -1,5 +1,5 @@
 async function vote(first) {
-    if (first == false) return
+    if (first === false) return
     try {
         if (document.querySelector('div.alert.alert-success') != null) {
             chrome.runtime.sendMessage({successfully: true})

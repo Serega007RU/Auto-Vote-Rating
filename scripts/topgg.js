@@ -1,5 +1,5 @@
 function vote(first) {
-    if (first == false) return
+    if (first === false) return
     try {
         if (document.URL.startsWith('https://discord.com/')) {
             if (document.URL.includes('%20guilds') || document.URL.includes('%20email') || !document.URL.includes('prompt=none')) {
@@ -15,12 +15,8 @@ function vote(first) {
                 const timer = setTimeout(()=>{//Да это костыль, а есть варинт по лучше?
                     chrome.runtime.sendMessage({discordLogIn: true})
                 }, 10000)
-                window.onbeforeunload = function(e) {
-                    clearTimeout(timer)
-                }
-                window.onunload = function(e) {
-                    clearTimeout(timer)
-                }
+                window.onbeforeunload = ()=> clearTimeout(timer)
+                window.onunload = ()=> clearTimeout(timer)
             }
             return
         }
@@ -45,13 +41,13 @@ function vote(first) {
                 if (document.getElementById('votingvoted').textContent.includes('already voted') || document.getElementById('votingvoted').value.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
                     clearInterval(timer2)
-                } else if (document.getElementById("reminder").style.display != 'none' || document.getElementById("successful-reminder").style.display != 'none' || document.getElementById("failure-reminder").style.display != 'none') {
+                } else if (document.getElementById("reminder").style.display !== 'none' || document.getElementById("successful-reminder").style.display !== 'none' || document.getElementById("failure-reminder").style.display !== 'none') {
                     chrome.runtime.sendMessage({successfully: true})
                     clearInterval(timer2)
-                } else if (document.getElementById('votingvoted').textContent == 'Voting...' || document.getElementById('votingvoted').value == 'Voting...' || document.getElementById('votingvoted').textContent == 'Vote' || document.getElementById('votingvoted').value == 'Vote') {
+                } else if (document.getElementById('votingvoted').textContent === 'Voting...' || document.getElementById('votingvoted').value === 'Voting...' || document.getElementById('votingvoted').textContent === 'Vote' || document.getElementById('votingvoted').value === 'Vote') {
                     //None
-                } else if (document.getElementById('votingvoted').textContent != '' || document.getElementById('votingvoted').value != '') {
-                    if (document.getElementById('votingvoted').textContent != '') {
+                } else if (document.getElementById('votingvoted').textContent !== '' || document.getElementById('votingvoted').value !== '') {
+                    if (document.getElementById('votingvoted').textContent !== '') {
                         chrome.runtime.sendMessage({message: document.getElementById('votingvoted').textContent.trim()})
                     } else {
                         chrome.runtime.sendMessage({message: document.getElementById('votingvoted').value})

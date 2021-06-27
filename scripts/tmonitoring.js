@@ -27,9 +27,9 @@ const timer = setInterval(()=>{
                 let min = 0
                 let sec = 0
                 for (const i in numbers) {
-                    if (count == 0) {
+                    if (count === 0) {
                         hour = numbers[i]
-                    } else if (count == 1) {
+                    } else if (count === 1) {
                         min = numbers[i]
                     }
                     count++

@@ -12,17 +12,17 @@ async function vote(first) {
                 let min = 0
                 let sec = 0
                 for (const i in numbers) {
-                    if (count == 0) {
+                    if (count === 0) {
                         hour = numbers[i]
-                    } else if (count == 1) {
+                    } else if (count === 1) {
                         min = numbers[i]
-                    } else if (count == 2) {
+                    } else if (count === 2) {
                         sec = numbers[i]
                     }
                     count++
                 }
                 let time = new Date()
-                if (time.getUTCHours() > hour || (time.getUTCHours() == hour && time.getUTCMinutes() >= min) || (time.getUTCHours() == hour && time.getUTCMinutes() == min && time.getUTCMinutes() >= sec)) {
+                if (time.getUTCHours() > hour || (time.getUTCHours() === hour && time.getUTCMinutes() >= min) || (time.getUTCHours() === hour && time.getUTCMinutes() === min && time.getUTCMinutes() >= sec)) {
                     time.setUTCDate(time.getUTCDate() + 1)
                 }
                 time.setUTCHours(hour, min, sec, 0)

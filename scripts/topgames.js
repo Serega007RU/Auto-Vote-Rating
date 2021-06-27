@@ -1,5 +1,5 @@
 async function vote(first) {
-    if (first == false) return
+    if (first === false) return
     try {
         //Если успешное авто-голосование
         if (document.querySelector('div.alert.alert-success') != null) {
@@ -16,7 +16,7 @@ async function vote(first) {
                 let min = 0
                 let sec = 0
                 for (const i in numbers) {
-                    if (count == 0) {
+                    if (count === 0) {
                         min = numbers[i]
                     }
                     count++
@@ -48,7 +48,7 @@ async function vote(first) {
             try {
                 if (document.querySelector('#captcha-content > div > div.grecaptcha-logo > iframe') != null) {
                     //Ждёт загрузки reCaptcha
-                    document.querySelector('button[type="submit"').click()
+                    document.querySelector('button[type="submit"]').click()
                     clearInterval(timer)
                 }
             } catch (e) {
@@ -59,7 +59,6 @@ async function vote(first) {
 
         if (document.querySelector('.mtcaptcha') != null) {
             chrome.runtime.sendMessage({captcha: true})
-            return
         }
     } catch (e) {
         throwError(e)

@@ -1,22 +1,20 @@
-var db
-
 //Текущие открытые вкладки расширением
-var openedProjects = new Map()
+const openedProjects = new Map()
 //Текущие fetch запросы
-let fetchProjects = new Map()
+const fetchProjects = new Map()
 //Текущие проекты за которые сейчас голосует расширение
-var queueProjects = new Set()
+const queueProjects = new Set()
 
 //Есть ли доступ в интернет?
-var online = true
+let online = true
 
-var secondVoteMinecraftIpList = false
+let secondVoteMinecraftIpList = false
 
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
-var check = true
+let check = true
 
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
-var closeTabs = true
+let closeTabs = true
 
 //Где храним настройки
 // let storageArea = 'local'
@@ -86,7 +84,7 @@ async function reloadAllAlarms() {
         const cursor = event.target.result
         if (cursor) {
             const project = cursor.value
-            if (project.time != null && project.time > Date.now() && times.indexOf(project.time) == -1) {
+            if (project.time != null && project.time > Date.now() && times.indexOf(project.time) === -1) {
                 chrome.alarms.create(String(cursor.primaryKey), {when: project.time})
                 times.push(project.time)
             }
@@ -118,7 +116,7 @@ async function checkOpen(project) {
 
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
-        if (project.rating == value.rating || value.randomize && project.randomize) {
+        if (project.rating === value.rating || value.randomize && project.randomize) {
             if (!value.nextAttempt)
                 return
             if (Date.now() < value.nextAttempt) {
@@ -132,7 +130,7 @@ async function checkOpen(project) {
     }
 
     let retryCoolDown
-    if (project.rating == 'TopCraft' || project.rating == 'McTOP' || project.rating == 'MCRate' || project.rating == 'MinecraftRating' || project.rating == 'MonitoringMinecraft' || project.rating == 'ServerPact' || project.rating == 'MinecraftIpList' || project.rating == 'MCServerList') {
+    if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -142,13 +140,13 @@ async function checkOpen(project) {
 
     //Если эта вкладка была уже открыта, он закрывает её
     for (const[key,value] of openedProjects.entries()) {
-        if (project.nick == value.nick && project.id == value.id && project.rating == value.rating) {
+        if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
             openedProjects.delete(key)
             if (closeTabs) {
                 chrome.tabs.remove(key, function() {
                     if (chrome.runtime.lastError) {
                         console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
+                        if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
                             sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     }
                 })
@@ -162,9 +160,9 @@ async function checkOpen(project) {
     if (!settings.disabledNotifStart)
         sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
 
-    if (project.rating == 'MonitoringMinecraft') {
+    if (project.rating === 'MonitoringMinecraft') {
         let url
-        if (project.rating == 'MonitoringMinecraft') {
+        if (project.rating === 'MonitoringMinecraft') {
             url = '.monitoringminecraft.ru'
         }
         let cookies = await new Promise(resolve=>{
@@ -173,7 +171,7 @@ async function checkOpen(project) {
             })
         })
         for (let i = 0; i < cookies.length; i++) {
-            if (cookies[i].domain.charAt(0) == '.') {
+            if (cookies[i].domain.charAt(0) === '.') {
                 await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
             } else {
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
@@ -204,7 +202,7 @@ async function newWindow(project) {
     await new Promise(resolve => {
         chrome.alarms.getAll(function(alarms) {
             for (const alarm of alarms) {
-                if (alarm.scheduledTime == project.time) {
+                if (alarm.scheduledTime === project.time) {
                     create = false
                     resolve()
                     break
@@ -218,13 +216,13 @@ async function newWindow(project) {
     }
     
     let silentVoteMode = false
-    if (project.rating == 'Custom') {
+    if (project.rating === 'Custom') {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (project.rating == 'TopCraft' || project.rating == 'McTOP' || project.rating == 'MCRate' || project.rating == 'MinecraftRating' || project.rating == 'MonitoringMinecraft' || project.rating == 'ServerPact' || project.rating == 'MinecraftIpList' || project.rating == 'MCServerList')) {
+        if (!project.emulateMode && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
             silentVoteMode = true
         }
-    } else if (project.silentMode && (project.rating == 'TopCraft' || project.rating == 'McTOP' || project.rating == 'MCRate' || project.rating == 'MinecraftRating' || project.rating == 'MonitoringMinecraft' || project.rating == 'ServerPact' || project.rating == 'MinecraftIpList' || project.rating == 'MCServerList')) {
+    } else if (project.silentMode && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
@@ -232,7 +230,7 @@ async function newWindow(project) {
     } else {
         let window = await new Promise(resolve=>{
             chrome.windows.getCurrent(function(win) {
-                if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {
+                if (chrome.runtime.lastError && chrome.runtime.lastError.message === 'No current window') {} else if (chrome.runtime.lastError) {
                     console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError.message)
                 }
                 resolve(win)
@@ -260,7 +258,7 @@ async function newWindow(project) {
 
 async function silentVote(project) {
     try {
-        if (project.rating == 'TopCraft') {
+        if (project.rating === 'TopCraft') {
             let response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
             if (!await checkResponseError(project, response, 'topcraft.ru', null, true)) return
             let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
@@ -272,8 +270,8 @@ async function silentVote(project) {
                 'method': 'POST'
             }, project)
             if (!await checkResponseError(project, response, 'topcraft.ru', [400], true)) return
-            if (response.status == 400) {
-                if (response.html == 'vk_error' || response.html == 'nick_error') {
+            if (response.status === 400) {
+                if (response.html === 'vk_error' || response.html === 'nick_error') {
                     endVote({later: response.html}, null, project)
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
@@ -283,10 +281,9 @@ async function silentVote(project) {
                 return
             }
             endVote({successfully: true}, null, project)
-            return
         } else
 
-        if (project.rating == 'McTOP') {
+        if (project.rating === 'McTOP') {
             let response = await _fetch('https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
             if (!await checkResponseError(project, response, 'mctop.su', null, true)) return
             let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
@@ -298,8 +295,8 @@ async function silentVote(project) {
                 'method': 'POST'
             }, project)
             if (!await checkResponseError(project, response, 'mctop.su', [400], true)) return
-            if (response.status == 400) {
-                if (response.html == 'vk_error' || response.html == 'nick_error') {
+            if (response.status === 400) {
+                if (response.html === 'vk_error' || response.html === 'nick_error') {
                     endVote({later: response.html}, null, project)
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
@@ -309,10 +306,9 @@ async function silentVote(project) {
                 return
             }
             endVote({successfully: true}, null, project)
-            return
         } else
 
-        if (project.rating == 'MCRate') {
+        if (project.rating === 'MCRate') {
             let response = await _fetch('https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code', null, project)
             if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
             let code = response.url.substring(response.url.length - 18)
@@ -338,7 +334,6 @@ async function silentVote(project) {
                 } else {
                     endVote({message: response.doc.querySelector('div[class=report]').textContent}, null, project)
                 }
-                return
             } else if (response.doc.querySelector('span[class=count_hour]') != null) {
 //              Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
 //              Берёт из скрипта переменную в которой хранится сколько осталось до следующего голосования
@@ -351,20 +346,17 @@ async function silentVote(project) {
 //              if (milliseconds == 0) return
 //              let later = Date.now() - (86400000 - milliseconds)
                 endVote({later: true}, null, project)
-                return
             } else if (response.doc.querySelector('div[class="error"]') != null) {
                 if (response.doc.querySelector('div[class="error"]').textContent.includes("уже голосовали")) {
                     endVote({later: true}, null, project)
                 }
                 endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
-                return
             } else {
                 endVote({errorVoteNoElement: true}, null, project)
-                return
             }
         } else
 
-        if (project.rating == 'MinecraftRating') {
+        if (project.rating === 'MinecraftRating') {
             let response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
             if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
@@ -395,26 +387,21 @@ async function silentVote(project) {
 //                  }
 //                  let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000
                     endVote({later: true}, null, project)
-                    return
                 } else {
                     endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
-                    return
                 }
             } else if (response.doc.querySelector('div.alert.alert-success') != null) {
                 if (response.doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
                     endVote({successfully: true}, null, project)
-                    return
                 } else {
                     endVote({message: response.doc.querySelector('div.alert.alert-success').textContent}, null, project)
-                    return
                 }
             } else {
                 endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null'}, null, project)
-                return
             }
         } else
 
-        if (project.rating == 'MonitoringMinecraft') {
+        if (project.rating === 'MonitoringMinecraft') {
             let i = 0
             while (i <= 3) {
                 i++
@@ -426,7 +413,7 @@ async function silentVote(project) {
                     'method': 'POST'
                 }, project)
                 if (!await checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
-                if (response.status == 503) {
+                if (response.status === 503) {
                     if (i >= 3) {
                         endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + String(response.status))}, null, project)
                         return
@@ -489,7 +476,7 @@ async function silentVote(project) {
             }
         } else
 
-        if (project.rating == 'ServerPact') {
+        if (project.rating === 'ServerPact') {
             let response = await _fetch('https://www.serverpact.com/vote-' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -565,20 +552,16 @@ async function silentVote(project) {
             if (!await checkResponseError(project, response, 'serverpact.com')) return
             if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
                 endVote({successfully: true}, null, project)
-                return
             } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null && (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('You can only vote once') || response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('already voted'))) {
                 endVote({later: Date.now() + 43200000}, null, project)
-                return
             } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null) {
                 endVote({message: response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.substring(0, response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.indexOf('\n'))}, null, project)
-                return
             } else {
                 endVote({errorVoteUnknown2: true}, null, project)
-                return
             }
         } else
 
-        if (project.rating == 'MinecraftIpList') {
+        if (project.rating === 'MinecraftIpList') {
             let response = await _fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -640,9 +623,9 @@ async function silentVote(project) {
                     let min = 0
                     let sec = 0
                     for (let i in numbers) {
-                        if (count == 0) {
+                        if (count === 0) {
                             hour = numbers[i]
-                        } else if (count == 1) {
+                        } else if (count === 1) {
                             min = numbers[i]
                         }
                         count++
@@ -661,8 +644,8 @@ async function silentVote(project) {
             }
             await craft(response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
 
-            code = 0
-            code2 = 0
+            let code = 0
+            let code2 = 0
 
             for (let i = 0; i < 6; i++) {
                 code += content[i] << (i * 5)
@@ -704,9 +687,9 @@ async function silentVote(project) {
                     let min = 0
                     let sec = 0
                     for (let i in numbers) {
-                        if (count == 0) {
+                        if (count === 0) {
                             hour = numbers[i]
-                        } else if (count == 1) {
+                        } else if (count === 1) {
                             min = numbers[i]
                         }
                         count++
@@ -720,45 +703,38 @@ async function silentVote(project) {
             }
             if (response.doc.querySelector('#Content > div.Good') != null && response.doc.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
                 endVote({successfully: true}, null, project)
-                return
             }
         } else
 
-        if (project.rating == 'MCServerList') {
+        if (project.rating === 'MCServerList') {
             let response = await _fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'}, project)
             let json = await response.json()
             if (response.ok) {
-                if (json[0].success == "false") {
-                    if (json[0].error == 'username_voted') {
+                if (json[0].success === "false") {
+                    if (json[0].error === 'username_voted') {
                         endVote({later: true}, null, project)
-                        return
                     } else {
                         endVote({message: json[0].error}, null, project)
-                        return
                     }
                 } else {
                     endVote({successfully: true}, null, project)
-                    return
                 }
             } else {
                 endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
-                return
             }
         } else
 
-        if (project.rating == 'Custom') {
+        if (project.rating === 'Custom') {
             let response = await _fetch(project.responseURL, {...project.body}, project)
             await response.text()
             if (response.ok) {
                 endVote({successfully: true}, null, project)
-                return
             } else {
                 endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
-                return
             }
         }
     } catch (e) {
-        if (e == 'TypeError: Failed to fetch') {
+        if (e === 'TypeError: Failed to fetch') {
 //          endVote({notConnectInternet: true}, null, project)
         } else {
             endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
@@ -803,7 +779,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     if (bypassCodes) {
         for (const code of bypassCodes) {
-            if (response.status == code) {
+            if (response.status === code) {
                 return true
             }
         }
@@ -819,15 +795,15 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
 chrome.webNavigation.onCompleted.addListener(async function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
-    if (details.frameId == 0) {
+    if (details.frameId === 0) {
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {
                     console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                    if (chrome.runtime.lastError.message != 'The tab was closed.') {
+                    if (chrome.runtime.lastError.message !== 'The tab was closed.') {
                         if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                         project.error = chrome.runtime.lastError.message
-                        changeProject(project)
+                        updateProject(project)
                     }
                 }
                 resolve()
@@ -839,31 +815,31 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             })
         })
         chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
-    } else if (details.frameId != 0 && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/))) {
+    } else if (details.frameId !== 0 && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/))) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                if (chrome.runtime.lastError.message != 'The frame was removed.') {
+                if (chrome.runtime.lastError.message !== 'The frame was removed.') {
                     if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
-                    changeProject(project)
+                    updateProject(project)
                 }
             }
         })
     }
-}, {urls: ['<all_urls>']})
+})
 
 chrome.webRequest.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
-    if (details.type == 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode != 503 && details.statusCode != 403/*Игнорируем проверку CloudFlare*/) {
+    if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
         const sender = {tab: {id: details.tabId}}
         endVote({errorVote: String(details.statusCode)}, sender, project)
     }
 }, {urls: ['<all_urls>']})
 
 chrome.webRequest.onErrorOccurred.addListener(function(details) {
-    if (details.initiator == 'chrome-extension://' + chrome.runtime.id) {
+    if (details.initiator === 'chrome-extension://' + chrome.runtime.id) {
         if (fetchProjects.has(details.requestId)) {
             let project = fetchProjects.get(details.requestId)
 //          if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED')) {
@@ -872,7 +848,7 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
 //          }
             endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
         }
-    } else if (details.type == 'main_frame') {
+    } else if (details.type === 'main_frame') {
         if (openedProjects.has(details.tabId)) {
             let project = openedProjects.get(details.tabId)
             if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED')) {
@@ -896,7 +872,7 @@ async function _fetch(url, options, project) {
 
     listener = (details)=>{
         //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net:ERR из fetch запроса?
-        if (details.initiator == 'chrome-extension://' + chrome.runtime.id && details.url.includes(url)) {
+        if (details.initiator === 'chrome-extension://' + chrome.runtime.id && details.url.includes(url)) {
             fetchProjects.set(details.requestId, project)
             removeListener()
         }
@@ -908,8 +884,7 @@ async function _fetch(url, options, project) {
     options.credentials = 'include'
 
     try {
-        const response = await fetch(url, options)
-        return response
+        return await fetch(url, options)
     } catch(e) {
         throw e
     } finally {
@@ -918,7 +893,7 @@ async function _fetch(url, options, project) {
 }
 
 //Слушатель сообщений и ошибок
-chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async function(request, sender/*, sendResponse*/) {
     //Если требует ручное прохождение капчи
     if ((request.captcha || request.authSteam || request.discordLogIn) && sender && openedProjects.has(sender.tab.id)) {
         let project = openedProjects.get(sender.tab.id)
@@ -948,7 +923,7 @@ async function endVote(request, sender, project) {
             chrome.tabs.remove(sender.tab.id, function() {
                 if (chrome.runtime.lastError) {
                     console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                    if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
+                    if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
                         sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                 }
             })
@@ -957,7 +932,7 @@ async function endVote(request, sender, project) {
     } else if (!project) return
 
     for (const[key,value] of fetchProjects.entries()) {
-        if (value.nick == project.nick && value.id == project.id && project.rating == value.rating) {
+        if (value.nick === project.nick && value.id === project.id && project.rating === value.rating) {
             fetchProjects.delete(key)
         }
     }
@@ -965,14 +940,14 @@ async function endVote(request, sender, project) {
     delete project.nextAttempt
 
     //Если усё успешно
-    let sendMessage = ''
+    let sendMessage
     if (request.successfully || request.later) {
         let time = new Date()
-        if (!project.rating == 'Custom' && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(),time.getMonth() + 1,0).getDate() != new Date().getDate())) {
+        if (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getFullYear(),time.getMonth() + 1,0).getDate() !== new Date().getDate())) {
             if (project.timeoutHour) {
                 if (!project.timeoutMinute) project.timeoutMinute = 0
                 if (!project.timeoutSecond) project.timeoutSecond = 0
-                if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
+                if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                     time.setDate(time.getDate() + 1)
                 }
                 time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
@@ -981,7 +956,7 @@ async function endVote(request, sender, project) {
             }
         } else if (request.later && Number.isInteger(request.later)) {
             time = new Date(request.later)
-            if (project.rating == 'ServeurPrive' || project.rating == 'TopGames') {
+            if (project.rating === 'ServeurPrive' || project.rating === 'TopGames') {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
                     time = new Date()
@@ -992,64 +967,64 @@ async function endVote(request, sender, project) {
         } else {
             //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
             let hour
-            if (project.rating == 'TopCraft' || project.rating == 'McTOP' || project.rating == 'MinecraftRating' || project.rating == 'MonitoringMinecraft' || project.rating == 'IonMc' || project.rating == 'QTop') {
+            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'IonMc' || project.rating === 'QTop') {
                 //Топы на которых время сбрасывается в 00:00 по МСК
                 hour = 21
-            } else if (project.rating == 'MCRate') {
+            } else if (project.rating === 'MCRate') {
                 hour = 22
-            } else if (project.rating == 'MinecraftServerList' || project.rating == 'ServerList101') {
+            } else if (project.rating === 'MinecraftServerList' || project.rating === 'ServerList101') {
                 hour = 23
-            } else if (project.rating == 'PlanetMinecraft' || project.rating == 'ListForge' || project.rating == 'MinecraftList') {
+            } else if (project.rating === 'PlanetMinecraft' || project.rating === 'ListForge' || project.rating === 'MinecraftList') {
                 hour = 5
-            } else if (project.rating == 'MinecraftServersOrg' || project.rating == 'MinecraftIndex' || project.rating == 'MinecraftBuzz' || project.rating == 'PixelmonServers') {
+            } else if (project.rating === 'MinecraftServersOrg' || project.rating === 'MinecraftIndex' || project.rating === 'MinecraftBuzz' || project.rating === 'PixelmonServers') {
                 hour = 0
-            } else if (project.rating == 'TopMinecraftServers') {
+            } else if (project.rating === 'TopMinecraftServers') {
                 hour = 4
-            } else if (project.rating == 'MMoTopRU') {
+            } else if (project.rating === 'MMoTopRU') {
                 hour = 20
-            } else if (project.rating == 'BotsForDiscord') {
+            } else if (project.rating === 'BotsForDiscord') {
                 hour = 12
             }
             if (hour != null) {
-                if (time.getUTCHours() > hour || (time.getUTCHours() == hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+                if (time.getUTCHours() > hour || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                     time.setUTCDate(time.getUTCDate() + 1)
                 }
                 time.setUTCHours(hour, (project.priority ? 0 : 10), 0, 0)
             //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
-            } else if (project.rating == 'TopG' || project.rating == 'MinecraftServersBiz' || project.rating == 'TopGG' || project.rating == 'DiscordBotList' || project.rating == 'MCListsOrg') {
+            } else if (project.rating === 'TopG' || project.rating === 'MinecraftServersBiz' || project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'MCListsOrg') {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.rating == 'MinecraftIpList' || project.rating == 'HotMC' || project.rating == 'MinecraftServerNet' || project.rating == 'TMonitoring' || project.rating == 'MCServers' || project.rating == 'CraftList' || project.rating == 'CzechCraft' || project.rating == 'TopMCServersCom' || project.rating == 'CraftListNet') {
+            } else if (project.rating === 'MinecraftIpList' || project.rating === 'HotMC' || project.rating === 'MinecraftServerNet' || project.rating === 'TMonitoring' || project.rating === 'MCServers' || project.rating === 'CraftList' || project.rating === 'CzechCraft' || project.rating === 'TopMCServersCom' || project.rating === 'CraftListNet') {
                 time.setUTCDate(time.getUTCDate() + 1)
-            } else if (project.rating == 'ServeurPrive' || project.rating == 'TopGames') {
+            } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames') {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
                     time.setDate(time.getDate() + 1)
                     time.setHours(0, (project.priority ? 0 : 10), 0, 0)
                     project.countVote = 0
                 } else {
-                    if (project.rating == 'ServeurPrive') {
+                    if (project.rating === 'ServeurProve') {
                         time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30)
                     } else {
                         time.setUTCHours(time.getUTCHours() + 2)
                     }
                 }
-            } else if (project.rating == 'ServerPact') {
+            } else if (project.rating === 'ServerPact') {
                 time.setUTCHours(time.getUTCHours() + 11)
                 time.setUTCMinutes(time.getUTCMinutes() + 7)
-            } else if (project.rating == 'Custom') {
+            } else if (project.rating === 'Custom') {
                 if (project.timeoutHour != null) {
                     if (!project.timeoutMinute) project.timeoutMinute = 0
                     if (!project.timeoutSecond) project.timeoutSecond = 0
-                    if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
+                    if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                         time.setDate(time.getDate() + 1)
                     }
                     time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
                 } else {
                     time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
                 }
-            } else if (project.rating == 'MCServerList') {
+            } else if (project.rating === 'MCServerList') {
                 time.setUTCHours(time.getUTCHours() + 2)
-            } else if (project.rating == 'CraftList') {
+            } else if (project.rating === 'CraftList') {
                 time = new Date(request.successfully)
             } else {
                 time.setUTCDate(time.getUTCDate() + 1)
@@ -1090,7 +1065,7 @@ async function endVote(request, sender, project) {
     } else {
         let message
         if (!request.message) {
-            if (Object.values(request)[0] == true) {
+            if (Object.values(request)[0] === true) {
                 message = chrome.i18n.getMessage(Object.keys(request)[0])
             } else {
                 message = chrome.i18n.getMessage(Object.keys(request)[0], Object.values(request)[0])
@@ -1098,9 +1073,9 @@ async function endVote(request, sender, project) {
         } else {
             message = request.message
         }
-        if (message.length == 0) message = chrome.i18n.getMessage('emptyError')
+        if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
-        if (project.rating == 'TopCraft' || project.rating == 'McTOP' || project.rating == 'MCRate' || project.rating == 'MinecraftRating' || project.rating == 'MonitoringMinecraft' || project.rating == 'ServerPact' || project.rating == 'MinecraftIpList') {
+        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
             retryCoolDown = 300000
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
         } else {
@@ -1128,7 +1103,7 @@ async function endVote(request, sender, project) {
         await new Promise(resolve => {
             chrome.alarms.getAll(function(alarms) {
                 for (const alarm of alarms) {
-                    if (alarm.scheduledTime == project.time) {
+                    if (alarm.scheduledTime === project.time) {
                         create = false
                         resolve()
                         break
@@ -1144,7 +1119,7 @@ async function endVote(request, sender, project) {
 
     function removeQueue() {
         for (const value of queueProjects) {
-            if (project.nick == value.nick && project.id == value.id && project.rating == value.rating) {
+            if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
                 queueProjects.delete(value)
             }
         }
@@ -1172,9 +1147,9 @@ function sendNotification(title, message) {
 
 function getProjectPrefix(project, detailed) {
     if (detailed) {
-        return '[' + project.rating + '] ' + (project.nick != null && project.nick != '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + ' '
+        return '[' + project.rating + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + ' '
     } else {
-        return '[' + project.rating + '] ' + (project.nick != null && project.nick != '' ? project.nick : project.game != null ? project.game : project.name) + (project.name != null ? ' – ' + project.name : ' – ' + project.id)
+        return '[' + project.rating + '] ' + (project.nick != null && project.nick !== '' ? project.nick : project.game != null ? project.game : project.name) + (project.name != null ? ' – ' + project.name : ' – ' + project.id)
     }
 }
 
@@ -1215,32 +1190,7 @@ async function checkTime() {
         }
     } catch (e) {
         console.error(chrome.i18n.getMessage('errorClock', e))
-        return
     }
-}
-
-async function setCookie(url, name, value) {
-    return new Promise(resolve=>{
-        chrome.cookies.set({'url': url, 'name': name, 'value': value}, function(details) {
-            resolve(details)
-        })
-    })
-}
-
-async function setCookieDetails(details) {
-    return new Promise(resolve=>{
-        chrome.cookies.set(details, function(det) {
-            resolve(det)
-        })
-    })
-}
-
-async function getCookie(url, name) {
-    return new Promise(resolve=>{
-        chrome.cookies.get({'url': url, 'name': name}, function(cookie) {
-            resolve(cookie)
-        })
-    })
 }
 
 async function removeCookie(url, name) {
@@ -1309,9 +1259,9 @@ function extractHostname(url) {
 }
 
 chrome.runtime.onInstalled.addListener(async function(details) {
-    if (details.reason == 'install') {
+    if (details.reason === 'install') {
         chrome.tabs.create({url: 'options.html?installed'})
-    } else if (details.reason == 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) == -1) {
+    } else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
         let storageArea = 'local'
         //Асинхронно достаёт/сохраняет настройки в chrome.storage
         async function getValue(name, area) {
@@ -1326,22 +1276,6 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                         reject(chrome.runtime.lastError)
                     } else {
                         resolve(data[name])
-                    }
-                })
-            })
-        }
-        async function setValue(key, value, area) {
-            if (!area) {
-                area = storageArea
-            }
-            return new Promise((resolve, reject)=>{
-                chrome.storage[area].set({[key]: value}, function(data) {
-                    if (chrome.runtime.lastError) {
-                        sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
-                        console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
-                        reject(chrome.runtime.lastError)
-                    } else {
-                        resolve(data)
                     }
                 })
             })
@@ -1363,7 +1297,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
             })
         }
         storageArea = await getValue('storageArea', 'local')
-        if (storageArea == null || storageArea == '') {
+        if (storageArea == null || storageArea === '') {
             if (await getValue('AVMRsettings', 'sync') != null) {
                 storageArea = 'sync'
             } else {
@@ -1382,7 +1316,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                 for (const project of list) {
                     delete project[item]
                     project.rating = item
-                    if (item == 'Custom') {
+                    if (item === 'Custom') {
                         project.body = project.id
                         delete project.id
                         project.id = project.nick
@@ -1426,18 +1360,16 @@ chrome.runtime.onInstalled.addListener(async function(details) {
 })
 
 function Version(s){
-  this.arr = s.split('.').map(Number);
+  this.arr = s.split('.').map(Number)
 }
 Version.prototype.compareTo = function(v){
-  for (let i=0; ;i++) {
-    if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1;
-    if (i>=this.arr.length) return -1;
-    var diff = this.arr[i]-v.arr[i]
-    if (diff) return diff>0 ? 1 : -1;
-  }
+    for (let i=0; ;i++) {
+        if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1
+        if (i>=this.arr.length) return -1
+        const diff = this.arr[i]-v.arr[i]
+        if (diff) return diff>0 ? 1 : -1
+    }
 }
-
-const varToString = varObj=>Object.keys(varObj)[0]
 
 
 /* Store the original log functions. */
@@ -1501,14 +1433,12 @@ logsopenRequest.onsuccess = function() {
         
         let log = '[' + time + ' ' + type.toUpperCase() + ']:'
     
-        for (let i in args) {
-            let arg = args[i]
-            if (typeof arg != 'string')
-                arg = JSON.stringify(arg)
+        for (let arg of args) {
+            if (typeof arg != 'string') arg = JSON.stringify(arg)
             log += ' ' + arg
         }
     
-        const request = logs.add(log)
+        logs.add(log)
     }
     
     console.log(chrome.i18n.getMessage('start'))

@@ -1,5 +1,5 @@
 async function vote(first) {
-    if (first == false) return
+    if (first === false) return
     try {
         //К чему это ожидание?
         if (document.getElementById('infoMessage') != null) document.getElementById('infoMessage').style.display = 'none'

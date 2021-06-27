@@ -2,7 +2,7 @@ if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anch
     const timer1 = setInterval(()=>{
         if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null
             && isScrolledIntoView(document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border'))
-            && document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').style.display != 'none') {
+            && document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').style.display !== 'none') {
             document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').click()
             clearInterval(timer1)
         }
@@ -14,7 +14,6 @@ if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anch
         if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0)) {
             window.top.postMessage('vote', '*')
             clearInterval(timer2)
-            return
         }
     }, 1000)
 } else if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) {
@@ -38,7 +37,7 @@ if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anch
     const timer4 = setInterval(()=>{
         if (document.getElementById('checkbox') != null
             && isScrolledIntoView(document.getElementById('checkbox'))
-            && document.getElementById('checkbox').style.display != 'none') {
+            && document.getElementById('checkbox').style.display !== 'none') {
             document.getElementById('checkbox').click()
             clearInterval(timer4)
         }
@@ -54,7 +53,7 @@ if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anch
     
     //Если требуется ручное прохождение капчи
     const timer6 = setInterval(()=>{
-        if (document.querySelector('body[class="no-selection"]') != null && document.querySelector('body[class="no-selection"]').ariaHidden == null && document.querySelector('body[class="no-selection"]').style.display == '') {
+        if (document.querySelector('body[class="no-selection"]') != null && document.querySelector('body[class="no-selection"]').ariaHidden == null && document.querySelector('body[class="no-selection"]').style.display === '') {
             chrome.runtime.sendMessage({captcha: true})
             clearInterval(timer6)
         }
