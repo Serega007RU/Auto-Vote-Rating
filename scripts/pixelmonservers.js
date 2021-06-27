@@ -1,7 +1,7 @@
 async function vote(first) {
-    if (first == false) return
+    if (first === false) return
     try {
-        if (document.querySelector('#flashes').textContent.trim() != '') {
+        if (document.querySelector('#flashes').textContent.trim() !== '') {
             if (document.querySelector('#flashes').textContent.includes('successfully voted')) {
                 chrome.runtime.sendMessage({successfully: true})
                 return
@@ -25,7 +25,7 @@ async function vote(first) {
         document.getElementById('web_server_vote_username').value = project.nick
         const timer = setInterval(()=>{
             try {
-                if (document.getElementById('captcha-input').style.display != 'none') {
+                if (document.getElementById('captcha-input').style.display !== 'none') {
                     chrome.runtime.sendMessage({captcha: true})
                     clearInterval(timer)
                 }

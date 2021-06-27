@@ -399,10 +399,11 @@ ul {
 
 #modals .modal .content .message {
 	overflow-y: auto;
-	font-size: 15px;
-	color: #fff;
-	padding: 5px;
-	margin: 20px auto;
+    font-size: 15px;
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    margin: 20px auto;
 	max-height: 240px;
 }
 
@@ -495,7 +496,7 @@ ul {
 	font-weight: 600;
 }
 
-.contentBlock {
+.projectsBlock .contentBlock {
 	margin-bottom: 15px;
 }
 
@@ -507,7 +508,7 @@ ul {
 	grid-gap: 15px;
 }
 
-.contentBlock .listcontent li {
+.projectsBlock .contentBlock .listcontent li {
 	background: #121214;
 	margin-bottom: 10px;
 	justify-content: space-between;
@@ -516,26 +517,24 @@ ul {
 	border-radius: 5px;
 }
 
-.contentBlock .listcontent li .controlItems {
+.projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
+	margin-right: 10px;
+}
+
+.projectsBlock .contentBlock .listcontent li .controlItems {
 	display: flex;
 	margin: auto 0;
 	justify-content: space-between;
 }
 
-.contentBlock .listcontent li img[src="images/icons/repair.svg"],
-.contentBlock .listcontent li img[src="images/icons/stats.svg"] {
-	margin-right: 10px;
-	margin-left: 10px;
-}
-
-.contentBlock .listcontent li .message {
+.projectsBlock .contentBlock .listcontent li .message {
 	line-height: 1.5;
 	display: flex;
     flex-direction: column;
     justify-content: space-around;
 }
 
-.contentBlock .listcontent li .controlItems img {
+.projectsBlock .contentBlock .listcontent li .controlItems img {
 	width: 30px;
 	display: block;
 	padding: 10px;
@@ -545,7 +544,7 @@ ul {
 	border-radius: 5px;
 }
 
-.contentBlock .listcontent li img:hover {
+.projectsBlock .contentBlock .listcontent li img:hover {
 	cursor: pointer;
 	opacity: 1;
 }
@@ -555,27 +554,19 @@ ul {
 	background: #1a7bee;
 }
 
-.projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
-	background: #1a7bee;
-}
-
-.contentBlock .listcontent li img[src="images/icons/info.svg"]:hover {
-	background: #1a7bee;
-}
-
-.contentBlock .listcontent li img[src="images/icons/delete.svg"]:hover {
+.projectsBlock .contentBlock .listcontent li img[src="images/icons/delete.svg"]:hover {
 	background: #da5e5e;
 }
 
-.contentBlock .listcontent li:nth-child(odd) {
+.projectsBlock .contentBlock .listcontent li:nth-child(odd) {
 	background: #2a2a2f;
 }
 
-.buttonBlock button {
+.projectsBlock .buttonBlock button {
 	position: relative;
-}	
+}
 
-.buttonBlock button > span {
+.projectsBlock .buttonBlock button > span {
     top: -10px;
     font-weight: 600;
     pointer-events: none;
@@ -702,7 +693,7 @@ ul {
 #addProxy {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	grid-gap: 20px; 
+	grid-gap: 20px;
 }
 
 #addProxy {
@@ -772,12 +763,11 @@ ul {
     	grid-template-columns: repeat(2, 1fr);
     }
 
-    .contentBlock .listcontent li .controlItems {
+    .projectsBlock .contentBlock .listcontent li .controlItems {
     	flex-direction: column;
     }
 
-    .contentBlock .listcontent li img[src="images/icons/repair.svg"],
-    .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
+    .projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
     	margin-right: 0;
     	margin-left: 0;
     	margin-bottom: 5px;
@@ -844,7 +834,7 @@ ul {
 	transition: .2s;
 }
 
-#statsSubtitle {
+.statsSubtitle {
 	font-size: 14px;
 }
 
@@ -871,7 +861,7 @@ ul {
 	margin: auto 0;
 }
 
-[data-resource="notAdded"] {
+[data-resource="notAdded"], [data-resource="load"] {
 	font-size: 14px;
 	display: block;
 	text-align: center;

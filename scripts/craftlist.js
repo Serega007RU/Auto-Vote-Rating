@@ -19,17 +19,17 @@ async function vote(first) {
                 let min = 0
                 let sec = 0
                 for (const i in numbers) {
-                    if (count == 0) {
+                    if (count === 0) {
                         day = numbers[i]
-                    } else if (count == 1) {
+                    } else if (count === 1) {
                         month = numbers[i] - 1
-                    } else if (count == 2) {
+                    } else if (count === 2) {
                         year = numbers[i]
-                    } else if (count == 3) {
+                    } else if (count === 3) {
                         hour = numbers[i]
-                    } else if (count == 4) {
+                    } else if (count === 4) {
                         min = numbers[i]
-                    } else if (count == 5) {
+                    } else if (count === 5) {
                         sec = numbers[i]
                     }
                     count++
@@ -49,11 +49,11 @@ async function vote(first) {
             let min = 0
             let sec = 0
             for (const i in numbers) {
-                if (count == 0) {
+                if (count === 0) {
                     hour = numbers[i]
-                } else if (count == 1) {
+                } else if (count === 1) {
                     min = numbers[i]
-                } else if (count == 2) {
+                } else if (count === 2) {
                     sec = numbers[i]
                 }
                 count++
@@ -71,9 +71,9 @@ async function vote(first) {
         let project = await getProject('CraftList')
         let hours = document.querySelector('#voteModal p.text-center').textContent.match(/\d+/g).map(Number)[0]
         const milliseconds = (hours * 60 * 60 * 1000)
-        if (project.timeout == null || project.timeout != milliseconds) {
+        if (project.timeout == null || project.timeout !== milliseconds) {
             project.timeout = milliseconds
-            await setProject(project)
+            chrome.runtime.sendMessage({changeProject: true, project})
         }
         document.querySelector('input[name="nickName"]').value = project.nick
         document.querySelector('button.btn.btn-vote').click()

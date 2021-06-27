@@ -74,11 +74,11 @@
                         </div>
                         <div style="display: none;" id="label3" class="input-block">
                             <label for="time" data-resource="delayFetch"></label>
-                            <input id="time" name="customTime" placeholder="delayFetch" type="number" min="10000" class="input"></input>
+                            <input id="time" name="customTime" placeholder="delayFetch" type="number" min="10000" class="input"/>
                         </div>
                         <div style="display: none;" id="label7" class="input-block">
                             <label for="hour" data-resource="chooseHour"></label>
-                            <input id="hour" name="chooseHour" placeholder="chooseHour" type="time" step="1" min="0" max="23" class="input"></input>
+                            <input id="hour" name="chooseHour" placeholder="chooseHour" type="time" step="1" min="0" max="23" class="input"/>
                         </div>
                         <div style="display: none;" id="label9" class="input-block">
                             <label for="sheldTime" data-resource="sheldTime"></label>
@@ -86,11 +86,11 @@
                         </div>
                         <div style="display: none;" id="label2" class="input-block">
                             <label for="responseURL" data-resource="urlFetch"></label>
-                            <input id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="input"></input>
+                            <input id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="input"/>
                         </div>
                         <div style="display: none;" id="label1" class="input-block">
                             <label for="customBody" data-resource="bodyFetch"></label>
-                            <textarea id="customBody" name="customBody" placeholder="bodyFetch" type="text" class="textarea"></textarea>
+                            <textarea id="customBody" name="customBody" placeholder="bodyFetch" class="textarea"></textarea>
                         </div>
                         <div style="display: none;" id="label8" class="input-block">
                             <label for="voteModeSelect" data-resource="enabledSilentVote">
@@ -125,7 +125,7 @@
                                     </span>
                                 </span>
                             </label>
-                            <input id="additionTopGG" name="additionTopGG" placeholder="additionTopGG" type="text" class="input"></input>
+                            <input id="additionTopGG" name="additionTopGG" placeholder="additionTopGG" type="text" class="input"/>
                         </div>
                         <!--ListForge-->
                         <div style="display: none;" id="urlGame" class="input-block">
@@ -139,7 +139,7 @@
                                     </span>
                                 </span>
                             </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGameListForge" placeholder="chooseGameURL" list="gameListListForge" class="input">
+                            <input class="input" name="chooseGame" type="text" id="chooseGameListForge" placeholder="chooseGameURL" list="gameListListForge">
                             <datalist id="gameListListForge">
                                 <option value="7daystodie-servers.com">7 Days To Die</option>
                                 <option value="ark-servers.net">ARK : Survival Evolved</option>
@@ -182,7 +182,7 @@
                                     </span>
                                 </span>
                             </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGameTopG" placeholder="chooseGameURL" list="gameListTopG" class="input">
+                            <input class="input" name="chooseGame" type="text" id="chooseGameTopG" placeholder="chooseGameURL" list="gameListTopG">
                             <datalist id="gameListTopG">
                                 <option value="minecraft-servers">Minecraft</option>
                                 <option value="cs-servers">Counter Strike: 1.6</option>
@@ -243,7 +243,7 @@
                             </datalist>
                         </div>
                         <div style="display: none;" class="input-block" id="label4">
-                            <label for="selectLang" data-resource="chooseLang"></label>
+                            <label for="selectLangTopGames" data-resource="chooseLang"></label>
                             <select style="display: none;" id="selectLangTopGames" class="select">
                                 <option value="de">Deutsch</option>
                                 <option value="en">English</option>
@@ -542,14 +542,14 @@
                             <input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox"/>
                             <label data-resource="disabledNotifError" for="disabledNotifError"></label>
                         </div>
-                        <div class="check-block enableSyncStorage" style="display: none;">
+<!--                    <div class="check-block">
                             <input class="checkbox" id="enableSyncStorage" type="checkbox" name="checkbox"/>
                             <label data-resource="enableSyncStorage" for="enableSyncStorage">
                                 <span class="tooltip1">
                                     <span data-resource="enableSyncStorageTooltip" class="tooltip1text"></span>
                                 </span>
                             </label>
-                        </div>
+                        </div> -->
                         <div class="check-block">
                             <input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox"/>
                             <label data-resource="disabledCheckTime" for="disabledCheckTime"></label>
@@ -664,7 +664,7 @@
                                             <span data-resource="antiBanVKTooltip" class="tooltip1text"></span>
                                         </span>
                                     </label>
-                                </div>                  
+                                </div>
                             </div>
 						    <div class="inputEl">
 						    	<button class="submitBtn" data-resource="addButton" id="AddVK"></button>
@@ -782,7 +782,7 @@
                                 <div class="check-block">
                                     <input class="checkbox" id="saveBorealisCredentials" type="checkbox" name="checkbox"/>
                                     <label data-resource="saveVKCredentials" for="saveBorealisCredentials"></label>
-                                </div>             
+                                </div>
                             </div>
 						    <div class="inputEl">
 						    	<button class="submitBtn" data-resource="addButton" id="AddBorealis"></button>
@@ -796,7 +796,7 @@
             		                <img src="images/icons/importBtn.svg" alt="importBtn">
             		            </label>
             		            <input id="importRegBorealis" type="file" accept=".txt">
-                                
+
 						    </div>
                             <button class="submitBtn" id="AddNicksAccBorealis">Добавить никнеймы по добавленным аккаунтам</button>
 							<div id="BorealisList"></div>
@@ -1093,7 +1093,7 @@
                 </div>
             </div>
             <!-- Если в облаке уже есть сохранённые настройки -->
-            <div class="modal" id="conflictSync">
+<!--        <div class="modal" id="conflictSync">
                 <div class="head">
                     <h3 data-resource="conflictSync"></h3>
                     <div class="close"></div>
@@ -1109,13 +1109,13 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <!-- Статистика -->
             <div class="modal" id="stats">
                 <div class="head">
                     <div class="title">
                         <h3 data-resource="stats2"></h3>
-                        <div id="statsSubtitle"></div>
+                        <div class="statsSubtitle"></div>
                     </div>
                     <div class="close"></div>
                 </div>
@@ -1161,5 +1161,6 @@
                 </div>
             </div>
         </div>
+        <script src="main.js"></script>
         <script src="options.js"></script>
     </body>

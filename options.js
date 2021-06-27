@@ -1,23 +1,17 @@
-var settings
-var generalStats = {}
-//Хранит значение отключения проверки на совпадение проектов
-var disableCheckProjects = false
-//Нужно ли return если обнаружило ошибку при добавлении проекта
-var returnAdd
 //Где храним настройки
-let storageArea = 'local'
+// let storageArea = 'local'
 //Блокировать ли кнопки которые требуют времени на выполнение?
 let blockButtons = false
 let currentVKCredentials = {}
 let currentBorealisCredentials = {}
 
-var authVKUrls = new Map([
+const authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
     ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
     ['MCRate', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
     ['MinecraftRating', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
     ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
-    ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&response_type=token&redirect_uri=close.html']
+    ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&redirect_uri=close.html']
 ])
 
 const svgInfo = document.createElement('img')
@@ -35,282 +29,37 @@ svgSuccess.src = 'images/icons/success.svg'
 const svgDelete = document.createElement('img')
 svgDelete.src = 'images/icons/delete.svg'
 
-//Конструктор настроек
-function Settings(disabledNotifStart, disabledNotifInfo, disabledNotifWarn, disabledNotifError, enabledSilentVote, disabledCheckTime, cooldown) {
-    this.disabledNotifStart = disabledNotifStart
-    this.disabledNotifInfo = disabledNotifInfo
-    this.disabledNotifWarn = disabledNotifWarn
-    this.disabledNotifError = disabledNotifError
-    this.enabledSilentVote = enabledSilentVote
-    this.disabledCheckTime = disabledCheckTime
-    this.cooldown = cooldown
-    this.useMultiVote = true
-    this.repeatAttemptLater = true
-    this.stopVote = 9000000000000000
-    this.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
-}
+document.addEventListener('DOMContentLoaded', async()=>{
+    await initializeConfig()
 
-// Restores select box and checkbox state using the preferences
-// stored in chrome.storage.
-async function restoreOptions() {
-    storageArea = await getValue('storageArea', 'local')
-    if (storageArea == null || storageArea == '') {
-        storageArea = 'local'
-        await setValue('storageArea', storageArea, 'local')
-    }
-    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-        window['projects' + item] = await getValue('AVMRprojects' + item)
-    }
-    VKs = await getValue('AVMRVKs')
-    borealisAccounts = await getValue('borealisAccounts')
-    proxies = await getValue('AVMRproxies')
-    settings = await getValue('AVMRsettings')
-    generalStats = await getValue('generalStats')
-    if (generalStats == null)
-        generalStats = {
-            added: Date.now()
-        }
-    if (projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function')) {
-        createNotif(chrome.i18n.getMessage('firstSettings'))
-        
-        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-            window['projects' + item] = []
-            await setValue('AVMRprojects' + item, window['projects' + item])
-        }
+    await restoreOptions()
 
-        VKs = []
-        borealisAccounts = []
-        proxies = []
-        settings = new Settings(true, false, false, false, true, false, 1000, false)
-        await setValue('AVMRsettings', settings)
-        await setValue('AVMRVKs', VKs)
-        await setValue('borealisAccounts', borealisAccounts)
-        await setValue('AVMRproxies', proxies)
-
-        console.log(chrome.i18n.getMessage('settingsGen'))
-        createNotif(chrome.i18n.getMessage('firstSettingsSave'), 'success')
+    if (document.URL.endsWith('?installed')) {
+        window.history.replaceState(null, null, 'options.html')
         alert(chrome.i18n.getMessage('firstInstall'))
     }
 
-    await checkUpdateConflicts(true)
+    fastAdd()
 
-    updateProjectList()
-
-    //Слушатель дополнительных настроек
-    let checkbox = document.querySelectorAll('input[name=checkbox]')
-    for (const check of checkbox) {
-        check.addEventListener('change', async function() {
-            if (blockButtons) {
-                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-                return
-            } else {
-                blockButtons = true
+    //Для FireFox почему-то не доступно это API
+    if (chrome.notifications.getPermissionLevel != null) {
+        chrome.notifications.getPermissionLevel(function(callback) {
+            if (callback !== 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
+                createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
             }
-            let _return = false
-            if (this.id == 'disabledNotifStart')
-                settings.disabledNotifStart = this.checked
-            else if (this.id == 'disabledNotifInfo')
-                settings.disabledNotifInfo = this.checked
-            else if (this.id == 'disabledNotifWarn')
-                settings.disabledNotifWarn = this.checked
-            else if (this.id == 'disabledNotifError') {
-                if (this.checked && confirm(chrome.i18n.getMessage('confirmDisableErrors'))) {
-                    settings.disabledNotifError = this.checked
-                } else if (this.checked) {
-                    this.checked = false
-                    _return = true
-                } else {
-                    settings.disabledNotifError = this.checked
-                }
-            } else if (this.id == 'disabledCheckTime')
-                settings.disabledCheckTime = this.checked
-            else if (this.id == 'disabledCheckInternet')
-                settings.disabledCheckInternet = this.checked
-            else if (this.id == 'disableCheckProjects') {
-                if (this.checked && confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
-                    disableCheckProjects = this.checked
-                } else if (this.checked) {
-                    this.checked = false
-                } else {
-                    disableCheckProjects = this.checked
-                }
-                _return = true
-            } else if (this.id == 'priority') {
-                if (this.checked && !confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
-                    this.checked = false
-                }
-                _return = true
-            } else if (this.id == 'useMultiVote') {
-                settings.useMultiVote = this.checked
-            } else if (this.id == 'repeatAttemptLater') {
-                settings.repeatAttemptLater = this.checked
-            } else if (this.id == 'useProxyOnUnProxyTop') {
-                settings.useProxyOnUnProxyTop = this.checked
-            } else if (this.id == 'randomize') {
-                _return = true
-            } else if (this.id == 'customTimeOut') {
-                if (this.checked) {
-                    document.getElementById('lastDayMonth').disabled = false
-                    document.getElementById('label6').removeAttribute('style')
-                    if (document.getElementById('selectTime').value == 'ms') {
-                        document.getElementById('label3').removeAttribute('style')
-                        document.getElementById('time').required = true
-                        document.getElementById('label7').style.display = 'none'
-                        document.getElementById('hour').required = false
-                    } else {
-                        document.getElementById('label7').removeAttribute('style')
-                        document.getElementById('hour').required = true
-                        document.getElementById('label3').style.display = 'none'
-                        document.getElementById('time').required = false
-                    }
-                } else {
-                    document.getElementById('lastDayMonth').disabled = true
-                    document.getElementById('label6').style.display = 'none'
-                    document.getElementById('label3').style.display = 'none'
-                    document.getElementById('time').required = false
-                    document.getElementById('label7').style.display = 'none'
-                    document.getElementById('hour').required = false
-                }
-                _return = true
-            } else if (this.id == 'lastDayMonth' || this.id == 'randomize') {
-                _return = true
-            } else if (this.id == 'sheldTimeCheckbox') {
-                if (this.checked) {
-                    document.getElementById('label9').removeAttribute('style')
-                    document.getElementById('sheldTime').required = true
-                } else {
-                    document.getElementById('label9').style.display = 'none'
-                    document.getElementById('sheldTime').required = false
-                }
-                _return = true
-            } else if (this.id == 'enableSyncStorage') {
-                _return = true
-                let oldStorageArea = storageArea
-                if (this.checked) {
-                    if (await getValue('AVMRsettings', 'sync') != null) {
-                        toggleModal('conflictSync')
-                        this.checked = false
-                        blockButtons = false
-                        return
-                    }
-                    storageArea = 'sync'
-                    createNotif(chrome.i18n.getMessage('settingsSyncCopy'))
-                } else {
-                    storageArea = 'local'
-                    createNotif(chrome.i18n.getMessage('settingsSyncCopyLocal'))
-                }
-                await setValue('storageArea', storageArea, 'local')
-                for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-                    await setValue('AVMRprojects' + item, window['projects' + item])
-                    await removeValue('AVMRprojects' + item, oldStorageArea)
-                }
-                await setValue('AVMRsettings', settings)
-                await setValue('generalStats', generalStats)
-                await setValue('AVMRVKs', VKs)
-                await setValue('borealisAccounts', borealisAccounts)
-                await setValue('AVMRproxies', proxies)
-                await removeValue('AVMRsettings', oldStorageArea)
-                await removeValue('generalStats', oldStorageArea)
-                await removeValue('AVMRVKs', oldStorageArea)
-                await removeValue('borealisAccounts', oldStorageArea)
-                await removeValue('AVMRproxies', oldStorageArea)
-
-                if (this.checked) {
-                    createNotif(chrome.i18n.getMessage('settingsSyncCopySuccess'), 'success');
-                } else {
-                    createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success');
-                }
-            } else if (this.id == 'voteMode') {
-                if (this.checked) {
-                    document.getElementById('label8').removeAttribute('style')
-                } else {
-                    document.getElementById('label8').style.display = 'none'
-                }
-                _return = true
-            } else if (this.id == 'autoAuthVK') {
-                if (this.checked && confirm(chrome.i18n.getMessage('confirmAutoAuthVK'))) {
-                    settings.autoAuthVK = this.checked
-                } else if (this.checked) {
-                    this.checked = false
-                    _return = true
-                } else {
-                    settings.autoAuthVK = this.checked
-                }
-            } else if (this.id == 'antiBanVK') {
-                settings.antiBanVK = this.checked
-            } else if (this.id == 'clearVKCookies') {
-                settings.clearVKCookies = this.checked
-            } else if (this.id == 'clearBorealisCookies') {
-                settings.clearBorealisCookies = this.checked
-            } else if (this.id == 'saveVKCredentials') {
-                if (this.checked && confirm(chrome.i18n.getMessage('confirmSaveVKCredentials'))) {
-                    settings.saveVKCredentials = this.checked
-                } else if (this.checked) {
-                    this.checked = false
-                    _return = true
-                } else {
-                    settings.saveVKCredentials = this.checked
-                }
-            } else if (this.id == 'saveBorealisCredentials') {
-                if (this.checked && confirm(chrome.i18n.getMessage('confirmSaveVKCredentials'))) {
-                    settings.saveBorealisCredentials = this.checked
-                } else if (this.checked) {
-                    this.checked = false
-                    _return = true
-                } else {
-                    settings.saveBorealisCredentials = this.checked
-                }
-            } else if (this.id == 'importNicks') {
-                if (this.checked) {
-                    document.querySelector('label[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNicks')
-                    document.getElementById('nick').required = false
-                    document.getElementById('nick').style.display = 'none'
-                    document.getElementById('importNicksFile').required = true
-                    document.getElementById('importNicksFile').parentElement.removeAttribute('style')
-                } else {
-                    document.querySelector('label[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
-                    document.getElementById('nick').required = true
-                    document.getElementById('nick').removeAttribute('style')
-                    document.getElementById('importNicksFile').required = false
-                    document.getElementById('importNicksFile').parentElement.style.display = 'none'
-                }
-                _return = true
-            }
-            if (!_return) await setValue('AVMRsettings', settings)
-            blockButtons = false
         })
     }
-    let stopVoteButton = async function () {
-        if (settings.stopVote > Date.now()) {
-            settings.stopVote = 0
-            document.querySelector('#stopVote img').src = 'images/icons/start.svg'
-            createNotif(chrome.i18n.getMessage('voteResumed'), 'success', 5000)
-        } else {
-            settings.stopVote = 9000000000000000
-            document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
-            await chrome.extension.getBackgroundPage().stopVote()
-            createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
-        }
-        await setValue('AVMRsettings', settings)
-    }
-    document.getElementById('stopVote').addEventListener('click', stopVoteButton)
+})
 
-    /*document.getElementById('countNicksBorealis').max = VKs.length*/
-
+// Restores select box and checkbox state using the preferences
+async function restoreOptions() {
     //Считывает настройки расширение и выдаёт их в html
     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
     document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
     document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
     document.getElementById('disabledNotifError').checked = settings.disabledNotifError
-    if (settings.enabledSilentVote) {
-        document.getElementById('enabledSilentVote').value = 'enabled'
-    } else {
-        document.getElementById('enabledSilentVote').value = 'disabled'
-    }
-    if (storageArea == 'sync') {
-        document.getElementById('enableSyncStorage').checked = true
-        document.querySelector('div.enableSyncStorage').removeAttribute('style')
-    }
+    if (!settings.enabledSilentVote) document.getElementById('enabledSilentVote').value = 'disabled'
+//  if (storageArea == 'sync') document.getElementById('enableSyncStorage').checked = true
     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('cooldown').value = settings.cooldown
@@ -330,249 +79,44 @@ async function restoreOptions() {
     if (settings.stopVote > Date.now()) {
         document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
     }
-    if (settings.enableCustom || projectsCustom.length > 0) addCustom()
-    //Для FireFox почему-то не доступно это API
-    if (chrome.notifications.getPermissionLevel != null) {
-        chrome.notifications.getPermissionLevel(function(callback) {
-            if (callback != 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
-                createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
-            }
-        })
-    }
-
-    await checkUpdateAvailbe()
-}
-
-async function checkUpdateAvailbe(forced) {
-    const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/files/manifest.json/raw?ref=multivote')
-    const json = await response.json()
-    if (forced || new Version(chrome.runtime.getManifest().version).compareTo(new Version(json.version)) == -1) {
-        const button = document.createElement('button')
-        button.classList.add('btn')
-        button.id = 'updateBtn'
-        button.addEventListener('click', () => update(forced ? forced : json.version))
-        button.textContent = chrome.i18n.getMessage('update')
-        createNotif([chrome.i18n.getMessage('updateAvailbe', forced ? forced : json.version), button], 'success', 60000)
-    } else if (document.URL.endsWith('?updated')) {
-        window.history.replaceState(null, null, 'options.html')
-        createNotif(chrome.i18n.getMessage('updated', chrome.runtime.getManifest().version), 'success')
-        toggleModal('ChangeLog')
-    }
-}
-
-//Автоматизированное обновление расширения с git
-async function update(version) {
-    if (window.opr) {//Если мы на Opera
-        chrome.tabs.create({url: 'https://noamidash.ml/auto_vote_rating-' + version + '-opera.crx'})
-        return
-    }
-    if (!chrome.app) {//Если мы на FireFox
-        chrome.tabs.create({url: 'https://noamidash.ml/auto_vote_rating-' + version + '-an+fx.xpi'})
-        return
-    }
-    document.querySelector('#updateVersion .content .message').parentNode.replaceChild(document.querySelector('#updateVersion .content .message').cloneNode(false), document.querySelector('#updateVersion .content .message'))
-    document.querySelector('#updateVersion .content .events').parentNode.replaceChild(document.querySelector('#updateVersion .content .events').cloneNode(false), document.querySelector('#updateVersion .content .events'))
-    const message = document.querySelector('#updateVersion > div.content > .message')
-    const events = document.querySelector('#updateVersion > div.content > .events')
-    const progress = document.createElement('progress')
-    events.append(progress)
-    try {
-        createNotif(chrome.i18n.getMessage('update1'), 'hint', 1000)
-        //Спрашиваем у пользователя папку где установлено расширение и получаем её
-        const dirHandle = await window.showDirectoryPicker()
-        if (!document.getElementById('updateVersion').className.includes('active')) toggleModal('updateVersion')
-        //Проверяем на соответствие манифеста
-//      message.append(chrome.i18n.getMessage('update2'))
-//      message.append(document.createElement('br'))
-//      message.scrollTop = message.scrollHeight
-//      let manifestHandle
-//      try {
-//           manifestHandle = await dirHandle.getFileHandle('manifest.json')
-//      } catch (e) {
-//          if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
-//              throw Error(chrome.i18n.getMessage('update3', 'Not found manifest'))
-//          } else {
-//              throw e
-//          }
-//      }
-//      const manifestFile = await manifestHandle.getFile()
-//      const manifest = await manifestFile.text()
-//      if (manifest != JSON.stringify(chrome.runtime.getManifest())) {
-//          throw Error(chrome.i18n.getMessage('update3', 'Invalid manifest'))
-//      }
-        //Также ещё проверим временным файлом в случае если у пользователя дубликат папки расширения. Засовываем в эту папку файл AVRtemp для проверки что пользователь указал дейсвительно правильную папку
-        const tempFileHandle = await dirHandle.getFileHandle('AVRtemp', {create: true})
-        //Проверяем дейсвительно ли это та папка?
-        await new Promise((resolve, reject)=>{
-            //Проверяем существует ли файл в AVRtemp в правильной папки расширения (этот метод даёт только изолированный доступ к папке расширения и мы можем только её читать чем мы и пользуемся)
-            chrome.runtime.getPackageDirectoryEntry(details=> {
-                details.getFile('AVRtemp', {}, file => resolve(file), error => reject(error))
-            })
-        }).catch(e=>{
-            if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
-                throw Error(chrome.i18n.getMessage('update3', 'Temporary file not found'))
-            } else {
-                throw e
-            }
-        }).finally(()=>{
-            dirHandle.removeEntry('AVRtemp')
-        })
-        
-        message.append(chrome.i18n.getMessage('update4'))
-        message.append(document.createElement('br'))
-        message.scrollTop = message.scrollHeight
-        document.getElementById('file-download').click()
-
-        //Удаляем все файлы для дальнейшего обновления
-        message.append(chrome.i18n.getMessage('update5'))
-        message.append(document.createElement('br'))
-        message.scrollTop = message.scrollHeight
-        for await (const entry of dirHandle.values()) {
-            await dirHandle.removeEntry(entry.name, {recursive: true})
-        }
-
-        //Обращаемся к git где все у нас файлы перечислены
-        message.append(chrome.i18n.getMessage('update6'))
-        message.append(document.createElement('br'))
-        message.scrollTop = message.scrollHeight
-        const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/tree?recursive=true&per_page=999&ref=multivote')
-        const json = await response.json()
-        progress.value = -1
-        progress.max = json.length
-        for (const file of json) {
-            progress.value = progress.value + 1
-            if (file.type == 'blob') {
-                message.append(chrome.i18n.getMessage('dowloading') + file.path)
-                message.append(document.createElement('br'))
-                message.scrollTop = message.scrollHeight
-                file.url = 'https://gitlab.com/api/v4/projects/19831620/repository/files/' + file.path.replaceAll('/', '%2F') + '/raw?ref=multivote'
-                await createFile(dirHandle, file.path.split('/'), file)
-            }
-        }
-        
-        //Создаёт поддиректории если их не существует и создаёт файл в нужной дирректории
-        async function createFile(rootDirEntry, folders, file) {
-            if (folders.length == 1) {
-                //Создаём файл
-                const newFileHandle = await rootDirEntry.getFileHandle(file.name, {create: true})
-                await writeURLToFile(newFileHandle, file.url)
-                return
-            }
-            //Фильтруем './' и '/' 
-            if (folders[0] == '.' || folders[0] == '') {
-                folders = folders.slice(1)
-            }
-            const dirEntry = await rootDirEntry.getDirectoryHandle(folders[0], {create: true})
-            if (folders.length) {//Если есть ещё поддиректории
-                createFile(dirEntry, folders.slice(1), file)
-            }
-        }
-        //Записывает в указанный файл содержимое из указанного URL
-        async function writeURLToFile(fileHandle, url) {
-            // Create a FileSystemWritableFileStream to write to.
-            const writable = await fileHandle.createWritable()
-            // Make an HTTP request for the contents.
-            const response = await fetch(url)
-            // Stream the response into the file.
-            await response.body.pipeTo(writable)
-            // pipeTo() closes the destination pipe by default, no need to close it.
-        }
-        message.append(createMessage(chrome.i18n.getMessage('update7'), 'warn'))
-        message.append(document.createElement('br'))
-        message.append(createMessage(chrome.i18n.getMessage('update8'), 'success'))
-        message.append(document.createElement('br'))
-        message.scrollTop = message.scrollHeight
-        const buttonReload = document.createElement('button')
-        buttonReload.classList.add('btn')
-        buttonReload.textContent = chrome.i18n.getMessage('reloadExtension')
-        document.querySelector('#updateVersion > div.content > .events').append(buttonReload)
-        buttonReload.addEventListener('click', ()=> {
-            chrome.runtime.reload()
-        })
-    } catch (e) {
-        if (document.getElementById('updateVersion').className.includes('active')) {
-            message.append(createMessage(e, 'error'))
-            message.append(document.createElement('br'))
-            message.append(chrome.i18n.getMessage('tryManuallyUpdate'))
-            message.append(' ')
-            let a = document.createElement('a')
-            a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/tree/multivote'
-            a.target = 'blank_'
-            a.textContent = 'https://gitlab.com/Serega007/auto-vote-rating/-/tree/multivote'
-            a.className = 'link'
-            message.append(a)
-            message.append(document.createElement('br'))
-        } else {
-            createNotif(e, 'error')
-        }
-        message.scrollTop = message.scrollHeight
-        if (!progress.value) progress.value = 0
-        const buttonRetry = document.createElement('button')
-        buttonRetry.classList.add('btn')
-        buttonRetry.textContent = chrome.i18n.getMessage('retry')
-        events.append(buttonRetry)
-        buttonRetry.addEventListener('click', ()=> {
-            update()
-        })
-    }
+    if (settings.enableCustom) addCustom()
+    await reloadProjectList()
 }
 
 //Добавить проект в список проекта
-async function addProjectList(project, visually) {
-    let listProject = document.getElementById(getProjectName(project) + 'List')
-    if (listProject == null) {//Генерация тела списка добавленных проектов для текущего рейтинга
-        let ul = document.createElement('ul')
-        ul.id = getProjectName(project) + 'Tab'
-        ul.classList.add('listcontent')
-        ul.style.display = 'none'
-        let div = document.createElement('div')
-        div.setAttribute('data-resource', 'notAdded')
-        div.textContent = chrome.i18n.getMessage('notAdded')
-        ul.append(div)
-        if (!(project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList)) {
-            let label = document.createElement('label')
-            label.setAttribute('data-resource', 'notAvaibledInSilent')
-            label.textContent = chrome.i18n.getMessage('notAvaibledInSilent')
-            let span = document.createElement('span')
-            span.classList.add('tooltip2')
-            let span2 = document.createElement('span')
-            span2.setAttribute('data-resource', 'warnSilentVoteTooltip')
-            span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
-            span2.classList.add('tooltip2text')
-            span.append(span2)
-            label.append(span)
-            ul.append(label)
-        }
-        let div2 = document.createElement('div')
-        div2.id = getProjectName(project) + 'List'
-        ul.append(div2)
-        const button = document.createElement('button')
-        button.className = 'submitBtn redBtn'
-        button.textContent = chrome.i18n.getMessage('deleteAll')
-        button.addEventListener('click', async function () {
-            if (confirm(chrome.i18n.getMessage('deleteAllRating'))) {
-                window['projects' + getProjectName(project)] = []
-                await setValue('AVMRprojects' + getProjectName(project), window['projects' + getProjectName(project)])
-                updateProjectList()
-            }
-        })
-        ul.append(button)
-        listProject = div2
-        document.querySelector('div.projectsBlock > div.contentBlock').append(ul)
+async function addProjectList(project, projectID) {
+    if (document.getElementById(project.rating + 'Button') == null) {
+        generateBtnListRating(project.rating, 0)
     }
-    listProject.parentElement.firstElementChild.style.display = 'none'
-    let li = document.createElement('li')
-    li.id = getProjectName(project) + '_' + project.id + '_' + project.nick
+    if (!projectID) {
+        const projects = db.transaction('projects', 'readwrite').objectStore('projects')
+        projectID = await new Promise((resolve, reject) => {
+            const request = projects.add(project)
+            request.onsuccess = function (event) {
+                resolve(event.target.result)
+            }
+            request.onerror = reject
+        })
+
+        const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent)
+        document.querySelector('#' + project.rating + 'Button > span').textContent = String(count + 1)
+
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkOpen(project)
+    }
+
+    const listProject = document.getElementById(project.rating + 'List')
+    if (listProject.childElementCount === 0 && listProject.parentElement.style.display === 'none') return
+    const li = document.createElement('li')
+    li.id = projectID
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon')
-    if (!(project.time == null || project.time == '') && Date.now() < project.time) {
+    if (!(project.time == null || project.time === '') && Date.now() < project.time) {
         text = new Date(project.time).toLocaleString().replace(',', '')
-    } else {
-        const queueProjects = chrome.extension.getBackgroundPage().queueProjects
-        for (let value of queueProjects) {
-            if (getProjectName(value) == getProjectName(project)) {
+    } else if (chrome.extension.getBackgroundPage()) {
+        for (const value of chrome.extension.getBackgroundPage().queueProjects) {
+            if (value.rating === project.rating) {
                 text = chrome.i18n.getMessage('inQueue')
-                if (JSON.stringify(value.id) == JSON.stringify(project.id) && value.nick == project.nick) {
+                if (JSON.stringify(value.id) === JSON.stringify(project.id) && value.nick === project.nick) {
                     text = chrome.i18n.getMessage('now')
                     break
                 }
@@ -595,7 +139,7 @@ async function addProjectList(project, visually) {
     contDiv.classList.add('message')
 
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.Custom && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')/* + (project.borealisNickExpires ? ' (' + chrome.i18n.getMessage('tempNick') + ')' : '')*/
+    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.rating === 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
     contDiv.append(nameProjectMes)
 
     if (project.error) {
@@ -621,56 +165,100 @@ async function addProjectList(project, visually) {
         } else {
             blockButtons = true
         }
-        await removeProjectList(project, false)
+        await removeProjectList(project, projectID)
         blockButtons = false
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', function() {
-        toggleModal('stats')
-        document.getElementById('statsSubtitle').textContent = getProjectName(project) + ' – ' + project.nick + (project.game != null ? ' – ' + project.game : '') + (project.Custom ? '' : ' – ' + (project.name != null ? project.name : project.id))
-        document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes ? project.stats.successVotes : 0
-        document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes ? project.stats.monthSuccessVotes : 0
-        document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.lastMonthSuccessVotes ? project.stats.lastMonthSuccessVotes : 0
-        document.querySelector('td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = project.stats.errorVotes ? project.stats.errorVotes : 0
-        document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = project.stats.laterVotes ? project.stats.laterVotes : 0
-        document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = project.stats.lastSuccessVote ? new Date(project.stats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
-        document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = project.stats.lastAttemptVote ? new Date(project.stats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
-        document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = project.stats.added ? new Date(project.stats.added).toLocaleString().replace(',', '') : 'None'
+        updateModalStats(project, projectID)
     })
-    if (document.getElementById(getProjectName(project) + 'Button') == null) {
-        if (document.querySelector('.buttonBlock').childElementCount == 0) {
-            document.querySelector('.buttonBlock').innerText = ''
+    if (document.getElementById('stats').classList.contains('active') && document.getElementById('stats' + projectID) != null) {
+        updateModalStats(project, projectID)
+    }
+}
+
+function updateModalStats(project, projectID) {
+    toggleModal('stats')
+    document.querySelector('.statsSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
+    document.querySelector('.statsSubtitle').id = 'stats' + projectID
+    document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
+    document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes
+    document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.lastMonthSuccessVotes
+    document.querySelector('td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = project.stats.errorVotes
+    document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = project.stats.laterVotes
+    document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = project.stats.lastSuccessVote ? new Date(project.stats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
+    document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = project.stats.lastAttemptVote ? new Date(project.stats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
+    document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = project.stats.added ? new Date(project.stats.added).toLocaleString().replace(',', '') : 'None'
+}
+
+function generateBtnListRating(rating, count) {
+    const button = document.createElement('button')
+    button.setAttribute('class', 'selectsite')
+    button.setAttribute('id', rating + 'Button')
+    button.style.order = String(Object.keys(allProjects).indexOf(rating))
+    button.textContent = allProjects[rating]('URL')
+    const span = document.createElement('span')
+    span.textContent = count
+    button.append(span)
+    document.querySelector('.buttonBlock').append(button)
+    button.addEventListener('click', function() {
+        listSelect(event, rating)
+    })
+
+    const ul = document.createElement('ul')
+    ul.id = rating + 'Tab'
+    ul.classList.add('listcontent')
+    ul.style.display = 'none'
+//  const div = document.createElement('div')
+//  div.setAttribute('data-resource', 'notAdded')
+//  div.textContent = chrome.i18n.getMessage('notAdded')
+//  ul.append(div)
+    if (!(rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
+        const label = document.createElement('label')
+        label.setAttribute('data-resource', 'notAvaibledInSilent')
+        label.textContent = chrome.i18n.getMessage('notAvaibledInSilent')
+        const span = document.createElement('span')
+        span.classList.add('tooltip2')
+        const span2 = document.createElement('span')
+        span2.setAttribute('data-resource', 'warnSilentVoteTooltip')
+        span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
+        span2.classList.add('tooltip2text')
+        span.append(span2)
+        label.append(span)
+        ul.append(label)
+    }
+    const div2 = document.createElement('div')
+    div2.id = rating + 'List'
+    ul.append(div2)
+    const dellAll = document.createElement('button')
+    dellAll.className = 'submitBtn redBtn'
+    dellAll.textContent = chrome.i18n.getMessage('deleteAll')
+    dellAll.addEventListener('click', function () {
+        if (confirm(chrome.i18n.getMessage('deleteAllRating'))) {
+            const projectsStore = db.transaction('projects', 'readwrite').objectStore('projects')
+            const projects = projectsStore.index('rating')
+            projects.openKeyCursor(rating).onsuccess = function(event) {
+                const cursor = event.target.result
+                if (cursor) {
+                    projectsStore.delete(cursor.primaryKey)
+                    chrome.alarms.clear(String(cursor.primaryKey))
+                    cursor.continue()
+                } else {
+                    document.getElementById(rating + 'Tab').remove()
+                    document.getElementById(rating + 'Button').remove()
+                    if (document.querySelector('.buttonBlock').childElementCount <= 0) {
+                        document.querySelector('p[data-resource="notAddedAll"]').textContent = chrome.i18n.getMessage('notAddedAll')
+                    }
+                }
+            }
         }
+    })
+    ul.append(dellAll)
+    document.querySelector('div.projectsBlock > div.contentBlock').append(ul)
 
-        let button = document.createElement('button')
-        button.setAttribute('class', 'selectsite')
-        button.setAttribute('id', getProjectName(project) + 'Button')
-        button.style.order = Object.keys(chrome.extension.getBackgroundPage().allProjects).indexOf(getProjectName(project))
-        button.textContent = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('URL')
-
-        let count = document.createElement('span')
-        count.textContent = getProjectList(project).length
-        button.append(count)
-
-        document.querySelector('.buttonBlock').append(button)
-        document.getElementById(getProjectName(project) + 'Button').addEventListener('click', function() {
-            listSelect(event, getProjectName(project) + 'Tab')
-        })
-    }
-    if (visually) return
-    if (project.priority) {
-        getProjectList(project).unshift(project)
-    } else {
-        getProjectList(project).push(project)
-    }
-    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
-    if (project.Custom && !settings.enableCustom) addCustom()
-    //projects.push(project)
-    //await setValue('AVMRprojects', projects)
     if (document.querySelector('.buttonBlock').childElementCount > 0) {
         document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
     }
-    document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
 }
 
 //Добавить аккаунт ВКонтакте в список
@@ -847,7 +435,7 @@ async function addProxyList(proxy, visually) {
     control.classList.add('controlItems')
     let del = (svgDelete.cloneNode(true))
     control.append(del)
-    
+
     if (proxy.notWorking) {
         if (proxy.notWorking == true) {
             mes.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
@@ -871,32 +459,44 @@ async function addProxyList(proxy, visually) {
 }
 
 //Удалить проект из списка проекта
-async function removeProjectList(project, visually) {
-    let li = document.getElementById(getProjectName(project) + '_' + project.id + '_' + project.nick)
+async function removeProjectList(project, projectID) {
+    const li = document.getElementById(projectID)
     if (li != null) {
-        li.remove()
+        const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
+        if (count <= 0) {
+            document.getElementById(project.rating + 'Tab').remove()
+            document.getElementById(project.rating + 'Button').remove()
+            if (document.querySelector('.buttonBlock').childElementCount <= 0) {
+                document.querySelector('p[data-resource="notAddedAll"]').textContent = chrome.i18n.getMessage('notAddedAll')
+            }
+        } else {
+            li.remove()
+            document.querySelector('#' + project.rating + 'Button > span').textContent = count
+        }
     } else {
         return
     }
-    if ((getProjectList(project).length - 1) == 0) document.getElementById(getProjectName(project) + 'Tab').firstElementChild.removeAttribute('style')
-    if (visually) return
-    for (let i = getProjectList(project).length; i--; ) {
-        let temp = getProjectList(project)[i]
-        if (temp.nick == project.nick && JSON.stringify(temp.id) == JSON.stringify(project.id) && getProjectName(temp) == getProjectName(project))
-            getProjectList(project).splice(i, 1)
-    }
-    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
-    //projects.splice(deleteCount, 1)
-    //await setValue('AVMRprojects', projects)
-    document.querySelector('#' + getProjectName(project) + 'Button > span').textContent = getProjectList(project).length
-    for (let value of chrome.extension.getBackgroundPage().queueProjects) {
-        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+
+    const projects = db.transaction('projects', 'readwrite').objectStore('projects')
+    await new Promise((resolve, reject) => {
+        const request = projects.delete(projectID)
+        request.onsuccess = function (event) {
+            resolve(event.target.result)
+        }
+        request.onerror = reject
+    })
+
+    chrome.alarms.clear(String(projectID))
+
+    if (!chrome.extension.getBackgroundPage()) return
+    for (const value of chrome.extension.getBackgroundPage().queueProjects) {
+        if (value.nick === project.nick && value.id === project.id && value.rating === project.rating) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
         }
     }
     //Если эта вкладка была уже открыта, он закрывает её
-    for (let[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+    for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
+        if (value.nick === project.nick && value.id === project.id && value.rating === project.rating) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
             chrome.tabs.remove(key)
         }
@@ -982,1178 +582,167 @@ async function removeProxyList(proxy, visually) {
 }
 
 //Перезагрузка списка проектов
-function updateProjectList(projects, key) {
-    if (projects != null) {
-        if (key.includes('AVMRprojects') && projects.length > 0) {
-            const projectName = getProjectName(projects[0])
-            if (document.getElementById(projectName + 'List') != null) document.getElementById(projectName + 'List').parentNode.replaceChild(document.getElementById(projectName + 'List').cloneNode(false), document.getElementById(projectName + 'List'))
-            for (const project of projects) {
-                addProjectList(project, true)
+async function reloadProjectList() {
+    for (const item of Object.keys(allProjects)) {
+        if (document.getElementById(item + 'List') != null) document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
+    }
+    document.querySelector('div.buttonBlock').parentNode.replaceChild(document.querySelector('div.buttonBlock').cloneNode(false), document.querySelector('div.buttonBlock'))
+    if (document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]') != null) {
+        document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]').style.display = 'none'
+    }
+    const projects = db.transaction('projects').objectStore('projects').index('rating')
+    for (const item of Object.keys(allProjects)) {
+        const count = await new Promise((resolve, reject) => {
+            const request = projects.count(item)
+            request.onsuccess = function (event) {
+                resolve(event.target.result)
             }
-        }
-    } else {
-        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-            if (document.getElementById(item + 'List') != null) document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
-        }
-        document.querySelector('div.buttonBlock').parentNode.replaceChild(document.querySelector('div.buttonBlock').cloneNode(false), document.querySelector('div.buttonBlock'))
-        if (document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]') != null) {
-            document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]').style.display = 'none'
-        }
-        forLoopAllProjects(async function(proj) {
-            await addProjectList(proj, true)
+            request.onerror = reject
         })
-    }
-    if (document.querySelector('.buttonBlock').childElementCount > 0) {
-        document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
-    }
-
-    //Список ВКонтакте
-    if (projects == null || key == 'AVMRVKs') {
-        document.getElementById('VKList').parentNode.replaceChild(document.getElementById('VKList').cloneNode(false), document.getElementById('VKList'))
-        for (let vkontakte of VKs) {
-            addVKList(vkontakte, true)
-        }
-    }
-
-    //Список Borealis
-    if (projects == null || key == 'borealisAccounts') {
-        document.getElementById('BorealisList').parentNode.replaceChild(document.getElementById('BorealisList').cloneNode(false), document.getElementById('BorealisList'))
-        for (let acc of borealisAccounts) {
-            addBorealisList(acc, true)
-        }
-    }
-
-    //Список прокси
-    if (projects == null || key == 'AVMRproxies') {
-        document.getElementById('ProxyList').parentNode.replaceChild(document.getElementById('ProxyList').cloneNode(false), document.getElementById('ProxyList'))
-        for (let proxy of proxies) {
-            addProxyList(proxy, true)
+        if (count > 0) {
+            generateBtnListRating(item, count)
+            if (item === 'Custom') {
+                if (!settings.enableCustom) addCustom()
+            }
         }
     }
 }
 
-//Слушатель кнопки 'Добавить' на MultiVote VKontakte
-document.getElementById('AddVK').addEventListener('click', async () => {
-    event.preventDefault()
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    await addVK()
-    blockButtons = false
-})
-
-//Слушатель кнопки 'Импорт' на MultiVote VKontakte
-document.getElementById('importVK').addEventListener('change', (evt) => {
-    if (!document.getElementById('autoAuthVK').checked) {
-        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('autoAuthVK') + '"', 'error')
-        document.getElementById('importVK').value = ''
-        return
-    }
-    if (!document.getElementById('clearVKCookies').checked) {
-        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('clearVKCookies') + '"', 'error')
-        document.getElementById('importVK').value = ''
-        return
-    }
-    createNotif(chrome.i18n.getMessage('importing'))
-    try {
-        if (evt.target.files.length == 0) return
-        let file = evt.target.files[0]
-        var reader = new FileReader()
-        reader.onload = (function(theFile) {
-            return async function(e) {
-                fastNotif = true
-                try {
-                    let VKList = e.target.result
-                    for (let VKString of VKList.split(/\n/g)) {
-                        VKString = VKString.replace(/(?:\r\n|\r|\n)/g, '')
-                        if (VKString == null || VKString == '') {
-                            continue
-                        }
-                        const vk_string = VKString.split(':')
-                        await addVK(false, {login: vk_string[0], password: vk_string[1]})
-                    }
-                    
-                    await setValue('VKs', VKs)
-
-                    createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
-                } catch (e) {
-                    createNotif(e, 'error')
-                } finally {
-                    fastNotif = false
-                }
-            }
-        })(file)
-        reader.readAsText(file)
-        document.getElementById('importVK').value = ''
-    } catch (e) {
-        createNotif(e, 'error')
-    }
-    document.getElementById('importVK').value = ''
-}, false)
-
-document.getElementById('importSettingsVK').addEventListener('change', (evt) => {
-    createNotif(chrome.i18n.getMessage('importing'))
-    try {
-        if (evt.target.files.length == 0) return
-        let file = evt.target.files[0]
-        var reader = new FileReader()
-        reader.onload = (function(theFile) {
-            return async function(e) {
-                try {
-                    const VKList = JSON.parse(e.target.result)
-                    let count = 0
-                    for (const VK of VKList.VKs) {
-                        let _continue = false
-                        for (const _vk of VKs) {
-                            if (_vk.id == VK.id) {
-                                _continue = true
-                                break
-                            }
-                        }
-                        if (_continue) continue
-                        VKs.push(VK)
-                        count++
-                    }
-                    
-                    await setValue('AVMRVKs', VKs)
-
-                    createNotif(chrome.i18n.getMessage('importingSettingVKEnd', String(count)), 'success')
-                } catch (e) {
-                    createNotif(e, 'error')
-                }
-            }
-        })(file)
-        reader.readAsText(file)
-        document.getElementById('importVK').value = ''
-    } catch (e) {
-        createNotif(e, 'error')
-    }
-    document.getElementById('importSettingsVK').value = ''
-}, false)
-
-//Слушатель на добавление аккаунтов Borealis по логин:пароль
-document.getElementById('importBorealis').addEventListener('change', async (evt) => {
-    if (!document.getElementById('clearBorealisCookies').checked) {
-        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('clearVKCookies') + '"', 'error')
-        document.getElementById('importBorealis').value = ''
-        return
-    }
-    if (evt.target.files.length == 0) return
-    createNotif(chrome.i18n.getMessage('importing'))
-    try {
-        const file = evt.target.files[0]
-        const data = await new Response(file).text()
-        fastNotif = true
-        for (let nick of data.split(/\n/g)) {
-            nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
-            if (nick == null || nick == '') continue
-            nick = nick.split(':')
-            await addBorealis(false, {auth: true, login: nick[0], password: nick[1]})
-        }
-        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
-    } catch (e) {
-        createNotif(e, 'error')
-    } finally {
-        fastNotif = false
-        document.getElementById('importBorealis').value = ''
-    }
-}, false)
-
-//Слушатель на регистрацию аккаунтов Borealis по логин:пароль
-document.getElementById('importRegBorealis').addEventListener('change', async (evt) => {
-    if (!document.getElementById('clearBorealisCookies').checked) {
-        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('clearVKCookies') + '"', 'error')
-        document.getElementById('importRegBorealis').value = ''
-        return
-    }
-    if (evt.target.files.length == 0) return
-    createNotif(chrome.i18n.getMessage('importing'))
-    try {
-        const file = evt.target.files[0]
-        const data = await new Response(file).text()
-        fastNotif = true
-        for (let nick of data.split(/\n/g)) {
-            nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
-            if (nick == null || nick == '') continue
-            nick = nick.split(':')
-            await addBorealis(false, {reg: true, login: nick[0], password: nick[1]})
-        }
-        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
-    } catch (e) {
-        createNotif(e, 'error')
-    } finally {
-        fastNotif = false
-        document.getElementById('importRegBorealis').value = ''
-    }
-}, false)
-
-window.onmessage = function (e) {
-    if (e.data.VKCredentials) {
-        currentVKCredentials.login = e.data.login
-        currentVKCredentials.password = e.data.password
-    } else if (e.data.BorealisCredentials) {
-        currentBorealisCredentials.login = e.data.login
-        currentBorealisCredentials.password = e.data.password
-    }
-}
-
-async function addVK(repair, imp) {
-    currentVKCredentials = {}
-    if (repair || !document.getElementById('clearVKCookies').checked || imp || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'VKontakte'))) {
-        if ((document.getElementById('clearVKCookies').checked && !repair) || imp) {
-            //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
-            createNotif(chrome.i18n.getMessage('deletingAllAcc', 'VK'))
-            
-            await new Promise(resolve => {
-                chrome.tabs.query({url: '*://*.vk.com/*'}, function(tabs) {
-                    for (tab of tabs) {
-                        chrome.tabs.remove(tab.id)
-                    }
-                    resolve()
-                })
-            })
-
-            let cookies = await new Promise(resolve => {
-                chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
-                    resolve(cookies)
-                })
-            })
-            for(let i=0; i<cookies.length;i++) {
-                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
-            }
-            
-            createNotif(chrome.i18n.getMessage('deletedAllAcc', 'VK'))
-        }
-
-        createNotif(chrome.i18n.getMessage('openPopupAcc', 'VK'))
-        
-        //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
-        await new Promise(resolve=> {
-            let code = null
-            if (imp || document.getElementById('saveVKCredentials').checked) {
-                if (imp) {
-                    code = `
-                        if (document.querySelector('input[name="email"]') != null) {
-                            document.querySelector('input[name="email"]').value = '` + imp.login + `'
-                            document.querySelector('input[name="pass"]').value = '` + imp.password + `'
-                            if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) document.getElementById('install_allow').click()
-                        }
-                    `
-                } else if (document.getElementById('saveVKCredentials').checked) {
-                    code = `
-                        document.querySelector('#install_allow').addEventListener('click', function () {
-                            const credentials = {VKCredentials: true}
-                            credentials.login = document.querySelector('input[name="email"]').value
-                            credentials.password = document.querySelector('input[name="pass"]').value
-                            window.opener.postMessage(credentials, '*')
-                        })
-                    `
-                }
-            }
-            openPopup('https://oauth.vk.com/authorize?client_id=-1&display=widget&redirect_uri=close.html&widget=4', resolve, code)
-        })
-
-        //После закрытия окна авторизации попытка добавить аккаунт ВКонтакте
-        createNotif(chrome.i18n.getMessage('adding'))
-        let response
-        try {
-            response = await fetch('https://vk.com/')
-        } catch (e) {
-            if (e == 'TypeError: Failed to fetch') {
-                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error')
-                return
-            } else {
-                createNotif(e, 'error')
-                return
-            }
-        }
-        if (!response.ok) {
-            createNotif(chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status, 'error')
+//Слушатель дополнительных настроек
+for (const check of document.querySelectorAll('input[name=checkbox]')) {
+    check.addEventListener('change', async function() {
+        if (blockButtons) {
+            createNotif(chrome.i18n.getMessage('notFast'), 'warn')
             return
-        }
-        let clone = response.clone()
-        let html = await response.text()
-        let doc = new DOMParser().parseFromString(html, 'text/html')
-        if (response.headers.get('Content-Type').includes('windows-1251')) {
-            //Почему не UTF-8?
-            response = await new Response(new TextDecoder('windows-1251').decode(await clone.arrayBuffer()))
-            html = await response.text()
-            doc = new DOMParser().parseFromString(html, 'text/html')
-        }
-        if (doc.querySelector('#index_login_button') != null) {
-            createNotif(chrome.i18n.getMessage('notAuthAcc', 'VK'), 'error')
-            return
-        }
-        let VK = {}
-        if (document.getElementById('saveVKCredentials').checked) {
-            if (imp) {
-                VK.login = imp.login
-                VK.password = imp.password
-            } else if (currentVKCredentials.login) {
-                VK.login = currentVKCredentials.login
-                VK.password = currentVKCredentials.password
-            }
-        }
-        try {
-            if (doc.querySelector('#login_blocked_wrap') != null) {
-                let text = doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
-                createNotif(text, 'error')
-                return
-            }
-            VK.name = doc.querySelector('#top_vkconnect_link > div > div.top_profile_vkconnect_name').textContent
-            VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
-        } catch(e) {
-            createNotif(e, 'error')
-            return
-        }
-
-        if (!repair) {
-            for (let vkontakte of VKs) {
-                if (VK.id == vkontakte.id && VK.name == vkontakte.name) {
-                    createNotif(chrome.i18n.getMessage('added'), 'success')
-                    await checkAuthVK(vkontakte)
-                    return
-                }
-            }
-        }
-        
-        //Достаём все куки ВКонтакте и запоминаем их
-        VK.cookies = await new Promise(resolve => {
-            chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
-                resolve(cookies)
-            })
-        })
-
-        let i = 0
-        for (let cookie of VK.cookies) {
-            if (cookie.name == 'tmr_detect') {
-                VK.cookies.splice(i, 1)
-                break
-            }
-            i++
-        }
-        
-        if (repair) {
-            for (_vk in VKs) {
-                if (VK.id == VKs[_vk].id) {
-                    for (const obj of Object.keys(VKs[_vk])) {//Совмещает данные со старым аккаунтом при этом перезаписывает новые данные если как такое были получены
-                        if (VK[obj] == null) {
-                            VK[obj] = VKs[_vk][obj]
-                        }
-                    }
-                    delete VK.notWorking
-                    VKs[_vk] = VK
-                    break
-                }
-            }
-            await setValue('AVMRVKs', VKs)
-            createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
         } else {
-            await addVKList(VK, false)
-            createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
+            blockButtons = true
         }
-
-        await checkAuthVK(VK)
-    }
-}
-
-//Слушатель кнопки 'Добавить' на MultiVote Borealis
-document.getElementById('AddBorealis').addEventListener('click', async () => {
-    event.preventDefault()
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    await addBorealis()
-    blockButtons = false
-})
-
-async function addBorealis(repair, imp) {
-    if (repair || !document.getElementById('clearVKCookies').checked || imp || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
-        if ((document.getElementById('clearVKCookies').checked && !repair) || imp) {
-            //Удаление всех куки и вкладок Borealis перед добавлением нового аккаунта Borealis
-            createNotif(chrome.i18n.getMessage('deletingAllAcc', 'Borealis'))
-            
-            await new Promise(resolve => {
-                chrome.tabs.query({url: '*://*.borealis.su/*'}, function(tabs) {
-                    for (tab of tabs) {
-                        chrome.tabs.remove(tab.id)
-                    }
-                    resolve()
-                })
-            })
-
-            if (document.getElementById('clearVKCookies').checked) {
-                let cookies = await new Promise(resolve => {
-                    chrome.cookies.getAll({domain: '.borealis.su'}, function(cookies) {
-                        resolve(cookies)
-                    })
-                })
-                for(let i=0; i<cookies.length;i++) {
-                    await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
-                }
-            }
-            
-            createNotif(chrome.i18n.getMessage('deletedAllAcc', 'Borealis'))
-        }
-        
-        createNotif(chrome.i18n.getMessage('openPopupAcc', 'Borealis'))
-        
-        //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
-        await new Promise(resolve => {
-            let code = null
-            if (imp) {
-                if (imp.auth) {
-                    code = `
-                        if (document.querySelector("#midside > div.clr.berrors") != null) {
-//                          window.close()
-                            if (!document.querySelector("#midside > div.clr.berrors").textContent.includes('Ошибка')) {
-                                window.close()
-                            }
-                        }
-                        document.getElementById('login_name').value = "` + imp.login + `"
-                        document.getElementById('login_password').value = "` + imp.password + `"
-                        document.querySelector('button[data-callback="executeLogin"]').click()
-                    `
-                } else if (imp.reg) {
-                    code = `
-// 	                    setInterval(()=>{
-// 	                	    if (document.getElementById('result-registration').textContent.includes('уже зарегистрировано')) {
-// 	                		    window.close()
-// 	                		}
-// 	                	}, 100)
-	                    if (document.getElementById('loginbtn') != null) window.close()
-                        if (document.querySelector("#midside > div.clr.berrors") != null) {
-//                          window.close()
-                            if (!document.querySelector("#midside > div.clr.berrors").textContent.includes('Ошибка')) {
-                                window.close()
-                            }
-                        }
-	                	document.getElementById('name').scrollIntoView()
-                        document.getElementById('name').value = "` + imp.login + `"
-                        document.querySelector('input[value="Проверить имя"]').click()
-                        document.querySelector('input[name="password1"]').value = "` + imp.password + `"
-                        document.querySelector('input[name="password2"]').value = "` + imp.password + `"
-                        document.querySelector('input[name="email"]').value = "` + imp.login + `@gmail.com"
-                        document.getElementById('rules').checked = true
-                    `
-                }
-            } else if (document.getElementById('saveBorealisCredentials').checked) {
-                code = `
-                    document.querySelector('button[data-callback="executeLogin"]').addEventListener('click', function () {
-                        const credentials = {BorealisCredentials: true}
-                        credentials.login = document.getElementById('login_name').value
-                        credentials.password = document.getElementById('login_password').value
-                        window.opener.postMessage(credentials, '*')
-                    })
-                `
-            }
-            openPopup('https://borealis.su/index.php?do=register', resolve, code)
-        })
-
-        //После закрытия окна авторизации попытка добавить аккаунт Borealis
-        createNotif(chrome.i18n.getMessage('adding'))
-        let response
-        try {
-            response = await fetch('https://borealis.su/')
-        } catch (e) {
-            if (e == 'TypeError: Failed to fetch') {
-                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error')
-                return
+        let _return = false
+        if (this.id === 'disabledNotifStart')
+            settings.disabledNotifStart = this.checked
+        else if (this.id === 'disabledNotifInfo')
+            settings.disabledNotifInfo = this.checked
+        else if (this.id === 'disabledNotifWarn')
+            settings.disabledNotifWarn = this.checked
+        else if (this.id === 'disabledNotifError') {
+            if (this.checked && confirm(chrome.i18n.getMessage('confirmDisableErrors'))) {
+                settings.disabledNotifError = this.checked
+            } else if (this.checked) {
+                this.checked = false
+                _return = true
             } else {
-                createNotif(e, 'error')
-                return
+                settings.disabledNotifError = this.checked
             }
-        }
-        if (!response.ok) {
-            createNotif(chrome.i18n.getMessage('notConnect', 'https://borealis.su/') + response.status, 'error')
-            return
-        }
-        //Почему не UTF-8?
-        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
-        let html = await response.text()
-        let doc = new DOMParser().parseFromString(html, 'text/html')
-        if (doc.querySelector('div.userinfo-pos > div.rcol2 a') == null) {
-            createNotif(chrome.i18n.getMessage('notAuthAcc', 'Borealis'), 'error')
-            return
-        }
-        let acc = {}
-        if (document.getElementById('saveBorealisCredentials').checked) {
-            if (imp) {
-                acc.login = imp.login
-                acc.password = imp.password
-            } else if (currentBorealisCredentials.login) {
-                acc.login = currentBorealisCredentials.login
-                acc.password = currentBorealisCredentials.password
+        } else if (this.id === 'disabledCheckTime')
+            settings.disabledCheckTime = this.checked
+        else if (this.id === 'disabledCheckInternet')
+            settings.disabledCheckInternet = this.checked
+        else if (this.id === 'disableCheckProjects') {
+            if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
+                this.checked = false
             }
-        }
-        try {
-            acc.nick = doc.querySelector('div.userinfo-pos > div.rcol2 a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '').replace('https://borealis.su/user/', '').replace('/', '')
-        } catch(e) {
-            createNotif(e, 'error')
-            return
-        }
-        
-        if (!repair) {
-            for (let bAcc of borealisAccounts) {
-                if (acc.nick == bAcc.nick) {
-                    createNotif(chrome.i18n.getMessage('added'), 'success')
-                    return
-                }
+            _return = true
+        } else if (this.id === 'priority') {
+            if (this.checked && !confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
+                this.checked = false
             }
-        }
-        
-        //Достаём все куки Borealis и запоминаем их
-        acc.cookies = await new Promise(resolve => {
-            chrome.cookies.getAll({domain: '.borealis.su'}, function(cookies) {
-                resolve(cookies)
-            })
-        })
-
-        let i = 0
-        for (let cookie of acc.cookies) {
-            if (cookie.name == 'xf_session') {
-                acc.cookies.splice(i, 1)
-                break
-            }
-            i++
-        }
-
-        if (repair) {
-            for (_acc in borealisAccounts) {
-                if (acc.nick == borealisAccounts[_acc].nick) {
-                    borealisAccounts[_acc] = acc
-                    break
-                }
-            }
-            await setValue('borealisAccounts', borealisAccounts)
-            createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + acc.nick, 'success')
-        } else {
-            await addBorealisList(acc, false)
-            createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + acc.nick, 'success')
-        }
-    }
-}
-
-//Проверяем авторизацию на всех Майнкрафт рейтингах где есть авторизация ВКонтакте и если пользователь не авторизован - предлагаем ему авторизоваться
-async function checkAuthVK(VK) {
-    document.querySelector('#notifBlock ')
-    createNotif(chrome.i18n.getMessage('checkAuthVK'))
-    let authStatus = []
-    let idAuth = document.createElement('div')
-    idAuth.id = 'notAuthVK'
-    authStatus.push(idAuth)
-    authStatus.push(chrome.i18n.getMessage('notAuthVKTop'))
-    let needReturn = false
-    for (let [key, value] of authVKUrls) {
-        let response2
-        try {
-            response2 = await fetch(value, {redirect: 'manual'})
-        } catch (e) {
-            if (e == 'TypeError: Failed to fetch') {
-                createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error')
-            } else {
-                createNotif(e, 'error')
-            }
-            needReturn = true
-        }
-
-        if (response2.ok) {
-            if (document.getElementById('autoAuthVK').checked) {
-                createNotif(chrome.i18n.getMessage('autoAuthVKStart', key))
-                response2.html = await response2.text()
-                response2.doc = new DOMParser().parseFromString(response2.html, 'text/html')
-                const text = response2.doc.querySelector('head > script:nth-child(9)').text
-                const url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
-                response2 = await fetch(url)
-            } else {
-                let a = document.createElement('a')
-                a.href = '#'
-                a.classList.add('link')
-                a.id = 'authvk' + key
-                a.textContent = key
-                a.addEventListener('click', function() {
-                    openPopup(value, function () {
-                        if (document.getElementById('notAuthVK') != null) {
-                            removeNotif(document.getElementById('notAuthVK').parentElement.parentElement)
-                        }
-                        checkAuthVK(VK)
-                    })
-                })
-                authStatus.push(a)
-                authStatus.push(' ')
-                needReturn = true
-            }
-        } else if (response2.status != 0) {
-            createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error')
-            needReturn = true
-        }
-
-        if (!needReturn && (key == 'TopCraft' || key == 'McTOP') && document.getElementById('antiBanVK').checked && VK['password' + key] == null) {
-            try {
-                let url
-                if (key == 'TopCraft') {
-                    url = 'topcraft.ru'
-                } else if (key == 'McTOP') {
-                    url = 'mctop.su'
-                }
-                createNotif(chrome.i18n.getMessage('antiBanVKStart', key))
-                let response = await fetch('https://' + url + '/accounts/vk/login/?process=login')
-                response.html = await response.text()
-                response.doc = new DOMParser().parseFromString(response.html, 'text/html')
-                const csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
-                function makeid(length) {
-                    const result = []
-                    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-                    const charactersLength = characters.length
-                    for (let i = 0; i < length; i++ ) {
-                        result.push(characters.charAt(Math.floor(Math.random() * charactersLength)))
-                    }
-                    return result.join('')
-                }
-                let password = makeid(15)
-                if (settings.singlePassword) password = settings.singlePassword
-                response = await fetch('https://' + url + '/account/profile/', {
-                    'headers': {
-                        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                    },
-                    'body': 'csrfmiddlewaretoken=' + csrftoken + '&type=password&password-password1=' + password + '&password-password2=' + password,
-                    'method': 'POST'
-                })
-                response.html = await response.text()
-                response.doc = new DOMParser().parseFromString(response.html, 'text/html')
-                VK.numberId = Number(response.doc.getElementById('id_profile-vk').value.replace('http://vk.com/id', ''))
-                VK['password' + key] = password
-                for (_vk in VKs) {
-                    if (VK.id == VKs[_vk].id) {
-                        VKs[_vk] = VK
-                        break
-                    }
-                }
-                await setValue('AVMRVKs', VKs)
-                createNotif(chrome.i18n.getMessage('antiBanVKEnd', [password, key]), 'success')
-            } catch (e) {
-                createNotif(e, 'error')
-            }
-        }
-    }
-    if (needReturn) {
-        authStatus.push(chrome.i18n.getMessage('notAcceptAuth'))
-        createNotif(authStatus, 'warn', 30000)
-        return
-    }
-    createNotif(chrome.i18n.getMessage('authOK'), 'success')
-}
-
-// //Слушатель кнопки 'Удалить куки' на MultiVote VKontakte
-// document.getElementById('deleteAllVKCookies').addEventListener('click', async () => {
-//     createNotif(chrome.i18n.getMessage('deletingAllVKCookies'))
-//     let cookies = await new Promise(resolve => {
-//         chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
-//             resolve(cookies)
-//         })
-//     })
-//     for(let i=0; i<cookies.length;i++) {
-//         await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
-//     }
-//     createNotif(createMessage(chrome.i18n.getMessage('deletedAllVKCookies'), 'success')
-// })
-
-//Слушатель кнопки 'Удалить нерабочие' прокси
-document.getElementById('deleteNotWorkingProxies').addEventListener('click', async () => {
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    createNotif(chrome.i18n.getMessage('deletingNotWorkingProxies'))
-    let proxiesCopy = [...proxies]
-    for (let prox of proxiesCopy) {
-        if (prox.notWorking) {
-            await removeProxyList(prox, false)
-        }
-    }
-    createNotif(chrome.i18n.getMessage('deletedNotWorkingProxies'), 'success')
-    blockButtons = false
-})
-
-//Слушатель кнопки 'Удалить всё' на Прокси
-document.getElementById('deleteAllProxies').addEventListener('click', async () => {
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    createNotif(chrome.i18n.getMessage('deletingAllProxies'))
-    document.getElementById('ProxyList').parentNode.replaceChild(document.getElementById('ProxyList').cloneNode(false), document.getElementById('ProxyList'))
-    proxies = []
-    await setValue('AVMRproxies', proxies)
-    document.querySelector('#ProxyButton > span').textContent = proxies.length
-    createNotif(chrome.i18n.getMessage('deletedAllProxies'), 'success')
-    blockButtons = false
-})
-
-//Слушатель кнопки 'Добавить' на Прокси
-document.getElementById('addProxy').addEventListener('submit', async () => {
-    event.preventDefault()
-
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-
-    let proxy = {}
-    proxy.ip = document.querySelector('#ip').value
-    proxy.port = parseInt(document.querySelector('#port').value)
-    if (document.querySelector('#proxyType').value != '') {
-        proxy.scheme = document.querySelector('#proxyType').value
-//     } else {
-//         //Если не указан тип прокси пытаемся его определить самому
-//         createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'socks5'))
-//         let error = await checkProxy(proxy, 'socks5')
-//         if (!error) {
-//             proxy.scheme = 'socks5'
-//         }
-
-//         if (error) {
-//             createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'socks4'))
-//             error = await checkProxy(proxy, 'socks4')
-//             if (!error) {
-//                 proxy.scheme = 'socks4'
-//             }
-//         }
-
-//         if (error) {
-//             createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'https'))
-//             error = await checkProxy(proxy, 'https')
-//             if (!error) {
-//                 proxy.scheme = 'https'
-//             }
-//         }
-        
-//         if (error) {
-//             createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'http'))
-//             error = await checkProxy(proxy, 'http')
-//             if (!error) {
-//                 proxy.scheme = 'http'
-//             }
-//         }
-
-//         if (error) {
-//             createNotif(chrome.i18n.getMessage('errorCheckSchemeProxy'), 'error')
-//             return
-//         }
-    }
-    if (document.querySelector('#login').value != '') {
-        proxy.login = document.querySelector('#login').value
-        proxy.password = document.querySelector('#password').value
-    }
-
-    await addProxy(proxy)
-    blockButtons = false
-})
-
-//Слушатель на импорт с TunnelBear
-let token
-document.getElementById('importTunnelBear').addEventListener('click', async () => {
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    createNotif(chrome.i18n.getMessage('importVPNStart', 'TunnelBear'))
-    try {
-        if (token == null) {
-            let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
-              'headers': {
-                'accept': 'application/json, text/plain, */*',
-                'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
-                'authorization': 'Bearer undefined',
-                'cache-control': 'no-cache',
-                'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
-                'pragma': 'no-cache',
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'none',
-                'tunnelbear-app-id': 'com.tunnelbear',
-                'tunnelbear-app-version': '1.0',
-                'tunnelbear-platform': 'Chrome',
-                'tunnelbear-platform-version': 'c3.3.3'
-              },
-              'referrerPolicy': 'strict-origin-when-cross-origin',
-              'body': null,
-              'method': 'POST',
-              'mode': 'cors',
-              'credentials': 'include'
-            })
-            if (!response.ok) {
-                if (response.status == 401) {
-                    let a = document.createElement('a')
-                    a.target = 'blank_'
-                    a.href = 'https://www.tunnelbear.com/account/login'
-                    a.textContent = chrome.i18n.getMessage('authButton')
-                    createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
-                    blockButtons = false
-                    return
-                }
-                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
-                blockButtons = false
-                return
-            }
-            let json = await response.json()
-            token = 'Bearer ' + json.access_token
-        }
-
-        let countries = ['AR', 'BR', 'AU', 'CA', 'DK', 'FI', 'FR', 'DE', 'IN', 'IE', 'IT', 'JP', 'MX', 'NL', 'NZ', 'NO', 'RO', 'SG', 'ES', 'SE', 'CH', 'GB', 'US']
-        for (let country of countries) {
-            response = await fetch('https://api.polargrizzly.com/vpns/countries/' + country, {'headers': {'authorization': token}})
-            if (!response.ok) {
-                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
-                if (response.status == 401) {
-                    let a = document.createElement('a')
-                    a.target = 'blank_'
-                    a.href = 'https://www.tunnelbear.com/account/login'
-                    a.textContent = chrome.i18n.getMessage('authButton')
-                    createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
-                    blockButtons = false
-                    return
+            _return = true
+        } else if (this.id === 'customTimeOut') {
+            if (this.checked) {
+                document.getElementById('lastDayMonth').disabled = false
+                document.getElementById('label6').removeAttribute('style')
+                if (document.getElementById('selectTime').value === 'ms') {
+                    document.getElementById('label3').removeAttribute('style')
+                    document.getElementById('time').required = true
+                    document.getElementById('label7').style.display = 'none'
+                    document.getElementById('hour').required = false
                 } else {
-                    continue
+                    document.getElementById('label7').removeAttribute('style')
+                    document.getElementById('hour').required = true
+                    document.getElementById('label3').style.display = 'none'
+                    document.getElementById('time').required = false
                 }
+            } else {
+                document.getElementById('lastDayMonth').disabled = true
+                document.getElementById('label6').style.display = 'none'
+                document.getElementById('label3').style.display = 'none'
+                document.getElementById('time').required = false
+                document.getElementById('label7').style.display = 'none'
+                document.getElementById('hour').required = false
             }
-            json = await response.json()
-            for (vpn of json.vpns) {
-                const proxy = {
-                    ip: vpn.url,
-                    port: 8080,
-                    scheme: 'https',
-                    TunnelBear: true
-                }
-                if (await addProxy(proxy, true, true)) {
-                    proxies.push(proxy)
-                }
+            _return = true
+        } else if (this.id === 'lastDayMonth' || this.id === 'randomize') {
+            _return = true
+        } else if (this.id === 'sheldTimeCheckbox') {
+            if (this.checked) {
+                document.getElementById('label9').removeAttribute('style')
+                document.getElementById('sheldTime').required = true
+            } else {
+                document.getElementById('label9').style.display = 'none'
+                document.getElementById('sheldTime').required = false
             }
-        }
-    } catch (e) {
-        createNotif(e, 'error')
-        console.error(e)
-        blockButtons = false
-        return
-    }
-    randomizeProxyList()
-    await setValue('AVMRproxies', proxies)
-    createNotif(chrome.i18n.getMessage('importVPNEnd', 'TunnelBear'), 'success')
-    blockButtons = false
-})
+            _return = true
+//      } else if (this.id == 'enableSyncStorage') {
+//          _return = true
+//          let oldStorageArea = storageArea
+//          if (this.checked) {
+//              if (await getValue('AVMRsettings', 'sync') != null) {
+//                  toggleModal('conflictSync')
+//                  this.checked = false
+//                  blockButtons = false
+//                  return
+//              }
+//              storageArea = 'sync'
+//              createNotif(chrome.i18n.getMessage('settingsSyncCopy'))
+//          } else {
+//              storageArea = 'local'
+//              createNotif(chrome.i18n.getMessage('settingsSyncCopyLocal'))
+//          }
+//          await setValue('storageArea', storageArea, 'local')
+//          for (const item of Object.keys(allProjects)) {
+//              await setValue('AVMRprojects' + item, window['projects' + item])
+//              await removeValue('AVMRprojects' + item, oldStorageArea)
+//          }
+//          await setValue('AVMRsettings', settings)
+//          await setValue('generalStats', generalStats)
+//          await removeValue('AVMRsettings', oldStorageArea)
+//          await removeValue('generalStats', oldStorageArea)
 
-//Слушатель на импорт с Windscribe
-document.getElementById('importWindscribe').addEventListener('click', async () => {
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    createNotif(chrome.i18n.getMessage('importVPNStart', 'Windscribe'))
-    let i = 0
-    while (i < 1) {
-        i++
-        try {
-            let response
-            if (i == 1) {
-                response = await fetch('https://assets.windscribe.com/serverlist/openvpn/0/ef53494bc440751713a7ad93e939aa190cee7458')
-            } else if (false) {//Для Pro аккаунта
-                response = await fetch('https://assets.windscribe.com/serverlist/openvpn/1/ef53494bc440751713a7ad93e939aa190cee7458')
+//          if (this.checked) {
+//              createNotif(chrome.i18n.getMessage('settingsSyncCopySuccess'), 'success')
+//          } else {
+//              createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success')
+//          }
+        } else if (this.id === 'voteMode') {
+            if (this.checked) {
+                document.getElementById('label8').removeAttribute('style')
+            } else {
+                document.getElementById('label8').style.display = 'none'
             }
-            if (!response.ok) {
-                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
-                blockButtons = false
-                return
-            }
-            const json = await response.json()
-            for (const data of json.data) {
-                if (data.nodes) {
-                    for (const node of data.nodes) {
-                        if (node.hostname) {
-                            const proxy = {
-                                ip: node.hostname,
-                                port: 443,
-                                scheme: 'https',
-                                Windscribe: true
-                            }
-                            if (await addProxy(proxy, true, true)) {
-                                proxies.push(proxy)
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (e) {
-            createNotif(e, 'error')
-            console.error(e)
-            blockButtons = false
-            return
+            _return = true
         }
-        randomizeProxyList()
-        await setValue('AVMRproxies', proxies)
-    }
-    createNotif(chrome.i18n.getMessage('importVPNEnd', 'Windscribe'), 'success')
-    blockButtons = false
-})
-
-//Слушатель на импорт с HolaVPN
-document.getElementById('importHolaVPN').addEventListener('click', async () => {
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    createNotif(chrome.i18n.getMessage('importVPNStart', 'HolaVPN'))
-    try {
-        let response = await fetch('https://client.hola.org/client_cgi/vpn_countries.json')
-        const countries = await response.json()
-        for (country of countries) {
-            response = await fetch('https://client.hola.org/client_cgi/zgettunnels?country=' + country + '&limit=999&is_premium=1', {
-                "headers": {
-                    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-                },
-                "body": "uuid=9cbc8085ce543d2ae846e8283e765ba9&session_key=2831647035",
-                "method": "POST"
+        if (!_return) {
+            await new Promise((resolve, reject) => {
+                const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+                request.onsuccess = resolve
+                request.onerror = reject
             })
-            const vpns = await response.json()
-            for (vpn of vpns.ztun[country]) {
-                let host = vpn.replace('HTTP ', '').split(':')
-                let port = 22223
-                if (host[1] != '22222') port = Number(host[1])
-                const proxy = {
-                    ip:host[0],
-                    port: port,
-                    scheme: 'https',
-                    HolaVPN: true
-                }
-                if (await addProxy(proxy, true, true)) {
-                    proxies.push(proxy)
-                }
-            }
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         }
-    } catch (e) {
-        createNotif(e, 'error')
-        console.error(e)
         blockButtons = false
-        return
-    }
-    randomizeProxyList()
-    await setValue('AVMRproxies', proxies)
-    createNotif(chrome.i18n.getMessage('importVPNEnd', 'HolaVPN'), 'success')
-    blockButtons = false
-})
-
-//Слушатель на импорт с ZenMate
-document.getElementById('importZenMate').addEventListener('click', async () => {
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    createNotif(chrome.i18n.getMessage('importVPNStart', 'ZenMate'))
-    try {
-        let response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/103", {
-          "headers": {
-            "accept": "application/json, text/plain, */*",
-            "accept-language": "ru,en-US;q=0.9,en;q=0.8",
-            "cache-control": "no-cache",
-            "pragma": "no-cache",
-            "sec-ch-ua": "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "none",
-            "x-app-key": "ZMEx4hfuto83htix763jf9cz3n59f73v659f",
-            "x-device-id": "97589925",
-            "x-device-secret": "ef483afb122e05400f895434df1394a82d31e340"
-          },
-          "referrerPolicy": "strict-origin-when-cross-origin",
-          "body": null,
-          "method": "GET",
-          "mode": "cors",
-          "credentials": "include"
-        })
-        let vpns = await response.json()
-        for (const vpn of vpns) {
-            let host = vpn.dnsname.split(':')
-            const proxy = {
-                ip: host[0],
-                port: Number(host[1]),
-                scheme: 'https',
-                ZenMate: true
-            }
-            if (await addProxy(proxy, true, true)) {
-                proxies.push(proxy)
-            }
-        }
-//      await setValue('AVMRproxies', proxies)
-    
-//      response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/104", {
-//        "headers": {
-//          "accept": "application/json, text/plain, */*",
-//          "accept-language": "ru,en-US;q=0.9,en;q=0.8",
-//          "cache-control": "no-cache",
-//          "pragma": "no-cache",
-//          "sec-ch-ua": "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"",
-//          "sec-ch-ua-mobile": "?0",
-//          "sec-fetch-dest": "empty",
-//          "sec-fetch-mode": "cors",
-//          "sec-fetch-site": "none",
-//          "x-app-key": "ZMEx4hfuto83htix763jf9cz3n59f73v659f",
-//          "x-device-id": "97589925",
-//          "x-device-secret": "ef483afb122e05400f895434df1394a82d31e340"
-//        },
-//        "referrerPolicy": "strict-origin-when-cross-origin",
-//        "body": null,
-//        "method": "GET",
-//        "mode": "cors",
-//        "credentials": "include"
-//      })
-//      vpns = await response.json()
-//      for (const vpn of vpns) {
-//          let host = vpn.dnsname.split(':')
-//          const proxy = {
-//              ip: host[0],
-//              port: Number(host[1]),
-//              scheme: 'https',
-//              ZenMate: true
-//          }
-//          if (await addProxy(proxy, true, true)) {
-//              proxies.push(proxy)
-//          }
-//      }
-    } catch (e) {
-        createNotif(e, 'error')
-        console.error(e)
-        blockButtons = false
-        return
-    }
-    randomizeProxyList()
-    await setValue('AVMRproxies', proxies)
-    createNotif(chrome.i18n.getMessage('importVPNEnd', 'ZenMate'), 'success')
-    blockButtons = false
-})
-
-//Слушатель на импорт с NordVPN
-document.getElementById('importNordVPN').addEventListener('click', async () => {
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    createNotif(chrome.i18n.getMessage('importVPNStart', 'NordVPN'))
-    try {
-        let response = await fetch('https://api.nordvpn.com/server')
-        let vpns = await response.json()
-        for (const vpn of vpns) {
-            const proxy = {
-                ip: vpn.domain,
-                port: 89,
-                scheme: 'https',
-                NordVPN: true
-            }
-            if (await addProxy(proxy, true, true)) {
-                proxies.push(proxy)
-            }
-        }
-    } catch (e) {
-        createNotif(e, 'error')
-        console.error(e)
-        blockButtons = false
-        return
-    }
-    randomizeProxyList()
-    await setValue('AVMRproxies', proxies)
-    createNotif(chrome.i18n.getMessage('importVPNEnd', 'NordVPN'), 'success')
-    blockButtons = false
-})
-
-function randomizeProxyList() {
-    proxies.sort(function(a, b) {
-        if (a.notWorking && b.notWorking) {
-            return 0
-        } else if (a.notWorking) {
-            return 1
-        } else if (b.notWorking) {
-            return -1
-        } else {
-            return Math.random() - 0.5
-        }
     })
-}
-
-async function addProxy(proxy, visually, dontNotif) {
-    if (!dontNotif) createNotif(chrome.i18n.getMessage('adding'))
-    for (let prox of proxies) {
-        if (proxy.ip == prox.ip && proxy.port == prox.port) {
-            if (!dontNotif) createNotif(chrome.i18n.getMessage('added'), 'success')
-            return false
-        }
-    }
-
-    await addProxyList(proxy, visually)
-    if (!dontNotif) createNotif(chrome.i18n.getMessage('addSuccess'), 'success')
-    return true
-}
-
-async function checkProxy(proxy, scheme) {
-    var config = {
-        mode: 'fixed_servers',
-        rules: {
-            singleProxy: {
-                scheme: scheme,
-                host: proxy.ip,
-                port: proxy.port
-            }
-        }
-    }
-    await new Promise(resolve => {
-        chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
-            resolve()
-        })
-    })
-    let error = false
-    try {
-        let response = await fetch('http://example.com/')
-        error = !response.ok
-    } catch (e) {
-        error = true
-    }
-    await clearProxy()
-    return error
 }
 
 //Слушатель кнопки "Добавить"
-document.getElementById('addProject').addEventListener('submit', ()=> {
+document.getElementById('addProject').addEventListener('submit', async()=>{
     event.preventDefault()
-    addProjectButton()
-})
-async function addProjectButton() {
     if (blockButtons) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
         blockButtons = true
     }
-    let project = {}
+    const project = {}
     let name
     if (document.querySelector('#projectList > option[value="' + this.project.value + '"]') != null) {
         name = document.querySelector('#projectList > option[value="' + this.project.value + '"]').getAttribute('name')
@@ -2163,21 +752,33 @@ async function addProjectButton() {
         blockButtons = false
         return
     }
-    project[name] = true
+    project.rating = name
     project.id = document.getElementById('id').value
-    if (!project.TopGG && !project.DiscordBotList && !project.BotsForDiscord && document.getElementById('nick').value != '') {
+    if (project.rating === 'Custom') {
+        project.id = document.getElementById('nick').value
+        project.nick = ''
+    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'BotsForDiscord' && document.getElementById('nick').value !== '') {
         project.nick = document.getElementById('nick').value
+    } else {
+        project.nick = ''
     }
     project.stats = {
+        successVotes: 0,
+        monthSuccessVotes: 0,
+        lastMonthSuccessVotes: 0,
+        errorVotes: 0,
+        laterVotes: 0,
+        lastSuccessVote: null,
+        lastAttemptVote: null,
         added: Date.now()
     }
-    if (document.getElementById('sheldTimeCheckbox').checked && document.getElementById('sheldTime').value != '') {
+    if (document.getElementById('sheldTimeCheckbox').checked && document.getElementById('sheldTime').value !== '') {
         project.time = new Date(document.getElementById('sheldTime').value).getTime()
     } else {
         project.time = null
     }
-    if (document.getElementById('customTimeOut').checked || project.Custom) {
-        if (document.getElementById('selectTime').value == 'ms') {
+    if (document.getElementById('customTimeOut').checked || project.rating === 'Custom') {
+        if (document.getElementById('selectTime').value === 'ms') {
             project.timeout = document.getElementById('time').valueAsNumber
         } else {
             project.timeoutHour = Number(document.getElementById('hour').value.split(':')[0])
@@ -2188,7 +789,7 @@ async function addProjectButton() {
     if (document.getElementById('lastDayMonth').checked) {
         project.lastDayMonth = true
     }
-    if (!project.Custom && document.getElementById('voteMode').checked) {
+    if (project.rating !== 'Custom' && document.getElementById('voteMode').checked) {
         project[document.getElementById('voteModeSelect').value] = true
     }
     if (document.getElementById('priority').checked) {
@@ -2197,30 +798,30 @@ async function addProjectButton() {
     if (document.getElementById('randomize').checked) {
         project.randomize = true
     }
-    if (project.ListForge) {
+    if (project.rating === 'ListForge') {
         project.game = document.getElementById('chooseGameListForge').value
-    } else if (project.TopG) {
+    } else if (project.rating === 'TopG') {
         project.game = document.getElementById('chooseGameTopG').value
-    } else if (project.TopGames) {
+    } else if (project.rating === 'TopGames') {
         project.game = document.getElementById('chooseGameTopGames').value
         project.lang = document.getElementById('selectLangTopGames').value
         project.maxCountVote = document.getElementById('countVote').valueAsNumber
         project.countVote = 0
-    } else if (project.ServeurPrive) {
+    } else if (project.rating === 'ServeurPrive') {
         project.game = document.getElementById('chooseGameServeurPrive').value
         project.lang = document.getElementById('selectLangServeurPrive').value
         project.maxCountVote = document.getElementById('countVote').valueAsNumber
         project.countVote = 0
-    } else if (project.MMoTopRU) {
+    } else if (project.rating === 'MMoTopRU') {
         project.game = document.getElementById('chooseGameMMoTopRU').value
         project.lang = document.getElementById('selectLangMMoTopRU').value
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
-    } else if (project.TopGG) {
+    } else if (project.rating === 'TopGG') {
         project.game = document.getElementById('chooseTopGG').value
         project.addition = document.getElementById('additionTopGG').value
     }
     
-    if (project.Custom) {
+    if (project.rating === 'Custom') {
         let body
         try {
             body = JSON.parse(document.getElementById('customBody').value)
@@ -2229,14 +830,15 @@ async function addProjectButton() {
             blockButtons = false
             return
         }
-        project.id = body
+//      project.id = body
+        project.body = body
         project.responseURL = document.getElementById('responseURL').value
         await addProject(project, null)
     } else {
         await addProject(project, null)
     }
     blockButtons = false
-}
+})
 
 //Слушатель кнопки "Установить" на кулдауне
 document.getElementById('timeout').addEventListener('submit', async ()=>{
@@ -2326,7 +928,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
             let number = doc.querySelector('.lk-desc2.border-rad.block-desc-padding').textContent.match(/\d+/g).map(Number)
             let coin = number[1]
             let vote = number[2]
-            
+
             if (document.getElementById('BorealisWhatToSend').value == 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value == 'Только бореалики') {
                 coins = coins + coin
                 if (coin > 0) {
@@ -2352,7 +954,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                     createNotif('На ' + acc.nick + ' 0 бореаликов', 'warn', 2000)
                 }
             }
-            
+
             if (document.getElementById('BorealisWhatToSend').value == 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value == 'Только голоса') {
                 votes = votes + vote
                 if (vote > 0) {
@@ -2491,59 +1093,69 @@ async function addProject(project, element) {
         secondBonusText = chrome.i18n.getMessage('secondBonus', 'MythicalWorld')
         secondBonusButton.id = 'secondBonusMythicalWorld'
         secondBonusButton.className = 'secondBonus'
-    } else*/ if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
+    } else*/ if (project.id === 'victorycraft' || project.id === 8179 || project.id === 4729) {
         secondBonusText = chrome.i18n.getMessage('secondBonus', 'VictoryCraft')
         secondBonusButton.id = 'secondBonusVictoryCraft'
         secondBonusButton.className = 'secondBonus'
     }
 
-    await forLoopAllProjects(function(proj) {
-        if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && !project.Custom && (settings.useMultiVote ? proj.nick == project.nick : true)) {
-            const message = chrome.i18n.getMessage('alreadyAdded')
-            if (!secondBonusText) {
-                createNotif(message, 'success', null, element)
-            } else {
-                createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
-            }
-            returnAdd = true
-            return
-        } else if (((proj.MCRate && project.MCRate) || (proj.ServerPact && project.ServerPact) || (proj.MinecraftServersOrg && project.MinecraftServersOrg) || (proj.HotMC && project.HotMC) || (proj.MMoTopRU && project.MMoTopRU && proj.game == project.game)) /*&& proj.nick == project.nick*/ && !disableCheckProjects && (settings.useMultiVote ? proj.id != project.id : true)) {
-            createNotif(chrome.i18n.getMessage('oneProject', getProjectName(proj)), 'error', null, element)
-            returnAdd = true
-            return
-        } else if (proj.MinecraftIpList && project.MinecraftIpList && !disableCheckProjects && projectsMinecraftIpList.length >= 5) {
-            createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
-            returnAdd = true
-            return
-        } else if (proj.Custom && project.Custom && proj.nick == project.nick) {
-            createNotif(chrome.i18n.getMessage('alreadyAdded'), 'success', null, element)
-            returnAdd = true
-            return
+    let projects = db.transaction('projects').objectStore('projects').index('rating, id')
+    let found = await new Promise((resolve, reject) => {
+        const request = projects.count([project.rating, project.id])
+        request.onsuccess = function (event) {
+            resolve(event.target.result)
         }
+        request.onerror = reject
     })
-    if (returnAdd) {
+    if (found > 0) {
+        const message = chrome.i18n.getMessage('alreadyAdded')
+        if (!secondBonusText) {
+            createNotif(message, 'success', null, element)
+        } else {
+            createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
+        }
         addProjectsBonus(project, element)
-        returnAdd = false
         return
+    } else if (project.rating === 'MCRate' || project.rating === 'ServerPact' || project.rating === 'MinecraftServersOrg' || project.rating === 'HotMC' || project.rating === 'MMoTopRU' || project.rating === 'MinecraftIpList') {
+        projects = db.transaction('projects').objectStore('projects').index('rating')
+        found = await new Promise((resolve, reject) => {
+            const request = projects.count(project.rating)
+            request.onsuccess = function (event) {
+                resolve(event.target.result)
+            }
+            request.onerror = reject
+        })
+        if (project.rating === 'MinecraftIpList') {
+            if (found >= 5) {
+                createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
+                return
+            }
+        } else {
+            if (found > 0) {
+                createNotif(chrome.i18n.getMessage('oneProject', project.rating), 'error', null, element)
+                return
+            }
+        }
     }
+
     let projectURL = ''
-    const url = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('pageURL', project)
-    const jsPath = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('jsPath', project)
+    const url = allProjects[project.rating]('pageURL', project)
+    const jsPath = allProjects[project.rating]('jsPath', project)
 
     if (!await checkPermissions([project])) return
 
-    if (!(disableCheckProjects || project.Custom)) {
+    if (!(document.getElementById('disableCheckProjects').checked || project.rating === 'Custom')) {
         createNotif(chrome.i18n.getMessage('checkHasProject'), null, null, element)
 
         let response
         try {
-            if (project.MinecraftIpList) {
+            if (project.rating === 'MinecraftIpList') {
                 response = await fetch(url, {credentials: 'omit'})
             } else {
                 response = await fetch(url, {credentials: 'include'})
             }
         } catch (e) {
-            if (e == 'TypeError: Failed to fetch') {
+            if (e === 'TypeError: Failed to fetch') {
                 createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error', null, element)
                 return
             } else {
@@ -2552,68 +1164,68 @@ async function addProject(project, element) {
             }
         }
 
-        if (response.status == 404) {
+        if (response.status === 404) {
             createNotif(chrome.i18n.getMessage('notFoundProjectCode', String(response.status)), 'error', null, element)
             return
         } else if (response.redirected) {
-            if (project.ServerPact || project.TopMinecraftServers || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101 || project.CraftList || project.MinecraftBuzz) {
+            if (project.rating === 'ServerPact' || project.rating === 'TopMinecraftServers' || project.rating === 'MCServers' || project.rating === 'MinecraftList' || project.rating === 'MinecraftIndex' || project.rating === 'ServerList101' || project.rating === 'CraftList' || project.rating === 'MinecraftBuzz') {
                 createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                 return
             }
             createNotif(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, 'error', null, element)
             return
-        } else if (response.status == 503) {//None
+        } else if (response.status === 503) {//None
         } else if (!response.ok) {
-            createNotif(chrome.i18n.getMessage('notConnect', [getProjectName(project), String(response.status)]), 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notConnect', [project.rating, String(response.status)]), 'error', null, element)
             return
         }
 
         try {
             let html = await response.text()
             let doc = new DOMParser().parseFromString(html, 'text/html')
-            if (project.MCRate) {
+            if (project.rating === 'MCRate') {
                 //А зачем 404 отдавать в status код? Мы лучше отошлём 200 и только потом на странице напишем что не найдено 404
                 if (doc.querySelector('div[class=error]') != null) {
                     createNotif(doc.querySelector('div[class=error]').textContent, 'error', null, element)
                     return
                 }
-            } else if (project.ServerPact) {
+            } else if (project.rating === 'ServerPact') {
                 if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center') != null && doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center').textContent.includes('This server does not exist')) {
                     createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                     return
                 }
-            } else if (project.ListForge) {
+            } else if (project.rating === 'ListForge') {
                 if (doc.querySelector('a[href="https://listforge.net/"]') == null && doc.querySelector('a[href="http://listforge.net/"]') == null) {
                     createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                     return
                 }
-            } else if (project.MinecraftIpList) {
+            } else if (project.rating === 'MinecraftIpList') {
                 if (doc.querySelector(jsPath) == null) {
                     createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
                     return
                 }
-            } else if (project.IonMc) {
+            } else if (project.rating === 'IonMc') {
                 if (doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div') != null) {
                     createNotif(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, 'error', null, element)
                     return
                 }
-//          } else if (project.TopGG) {
+//          } else if (project.rating == 'TopGG') {
 //              if (doc.querySelector('a.btn.primary') != null && doc.querySelector('a.btn.primary').textContent.includes('Login')) {
 //                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
-//          } else if (project.DiscordBotList) {
+//          } else if (project.rating == 'DiscordBotList') {
 //              if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
 //                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
-//          } else if (project.BotsForDiscord) {
+//          } else if (project.rating == 'BotsForDiscord') {
 //              if (doc.getElementById("sign-in") != null) {
 //                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
-            } else if (project.MMoTopRU) {
-                if (doc.querySelector('body > div') == null && doc.querySelectorAll('body > script[type="text/javascript"]').length == 1) {
+            } else if (project.rating === 'MMoTopRU') {
+                if (doc.querySelector('body > div') == null && doc.querySelectorAll('body > script[type="text/javascript"]').length === 1) {
                     createNotif(chrome.i18n.getMessage('emptySite'), 'error', null, element)
                     return
                 } else if (doc.querySelector('a[href="https://mmotop.ru/users/sign_in"]') != null) {
@@ -2622,28 +1234,28 @@ async function addProject(project, element) {
                 }
             }
             
-            if (project.MCServerList) {
+            if (project.rating === 'MCServerList') {
                 projectURL = JSON.parse(html)[0].name
             } else
-            if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text != '') {
+            if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text !== '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).text)
-            } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent != '') {
+            } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent !== '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).textContent)
-            } else if (doc.querySelector(jsPath).value != null && doc.querySelector(jsPath).value != '') {
+            } else if (doc.querySelector(jsPath).value != null && doc.querySelector(jsPath).value !== '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).value)
-            } else if (doc.querySelector(jsPath).href != null && doc.querySelector(jsPath).href != '') {
+            } else if (doc.querySelector(jsPath).href != null && doc.querySelector(jsPath).href !== '') {
                 projectURL = extractHostname(doc.querySelector(jsPath).href)
             } else {
                 projectURL = ''
             }
 
-            if (projectURL != '') {
+            if (projectURL !== '') {
                 projectURL = projectURL.trim()
-                if (project.HotMC) {
+                if (project.rating === 'HotMC') {
                     projectURL = projectURL.replace(' сервер Майнкрафт', '')
-                } else if (project.ListForge) {
+                } else if (project.rating === 'ListForge') {
                     projectURL = projectURL.substring(9, projectURL.length)
-                } else if (project.MinecraftList) {
+                } else if (project.rating === 'MinecraftList') {
                     projectURL = projectURL.replace(' Minecraft Server', '')
                 }
                 project.name = projectURL
@@ -2663,14 +1275,14 @@ async function addProject(project, element) {
         createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
 
         //Проверка авторизации ВКонтакте
-        if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && !settings.useMultiVote) {
+        if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && !settings.useMultiVote) {
             createNotif(chrome.i18n.getMessage('checkAuthVK'), null, null, element)
-            let url2 = authVKUrls.get(getProjectName(project))
+            let url2 = authVKUrls.get(project.rating)
             let response2
             try {
                 response2 = await fetch(url2, {redirect: 'manual', credentials: 'include'})
             } catch (e) {
-                if (e == 'TypeError: Failed to fetch') {
+                if (e === 'TypeError: Failed to fetch') {
                     createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error', null, element)
                     return
                 } else {
@@ -2680,14 +1292,14 @@ async function addProject(project, element) {
             }
 
             if (response2.ok) {
-                const message = chrome.i18n.getMessage('authVK', getProjectName(project))
+                const message = chrome.i18n.getMessage('authVK', project.rating)
                 const button = document.createElement('button')
                 button.id = 'authvk'
                 button.classList.add('btn')
-                let img = document.createElement('img')
+                const img = document.createElement('img')
                 img.src = 'images/icons/arrow.svg'
                 button.append(img)
-                let text = document.createElement('div')
+                const text = document.createElement('div')
                 text.textContent = chrome.i18n.getMessage('authButton')
                 button.append(text)
                 createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
@@ -2710,7 +1322,7 @@ async function addProject(project, element) {
                     }
                 })
                 return
-            } else if (response2.status != 0) {
+            } else if (response2.status !== 0) {
                 createNotif(chrome.i18n.getMessage('notConnect', [extractHostname(response.url), String(response2.status)]), 'error', null, element)
                 return
             }
@@ -2723,14 +1335,14 @@ async function addProject(project, element) {
 //      project.randomize = true
 //      random = true
 //  }
-    
+
     let countNicks = 0
     if (document.getElementById('importNicks').checked) {
         const file = document.getElementById('importNicksFile').files[0]
         const data = await new Response(file).text()
         for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
-            if (nick == null || nick == '') continue
+            if (nick == null || nick === '') continue
             let _continue = false
             const project2 = Object.assign({}, project)
             project2.nick = nick
@@ -2751,15 +1363,15 @@ async function addProject(project, element) {
     }
 
     /*f (random) {
-        createNotif('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', getProjectName(project)) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element);
+        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', project.rating) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element)
     } else*/
-    let array = []
+    const array = []
     if (document.getElementById('importNicks').checked) {
         array.push(chrome.i18n.getMessage('addSuccessNicks', String(countNicks)) + ' ' + projectURL)
     } else {
         array.push(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL)
     }
-//  if ((project.PlanetMinecraft || project.TopG || project.MinecraftServerList || project.IonMc || project.MinecraftServersOrg || project.ServeurPrive || project.TopMinecraftServers || project.MinecraftServersBiz || project.HotMC || project.MinecraftServerNet || project.TopGames || project.TMonitoring || project.TopGG || project.DiscordBotList || project.MMoTopRU || project.MCServers || project.MinecraftList || project.MinecraftIndex || project.ServerList101) && settings.enabledSilentVote && !element) {
+//  if ((project.rating == 'PlanetMinecraft' || project.rating == 'TopG' || project.rating == 'MinecraftServerList' || project.rating == 'IonMc' || project.rating == 'MinecraftServersOrg' || project.rating == 'ServeurPrive' || project.rating == 'TopMinecraftServers' || project.rating == 'MinecraftServersBiz' || project.rating == 'HotMC' || project.rating == 'MinecraftServerNet' || project.rating == 'TopGames' || project.rating == 'TMonitoring' || project.rating == 'TopGG' || project.rating == 'DiscordBotList' || project.rating == 'MMoTopRU' || project.rating == 'MCServers' || project.rating == 'MinecraftList' || project.rating == 'MinecraftIndex' || project.rating == 'ServerList101') && settings.enabledSilentVote && !element) {
 //      const messageWSV = chrome.i18n.getMessage('warnSilentVote', getProjectName(project))
 //      const span = document.createElement('span')
 //      span.className = 'tooltip2'
@@ -2777,7 +1389,7 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (project.MinecraftServersOrg || project.ListForge || project.ServerList101) {
+    if (project.rating === 'MinecraftServersOrg' || project.rating === 'ListForge' || project.rating === 'ServerList101') {
         array.push(document.createElement('br'))
         array.push(chrome.i18n.getMessage('privacyPass'))
         const a = document.createElement('a')
@@ -2813,7 +1425,7 @@ async function addProject(project, element) {
         createNotif(array, 'success', null, element)
     }
 
-    if (project.MinecraftIndex || project.PixelmonServers) {
+    if (project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers') {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 
@@ -2839,7 +1451,7 @@ function addProjectsBonus(project, element) {
 //          await addProject('Custom', 'MythicalWorldBonus6Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=6&item=11","method":"POST","mode":"cors"}', null, 'https://mythicalworld.su/bonus', {ms: 86400000}, priorityOption, null)
 //          await addProject('Custom', 'MythicalWorldBonusMith', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"type=1&bonus=1&value=5","method":"POST","mode":"cors"}', null, 'https://mythicalworld.su/bonus', {ms: 86400000}, priorityOption, null)
 //      })
-/*  } else */if (project.id == 'victorycraft' || project.id == 8179 || project.id == 4729) {
+/*  } else */if (project.id === 'victorycraft' || project.id === 8179 || project.id === 4729) {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async()=>{
             if (blockButtons) {
                 createNotif(chrome.i18n.getMessage('notFast'), 'warn')
@@ -2857,10 +1469,17 @@ function addProjectsBonus(project, element) {
                 timeoutMinute: 10,
                 timeoutSecond: 0,
                 stats: {
+                    successVotes: 0,
+                    monthSuccessVotes: 0,
+                    lastMonthSuccessVotes: 0,
+                    errorVotes: 0,
+                    laterVotes: 0,
+                    lastSuccessVote: null,
+                    lastAttemptVote: null,
                     added: Date.now()
                 }
             }
-            await addProject(vict, null)
+            await addProject(vict, element)
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null)
             blockButtons = false
         })
@@ -2871,13 +1490,16 @@ async function checkPermissions(projects, element) {
     const origins = []
     const permissions = []
     for (const project of projects) {
-        const url = chrome.extension.getBackgroundPage().allProjects[getProjectName(project)]('pageURL', project)
+        const url = allProjects[project.rating]('pageURL', project)
         const domain = getDomainWithoutSubdomain(url)
         if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
-        if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) {
+        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') {
             if (!origins.includes('*://*.vk.com/*')) origins.push('*://*.vk.com/*')
         }
-        if (project.MonitoringMinecraft) {
+        if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'BotsForDiscord') {
+            if (!origins.includes('https://discord.com/oauth2/*')) origins.push('https://discord.com/oauth2/*')
+        }
+        if (project.rating === 'MonitoringMinecraft') {
             if (!permissions.includes('cookies')) permissions.push('cookies')
         }
     }
@@ -2922,10 +1544,14 @@ async function checkPermissions(projects, element) {
 }
 
 async function setCoolDown() {
-    if (settings.cooldown && settings.cooldown == document.getElementById('cooldown').valueAsNumber)
-        return
+    if (settings.cooldown && settings.cooldown === document.getElementById('cooldown').valueAsNumber) return
     settings.cooldown = document.getElementById('cooldown').valueAsNumber
-    await setValue('AVMRsettings', settings)
+    await new Promise((resolve, reject) => {
+        const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+        request.onsuccess = resolve
+        request.onerror = reject
+    })
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
         chrome.runtime.reload()
     }
@@ -2983,142 +1609,24 @@ const getDomainWithoutSubdomain = url => {
     .join('.')
 }
 
-//Асинхронно достаёт/сохраняет настройки в chrome.storage
-async function getValue(name, area) {
-    if (!area) {
-        area = storageArea
-    }
-    return new Promise((resolve, reject)=>{
-        chrome.storage[area].get(name, function(data) {
-            if (chrome.runtime.lastError) {
-                createNotif(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message), 'error')
-//              console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError.message))
-                reject(chrome.runtime.lastError.message)
-            } else {
-                resolve(data[name])
-            }
-        })
-    })
-}
-async function setValue(key, value, area) {
-    if (!area) {
-        area = storageArea
-    }
-    return new Promise((resolve, reject)=>{
-        chrome.storage[area].set({[key]: value}, function(data) {
-            if (chrome.runtime.lastError) {
-                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message), 'error')
-//              console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
-                reject(chrome.runtime.lastError.message)
-            } else {
-                resolve(data)
-            }
-        })
-    })
-}
-async function removeValue(name, area) {
-    if (!area) {
-        area = storageArea
-    }
-    return new Promise((resolve, reject)=>{
-        chrome.storage[area].remove(name, function(data) {
-            if (chrome.runtime.lastError) {
-                createNotif(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message), 'error')
-//              console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError.message))
-                reject(chrome.runtime.lastError.message)
-            } else {
-                resolve(data)
-            }
-        })
-    })
-}
-
-async function clearProxy() {
-    return new Promise(resolve => {
-        chrome.proxy.settings.clear({scope: 'regular'},function() {
-            resolve()
-        })
-    })
-}
-
-async function wait(ms) {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve()
-        }, ms)
-    })
-}
-
-function Version(s){
-  this.arr = s.split('.').map(Number);
-}
-Version.prototype.compareTo = function(v){
-  for (let i=0; ;i++) {
-    if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1;
-    if (i>=this.arr.length) return -1;
-    var diff = this.arr[i]-v.arr[i]
-    if (diff) return diff>0 ? 1 : -1;
-  }
-}
-
-//Слушатель на изменение настроек
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-    if (namespace != storageArea) return
-    for (const key in changes) {
-        let storageChange = changes[key]
-        if (key.startsWith('AVMRprojects')) {
-            window['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
-        } else if (key == 'AVMRsettings') {
-            settings = storageChange.newValue
-            if (settings.stopVote > Date.now()) {
-                document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
-            } else {
-                document.querySelector('#stopVote img').setAttribute('src', 'images/icons/start.svg')
-            }
-            return
-        } else if (key == 'generalStats') {
-            generalStats = storageChange.newValue
-            return
-        } else if (key == 'AVMRproxies' || key == 'AVMRVKs' || key == 'borealisAccounts') {
-            if (key == 'AVMRproxies') proxies = storageChange.newValue
-            if (key == 'AVMRVKs') VKs = storageChange.newValue
-            if (storageChange.oldValue && storageChange.oldValue.length == storageChange.newValue.length) {
-                updateProjectList(storageChange.newValue, key)
-            }
-        } else if (key == 'storageArea') {
-            return
-        }
-        if (storageChange.oldValue == null || !(typeof storageChange.oldValue[Symbol.iterator] === 'function') || storageChange.newValue == null || !(typeof storageChange.newValue[Symbol.iterator] === 'function')) return
-//      if (storageChange.oldValue.length == storageChange.newValue.length) {
-        updateProjectList(storageChange.newValue, key)
-//      }
-    }
-})
-
-async function forLoopAllProjects(fuc) {
-    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-        for (let proj of window['projects' + item]) {
-            await fuc(proj)
-        }
-    }
-}
-
 //Слушатель на экспорт настроек
-document.getElementById('file-download').addEventListener('click', ()=> {
+document.getElementById('file-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))
-    let allSetting = {
-        VKs,
-        borealisAccounts,
-        proxies,
+    generalStats = await new Promise(resolve => db.transaction('other').objectStore('other').get('generalStats').onsuccess = (event) => resolve(event.target.result))
+    const allSetting = {
         settings,
         generalStats
     }
-    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-        allSetting['projects' + item] = window['projects' + item]
-    }
-    let text = JSON.stringify(allSetting, null, '\t')
-    let blob = new Blob([text],{type: 'text/json;charset=UTF-8;'})
-    let anchor = document.createElement('a')
+    allSetting.projects = await new Promise((resolve, reject) => {
+        const request = db.transaction('projects').objectStore('projects').getAll()
+        request.onsuccess = function (event) {
+            resolve(event.target.result)
+        }
+        request.onerror = reject
+    })
+    const text = JSON.stringify(allSetting, null, '\t')
+    const blob = new Blob([text],{type: 'text/json;charset=UTF-8;'})
+    const anchor = document.createElement('a')
 
     anchor.download = 'AVR.json'
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
@@ -3172,7 +1680,7 @@ document.getElementById('importProxy').addEventListener('change', (evt) => {
                             proxies.push(varProxy)
                         }
                     }
-                    
+
                     await setValue('AVMRproxies', proxies)
 
                     createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
@@ -3201,16 +1709,15 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
         if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
     }
     openRequest.onerror = function() {
-        createNotif(chrome.i18n.getMessage('errordb', 'logs') + ' ' + openRequest.error, 'e')
+        createNotif(chrome.i18n.getMessage('errordb', ['logs', openRequest.error]), 'error')
     }
     openRequest.onsuccess = function() {
-        const db = openRequest.result
-        db.onerror = function(event) {
-            let request = event.target; // запрос, в котором произошла ошибка
-            createNotif(chrome.i18n.getMessage('errordb', 'logs') + ' ' + request.error, 'e');
+        const logsdb = openRequest.result
+        logsdb.onerror = function(event) {
+            createNotif(chrome.i18n.getMessage('errordb', ['logs', event.target.error]), 'error')
         }
-        // продолжить работу с базой данных, используя объект db
-        const transaction = db.transaction('logs', 'readonly')
+        // продолжить работу с базой данных, используя объект logsdb
+        const transaction = logsdb.transaction('logs', 'readonly')
         const logs = transaction.objectStore('logs')
         const request = logs.getAll()
         request.onsuccess = function() {
@@ -3220,8 +1727,8 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
                 text += '\n'
             }
             
-            let blob = new Blob([text],{type: 'text/plain;charset=UTF-8;'})
-            let anchor = document.createElement('a')
+            const blob = new Blob([text],{type: 'text/plain;charset=UTF-8;'})
+            const anchor = document.createElement('a')
             
             anchor.download = 'console_history.txt'
             anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
@@ -3234,15 +1741,6 @@ document.getElementById('logs-download').addEventListener('click', ()=>{
     }
 })
 
-//Сколько использовано места на логи
-usageLogs()
-async function usageLogs() {
-    const quota = await navigator.storage.estimate()
-    //На FireFox почему-то не поддерживается это API
-    if (quota.usageDetails == null) return
-    const usage = quota.usageDetails.indexedDB / (1024 * 1024)
-    document.querySelector('span[data-resource="clearLogs"]').textContent = chrome.i18n.getMessage('clearLogs') + ' (' + usage.toFixed(3) + ' Mib)'
-}
 //Очистка логов
 document.getElementById('logs-clear').addEventListener('click', ()=>{
     createNotif(chrome.i18n.getMessage('clearingLogs'))
@@ -3255,21 +1753,19 @@ document.getElementById('logs-clear').addEventListener('click', ()=>{
         if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
     }
     openRequest.onerror = function() {
-        createNotif(chrome.i18n.getMessage('errordb', 'logs') + ' ' + openRequest.error, 'e')
+        createNotif(chrome.i18n.getMessage('errordb', ['logs', openRequest.error]), 'error')
     }
     openRequest.onsuccess = function() {
-        const db = openRequest.result
-        db.onerror = function(event) {
-            let request = event.target; // запрос, в котором произошла ошибка
-            createNotif(chrome.i18n.getMessage('errordb', 'logs') + ' ' + request.error, 'e');
+        const logsdb = openRequest.result
+        logsdb.onerror = function(event) {
+            createNotif(chrome.i18n.getMessage('errordb', ['logs', event.target.error]), 'error')
         }
-        // продолжить работу с базой данных, используя объект db
-        const transaction = db.transaction('logs', 'readwrite')
+        // продолжить работу с базой данных, используя объект logsdb
+        const transaction = logsdb.transaction('logs', 'readwrite')
         const logs = transaction.objectStore('logs')
         const request = logs.clear()
         request.onsuccess = function() {
             createNotif(chrome.i18n.getMessage('clearedLogs'), 'success')
-            usageLogs()
         }
     }
 })
@@ -3282,51 +1778,61 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
     }
     createNotif(chrome.i18n.getMessage('importing'))
     try {
-        if (evt.target.files.length == 0) return
+        if (evt.target.files.length === 0) return
         const file = evt.target.files[0]
         const data = await new Response(file).json()
+
         let projects = []
-        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-            if (data['projects' + item] != null) projects = projects.concat(data['projects' + item])
+        if (data.projectsTopCraft) {
+            createNotif(chrome.i18n.getMessage('oldSettings'))
+            for (const item of Object.keys(allProjects)) {
+                for (const project of data['projects' + item]) {
+                    delete project[item]
+                    project.rating = item
+                    if (item === 'Custom') {
+                        project.body = project.id
+                        delete project.id
+                        project.id = project.nick
+                        project.nick = ''
+                    }
+                    if (project.nick == null) project.nick = ''
+                    if (project.stats.successVotes == null) project.stats.successVotes = 0
+                    if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
+                    if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
+                    if (project.stats.errorVotes == null) project.stats.errorVotes = 0
+                    if (project.stats.laterVotes == null) project.stats.laterVotes = 0
+                    projects.push(project)
+                }
+            }
+            createNotif(chrome.i18n.getMessage('importing'))
+        } else {
+            projects = data.projects
         }
+
         if (!await checkPermissions(projects)) return
-        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-            window['projects' + item] = data['projects' + item]
+
+        const projectsts = db.transaction(['projects', 'other'], 'readwrite')
+        projectsts.objectStore('projects').clear()
+        for (const project of projects) {
+            projectsts.objectStore('projects').add(project)
         }
+        projectsts.objectStore('other').put(data.settings, 'settings')
+        projectsts.objectStore('other').put(data.generalStats, 'generalStats')
+        await new Promise((resolve, reject) => {
+            projectsts.oncomplete = resolve
+            projectsts.onerror = reject
+        })
+
         settings = data.settings
         generalStats = data.generalStats
-        VKs = data.VKs
-        borealisAccounts = data.borealisAccounts
-        proxies = data.proxies
-
-        await checkUpdateConflicts(false)
-
-        for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-            await setValue('AVMRprojects' + item, window['projects' + item])
+        if (chrome.extension.getBackgroundPage()) {
+            chrome.extension.getBackgroundPage().settings = settings
+            chrome.extension.getBackgroundPage().generalStats = generalStats
+            chrome.extension.getBackgroundPage().reloadAllAlarms()
+            chrome.extension.getBackgroundPage().checkVote()
         }
-        await setValue('AVMRsettings', settings)
-        await setValue('generalStats', generalStats)
-        await setValue('AVMRVKs', VKs)
-        await setValue('borealisAccounts', borealisAccounts)
-        await setValue('AVMRproxies', proxies)
 
-        document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
-        document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
-        document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
-        document.getElementById('disabledNotifError').checked = settings.disabledNotifError
-        document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
-        document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
-        document.getElementById('cooldown').value = settings.cooldown
-        if (settings.enabledSilentVote) {
-            document.getElementById('enabledSilentVote').value = 'enabled'
-        } else {
-            document.getElementById('enabledSilentVote').value = 'disabled'
-        }
-        document.getElementById('useMultiVote').checked = settings.useMultiVote
-        document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
-        if (settings.enableCustom) addCustom()
-
-        await updateProjectList()
+        await restoreOptions()
 
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
     } catch (e) {
@@ -3337,71 +1843,6 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
     }
 }, false)
 
-async function checkUpdateConflicts(save) {
-    let updated = false
-    //Если пользователь обновился с версии 3.3.1
-    if (projectsTopGames == null || !(typeof projectsTopGames[Symbol.iterator] === 'function')) {
-        updated = true
-        createNotif(chrome.i18n.getMessage('settingsUpdate'))
-        await forLoopAllProjects(async function(proj) {
-            proj.stats = {}
-            //Да, это весьма не оптимизированно
-            if (save) await setValue('AVMRprojects' + getProjectName(proj), getProjectList(proj))
-        })
-    }
-
-    //Если пользователь обновился с версии без MultiVote
-    if (VKs == null || !(typeof VKs[Symbol.iterator] === 'function') || proxies == null || !(typeof proxies[Symbol.iterator] === 'function')) {
-        updated = true
-        createNotif(chrome.i18n.getMessage('settingsUpdate'))
-        VKs = []
-        proxies = []
-        await setValue('AVMRVKs', VKs)
-        await setValue('AVMRproxies', proxies)
-    }
-    if (borealisAccounts == null || !(typeof borealisAccounts[Symbol.iterator] === 'function')) {
-        updated = true
-        createNotif(chrome.i18n.getMessage('settingsUpdate'))
-        borealisAccounts = []
-        await setValue('borealisAccounts', borealisAccounts)
-    }
-    if (settings.stopVote == null) {
-        updated = true
-        createNotif(chrome.i18n.getMessage('settingsUpdate'))
-        settings.stopVote = 9000000000000000
-        await setValue('AVMRsettings', settings)
-    }
-    if (settings.proxyBlackList == null) {
-        updated = true
-        createNotif(chrome.i18n.getMessage('settingsUpdate'))
-        settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
-    }
-
-    if (generalStats == null) {
-        updated = true
-        createNotif(chrome.i18n.getMessage('settingsUpdate'))
-        generalStats = {}
-        if (save) await setValue('generalStats', generalStats)
-    }
-
-    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-        if (window['projects' + item] == null || !(typeof window['projects' + item][Symbol.iterator] === 'function')) {
-            if (!updated) {
-                createNotif(chrome.i18n.getMessage('settingsUpdate'))
-                updated = true
-            }
-            window['projects' + item] = []
-            if (save) await setValue('AVMRprojects' + item, window['projects' + item])
-        }
-    }
-    if (save) await setValue('AVMRsettings', settings)
-
-    if (updated) {
-        console.log(chrome.i18n.getMessage('settingsUpdateEnd'))
-        createNotif(chrome.i18n.getMessage('settingsUpdateEnd2'), 'success')
-    }
-}
-
 //Слушатель переключателя режима голосования
 let modeVote = document.getElementById('enabledSilentVote')
 modeVote.addEventListener('change', async function() {
@@ -3411,12 +1852,13 @@ modeVote.addEventListener('change', async function() {
     } else {
         blockButtons = true
     }
-    if (modeVote.value == 'enabled') {
-        settings.enabledSilentVote = true
-    } else {
-        settings.enabledSilentVote = false
-    }
-    await setValue('AVMRsettings', settings)
+    settings.enabledSilentVote = modeVote.value === 'enabled'
+    await new Promise((resolve, reject) => {
+        const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+        request.onsuccess = resolve
+        request.onerror = reject
+    })
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     blockButtons = false
 })
 
@@ -3424,17 +1866,24 @@ modeVote.addEventListener('change', async function() {
 function getUrlProjects() {
     let projects = []
     let project = {}
-    let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        if (key == 'top' || key == 'nick' || key == 'id' || key == 'game' || key == 'lang' || key == 'maxCountVote' || key == 'ordinalWorld' || key == 'randomize' || key == 'addition' || key == 'silentMode' || key == 'emulateMode') {
-            if (key == 'top' && Object.keys(project).length > 0) {
+    /*let parts = */window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+        if (key === 'top' || key === 'nick' || key === 'id' || key === 'game' || key === 'lang' || key === 'maxCountVote' || key === 'ordinalWorld' || key === 'randomize' || key === 'addition' || key === 'silentMode' || key === 'emulateMode') {
+            if (key === 'top' && Object.keys(project).length > 0) {
                 project.time = null
                 project.stats = {
+                    successVotes: 0,
+                    monthSuccessVotes: 0,
+                    lastMonthSuccessVotes: 0,
+                    errorVotes: 0,
+                    laterVotes: 0,
+                    lastSuccessVote: null,
+                    lastAttemptVote: null,
                     added: Date.now()
                 }
                 projects.push(project)
                 project = {}
             }
-            if (key == 'top' || key == 'randomize' || key == 'silentMode' || key == 'emulateMode') {
+            if (key === 'top' || key === 'randomize' || key === 'silentMode' || key === 'emulateMode') {
                 project[value] = true
             } else {
                 project[key] = value
@@ -3444,6 +1893,13 @@ function getUrlProjects() {
     if (Object.keys(project).length > 0) {
         project.time = null
         project.stats = {
+            successVotes: 0,
+            monthSuccessVotes: 0,
+            lastMonthSuccessVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null,
             added: Date.now()
         }
         projects.push(project)
@@ -3454,7 +1910,7 @@ function getUrlProjects() {
 //Достаёт все указанные аргументы из URL
 function getUrlVars() {
     const vars = {}
-    const parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+    /*const parts = */window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         vars[key] = value
     })
     return vars
@@ -3470,9 +1926,14 @@ async function fastAdd() {
         const listFastAdd = document.querySelector('#addFastProject > div.content > .message')
         listFastAdd.textContent = ''
 
-        if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] == 'true') {
+        if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] === 'true') {
             settings.disabledNotifInfo = true
-            await setValue('AVMRsettings', settings)
+            await new Promise((resolve, reject) => {
+                const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+                request.onsuccess = resolve
+                request.onerror = reject
+            })
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -3485,9 +1946,14 @@ async function fastAdd() {
             html.append(div)
             listFastAdd.append(html)
         }
-        if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] == 'true') {
+        if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] === 'true') {
             settings.disabledNotifWarn = true
-            await setValue('AVMRsettings', settings)
+            await new Promise((resolve, reject) => {
+                const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+                request.onsuccess = resolve
+                request.onerror = reject
+            })
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -3500,9 +1966,14 @@ async function fastAdd() {
             html.append(div)
             listFastAdd.append(html)
         }
-        if (vars['disableNotifStart'] != null && vars['disableNotifStart'] == 'true') {
+        if (vars['disableNotifStart'] != null && vars['disableNotifStart'] === 'true') {
             settings.disabledNotifStart = true
-            await setValue('AVMRsettings', settings)
+            await new Promise((resolve, reject) => {
+                const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+                request.onsuccess = resolve
+                request.onerror = reject
+            })
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -3542,12 +2013,12 @@ async function fastAdd() {
         for (const project of projects) {
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
-            html.setAttribute('div', getProjectName(project)+'–'+project.nick+'–'+project.id)
+            html.setAttribute('div', project.rating+'–'+project.nick+'–'+project.id)
             html.appendChild(svgFail.cloneNode(true))
 
             const div = document.createElement('div')
             const p = document.createElement('p')
-            p.textContent = getProjectName(project)+' – '+project.nick+' – '+project.id
+            p.textContent = project.rating+' – '+project.nick+' – '+project.id
             const status = document.createElement('span')
             p.append(document.createElement('br'))
             p.append(status)
@@ -3606,7 +2077,8 @@ function addCustom() {
 //  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
-        setValue('AVMRsettings', settings)
+        db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     }
 }
 
@@ -3637,8 +2109,8 @@ async function openPopup(url, onClose, code) {
         }
     }
     if (onClose) {
-        function onRemoved(tabId, removeInfo) {
-            if (tabID == tabId) {
+        function onRemoved(tabId/*, removeInfo*/) {
+            if (tabID === tabId) {
                 onClose()
                 if (code) chrome.tabs.onUpdated.removeListener(onUpdated)
                 chrome.tabs.onRemoved.removeListener(onRemoved)
@@ -3649,11 +2121,6 @@ async function openPopup(url, onClose, code) {
     }
     return tabID
 }
-
-document.addEventListener('DOMContentLoaded', async()=>{
-    await restoreOptions()
-    fastAdd()
-})
 
 document.querySelector('.burger').addEventListener('click', ()=>{
     document.querySelector('.burger').classList.toggle('active')
@@ -3677,8 +2144,9 @@ document.querySelectorAll('.tablinks').forEach((item)=> {
         document.querySelectorAll('.tablinks').forEach((elem)=> {
             elem.classList.remove('active')
         })
+
         let genStats = document.querySelector('#generalStats')
-        if (item.getAttribute('data-tab') == 'added') genStats.style.visibility = 'visible'
+        if (item.getAttribute('data-tab') === 'added') genStats.style.visibility = 'visible'
         else genStats.removeAttribute('style')
  
         item.classList.add('active')
@@ -3688,7 +2156,7 @@ document.querySelectorAll('.tablinks').forEach((item)=> {
 
 //Переключение между списками добавленных проектов
 function listSelect(evt, tabs) {
-    let x, listcontent, selectsite
+    let listcontent, selectsite
 
     listcontent = document.getElementsByClassName('listcontent')
     for (let x = 0; x < listcontent.length; x++) {
@@ -3700,8 +2168,26 @@ function listSelect(evt, tabs) {
         selectsite[x].className = selectsite[x].className.replace(' activeList', '')
     }
 
-    document.getElementById(tabs).style.display = 'block'
+    document.getElementById(tabs + 'Tab').style.display = 'block'
     evt.currentTarget.className += ' activeList'
+
+    const list = document.getElementById(tabs + 'List')
+    if (list.childElementCount === 0) {//Если список проектов данного рейтинга пустой - заполняем его
+        let div = document.createElement('div')
+        div.setAttribute('data-resource', 'load')
+        div.textContent = chrome.i18n.getMessage('load')
+        list.append(div)
+        const projects = db.transaction('projects').objectStore('projects').index('rating')
+        projects.openCursor(tabs).onsuccess = function(event) {
+            const cursor = event.target.result
+            if (cursor) {
+                addProjectList(cursor.value, cursor.primaryKey)
+                cursor.continue()
+            } else {
+                div.remove()
+            }
+        }
+    }
 }
 
 //Слушатели кнопок списка доавленных проектов
@@ -3725,10 +2211,13 @@ document.getElementById('BorealisButton').addEventListener('click', function() {
 })
 
 //Слушатель закрытия модалки статистики и её сброс
-document.querySelector('#stats .close').addEventListener('click', ()=> {
-    if (document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent != '') {
-        document.getElementById('statsSubtitle').firstChild.remove()
-        document.getElementById('statsSubtitle').append('\u00A0')
+document.querySelector('#stats .close').addEventListener('click', resetModalStats)
+//Сброс модалки статистики
+function resetModalStats() {
+    if (document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent !== '') {
+        document.querySelector('.statsSubtitle').firstChild.remove()
+        document.querySelector('.statsSubtitle').append('\u00A0')
+        document.querySelector('.statsSubtitle').removeAttribute('id')
         document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = ''
@@ -3736,40 +2225,41 @@ document.querySelector('#stats .close').addEventListener('click', ()=> {
         document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = ''
-        document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsAdded')
+        document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = ''
     }
-})
+}
 
 
 //Слушатель общей статистики и вывод её в модалку
-document.getElementById('generalStats').addEventListener('click', ()=> {
+document.getElementById('generalStats').addEventListener('click', async()=> {
     // document.getElementById('modalStats').click()
     toggleModal('stats')
-    document.getElementById('statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
-    document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = generalStats.successVotes ? generalStats.successVotes : 0
-    document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.monthSuccessVotes ? generalStats.monthSuccessVotes : 0
-    document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.lastMonthSuccessVotes ? generalStats.lastMonthSuccessVotes : 0
-    document.querySelector('td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = generalStats.errorVotes ? generalStats.errorVotes : 0
-    document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = generalStats.laterVotes ? generalStats.laterVotes : 0
+    document.querySelector('.statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
+    generalStats = await new Promise(resolve => db.transaction('other').objectStore('other').get('generalStats').onsuccess = (event) => resolve(event.target.result))
+    document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = generalStats.successVotes
+    document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.monthSuccessVotes
+    document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.lastMonthSuccessVotes
+    document.querySelector('td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = generalStats.errorVotes
+    document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = generalStats.laterVotes
     document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = generalStats.lastSuccessVote ? new Date(generalStats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
     document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = generalStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
     document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsInstalled')
     document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = generalStats.added ? new Date(generalStats.added).toLocaleString().replace(',', '') : 'None'
 })
 
-document.getElementById('localStorage').addEventListener('click', async ()=>{
-    toggleModal('conflictSync')
-    await removeValue('AVMRsettings', 'sync')
-    document.getElementById('enableSyncStorage').click()
-})
-document.getElementById('syncStorage').addEventListener('click', async ()=>{
-    toggleModal('conflictSync')
-    await setValue('storageArea', 'sync', 'local')
-    document.location.reload()
-})
+// document.getElementById('localStorage').addEventListener('click', async ()=>{
+//     toggleModal('conflictSync')
+//     await removeValue('AVMRsettings', 'sync')
+//     document.getElementById('enableSyncStorage').click()
+// })
+// document.getElementById('syncStorage').addEventListener('click', async ()=>{
+//     toggleModal('conflictSync')
+//     await setValue('storageArea', 'sync', 'local')
+//     document.location.reload()
+// })
 
 //Генерация поля ввода ID
-var selectedTop = document.getElementById('project')
+const selectedTop = document.getElementById('project')
 
 // selectedTop.addEventListener('click', function() {
 //     let options = selectedTop.querySelectorAll('option')
@@ -3779,7 +2269,7 @@ var selectedTop = document.getElementById('project')
 //     }
 // })
 
-var laterChoose
+let laterChoose
 selectedTop.addEventListener('change', function() {
     document.getElementById('id').value = ''
     let name
@@ -3799,6 +2289,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('label8').style.display = 'none'
         document.getElementById('label9').style.display = 'none'
         document.getElementById('label10').style.display = 'none'
+        document.getElementById('idGame').style.display = 'none'
         document.getElementById('countVote').required = false
         document.getElementById('id').required = false
         document.getElementById('ordinalWorld').required = false
@@ -3808,7 +2299,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('nick').parentElement.removeAttribute('style')
         document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
-        if (laterChoose && (laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU')) {
+        if (laterChoose && (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MMoTopRU')) {
             document.getElementById('selectLang' + laterChoose).style.display = 'none'
             document.getElementById('selectLang' + laterChoose).required = false
             document.getElementById('chooseGame' + laterChoose).style.display = 'none'
@@ -3828,12 +2319,12 @@ selectedTop.addEventListener('change', function() {
 
     document.getElementById('id').required = true
 
-    const exampleURL = chrome.extension.getBackgroundPage().allProjects[name]('exampleURL')
+    const exampleURL = allProjects[name]('exampleURL')
     document.getElementById('projectIDTooltip1').textContent = exampleURL[0]
     document.getElementById('projectIDTooltip2').textContent = exampleURL[1]
     document.getElementById('projectIDTooltip3').textContent = exampleURL[2]
 
-    if (name == 'Custom' || name == 'ServeurPrive' || name == 'TopGames' || name == 'MMoTopRU' || laterChoose == 'Custom' || laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU') {
+    if (name === 'Custom' || name === 'ServeurPrive' || name === 'TopGames' || name === 'MMoTopRU' || laterChoose === 'Custom' || laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MMoTopRU') {
         document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('importNicks').disabled = false
@@ -3847,7 +2338,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('label10').style.display = 'none'
         document.getElementById('countVote').required = false
         document.getElementById('ordinalWorld').required = false
-        if (laterChoose && (laterChoose == 'ServeurPrive' || laterChoose == 'TopGames' || laterChoose == 'MMoTopRU')) {
+        if (laterChoose && (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MMoTopRU')) {
             document.getElementById('selectLang' + laterChoose).style.display = 'none'
             document.getElementById('selectLang' + laterChoose).required = false
             document.getElementById('chooseGame' + laterChoose).style.display = 'none'
@@ -3864,7 +2355,7 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('hour').required = false
         }
 
-        if (name == 'Custom') {
+        if (name === 'Custom') {
             document.getElementById('customTimeOut').disabled = true
             document.getElementById('customTimeOut').checked = false
             document.getElementById('lastDayMonth').disabled = true
@@ -3880,7 +2371,7 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('label6').removeAttribute('style')
             document.getElementById('label1').removeAttribute('style')
             document.getElementById('label2').removeAttribute('style')
-            if (document.getElementById('selectTime').value == 'ms') {
+            if (document.getElementById('selectTime').value === 'ms') {
                 document.getElementById('label3').removeAttribute('style')
                 document.getElementById('time').required = true
                 document.getElementById('label7').style.display = 'none'
@@ -3899,10 +2390,10 @@ selectedTop.addEventListener('change', function() {
 //          document.getElementById('nick').required = true
 
             selectedTop.after(' ')
-        } else if (name == 'TopGames' || name == 'ServeurPrive' || name == 'MMoTopRU') {
+        } else if (name === 'TopGames' || name === 'ServeurPrive' || name === 'MMoTopRU') {
 //          document.getElementById('nick').required = false
             
-            if (name != 'MMoTopRU') {
+            if (name !== 'MMoTopRU') {
                 document.getElementById('countVote').required = true
                 document.getElementById('label5').removeAttribute('style')
             } else {
@@ -3917,15 +2408,15 @@ selectedTop.addEventListener('change', function() {
 
             document.getElementById('label4').removeAttribute('style')
             document.getElementById('idGame').removeAttribute('style')
-            if (name == 'ServeurPrive') {
+            if (name === 'ServeurPrive') {
                 document.getElementById('gameIDTooltip1').textContent = 'https://serveur-prive.net/'
                 document.getElementById('gameIDTooltip2').textContent = 'minecraft'
                 document.getElementById('gameIDTooltip3').textContent = '/gommehd-net-4932'
-            } else if (name == 'TopGames') {
+            } else if (name === 'TopGames') {
                 document.getElementById('gameIDTooltip1').textContent = 'https://top-serveurs.net/'
                 document.getElementById('gameIDTooltip2').textContent = 'minecraft'
                 document.getElementById('gameIDTooltip3').textContent = '/hailcraft'
-            } else if (name == 'MMoTopRU') {
+            } else if (name === 'MMoTopRU') {
                 document.getElementById('gameIDTooltip1').textContent = 'https://'
                 document.getElementById('gameIDTooltip2').textContent = 'pw'
                 document.getElementById('gameIDTooltip3').textContent = '.mmotop.ru/servers/25895/votes/new'
@@ -3933,49 +2424,49 @@ selectedTop.addEventListener('change', function() {
         }
     }
 
-    if (name == 'TopGG' || name == 'DiscordBotList' || name == 'BotsForDiscord') {
+    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'BotsForDiscord') {
         document.getElementById('nick').required = false
         document.getElementById('nick').parentElement.style.display = 'none'
         if (document.getElementById('importNicks').checked) document.getElementById('importNicks').click()
         document.getElementById('importNicks').disabled = true
-    } else if (laterChoose == 'TopGG' || laterChoose == 'DiscordBotList' || laterChoose == 'BotsForDiscord') {
+    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'BotsForDiscord') {
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
         document.getElementById('importNicks').disabled = false
     }
     
-    if (name == 'ListForge') {
+    if (name === 'ListForge') {
         document.getElementById('nick').required = false
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
         document.getElementById('urlGame').removeAttribute('style')
         document.getElementById('chooseGameListForge').required = true
-    } else if (laterChoose == 'ListForge') {
-        if (name != 'TopGG' && name != 'DiscordBotList' && name != 'BotsForDiscord') document.getElementById('nick').required = true
-        if (name != 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
+    } else if (laterChoose === 'ListForge') {
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'BotsForDiscord') document.getElementById('nick').required = true
+        if (name !== 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('urlGame').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
     }
 
-    if (name == 'BestServersCom') {
+    if (name === 'BestServersCom') {
         document.getElementById('nick').required = false
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
-    } else if (laterChoose == 'BestServersCom') {
-        if (name != 'TopGG' && name != 'DiscordBotList' && name != 'BotsForDiscord' && name != 'BestServersCom') document.getElementById('nick').required = true
-        if (name != 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
+    } else if (laterChoose === 'BestServersCom') {
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'BotsForDiscord' && name !== 'BestServersCom') document.getElementById('nick').required = true
+        if (name !== 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
     }
 
-    if (name == 'TopG') {
+    if (name === 'TopG') {
         document.getElementById('urlGameTopG').removeAttribute('style')
         document.getElementById('chooseGameTopG').required = true
-    } else if (laterChoose == 'TopG') {
+    } else if (laterChoose === 'TopG') {
         document.getElementById('urlGameTopG').style.display = 'none'
         document.getElementById('chooseGameTopG').required = false
     }
 
-    if (name == 'TopGG') {
+    if (name === 'TopGG') {
         document.getElementById('chooseTopGG1').removeAttribute('style')
         document.getElementById('additionTopGG1').removeAttribute('style')
-    } else if (laterChoose == 'TopGG') {
+    } else if (laterChoose === 'TopGG') {
         document.getElementById('chooseTopGG1').style.display = 'none'
         document.getElementById('additionTopGG1').style.display = 'none'
     }
@@ -3986,7 +2477,7 @@ selectedTop.dispatchEvent(new Event('change'))
 
 //Слушатель на выбор типа timeout для Custom
 document.getElementById('selectTime').addEventListener('change', function() {
-    if (this.value == 'ms') {
+    if (this.value === 'ms') {
         document.getElementById('label3').removeAttribute('style')
         document.getElementById('time').required = true
         document.getElementById('label7').style.display = 'none'
@@ -3996,7 +2487,6 @@ document.getElementById('selectTime').addEventListener('change', function() {
         document.getElementById('hour').required = true
         document.getElementById('label3').style.display = 'none'
         document.getElementById('time').required = false
-
     }
 })
 
@@ -4019,8 +2509,8 @@ async function setCookieDetails(details) {
 generateDataList()
 function generateDataList() {
     const datalist = document.getElementById('projectList')
-    for (const item of Object.keys(chrome.extension.getBackgroundPage().allProjects)) {
-        const url = chrome.extension.getBackgroundPage().allProjects[item]('URL')
+    for (const item of Object.keys(allProjects)) {
+        const url = allProjects[item]('URL')
         const option = document.createElement('option')
         option.setAttribute('name', item)
         option.value = url
@@ -4032,29 +2522,40 @@ function generateDataList() {
     document.querySelector('option[name="Custom"]').disabled = true
 }
 
+chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
+    if (request.updateProject) {
+        const el = document.getElementById(request.projectID)
+        if (el != null) {
+            el.remove()
+            addProjectList(request.project, request.projectID)
+        }
+    }
+})
+
 //Локализация
-let elements = document.querySelectorAll('[data-resource]')
+const elements = document.querySelectorAll('[data-resource]')
 elements.forEach(function(el) {
     el.prepend(chrome.i18n.getMessage(el.getAttribute('data-resource')))
 })
 document.querySelectorAll('[placeholder]').forEach(function(el) {
     const message = chrome.i18n.getMessage(el.placeholder)
-    if (!message || message == '') return
+    if (!message || message === '') return
     el.placeholder = message
 })
+document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
 document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
 
 //Модалки
 document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
     closeBtn.addEventListener('click', ()=> {
-        if (closeBtn.parentElement.parentElement.id == 'addFastProject') {
+        if (closeBtn.parentElement.parentElement.id === 'addFastProject') {
             location.href = 'options.html'
         }
         toggleModal(closeBtn.parentElement.parentElement.id)
     })
 })
 
-let modalsBlock = document.querySelector('#modals')
+const modalsBlock = document.querySelector('#modals')
 function toggleModal(modalID) {
     if (modalsBlock.querySelector('.overlay').classList.contains('active')) {
         modalsBlock.querySelector('.overlay').style.transition = '.3s'
@@ -4069,9 +2570,9 @@ function toggleModal(modalID) {
 }
 
 modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
-    let activeModal = modalsBlock.querySelector('.modal.active')
-    if (activeModal.id == 'stats' || activeModal.id == 'info') {
-        toggleModal(activeModal.id)
+    const activeModal = modalsBlock.querySelector('.modal.active')
+    if (activeModal.id === 'stats' || activeModal.id === 'info') {
+        document.querySelector('#stats .close').click()
         return
     }
     activeModal.style.transform = 'scale(1.1)'
@@ -4091,21 +2592,21 @@ async function createNotif(message, type, delay, element) {
             element.textContent = message
         }
         element.className = type
-        if (type == 'success') {
+        if (type === 'success') {
             element.parentElement.parentElement.parentElement.firstElementChild.src = 'images/icons/success.svg'
         }
         return
     }
-    if (fastNotif && type == 'hint') return
-    let notif = document.createElement('div')
+    if (fastNotif && type === 'hint') return
+    const notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
     if (!delay) {
-        if (type == 'error') delay = 30000
+        if (type === 'error') delay = 30000
         else delay = 5000
     }
     if (fastNotif) delay = 3000
 
-    if (type != 'hint') {
+    if (type !== 'hint') {
         let imgBlock = document.createElement('img')
         imgBlock.src = 'images/notif/'+type+'.png'
         notif.append(imgBlock)
@@ -4145,7 +2646,7 @@ async function createNotif(message, type, delay, element) {
     while (window.innerHeight < allNotifH) {
         await new Promise(resolve=>{
             function listener(event) {
-                if (event.animationName == 'notif-hide') {
+                if (event.animationName === 'notif-hide') {
                     document.getElementById('notifBlock').removeEventListener('animationend', listener)
                     resolve()
                 }
@@ -4158,7 +2659,7 @@ async function createNotif(message, type, delay, element) {
     document.getElementById('notifBlock').append(notif)
 
     let timer
-    if (type != 'hint') timer = new Timer(()=> removeNotif(notif), delay)
+    if (type !== 'hint') timer = new Timer(()=> removeNotif(notif), delay)
 
     if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
         setTimeout(()=> removeNotif(notif.previousElementSibling), delay >= 3000 ? 3000 : delay)
@@ -4166,7 +2667,7 @@ async function createNotif(message, type, delay, element) {
 
     notif.addEventListener('click', (e)=> {
         if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
-            if (e.detail == 2) removeNotif(notif)
+            if (e.detail === 2) removeNotif(notif)
         } else {
             removeNotif(notif)
         }
@@ -4196,18 +2697,18 @@ function removeNotif(elem) {
 }
 
 let Timer = function(callback, delay) {
-    let timerId, start, remaining = delay;
+    let timerId, start, remaining = delay
 
     this.pause = function() {
-        window.clearTimeout(timerId);
-        remaining -= Date.now() - start;
-    };
+        window.clearTimeout(timerId)
+        remaining -= Date.now() - start
+    }
 
     this.resume = function() {
-        start = Date.now();
-        window.clearTimeout(timerId);
-        timerId = window.setTimeout(callback, remaining);
-    };
+        start = Date.now()
+        window.clearTimeout(timerId)
+        timerId = window.setTimeout(callback, remaining)
+    }
 
-    this.resume();
+    this.resume()
 }

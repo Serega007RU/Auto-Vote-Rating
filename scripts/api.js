@@ -1,16 +1,23 @@
+let proj
+chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
+    if (request.sendProject) {
+        proj = request.project
+    }
+})
+
 try {
     //Если мы находимся на странице авторизации Steam
     if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
         document.getElementById('imageLogin').click()
         const timer2 = setInterval(()=>{
             try {
-                if (document.getElementById('error_display').style.display != 'none') {
+                if (document.getElementById('error_display').style.display !== 'none') {
                     chrome.runtime.sendMessage({message: document.getElementById('error_display').textContent})
                     clearInterval(timer2)
-                } else if ((document.querySelector('div.newmodal') != null && document.querySelector('div.newmodal').style.display != 'none')
-                    || (document.querySelector('div.login_modal.loginAuthCodeModal') != null && document.querySelector('div.login_modal.loginAuthCodeModal').style.display != 'none')
-                    || (document.querySelector('div.login_modal.loginTwoFactorCodeModal') != null && document.querySelector('div.login_modal.loginTwoFactorCodeModal').style.display != 'none')
-                    || (document.querySelector('div.login_modal.loginIPTModal') != null && document.querySelector('div.login_modal.loginIPTModal').style.display != 'none')) {
+                } else if ((document.querySelector('div.newmodal') != null && document.querySelector('div.newmodal').style.display !== 'none')
+                    || (document.querySelector('div.login_modal.loginAuthCodeModal') != null && document.querySelector('div.login_modal.loginAuthCodeModal').style.display !== 'none')
+                    || (document.querySelector('div.login_modal.loginTwoFactorCodeModal') != null && document.querySelector('div.login_modal.loginTwoFactorCodeModal').style.display !== 'none')
+                    || (document.querySelector('div.login_modal.loginIPTModal') != null && document.querySelector('div.login_modal.loginIPTModal').style.display !== 'none')) {
                         chrome.runtime.sendMessage({authSteam: true})
                         clearInterval(timer2)
                 }
@@ -43,23 +50,23 @@ try {
 
                 function removeURLParameter(url, parameter) {
                     //prefer to use l.search if you have a location/link object
-                    var urlparts = url.split('?');   
+                    const urlparts = url.split('?')
                     if (urlparts.length >= 2) {
-                
-                        var prefix = encodeURIComponent(parameter) + '=';
-                        var pars = urlparts[1].split(/[&;]/g);
-                
+
+                        const prefix = encodeURIComponent(parameter) + '='
+                        const pars = urlparts[1].split(/[&;]/g)
+
                         //reverse iteration as may be destructive
-                        for (var i = pars.length; i-- > 0;) {    
+                        for (let i = pars.length; i-- > 0;) {
                             //idiom for string.startsWith
                             if (pars[i].lastIndexOf(prefix, 0) !== -1) {  
-                                pars.splice(i, 1);
+                                pars.splice(i, 1)
                             }
                         }
                 
-                        return urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : '');
+                        return urlparts[0] + (pars.length > 0 ? '?' + pars.join('&') : '')
                     }
-                    return url;
+                    return url
                 }
                 
                 let url = removeURLParameter(document.URL, '__cf_chl_jschl_tk__')
@@ -77,9 +84,9 @@ try {
 
         if (check) {
             window.onmessage = function(e) {
-                if (e.data == 'vote') {
+                if (e.data === 'vote') {
                     vote(false)
-                } else if (e.data == 'voteReady') {
+                } else if (e.data === 'voteReady') {
                     vote()
                 }
             }
@@ -90,54 +97,21 @@ try {
     throwError(e)
 }
 
-async function getProject(name, game) {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
+async function getProject() {
+    if (proj == null) {
+        return await new Promise(resolve => {
+            setInterval(()=>{
+                if (proj != null) resolve(proj)
+            }, 100)
         })
-    })
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojects' + name, data=>{
-            resolve(data['AVMRprojects' + name])
-        })
-    })
-    for (const project of projects) {
-        if (document.URL.includes(project.id) && (game == null || document.URL.includes(project.game))) {
-            return project
-        }
+    } else {
+        return proj
     }
-
-    throw Error('errorVoteNoNick2')
-}
-
-async function setProject(project) {
-    const storageArea = await new Promise(resolve=>{
-        chrome.storage.local.get('storageArea', data=>{
-            resolve(data['storageArea'])
-        })
-    })
-    let name = Object.keys(project)[0]
-    const projects = await new Promise(resolve=>{
-        chrome.storage[storageArea].get('AVMRprojects' + name, data=>{
-            resolve(data['AVMRprojects' + name])
-        })
-    })
-    for (let i in projects) {
-        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id)) {
-            projects[i] = project
-            break
-        }
-    }
-    await new Promise(resolve=>{
-        chrome.storage[storageArea].set({['AVMRprojects' + name]: projects}, data=>{
-            resolve(data)
-        })
-    })
 }
 
 function throwError(error) {
     let message
-    if (error.message == 'errorVoteNoNick2') {
+    if (error.message === 'errorVoteNoNick2') {
         chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
         return
     } else if (error.stack) {

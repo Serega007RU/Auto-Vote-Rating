@@ -1,379 +1,14 @@
-//Список рейтингов
-var allProjects = {
-    TopCraft: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
-        case 'pageURL': return 'https://topcraft.ru/servers/' + project.id + '/'
-        case 'jsPath': return '#project-about > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
-        case 'exampleURL': return ['https://topcraft.ru/servers/', '10496', '/']
-        case 'URL': return 'TopCraft.ru'
-    }},
-    McTOP: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
-        case 'pageURL': return 'https://mctop.su/servers/' + project.id + '/'
-        case 'jsPath': return '#project-about > div.row > div:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
-        case 'exampleURL': return ['https://mctop.su/servers/', '5231', '/']
-        case 'URL': return 'McTOP.su'
-    }},
-    MCRate: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code'  
-        case 'pageURL': return 'http://mcrate.su/project/' + project.id
-        case 'jsPath': return '#button-circle > a'
-        case 'exampleURL': return ['http://mcrate.su/rate/', '4396', '']
-        case 'URL': return 'MCRate.su'
-    }},
-    MinecraftRating: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45'
-        case 'pageURL': return 'https://minecraftrating.ru/projects/' + project.id + '/'
-        case 'jsPath': return 'table[class="table server-table"] > tbody > tr:nth-child(2) > td:nth-child(2) > a'
-        case 'exampleURL': return ['https://minecraftrating.ru/projects/', 'cubixworld', '/']
-        case 'URL': return 'MinecraftRating.ru'
-    }},
-    MonitoringMinecraft: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://monitoringminecraft.ru/top/' + project.id + '/vote'
-        case 'pageURL': return 'https://monitoringminecraft.ru/top/' + project.id + '/'
-        case 'jsPath': return '#page > div.box.visible.main > div.left > table > tbody > tr:nth-child(1) > td.wid > noindex > a'
-        case 'exampleURL': return ['https://monitoringminecraft.ru/top/', 'gg', '/vote']
-        case 'URL': return 'MonitoringMinecraft.ru'
-    }},
-    IonMc: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://ionmc.top/projects/' + project.id + '/vote'
-        case 'pageURL': return 'https://ionmc.top/projects/' + project.id + '/vote'
-        case 'jsPath': return '#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.mx-2.-mt-1.mb-1.sm\\:mx-5.sm\\:my-2 > ul > li:nth-child(2) > a'
-        case 'exampleURL': return ['https://ionmc.top/projects/', '80', '/vote']
-        case 'URL': return 'IonMc.top'
-    }},
-    MinecraftServersOrg: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://minecraftservers.org/vote/' + project.id
-        case 'pageURL': return 'https://minecraftservers.org/server/' + project.id
-        case 'jsPath': return '#left > div > h1'
-        case 'exampleURL': return ['https://minecraftservers.org/vote/', '25531', '']
-        case 'URL': return 'MinecraftServers.org'
-    }},
-    ServeurPrive: (type, project)=> { switch (type) {
-        case 'voteURL': 
-        case 'pageURL':
-            if (project.lang == 'en') {
-                return 'https://serveur-prive.net/' + project.lang + '/' + project.game + '/' + project.id + '/vote'
-            } else {
-                return 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
-            }
-        case 'jsPath': return '#t > div > div > h2'
-        case 'exampleURL': return ['https://serveur-prive.net/minecraft/', 'gommehd-net-4932', '/vote']
-        case 'URL': return 'Serveur-Prive.net'
-    }},
-    PlanetMinecraft: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://www.planetminecraft.com/server/' + project.id + '/vote/'
-        case 'pageURL': return 'https://www.planetminecraft.com/server/' + project.id + '/'
-        case 'jsPath': return '#resource-title-text'
-        case 'exampleURL': return ['https://www.planetminecraft.com/server/', 'legends-evolved', '/vote/']
-        case 'URL': return 'PlanetMinecraft.com'
-    }},
-    TopG: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://topg.org/' + project.game + '/server-' + project.id
-        case 'pageURL': return 'https://topg.org/' + project.game + '/server-' + project.id
-        case 'jsPath': return 'div.sheader'
-        case 'exampleURL': return ['https://topg.org/minecraft-servers/server-', '405637', '']
-        case 'URL': return 'TopG.org'
-    }},
-    ListForge: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://' + project.game + '/server/' + project.id + '/vote/'
-        case 'pageURL': return 'https://' + project.game + '/server/' + project.id + '/vote/'
-        case 'jsPath': return 'head > title'
-        case 'exampleURL': return ['https://minecraft-mp.com/server/', '81821', '/vote/']
-        case 'URL': return 'ListForge.net'
-    }},
-    MinecraftServerList: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://minecraft-server-list.com/server/' + project.id + '/vote/'
-        case 'pageURL': return 'https://minecraft-server-list.com/server/' + project.id + '/'
-        case 'jsPath': return '#site-wrapper > section > div.hfeed > span > div.serverdatadiv > table > tbody > tr:nth-child(5) > td > a'
-        case 'exampleURL': return ['https://minecraft-server-list.com/server/', '292028', '/vote/']
-        case 'URL': return 'Minecraft-Server-List.com'
-    }},
-    ServerPact: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://www.serverpact.com/vote-' + project.id
-        case 'pageURL': return 'https://www.serverpact.com/vote-' + project.id
-        case 'jsPath': return 'body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(2) > div > div.panel-body > table > tbody > tr:nth-child(6) > td:nth-child(2) > a'
-        case 'exampleURL': return ['https://www.serverpact.com/vote-', '26492123', '']
-        case 'URL': return 'ServerPact.com'
-    }},
-    MinecraftIpList: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id
-        case 'pageURL': return 'https://minecraftiplist.com/server/-' + project.id
-        case 'jsPath': return '#addr > span:nth-child(3)'
-        case 'exampleURL': return ['https://minecraftiplist.com/index.php?action=vote&listingID=', '2576', '']
-        case 'URL': return 'MinecraftIpList.com'
-    }},
-    TopMinecraftServers: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://topminecraftservers.org/vote/' + project.id
-        case 'pageURL': return 'https://topminecraftservers.org/server/' + project.id
-        case 'jsPath': return 'body > div.container > div > div > div > div.col-md-8 > h1'
-        case 'exampleURL': return ['https://topminecraftservers.org/vote/', '9126', '']
-        case 'URL': return 'TopMinecraftServers.org'
-    }},
-    MinecraftServersBiz: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://minecraftservers.biz/' + project.id + '/'
-        case 'pageURL': return 'https://minecraftservers.biz/' + project.id + '/'
-        case 'jsPath': return 'table[class="table table-hover table-striped"] > tbody > tr:nth-child(4) > td:nth-child(2)'
-        case 'exampleURL': return ['https://minecraftservers.biz/', 'servers/145999', '/']
-        case 'URL': return 'MinecraftServers.biz'
-    }},
-    HotMC: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://hotmc.ru/vote-' + project.id
-        case 'pageURL': return 'https://hotmc.ru/minecraft-server-' + project.id
-        case 'jsPath': return 'div[class="text-server"] > h1'
-        case 'exampleURL': return ['https://hotmc.ru/vote-', '199493', '']
-        case 'URL': return 'HotMC.ru'
-    }},
-    MinecraftServerNet: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://minecraft-server.net/vote/' + project.id + '/'
-        case 'pageURL': return 'https://minecraft-server.net/details/' + project.id + '/'
-        case 'jsPath': return 'div.card-header > h1'
-        case 'exampleURL': return ['https://minecraft-server.net/vote/', 'TitanicFreak', '/']
-        case 'URL': return 'Minecraft-Server.net'
-    }},
-    TopGames: (type, project)=> { switch (type) {
-        case 'voteURL':
-            if (project.lang == 'fr') {
-                return 'https://top-serveurs.net/' + project.game + '/vote/' + project.id
-            } else if (project.lang == 'en') {
-                return 'https://top-games.net/' + project.game + '/vote/' + project.id
-            } else {
-                return 'https://' + project.lang + '.top-games.net/' + project.game + '/vote/' + project.id
-            }
-        case 'pageURL':
-            if (project.lang == 'fr') {
-                return 'https://top-serveurs.net/' + project.game + '/' + project.id
-            } else if (project.lang == 'en') {
-                return 'https://top-games.net/' + project.game + '/' + project.id
-            } else {
-                return 'https://' + project.lang + '.top-games.net/' + project.game + '/' + project.id
-            }
-        case 'jsPath': return 'body > div.game-jumbotron > div > div > h1'
-        case 'exampleURL': return ['https://top-serveurs.net/minecraft/', 'icesword-pvpfaction-depuis-2014-crack-on', '']
-        case 'URL': return 'Top-Games.net'
-    }},
-    TMonitoring: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://tmonitoring.com/server/' + project.id + '/'
-        case 'pageURL': return 'https://tmonitoring.com/server/' + project.id + '/'
-        case 'jsPath': return 'div[class="info clearfix"] > div.pull-left > h1'
-        case 'exampleURL': return ['https://tmonitoring.com/server/', 'qoobworldru', '']
-        case 'URL': return 'TMonitoring.com'
-    }},
-    TopGG: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://top.gg/' + project.game + '/' + project.id + '/vote' + project.addition
-        case 'pageURL': return 'https://top.gg/' + project.game + '/' + project.id + '/vote'
-        case 'jsPath': return '#entity-title'
-        case 'exampleURL': return ['https://top.gg/bot/', '270904126974590976', '/vote']
-        case 'URL': return 'Top.gg'
-    }},
-    DiscordBotList: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://discordbotlist.com/bots/' + project.id + '/upvote'
-        case 'pageURL': return 'https://discordbotlist.com/bots/' + project.id
-        case 'jsPath': return 'h1[class="bot-name"]'
-        case 'exampleURL': return ['https://discordbotlist.com/bots/', 'dank-memer', '/upvote']
-        case 'URL': return 'DiscordBotList.com'
-    }},
-    BotsForDiscord: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://botsfordiscord.com/bot/' + project.id + '/vote'
-        case 'pageURL': return 'https://botsfordiscord.com/bot/' + project.id + '/vote'
-        case 'jsPath': return 'h2[class="subtitle"] > b'
-        case 'exampleURL': return ['https://botsfordiscord.com/bot/', '469610550159212554', '/vote']
-        case 'URL': return 'BotsForDiscord.com'
-    }},
-    MMoTopRU: (type, project)=> { switch (type) {
-        case 'voteURL':
-            if (project.lang == 'ru') {
-                return 'https://' + project.game + '.mmotop.ru/servers/' + project.id + '/votes/new'
-            } else {
-                return 'https://' + project.game + '.mmotop.ru/' + project.lang + '/' + 'servers/' + project.id + '/votes/new'
-            }
-        case 'pageURL':
-            if (project.lang == 'ru') {
-                return 'https://' + project.game + '.mmotop.ru/servers/' + project.id
-            } else {
-                return 'https://' + project.game + '.mmotop.ru/' + project.lang + '/' + 'servers/' + project.id
-            }
-        case 'jsPath': return '#site-link'
-        case 'exampleURL': return ['https://pw.mmotop.ru/servers/', '25895', '/votes/new']
-        case 'URL': return 'MMoTop.ru'
-    }},
-    MCServers: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://mc-servers.com/mcvote/' + project.id + '/'
-        case 'pageURL': return 'https://mc-servers.com/details/' + project.id + '/'
-        case 'jsPath': return 'a[href="/details/' + project.id + '"]'
-        case 'exampleURL': return ['https://mc-servers.com/mcvote/', '1890', '/']
-        case 'URL': return 'MC-Servers.com'
-    }},
-    MinecraftList: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://minecraftlist.org/vote/' + project.id
-        case 'pageURL': return 'https://minecraftlist.org/server/' + project.id
-        case 'jsPath': return 'h1'
-        case 'exampleURL': return ['https://minecraftlist.org/vote/', '11227', '']
-        case 'URL': return 'MinecraftList.org'
-    }},
-    MinecraftIndex: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://www.minecraft-index.com/' + project.id + '/vote'
-        case 'pageURL': return 'https://www.minecraft-index.com/' + project.id
-        case 'jsPath': return 'h3.stitle'
-        case 'exampleURL': return ['https://www.minecraft-index.com/', '33621-extremecraft-net', '/vote']
-        case 'URL': return 'Minecraft-Index.com'
-    }},
-    ServerList101: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://serverlist101.com/server/' + project.id + '/vote/'
-        case 'pageURL': return 'https://serverlist101.com/server/' + project.id + '/'
-        case 'jsPath': return 'li > h1'
-        case 'exampleURL': return ['https://serverlist101.com/server/', '1547', '/vote/']
-        case 'URL': return 'ServerList101.com'
-    }},
-    MCServerList: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://mcserver-list.eu/hlasovat?id=' + project.id
-        case 'pageURL': return 'https://api.mcserver-list.eu/server/?id=' + project.id
-        case 'jsPath': return ''
-        case 'exampleURL': return ['https://mcserver-list.eu/hlasovat/?id=', '307', '']
-        case 'URL': return 'MCServer-List.eu'
-    }},
-    CraftList: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://craftlist.org/' + project.id
-        case 'pageURL': return 'https://craftlist.org/' + project.id
-        case 'jsPath': return 'main h1'
-        case 'exampleURL': return ['https://craftlist.org/', 'basicland', '']
-        case 'URL': return 'CraftList.org'
-    }},
-    CzechCraft: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://czech-craft.eu/server/' + project.id + '/vote/'
-        case 'pageURL': return 'https://czech-craft.eu/server/' + project.id + '/'
-        case 'jsPath': return 'a.server-name'
-        case 'exampleURL': return ['https://czech-craft.eu/server/', 'trenend', '/vote/']
-        case 'URL': return 'Czech-Craft.eu'
-    }},
-    PixelmonServers: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://pixelmonservers.com/server/' + project.id + '/vote'
-        case 'pageURL': return 'https://pixelmonservers.com/server/' + project.id + '/vote'
-        case 'jsPath': return '#title'
-        case 'exampleURL': return ['https://pixelmonservers.com/server/', '8IO9idMv', '/vote']
-        case 'URL': return 'PixelmonServers.com'
-    }},
-    QTop: (type, project)=> { switch (type) {
-        case 'voteURL': return 'http://q-top.ru/vote' + project.id
-        case 'pageURL': return 'http://q-top.ru/vote' + project.id
-        case 'jsPath': return 'a[href="profile' + project.id + '"]'
-        case 'exampleURL': return ['http://q-top.ru/vote', '1549', '']
-        case 'URL': return 'Q-Top.ru'
-    }},
-    MinecraftBuzz: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://minecraft.buzz/server/' + project.id + '&tab=vote'
-        case 'pageURL': return 'https://minecraft.buzz/server/' + project.id
-        case 'jsPath': return '[href="server/' + project.id + '"]'
-        case 'exampleURL': return ['https://minecraft.buzz/server/', '306', '&tab=vote']
-        case 'URL': return 'Minecraft.Buzz'
-    }},
-    MinecraftServery: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://minecraftservery.eu/server/' + project.id
-        case 'pageURL': return 'https://minecraftservery.eu/server/' + project.id
-        case 'jsPath': return 'div.container div.box h1.title'
-        case 'exampleURL': return ['https://minecraftservery.eu/server/', '105', '']
-        case 'URL': return 'MinecraftServery.eu'
-    }},
-    RPGParadize: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id
-        case 'pageURL': return 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id
-        case 'jsPath': return 'div.div-box > h1'
-        case 'exampleURL': return ['https://www.rpg-paradize.com/?page=vote&vote=', '113763', '']
-        case 'URL': return 'RPG-Paradize.com'
-    }},
-    MinecraftServerListNet: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://www.minecraft-serverlist.net/vote/' + project.id
-        case 'pageURL': return 'https://www.minecraft-serverlist.net/vote/' + project.id
-        case 'jsPath': return 'a.server-name'
-        case 'exampleURL': return ['https://www.minecraft-serverlist.net/vote/', '51076', '']
-        case 'URL': return 'Minecraft-ServerList.net'
-    }},
-    MinecraftServerEu: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://minecraft-server.eu/vote/index/' + project.id
-        case 'pageURL': return 'https://minecraft-server.eu/server/index/' + project.id
-        case 'jsPath': return 'div.serverName'
-        case 'exampleURL': return ['https://minecraft-server.eu/vote/index/', '1A73C', '']
-        case 'URL': return 'Minecraft-Server.eu'
-    }},
-    MinecraftKrant: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://www.minecraftkrant.nl/serverlijst/' + project.id
-        case 'pageURL': return 'https://www.minecraftkrant.nl/serverlijst/' + project.id
-        case 'jsPath': return 'div.inner-title'
-        case 'exampleURL': return ['https://www.minecraftkrant.nl/serverlijst/', 'torchcraft', '']
-        case 'URL': return 'MinecraftKrant.nl'
-    }},
-    TrackyServer: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://www.trackyserver.com/server/' + project.id
-        case 'pageURL': return 'https://www.trackyserver.com/server/' + project.id
-        case 'jsPath': return 'div.panel h1'
-        case 'exampleURL': return ['https://www.trackyserver.com/server/', 'anubismc-486999', '']
-        case 'URL': return 'TrackyServer.com'
-    }},
-    MCListsOrg: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://mc-lists.org/' + project.id + '/vote'
-        case 'pageURL': return 'https://mc-lists.org/' + project.id + '/vote'
-        case 'jsPath': return 'div.header > div.ui.container'
-        case 'exampleURL': return ['https://mc-lists.org/', 'server-luxurycraft.1818', '/vote']
-        case 'URL': return 'MC-Lists.org'
-    }},
-    TopMCServersCom: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://topmcservers.com/server/' + project.id + '/vote'
-        case 'pageURL': return 'https://topmcservers.com/server/' + project.id
-        case 'jsPath': return '#serverPage > h1.header'
-        case 'exampleURL': return ['https://topmcservers.com/server/', '17', '/vote']
-        case 'URL': return 'TopMCServers.com'
-    }},
-    BestServersCom: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://bestservers.com/server/' + project.id + '/vote'
-        case 'pageURL': return 'https://bestservers.com/server/' + project.id + '/vote'
-        case 'jsPath': return 'a[href="/server/' + project.id + '"]'
-        case 'exampleURL': return ['https://bestservers.com/server/', '1135', '/vote']
-        case 'URL': return 'BestServers.com'
-    }},
-    CraftListNet: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://craft-list.net/minecraft-server/' + project.id + '/vote'
-        case 'pageURL': return 'https://craft-list.net/minecraft-server/' + project.id
-        case 'jsPath': return 'div.serverpage-navigation-headername.header'
-        case 'exampleURL': return ['https://craft-list.net/minecraft-server/', 'Advancius-Network', '/vote']
-        case 'URL': return 'Craft-List.net'
-    }},
-    MinecraftServersListOrg: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://www.minecraft-servers-list.org/index.php?a=in&u=' + project.id
-        case 'pageURL': return 'https://www.minecraft-servers-list.org/details/' + project.id + '/'
-        case 'jsPath': return 'div.card-header > h1'
-        case 'exampleURL': return ['https://www.minecraft-servers-list.org/index.php?a=in&u=', 'chromity', '']
-        case 'URL': return 'Minecraft-Servers-List.org'
-    }},
-    ServerListe: (type, project)=> { switch (type) {
-        case 'voteURL': return 'https://www.serverliste.net/vote/' + project.id
-        case 'pageURL': return 'https://www.serverliste.net/vote/' + project.id
-        case 'jsPath': return '#bar > h3'
-        case 'exampleURL': return ['https://www.serverliste.net/vote/', '775', '']
-        case 'URL': return 'ServerListe.net'
-    }},
-    Custom: (type, project)=> { switch (type) {
-        case 'pageURL': return project.responseURL
-        case 'URL': return 'Custom'
-    }}
-}
-
-//Настройки
-var settings
-
-//Общая статистика
-var generalStats = {}
-
 //Текущие открытые вкладки расширением
-var openedProjects = new Map()
+const openedProjects = new Map()
 //Текущие fetch запросы
-let fetchProjects = new Map()
+const fetchProjects = new Map()
 //Текущие проекты за которые сейчас голосует расширение
-var queueProjects = new Set()
+const queueProjects = new Set()
 
 //Есть ли доступ в интернет?
-var online = true
+let online = true
 
-var secondVoteMinecraftIpList = false
+let secondVoteMinecraftIpList = false
 
 var currentVK
 var currentProxy
@@ -387,86 +22,22 @@ var debug = false
 let tunnelBear = {}
 
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
-var check = true
+let check = true
 var break1 = false
 var break2 = false
 let lastErrorNotFound
 
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
-var closeTabs = true
+let closeTabs = true
 
 //Где храним настройки
-let storageArea = 'local'
-
-if (chrome.runtime.onSuspend) {
-    chrome.runtime.onSuspend.addListener(function(){
-        console.warn(chrome.i18n.getMessage('suspended'))
-    })
-}
+// let storageArea = 'local'
 
 //Инициализация настроек расширения
-initializeConfig()
-async function initializeConfig() {
-    storageArea = await getValue('storageArea', 'local')
-    if (storageArea == null || storageArea == '') {
-        if (await getValue('AVMRsettings', 'sync') != null) {
-            storageArea = 'sync'
-        } else {
-            storageArea = 'local'
-        }
-        await setValue('storageArea', storageArea)
-    }
-    for (const item of Object.keys(allProjects)) {
-        window['projects' + item] = await getValue('AVMRprojects' + item)
-    }
-    VKs = await getValue('AVMRVKs')
-    proxies = await getValue('AVMRproxies')
-    settings = await getValue('AVMRsettings')
-    generalStats = await getValue('generalStats')
-    if (generalStats == null)
-        generalStats = {}
-
-    for (const item of Object.keys(allProjects)) {
-        if (window['projects' + item] == null || !(typeof window['projects' + item][Symbol.iterator] === 'function')) window['projects' + item] = []
-    }
-
-    //Если пользователь обновился с версии без MultiVote
-    if (VKs == null || !(typeof VKs[Symbol.iterator] === 'function') || proxies == null || !(typeof proxies[Symbol.iterator] === 'function')) {
-        VKs = []
-        proxies = []
-    }
-    if (settings && settings.stopVote == null) {
-        settings.stopVote = 0
-    }
-
-    let cooldown = 1000
-    if (settings && settings.cooldown && Number.isInteger(settings.cooldown)) cooldown = settings.cooldown
-
-    if (settings && !settings.disabledCheckTime) checkTime()
-    
-    //Да да, целую минуту ждём перед запуском расширения, больше никак не понять когда закончилась синхронизация браузера
-    if (storageArea == 'sync') await wait(60000)
-
-    if (settings && settings.useMultiVote) {
-        chrome.proxy.settings.get({}, async function(config) {
-            if (config && config.value && config.value.mode && config.value.mode == 'fixed_servers') {
-                //Прекращаем использование прокси
-                await clearProxy()
-            }
-        })
-    }
-    
-    //Проверка на голосование
-    setInterval(async()=>{
-        await checkVote()
-    }, cooldown)
-}
+initializeConfig(true)
 
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
-//  return
-    if (!settings || projectsTopCraft == null || !(typeof projectsTopCraft[Symbol.iterator] === 'function'))
-        return
 
     if (settings.stopVote > Date.now()) return
 
@@ -486,16 +57,69 @@ async function checkVote() {
         return
     }
 
-    await forLoopAllProjects(async function(proj) {
-        if (proj.time == null || proj.time < Date.now()) {
-            await checkOpen(proj)
-        }
-    })
+    //Старый метод
+//  const projects = await new Promise(resolve=> db.transaction('projects').objectStore('projects').getAll().onsuccess = event => resolve(event.target.result))
 
-    check = true
-    break1 = false
-    break2 = false
+//  for (const project of projects) {
+//      if (project.time == null || project.time < Date.now()) {
+//          await checkOpen(project)
+//      }
+//  }
+
+    // check = true
+    // break1 = false
+    // break2 = false
+
+    const request = db.transaction('projects').objectStore('projects').openCursor()
+    request.onsuccess = function(event) {
+        const cursor = event.target.result
+        if (cursor) {
+            const project = cursor.value
+            if (project.time == null || project.time < Date.now()) {
+                checkOpen(project, cursor.primaryKey)
+            }
+            cursor.continue()
+        } else {
+            check = true
+            break1 = false
+            break2 = false
+        }
+    }
 }
+
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    const projectID = Number(alarm.name)
+    db.transaction('projects').objectStore('projects').get(projectID).onsuccess = event => {
+        if (event.target.result) {
+            checkOpen(event.target.result)
+        }
+    }
+})
+
+async function reloadAllAlarms() {
+    await new Promise(resolve => chrome.alarms.clearAll(resolve))
+    const request = db.transaction('projects').objectStore('projects').openCursor()
+    const times = []
+    request.onsuccess = function(event) {
+        const cursor = event.target.result
+        if (cursor) {
+            const project = cursor.value
+            if (project.time != null && project.time > Date.now() && times.indexOf(project.time) === -1) {
+                chrome.alarms.create(String(cursor.primaryKey), {when: project.time})
+                times.push(project.time)
+            }
+            cursor.continue()
+        }
+    }
+}
+
+window.addEventListener('online', ()=> {
+    online = true
+    checkVote()
+})
+window.addEventListener('offline', ()=> {
+    online = false
+})
 
 async function checkOpen(project) {
     //Если нет подключения к интернету
@@ -503,8 +127,7 @@ async function checkOpen(project) {
         if (!navigator.onLine && online) {
             online = false
             console.warn(chrome.i18n.getMessage('internetDisconected'))
-            if (!settings.disabledNotifError)
-                sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'))
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'))
             return
         } else if (!online) {
             return
@@ -512,7 +135,7 @@ async function checkOpen(project) {
     }
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
-        if (getProjectName(value) == getProjectName(project) || (value.randomize && project.randomize && !settings.useMultiVote)) {
+        if (project.rating === value.rating || value.randomize && project.randomize) {
             if (!value.nextAttempt) return
             if (Date.now() < value.nextAttempt) {
                 return
@@ -524,13 +147,13 @@ async function checkOpen(project) {
         }
         if (settings.useMultiVote && !settings.useProxyOnUnProxyTop) {
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
-            if (project.TopCraft || project.McTOP || project.MinecraftRating) {
-                if (!value.TopCraft && !value.McTOP && !value.MinecraftRating) {
+            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') {
+                if (!value.rating === 'TopCraft' && !value.rating === 'McTOP' && !value.rating === 'MinecraftRating') {
                     return
                 }
             }
-            if (value.TopCraft || value.McTOP || value.MinecraftRating) {
-                if (!project.TopCraft && !project.McTOP && !project.MinecraftRating) {
+            if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MinecraftRating') {
+                if (!project.rating === 'TopCraft' && !project.rating === 'McTOP' && !project.rating === 'MinecraftRating') {
                     //Если безпроксиевый рейтинг закончил голосование, позволяет проксиевым начать голосовать ради экономии времени
                     if (value.time > Date.now()) {
                         continue
@@ -542,58 +165,58 @@ async function checkOpen(project) {
         }
     }
     if (settings.useMultiVote) {
-        if (queueProjects.size == 0 && (currentVK != null || currentProxy != null)) {
+        if (queueProjects.size === 0 && (currentVK != null || currentProxy != null)) {
             if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
             if (currentProxy != null) clearProxy()
             currentProxy = null
             currentVK = null
         }
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
-        if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop)) {
+        if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
             let usedProjects = getTopFromList(currentVK, project)
             for (let usedProject of usedProjects) {
-                if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
+                if (project.id === usedProject.id && usedProject.nextFreeVote > Date.now()) {
                     return
                 }
             }
             if (currentVK.notWorking) {
                 let _return = true
-                if (project.TopCraft && (currentVK.passwordTopCraft || project.AuthURLTopCraft)) _return = false
-                if (project.McTOP && (currentVK.passwordMcTOP || project.AuthURLMcTOP)) _return = false
-                if (project.MinecraftRating && currentVK['AuthURLMinecraftRating' + project.id] != null) _return = false
-                if (project.MonitoringMinecraft && currentVK['AuthURLMonitoringMinecraft' + project.id] != null) _return = false
+                if (project.rating === 'TopCraft' && (currentVK.passwordTopCraft || project.AuthURLTopCraft)) _return = false
+                if (project.rating === 'McTOP' && (currentVK.passwordMcTOP || project.AuthURLMcTOP)) _return = false
+                if (project.rating === 'MinecraftRating' && currentVK['AuthURLMinecraftRating' + project.id] != null) _return = false
+                if (project.rating === 'MonitoringMinecraft' && currentVK['AuthURLMonitoringMinecraft' + project.id] != null) _return = false
                 if (_return) return
             }
         }
         if (currentProxy != null) {
-            if (!settings.useProxyOnUnProxyTop && (project.TopCraft || project.McTOP || project.MinecraftRating)) {
+            if (!settings.useProxyOnUnProxyTop && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {
                 return
             }
             let usedProjects = getTopFromList(currentProxy, project)
             for (let usedProject of usedProjects) {
-                if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
+                if (project.id === usedProject.id && usedProject.nextFreeVote > Date.now()) {
                     return
                 }
             }
         }
 
         //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
-        if (currentVK == null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop)) {
+        if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
             for (let vkontakte of VKs) {
                 if (vkontakte.notWorking) {
                     let _continue = true
-                    if (project.TopCraft && (vkontakte.passwordTopCraft || vkontakte.AuthURLTopCraft)) _continue = false
-                    if (project.McTOP && (vkontakte.passwordMcTOP || project.AuthURLMcTOP)) _continue = false
-                    if (project.MinecraftRating && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
-                    if (project.MonitoringMinecraft && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
+                    if (project.rating === 'TopCraft' && (vkontakte.passwordTopCraft || vkontakte.AuthURLTopCraft)) _continue = false
+                    if (project.rating === 'McTOP' && (vkontakte.passwordMcTOP || project.AuthURLMcTOP)) _continue = false
+                    if (project.rating === 'MinecraftRating' && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
+                    if (project.rating === 'MonitoringMinecraft' && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
                     if (_continue) continue
                 }
                 let usedProjects = getTopFromList(vkontakte, project)
                 let used = false
                 for (let usedProject of usedProjects) {
-                    if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
+                    if (project.id === usedProject.id && usedProject.nextFreeVote > Date.now()) {
                         used = true
                         break
                     }
@@ -643,7 +266,7 @@ async function checkOpen(project) {
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
                 for (const value of queueProjects) {
-                    if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+                    if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
                         queueProjects.delete(value)
                     }
                 }
@@ -658,7 +281,7 @@ async function checkOpen(project) {
                     resolve(details)
                 })
             })
-            if (!(proxyDetails.levelOfControl == 'controllable_by_this_extension' || proxyDetails.levelOfControl == 'controlled_by_this_extension')) {
+            if (!(proxyDetails.levelOfControl === 'controllable_by_this_extension' || proxyDetails.levelOfControl == 'controlled_by_this_extension')) {
                 settings.stopVote = Date.now() + 86400000
                 console.error(chrome.i18n.getMessage('otherProxy'))
                 if (!settings.disabledNotifError) {
@@ -676,7 +299,7 @@ async function checkOpen(project) {
                 let usedProjects = getTopFromList(proxy, project)
                 let used = false
                 for (let usedProject of usedProjects) {
-                    if (JSON.stringify(project.id) == JSON.stringify(usedProject.id) && usedProject.nextFreeVote > Date.now()) {
+                    if (project.id === usedProject.id && usedProject.nextFreeVote > Date.now()) {
                         used = true
                         break
                     }
@@ -714,7 +337,7 @@ async function checkOpen(project) {
                             settings.stopVote = Date.now() + 86400000
                             await setValue('AVMRsettings', settings)
                             await stopVote()
-                            if (response.status == 401) {
+                            if (response.status === 401) {
                                 console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
                                 if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
                                 return
@@ -761,7 +384,7 @@ async function checkOpen(project) {
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
                 for (const value of queueProjects) {
-                    if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+                    if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
                         queueProjects.delete(value)
                     }
                 }
@@ -774,85 +397,85 @@ async function checkOpen(project) {
 
         //Очистка куки
         let url
-        if (project.TopCraft) {
+        if (project.rating === 'TopCraft') {
             url = '.topcraft.ru'
-        } else if (project.McTOP) {
+        } else if (project.rating === 'McTOP') {
             url = '.mctop.su'
-        } else if (project.MCRate) {
+        } else if (project.rating === 'MCRate') {
             url = '.mcrate.su'
-        } else if (project.MinecraftRating) {
+        } else if (project.rating === 'MinecraftRating') {
             url = '.minecraftrating.ru'
-        } else if (project.MonitoringMinecraft) {
+        } else if (project.rating === 'MonitoringMinecraft') {
             url = '.monitoringminecraft.ru'
-        } else if (project.FairTop) {
+        } else if (project.rating === 'FairTop') {
             url = '.fairtop.in'
-        } else if (project.IonMc) {
+        } else if (project.rating === 'IonMc') {
             url = '.ionmc.top'
-        } else if (project.MinecraftServersOrg) {
+        } else if (project.rating === 'MinecraftServersOrg') {
             url = '.minecraftservers.org'
-        } else if (project.ServeurPrive) {
+        } else if (project.rating === 'ServeurPrive') {
             url = '.serveur-prive.net'
-        } else if (project.PlanetMinecraft) {
+        } else if (project.rating === 'PlanetMinecraft') {
             url = '.planetminecraft.com'
-        } else if (project.TopG) {
+        } else if (project.rating === 'TopG') {
             url = '.topg.org'
-        } else if (project.ListForge) {
+        } else if (project.rating === 'ListForge') {
             url = '.' + project.game
-        } else if (project.MinecraftServerList) {
+        } else if (project.rating === 'MinecraftServerList') {
             url = '.minecraft-server-list.com'
-        } else if (project.ServerPact) {
+        } else if (project.rating === 'ServerPact') {
             url = '.serverpact.com'
-        } else if (project.MinecraftIpList) {
+        } else if (project.rating === 'MinecraftIpList') {
             url = '.minecraftiplist.com'
-        } else if (project.TopMinecraftServers) {
+        } else if (project.rating === 'TopMinecraftServers') {
             url = '.topminecraftservers.org'
-        } else if (project.MinecraftServersBiz) {
+        } else if (project.rating === 'MinecraftServersBiz') {
             url = '.minecraftservers.biz'
-        } else if (project.HotMC) {
+        } else if (project.rating === 'HotMC') {
             url = '.hotmc.ru'
-        } else if (project.MinecraftServerNet) {
+        } else if (project.rating === 'MinecraftServerNet') {
             url = '.minecraft-server.net'
-        } else if (project.TopGames) {
-            if (project.lang == 'fr') {
+        } else if (project.rating === 'TopGames') {
+            if (project.lang === 'fr') {
                 url = '.top-serveurs.net'
             } else {
                 url = '.top-games.net'
             }
             url = '.minecraftservers.biz'
-        } else if (project.TMonitoring) {
+        } else if (project.rating === 'TMonitoring') {
             url = '.tmonitoring.com'
-        } else if (project.TopGG) {
+        } else if (project.rating === 'TopGG') {
             url = '.top.gg'
-        } else if (project.DiscordBotList) {
+        } else if (project.rating === 'DiscordBotList') {
             url = '.discordbotlist.com'
-        } else if (project.BotsForDiscord) {
+        } else if (project.rating === 'BotsForDiscord') {
             url = '.botsfordiscord.com'
-        } else if (project.MMoTopRU) {
+        } else if (project.rating === 'MMoTopRU') {
             url = '.mmotop.ru'
-        } else if (project.MCServers) {
+        } else if (project.rating === 'MCServers') {
             url = '.mc-servers.com'
-        } else if (project.MinecraftList) {
+        } else if (project.rating === 'MinecraftList') {
             url = '.minecraftlist.org'
-        } else if (project.MinecraftIndex) {
+        } else if (project.rating === 'MinecraftIndex') {
             url = '.minecraft-index.com'
-        } else if (project.ServerList101) {
+        } else if (project.rating === 'ServerList101') {
             url = '.serverlist101.com'
-        } else if (project.MCServerList) {
+        } else if (project.rating === 'MCServerList') {
             url = '.mcserver-list.eu'
-        } else if (project.CraftList) {
+        } else if (project.rating === 'CraftList') {
             url = '.craftlist.org'
-        } else if (project.CzechCraft) {
+        } else if (project.rating === 'CzechCraft') {
             url = '.czech-craft.eu'
-        } else if (project.PixelmonServers) {
+        } else if (project.rating === 'PixelmonServers') {
             url = '.pixelmonservers.com'
-        } else if (project.QTop) {
+        } else if (project.rating === 'QTop') {
             url = '.q-top.ru'
-        } else if (project.MinecraftBuzz) {
+        } else if (project.rating === 'MinecraftBuzz') {
             url = '.minecraft.buzz'
-        }/* else if (project.Custom) {
+        }/* else if (project.rating === 'Custom') {
             url = '.custom.com'
         }*/
-        if (url != null && url != '') {
+        if (url != null && url !== '') {
             let cookies = await new Promise(resolve=>{
                 chrome.cookies.getAll({domain: url}, function(cookies) {
                     resolve(cookies)
@@ -860,7 +483,7 @@ async function checkOpen(project) {
             })
             if (debug) console.log('Удаляю куки ' + url)
             for (let i = 0; i < cookies.length; i++) {
-                if (cookies[i].domain.charAt(0) == '.') {
+                if (cookies[i].domain.charAt(0) === '.') {
                     await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
                 } else {
                     await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
@@ -911,23 +534,23 @@ async function checkOpen(project) {
 //  }
 
     let retryCoolDown
-    if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList) {
+    if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
     }
     project.nextAttempt = Date.now() + retryCoolDown
     queueProjects.add(project)
-    
+
     //Если эта вкладка была уже открыта, он закрывает её
-    for (let[key,value] of openedProjects.entries()) {
-        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+    for (const[key,value] of openedProjects.entries()) {
+        if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
             openedProjects.delete(key)
             if (closeTabs) {
                 chrome.tabs.remove(key, function() {
                     if (chrome.runtime.lastError) {
                         console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
+                        if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
                             sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     }
                 })
@@ -941,9 +564,9 @@ async function checkOpen(project) {
     if (!settings.disabledNotifStart)
         sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
 
-    if (project.MonitoringMinecraft && !settings.useMultiVote) {
+    if (project.rating === 'MonitoringMinecraft' && !settings.useMultiVote) {
         let url
-        if (project.MonitoringMinecraft) {
+        if (project.rating === 'MonitoringMinecraft') {
             url = '.monitoringminecraft.ru'
         }
         let cookies = await new Promise(resolve=>{
@@ -953,7 +576,7 @@ async function checkOpen(project) {
         })
         if (debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
         for (let i = 0; i < cookies.length; i++) {
-            if (cookies[i].domain.charAt(0) == '.') {
+            if (cookies[i].domain.charAt(0) === '.') {
                 await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
             } else {
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
@@ -966,29 +589,45 @@ async function checkOpen(project) {
 
 //Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
-
-    if (project.stats.lastAttemptVote && (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear())) {
+    if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
         project.stats.monthSuccessVotes = 0
     }
     project.stats.lastAttemptVote = Date.now()
 
-    if (generalStats.lastAttemptVote && (new Date(generalStats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(generalStats.lastAttemptVote).getFullYear() < new Date().getFullYear())) {
+    if (new Date(generalStats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(generalStats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         generalStats.lastMonthSuccessVotes = generalStats.monthSuccessVotes
         generalStats.monthSuccessVotes = 0
     }
     generalStats.lastAttemptVote = Date.now()
-    await setValue('generalStats', generalStats)
-    await changeProject(project)
+    await updateGeneralStats()
+    const projectID = await updateProject(project)
+
+    let create = true
+    await new Promise(resolve => {
+        chrome.alarms.getAll(function(alarms) {
+            for (const alarm of alarms) {
+                if (alarm.scheduledTime === project.time) {
+                    create = false
+                    resolve()
+                    break
+                }
+            }
+            resolve()
+        })
+    })
+    if (create) {
+        chrome.alarms.create(String(projectID), {when: project.nextAttempt})
+    }
 
     let silentVoteMode = false
-    if (project.Custom) {
+    if (project.rating === 'Custom') {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList)) {
+        if (!project.emulateMode && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
             silentVoteMode = true
         }
-    } else if (project.silentMode && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList || project.MCServerList)) {
+    } else if (project.silentMode && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
         silentVoteMode = true
     }
     if (debug) console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (silentVoteMode ? ' Начинаю Fetch запрос' : ' Открываю вкладку'))
@@ -997,7 +636,7 @@ async function newWindow(project) {
     } else {
         let window = await new Promise(resolve=>{
             chrome.windows.getCurrent(function(win) {
-                if (chrome.runtime.lastError && chrome.runtime.lastError.message == 'No current window') {} else if (chrome.runtime.lastError) {
+                if (chrome.runtime.lastError && chrome.runtime.lastError.message === 'No current window') {} else if (chrome.runtime.lastError) {
                     console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError.message)
                 }
                 resolve(win)
@@ -1012,7 +651,7 @@ async function newWindow(project) {
             chrome.windows.update(window.id, {focused: false})
         }
 
-        const url = allProjects[getProjectName(project)]('voteURL', project)
+        const url = allProjects[project.rating]('voteURL', project)
         
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url, active: false}, function(tab_) {
@@ -1025,7 +664,7 @@ async function newWindow(project) {
 
 async function silentVote(project) {
     try {
-        if (project.TopCraft) {
+        if (project.rating === 'TopCraft') {
             let response
             if (currentVK != null && currentVK.passwordTopCraft != null) {
                 response = await _fetch('https://topcraft.ru/', null, project)
@@ -1061,8 +700,8 @@ async function silentVote(project) {
                 'method': 'POST'
             }, project)
             if (!await checkResponseError(project, response, 'topcraft.ru', [400], true)) return
-            if (response.status == 400) {
-                if (response.html == 'vk_error' || response.html == 'nick_error') {
+            if (response.status === 400) {
+                if (response.html === 'vk_error' || response.html === 'nick_error') {
                     endVote({later: response.html}, null, project)
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
@@ -1072,10 +711,9 @@ async function silentVote(project) {
                 return
             }
             endVote({successfully: true}, null, project)
-            return
         } else
 
-        if (project.McTOP) {
+        if (project.rating === 'McTOP') {
             let response
             if (currentVK != null && currentVK.passwordMcTOP != null) {
                 response = await _fetch('https://mctop.su/', null, project)
@@ -1111,8 +749,8 @@ async function silentVote(project) {
                 'method': 'POST'
             }, project)
             if (!await checkResponseError(project, response, 'mctop.su', [400], true)) return
-            if (response.status == 400) {
-                if (response.html == 'vk_error' || response.html == 'nick_error') {
+            if (response.status === 400) {
+                if (response.html === 'vk_error' || response.html === 'nick_error') {
                     endVote({later: response.html}, null, project)
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
@@ -1122,10 +760,9 @@ async function silentVote(project) {
                 return
             }
             endVote({successfully: true}, null, project)
-            return
         } else
 
-        if (project.MCRate) {
+        if (project.rating === 'MCRate') {
             let response = await _fetch('https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code', null, project)
             if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
             let code = response.url.substring(response.url.length - 18)
@@ -1151,7 +788,6 @@ async function silentVote(project) {
                 } else {
                     endVote({message: response.doc.querySelector('div[class=report]').textContent}, null, project)
                 }
-                return
             } else if (response.doc.querySelector('span[class=count_hour]') != null) {
 //              Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
 //              Берёт из скрипта переменную в которой хранится сколько осталось до следующего голосования
@@ -1164,7 +800,6 @@ async function silentVote(project) {
 //              if (milliseconds == 0) return
 //              let later = Date.now() - (86400000 - milliseconds)
                 endVote({later: true}, null, project)
-                return
             } else if (response.doc.querySelector('div[class="error"]') != null) {
                 const error = response.doc.querySelector('div[class="error"]').textContent
                 if (error.includes("уже голосовали")) {
@@ -1174,14 +809,12 @@ async function silentVote(project) {
                 } else {
                     endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
                 }
-                return
             } else {
                 endVote({errorVoteNoElement: true}, null, project)
-                return
             }
         } else
 
-        if (project.MinecraftRating) {
+        if (project.rating === 'MinecraftRating') {
             let response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
             if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
@@ -1212,26 +845,21 @@ async function silentVote(project) {
 //                  }
 //                  let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000
                     endVote({later: true}, null, project)
-                    return
                 } else {
                     endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
-                    return
                 }
             } else if (response.doc.querySelector('div.alert.alert-success') != null) {
                 if (response.doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
                     endVote({successfully: true}, null, project)
-                    return
                 } else {
                     endVote({message: response.doc.querySelector('div.alert.alert-success').textContent}, null, project)
-                    return
                 }
             } else {
                 endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null'}, null, project)
-                return
             }
         } else
 
-        if (project.MonitoringMinecraft) {
+        if (project.rating === 'MonitoringMinecraft') {
             let i = 0
             while (i <= 3) {
                 i++
@@ -1243,7 +871,7 @@ async function silentVote(project) {
                     'method': 'POST'
                 }, project)
                 if (!await checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
-                if (response.status == 503) {
+                if (response.status === 503) {
                     if (i >= 3) {
                         endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + String(response.status))}, null, project)
                         return
@@ -1306,7 +934,7 @@ async function silentVote(project) {
             }
         } else
 
-        if (project.ServerPact) {
+        if (project.rating === 'ServerPact') {
             let response = await _fetch('https://www.serverpact.com/vote-' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -1382,20 +1010,16 @@ async function silentVote(project) {
             if (!await checkResponseError(project, response, 'serverpact.com')) return
             if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
                 endVote({successfully: true}, null, project)
-                return
             } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null && (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('You can only vote once') || response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('already voted'))) {
                 endVote({later: Date.now() + 43200000}, null, project)
-                return
             } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null) {
                 endVote({message: response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.substring(0, response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.indexOf('\n'))}, null, project)
-                return
             } else {
                 endVote({errorVoteUnknown2: true}, null, project)
-                return
             }
         } else
 
-        if (project.MinecraftIpList) {
+        if (project.rating === 'MinecraftIpList') {
             let response = await _fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -1457,9 +1081,9 @@ async function silentVote(project) {
                     let min = 0
                     let sec = 0
                     for (let i in numbers) {
-                        if (count == 0) {
+                        if (count === 0) {
                             hour = numbers[i]
-                        } else if (count == 1) {
+                        } else if (count === 1) {
                             min = numbers[i]
                         }
                         count++
@@ -1478,8 +1102,8 @@ async function silentVote(project) {
             }
             await craft(response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
 
-            code = 0
-            code2 = 0
+            let code = 0
+            let code2 = 0
 
             for (let i = 0; i < 6; i++) {
                 code += content[i] << (i * 5)
@@ -1521,9 +1145,9 @@ async function silentVote(project) {
                     let min = 0
                     let sec = 0
                     for (let i in numbers) {
-                        if (count == 0) {
+                        if (count === 0) {
                             hour = numbers[i]
-                        } else if (count == 1) {
+                        } else if (count === 1) {
                             min = numbers[i]
                         }
                         count++
@@ -1537,45 +1161,38 @@ async function silentVote(project) {
             }
             if (response.doc.querySelector('#Content > div.Good') != null && response.doc.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
                 endVote({successfully: true}, null, project)
-                return
             }
         } else
 
-        if (project.MCServerList) {
+        if (project.rating === 'MCServerList') {
             let response = await _fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'}, project)
             let json = await response.json()
             if (response.ok) {
-                if (json[0].success == "false") {
-                    if (json[0].error == 'username_voted') {
+                if (json[0].success === "false") {
+                    if (json[0].error === 'username_voted') {
                         endVote({later: true}, null, project)
-                        return
                     } else {
                         endVote({message: json[0].error}, null, project)
-                        return
                     }
                 } else {
                     endVote({successfully: true}, null, project)
-                    return
                 }
             } else {
                 endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
-                return
             }
         } else
 
-        if (project.Custom) {
-            let response = await _fetch(project.responseURL, {...project.id}, project)
+        if (project.rating === 'Custom') {
+            let response = await _fetch(project.responseURL, {...project.body}, project)
             await response.text()
             if (response.ok) {
                 endVote({successfully: true}, null, project)
-                return
             } else {
                 endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
-                return
             }
         }
     } catch (e) {
-        if (e == 'TypeError: Failed to fetch' || e.message == 'The user aborted a request.') {
+        if (e === 'TypeError: Failed to fetch' || e.message === 'The user aborted a request.') {
 //          endVote({notConnectInternet: true}, null, project)
         } else {
             endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
@@ -1618,7 +1235,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     if (bypassCodes) {
         for (const code of bypassCodes) {
-            if (response.status == code) {
+            if (response.status === code) {
                 return true
             }
         }
@@ -1631,46 +1248,54 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
 }
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
-chrome.webNavigation.onCompleted.addListener(function(details) {
+chrome.webNavigation.onCompleted.addListener(async function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
-    if (details.frameId == 0) {
-        chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + getProjectName(project).toLowerCase() +'.js'}, function() {
-            if (chrome.runtime.lastError) {
-                console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                if (chrome.runtime.lastError.message != 'The tab was closed.') {
-                    if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                    project.error = chrome.runtime.lastError.message
-                    changeProject(project)
+    if (details.frameId === 0) {
+        await new Promise(resolve => {
+            chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
+                if (chrome.runtime.lastError) {
+                    console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                    if (chrome.runtime.lastError.message !== 'The tab was closed.') {
+                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                        project.error = chrome.runtime.lastError.message
+                        updateProject(project)
+                    }
                 }
-            }
+                resolve()
+            })
         })
-        chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'})
-    } else if (details.frameId != 0 && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/))) {
+        await new Promise(resolve => {
+            chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'}, function() {
+                resolve()
+            })
+        })
+        chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
+    } else if (details.frameId !== 0 && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/))) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                if (chrome.runtime.lastError.message != 'The frame was removed.') {
+                if (chrome.runtime.lastError.message !== 'The frame was removed.') {
                     if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
-                    changeProject(project)
+                    updateProject(project)
                 }
             }
         })
     }
-}, {urls: ['<all_urls>']})
+})
 
 chrome.webRequest.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
-    if (details.type == 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode != 503 && details.statusCode != 403/*Игнорируем проверку CloudFlare*/) {
+    if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
         const sender = {tab: {id: details.tabId}}
         endVote({errorVote: String(details.statusCode)}, sender, project)
     }
 }, {urls: ['<all_urls>']})
 
 chrome.webRequest.onErrorOccurred.addListener(function(details) {
-    if (details.initiator == 'chrome-extension://' + chrome.runtime.id) {
+    if (details.initiator === 'chrome-extension://' + chrome.runtime.id) {
         if (fetchProjects.has(details.requestId)) {
             let project = fetchProjects.get(details.requestId)
             if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED')) {
@@ -1679,7 +1304,7 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
             }
             endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
         }
-    } else if (details.type == 'main_frame') {
+    } else if (details.type === 'main_frame') {
         if (openedProjects.has(details.tabId)) {
             let project = openedProjects.get(details.tabId)
             if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED')) {
@@ -1703,7 +1328,7 @@ async function _fetch(url, options, project) {
 
     listener = (details)=>{
         //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net:ERR из fetch запроса?
-        if (details.initiator == 'chrome-extension://' + chrome.runtime.id && details.url.includes(url)) {
+        if (details.initiator === 'chrome-extension://' + chrome.runtime.id && details.url.includes(url)) {
             fetchProjects.set(details.requestId, project)
             removeListener()
         }
@@ -1719,8 +1344,7 @@ async function _fetch(url, options, project) {
     options.credentials = 'include'
 
     try {
-        const response = await fetch(url, options)
-        return response
+        return await fetch(url, options)
     } catch(e) {
         throw e
     } finally {
@@ -1729,7 +1353,7 @@ async function _fetch(url, options, project) {
 }
 
 //Слушатель сообщений и ошибок
-chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async function(request, sender/*, sendResponse*/) {
     //Если требует ручное прохождение капчи
     if ((request.captcha || request.authSteam || request.discordLogIn) && sender && openedProjects.has(sender.tab.id)) {
         let project = openedProjects.get(sender.tab.id)
@@ -1738,7 +1362,13 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
         if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
         project.error = message
         delete project.nextAttempt
-        await changeProject(project)
+        openedProjects.delete(sender.tab.id)
+        openedProjects.set(sender.tab.id, project)
+        await updateProject(project)
+    } else if (request.changeProject) {
+        openedProjects.delete(sender.tab.id)
+        openedProjects.set(sender.tab.id, request.project)
+        await updateProject(request.project)
     } else {
         endVote(request, sender, null)
     }
@@ -1753,7 +1383,7 @@ async function endVote(request, sender, project) {
             chrome.tabs.remove(sender.tab.id, function() {
                 if (chrome.runtime.lastError) {
                     console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                    if (!settings.disabledNotifError && chrome.runtime.lastError.message != 'No tab with id.')
+                    if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
                         sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                 }
             })
@@ -1761,29 +1391,16 @@ async function endVote(request, sender, project) {
         openedProjects.delete(sender.tab.id)
     } else if (!project) return
 
-    for (let[key,value] of fetchProjects.entries()) {
-        if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+    for (const[key,value] of fetchProjects.entries()) {
+        if (value.nick === project.nick && value.id === project.id && project.rating === value.rating) {
             fetchProjects.delete(key)
         }
     }
 
     delete project.nextAttempt
 
-    let deleted = true
-    for (let i = getProjectList(project).length; i--; ) {
-        let temp = getProjectList(project)[i]
-        if (temp.nick == project.nick && JSON.stringify(temp.id) == JSON.stringify(project.id) && getProjectName(temp) == getProjectName(project)) {
-            getProjectList(project).splice(i, 1)
-            deleted = false
-        }
-    }
-    if (deleted) {
-        console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
-        return
-    }
-
     //Если усё успешно
-    let sendMessage = ''
+    let sendMessage
     if (request.successfully || request.later) {
         if (settings.useMultiVote && settings.repeatAttemptLater) {
             if (request.successfully) {
@@ -1797,11 +1414,11 @@ async function endVote(request, sender, project) {
             }
         }
         let time = new Date()
-        if (!project.Custom && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getYear(),time.getMonth() + 1,0).getDate() != new Date().getDate())) {
+        if (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getFullYear(),time.getMonth() + 1,0).getDate() !== new Date().getDate())) {
             if (project.timeoutHour) {
                 if (!project.timeoutMinute) project.timeoutMinute = 0
                 if (!project.timeoutSecond) project.timeoutSecond = 0
-                if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
+                if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                     time.setDate(time.getDate() + 1)
                 }
                 time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
@@ -1810,7 +1427,7 @@ async function endVote(request, sender, project) {
             }
         } else if (request.later && Number.isInteger(request.later)) {
             time = new Date(request.later)
-            if (project.ServeurPrive || project.TopGames) {
+            if (project.rating === 'ServeurPrive' || project.rating === 'TopGames') {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
                     time = new Date()
@@ -1821,64 +1438,64 @@ async function endVote(request, sender, project) {
         } else {
             //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
             let hour
-            if (project.TopCraft || project.McTOP || project.MinecraftRating || project.MonitoringMinecraft || project.IonMc || project.QTop) {
+            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'IonMc' || project.rating === 'QTop') {
                 //Топы на которых время сбрасывается в 00:00 по МСК
                 hour = 21
-            } else if (project.MCRate) {
+            } else if (project.rating === 'MCRate') {
                 hour = 22
-            } else if (project.MinecraftServerList || project.ServerList101) {
+            } else if (project.rating === 'MinecraftServerList' || project.rating === 'ServerList101') {
                 hour = 23
-            } else if (project.PlanetMinecraft || project.ListForge || project.MinecraftList) {
+            } else if (project.rating === 'PlanetMinecraft' || project.rating === 'ListForge' || project.rating === 'MinecraftList') {
                 hour = 5
-            } else if (project.MinecraftServersOrg || project.MinecraftIndex || project.MinecraftBuzz || project.PixelmonServers) {
+            } else if (project.rating === 'MinecraftServersOrg' || project.rating === 'MinecraftIndex' || project.rating === 'MinecraftBuzz' || project.rating === 'PixelmonServers') {
                 hour = 0
-            } else if (project.TopMinecraftServers) {
+            } else if (project.rating === 'TopMinecraftServers') {
                 hour = 4
-            } else if (project.MMoTopRU) {
+            } else if (project.rating === 'MMoTopRU') {
                 hour = 20
-            } else if (project.BotsForDiscord) {
+            } else if (project.rating === 'BotsForDiscord') {
                 hour = 12
             }
             if (hour != null) {
-                if (time.getUTCHours() > hour || (time.getUTCHours() == hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+                if (time.getUTCHours() > hour || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
                     time.setUTCDate(time.getUTCDate() + 1)
                 }
                 time.setUTCHours(hour, (project.priority ? 0 : 10), 0, 0)
             //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
-            } else if (project.TopG || project.MinecraftServersBiz || project.TopGG || project.DiscordBotList || project.MCListsOrg) {
+            } else if (project.rating === 'TopG' || project.rating === 'MinecraftServersBiz' || project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'MCListsOrg') {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.MinecraftIpList || project.HotMC || project.MinecraftServerNet || project.TMonitoring || project.MCServers || project.CraftList || project.CzechCraft || project.TopMCServersCom || project.CraftListNet) {
+            } else if (project.rating === 'MinecraftIpList' || project.rating === 'HotMC' || project.rating === 'MinecraftServerNet' || project.rating === 'TMonitoring' || project.rating === 'MCServers' || project.rating === 'CraftList' || project.rating === 'CzechCraft' || project.rating === 'TopMCServersCom' || project.rating === 'CraftListNet') {
                 time.setUTCDate(time.getUTCDate() + 1)
-            } else if (project.ServeurPrive || project.TopGames) {
+            } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames') {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
                     time.setDate(time.getDate() + 1)
                     time.setHours(0, (project.priority ? 0 : 10), 0, 0)
                     project.countVote = 0
                 } else {
-                    if (project.ServeurPrive) {
+                    if (project.rating === 'ServeurProve') {
                         time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30)
                     } else {
                         time.setUTCHours(time.getUTCHours() + 2)
                     }
                 }
-            } else if (project.ServerPact) {
+            } else if (project.rating === 'ServerPact') {
                 time.setUTCHours(time.getUTCHours() + 11)
                 time.setUTCMinutes(time.getUTCMinutes() + 7)
-            } else if (project.Custom) {
+            } else if (project.rating === 'Custom') {
                 if (project.timeoutHour != null) {
                     if (!project.timeoutMinute) project.timeoutMinute = 0
                     if (!project.timeoutSecond) project.timeoutSecond = 0
-                    if (time.getHours() > project.timeoutHour || (time.getHours() == project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
+                    if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                         time.setDate(time.getDate() + 1)
                     }
                     time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
                 } else {
                     time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
                 }
-            } else if (project.MCServerList) {
+            } else if (project.rating === 'MCServerList') {
                 time.setUTCHours(time.getUTCHours() + 2)
-            } else if (project.CraftList) {
+            } else if (project.rating === 'CraftList') {
                 time = new Date(request.successfully)
             } else {
                 time.setUTCDate(time.getUTCDate() + 1)
@@ -1893,12 +1510,12 @@ async function endVote(request, sender, project) {
         }
 
         if (settings.useMultiVote)  {
-            if (currentVK != null && (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) != -1) {
+            if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) !== -1) {
                 if (request.later && settings.repeatAttemptLater && project.later != null) {
-                    if (project.TopCraft || project.McTOP) {
-                        if (request.later == 'nick_error') {
+                    if (project.rating === 'TopCraft' || project.rating === 'McTOP') {
+                        if (request.later === 'nick_error') {
                             //None
-                        } else if (request.later == 'vk_error') {
+                        } else if (request.later === 'vk_error') {
                             await useVK()
                         } else {
                             if (project.later >= 15) {
@@ -1918,17 +1535,17 @@ async function endVote(request, sender, project) {
                         id: project.id,
                         nextFreeVote: time
                     }
-                    const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id == usedProject.id})
+                    const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id === usedProject.id})
                     if (index > -1) {
                         getTopFromList(currentVK, project).splice(index, 1)
                     }
                     getTopFromList(currentVK, project).push(usedProject)
-                    VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK
+                    VKs[VKs.findIndex(function(element) { return element.id === currentVK.id && element.name === currentVK.name})] = currentVK
                     await setValue('AVMRVKs', VKs)
                 }
             }
-            
-            if (currentProxy != null && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) && proxies.findIndex(function(element) { return element.ip == currentProxy.ip && element.port == currentProxy.port}) != -1) {
+
+            if (currentProxy != null && (settings.useProxyOnUnProxyTop || (!project.rating === 'TopCraft' && !project.rating === 'McTOP' && !project.rating === 'MinecraftRating')) && proxies.findIndex(function(element) { return element.ip === currentProxy.ip && element.port === currentProxy.port}) !== -1) {
                 let usedProject = {
                     id: project.id,
                     nextFreeVote: time
@@ -1951,15 +1568,11 @@ async function endVote(request, sender, project) {
             sendMessage = chrome.i18n.getMessage('successAutoVote')
             if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage)
 
-            if (!project.stats.successVotes) project.stats.successVotes = 0
             project.stats.successVotes++
-            if (!project.stats.monthSuccessVotes) project.stats.monthSuccessVotes = 0
             project.stats.monthSuccessVotes++
             project.stats.lastSuccessVote = Date.now()
 
-            if (!generalStats.successVotes) generalStats.successVotes = 0
             generalStats.successVotes++
-            if (!generalStats.monthSuccessVotes) generalStats.monthSuccessVotes = 0
             generalStats.monthSuccessVotes++
             generalStats.lastSuccessVote = Date.now()
             delete project.later
@@ -1977,10 +1590,8 @@ async function endVote(request, sender, project) {
             if (typeof request.later == 'string') sendMessage = sendMessage + ' ' + request.later
             if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage)
 
-            if (!project.stats.laterVotes) project.stats.laterVotes = 0
             project.stats.laterVotes++
 
-            if (!generalStats.laterVotes) generalStats.laterVotes = 0
             generalStats.laterVotes++
         }
         console.log(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
@@ -1988,7 +1599,7 @@ async function endVote(request, sender, project) {
     } else {
         let message
         if (!request.message) {
-            if (Object.values(request)[0] == true) {
+            if (Object.values(request)[0] === true) {
                 message = chrome.i18n.getMessage(Object.keys(request)[0])
             } else {
                 message = chrome.i18n.getMessage(Object.keys(request)[0], Object.values(request)[0])
@@ -1996,11 +1607,11 @@ async function endVote(request, sender, project) {
         } else {
             message = request.message
         }
-        if (message.length == 0) message = chrome.i18n.getMessage('emptyError')
+        if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
         if (settings.useMultiVote) {
             sendMessage = message
-            if ((project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.QTop) && request.errorAuthVK && currentVK != null) {
+            if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
                 await setValue('AVMRVKs', VKs)
             } else if (project.MCRate && message.includes('Ваш аккаунт заблокирован для голосования за этот проект')) {
@@ -2009,12 +1620,12 @@ async function endVote(request, sender, project) {
                     nextFreeVote: 999999999999999,
                     error: message
                 }
-                const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id == usedProject.id})
+                const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id === usedProject.id})
                 if (index > -1) {
                     getTopFromList(currentVK, project).splice(index, 1)
                 }
                 getTopFromList(currentVK, project).push(usedProject)
-                VKs[VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name})] = currentVK
+                VKs[VKs.findIndex(function(element) { return element.id === currentVK.id && element.name === currentVK.name})] = currentVK
                 await setValue('AVMRVKs', VKs)
             } else if (project.MCRate && message.includes('Ваш ВК ID заблокирован для голосовани')) {
                 currentVK.MCRate = message
@@ -2026,7 +1637,7 @@ async function endVote(request, sender, project) {
                     await stopVote()
                 }
             }
-        } else if (project.TopCraft || project.McTOP || project.MCRate || project.MinecraftRating || project.MonitoringMinecraft || project.ServerPact || project.MinecraftIpList) {
+        } else if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
             retryCoolDown = 300000
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
         } else {
@@ -2045,28 +1656,40 @@ async function endVote(request, sender, project) {
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
         if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), sendMessage)
 
-        if (!project.stats.errorVotes) project.stats.errorVotes = 0
         project.stats.errorVotes++
 
-        if (!generalStats.errorVotes) generalStats.errorVotes = 0
         generalStats.errorVotes++
     }
 
-    if (project.priority || (settings.useMultiVote && settings.repeatAttemptLater && project.later && project.later <= 15)) {
-        getProjectList(project).unshift(project)
-    } else {
-        getProjectList(project).push(project)
+    await updateGeneralStats()
+    const projectID = await updateProject(project)
+
+    if (project.time != null && project.time > Date.now()) {
+        let create = true
+        await new Promise(resolve => {
+            chrome.alarms.getAll(function(alarms) {
+                for (const alarm of alarms) {
+                    if (alarm.scheduledTime === project.time) {
+                        create = false
+                        resolve()
+                        break
+                    }
+                }
+                resolve()
+            })
+        })
+        if (create) {
+            chrome.alarms.create(String(projectID), {when: project.time})
+        }
     }
-    await setValue('generalStats', generalStats)
-    await setValue('AVMRprojects' + getProjectName(project), getProjectList(project))
-    
+
     function removeQueue() {
         for (const value of queueProjects) {
-            if (value.nick == project.nick && JSON.stringify(value.id) == JSON.stringify(project.id) && getProjectName(value) == getProjectName(project)) {
+            if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
                 queueProjects.delete(value)
             }
         }
-        if (settings.useMultiVote && queueProjects.size == 0 && (currentVK != null || currentProxy != null)) {
+        if (settings.useMultiVote && queueProjects.size === 0 && (currentVK != null || currentProxy != null)) {
             if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
             if (currentProxy != null) clearProxy()
             currentProxy = null
@@ -2093,20 +1716,12 @@ function sendNotification(title, message) {
     chrome.notifications.create('', notification, function() {})
 }
 
-function getProjectName(project) {
-    return Object.keys(project)[0]
-}
-
 function getProjectPrefix(project, detailed) {
     if (detailed) {
-        return '[' + getProjectName(project) + '] ' + (project.nick != null && project.nick != '' ? project.Custom ? project.nick : project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + (project.Custom ? '' : project.id) + (project.name != null ? ' – ' + project.name : '') + ' '
+        return '[' + project.rating + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + ' '
     } else {
-        return '[' + getProjectName(project) + '] ' + (project.nick != null && project.nick != '' ? project.nick : project.game != null ? project.game : project.name) + (project.Custom ? '' : project.name != null ? ' – ' + project.name : ' – ' + project.id)
+        return '[' + project.rating + '] ' + (project.nick != null && project.nick !== '' ? project.nick : project.game != null ? project.game : project.name) + (project.name != null ? ' – ' + project.name : ' – ' + project.id)
     }
-}
-
-function getProjectList(project) {
-    return window['projects' + getProjectName(project)]
 }
 
 //Проверяет правильное ли у вас время
@@ -2146,72 +1761,13 @@ async function checkTime() {
         }
     } catch (e) {
         console.error(chrome.i18n.getMessage('errorClock', e))
-        return
     }
-}
-
-async function setCookie(url, name, value) {
-    return new Promise(resolve=>{
-        chrome.cookies.set({'url': url, 'name': name, 'value': value}, function(details) {
-            resolve(details)
-        })
-    })
-}
-
-async function setCookieDetails(details) {
-    return new Promise(resolve=>{
-        chrome.cookies.set(details, function(det) {
-            resolve(det)
-        })
-    })
-}
-
-async function getCookie(url, name) {
-    return new Promise(resolve=>{
-        chrome.cookies.get({'url': url, 'name': name}, function(cookie) {
-            resolve(cookie)
-        })
-    })
 }
 
 async function removeCookie(url, name) {
     return new Promise(resolve=>{
         chrome.cookies.remove({'url': url, 'name': name}, function(details) {
             resolve(details)
-        })
-    })
-}
-
-//Асинхронно достаёт/сохраняет настройки в chrome.storage
-async function getValue(name, area) {
-    if (!area) {
-        area = storageArea
-    }
-    return new Promise((resolve, reject)=>{
-        chrome.storage[area].get(name, function(data) {
-            if (chrome.runtime.lastError) {
-                sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
-                console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
-                reject(chrome.runtime.lastError)
-            } else {
-                resolve(data[name])
-            }
-        })
-    })
-}
-async function setValue(key, value, area) {
-    if (!area) {
-        area = storageArea
-    }
-    return new Promise((resolve, reject)=>{
-        chrome.storage[area].set({[key]: value}, function(data) {
-            if (chrome.runtime.lastError) {
-                sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
-                console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
-                reject(chrome.runtime.lastError)
-            } else {
-                resolve(data)
-            }
         })
     })
 }
@@ -2232,6 +1788,7 @@ async function setProxy(config) {
         })
     })
 }
+
 async function wait(ms) {
     return new Promise(resolve=>{
         setTimeout(()=>{
@@ -2240,40 +1797,35 @@ async function wait(ms) {
     })
 }
 
-async function changeProject(project) {
-    let projects = getProjectList(project)
-    for (let i in projects) {
-        if (projects[i].nick == project.nick && JSON.stringify(projects[i].id) == JSON.stringify(project.id)) {
-            projects[i] = project
-            await setValue('AVMRprojects' + getProjectName(project), projects)
-            break
-            //Stop this loop, we found it!
-        }
-    }
+async function updateGeneralStats() {
+    await new Promise(resolve => {
+        const request = db.transaction('other', 'readwrite').objectStore('other').put(generalStats, 'generalStats')
+        request.onsuccess = resolve
+    })
 }
 
-async function forLoopAllProjects(fuc) {
-    if (lastErrorNotFound != null) lastErrorNotFound = null
-    for (const item of Object.keys(allProjects)) {
-        if (break1) {
-            break1 = false
-            break
-        }
-        for (let proj of window['projects' + item]) {
-            if (break2) {
-                break2 = false
-                break
-            }
-            await fuc(proj)
-        }
+async function updateProject(project) {
+    const projectID = await getProjectID(project)
+    if (projectID != null) {
+        await new Promise((resolve, reject) => {
+            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, projectID)
+            request.onsuccess = resolve
+            request.onerror = reject
+        })
+        chrome.runtime.sendMessage({updateProject: true, project, projectID})
+    } else {
+        console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
     }
-    if (lastErrorNotFound != null) {
-        settings.stopVote = Date.now() + 86400000
-        console.error(lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
-        if (!settings.disabledNotifError) sendNotification(lastErrorNotFound, lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
-        await setValue('AVMRsettings', settings)
-        await stopVote()
-    }
+    return projectID
+}
+
+async function getProjectID(project) {
+    return await new Promise((resolve, reject) => {
+        const index = db.transaction('projects').objectStore('projects').index('rating, id, nick')
+        const request = index.getKey([project.rating, project.id, project.nick])
+        request.onsuccess = event => resolve(event.target.result)
+        request.onerror = reject
+    })
 }
 
 function extractHostname(url) {
@@ -2294,179 +1846,104 @@ function extractHostname(url) {
     return hostname
 }
 
-//Слушатель на изменение настроек
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-    for (let key in changes) {
-        let storageChange = changes[key]
-        if (key == 'storageArea') {
-            storageArea = storageChange.newValue
-        } else if (namespace != storageArea) {
-            return
-        } else if (key.startsWith('AVMRprojects')) {
-            window['projects' + key.replace('AVMRprojects', '')] = storageChange.newValue
-            for (const project of storageChange.newValue) {
-                for (let[key,value] of openedProjects.entries()) {
-                    if (getProjectName(project) == getProjectName(value) && JSON.stringify(project.id) == JSON.stringify(value) && project.nick == value.nick) {
-                        openedProjects.set(key, project)
-                    }
-                }
-                for (let value of queueProjects) {
-                    if (getProjectName(project) == getProjectName(value) && JSON.stringify(project.id) == JSON.stringify(value) && project.nick == value.nick) {
-                        queueProjects.delete(value)
-                        queueProjects.add(project)
-                    }
-                }
+chrome.runtime.onInstalled.addListener(async function(details) {
+    if (details.reason === 'install') {
+        chrome.tabs.create({url: 'options.html?installed'})
+    } else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
+        let storageArea = 'local'
+        //Асинхронно достаёт/сохраняет настройки в chrome.storage
+        async function getValue(name, area) {
+            if (!area) {
+                area = storageArea
             }
-        } else if (key == 'AVMRsettings') {
-            settings = storageChange.newValue
-        } else if (key == 'generalStats') {
-            generalStats = storageChange.newValue
-        } else if (key == 'AVMRVKs') {
-            VKs = storageChange.newValue
-        } else if (key == 'AVMRproxies') {
-            proxies = storageChange.newValue
-        }
-    }
-})
-
-async function stopVote() {
-    if (debug) console.log('Отмена всех голосований и очистка всего')
-    await clearProxy()
-    currentVK = null
-    currentProxy = null
-    queueProjects.clear()
-    for (let[key,value] of openedProjects.entries()) {
-        chrome.tabs.remove(key, function() {
-            if (chrome.runtime.lastError) {
-                console.warn(chrome.runtime.lastError.message)
-                if (!settings.disabledNotifError)
-                    sendNotification(chrome.i18n.getMessage('closeTabError'), chrome.runtime.lastError.message)
-            }
-        })
-    }
-    controller.abort()
-    openedProjects.clear()
-    fetchProjects.clear()
-    break1 = true
-    break2 = true
-}
-
-//Если требуется авторизация для Прокси
-let errorProxy = {ip: '', count: 0}
-chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn) {
-    if (details.isProxy && currentProxy && currentProxy != null) {
-        if (errorProxy.ip != currentProxy.ip) {
-            errorProxy.count = 0
-        }
-        errorProxy.ip = currentProxy.ip
-        if (errorProxy.count++ > 5) {
-            currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxy2')
-            console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxy2'))
-            if (!settings.disabledNotifError) {
-                sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxy2'))
-            }
-            callbackFn()
-            return
-        }
-        if (currentProxy.login) {
-            console.log(chrome.i18n.getMessage('proxyAuth'))
-            callbackFn({
-                authCredentials: {
-                    'username': currentProxy.login,
-                    'password': currentProxy.password
-                }
-            })
-            return
-        } else if (currentProxy.TunnelBear) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'TunnelBear'))
-            if (tunnelBear.token != null && tunnelBear.expires > Date.now()) {
-                callbackFn({
-                    authCredentials: {
-                        'username': tunnelBear.token,
-                        'password': tunnelBear.token
+            return new Promise((resolve, reject)=>{
+                chrome.storage[area].get(name, function(data) {
+                    if (chrome.runtime.lastError) {
+                        sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
+                        console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
+                        reject(chrome.runtime.lastError)
+                    } else {
+                        resolve(data[name])
                     }
                 })
-                return
+            })
+        }
+        async function removeValue(name, area) {
+            if (!area) {
+                area = storageArea
+            }
+            return new Promise((resolve, reject)=>{
+                chrome.storage[area].remove(name, function(data) {
+                    if (chrome.runtime.lastError) {
+                        sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
+                        console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
+                        reject(chrome.runtime.lastError.message)
+                    } else {
+                        resolve(data)
+                    }
+                })
+            })
+        }
+        storageArea = await getValue('storageArea', 'local')
+        if (storageArea == null || storageArea === '') {
+            if (await getValue('AVMRsettings', 'sync') != null) {
+                storageArea = 'sync'
             } else {
-                settings.stopVote = Date.now() + 86400000
-                console.error(chrome.i18n.getMessage('errorAuthProxyTB'))
-                if (!settings.disabledNotifError) {
-                    sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyTB'))
-                }
-                await setValue('AVMRsettings', settings)
-                await stopVote()
-            }
-        } else if (currentProxy.Windscribe) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'Windscribe'))
-            callbackFn({
-                authCredentials: {
-                    'username': 'mdib1352-t94rvyq',
-                    'password': 'uem29h65n8'
-                }
-            })
-            return
-        } else if (currentProxy.HolaVPN) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'HolaVPN'))
-            callbackFn({
-                authCredentials: {
-                    'username': 'user-uuid-c1b9e2c1bbab1664da384d748ef3899c',
-                    'password': '6e07f7fa2eda'
-                }
-            })
-            return
-        } else if (currentProxy.ZenMate) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'ZenMate'))
-            callbackFn({
-                authCredentials: {
-                    'username': '97589925',
-                    'password': 'ef483afb122e05400f895434df1394a82d31e340'
-                }
-            })
-            return
-        } else if (currentProxy.NordVPN) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'NordVPN'))
-            callbackFn({
-                authCredentials: {
-                    'username': 'n2qNF1K4PBLbWWkJSTfmGEdX',
-                    'password': 'UKweV43HJP5QnWtVEaWnCChM'
-                }
-            })
-            return
-        } else {
-            currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword')
-            console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword'))
-            if (!settings.disabledNotifError) {
-                sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyNoPassword'))
+                storageArea = 'local'
             }
         }
-    }
-    callbackFn()
-}, {urls: ['<all_urls>']}, ['asyncBlocking'])
+        const oldSettings = await getValue('AVMRsettings')
+        if (oldSettings == null) return
+        const oldGeneralStats = await getValue('generalStats')
 
-chrome.runtime.onInstalled.addListener(async function(details) {
-    if (details.reason == 'install') {
-        chrome.runtime.openOptionsPage()
-    } else if (details.reason == 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('4.0.0')) == -1) {
-        console.log('Перенос MinecraftMp в ListForge')
-        let oldMinecraftMp = await getValue('AVMRprojectsMinecraftMp')
-        if (oldMinecraftMp != null && typeof oldMinecraftMp != 'function' && oldMinecraftMp.length > 0) {
-            for (const old of oldMinecraftMp) {
-                let newListForge = {}
-                newListForge.ListForge = true
-                newListForge.game = 'minecraft-mp.com'
-                newListForge.id = old.id
-                newListForge.name = old.name
-                newListForge.stats = old.stats
-                newListForge.nick = old.nick
-                newListForge.time = old.time
-                projectsListForge.push(newListForge)
+        console.log(chrome.i18n.getMessage('oldSettings'))
+        const projects = []
+        for (const item of Object.keys(allProjects)) {
+            const list = await getValue('AVMRprojects' + item)
+            if (list) {
+                for (const project of list) {
+                    delete project[item]
+                    project.rating = item
+                    if (item === 'Custom') {
+                        project.body = project.id
+                        delete project.id
+                        project.id = project.nick
+                        project.nick = ''
+                    }
+                    if (project.nick == null) project.nick = ''
+                    if (project.stats.successVotes == null) project.stats.successVotes = 0
+                    if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
+                    if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
+                    if (project.stats.errorVotes == null) project.stats.errorVotes = 0
+                    if (project.stats.laterVotes == null) project.stats.laterVotes = 0
+                    projects.push(project)
+                }
             }
-            await setValue('AVMRprojectsListForge', projectsListForge)
-            await setValue('AVMRprojectsMinecraftMp', null)
         }
-    } else if (details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version(chrome.runtime.getManifest().version)) == -1) {
-//      chrome.runtime.openOptionsPage()
-        window.open('options.html?updated')
+        if (!db) {
+            await new Promise(resolve => {//Да это странно выглядит
+                setInterval(() => {
+                    if (db) {
+                        resolve()
+                    }
+                }, 1000)
+            })
+        }
+        const projectsts = db.transaction(['projects', 'other'], 'readwrite')
+        projectsts.objectStore('projects').clear()
+        for (const project of projects) {
+            projectsts.objectStore('projects').add(project)
+        }
+        projectsts.objectStore('other').put(oldSettings, 'settings')
+        projectsts.objectStore('other').put(oldGeneralStats, 'generalStats')
+        for (const item of Object.keys(allProjects)) {
+            await removeValue('AVMRprojects' + item)
+        }
+        await removeValue('AVMRsettings')
+        await removeValue('generalStats')
+        await removeValue('storageArea', 'local')
+        await reloadAllAlarms()
+        console.log(chrome.i18n.getMessage('importingEnd'))
     }
 })
 
@@ -2479,35 +1956,17 @@ function getTopFromList(list, project) {
 }
 
 function Version(s){
-  this.arr = s.split('.').map(Number);
+  this.arr = s.split('.').map(Number)
 }
 Version.prototype.compareTo = function(v){
-  for (let i=0; ;i++) {
-    if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1;
-    if (i>=this.arr.length) return -1;
-    var diff = this.arr[i]-v.arr[i]
-    if (diff) return diff>0 ? 1 : -1;
-  }
+    for (let i=0; ;i++) {
+        if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1
+        if (i>=this.arr.length) return -1
+        const diff = this.arr[i]-v.arr[i]
+        if (diff) return diff>0 ? 1 : -1
+    }
 }
 
-const varToString = varObj=>Object.keys(varObj)[0]
-
-
-// https://github.com/lesander/console.history
-/**
- * Console History v1.5.1
- * console-history.js
- *
- * Licensed under the MIT License.
- * https://git.io/console
- */
-
-// 'use strict'
-
-// /* Allow only one instance of console-history.js */
-// if (typeof console.history !== 'undefined') {
-//   throw new Error('Only one instance of console-history.js can run at a time.')
-// }
 
 /* Store the original log functions. */
 console._log = console.log
@@ -2538,93 +1997,44 @@ console._intercept = function (type, args) {
     console._collect(type, args)
 }
 
-let db
-const openRequest = indexedDB.open('logs', 1)
-openRequest.onupgradeneeded = function() {
+let logsdb
+const logsopenRequest = indexedDB.open('logs', 1)
+logsopenRequest.onupgradeneeded = function() {
     // срабатывает, если на клиенте нет базы данных
     // ...выполнить инициализацию...
-    openRequest.result.createObjectStore('logs', {autoIncrement: true})
+    logsopenRequest.result.createObjectStore('logs', {autoIncrement: true})
     //Удаляем старые логи из localStorage
     if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
 }
-openRequest.onerror = function() {
-    console._error(chrome.i18n.getMessage('errordb', 'logs'), openRequest.error)
+logsopenRequest.onerror = function() {
+    console._error(chrome.i18n.getMessage('errordb', ['logs', logsopenRequest.error]))
 }
-openRequest.onsuccess = function() {
-    db = openRequest.result
-    db.onerror = function(event) {
-        let request = event.target // запрос, в котором произошла ошибка
-        
-        console._error(chrome.i18n.getMessage('errordb', 'logs'), request.error)
+logsopenRequest.onsuccess = function() {
+    logsdb = logsopenRequest.result
+    logsdb.onerror = function(event) {
+        const request = event.target // запрос, в котором произошла ошибка
+        console._error(chrome.i18n.getMessage('errordb', ['logs', request.error]), )
     }
-    // продолжить работу с базой данных, используя объект db
 
-    /* Define the main log catcher. */
     console._collect = function (type, args) {
-      // WARNING: When debugging this function, DO NOT call a modified console.log
-      // function, all hell will break loose.
-      // Instead use the original console._log functions.
-    
-      // All the arguments passed to any function, even when not defined
-      // inside the function declaration, are stored and locally available in
-      // the variable called 'arguments'.
-      //
-      // The arguments of the original console.log functions are collected above,
-      // and passed to this function as a variable 'args', since 'arguments' is
-      // reserved for the current function.
-    
-      // Collect the timestamp of the console log.
-    //   var time = new Date().toUTCString()
         let time = new Date().toLocaleString().replace(',', '')
-        
-        // Make sure the 'type' parameter is set. If no type is set, we fall
-        // back to the default log type.
+
         if (!type) type = 'log'
-        
-        // To ensure we behave like the original console log functions, we do not
-        // output anything if no arguments are provided.
+
         if (!args || args.length === 0) return
-        
-        // Act normal, and just pass all original arguments to
-        // the origial console function :)
+
         console['_' + type].apply(console, args)
-        
-        // Get stack trace information. By throwing an error, we get access to
-        // a stack trace. We then go up in the trace tree and filter out
-        // irrelevant information.
-    //   var stack = false
-    //   try { throw Error('') } catch (error) {
-    //     // The lines containing 'console-history.js' are not relevant to us.
-    //     var stackParts = error.stack.split('\n')
-    //     stack = []
-    //     for (var i = 0; i < stackParts.length; i++) {
-    //       if (stackParts[i].indexOf('console-history.js') > -1 ||
-    //       stackParts[i].indexOf('console-history.min.js') > -1 ||
-    //       stackParts[i] === 'Error') {
-    //         continue
-    //       }
-    //       stack.push(stackParts[i].trim())
-    //     }
-    //   }
     
-      // Add the log to our history.
-    //   console.history.push({ type: type, timestamp: time, arguments: args/*, stack: stack*/ })
-    
-        const transaction = db.transaction('logs', 'readwrite')
-        
-        // получить хранилище объектов для работы с ним
-        const logs = transaction.objectStore('logs')
-        
+        const logs = logsdb.transaction('logs', 'readwrite').objectStore('logs')
+
         let log = '[' + time + ' ' + type.toUpperCase() + ']:'
     
-        for (let i in args) {
-            let arg = args[i]
-            if (typeof arg != 'string')
-                arg = JSON.stringify(arg)
+        for (let arg of args) {
+            if (typeof arg != 'string') arg = JSON.stringify(arg)
             log += ' ' + arg
         }
     
-        const request = logs.add(log)
+        logs.add(log)
     }
     
     console.log(chrome.i18n.getMessage('start'))

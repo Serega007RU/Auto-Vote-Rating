@@ -4,6 +4,7 @@
 	"author": "Serega007",
 	"background": {
 		"scripts": [
+		    "main.js",
 			"background.js",
 			"scripts/minecraftiplist.js"
 		],
@@ -30,7 +31,6 @@
 		"webRequest",
 		"webRequestBlocking",
 		"webNavigation",
-		"proxy",
 		"cookies",
 		"<all_urls>"
 	],

@@ -1,7 +1,7 @@
 async function vote(first) {
     try {
         //MMoTopRU, что за костыли?
-        if (document.querySelector('body > div') == null && document.querySelectorAll('body > script[type="text/javascript"]').length == 1) {
+        if (document.querySelector('body > div') == null && document.querySelectorAll('body > script[type="text/javascript"]').length === 1) {
 //          chrome.runtime.sendMessage({emptySite: true})
             return
         }
