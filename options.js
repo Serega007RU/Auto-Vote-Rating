@@ -51,23 +51,28 @@ async function restoreOptions() {
 //  if (storageArea == 'sync') document.getElementById('enableSyncStorage').checked = true
     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
-    document.getElementById('cooldown').value = settings.cooldown
+    // document.getElementById('cooldown').value = settings.cooldown
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
 }
 
 //Добавить проект в список проекта
-async function addProjectList(project, projectID) {
+async function addProjectList(project) {
     if (document.getElementById(project.rating + 'Button') == null) {
         generateBtnListRating(project.rating, 0)
     }
-    if (!projectID) {
+    if (!project.key) {
         const projects = db.transaction('projects', 'readwrite').objectStore('projects')
-        projectID = await new Promise((resolve, reject) => {
+        project.key = await new Promise((resolve, reject) => {
             const request = projects.add(project)
             request.onsuccess = function (event) {
                 resolve(event.target.result)
             }
+            request.onerror = reject
+        })
+        await new Promise((resolve, reject) => {
+            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, project.key)
+            request.onsuccess = resolve
             request.onerror = reject
         })
 
@@ -80,7 +85,7 @@ async function addProjectList(project, projectID) {
     const listProject = document.getElementById(project.rating + 'List')
     if (listProject.childElementCount === 0 && listProject.parentElement.style.display === 'none') return
     const li = document.createElement('li')
-    li.id = projectID
+    li.id = project.key
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon')
     if (!(project.time == null || project.time === '') && Date.now() < project.time) {
@@ -138,22 +143,22 @@ async function addProjectList(project, projectID) {
         } else {
             blockButtons = true
         }
-        await removeProjectList(project, projectID)
+        await removeProjectList(project)
         blockButtons = false
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', function() {
-        updateModalStats(project, projectID)
+        updateModalStats(project)
     })
-    if (document.getElementById('stats').classList.contains('active') && document.getElementById('stats' + projectID) != null) {
-        updateModalStats(project, projectID)
+    if (document.getElementById('stats').classList.contains('active') && document.getElementById('stats' + project.key) != null) {
+        updateModalStats(project)
     }
 }
 
-function updateModalStats(project, projectID) {
+function updateModalStats(project) {
     toggleModal('stats')
     document.querySelector('.statsSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
-    document.querySelector('.statsSubtitle').id = 'stats' + projectID
+    document.querySelector('.statsSubtitle').id = 'stats' + project.key
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
     document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes
     document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.lastMonthSuccessVotes
@@ -235,8 +240,8 @@ function generateBtnListRating(rating, count) {
 }
 
 //Удалить проект из списка проекта
-async function removeProjectList(project, projectID) {
-    const li = document.getElementById(projectID)
+async function removeProjectList(project) {
+    const li = document.getElementById(project.key)
     if (li != null) {
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
         if (count <= 0) {
@@ -255,24 +260,24 @@ async function removeProjectList(project, projectID) {
 
     const projects = db.transaction('projects', 'readwrite').objectStore('projects')
     await new Promise((resolve, reject) => {
-        const request = projects.delete(projectID)
+        const request = projects.delete(project.key)
         request.onsuccess = function (event) {
             resolve(event.target.result)
         }
         request.onerror = reject
     })
 
-    chrome.alarms.clear(String(projectID))
+    chrome.alarms.clear(String(project.key))
     
     if (!chrome.extension.getBackgroundPage()) return
     for (const value of chrome.extension.getBackgroundPage().queueProjects) {
-        if (value.nick === project.nick && value.id === project.id && value.rating === project.rating) {
+        if (value.key === project.key) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
         }
     }
     //Если эта вкладка была уже открыта, он закрывает её
     for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-        if (value.nick === project.nick && value.id === project.id && value.rating === project.rating) {
+        if (value.key === project.key) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
             chrome.tabs.remove(key)
         }
@@ -539,17 +544,17 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
 })
 
 //Слушатель кнопки "Установить" на кулдауне
-document.getElementById('timeout').addEventListener('submit', async ()=>{
-    event.preventDefault()
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    await setCoolDown()
-    blockButtons = false
-})
+// document.getElementById('timeout').addEventListener('submit', async ()=>{
+//     event.preventDefault()
+//     if (blockButtons) {
+//         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+//         return
+//     } else {
+//         blockButtons = true
+//     }
+//     await setCoolDown()
+//     blockButtons = false
+// })
 
 async function addProject(project, element) {
     createNotif(chrome.i18n.getMessage('adding'), null, null, element)
@@ -1170,7 +1175,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         const projectsts = db.transaction(['projects', 'other'], 'readwrite')
         projectsts.objectStore('projects').clear()
         for (const project of projects) {
-            projectsts.objectStore('projects').add(project)
+            projectsts.objectStore('projects').add(project, project.key)
         }
         projectsts.objectStore('other').put(data.settings, 'settings')
         projectsts.objectStore('other').put(data.generalStats, 'generalStats')
@@ -1831,10 +1836,10 @@ function generateDataList() {
 
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
     if (request.updateProject) {
-        const el = document.getElementById(request.projectID)
+        const el = document.getElementById(request.project.key)
         if (el != null) {
             el.remove()
-            addProjectList(request.project, request.projectID)
+            addProjectList(request.project, request.project.key)
         }
     }
 })

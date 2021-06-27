@@ -1,9 +1,12 @@
 //Текущие открытые вкладки расширением
-const openedProjects = new Map()
+// noinspection ES6ConvertVarToLetConst
+var openedProjects = new Map()
 //Текущие fetch запросы
-const fetchProjects = new Map()
+// noinspection ES6ConvertVarToLetConst
+var fetchProjects = new Map()
 //Текущие проекты за которые сейчас голосует расширение
-const queueProjects = new Set()
+// noinspection ES6ConvertVarToLetConst
+var queueProjects = new Set()
 
 //Есть ли доступ в интернет?
 let online = true
@@ -140,7 +143,7 @@ async function checkOpen(project) {
 
     //Если эта вкладка была уже открыта, он закрывает её
     for (const[key,value] of openedProjects.entries()) {
-        if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
+        if (project.key === value.key) {
             openedProjects.delete(key)
             if (closeTabs) {
                 chrome.tabs.remove(key, function() {
@@ -196,7 +199,7 @@ async function newWindow(project) {
     }
     generalStats.lastAttemptVote = Date.now()
     await updateGeneralStats()
-    const projectID = await updateProject(project)
+    await updateProject(project)
     
     let create = true
     await new Promise(resolve => {
@@ -212,7 +215,7 @@ async function newWindow(project) {
         })
     })
     if (create) {
-        chrome.alarms.create(String(projectID), {when: project.nextAttempt})
+        chrome.alarms.create(String(project.key), {when: project.nextAttempt})
     }
     
     let silentVoteMode = false
@@ -348,7 +351,7 @@ async function silentVote(project) {
                 endVote({later: true}, null, project)
             } else if (response.doc.querySelector('div[class="error"]') != null) {
                 const error = response.doc.querySelector('div[class="error"]').textContent
-                if (error.includes("уже голосовали")) {
+                if (error.includes('уже голосовали')) {
                     endVote({later: true}, null, project)
 //              } else if (error.includes('Ваш ВК ID заблокирован для голосовани') || error.includes('Ваш аккаунт заблокирован')) {
 //                  endVote({errorAuthVK: error}, null, project)
@@ -936,7 +939,7 @@ async function endVote(request, sender, project) {
     } else if (!project) return
 
     for (const[key,value] of fetchProjects.entries()) {
-        if (value.nick === project.nick && value.id === project.id && project.rating === value.rating) {
+        if (value.key === project.key) {
             fetchProjects.delete(key)
         }
     }
@@ -1100,7 +1103,7 @@ async function endVote(request, sender, project) {
     }
     
     await updateGeneralStats()
-    const projectID = await updateProject(project)
+    await updateProject(project)
     
     if (project.time != null && project.time > Date.now()) {
         let create = true
@@ -1117,13 +1120,13 @@ async function endVote(request, sender, project) {
             })
         })
         if (create) {
-            chrome.alarms.create(String(projectID), {when: project.time})
+            chrome.alarms.create(String(project.key), {when: project.time})
         }
     }
 
     function removeQueue() {
         for (const value of queueProjects) {
-            if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
+            if (project.key === value.key) {
                 queueProjects.delete(value)
             }
         }
@@ -1221,27 +1224,17 @@ async function updateGeneralStats() {
 }
 
 async function updateProject(project) {
-    const projectID = await getProjectID(project)
-    if (projectID != null) {
+    const found = await new Promise(resolve => db.transaction('projects').objectStore('projects').count(project.key).onsuccess = (event) => resolve(event.target.result))
+    if (found) {
         await new Promise((resolve, reject) => {
-            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, projectID)
+            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, project.key)
             request.onsuccess = resolve
             request.onerror = reject
         })
-        chrome.runtime.sendMessage({updateProject: true, project, projectID})
+        chrome.runtime.sendMessage({updateProject: true, project})
     } else {
         console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
     }
-    return projectID
-}
-
-async function getProjectID(project) {
-    return await new Promise((resolve, reject) => {
-        const index = db.transaction('projects').objectStore('projects').index('rating, id, nick')
-        const request = index.getKey([project.rating, project.id, project.nick])
-        request.onsuccess = event => resolve(event.target.result)
-        request.onerror = reject
-    })
 }
 
 function extractHostname(url) {
@@ -1314,6 +1307,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         
         console.log(chrome.i18n.getMessage('oldSettings'))
         const projects = []
+        let key = 0
         for (const item of Object.keys(allProjects)) {
             const list = await getValue('AVMRprojects' + item)
             if (list) {
@@ -1332,6 +1326,8 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                     if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
                     if (project.stats.errorVotes == null) project.stats.errorVotes = 0
                     if (project.stats.laterVotes == null) project.stats.laterVotes = 0
+                    key++
+                    project.key = key
                     projects.push(project)
                 }
             }
