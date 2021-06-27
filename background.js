@@ -120,8 +120,7 @@ async function checkOpen(project) {
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
         if (project.rating === value.rating || value.randomize && project.randomize) {
-            if (!value.nextAttempt)
-                return
+            if (!value.nextAttempt) return
             if (Date.now() < value.nextAttempt) {
                 return
             } else {
@@ -755,8 +754,6 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         if (response.headers.get('Content-Type').includes('windows-1251')) {
             //Почему не UTF-8?
             response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
-        } else {
-            console.warn(getProjectPrefix(project, true), 'Что-то не так с кодирвкой', response.headers.get('Content-Type'))
         }
     }
     response.html = await response.text()
@@ -772,13 +769,13 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
             text = response.doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + response.doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
         } else if (response.doc.querySelector('div.login_blocked_panel') != null) {
             text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
+        } else if (response.html.length < 500) {
+            text = response.html
         } else {
             text = 'null'
         }
         endVote({errorAuthVK: text}, null, project)
         return false
-    } else {
-        
     }
     if (!host.includes(url)) {
         endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
