@@ -347,10 +347,14 @@ async function silentVote(project) {
 //              let later = Date.now() - (86400000 - milliseconds)
                 endVote({later: true}, null, project)
             } else if (response.doc.querySelector('div[class="error"]') != null) {
-                if (response.doc.querySelector('div[class="error"]').textContent.includes("уже голосовали")) {
+                const error = response.doc.querySelector('div[class="error"]').textContent
+                if (error.includes("уже голосовали")) {
                     endVote({later: true}, null, project)
+//              } else if (error.includes('Ваш ВК ID заблокирован для голосовани') || error.includes('Ваш аккаунт заблокирован')) {
+//                  endVote({errorAuthVK: error}, null, project)
+                } else {
+                    endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
                 }
-                endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
             } else {
                 endVote({errorVoteNoElement: true}, null, project)
             }
