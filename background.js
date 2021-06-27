@@ -1310,7 +1310,7 @@ function extractHostname(url) {
 
 chrome.runtime.onInstalled.addListener(async function(details) {
     if (details.reason == 'install') {
-        window.open('options.html?installed')
+        chrome.tabs.create({url: 'options.html?installed'})
     } else if (details.reason == 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) == -1) {
         let storageArea = 'local'
         //Асинхронно достаёт/сохраняет настройки в chrome.storage
