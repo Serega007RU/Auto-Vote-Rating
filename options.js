@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
     await initializeConfig()
 
     await restoreOptions()
-
+    
     if (document.URL.endsWith('?installed')) {
         window.history.replaceState(null, null, 'options.html')
         alert(chrome.i18n.getMessage('firstInstall'))
@@ -62,7 +62,7 @@ async function restoreOptions() {
 //  if (storageArea == 'sync') document.getElementById('enableSyncStorage').checked = true
     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
-    document.getElementById('cooldown').value = settings.cooldown
+    // document.getElementById('cooldown').value = settings.cooldown
     document.getElementById('useMultiVote').checked = settings.useMultiVote
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
@@ -84,17 +84,22 @@ async function restoreOptions() {
 }
 
 //Добавить проект в список проекта
-async function addProjectList(project, projectID) {
+async function addProjectList(project) {
     if (document.getElementById(project.rating + 'Button') == null) {
         generateBtnListRating(project.rating, 0)
     }
-    if (!projectID) {
+    if (!project.key) {
         const projects = db.transaction('projects', 'readwrite').objectStore('projects')
-        projectID = await new Promise((resolve, reject) => {
+        project.key = await new Promise((resolve, reject) => {
             const request = projects.add(project)
             request.onsuccess = function (event) {
                 resolve(event.target.result)
             }
+            request.onerror = reject
+        })
+        await new Promise((resolve, reject) => {
+            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, project.key)
+            request.onsuccess = resolve
             request.onerror = reject
         })
 
@@ -103,11 +108,11 @@ async function addProjectList(project, projectID) {
 
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkOpen(project)
     }
-
+    
     const listProject = document.getElementById(project.rating + 'List')
     if (listProject.childElementCount === 0 && listProject.parentElement.style.display === 'none') return
     const li = document.createElement('li')
-    li.id = projectID
+    li.id = project.key
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon')
     if (!(project.time == null || project.time === '') && Date.now() < project.time) {
@@ -123,39 +128,39 @@ async function addProjectList(project, projectID) {
             }
         }
     }
-
+    
     const div = document.createElement('div')
     div.classList.add('controlItems')
-
+    
     const img1 = document.createElement('img')
     img1.src = 'images/icons/stats.svg'
     div.appendChild(img1)
-
+    
     const img2 = document.createElement('img')
     img2.src = 'images/icons/delete.svg'
     div.appendChild(img2)
-
+    
     const contDiv = document.createElement('div')
     contDiv.classList.add('message')
-
+    
     const nameProjectMes = document.createElement('div')
     nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.rating === 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
     contDiv.append(nameProjectMes)
-
+    
     if (project.error) {
         const div2 = document.createElement('div')
         div2.style = 'color:#da5e5e;'
         div2.append(project.error)
         contDiv.appendChild(div2)
     }
-
+    
     const nextVoteMes = document.createElement('div')
     nextVoteMes.textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
     contDiv.append(nextVoteMes)
-
+    
     li.append(contDiv)
     li.append(div)
-
+    
     listProject.append(li)
     //Слушатель кнопки Удалить на проект
     img2.addEventListener('click', async function() {
@@ -165,22 +170,22 @@ async function addProjectList(project, projectID) {
         } else {
             blockButtons = true
         }
-        await removeProjectList(project, projectID)
+        await removeProjectList(project)
         blockButtons = false
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', function() {
-        updateModalStats(project, projectID)
+        updateModalStats(project)
     })
-    if (document.getElementById('stats').classList.contains('active') && document.getElementById('stats' + projectID) != null) {
-        updateModalStats(project, projectID)
+    if (document.getElementById('stats').classList.contains('active') && document.getElementById('stats' + project.key) != null) {
+        updateModalStats(project)
     }
 }
 
-function updateModalStats(project, projectID) {
+function updateModalStats(project) {
     toggleModal('stats')
     document.querySelector('.statsSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
-    document.querySelector('.statsSubtitle').id = 'stats' + projectID
+    document.querySelector('.statsSubtitle').id = 'stats' + project.key
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
     document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes
     document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.lastMonthSuccessVotes
@@ -459,8 +464,8 @@ async function addProxyList(proxy, visually) {
 }
 
 //Удалить проект из списка проекта
-async function removeProjectList(project, projectID) {
-    const li = document.getElementById(projectID)
+async function removeProjectList(project) {
+    const li = document.getElementById(project.key)
     if (li != null) {
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
         if (count <= 0) {
@@ -479,24 +484,24 @@ async function removeProjectList(project, projectID) {
 
     const projects = db.transaction('projects', 'readwrite').objectStore('projects')
     await new Promise((resolve, reject) => {
-        const request = projects.delete(projectID)
+        const request = projects.delete(project.key)
         request.onsuccess = function (event) {
             resolve(event.target.result)
         }
         request.onerror = reject
     })
 
-    chrome.alarms.clear(String(projectID))
-
+    chrome.alarms.clear(String(project.key))
+    
     if (!chrome.extension.getBackgroundPage()) return
     for (const value of chrome.extension.getBackgroundPage().queueProjects) {
-        if (value.nick === project.nick && value.id === project.id && value.rating === project.rating) {
+        if (value.key === project.key) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
         }
     }
     //Если эта вкладка была уже открыта, он закрывает её
     for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-        if (value.nick === project.nick && value.id === project.id && value.rating === project.rating) {
+        if (value.key === project.key) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
             chrome.tabs.remove(key)
         }
@@ -707,7 +712,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
 //          await setValue('generalStats', generalStats)
 //          await removeValue('AVMRsettings', oldStorageArea)
 //          await removeValue('generalStats', oldStorageArea)
-
+            
 //          if (this.checked) {
 //              createNotif(chrome.i18n.getMessage('settingsSyncCopySuccess'), 'success')
 //          } else {
@@ -841,17 +846,17 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
 })
 
 //Слушатель кнопки "Установить" на кулдауне
-document.getElementById('timeout').addEventListener('submit', async ()=>{
-    event.preventDefault()
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        blockButtons = true
-    }
-    await setCoolDown()
-    blockButtons = false
-})
+// document.getElementById('timeout').addEventListener('submit', async ()=>{
+//     event.preventDefault()
+//     if (blockButtons) {
+//         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+//         return
+//     } else {
+//         blockButtons = true
+//     }
+//     await setCoolDown()
+//     blockButtons = false
+// })
 
 //Слушатель кнопки 'Установить' на blacklist proxy
 document.getElementById('formProxyBlackList').addEventListener('submit', async ()=>{
@@ -1781,7 +1786,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         if (evt.target.files.length === 0) return
         const file = evt.target.files[0]
         const data = await new Response(file).json()
-
+        
         let projects = []
         if (data.projectsTopCraft) {
             createNotif(chrome.i18n.getMessage('oldSettings'))
@@ -1810,11 +1815,11 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         }
 
         if (!await checkPermissions(projects)) return
-
+        
         const projectsts = db.transaction(['projects', 'other'], 'readwrite')
         projectsts.objectStore('projects').clear()
         for (const project of projects) {
-            projectsts.objectStore('projects').add(project)
+            projectsts.objectStore('projects').add(project, project.key)
         }
         projectsts.objectStore('other').put(data.settings, 'settings')
         projectsts.objectStore('other').put(data.generalStats, 'generalStats')
@@ -1822,7 +1827,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
             projectsts.oncomplete = resolve
             projectsts.onerror = reject
         })
-
+        
         settings = data.settings
         generalStats = data.generalStats
         if (chrome.extension.getBackgroundPage()) {
@@ -2524,10 +2529,10 @@ function generateDataList() {
 
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
     if (request.updateProject) {
-        const el = document.getElementById(request.projectID)
+        const el = document.getElementById(request.project.key)
         if (el != null) {
             el.remove()
-            addProjectList(request.project, request.projectID)
+            addProjectList(request.project, request.project.key)
         }
     }
 })
@@ -2687,7 +2692,6 @@ async function createNotif(message, type, delay, element) {
         }
     })
 }
-
 function removeNotif(elem) {
     if (!elem) return
     elem.classList.remove('show')

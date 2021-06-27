@@ -1,9 +1,12 @@
 //Текущие открытые вкладки расширением
-const openedProjects = new Map()
+// noinspection ES6ConvertVarToLetConst
+var openedProjects = new Map()
 //Текущие fetch запросы
-const fetchProjects = new Map()
+// noinspection ES6ConvertVarToLetConst
+var fetchProjects = new Map()
 //Текущие проекты за которые сейчас голосует расширение
-const queueProjects = new Set()
+// noinspection ES6ConvertVarToLetConst
+var queueProjects = new Set()
 
 //Есть ли доступ в интернет?
 let online = true
@@ -56,10 +59,10 @@ async function checkVote() {
     } else {
         return
     }
-
+    
     //Старый метод
 //  const projects = await new Promise(resolve=> db.transaction('projects').objectStore('projects').getAll().onsuccess = event => resolve(event.target.result))
-
+    
 //  for (const project of projects) {
 //      if (project.time == null || project.time < Date.now()) {
 //          await checkOpen(project)
@@ -133,10 +136,12 @@ async function checkOpen(project) {
             return
         }
     }
+
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
         if (project.rating === value.rating || value.randomize && project.randomize) {
-            if (!value.nextAttempt) return
+            if (!value.nextAttempt)
+                return
             if (Date.now() < value.nextAttempt) {
                 return
             } else {
@@ -544,7 +549,7 @@ async function checkOpen(project) {
 
     //Если эта вкладка была уже открыта, он закрывает её
     for (const[key,value] of openedProjects.entries()) {
-        if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
+        if (project.key === value.key) {
             openedProjects.delete(key)
             if (closeTabs) {
                 chrome.tabs.remove(key, function() {
@@ -601,8 +606,8 @@ async function newWindow(project) {
     }
     generalStats.lastAttemptVote = Date.now()
     await updateGeneralStats()
-    const projectID = await updateProject(project)
-
+    await updateProject(project)
+    
     let create = true
     await new Promise(resolve => {
         chrome.alarms.getAll(function(alarms) {
@@ -617,9 +622,9 @@ async function newWindow(project) {
         })
     })
     if (create) {
-        chrome.alarms.create(String(projectID), {when: project.nextAttempt})
+        chrome.alarms.create(String(project.key), {when: project.nextAttempt})
     }
-
+    
     let silentVoteMode = false
     if (project.rating === 'Custom') {
         silentVoteMode = true
@@ -802,7 +807,7 @@ async function silentVote(project) {
                 endVote({later: true}, null, project)
             } else if (response.doc.querySelector('div[class="error"]') != null) {
                 const error = response.doc.querySelector('div[class="error"]').textContent
-                if (error.includes("уже голосовали")) {
+                if (error.includes('уже голосовали')) {
                     endVote({later: true}, null, project)
 //              } else if (error.includes('Ваш ВК ID заблокирован для голосовани') || error.includes('Ваш аккаунт заблокирован')) {
 //                  endVote({errorAuthVK: error}, null, project)
@@ -1206,6 +1211,8 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         if (response.headers.get('Content-Type').includes('windows-1251')) {
             //Почему не UTF-8?
             response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+        } else {
+            console.warn(getProjectPrefix(project, true), 'Что-то не так с кодирвкой', response.headers.get('Content-Type'))
         }
     }
     response.html = await response.text()
@@ -1221,13 +1228,13 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
             text = response.doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + response.doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
         } else if (response.doc.querySelector('div.login_blocked_panel') != null) {
             text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
-        } else if (response.html.length < 500) {
-            text = response.html
         } else {
             text = 'null'
         }
         endVote({errorAuthVK: text}, null, project)
         return false
+    } else {
+        
     }
     if (!host.includes(url)) {
         endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
@@ -1392,7 +1399,7 @@ async function endVote(request, sender, project) {
     } else if (!project) return
 
     for (const[key,value] of fetchProjects.entries()) {
-        if (value.nick === project.nick && value.id === project.id && project.rating === value.rating) {
+        if (value.key === project.key) {
             fetchProjects.delete(key)
         }
     }
@@ -1660,10 +1667,10 @@ async function endVote(request, sender, project) {
 
         generalStats.errorVotes++
     }
-
+    
     await updateGeneralStats()
-    const projectID = await updateProject(project)
-
+    await updateProject(project)
+    
     if (project.time != null && project.time > Date.now()) {
         let create = true
         await new Promise(resolve => {
@@ -1679,13 +1686,13 @@ async function endVote(request, sender, project) {
             })
         })
         if (create) {
-            chrome.alarms.create(String(projectID), {when: project.time})
+            chrome.alarms.create(String(project.key), {when: project.time})
         }
     }
 
     function removeQueue() {
         for (const value of queueProjects) {
-            if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
+            if (project.key === value.key) {
                 queueProjects.delete(value)
             }
         }
@@ -1695,6 +1702,7 @@ async function endVote(request, sender, project) {
             currentProxy = null
             currentVK = null
         }
+        checkVote()
     }
     if (settings.useMultiVote && settings.cooldown < 10000 /*&& (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))*/) {
         removeQueue()
@@ -1805,27 +1813,17 @@ async function updateGeneralStats() {
 }
 
 async function updateProject(project) {
-    const projectID = await getProjectID(project)
-    if (projectID != null) {
+    const found = await new Promise(resolve => db.transaction('projects').objectStore('projects').count(project.key).onsuccess = (event) => resolve(event.target.result))
+    if (found) {
         await new Promise((resolve, reject) => {
-            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, projectID)
+            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, project.key)
             request.onsuccess = resolve
             request.onerror = reject
         })
-        chrome.runtime.sendMessage({updateProject: true, project, projectID})
+        chrome.runtime.sendMessage({updateProject: true, project})
     } else {
         console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
     }
-    return projectID
-}
-
-async function getProjectID(project) {
-    return await new Promise((resolve, reject) => {
-        const index = db.transaction('projects').objectStore('projects').index('rating, id, nick')
-        const request = index.getKey([project.rating, project.id, project.nick])
-        request.onsuccess = event => resolve(event.target.result)
-        request.onerror = reject
-    })
 }
 
 function extractHostname(url) {
@@ -1895,9 +1893,10 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         const oldSettings = await getValue('AVMRsettings')
         if (oldSettings == null) return
         const oldGeneralStats = await getValue('generalStats')
-
+        
         console.log(chrome.i18n.getMessage('oldSettings'))
         const projects = []
+        let key = 0
         for (const item of Object.keys(allProjects)) {
             const list = await getValue('AVMRprojects' + item)
             if (list) {
@@ -1916,6 +1915,8 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                     if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
                     if (project.stats.errorVotes == null) project.stats.errorVotes = 0
                     if (project.stats.laterVotes == null) project.stats.laterVotes = 0
+                    key++
+                    project.key = key
                     projects.push(project)
                 }
             }
@@ -2018,15 +2019,15 @@ logsopenRequest.onsuccess = function() {
 
     console._collect = function (type, args) {
         let time = new Date().toLocaleString().replace(',', '')
-
+        
         if (!type) type = 'log'
-
+        
         if (!args || args.length === 0) return
-
+        
         console['_' + type].apply(console, args)
     
         const logs = logsdb.transaction('logs', 'readwrite').objectStore('logs')
-
+        
         let log = '[' + time + ' ' + type.toUpperCase() + ']:'
     
         for (let arg of args) {
