@@ -61,60 +61,36 @@ async function checkVote() {
     } else {
         return
     }
-    
-    //Старый метод
-//  const projects = await new Promise(resolve=> db.transaction('projects').objectStore('projects').getAll().onsuccess = event => resolve(event.target.result))
-    
-//  for (const project of projects) {
-//      if (project.time == null || project.time < Date.now()) {
-//          await checkOpen(project)
-//      }
-//  }
 
-    // check = true
-    // break1 = false
-    // break2 = false
-
-    const request = db.transaction('projects').objectStore('projects').openCursor()
-    request.onsuccess = function(event) {
-        const cursor = event.target.result
-        if (cursor) {
-            const project = cursor.value
-            if (project.time == null || project.time < Date.now()) {
-                checkOpen(project, cursor.primaryKey)
-            }
-            cursor.continue()
-        } else {
-            check = true
-            break1 = false
-            break2 = false
+    let cursor = await db.transaction('projects').store.openCursor()
+    while (cursor) {
+        const project = cursor.value
+        if (project.time == null || project.time < Date.now()) {
+            checkOpen(project, cursor.key)
         }
+        cursor = await cursor.continue()
     }
+
+    check = true
+    break1 = true
+    break2 = true
 }
 
-chrome.alarms.onAlarm.addListener(function (alarm) {
-    const projectID = Number(alarm.name)
-    db.transaction('projects').objectStore('projects').get(projectID).onsuccess = event => {
-        if (event.target.result) {
-            checkOpen(event.target.result)
-        }
-    }
+chrome.alarms.onAlarm.addListener(async function (alarm) {
+    checkOpen(await db.get('projects', Number(alarm.name)))
 })
 
 async function reloadAllAlarms() {
     await new Promise(resolve => chrome.alarms.clearAll(resolve))
-    const request = db.transaction('projects').objectStore('projects').openCursor()
+    let cursor = await db.transaction('projects').store.openCursor()
     const times = []
-    request.onsuccess = function(event) {
-        const cursor = event.target.result
-        if (cursor) {
-            const project = cursor.value
-            if (project.time != null && project.time > Date.now() && times.indexOf(project.time) === -1) {
-                chrome.alarms.create(String(cursor.primaryKey), {when: project.time})
-                times.push(project.time)
-            }
-            cursor.continue()
+    while (cursor) {
+        const project = cursor.value
+        if (project.time != null && project.time > Date.now() && times.indexOf(project.time) === -1) {
+            chrome.alarms.create(String(cursor.key), {when: project.time})
+            times.push(project.time)
         }
+        cursor = await cursor.continue()
     }
 }
 
@@ -142,8 +118,7 @@ async function checkOpen(project) {
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
         if (project.rating === value.rating || value.randomize && project.randomize) {
-            if (!value.nextAttempt)
-                return
+            if (!value.nextAttempt) return
             if (Date.now() < value.nextAttempt) {
                 return
             } else {
@@ -623,14 +598,14 @@ async function newWindow(project) {
         generalStats.monthSuccessVotes = 0
     }
     generalStats.lastAttemptVote = Date.now()
-    await updateGeneralStats()
+    await db.put('other', generalStats, 'generalStats')
     await updateProject(project)
     
     let create = true
     await new Promise(resolve => {
         chrome.alarms.getAll(function(alarms) {
             for (const alarm of alarms) {
-                if (alarm.scheduledTime === project.time) {
+                if (alarm.scheduledTime === project.nextAttempt) {
                     create = false
                     resolve()
                     break
@@ -1229,8 +1204,6 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         if (response.headers.get('Content-Type').includes('windows-1251')) {
             //Почему не UTF-8?
             response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
-        } else {
-            console.warn(getProjectPrefix(project, true), 'Что-то не так с кодирвкой', response.headers.get('Content-Type'))
         }
     }
     response.html = await response.text()
@@ -1246,13 +1219,13 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
             text = response.doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + response.doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
         } else if (response.doc.querySelector('div.login_blocked_panel') != null) {
             text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
+        } else if (response.html.length < 500) {
+            text = response.html
         } else {
             text = 'null'
         }
         endVote({errorAuthVK: text}, null, project)
         return false
-    } else {
-        
     }
     if (!host.includes(url)) {
         endVote({message: chrome.i18n.getMessage('errorRedirected', response.url)}, null, project)
@@ -1707,9 +1680,10 @@ async function endVote(request, sender, project) {
         generalStats.errorVotes++
     }
     
-    await updateGeneralStats()
+    await db.put('other', generalStats, 'generalStats')
     await updateProject(project)
-    
+
+    chrome.alarms.clear(String(project.key))
     if (project.time != null && project.time > Date.now()) {
         let create = true
         await new Promise(resolve => {
@@ -1844,21 +1818,10 @@ async function wait(ms) {
     })
 }
 
-async function updateGeneralStats() {
-    await new Promise(resolve => {
-        const request = db.transaction('other', 'readwrite').objectStore('other').put(generalStats, 'generalStats')
-        request.onsuccess = resolve
-    })
-}
-
 async function updateProject(project) {
-    const found = await new Promise(resolve => db.transaction('projects').objectStore('projects').count(project.key).onsuccess = (event) => resolve(event.target.result))
+    const found = await db.count('projects', project.key)
     if (found) {
-        await new Promise((resolve, reject) => {
-            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, project.key)
-            request.onsuccess = resolve
-            request.onerror = reject
-        })
+        db.put('projects', project, project.key)
         chrome.runtime.sendMessage({updateProject: true, project})
     } else {
         console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
@@ -2086,13 +2049,17 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                 }, 1000)
             })
         }
-        const projectsts = db.transaction(['projects', 'other'], 'readwrite')
-        projectsts.objectStore('projects').clear()
+        await db.clear('projects')
+        const tx = db.transaction(['projects', 'other'], 'readwrite')
         for (const project of projects) {
-            projectsts.objectStore('projects').add(project)
+            tx.objectStore('projects').add(project, project.key)
         }
-        projectsts.objectStore('other').put(oldSettings, 'settings')
-        projectsts.objectStore('other').put(oldGeneralStats, 'generalStats')
+        tx.objectStore('other').put(oldSettings, 'settings')
+        tx.objectStore('other').put(oldGeneralStats, 'generalStats')
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = (event) => resolve(event.target.result)
+            tx.onerror = (event) => reject(event.target.error)
+        })
         for (const item of Object.keys(allProjects)) {
             await removeValue('AVMRprojects' + item)
         }
@@ -2168,9 +2135,8 @@ logsopenRequest.onerror = function() {
 }
 logsopenRequest.onsuccess = function() {
     logsdb = logsopenRequest.result
-    logsdb.onerror = function(event) {
-        const request = event.target // запрос, в котором произошла ошибка
-        console._error(chrome.i18n.getMessage('errordb', ['logs', request.error]), )
+    logsdb.onerror = event => {
+        console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), )
     }
 
     console._collect = function (type, args) {

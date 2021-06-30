@@ -4,6 +4,7 @@
 	"author": "Serega007",
 	"background": {
 		"scripts": [
+			"idb-min.js",
 		    "main.js",
 			"background.js",
 			"scripts/minecraftiplist.js"

@@ -689,103 +689,88 @@ let db
 
 //Инициализация настроек расширения
 async function initializeConfig(background) {
-    const openRequest = indexedDB.open('avr', 2)
-    openRequest.onupgradeneeded = function(event) {
-        if (event.oldVersion === 0) {
-            const ratings = openRequest.result.createObjectStore('projects', {autoIncrement: true})
-            ratings.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
-            ratings.createIndex('rating, id', ['rating', 'id'])
-            ratings.createIndex('rating', 'rating')
-            const vks = openRequest.result.createObjectStore('vks', {autoIncrement: true})
-            vks.createIndex('id', 'id')
-            const proxies = openRequest.result.createObjectStore('proxies', {autoIncrement: true})
-            proxies.createIndex('ip, port', ['ip', 'port'])
-            const borealis = openRequest.result.createObjectStore('borealis', {autoIncrement: true})
-            borealis.createIndex('nick', 'nick')
-            openRequest.result.createObjectStore('other')
-            const other = openRequest.transaction.objectStore('other')
-            settings = {
-                disabledNotifStart: true,
-                disabledNotifInfo: false,
-                disabledNotifWarn: false,
-                disabledNotifError: false,
-                enabledSilentVote: true,
-                disabledCheckTime: false,
-                disabledCheckInternet: false,
-                enableCustom: false,
-                proxyBlackList: ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"],
-                stopVote: 0,
-                autoAuthVK: false,
-                clearVKCookies: true,
-                clearBorealisCookies: true,
-                repeatAttemptLater: true,
-                saveVKCredentials: false,
-                saveBorealisCredentials: false,
-                useMultiVote: true,
-                useProxyOnUnProxyTop: false
+    // noinspection JSUnusedGlobalSymbols
+    db = await idb.openDB('avr', 1, {
+        upgrade(db, oldVersion/*, newVersion, transaction*/) {
+            if (oldVersion === 0) {
+                const projects = db.createObjectStore('projects', {autoIncrement: true})
+                projects.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
+                projects.createIndex('rating, id', ['rating', 'id'])
+                projects.createIndex('rating', 'rating')
+                const vks = db.createObjectStore('vks', {autoIncrement: true})
+                vks.createIndex('id', 'id')
+                const proxies = db.createObjectStore('proxies', {autoIncrement: true})
+                proxies.createIndex('ip, port', ['ip', 'port'])
+                const borealis = db.createObjectStore('borealis', {autoIncrement: true})
+                borealis.createIndex('nick', 'nick')
+                const other = db.createObjectStore('other')
+                // const other = transaction.objectStore('other')
+                settings = {
+                    disabledNotifStart: true,
+                    disabledNotifInfo: false,
+                    disabledNotifWarn: false,
+                    disabledNotifError: false,
+                    enabledSilentVote: true,
+                    disabledCheckTime: false,
+                    disabledCheckInternet: false,
+                    enableCustom: false,
+                    proxyBlackList: ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"],
+                    stopVote: 0,
+                    autoAuthVK: false,
+                    clearVKCookies: true,
+                    clearBorealisCookies: true,
+                    repeatAttemptLater: true,
+                    saveVKCredentials: false,
+                    saveBorealisCredentials: false,
+                    useMultiVote: true,
+                    useProxyOnUnProxyTop: false
+                }
+                other.add(settings, 'settings')
+                generalStats = {
+                    successVotes: 0,
+                    monthSuccessVotes: 0,
+                    lastMonthSuccessVotes: 0,
+                    errorVotes: 0,
+                    laterVotes: 0,
+                    lastSuccessVote: null,
+                    lastAttemptVote: null,
+                    added: Date.now()
+                }
+                other.add(generalStats, 'generalStats')
+            } else if (oldVersion === 1) {
+                const other = db.objectStore('other')
+                other.get('settings').onsuccess = (event)=> {
+                    const settings = event.target.result
+                    settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
+                    settings.stopVote = 0
+                    settings.autoAuthVK = false
+                    settings.clearVKCookies = true
+                    settings.clearBorealisCookies = true
+                    settings.repeatAttemptLater = true
+                    settings.saveVKCredentials = false
+                    settings.saveBorealisCredentials = false
+                    settings.useMultiVote = true
+                    settings.useProxyOnUnProxyTop = false
+                    other.put(settings, 'settings')
+                }
+                const vks = db.createObjectStore('vks', {autoIncrement: true})
+                vks.createIndex('id', 'id')
+                const proxies = db.createObjectStore('proxies', {autoIncrement: true})
+                proxies.createIndex('ip, port', ['ip', 'port'])
+                const borealis = db.createObjectStore('borealis', {autoIncrement: true})
+                borealis.createIndex('nick', 'nick')
             }
-            other.add(settings, 'settings')
-            generalStats = {
-                successVotes: 0,
-                monthSuccessVotes: 0,
-                lastMonthSuccessVotes: 0,
-                errorVotes: 0,
-                laterVotes: 0,
-                lastSuccessVote: null,
-                lastAttemptVote: null,
-                added: Date.now()
-            }
-            other.add(generalStats, 'generalStats')
-        } else if (event.oldVersion === 1) {
-            const other = openRequest.transaction.objectStore('other')
-            other.get('settings').onsuccess = (event)=> {
-                const settings = event.target.result
-                settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
-                settings.stopVote = 0
-                settings.autoAuthVK = false
-                settings.clearVKCookies = true
-                settings.clearBorealisCookies = true
-                settings.repeatAttemptLater = true
-                settings.saveVKCredentials = false
-                settings.saveBorealisCredentials = false
-                settings.useMultiVote = true
-                settings.useProxyOnUnProxyTop = false
-                other.put(settings, 'settings')
-            }
-            const vks = openRequest.result.createObjectStore('vks', {autoIncrement: true})
-            vks.createIndex('id', 'id')
-            const proxies = openRequest.result.createObjectStore('proxies', {autoIncrement: true})
-            proxies.createIndex('ip, port', ['ip', 'port'])
-            const borealis = openRequest.result.createObjectStore('borealis', {autoIncrement: true})
-            borealis.createIndex('nick', 'nick')
-        }
-    }
-    db = await new Promise((resolve, reject) => {
-        openRequest.onerror = function() {
-            reject(openRequest.error)
-        }
-        openRequest.onsuccess = function() {
-            resolve(openRequest.result)
         }
     })
-    db.onerror = function(event) {
+    db.onerror = event => {
         if (background) {
-            console.error(chrome.i18n.getMessage('errordb', ['avr', event.target.error]))
+            console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
         } else {
-            createNotif(chrome.i18n.getMessage('errordb', ['avr', event.target.error]), 'error')
+            createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
         }
     }
-    await new Promise(resolve => {
-        const transaction = db.transaction('other')
-        transaction.objectStore('other').get('settings').onsuccess = function(event) {
-            settings = event.target.result
-        }
-        transaction.objectStore('other').get('generalStats').onsuccess = function(event) {
-            generalStats = event.target.result
-        }
-        transaction.oncomplete = resolve
-    })
-
+    settings = await db.get('other', 'settings')
+    generalStats = await db.get('other', 'generalStats')
 
     if (!background) return
 
