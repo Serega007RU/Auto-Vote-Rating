@@ -985,7 +985,8 @@ document.getElementById('file-download').addEventListener('click', async ()=>{
     generalStats = await db.get('other', 'generalStats')
     const allSetting = {
         settings,
-        generalStats
+        generalStats,
+        version: db.version
     }
     allSetting.projects = await db.getAll('projects')
     const text = JSON.stringify(allSetting, null, '\t')
