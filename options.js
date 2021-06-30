@@ -62,7 +62,12 @@ async function addProjectList(project) {
         generateBtnListRating(project.rating, 0)
     }
     if (!project.key) {
-        project.key = await db.put('projects', project)
+        const found = await db.getKeyFromIndex('projects', 'rating, id, nick', [project.rating, project.id, project.nick])
+        if (found == null) {
+            project.key = await db.put('projects', project)
+        } else {
+            project.key = found
+        }
         await db.put('projects', project, project.key)
 
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent)
@@ -1086,7 +1091,12 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
 
         await db.clear('projects')
         const tx = db.transaction(['projects', 'other'], 'readwrite')
+        let key = 0
         for (const project of projects) {
+            if (project.key == null) {
+                key++
+                project.key = key
+            }
             await tx.objectStore('projects').add(project, project.key)
         }
         await tx.objectStore('other').put(data.settings, 'settings')
