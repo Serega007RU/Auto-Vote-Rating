@@ -339,12 +339,12 @@ async function addProjectList(project) {
     contDiv.classList.add('message')
     
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.rating === 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
+    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
     contDiv.append(nameProjectMes)
     
     if (project.error) {
         const div2 = document.createElement('div')
-        div2.style = 'color:#da5e5e;'
+        div2.style.color = '#da5e5e'
         div2.append(project.error)
         contDiv.appendChild(div2)
     }
@@ -413,8 +413,8 @@ function generateBtnListRating(rating, count) {
 //  ul.append(div)
     if (!(rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
         const label = document.createElement('label')
-        label.setAttribute('data-resource', 'notAvaibledInSilent')
-        label.textContent = chrome.i18n.getMessage('notAvaibledInSilent')
+        label.setAttribute('data-resource', 'notAvailableInSilent')
+        label.textContent = chrome.i18n.getMessage('notAvailableInSilent')
         const span = document.createElement('span')
         span.classList.add('tooltip2')
         const span2 = document.createElement('span')
@@ -667,7 +667,7 @@ async function removeProjectList(project) {
             }
         } else {
             li.remove()
-            document.querySelector('#' + project.rating + 'Button > span').textContent = count
+            document.querySelector('#' + project.rating + 'Button > span').textContent = String(count)
         }
     } else {
         return
@@ -692,7 +692,7 @@ async function removeProjectList(project) {
     }
     //Если в этот момент прокси использовался
     if (settings.useMultiVote && chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
-        if (chrome.extension.getBackgroundPage().queueProjects === 0) {
+        if (chrome.extension.getBackgroundPage().queueProjects.size === 0) {
             //Прекращаем использование прокси
             await clearProxy()
         }
@@ -726,7 +726,7 @@ async function removeBorealisList(acc) {
 }
 
 async function removeProxyList(proxy) {
-    let li = document.getElementById(proxy.ip + '_' + proxy.port)
+    let li = document.getElementById(proxy.key)
     if (li != null) {
         const count = Number(document.querySelector('#ProxyButton > span').textContent) - 1
         li.remove()
@@ -936,7 +936,7 @@ async function addVK(repair, imp) {
 
             await new Promise(resolve => {
                 chrome.tabs.query({url: '*://*.vk.com/*'}, function(tabs) {
-                    for (tab of tabs) {
+                    for (const tab of tabs) {
                         chrome.tabs.remove(tab.id)
                     }
                     resolve()
@@ -1082,7 +1082,7 @@ async function addVK(repair, imp) {
 }
 
 //Слушатель кнопки 'Добавить' на MultiVote Borealis
-document.getElementById('AddBorealis').addEventListener('click', async () => {
+document.getElementById('AddBorealis').addEventListener('click', async (event) => {
     event.preventDefault()
     if (blockButtons) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
@@ -1102,7 +1102,7 @@ async function addBorealis(repair, imp) {
 
             await new Promise(resolve => {
                 chrome.tabs.query({url: '*://*.borealis.su/*'}, function(tabs) {
-                    for (tab of tabs) {
+                    for (const tab of tabs) {
                         chrome.tabs.remove(tab.id)
                     }
                     resolve()
@@ -1305,7 +1305,7 @@ async function checkAuthVK(VK) {
                 needReturn = true
             }
         } else if (response2.status !== 0) {
-            createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error')
+            createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response2.url)) + response2.status, 'error')
             needReturn = true
         }
 
@@ -1382,11 +1382,9 @@ document.getElementById('deleteNotWorkingProxies').addEventListener('click', asy
         blockButtons = true
     }
     createNotif(chrome.i18n.getMessage('deletingNotWorkingProxies'))
-    let proxiesCopy = [...proxies]
-    for (let prox of proxiesCopy) {
-        if (prox.notWorking) {
-            await removeProxyList(prox, false)
-        }
+    let cursor = await db.transaction('proxies').store.openCursor()
+    while (cursor) {
+        if (cursor.value.notWorking) await removeProxyList(cursor.value)
     }
     createNotif(chrome.i18n.getMessage('deletedNotWorkingProxies'), 'success')
     blockButtons = false
@@ -1630,9 +1628,9 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
             let response
             if (i === 1) {
                 response = await fetch('https://assets.windscribe.com/serverlist/openvpn/0/ef53494bc440751713a7ad93e939aa190cee7458')
-            } else if (false) {//Для Pro аккаунта
+            }/* else if (false) {//Для Pro аккаунта
                 response = await fetch('https://assets.windscribe.com/serverlist/openvpn/1/ef53494bc440751713a7ad93e939aa190cee7458')
-            }
+            }*/
             if (!response.ok) {
                 createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
                 blockButtons = false
@@ -1868,32 +1866,32 @@ async function addProxy(proxy, dontNotif) {
     if (!dontNotif) createNotif(chrome.i18n.getMessage('addSuccess'), 'success')
 }
 
-async function checkProxy(proxy, scheme) {
-    var config = {
-        mode: 'fixed_servers',
-        rules: {
-            singleProxy: {
-                scheme: scheme,
-                host: proxy.ip,
-                port: proxy.port
-            }
-        }
-    }
-    await new Promise(resolve => {
-        chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
-            resolve()
-        })
-    })
-    let error = false
-    try {
-        let response = await fetch('http://example.com/')
-        error = !response.ok
-    } catch (e) {
-        error = true
-    }
-    await clearProxy()
-    return error
-}
+// async function checkProxy(proxy, scheme) {
+//     var config = {
+//         mode: 'fixed_servers',
+//         rules: {
+//             singleProxy: {
+//                 scheme: scheme,
+//                 host: proxy.ip,
+//                 port: proxy.port
+//             }
+//         }
+//     }
+//     await new Promise(resolve => {
+//         chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
+//             resolve()
+//         })
+//     })
+//     let error = false
+//     try {
+//         let response = await fetch('http://example.com/')
+//         error = !response.ok
+//     } catch (e) {
+//         error = true
+//     }
+//     await clearProxy()
+//     return error
+// }
 
 //Слушатель дополнительных настроек
 for (const check of document.querySelectorAll('input[name=checkbox]')) {
@@ -1930,7 +1928,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             }
             _return = true
         } else if (this.id === 'priority') {
-            if (this.checked && !confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
+            if (this.checked && !confirm(chrome.i18n.getMessage('confirmPriority'))) {
                 this.checked = false
             }
             _return = true
@@ -1960,13 +1958,13 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             _return = true
         } else if (this.id === 'lastDayMonth' || this.id === 'randomize') {
             _return = true
-        } else if (this.id === 'sheldTimeCheckbox') {
+        } else if (this.id === 'scheduleTimeCheckbox') {
             if (this.checked) {
                 document.getElementById('label9').removeAttribute('style')
-                document.getElementById('sheldTime').required = true
+                document.getElementById('scheduleTime').required = true
             } else {
                 document.getElementById('label9').style.display = 'none'
-                document.getElementById('sheldTime').required = false
+                document.getElementById('scheduleTime').required = false
             }
             _return = true
 //      } else if (this.id == 'enableSyncStorage') {
@@ -2071,7 +2069,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
 }
 
 //Слушатель кнопки "Добавить"
-document.getElementById('addProject').addEventListener('submit', async()=>{
+document.getElementById('addProject').addEventListener('submit', async(event)=>{
     event.preventDefault()
     if (blockButtons) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
@@ -2109,8 +2107,8 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
         lastAttemptVote: null,
         added: Date.now()
     }
-    if (document.getElementById('sheldTimeCheckbox').checked && document.getElementById('sheldTime').value !== '') {
-        project.time = new Date(document.getElementById('sheldTime').value).getTime()
+    if (document.getElementById('scheduleTimeCheckbox').checked && document.getElementById('scheduleTime').value !== '') {
+        project.time = new Date(document.getElementById('scheduleTime').value).getTime()
     } else {
         project.time = null
     }
@@ -2127,7 +2125,11 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
         project.lastDayMonth = true
     }
     if (project.rating !== 'Custom' && document.getElementById('voteMode').checked) {
-        project[document.getElementById('voteModeSelect').value] = true
+        if (document.getElementById('voteModeSelect').value === 'silentMode') {
+            project.silentMode = true
+        } else if (document.getElementById('voteModeSelect').value === 'emulateMode') {
+            project.emulateMode = true
+        }
     }
     if (document.getElementById('priority').checked) {
         project.priority = true
@@ -2214,7 +2216,7 @@ document.getElementById('formProxyBlackList').addEventListener('submit', async (
 })
 
 //Слушатель кнопки 'Отправить' на Borealis
-document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
+document.getElementById('sendBorealis').addEventListener('submit', async (event)=>{
     event.preventDefault()
     if (blockButtons) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
@@ -2868,11 +2870,11 @@ function createMessage(text, level) {
     const span = document.createElement('span')
     if (level) {
         if (level === 'success') {
-            span.style = 'color:#4CAF50;'
+            span.style.color = '#4CAF50'
         } else if (level === 'error') {
-            span.style = 'color:#da5e5e;'
+            span.style.color = '#da5e5e'
         } else if (level === 'warn') {
-            span.style = 'color:#f1af4c;'
+            span.style.color = '#f1af4c'
         }
     }
     span.textContent = text
@@ -3343,10 +3345,10 @@ async function openPopup(url, onClose, code) {
         })
     })
     if (code) {
-        function onUpdated(tabId, changeInfo, tab) {
+        function onUpdated(tabId, changeInfo/*, tab*/) {
             if (tabID === tabId) {
                 if (changeInfo.status && changeInfo.status === 'complete') {
-                    chrome.tabs.executeScript(tabID, {code}, function(result) {
+                    chrome.tabs.executeScript(tabID, {code}, function() {
                         if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
                     })
                 }
@@ -3443,23 +3445,15 @@ async function listSelect(event, tabs) {
 
 //Слушатели кнопок списка доавленных проектов
 if (document.getElementById('CustomButton')) {
-    document.getElementById('CustomButton').addEventListener('click', ()=> {
+    document.getElementById('CustomButton').addEventListener('click', (event)=> {
         listSelect(event, 'CustomTab')
     })
 }
 
-document.getElementById('VKButton').addEventListener('click', function() {
-    listSelect(event, 'vks')
-})
-document.getElementById('ProxyButton').addEventListener('click', function() {
-    listSelect(event, 'proxies')
-})
-// document.getElementById('IonMcButton').addEventListener('click', function() {
-//     listSelect(event, 'IonMcTab')
-// })
-document.getElementById('BorealisButton').addEventListener('click', function() {
-    listSelect(event, 'borealis')
-})
+document.getElementById('VKButton').addEventListener('click', event => listSelect(event, 'vks'))
+document.getElementById('ProxyButton').addEventListener('click', event => listSelect(event, 'proxies'))
+// document.getElementById('IonMcButton').addEventListener('click', event => listSelect(event, 'ionmc'))
+document.getElementById('BorealisButton').addEventListener('click',event => listSelect(event, 'borealis'))
 
 //Слушатель закрытия модалки статистики и её сброс
 document.querySelector('#stats .close').addEventListener('click', resetModalStats)

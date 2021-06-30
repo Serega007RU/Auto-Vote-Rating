@@ -691,7 +691,7 @@ let db
 async function initializeConfig(background) {
     // noinspection JSUnusedGlobalSymbols
     db = await idb.openDB('avr', 2, {
-        upgrade(db, oldVersion/*, newVersion, transaction*/) {
+        upgrade(db, oldVersion, newVersion, transaction) {
             if (oldVersion === 0) {
                 const projects = db.createObjectStore('projects', {autoIncrement: true})
                 projects.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
@@ -738,7 +738,7 @@ async function initializeConfig(background) {
                 }
                 other.add(generalStats, 'generalStats')
             } else if (oldVersion === 1) {
-                const other = db.objectStore('other')
+                const other = transaction.objectStore('other')
                 other.get('settings').onsuccess = (event)=> {
                     const settings = event.target.result
                     settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]

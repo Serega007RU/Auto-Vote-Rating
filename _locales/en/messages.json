@@ -102,7 +102,7 @@
     "description": "Tooltip. Disable check when adding a project"
   },
   "priority": {
-    "message": "Add in priority",
+    "message": "Add to priority",
     "description": "Checkbox. Priority"
   },
   "priorityTooltip": {
@@ -114,7 +114,7 @@
     "description": "Label. Voting mode"
   },
   "enabledSilentVoteTooltip": {
-    "message": "Quiet Mode (Recommended) - Vote for projects entirely in the background without opening any tabs. Emulation mode - emulates a real user, opens a tab and clicks on the voting button, it is best to leave at least one open tab in the browser in this mode, otherwise the browser window will be open on top of other windows and may cause inconvenience.",
+    "message": "Quiet Mode (Recommended) - Vote for projects entirely in the background without opening any tabs. Emulation mode - emulates a real user, opens a tab and clicks on the voting button, it's better to leave at least one open tab in the browser, otherwise the browser will be open on top of other windows and may cause inconvenience.",
     "description": "Tooltip. Silent vote"
   },
   "enabledSilentVoteSilent": {
@@ -160,7 +160,7 @@
     "message": "You haven't added any projects to this voting page yet!",
     "description": "Notification. You haven't added any projects"
   },
-  "notAvaibledInSilent": {
+  "notAvailableInSilent": {
     "message": "This is not available in silent mode by default!",
     "description": "Notification. available in silent voting mode"
   },
@@ -195,7 +195,7 @@
   "confirmDisableCheckProjects": {
     "message": "Are you sure you want to disable verification when adding a project? If you make an error when adding a project, voting might fail"
   },
-  "confirmPrioriry": {
+  "confirmPriority": {
     "message": "Are you sure you want to give priority to this project? When you enable priority, if you don't have precise time set this may lead to late voting. Set the precise time (accurate to seconds) and don't change it for correct voting process"
   },
   "deleteButton": {
@@ -434,7 +434,7 @@
     "message": "You have already voted"
   },
   "errorOpenTab": {
-    "message": "Error occured while opening the tab: "
+    "message": "Error occurred while opening the tab: "
   },
   "errorAuthVK": {
     "message": "Error with the VK account! $error$",
@@ -652,7 +652,7 @@
     "message": "Unable to determine the type of proxy, this proxy is probably dead."
   },
   "authSteam": {
-    "message": "Requires auth Steam"
+    "message": "Requires Steam auth"
   },
   "privacyPass": {
     "message": "Install the "
@@ -759,7 +759,7 @@
     "message": "There is a vote going on right now..."
   },
   "timeout": {
-    "message": "Vote expecting time has expired, restarting the voted"
+    "message": "Vote expecting time has expired, restarting the vote"
   },
   "repeatAttemptLater": {
     "message": "Ignore the 'You have already voted' error at least 15 times"
@@ -906,17 +906,17 @@
   "notAcceptAuth": {
     "message": "click to log in. If you are not going to vote on the listed ratings then just ignore this message"
   },
-  "sheldTime": {
+  "scheduleTime": {
     "message": "Schedule a vote"
   },
   "discordLogIn": {
-    "message": "You must be logged in to upvote bots!"
+    "message": "You must be logged in to upvote discord bots!"
   },
   "auth": {
     "message": "Only registered users can vote on this rating. Please log in or register."
   },
   "emptySite": {
-    "message": "It seems that this rating gave out an empty page, try to go to the site of this rating and then try again to add"
+    "message": "It seems that this rating responded with an empty page, try to visit this page and then try adding again"
   },
   "ordinalWorld": {
     "message": "World count number"

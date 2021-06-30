@@ -130,12 +130,12 @@ async function checkOpen(project) {
         if (settings.useMultiVote && !settings.useProxyOnUnProxyTop) {
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
             if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') {
-                if (!value.rating === 'TopCraft' && !value.rating === 'McTOP' && !value.rating === 'MinecraftRating') {
+                if (value.rating !== 'TopCraft' && value.rating !== 'McTOP' && value.rating !== 'MinecraftRating') {
                     return
                 }
             }
             if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MinecraftRating') {
-                if (!project.rating === 'TopCraft' && !project.rating === 'McTOP' && !project.rating === 'MinecraftRating') {
+                if (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating') {
                     //Если безпроксиевый рейтинг закончил голосование, позволяет проксиевым начать голосовать ради экономии времени
                     if (value.time > Date.now()) {
                         continue
@@ -612,7 +612,7 @@ async function newWindow(project) {
     } else if (project.silentMode && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
         silentVoteMode = true
     }
-    if (debug) console.log('[' + getProjectName(project) + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (silentVoteMode ? ' Начинаю Fetch запрос' : ' Открываю вкладку'))
+    if (debug) console.log('[' + project.rating + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (silentVoteMode ? ' Начинаю Fetch запрос' : ' Открываю вкладку'))
     if (silentVoteMode) {
         silentVote(project)
     } else {
@@ -1526,7 +1526,7 @@ async function endVote(request, sender, project) {
                 }
             }
 
-            if (currentProxy != null && (settings.useProxyOnUnProxyTop || (!project.rating === 'TopCraft' && !project.rating === 'McTOP' && !project.rating === 'MinecraftRating')) /*&& proxies.findIndex(function(element) { return element.ip === currentProxy.ip && element.port === currentProxy.port}) !== -1*/) {
+            if (currentProxy != null && (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) /*&& proxies.findIndex(function(element) { return element.ip === currentProxy.ip && element.port === currentProxy.port}) !== -1*/) {
                 let usedProject = {
                     id: project.id,
                     nextFreeVote: time
@@ -1676,7 +1676,7 @@ async function endVote(request, sender, project) {
         }
         checkVote()
     }
-    if (settings.useMultiVote && settings.cooldown < 10000 /*&& (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))*/) {
+    if (settings.useMultiVote /*&& (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))*/) {
         removeQueue()
     } else {
         setTimeout(()=>{
@@ -2024,11 +2024,11 @@ chrome.runtime.onInstalled.addListener(async function(details) {
 })
 
 function getTopFromList(list, project) {
-    if (typeof list[getProjectName(project)] === 'string') {
+    if (typeof list[project.rating] === 'string') {
         return [{id: project.id, nextFreeVote: Number.POSITIVE_INFINITY}]
     }
-    if (!list[getProjectName(project)]) list[getProjectName(project)] = []
-    return list[getProjectName(project)]
+    if (!list[project.rating]) list[project.rating] = []
+    return list[project.rating]
 }
 
 function Version(s){

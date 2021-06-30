@@ -9,7 +9,7 @@ body {
 }
  
 body * {
-	font-family: Roboto;
+	font-family: Roboto, serif;
 }
 
 /* Навигация */
@@ -62,9 +62,8 @@ nav .logo div {
 }
 
 nav .logo img {
-	margin: 0 auto;
-	margin-bottom: 10px;
-    width: 90%;
+	margin: 0 auto 10px;
+	width: 90%;
     display: block;
 }
 
@@ -146,7 +145,7 @@ nav .logo img {
     }
 
     nav.active {
-    	left: 0px;
+    	left: 0;
     }
 
     nav .logo {
@@ -161,9 +160,8 @@ nav .logo img {
 
     nav .logo img {
     	width: 50px;
-    	margin: auto 0;
-    	margin-right: 10px;
-    }
+		margin: auto 10px auto 0;
+	}
 
     .burger,
     nav div.navigation > button > div {
@@ -253,8 +251,8 @@ h4,.h4 {
 }
 
 .changes-entry ul,ol {
-    margin: 0.8rem 0px .8rem 0.8rem;
-    padding: 0px;
+    margin: 0.8rem 0 .8rem 0.8rem;
+    padding: 0;
 }
 small {
     font-size: 80%;
@@ -480,8 +478,7 @@ ul {
 
 /* Тело */
 .container {
-	margin: auto;
-	margin-top: 60px;
+	margin: 60px auto auto;
 	width: 1000px;
 	background: #1b1b1e;
 	border-radius: 10px;
@@ -615,7 +612,7 @@ ul {
 	margin-top: 15px;
 	margin-bottom: 20px;
 	font-weight: 600;
-	font-size: 18;
+	font-size: 18px;
 }
 
 .aboutProject .cont .text {
@@ -788,8 +785,7 @@ ul {
 	}
 
 	#vksTab .inputEl > * {
-		margin: auto;
-		margin-bottom: 20px;
+		margin: auto auto 20px;
 	}
 
 	#formProxyBlackList .inputEl {
@@ -868,7 +864,7 @@ ul {
 	margin: 10px 0;
 }
 
-[data-resource="notAvaibledInSilent"] {
+[data-resource="notAvailableInSilent"] {
 	position: relative;
 	display: block;
 	text-align: center;
@@ -1008,8 +1004,8 @@ ul {
 	font-size: initial !important;
 }
 
-[data-resource="notAvaibledInSilent"] .tooltip1,
-[data-resource="notAvaibledInSilent"] .tooltip2,
+[data-resource="notAvailableInSilent"] .tooltip1,
+[data-resource="notAvailableInSilent"] .tooltip2,
 .input-block .tooltip1,
 .input-block .tooltip2,
 .label-block .tooltip2,
@@ -1125,8 +1121,7 @@ ul {
 	line-height: 1.2;
     display: inline-block;
 	position: relative;
-	padding: 4px 0;
-	padding-left: 35px;
+	padding: 4px 0 4px 35px;
 	font-size: 15px;
 	color: #ddd;
 	cursor: pointer;
@@ -1226,12 +1221,10 @@ input.checkbox:disabled + label {
 	font-size: 15px;
 	display: block;
 	padding: 3px 10px;
-	border-radius: 5px;
 	outline: none !important;
 	border: none !important;
 	background: #2a2a2f;
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0;
+	border-radius: 5px 5px 0 0;
 	border-bottom: solid 2px #1a7bee !important;
 }
 
@@ -1291,7 +1284,7 @@ input.checkbox:disabled + label {
     cursor: pointer;
     pointer-events: auto;
     right: 0;
-    transition: .5s;
+    /*transition: .5s;*/
     transition: .3s box-shadow;
     margin: 10px 10px 0 10px;
     display: flex;
@@ -1305,9 +1298,9 @@ input.checkbox:disabled + label {
 }
 
 #notifBlock > .notif:hover {
-	-webkit-box-shadow: 0px 0px 7px 2px rgba(255, 255, 255, 0.5);
-	-moz-box-shadow: 0px 0px 7px 2px rgba(255, 255, 255, 0.5);
-	box-shadow: 0px 0px 7px 2px rgba(255, 255, 255, 0.5);
+	-webkit-box-shadow: 0 0 7px 2px rgba(255, 255, 255, 0.5);
+	-moz-box-shadow: 0 0 7px 2px rgba(255, 255, 255, 0.5);
+	box-shadow: 0 0 7px 2px rgba(255, 255, 255, 0.5);
 }
 
 @media(max-width: 330px) {
@@ -1411,7 +1404,7 @@ input.checkbox:disabled + label {
 
 @keyframes notif-progress {   
     0% {
-        width: 0%;
+        width: 0;
     }
     100% {
         width: 100%;
@@ -1442,10 +1435,10 @@ input.checkbox:disabled + label {
 
 /* Скроллер */
 ::-webkit-scrollbar-button {
-	background-image: url('');
+	/*background-image: url('');*/
 	background-repeat: no-repeat;
 	width: 5px;
-	height: 0px;
+	height: 0;
 }
 
 ::-webkit-scrollbar-track {
@@ -1454,9 +1447,9 @@ input.checkbox:disabled + label {
 }
 
 ::-webkit-scrollbar-thumb {
-	border-radius: 0px;
+	/*border-radius: 0px;*/
 	background: #1a7bee;
-	border-radius: 2px;
+	/*border-radius: 2px;*/
 }
 
 ::-webkit-scrollbar-thumb:hover{
@@ -1464,10 +1457,10 @@ input.checkbox:disabled + label {
 }
 
 ::-webkit-resizer{
-	background-image: url('');
+	/*background-image: url('');*/
 	background-repeat: no-repeat;
 	width: 4px;
-	height: 0px;
+	height: 0;
 }
 
 ::-webkit-scrollbar{

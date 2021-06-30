@@ -81,8 +81,8 @@
                             <input id="hour" name="chooseHour" placeholder="chooseHour" type="time" step="1" min="0" max="23" class="input"/>
                         </div>
                         <div style="display: none;" id="label9" class="input-block">
-                            <label for="sheldTime" data-resource="sheldTime"></label>
-                            <input id="sheldTime" type="datetime-local" class="input">
+                            <label for="scheduleTime" data-resource="scheduleTime"></label>
+                            <input id="scheduleTime" type="datetime-local" class="input">
                         </div>
                         <div style="display: none;" id="label2" class="input-block">
                             <label for="responseURL" data-resource="urlFetch"></label>
@@ -479,8 +479,8 @@
                             <label data-resource="lastDayMonth" for="lastDayMonth"></label>
                         </div>
                         <div class="check-block">
-                            <input class="checkbox" id="sheldTimeCheckbox" type="checkbox" name="checkbox"/>
-                            <label data-resource="sheldTime" for="sheldTimeCheckbox"></label>
+                            <input class="checkbox" id="scheduleTimeCheckbox" type="checkbox" name="checkbox"/>
+                            <label data-resource="scheduleTime" for="scheduleTimeCheckbox"></label>
                         </div>
                         <div class="check-block">
                             <input class="checkbox" id="disableCheckProjects" type="checkbox" name="checkbox"/>
@@ -650,11 +650,11 @@
                                     <label data-resource="autoAuthVK" for="autoAuthVK"></label>
                                 </div>
                                 <div class="check-block">
-                                    <input class="checkbox" id="clearVKCookies" type="checkbox" name="checkbox" checked="true"/>
+                                    <input class="checkbox" id="clearVKCookies" type="checkbox" name="checkbox" checked/>
                                     <label data-resource="clearVKCookies" for="clearVKCookies"></label>
                                 </div>
                                 <div class="check-block">
-                                    <input class="checkbox" id="saveVKCredentials" type="checkbox" name="checkbox" checked="true"/>
+                                    <input class="checkbox" id="saveVKCredentials" type="checkbox" name="checkbox" checked/>
                                     <label data-resource="saveVKCredentials" for="saveVKCredentials"></label>
                                 </div>
                                 <div class="check-block antiBanVK" style="display: none;">
@@ -668,12 +668,12 @@
                             </div>
 						    <div class="inputEl">
 						    	<button class="submitBtn" data-resource="addButton" id="AddVK"></button>
-            		            <label class="file" for="importVK" class="importVK">
+            		            <label class="file importVK" for="importVK" >
             		                <span data-resource="importVK"></span>
             		                <img src="images/icons/importBtn.svg" alt="importBtn">
             		            </label>
             		            <input id="importVK" type="file" accept=".txt">
-            		            <label class="file" for="importSettingsVK" class="importVK">
+            		            <label class="file importVK" for="importSettingsVK">
             		                <span data-resource="importSettingsVK"></span>
             		                <img src="images/icons/importBtn.svg" alt="importBtn">
             		            </label>
@@ -734,7 +734,7 @@
 
             		        <div class="importProxyBtns">
             		        	<div>
-            		        		<label class="file" for="importProxy" class="importProxy">
+            		        		<label class="file importProxy" for="importProxy">
             		        		    <span data-resource="importProxy"></span>
             		        		    <img src="images/icons/importBtn.svg" alt="importBtn">
             		        		</label>
@@ -776,7 +776,7 @@
             		        </form>
 						    <div class="checkboxesBlock">
                                 <div class="check-block">
-                                    <input class="checkbox" id="clearBorealisCookies" type="checkbox" name="checkbox" checked="true"/>
+                                    <input class="checkbox" id="clearBorealisCookies" type="checkbox" name="checkbox" checked/>
                                     <label data-resource="clearVKCookies" for="clearBorealisCookies"></label>
                                 </div>
                                 <div class="check-block">
@@ -786,12 +786,12 @@
                             </div>
 						    <div class="inputEl">
 						    	<button class="submitBtn" data-resource="addButton" id="AddBorealis"></button>
-            		            <label class="file" for="importBorealis" class="importVK">
+            		            <label class="file importVK" for="importBorealis">
             		                <span data-resource="importVK"></span>
             		                <img src="images/icons/importBtn.svg" alt="importBtn">
             		            </label>
             		            <input id="importBorealis" type="file" accept=".txt">
-            		            <label class="file" for="importRegBorealis" class="importVK">
+            		            <label class="file importVK" for="importRegBorealis">
             		                <span data-resource="importRegBorealis"></span>
             		                <img src="images/icons/importBtn.svg" alt="importBtn">
             		            </label>
