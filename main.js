@@ -730,7 +730,7 @@ async function initializeConfig(background) {
             resolve(openRequest.result)
         }
     })
-    db.onerror = function(event) {
+    db.onerror = event => {
         if (background) {
             console.error(chrome.i18n.getMessage('errordb', ['avr', event.target.error]))
         } else {

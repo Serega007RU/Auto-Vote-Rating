@@ -990,19 +990,19 @@ async function checkPermissions(projects, element) {
     return true
 }
 
-async function setCoolDown() {
-    if (settings.cooldown && settings.cooldown === document.getElementById('cooldown').valueAsNumber) return
-    settings.cooldown = document.getElementById('cooldown').valueAsNumber
-    await new Promise((resolve, reject) => {
-        const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-        request.onsuccess = resolve
-        request.onerror = reject
-    })
-    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
-    if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
-        chrome.runtime.reload()
-    }
-}
+// async function setCoolDown() {
+//     if (settings.cooldown && settings.cooldown === document.getElementById('cooldown').valueAsNumber) return
+//     settings.cooldown = document.getElementById('cooldown').valueAsNumber
+//     await new Promise((resolve, reject) => {
+//         const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+//         request.onsuccess = resolve
+//         request.onerror = reject
+//     })
+//     if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+//     if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
+//         chrome.runtime.reload()
+//     }
+// }
 
 function extractHostname(url) {
     let hostname
@@ -1248,7 +1248,7 @@ function getUrlProjects() {
                 project = {}
             }
             if (key === 'top' || key === 'randomize' || key === 'silentMode' || key === 'emulateMode') {
-                project[value] = true
+                project.rating = value
             } else {
                 project[key] = value
             }
@@ -1292,6 +1292,7 @@ async function fastAdd() {
 
         if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] === 'true') {
             settings.disabledNotifInfo = true
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             await new Promise((resolve, reject) => {
                 const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
                 request.onsuccess = resolve
@@ -1312,6 +1313,7 @@ async function fastAdd() {
         }
         if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] === 'true') {
             settings.disabledNotifWarn = true
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             await new Promise((resolve, reject) => {
                 const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
                 request.onsuccess = resolve
@@ -1332,6 +1334,7 @@ async function fastAdd() {
         }
         if (vars['disableNotifStart'] != null && vars['disableNotifStart'] === 'true') {
             settings.disabledNotifStart = true
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             await new Promise((resolve, reject) => {
                 const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
                 request.onsuccess = resolve
