@@ -28,8 +28,8 @@ let tunnelBear = {}
 
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
-let break1 = false
-let break2 = false
+// let break1 = false
+// let break2 = false
 let lastErrorNotFound
 
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
@@ -72,8 +72,8 @@ async function checkVote() {
     }
 
     check = true
-    break1 = true
-    break2 = true
+    // break1 = false
+    // break2 = false
 }
 
 chrome.alarms.onAlarm.addListener(async function (alarm) {
@@ -103,6 +103,7 @@ window.addEventListener('offline', ()=> {
 })
 
 async function checkOpen(project) {
+    if (settings.stopVote > Date.now()) return
     //Если нет подключения к интернету
     if (!settings.disabledCheckInternet) {
         if (!navigator.onLine && online) {
@@ -137,9 +138,7 @@ async function checkOpen(project) {
             if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MinecraftRating') {
                 if (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating') {
                     //Если безпроксиевый рейтинг закончил голосование, позволяет проксиевым начать голосовать ради экономии времени
-                    if (value.time > Date.now()) {
-                        continue
-                    } else {
+                    if (value.time < Date.now()) {
                         return
                     }
                 }
@@ -185,7 +184,7 @@ async function checkOpen(project) {
         if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
-            const VKs = await db.getAll('vks')
+            let VKs = await db.getAll('vks')
             for (let vkontakte of VKs) {
                 if (vkontakte.notWorking) {
                     let _continue = true
@@ -257,7 +256,7 @@ async function checkOpen(project) {
             }
         }
 
-        if (currentProxy == null && (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))) {
+        if (currentProxy == null && (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))) {
             let proxyDetails = await new Promise(resolve => {
                 chrome.proxy.settings.get({}, async function(details) {
                     resolve(details)
@@ -1537,7 +1536,7 @@ async function endVote(request, sender, project) {
                 }
                 getTopFromList(currentProxy, project).push(usedProject)
                 await db.put('proxies', currentProxy, currentProxy.key)
-            } else if (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
+            } else if (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) {
                 console.warn('currentProxy is null or not found')
             }
         }
@@ -1557,7 +1556,7 @@ async function endVote(request, sender, project) {
             generalStats.lastSuccessVote = Date.now()
             delete project.later
         } else {
-            if (settings.useMultiVote && settings.repeatAttemptLater && project.later && !(project.TopCraft || project.McTOP || project.MinecraftRating)) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
+            if (settings.useMultiVote && settings.repeatAttemptLater && project.later && !(project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
                 if (project.later < 15) {
                     project.time = null
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
@@ -1594,7 +1593,7 @@ async function endVote(request, sender, project) {
             if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
                 await db.put('vks', currentVK, currentVK.key)
-            } else if (project.MCRate && message.includes('Ваш аккаунт заблокирован для голосования за этот проект')) {
+            } else if (project.rating === 'MCRate' && message.includes('Ваш аккаунт заблокирован для голосования за этот проект')) {
                 let usedProject = {
                     id: project.id,
                     nextFreeVote: 999999999999999,
@@ -1606,7 +1605,7 @@ async function endVote(request, sender, project) {
                 }
                 getTopFromList(currentVK, project).push(usedProject)
                 await db.put('vks', currentVK, currentVK.key)
-            } else if (project.MCRate && message.includes('Ваш ВК ID заблокирован для голосовани')) {
+            } else if (project.rating === 'MCRate' && message.includes('Ваш ВК ID заблокирован для голосовани')) {
                 currentVK.MCRate = message
                 await db.put('vks', currentVK, currentVK.key)
             } else if (currentProxy != null && request && request.errorVoteNetwork) {
@@ -1676,7 +1675,7 @@ async function endVote(request, sender, project) {
         }
         checkVote()
     }
-    if (settings.useMultiVote /*&& (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating))*/) {
+    if (settings.useMultiVote /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
         removeQueue()
     } else {
         setTimeout(()=>{
@@ -1742,6 +1741,32 @@ async function checkTime() {
     } catch (e) {
         console.error(chrome.i18n.getMessage('errorClock', e))
     }
+}
+
+// noinspection JSUnusedGlobalSymbols
+async function setCookie(url, name, value) {
+    return new Promise(resolve=>{
+        chrome.cookies.set({'url': url, 'name': name, 'value': value}, function(details) {
+            resolve(details)
+        })
+    })
+}
+
+async function setCookieDetails(details) {
+    return new Promise(resolve=>{
+        chrome.cookies.set(details, function(det) {
+            resolve(det)
+        })
+    })
+}
+
+// noinspection JSUnusedGlobalSymbols
+async function getCookie(url, name) {
+    return new Promise(resolve=>{
+        chrome.cookies.get({'url': url, 'name': name}, function(cookie) {
+            resolve(cookie)
+        })
+    })
 }
 
 async function removeCookie(url, name) {
@@ -1823,8 +1848,8 @@ async function stopVote() {
     controller.abort()
     openedProjects.clear()
     fetchProjects.clear()
-    break1 = true
-    break2 = true
+    // break1 = true
+    // break2 = true
 }
 
 //Если требуется авторизация для Прокси
@@ -1966,60 +1991,64 @@ chrome.runtime.onInstalled.addListener(async function(details) {
             }
         }
         const oldSettings = await getValue('AVMRsettings')
-        if (oldSettings == null) return
-        const oldGeneralStats = await getValue('generalStats')
-        
-        console.log(chrome.i18n.getMessage('oldSettings'))
-        const projects = []
-        let key = 0
-        for (const item of Object.keys(allProjects)) {
-            const list = await getValue('AVMRprojects' + item)
-            if (list) {
-                for (const project of list) {
-                    delete project[item]
-                    project.rating = item
-                    if (item === 'Custom') {
-                        project.body = project.id
-                        delete project.id
-                        project.id = project.nick
-                        project.nick = ''
+        if (oldSettings != null) {
+            const oldGeneralStats = await getValue('generalStats')
+
+            console.log(chrome.i18n.getMessage('oldSettings'))
+            const projects = []
+            let key = 0
+            for (const item of Object.keys(allProjects)) {
+                const list = await getValue('AVMRprojects' + item)
+                if (list) {
+                    for (const project of list) {
+                        delete project[item]
+                        project.rating = item
+                        if (item === 'Custom') {
+                            project.body = project.id
+                            delete project.id
+                            project.id = project.nick
+                            project.nick = ''
+                        }
+                        if (project.nick == null) project.nick = ''
+                        if (project.stats.successVotes == null) project.stats.successVotes = 0
+                        if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
+                        if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
+                        if (project.stats.errorVotes == null) project.stats.errorVotes = 0
+                        if (project.stats.laterVotes == null) project.stats.laterVotes = 0
+                        key++
+                        project.key = key
+                        projects.push(project)
                     }
-                    if (project.nick == null) project.nick = ''
-                    if (project.stats.successVotes == null) project.stats.successVotes = 0
-                    if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
-                    if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
-                    if (project.stats.errorVotes == null) project.stats.errorVotes = 0
-                    if (project.stats.laterVotes == null) project.stats.laterVotes = 0
-                    key++
-                    project.key = key
-                    projects.push(project)
                 }
             }
+            if (!db) {
+                await new Promise(resolve => {//Да это странно выглядит
+                    setInterval(() => {
+                        if (db) {
+                            resolve()
+                        }
+                    }, 1000)
+                })
+            }
+            await db.clear('projects')
+            const tx = db.transaction(['projects', 'other'], 'readwrite')
+            for (const project of projects) {
+                await tx.objectStore('projects').add(project, project.key)
+            }
+            await tx.objectStore('other').put(oldSettings, 'settings')
+            await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
+            for (const item of Object.keys(allProjects)) {
+                await removeValue('AVMRprojects' + item)
+            }
+            await removeValue('AVMRsettings')
+            await removeValue('generalStats')
+            await removeValue('storageArea', 'local')
+            await reloadAllAlarms()
+            console.log(chrome.i18n.getMessage('importingEnd'))
         }
-        if (!db) {
-            await new Promise(resolve => {//Да это странно выглядит
-                setInterval(() => {
-                    if (db) {
-                        resolve()
-                    }
-                }, 1000)
-            })
-        }
-        await db.clear('projects')
-        const tx = db.transaction(['projects', 'other'], 'readwrite')
-        for (const project of projects) {
-            await tx.objectStore('projects').add(project, project.key)
-        }
-        await tx.objectStore('other').put(oldSettings, 'settings')
-        await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
-        for (const item of Object.keys(allProjects)) {
-            await removeValue('AVMRprojects' + item)
-        }
-        await removeValue('AVMRsettings')
-        await removeValue('generalStats')
-        await removeValue('storageArea', 'local')
-        await reloadAllAlarms()
-        console.log(chrome.i18n.getMessage('importingEnd'))
+    }
+    if (details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version(chrome.runtime.getManifest().version)) === -1) {
+        chrome.tabs.create({url: 'options.html?updated'})
     }
 })
 

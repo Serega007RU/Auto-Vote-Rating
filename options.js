@@ -271,12 +271,15 @@ async function restoreOptions() {
     let stopVoteButton = async function () {
         if (settings.stopVote > Date.now()) {
             settings.stopVote = 0
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+            chrome.extension.getBackgroundPage().checkVote()
             document.querySelector('#stopVote img').src = 'images/icons/start.svg'
             createNotif(chrome.i18n.getMessage('voteResumed'), 'success', 5000)
         } else {
             settings.stopVote = 9000000000000000
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
-            await chrome.extension.getBackgroundPage().stopVote()
+            if (chrome.extension.getBackgroundPage()) await chrome.extension.getBackgroundPage().stopVote()
             createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
         }
         await db.put('other', settings, 'settings')
@@ -3073,7 +3076,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         if (!await checkPermissions(projects)) return
 
         await db.clear('projects')
-        const tx = db.transaction(['projects', 'other'], 'readwrite')
+        const tx = db.transaction(['projects', 'other', 'vks', 'proxies', 'borealis'], 'readwrite')
         let key = 0
         for (const project of projects) {
             if (project.key == null) {
