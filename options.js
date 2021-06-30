@@ -1146,6 +1146,7 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         let projects = []
         if (data.projectsTopCraft) {
             createNotif(chrome.i18n.getMessage('oldSettings'))
+            let key = 0
             for (const item of Object.keys(allProjects)) {
                 for (const project of data['projects' + item]) {
                     delete project[item]
@@ -1162,6 +1163,8 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
                     if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
                     if (project.stats.errorVotes == null) project.stats.errorVotes = 0
                     if (project.stats.laterVotes == null) project.stats.laterVotes = 0
+                    key++
+                    project.key = key
                     projects.push(project)
                 }
             }
