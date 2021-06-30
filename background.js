@@ -204,7 +204,7 @@ async function newWindow(project) {
     await new Promise(resolve => {
         chrome.alarms.getAll(function(alarms) {
             for (const alarm of alarms) {
-                if (alarm.scheduledTime === project.time) {
+                if (alarm.scheduledTime === project.nextAttempt) {
                     create = false
                     resolve()
                     break
@@ -1101,7 +1101,8 @@ async function endVote(request, sender, project) {
     
     await updateGeneralStats()
     await updateProject(project)
-    
+
+    chrome.alarms.clear(String(project.key))
     if (project.time != null && project.time > Date.now()) {
         let create = true
         await new Promise(resolve => {
