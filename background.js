@@ -43,56 +43,34 @@ async function checkVote() {
     } else {
         return
     }
-    
-    //Старый метод
-//  const projects = await new Promise(resolve=> db.transaction('projects').objectStore('projects').getAll().onsuccess = event => resolve(event.target.result))
-    
-//  for (const project of projects) {
-//      if (project.time == null || project.time < Date.now()) {
-//          await checkOpen(project)
-//      }
-//  }
-    
-//  check = true
 
-    const request = db.transaction('projects').objectStore('projects').openCursor()
-    request.onsuccess = function(event) {
-        const cursor = event.target.result
-        if (cursor) {
-            const project = cursor.value
-            if (project.time == null || project.time < Date.now()) {
-                checkOpen(project, cursor.primaryKey)
-            }
-            cursor.continue()
-        } else {
-            check = true
+    let cursor = await db.transaction('projects').store.openCursor()
+    while (cursor) {
+        const project = cursor.value
+        if (project.time == null || project.time < Date.now()) {
+            checkOpen(project, cursor.key)
         }
+        cursor = await cursor.continue()
     }
+
+    check = true
 }
 
-chrome.alarms.onAlarm.addListener(function (alarm) {
-    const projectID = Number(alarm.name)
-    db.transaction('projects').objectStore('projects').get(projectID).onsuccess = event => {
-        if (event.target.result) {
-            checkOpen(event.target.result)
-        }
-    }
+chrome.alarms.onAlarm.addListener(async function (alarm) {
+    checkOpen(await db.get('projects', Number(alarm.name)))
 })
 
 async function reloadAllAlarms() {
     await new Promise(resolve => chrome.alarms.clearAll(resolve))
-    const request = db.transaction('projects').objectStore('projects').openCursor()
+    let cursor = await db.transaction('projects').store.openCursor()
     const times = []
-    request.onsuccess = function(event) {
-        const cursor = event.target.result
-        if (cursor) {
-            const project = cursor.value
-            if (project.time != null && project.time > Date.now() && times.indexOf(project.time) === -1) {
-                chrome.alarms.create(String(cursor.primaryKey), {when: project.time})
-                times.push(project.time)
-            }
-            cursor.continue()
+    while (cursor) {
+        const project = cursor.value
+        if (project.time != null && project.time > Date.now() && times.indexOf(project.time) === -1) {
+            chrome.alarms.create(String(cursor.key), {when: project.time})
+            times.push(project.time)
         }
+        cursor = await cursor.continue()
     }
 }
 
@@ -197,7 +175,7 @@ async function newWindow(project) {
         generalStats.monthSuccessVotes = 0
     }
     generalStats.lastAttemptVote = Date.now()
-    await updateGeneralStats()
+    await db.put('other', generalStats, 'generalStats')
     await updateProject(project)
     
     let create = true
@@ -1099,7 +1077,7 @@ async function endVote(request, sender, project) {
         generalStats.errorVotes++
     }
     
-    await updateGeneralStats()
+    await db.put('other', generalStats, 'generalStats')
     await updateProject(project)
 
     chrome.alarms.clear(String(project.key))
@@ -1214,21 +1192,10 @@ async function wait(ms) {
     })
 }
 
-async function updateGeneralStats() {
-    await new Promise(resolve => {
-        const request = db.transaction('other', 'readwrite').objectStore('other').put(generalStats, 'generalStats')
-        request.onsuccess = resolve
-    })
-}
-
 async function updateProject(project) {
-    const found = await new Promise(resolve => db.transaction('projects').objectStore('projects').count(project.key).onsuccess = (event) => resolve(event.target.result))
+    const found = await db.count('projects', project.key)
     if (found) {
-        await new Promise((resolve, reject) => {
-            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, project.key)
-            request.onsuccess = resolve
-            request.onerror = reject
-        })
+        db.put('projects', project, project.key)
         chrome.runtime.sendMessage({updateProject: true, project})
     } else {
         console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
@@ -1339,13 +1306,17 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                 }, 1000)
             })
         }
-        const projectsts = db.transaction(['projects', 'other'], 'readwrite')
-        projectsts.objectStore('projects').clear()
+        await db.clear('projects')
+        const tx = db.transaction(['projects', 'other'], 'readwrite')
         for (const project of projects) {
-            projectsts.objectStore('projects').add(project)
+            tx.objectStore('projects').add(project, project.key)
         }
-        projectsts.objectStore('other').put(oldSettings, 'settings')
-        projectsts.objectStore('other').put(oldGeneralStats, 'generalStats')
+        tx.objectStore('other').put(oldSettings, 'settings')
+        tx.objectStore('other').put(oldGeneralStats, 'generalStats')
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = (event) => resolve(event.target.result)
+            tx.onerror = (event) => reject(event.target.error)
+        })
         for (const item of Object.keys(allProjects)) {
             await removeValue('AVMRprojects' + item)
         }
@@ -1413,9 +1384,8 @@ logsopenRequest.onerror = function() {
 }
 logsopenRequest.onsuccess = function() {
     logsdb = logsopenRequest.result
-    logsdb.onerror = function(event) {
-        const request = event.target // запрос, в котором произошла ошибка
-        console._error(chrome.i18n.getMessage('errordb', ['logs', request.error]), )
+    logsdb.onerror = event => {
+        console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), )
     }
 
     console._collect = function (type, args) {

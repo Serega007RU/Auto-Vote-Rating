@@ -62,19 +62,8 @@ async function addProjectList(project) {
         generateBtnListRating(project.rating, 0)
     }
     if (!project.key) {
-        const projects = db.transaction('projects', 'readwrite').objectStore('projects')
-        project.key = await new Promise((resolve, reject) => {
-            const request = projects.add(project)
-            request.onsuccess = function (event) {
-                resolve(event.target.result)
-            }
-            request.onerror = reject
-        })
-        await new Promise((resolve, reject) => {
-            const request = db.transaction('projects', 'readwrite').objectStore('projects').put(project, project.key)
-            request.onsuccess = resolve
-            request.onerror = reject
-        })
+        project.key = await db.put('projects', project)
+        await db.put('projects', project, project.key)
 
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent)
         document.querySelector('#' + project.rating + 'Button > span').textContent = String(count + 1)
@@ -179,9 +168,7 @@ function generateBtnListRating(rating, count) {
     span.textContent = count
     button.append(span)
     document.querySelector('.buttonBlock').append(button)
-    button.addEventListener('click', function() {
-        listSelect(event, rating)
-    })
+    button.addEventListener('click', event => listSelect(event, rating))
 
     const ul = document.createElement('ul')
     ul.id = rating + 'Tab'
@@ -211,23 +198,18 @@ function generateBtnListRating(rating, count) {
     const dellAll = document.createElement('button')
     dellAll.className = 'submitBtn redBtn'
     dellAll.textContent = chrome.i18n.getMessage('deleteAll')
-    dellAll.addEventListener('click', function () {
+    dellAll.addEventListener('click', async function () {
         if (confirm(chrome.i18n.getMessage('deleteAllRating'))) {
-            const projectsStore = db.transaction('projects', 'readwrite').objectStore('projects')
-            const projects = projectsStore.index('rating')
-            projects.openKeyCursor(rating).onsuccess = function(event) {
-                const cursor = event.target.result
-                if (cursor) {
-                    projectsStore.delete(cursor.primaryKey)
-                    chrome.alarms.clear(String(cursor.primaryKey))
-                    cursor.continue()
-                } else {
-                    document.getElementById(rating + 'Tab').remove()
-                    document.getElementById(rating + 'Button').remove()
-                    if (document.querySelector('.buttonBlock').childElementCount <= 0) {
-                        document.querySelector('p[data-resource="notAddedAll"]').textContent = chrome.i18n.getMessage('notAddedAll')
-                    }
-                }
+            let cursor = await db.transaction('projects', 'readwrite').store.index('rating').openCursor(rating)
+            while (cursor) {
+                await cursor.delete()
+                chrome.alarms.clear(String(cursor.primaryKey))
+                cursor = await cursor.continue()
+            }
+            document.getElementById(rating + 'Tab').remove()
+            document.getElementById(rating + 'Button').remove()
+            if (document.querySelector('.buttonBlock').childElementCount <= 0) {
+                document.querySelector('p[data-resource="notAddedAll"]').textContent = chrome.i18n.getMessage('notAddedAll')
             }
         }
     })
@@ -258,14 +240,7 @@ async function removeProjectList(project) {
         return
     }
 
-    const projects = db.transaction('projects', 'readwrite').objectStore('projects')
-    await new Promise((resolve, reject) => {
-        const request = projects.delete(project.key)
-        request.onsuccess = function (event) {
-            resolve(event.target.result)
-        }
-        request.onerror = reject
-    })
+    await db.delete('projects', project.key)
 
     chrome.alarms.clear(String(project.key))
     
@@ -293,15 +268,9 @@ async function reloadProjectList() {
     if (document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]') != null) {
         document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]').style.display = 'none'
     }
-    const projects = db.transaction('projects').objectStore('projects').index('rating')
+    const index = db.transaction('projects').store.index('rating')
     for (const item of Object.keys(allProjects)) {
-        const count = await new Promise((resolve, reject) => {
-            const request = projects.count(item)
-            request.onsuccess = function (event) {
-                resolve(event.target.result)
-            }
-            request.onerror = reject
-        })
+        const count = await index.count(item)
         if (count > 0) {
             generateBtnListRating(item, count)
             if (item === 'Custom') {
@@ -425,11 +394,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             _return = true
         }
         if (!_return) {
-            await new Promise((resolve, reject) => {
-                const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-                request.onsuccess = resolve
-                request.onerror = reject
-            })
+            db.put('other', settings, 'settings')
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         }
         blockButtons = false
@@ -574,14 +539,7 @@ async function addProject(project, element) {
         secondBonusButton.className = 'secondBonus'
     }
 
-    let projects = db.transaction('projects').objectStore('projects').index('rating, id')
-    let found = await new Promise((resolve, reject) => {
-        const request = projects.count([project.rating, project.id])
-        request.onsuccess = function (event) {
-            resolve(event.target.result)
-        }
-        request.onerror = reject
-    })
+    let found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
     if (found > 0) {
         const message = chrome.i18n.getMessage('alreadyAdded')
         if (!secondBonusText) {
@@ -592,14 +550,7 @@ async function addProject(project, element) {
         addProjectsBonus(project, element)
         return
     } else if (project.rating === 'MCRate' || project.rating === 'ServerPact' || project.rating === 'MinecraftServersOrg' || project.rating === 'HotMC' || project.rating === 'MMoTopRU' || project.rating === 'MinecraftIpList') {
-        projects = db.transaction('projects').objectStore('projects').index('rating')
-        found = await new Promise((resolve, reject) => {
-            const request = projects.count(project.rating)
-            request.onsuccess = function (event) {
-                resolve(event.target.result)
-            }
-            request.onerror = reject
-        })
+        found = await db.countFromIndex('projects', 'rating', project.rating)
         if (project.rating === 'MinecraftIpList') {
             if (found >= 5) {
                 createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
@@ -990,20 +941,6 @@ async function checkPermissions(projects, element) {
     return true
 }
 
-// async function setCoolDown() {
-//     if (settings.cooldown && settings.cooldown === document.getElementById('cooldown').valueAsNumber) return
-//     settings.cooldown = document.getElementById('cooldown').valueAsNumber
-//     await new Promise((resolve, reject) => {
-//         const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-//         request.onsuccess = resolve
-//         request.onerror = reject
-//     })
-//     if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
-//     if (confirm(chrome.i18n.getMessage('cooldownChanged'))) {
-//         chrome.runtime.reload()
-//     }
-// }
-
 function extractHostname(url) {
     let hostname
     //find & remove protocol (http, ftp, etc.) and get hostname
@@ -1036,18 +973,12 @@ const getDomainWithoutSubdomain = url => {
 //Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))
-    generalStats = await new Promise(resolve => db.transaction('other').objectStore('other').get('generalStats').onsuccess = (event) => resolve(event.target.result))
+    generalStats = await db.get('other', 'generalStats')
     const allSetting = {
         settings,
         generalStats
     }
-    allSetting.projects = await new Promise((resolve, reject) => {
-        const request = db.transaction('projects').objectStore('projects').getAll()
-        request.onsuccess = function (event) {
-            resolve(event.target.result)
-        }
-        request.onerror = reject
-    })
+    allSetting.projects = await db.getAll('projects')
     const text = JSON.stringify(allSetting, null, '\t')
     const blob = new Blob([text],{type: 'text/json;charset=UTF-8;'})
     const anchor = document.createElement('a')
@@ -1059,76 +990,50 @@ document.getElementById('file-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
 })
 
-document.getElementById('logs-download').addEventListener('click', ()=>{
+document.getElementById('logs-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))
-    const openRequest = indexedDB.open('logs', 1)
-    openRequest.onupgradeneeded = function() {
-        // срабатывает, если на клиенте нет базы данных
-        // ...выполнить инициализацию...
-        openRequest.result.createObjectStore('logs', {autoIncrement: true})
-        //Удаляем старые логи из localStorage
-        if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
-    }
-    openRequest.onerror = function() {
-        createNotif(chrome.i18n.getMessage('errordb', ['logs', openRequest.error]), 'error')
-    }
-    openRequest.onsuccess = function() {
-        const logsdb = openRequest.result
-        logsdb.onerror = function(event) {
-            createNotif(chrome.i18n.getMessage('errordb', ['logs', event.target.error]), 'error')
+    const logsdb = await idb.openDB('logs', 1, {
+        upgrade(db) {
+            db.createObjectStore('logs', {autoIncrement: true})
+            if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
         }
-        // продолжить работу с базой данных, используя объект logsdb
-        const transaction = logsdb.transaction('logs', 'readonly')
-        const logs = transaction.objectStore('logs')
-        const request = logs.getAll()
-        request.onsuccess = function() {
-            let text = ''
-            for (const log of request.result) {
-                text += log
-                text += '\n'
-            }
-            
-            const blob = new Blob([text],{type: 'text/plain;charset=UTF-8;'})
-            const anchor = document.createElement('a')
-            
-            anchor.download = 'console_history.txt'
-            anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
-            anchor.dataset.downloadurl = ['text/plain;charset=UTF-8;', anchor.download, anchor.href].join(':')
-            
-            openPopup(anchor.href)
-            
-            createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
-        }
+    })
+    logsdb.onerror = event => {
+        createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
     }
+    const logs = await logsdb.getAll('logs')
+    let text = ''
+    for (const log of logs) {
+        text += log
+        text += '\n'
+    }
+
+    const blob = new Blob([text],{type: 'text/plain;charset=UTF-8;'})
+    const anchor = document.createElement('a')
+
+    anchor.download = 'console_history.txt'
+    anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
+    anchor.dataset.downloadurl = ['text/plain;charset=UTF-8;', anchor.download, anchor.href].join(':')
+
+    openPopup(anchor.href)
+
+    createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
 })
 
 //Очистка логов
-document.getElementById('logs-clear').addEventListener('click', ()=>{
+document.getElementById('logs-clear').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('clearingLogs'))
-    const openRequest = indexedDB.open('logs', 1)
-    openRequest.onupgradeneeded = function() {
-        // срабатывает, если на клиенте нет базы данных
-        // ...выполнить инициализацию...
-        openRequest.result.createObjectStore('logs', {autoIncrement: true})
-        //Удаляем старые логи из localStorage
-        if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
-    }
-    openRequest.onerror = function() {
-        createNotif(chrome.i18n.getMessage('errordb', ['logs', openRequest.error]), 'error')
-    }
-    openRequest.onsuccess = function() {
-        const logsdb = openRequest.result
-        logsdb.onerror = function(event) {
-            createNotif(chrome.i18n.getMessage('errordb', ['logs', event.target.error]), 'error')
+    const logsdb = await idb.openDB('logs', 1, {
+        upgrade(db) {
+            db.createObjectStore('logs', {autoIncrement: true})
+            if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
         }
-        // продолжить работу с базой данных, используя объект logsdb
-        const transaction = logsdb.transaction('logs', 'readwrite')
-        const logs = transaction.objectStore('logs')
-        const request = logs.clear()
-        request.onsuccess = function() {
-            createNotif(chrome.i18n.getMessage('clearedLogs'), 'success')
-        }
+    })
+    logsdb.onerror = event => {
+        createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
     }
+    await logsdb.clear('logs')
+    createNotif(chrome.i18n.getMessage('clearedLogs'), 'success')
 })
 
 //Слушатель на импорт настроек
@@ -1174,19 +1079,19 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         }
 
         if (!await checkPermissions(projects)) return
-        
-        const projectsts = db.transaction(['projects', 'other'], 'readwrite')
-        projectsts.objectStore('projects').clear()
+
+        await db.clear('projects')
+        const tx = db.transaction(['projects', 'other'], 'readwrite')
         for (const project of projects) {
-            projectsts.objectStore('projects').add(project, project.key)
+            tx.objectStore('projects').add(project, project.key)
         }
-        projectsts.objectStore('other').put(data.settings, 'settings')
-        projectsts.objectStore('other').put(data.generalStats, 'generalStats')
+        tx.objectStore('other').put(data.settings, 'settings')
+        tx.objectStore('other').put(data.generalStats, 'generalStats')
         await new Promise((resolve, reject) => {
-            projectsts.oncomplete = resolve
-            projectsts.onerror = reject
+            tx.oncomplete = (event) => resolve(event.target.result)
+            tx.onerror = (event) => reject(event.target.error)
         })
-        
+
         settings = data.settings
         generalStats = data.generalStats
         if (chrome.extension.getBackgroundPage()) {
@@ -1217,11 +1122,7 @@ modeVote.addEventListener('change', async function() {
         blockButtons = true
     }
     settings.enabledSilentVote = modeVote.value === 'enabled'
-    await new Promise((resolve, reject) => {
-        const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-        request.onsuccess = resolve
-        request.onerror = reject
-    })
+    await db.put('other', settings, 'settings')
     if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     blockButtons = false
 })
@@ -1293,11 +1194,7 @@ async function fastAdd() {
         if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] === 'true') {
             settings.disabledNotifInfo = true
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
-            await new Promise((resolve, reject) => {
-                const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-                request.onsuccess = resolve
-                request.onerror = reject
-            })
+            await db.put('other', settings, 'settings')
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             const html = document.createElement('div')
@@ -1314,11 +1211,7 @@ async function fastAdd() {
         if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] === 'true') {
             settings.disabledNotifWarn = true
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
-            await new Promise((resolve, reject) => {
-                const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-                request.onsuccess = resolve
-                request.onerror = reject
-            })
+            await db.put('other', settings, 'settings')
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             const html = document.createElement('div')
@@ -1335,11 +1228,7 @@ async function fastAdd() {
         if (vars['disableNotifStart'] != null && vars['disableNotifStart'] === 'true') {
             settings.disabledNotifStart = true
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
-            await new Promise((resolve, reject) => {
-                const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-                request.onsuccess = resolve
-                request.onerror = reject
-            })
+            await db.put('other', settings, 'settings')
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             const html = document.createElement('div')
@@ -1444,7 +1333,7 @@ function addCustom() {
 //  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
-        db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+        db.put('other', settings, 'settings')
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     }
 }
@@ -1508,7 +1397,7 @@ document.querySelectorAll('.tablinks').forEach((item)=> {
 })
 
 //Переключение между списками добавленных проектов
-function listSelect(evt, tabs) {
+async function listSelect(event, tabs) {
     let listcontent, selectsite
 
     listcontent = document.getElementsByClassName('listcontent')
@@ -1522,7 +1411,7 @@ function listSelect(evt, tabs) {
     }
 
     document.getElementById(tabs + 'Tab').style.display = 'block'
-    evt.currentTarget.className += ' activeList'
+    event.currentTarget.className += ' activeList'
 
     const list = document.getElementById(tabs + 'List')
     if (list.childElementCount === 0) {//Если список проектов данного рейтинга пустой - заполняем его
@@ -1530,16 +1419,12 @@ function listSelect(evt, tabs) {
         div.setAttribute('data-resource', 'load')
         div.textContent = chrome.i18n.getMessage('load')
         list.append(div)
-        const projects = db.transaction('projects').objectStore('projects').index('rating')
-        projects.openCursor(tabs).onsuccess = function(event) {
-            const cursor = event.target.result
-            if (cursor) {
-                addProjectList(cursor.value, cursor.primaryKey)
-                cursor.continue()
-            } else {
-                div.remove()
-            }
+        let cursor = await db.transaction('projects').store.index('rating').openCursor(tabs)
+        while (cursor) {
+            addProjectList(cursor.value)
+            cursor = await cursor.continue()
         }
+        div.remove()
     }
 }
 
@@ -1575,7 +1460,7 @@ document.getElementById('generalStats').addEventListener('click', async()=> {
     // document.getElementById('modalStats').click()
     toggleModal('stats')
     document.querySelector('.statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
-    generalStats = await new Promise(resolve => db.transaction('other').objectStore('other').get('generalStats').onsuccess = (event) => resolve(event.target.result))
+    generalStats = await db.get('other', 'generalStats')
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = generalStats.successVotes
     document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.monthSuccessVotes
     document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.lastMonthSuccessVotes

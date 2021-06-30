@@ -689,64 +689,48 @@ let db
 
 //Инициализация настроек расширения
 async function initializeConfig(background) {
-    const openRequest = indexedDB.open('avr', 1)
-    openRequest.onupgradeneeded = function() {
-        // срабатывает, если на клиенте нет базы данных
-        // ...выполнить инициализацию...
-        const ratings = openRequest.result.createObjectStore('projects', {autoIncrement: true})
-        ratings.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
-        ratings.createIndex('rating, id', ['rating', 'id'])
-        ratings.createIndex('rating', 'rating')
-        openRequest.result.createObjectStore('other')
-        const other = openRequest.transaction.objectStore('other')
-        settings = {
-            disabledNotifStart: true,
-            disabledNotifInfo: false,
-            disabledNotifWarn: false,
-            disabledNotifError: false,
-            enabledSilentVote: true,
-            disabledCheckTime: false,
-            disabledCheckInternet: false,
-            enableCustom: false,
-        }
-        other.add(settings, 'settings')
-        generalStats = {
-            successVotes: 0,
-            monthSuccessVotes: 0,
-            lastMonthSuccessVotes: 0,
-            errorVotes: 0,
-            laterVotes: 0,
-            lastSuccessVote: null,
-            lastAttemptVote: null,
-            added: Date.now()
-        }
-        other.add(generalStats, 'generalStats')
-    }
-    db = await new Promise((resolve, reject) => {
-        openRequest.onerror = function() {
-            reject(openRequest.error)
-        }
-        openRequest.onsuccess = function() {
-            resolve(openRequest.result)
+    // noinspection JSUnusedGlobalSymbols
+    db = await idb.openDB('avr', 1, {
+        upgrade(db/*, oldVersion, newVersion, transaction*/) {
+            const projects = db.createObjectStore('projects', {autoIncrement: true})
+            projects.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
+            projects.createIndex('rating, id', ['rating', 'id'])
+            projects.createIndex('rating', 'rating')
+            const other = db.createObjectStore('other')
+            // const other = transaction.objectStore('other')
+            settings = {
+                disabledNotifStart: true,
+                disabledNotifInfo: false,
+                disabledNotifWarn: false,
+                disabledNotifError: false,
+                enabledSilentVote: true,
+                disabledCheckTime: false,
+                disabledCheckInternet: false,
+                enableCustom: false,
+            }
+            other.add(settings, 'settings')
+            generalStats = {
+                successVotes: 0,
+                monthSuccessVotes: 0,
+                lastMonthSuccessVotes: 0,
+                errorVotes: 0,
+                laterVotes: 0,
+                lastSuccessVote: null,
+                lastAttemptVote: null,
+                added: Date.now()
+            }
+            other.add(generalStats, 'generalStats')
         }
     })
     db.onerror = event => {
         if (background) {
-            console.error(chrome.i18n.getMessage('errordb', ['avr', event.target.error]))
+            console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
         } else {
-            createNotif(chrome.i18n.getMessage('errordb', ['avr', event.target.error]), 'error')
+            createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
         }
     }
-    await new Promise(resolve => {
-        const transaction = db.transaction('other')
-        transaction.objectStore('other').get('settings').onsuccess = function(event) {
-            settings = event.target.result
-        }
-        transaction.objectStore('other').get('generalStats').onsuccess = function(event) {
-            generalStats = event.target.result
-        }
-        transaction.oncomplete = resolve
-    })
+    settings = await db.get('other', 'settings')
+    generalStats = await db.get('other', 'generalStats')
 
     if (!background) return
 
