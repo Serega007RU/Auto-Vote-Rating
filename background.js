@@ -1195,7 +1195,7 @@ async function wait(ms) {
 async function updateProject(project) {
     const found = await db.count('projects', project.key)
     if (found) {
-        db.put('projects', project, project.key)
+        await db.put('projects', project, project.key)
         chrome.runtime.sendMessage({updateProject: true, project})
     } else {
         console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
@@ -1309,14 +1309,10 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         await db.clear('projects')
         const tx = db.transaction(['projects', 'other'], 'readwrite')
         for (const project of projects) {
-            tx.objectStore('projects').add(project, project.key)
+            await tx.objectStore('projects').add(project, project.key)
         }
-        tx.objectStore('other').put(oldSettings, 'settings')
-        tx.objectStore('other').put(oldGeneralStats, 'generalStats')
-        await new Promise((resolve, reject) => {
-            tx.oncomplete = (event) => resolve(event.target.result)
-            tx.onerror = (event) => reject(event.target.error)
-        })
+        await tx.objectStore('other').put(oldSettings, 'settings')
+        await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
         for (const item of Object.keys(allProjects)) {
             await removeValue('AVMRprojects' + item)
         }

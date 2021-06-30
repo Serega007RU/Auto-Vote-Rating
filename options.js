@@ -106,12 +106,12 @@ async function addProjectList(project) {
     contDiv.classList.add('message')
     
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (!project.rating === 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
+    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
     contDiv.append(nameProjectMes)
     
     if (project.error) {
         const div2 = document.createElement('div')
-        div2.style = 'color:#da5e5e;'
+        div2.style.color = '#da5e5e'
         div2.append(project.error)
         contDiv.appendChild(div2)
     }
@@ -180,8 +180,8 @@ function generateBtnListRating(rating, count) {
 //  ul.append(div)
     if (!(rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
         const label = document.createElement('label')
-        label.setAttribute('data-resource', 'notAvaibledInSilent')
-        label.textContent = chrome.i18n.getMessage('notAvaibledInSilent')
+        label.setAttribute('data-resource', 'notAvailableInSilent')
+        label.textContent = chrome.i18n.getMessage('notAvailableInSilent')
         const span = document.createElement('span')
         span.classList.add('tooltip2')
         const span2 = document.createElement('span')
@@ -234,7 +234,7 @@ async function removeProjectList(project) {
             }
         } else {
             li.remove()
-            document.querySelector('#' + project.rating + 'Button > span').textContent = count
+            document.querySelector('#' + project.rating + 'Button > span').textContent = String(count)
         }
     } else {
         return
@@ -315,7 +315,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             }
             _return = true
         } else if (this.id === 'priority') {
-            if (this.checked && !confirm(chrome.i18n.getMessage('confirmPrioriry'))) {
+            if (this.checked && !confirm(chrome.i18n.getMessage('confirmPriority'))) {
                 this.checked = false
             }
             _return = true
@@ -345,13 +345,13 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             _return = true
         } else if (this.id === 'lastDayMonth' || this.id === 'randomize') {
             _return = true
-        } else if (this.id === 'sheldTimeCheckbox') {
+        } else if (this.id === 'scheduleTimeCheckbox') {
             if (this.checked) {
                 document.getElementById('label9').removeAttribute('style')
-                document.getElementById('sheldTime').required = true
+                document.getElementById('scheduleTime').required = true
             } else {
                 document.getElementById('label9').style.display = 'none'
-                document.getElementById('sheldTime').required = false
+                document.getElementById('scheduleTime').required = false
             }
             _return = true
 //      } else if (this.id == 'enableSyncStorage') {
@@ -394,7 +394,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             _return = true
         }
         if (!_return) {
-            db.put('other', settings, 'settings')
+            await db.put('other', settings, 'settings')
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         }
         blockButtons = false
@@ -402,7 +402,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
 }
 
 //Слушатель кнопки "Добавить"
-document.getElementById('addProject').addEventListener('submit', async()=>{
+document.getElementById('addProject').addEventListener('submit', async(event)=>{
     event.preventDefault()
     if (blockButtons) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
@@ -440,8 +440,8 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
         lastAttemptVote: null,
         added: Date.now()
     }
-    if (document.getElementById('sheldTimeCheckbox').checked && document.getElementById('sheldTime').value !== '') {
-        project.time = new Date(document.getElementById('sheldTime').value).getTime()
+    if (document.getElementById('scheduleTimeCheckbox').checked && document.getElementById('scheduleTime').value !== '') {
+        project.time = new Date(document.getElementById('scheduleTime').value).getTime()
     } else {
         project.time = null
     }
@@ -458,7 +458,11 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
         project.lastDayMonth = true
     }
     if (project.rating !== 'Custom' && document.getElementById('voteMode').checked) {
-        project[document.getElementById('voteModeSelect').value] = true
+        if (document.getElementById('voteModeSelect').value === 'silentMode') {
+            project.silentMode = true
+        } else if (document.getElementById('voteModeSelect').value === 'emulateMode') {
+            project.emulateMode = true
+        }
     }
     if (document.getElementById('priority').checked) {
         project.priority = true
@@ -1083,14 +1087,10 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         await db.clear('projects')
         const tx = db.transaction(['projects', 'other'], 'readwrite')
         for (const project of projects) {
-            tx.objectStore('projects').add(project, project.key)
+            await tx.objectStore('projects').add(project, project.key)
         }
-        tx.objectStore('other').put(data.settings, 'settings')
-        tx.objectStore('other').put(data.generalStats, 'generalStats')
-        await new Promise((resolve, reject) => {
-            tx.oncomplete = (event) => resolve(event.target.result)
-            tx.onerror = (event) => reject(event.target.error)
-        })
+        await tx.objectStore('other').put(data.settings, 'settings')
+        await tx.objectStore('other').put(data.generalStats, 'generalStats')
 
         settings = data.settings
         generalStats = data.generalStats
@@ -1314,7 +1314,7 @@ async function fastAdd() {
     }
 }
 
-function addCustom() {
+async function addCustom() {
     if (document.querySelector('option[name="Custom"]').disabled) {
         document.querySelector('option[name="Custom"]').disabled = false
     }
@@ -1333,7 +1333,7 @@ function addCustom() {
 //  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
-        db.put('other', settings, 'settings')
+        await db.put('other', settings, 'settings')
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     }
 }
@@ -1430,7 +1430,7 @@ async function listSelect(event, tabs) {
 
 //Слушатели кнопок списка доавленных проектов
 if (document.getElementById('CustomButton')) {
-    document.getElementById('CustomButton').addEventListener('click', ()=> {
+    document.getElementById('CustomButton').addEventListener('click', (event)=> {
         listSelect(event, 'CustomTab')
     })
 }

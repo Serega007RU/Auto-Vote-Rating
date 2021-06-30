@@ -160,7 +160,7 @@
     "message": "You haven't added any projects to this voting page yet!",
     "description": "Notification. You haven't added any projects"
   },
-  "notAvaibledInSilent": {
+  "notAvailableInSilent": {
     "message": "This is not available in silent mode by default!",
     "description": "Notification. available in silent voting mode"
   },
@@ -195,7 +195,7 @@
   "confirmDisableCheckProjects": {
     "message": "Are you sure you want to disable verification when adding a project? If you make an error when adding a project, voting might fail"
   },
-  "confirmPrioriry": {
+  "confirmPriority": {
     "message": "Are you sure you want to give priority to this project? When you enable priority, if you don't have precise time set this may lead to late voting. Set the precise time (accurate to seconds) and don't change it for correct voting process"
   },
   "deleteButton": {
@@ -426,7 +426,7 @@
     "message": "You have already voted"
   },
   "errorOpenTab": {
-    "message": "Error occured while opening the tab: "
+    "message": "Error occurred while opening the tab: "
   },
   "errorAuthVK": {
     "message": "VK authorization failed! Vote manually this time in order to fix this error"
@@ -714,7 +714,7 @@
   "lastDayMonth2": {
     "message": "on the last day of the month"
   },
-  "sheldTime": {
+  "scheduleTime": {
     "message": "Schedule a vote"
   },
   "discordLogIn": {
