@@ -185,11 +185,7 @@ async function checkOpen(project) {
         if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
-            const VKs = await new Promise((resolve, reject) => {
-                const request = db.transaction('vks').objectStore('vks').getAll()
-                request.onsuccess = (event) => resolve(event.target.result)
-                request.onerror = reject
-            })
+            const VKs = await db.getAll('vks')
             for (let vkontakte of VKs) {
                 if (vkontakte.notWorking) {
                     let _continue = true
@@ -273,21 +269,13 @@ async function checkOpen(project) {
                 if (!settings.disabledNotifError) {
                     sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
                 }
-                await new Promise((resolve, reject) => {
-                    const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-                    request.onsuccess = resolve
-                    request.onerror = reject
-                })
+                await db.put('other', settings, 'settings')
                 await stopVote()
                 return
             }
             //Ищет не юзанный свободный прокси
             let found = false
-            const proxies = await new Promise((resolve, reject) => {
-                const request = db.transaction('proxies').objectStore('proxies').getAll()
-                request.onsuccess = (event) => resolve(event.target.result)
-                request.onerror = reject
-            })
+            const proxies = await db.getAll('proxies')
             for (let proxy of proxies) {
                 if (proxy.notWorking) continue
                 let usedProjects = getTopFromList(proxy, project)
@@ -329,11 +317,7 @@ async function checkOpen(project) {
                         })
                         if (!response.ok) {
                             settings.stopVote = Date.now() + 86400000
-                            await new Promise((resolve, reject) => {
-                                const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-                                request.onsuccess = resolve
-                                request.onerror = reject
-                            })
+                            await db.put('other', settings, 'settings')
                             await stopVote()
                             if (response.status === 401) {
                                 console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
@@ -1538,11 +1522,7 @@ async function endVote(request, sender, project) {
                         getTopFromList(currentVK, project).splice(index, 1)
                     }
                     getTopFromList(currentVK, project).push(usedProject)
-                    await new Promise((resolve, reject) => {
-                        const request = db.transaction('vks', 'readwrite').objectStore('vks').put(currentVK, currentVK.key)
-                        request.onsuccess = resolve
-                        request.onerror = reject
-                    })
+                    await db.put('vks', currentVK, currentVK.key)
                 }
             }
 
@@ -1556,11 +1536,7 @@ async function endVote(request, sender, project) {
                     getTopFromList(currentProxy, project).splice(index, 1)
                 }
                 getTopFromList(currentProxy, project).push(usedProject)
-                await new Promise((resolve, reject) => {
-                    const request = db.transaction('proxies', 'readwrite').objectStore('proxies').put(currentProxy, currentProxy.key)
-                    request.onsuccess = resolve
-                    request.onerror = reject
-                })
+                await db.put('proxies', currentProxy, currentProxy.key)
             } else if (settings.useProxyOnUnProxyTop || (!project.TopCraft && !project.McTOP && !project.MinecraftRating)) {
                 console.warn('currentProxy is null or not found')
             }
@@ -1617,11 +1593,7 @@ async function endVote(request, sender, project) {
             sendMessage = message
             if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
-                await new Promise((resolve, reject) => {
-                    const request = db.transaction('vks', 'readwrite').objectStore('vks').put(currentVK, currentVK.key)
-                    request.onsuccess = resolve
-                    request.onerror = reject
-                })
+                await db.put('vks', currentVK, currentVK.key)
             } else if (project.MCRate && message.includes('Ваш аккаунт заблокирован для голосования за этот проект')) {
                 let usedProject = {
                     id: project.id,
@@ -1633,26 +1605,14 @@ async function endVote(request, sender, project) {
                     getTopFromList(currentVK, project).splice(index, 1)
                 }
                 getTopFromList(currentVK, project).push(usedProject)
-                await new Promise((resolve, reject) => {
-                    const request = db.transaction('vks', 'readwrite').objectStore('vks').put(currentVK, currentVK.key)
-                    request.onsuccess = resolve
-                    request.onerror = reject
-                })
+                await db.put('vks', currentVK, currentVK.key)
             } else if (project.MCRate && message.includes('Ваш ВК ID заблокирован для голосовани')) {
                 currentVK.MCRate = message
-                await new Promise((resolve, reject) => {
-                    const request = db.transaction('vks', 'readwrite').objectStore('vks').put(currentVK, currentVK.key)
-                    request.onsuccess = resolve
-                    request.onerror = reject
-                })
+                await db.put('vks', currentVK, currentVK.key)
             } else if (currentProxy != null && request && request.errorVoteNetwork) {
                 if (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT')) {
                     currentProxy.notWorking = request.errorVoteNetwork[0]
-                    await new Promise((resolve, reject) => {
-                        const request = db.transaction('proxies', 'readwrite').objectStore('proxies').put(currentProxy, currentProxy.key)
-                        request.onsuccess = resolve
-                        request.onerror = reject
-                    })
+                    await db.put('proxies', currentProxy, currentProxy.key)
                     await stopVote()
                 }
             }
@@ -1821,7 +1781,7 @@ async function wait(ms) {
 async function updateProject(project) {
     const found = await db.count('projects', project.key)
     if (found) {
-        db.put('projects', project, project.key)
+        await db.put('projects', project, project.key)
         chrome.runtime.sendMessage({updateProject: true, project})
     } else {
         console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
@@ -1909,11 +1869,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 if (!settings.disabledNotifError) {
                     sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyTB'))
                 }
-                await new Promise((resolve, reject) => {
-                    const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-                    request.onsuccess = resolve
-                    request.onerror = reject
-                })
+                await db.put('other', settings, 'settings')
                 await stopVote()
             }
         } else if (currentProxy.Windscribe) {
@@ -2052,14 +2008,10 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         await db.clear('projects')
         const tx = db.transaction(['projects', 'other'], 'readwrite')
         for (const project of projects) {
-            tx.objectStore('projects').add(project, project.key)
+            await tx.objectStore('projects').add(project, project.key)
         }
-        tx.objectStore('other').put(oldSettings, 'settings')
-        tx.objectStore('other').put(oldGeneralStats, 'generalStats')
-        await new Promise((resolve, reject) => {
-            tx.oncomplete = (event) => resolve(event.target.result)
-            tx.onerror = (event) => reject(event.target.error)
-        })
+        await tx.objectStore('other').put(oldSettings, 'settings')
+        await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
         for (const item of Object.keys(allProjects)) {
             await removeValue('AVMRprojects' + item)
         }

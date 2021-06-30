@@ -279,7 +279,7 @@ async function restoreOptions() {
             await chrome.extension.getBackgroundPage().stopVote()
             createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
         }
-        db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+        await db.put('other', settings, 'settings')
     }
     document.getElementById('stopVote').addEventListener('click', stopVoteButton)
     if (settings.enableCustom) addCustom()
@@ -457,16 +457,8 @@ function generateBtnListRating(rating, count) {
 //Добавить аккаунт ВКонтакте в список
 async function addVKList(VK) {
     if (!VK.key) {
-        VK.key = await new Promise((resolve, reject) => {
-            const request = db.transaction('vks', 'readwrite').objectStore('vks').add(VK)
-            request.onsuccess = (event) => resolve(event.target.result)
-            request.onerror = reject
-        })
-        await new Promise((resolve, reject) => {
-            const request = db.transaction('vks', 'readwrite').objectStore('vks').put(VK, VK.key)
-            request.onsuccess = resolve
-            request.onerror = reject
-        })
+        VK.key = await db.add('vks', VK)
+        await db.put('vks', VK, VK.key)
 
         const count = Number(document.querySelector('#VKButton > span').textContent)
         document.querySelector('#VKButton > span').textContent = String(count + 1)
@@ -535,11 +527,7 @@ async function addVKList(VK) {
         document.querySelector('#info .content .events').parentNode.replaceChild(document.querySelector('#info .content .events').cloneNode(false), document.querySelector('#info .content .events'))
         toggleModal('info')
         const message = document.querySelector('#info > div.content > .message')
-        VK = await new Promise((resolve, reject) => {
-            const request = db.transaction('vks').objectStore('vks').get(VK.key)
-            request.onsuccess = (event) => resolve(event.target.result)
-            request.onerror = reject
-        })
+        VK = await db.get('vks', VK.key)
         for (const [key, value] of Object.entries(VK)) {
             if (key === 'cookies') continue
             message.append(key + ': ' + JSON.stringify(value, null, '\t'))
@@ -551,16 +539,8 @@ async function addVKList(VK) {
 //Добавить аккаунт Borealis в список
 async function addBorealisList(acc) {
     if (!acc.key) {
-        acc.key = await new Promise((resolve, reject) => {
-            const request = db.transaction('borealis', 'readwrite').objectStore('borealis').add(acc)
-            request.onsuccess = (event) => resolve(event.target.result)
-            request.onerror = reject
-        })
-        await new Promise((resolve, reject) => {
-            const request = db.transaction('borealis', 'readwrite').objectStore('borealis').put(acc, acc.key)
-            request.onsuccess = resolve
-            request.onerror = reject
-        })
+        acc.key = await db.add('borealis', acc)
+        await db.put('borealis', acc, acc.key)
 
         const count = Number(document.querySelector('#BorealisButton > span').textContent)
         document.querySelector('#BorealisButton > span').textContent = String(count + 1)
@@ -639,18 +619,8 @@ async function addBorealisList(acc) {
 //Добавить прокси в список
 async function addProxyList(proxy) {
     if (!proxy.key) {
-        proxy.key = await new Promise((resolve, reject) => {
-            const request = db.transaction('proxies', 'readwrite').objectStore('proxies').add(proxy)
-            request.onsuccess = function (event) {
-                resolve(event.target.result)
-            }
-            request.onerror = reject
-        })
-        await new Promise((resolve, reject) => {
-            const request = db.transaction('proxies', 'readwrite').objectStore('proxies').put(proxy, proxy.key)
-            request.onsuccess = resolve
-            request.onerror = reject
-        })
+        proxy.key = await db.add('proxies', proxy)
+        await db.put('proxies', proxy, proxy.key)
 
         const count = Number(document.querySelector('#ProxyButton > span').textContent)
         document.querySelector('#ProxyButton > span').textContent = String(count + 1)
@@ -739,12 +709,7 @@ async function removeVKList(VK) {
         return
     }
 
-    const vks = db.transaction('vks', 'readwrite').objectStore('vks')
-    await new Promise((resolve, reject) => {
-        const request = vks.delete(VK.key)
-        request.onsuccess = resolve
-        request.onerror = reject
-    })
+    await db.delete('vks', VK.key)
 }
 
 async function removeBorealisList(acc) {
@@ -757,12 +722,7 @@ async function removeBorealisList(acc) {
         return
     }
 
-    const borealis = db.transaction('borealis', 'readwrite').objectStore('borealis')
-    await new Promise((resolve, reject) => {
-        const request = borealis.delete(acc.key)
-        request.onsuccess = resolve
-        request.onerror = reject
-    })
+    await db.delete('borealis', acc.key)
 }
 
 async function removeProxyList(proxy) {
@@ -774,12 +734,7 @@ async function removeProxyList(proxy) {
     } else {
         return
     }
-    const proxies = db.transaction('proxies', 'readwrite').objectStore('proxies')
-    await new Promise((resolve, reject) => {
-        const request = proxies.delete(proxy.key)
-        request.onsuccess = resolve
-        request.onerror = reject
-    })
+    await db.delete('proxies', proxy.key)
     //Если в этот момент прокси использовался
     if (chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
         if (chrome.extension.getBackgroundPage().currentProxy.ip === proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port === proxy.port) {
@@ -812,11 +767,7 @@ async function reloadProjectList() {
 
 async function reloadVKsList() {
     document.getElementById('vksList').parentNode.replaceChild(document.getElementById('vksList').cloneNode(false), document.getElementById('vksList'))
-    document.querySelector('#VKButton > span').textContent = await new Promise((resolve, reject) => {
-        const request = db.transaction('vks').objectStore('vks').count()
-        request.onsuccess = (event) => resolve(event.target.result)
-        request.onerror = reject
-    })
+    document.querySelector('#VKButton > span').textContent = await db.count('vks')
     if (document.getElementById('VKButton').classList.contains('activeList')) {
         listSelect({currentTarget: document.getElementById('VKButton')}, 'vks')
     }
@@ -824,11 +775,7 @@ async function reloadVKsList() {
 
 async function reloadProxiesList() {
     document.getElementById('proxiesList').parentNode.replaceChild(document.getElementById('proxiesList').cloneNode(false), document.getElementById('proxiesList'))
-    document.querySelector('#ProxyButton > span').textContent = await new Promise((resolve, reject) => {
-        const request = db.transaction('proxies').objectStore('proxies').count()
-        request.onsuccess = (event) => resolve(event.target.result)
-        request.onerror = reject
-    })
+    document.querySelector('#ProxyButton > span').textContent = await db.count('proxies')
     if (document.getElementById('ProxyButton').classList.contains('activeList')) {
         listSelect({currentTarget: document.getElementById('ProxyButton')}, 'proxies')
     }
@@ -836,11 +783,7 @@ async function reloadProxiesList() {
 
 async function reloadBorealisList() {
     document.getElementById('borealisList').parentNode.replaceChild(document.getElementById('borealisList').cloneNode(false), document.getElementById('borealisList'))
-    document.querySelector('#BorealisButton > span').textContent = await new Promise((resolve, reject) => {
-        const request = db.transaction('borealis').objectStore('borealis').count()
-        request.onsuccess = (event) => resolve(event.target.result)
-        request.onerror = reject
-    })
+    document.querySelector('#BorealisButton > span').textContent = await db.count('borealis')
     if (document.getElementById('BorealisButton').classList.contains('activeList')) {
         listSelect({currentTarget: document.getElementById('BorealisButton')}, 'borealis')
     }
@@ -899,24 +842,16 @@ document.getElementById('importSettingsVK').addEventListener('change', async (ev
         const file = event.target.files[0]
         const data = await new Response(file).json()
         let count = 0
-        const transaction = db.transaction('vks', 'readwrite')
-        const vks = transaction.objectStore('vks')
+        const tx = db.transaction('vks', 'readwrite')
         for (const VK of data.vks) {
             delete VK.key
-            vks.index('id').count(VK.id).onsuccess = (event) =>{
-                if (event.target.result === 0) {
-                    vks.put(VK).onsuccess = (event) => {
-                        VK.key = event.target.result
-                        vks.put(VK, VK.key)
-                    }
-                }
+            const found = await tx.store.index('id').count(VK.id)
+            if (found === 0) {
+                VK.key = await tx.store.add(VK)
+                await tx.store.put(VK, VK.key)
+                count++
             }
-            count++
         }
-        await new Promise((resolve, reject) => {
-            transaction.oncomplete = resolve
-            transaction.onerror = reject
-        })
         reloadVKsList()
 
         createNotif(chrome.i18n.getMessage('importingSettingVKEnd', String(count)), 'success')
@@ -1103,14 +1038,7 @@ async function addVK(repair, imp) {
         }
 
         if (!repair) {
-            let vks = db.transaction('vks').objectStore('vks').index('id')
-            let found = await new Promise((resolve, reject) => {
-                const request = vks.get(VK.id)
-                request.onsuccess = function (event) {
-                    resolve(event.target.result)
-                }
-                request.onerror = reject
-            })
+            const found = await db.getFromIndex('vks', 'id', VK.id)
             if (found) {
                 createNotif(chrome.i18n.getMessage('added'), 'success')
                 await checkAuthVK(found)
@@ -1135,28 +1063,15 @@ async function addVK(repair, imp) {
         }
 
         if (repair) {
-            let vks = db.transaction('vks').objectStore('vks').index('id')
-            let found = await new Promise((resolve, reject) => {
-                const request = vks.get(VK.id)
-                request.onsuccess = function (event) {
-                    resolve(event.target.result)
+            const found = await db.getFromIndex('vks', 'id', VK.id)
+            for (const obj of Object.keys(found)) {//Совмещает данные со старым аккаунтом при этом перезаписывает новые данные если как такое были получены
+                if (VK[obj] == null) {
+                    VK[obj] = found[obj]
                 }
-                request.onerror = reject
-            })
-            if (found) {
-                for (const obj of Object.keys(found)) {//Совмещает данные со старым аккаунтом при этом перезаписывает новые данные если как такое были получены
-                    if (VK[obj] == null) {
-                        VK[obj] = found[obj]
-                    }
-                }
-                delete VK.notWorking
-                await new Promise(((resolve, reject) => {
-                    const request = db.transaction('vks', 'readwrite').objectStore('vks').put(VK, VK.key)
-                    request.onsuccess = resolve
-                    request.onerror = reject
-                }))
-                createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
             }
+            delete VK.notWorking
+            await db.put('vks', VK, VK.key)
+            createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
         } else {
             await addVKList(VK)
             createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
@@ -1306,12 +1221,7 @@ async function addBorealis(repair, imp) {
         }
 
         if (!repair) {
-            const borealis = db.transaction('borealis').objectStore('borealis').index('nick')
-            let found = await new Promise((resolve, reject) => {
-                const request = borealis.get(acc.nick)
-                request.onsuccess = (event) => resolve(event.target.result)
-                request.onerror = reject
-            })
+            const found = await db.getFromIndex('borealis', 'nick', acc.nick)
             if (found) {
                 createNotif(chrome.i18n.getMessage('added'), 'success')
                 return
@@ -1335,20 +1245,8 @@ async function addBorealis(repair, imp) {
         }
 
         if (repair) {
-            let borealis = db.transaction('borealis').objectStore('borealis').index('nick')
-            let found = await new Promise((resolve, reject) => {
-                const request = borealis.get(acc.nick)
-                request.onsuccess = (event) => resolve(event.target.result)
-                request.onerror = reject
-            })
-            if (found) {
-                await new Promise(((resolve, reject) => {
-                    const request = db.transaction('borealis', 'readwrite').objectStore('borealis').put(acc, found.key)
-                    request.onsuccess = resolve
-                    request.onerror = reject
-                }))
-                createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
-            }
+            const found = await db.getFromIndex('borealis', 'nick', acc.nick)
+            await db.put('borealis', found, found.key)
             createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + acc.nick, 'success')
         } else {
             await addBorealisList(acc)
@@ -1446,11 +1344,7 @@ async function checkAuthVK(VK) {
                 response.doc = new DOMParser().parseFromString(response.html, 'text/html')
                 VK.numberId = Number(response.doc.getElementById('id_profile-vk').value.replace('http://vk.com/id', ''))
                 VK['password' + key] = password
-                await new Promise(((resolve, reject) => {
-                    const request = db.transaction('vks', 'readwrite').objectStore('vks').put(VK, VK.key)
-                    request.onsuccess = resolve
-                    request.onerror = reject
-                }))
+                await db.put('vks', VK, VK.key)
                 createNotif(chrome.i18n.getMessage('antiBanVKEnd', [password, key]), 'success')
             } catch (e) {
                 createNotif(e, 'error')
@@ -1507,11 +1401,7 @@ document.getElementById('deleteAllProxies').addEventListener('click', async () =
         blockButtons = true
     }
     createNotif(chrome.i18n.getMessage('deletingAllProxies'))
-    await new Promise((resolve, reject) => {
-        const request = db.transaction('proxies', 'readwrite').objectStore('proxies').clear()
-        request.onsuccess = resolve
-        request.onerror = reject
-    })
+    await db.clear('proxies')
     reloadProxiesList()
     createNotif(chrome.i18n.getMessage('deletedAllProxies'), 'success')
     blockButtons = false
@@ -1586,8 +1476,7 @@ document.getElementById('importProxy').addEventListener('change', async (event) 
         if (event.target.files.length === 0) return
         let file = event.target.files[0]
         const data = await new Response(file).text()
-        const transaction = db.transaction('proxies', 'readwrite')
-        const proxies = transaction.objectStore('proxies')
+        const tx = db.transaction('proxies', 'readwrite')
         for (let proxyString of data.split(/\n/g)) {
             proxyString = proxyString.replace(/(?:\r\n|\r|\n)/g, '')
             if (proxyString == null || proxyString === '') continue
@@ -1614,19 +1503,12 @@ document.getElementById('importProxy').addEventListener('change', async (event) 
             }
             if (_continue) continue
             if (!proxy.scheme) proxy.scheme = 'https'
-            proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
-                if (event.target.result === 0) {
-                    proxies.put(proxy).onsuccess = (event) => {
-                        proxy.key = event.target.result
-                        proxies.put(proxy, proxy.key)
-                    }
-                }
+            const found = await tx.store.index('ip, port').count([proxy.ip, proxy.port])
+            if (found === 0) {
+                proxy.key = await tx.store.add(proxy)
+                await tx.store.put(proxy, proxy.key)
             }
         }
-        await new Promise((resolve, reject) => {
-            transaction.oncomplete = resolve
-            transaction.onerror = reject
-        })
         reloadProxiesList()
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
     } catch (e) {
@@ -1706,8 +1588,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                 }
             }
             const json = await response.json()
-            const transaction = db.transaction('proxies', 'readwrite')
-            const proxies = transaction.objectStore('proxies')
+            const tx = db.transaction('proxies', 'readwrite')
             for (const vpn of json.vpns) {
                 const proxy = {
                     ip: vpn.url,
@@ -1715,20 +1596,13 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     scheme: 'https',
                     TunnelBear: true
                 }
-                proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
-                    if (event.target.result === 0) {
-                        proxies.put(proxy).onsuccess = (event) => {
-                            proxy.key = event.target.result
-                            proxies.put(proxy, proxy.key)
-                        }
-                    }
+                const found = await tx.store.index('ip, port').count([proxy.ip, proxy.port])
+                if (found === 0) {
+                    proxy.key = await tx.store.add(proxy)
+                    await tx.store.put(proxy, proxy.key)
                 }
             }
-            await new Promise((resolve, reject) => {
-                transaction.oncomplete = resolve
-                transaction.onerror = reject
-            })
-            db.transaction('proxies').objectStore('proxies').count().onsuccess = (event) => document.querySelector('#ProxyButton > span').textContent = event.target.result
+            document.querySelector('#ProxyButton > span').textContent = await db.count('proxies')
         }
         reloadProxiesList()
     } catch (e) {
@@ -1765,8 +1639,7 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
                 return
             }
             const json = await response.json()
-            const transaction = db.transaction('proxies', 'readwrite')
-            const proxies = transaction.objectStore('proxies')
+            const tx = db.transaction('proxies', 'readwrite')
             for (const data of json.data) {
                 if (data.nodes) {
                     for (const node of data.nodes) {
@@ -1777,23 +1650,16 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
                                 scheme: 'https',
                                 Windscribe: true
                             }
-                            proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
-                                if (event.target.result === 0) {
-                                    proxies.put(proxy).onsuccess = (event) => {
-                                        proxy.key = event.target.result
-                                        proxies.put(proxy, proxy.key)
-                                    }
-                                }
+                            const found = await tx.store.index('ip, port').count([proxy.ip, proxy.port])
+                            if (found === 0) {
+                                proxy.key = await tx.store.add(proxy)
+                                await tx.store.put(proxy, proxy.key)
                             }
                         }
                     }
                 }
             }
 
-            await new Promise((resolve, reject) => {
-                transaction.oncomplete = resolve
-                transaction.onerror = reject
-            })
             reloadProxiesList()
         } catch (e) {
             createNotif(e, 'error')
@@ -1827,8 +1693,7 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
                 "method": "POST"
             })
             const vpns = await response.json()
-            const transaction = db.transaction('proxies', 'readwrite')
-            const proxies = transaction.objectStore('proxies')
+            const tx = db.transaction('proxies', 'readwrite')
             for (vpn of vpns.ztun[country]) {
                 let host = vpn.replace('HTTP ', '').split(':')
                 let port = 22223
@@ -1839,20 +1704,13 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
                     scheme: 'https',
                     HolaVPN: true
                 }
-                proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
-                    if (event.target.result === 0) {
-                        proxies.put(proxy).onsuccess = (event) => {
-                            proxy.key = event.target.result
-                            proxies.put(proxy, proxy.key)
-                        }
-                    }
+                const found = await tx.store.index('ip, port').count([proxy.ip, proxy.port])
+                if (found === 0) {
+                    proxy.key = await tx.store.add(proxy)
+                    await tx.store.put(proxy, proxy.key)
                 }
             }
-            await new Promise((resolve, reject) => {
-                transaction.oncomplete = resolve
-                transaction.onerror = reject
-            })
-            db.transaction('proxies').objectStore('proxies').count().onsuccess = (event) => document.querySelector('#ProxyButton > span').textContent = event.target.result
+            document.querySelector('#ProxyButton > span').textContent = await db.count('proxies')
         }
         reloadProxiesList()
     } catch (e) {
@@ -1897,8 +1755,7 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
             "credentials": "include"
         })
         let vpns = await response.json()
-        const transaction = db.transaction('proxies', 'readwrite')
-        const proxies = transaction.objectStore('proxies')
+        const tx = db.transaction('proxies', 'readwrite')
         for (const vpn of vpns) {
             let host = vpn.dnsname.split(':')
             const proxy = {
@@ -1907,19 +1764,12 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
                 scheme: 'https',
                 ZenMate: true
             }
-            proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
-                if (event.target.result === 0) {
-                    proxies.put(proxy).onsuccess = (event) => {
-                        proxy.key = event.target.result
-                        proxies.put(proxy, proxy.key)
-                    }
-                }
+            const found = await tx.store.index('ip, port').count([proxy.ip, proxy.port])
+            if (found === 0) {
+                proxy.key = await tx.store.add(proxy)
+                await tx.store.put(proxy, proxy.key)
             }
         }
-        await new Promise((resolve, reject) => {
-            transaction.oncomplete = resolve
-            transaction.onerror = reject
-        })
 //      await setValue('AVMRproxies', proxies)
 
 //      response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/104", {
@@ -1944,8 +1794,7 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
 //        "credentials": "include"
 //      })
 //      vpns = await response.json()
-//      const transaction = db.transaction('proxies', 'readwrite')
-//      const proxies = transaction.objectStore('proxies')
+//      const tx = db.transaction('proxies', 'readwrite')
 //      for (const vpn of vpns) {
 //          let host = vpn.dnsname.split(':')
 //          const proxy = {
@@ -1954,19 +1803,12 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
 //              scheme: 'https',
 //              ZenMate: true
 //          }
-//          proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
-//              if (event.target.result === 0) {
-//                  proxies.put(proxy).onsuccess = (event) => {
-//                      proxy.key = event.target.result
-//                      proxies.put(proxy, proxy.key)
-//                  }
-//              }
+//          const found = await tx.store.index('ip, port').count([proxy.ip, proxy.port])
+//          if (found === 0) {
+//              proxy.key = await tx.store.add(proxy)
+//              await tx.store.put(proxy, proxy.key)
 //          }
 //      }
-//      await new Promise((resolve, reject) => {
-//          transaction.oncomplete = resolve
-//          transaction.onerror = reject
-//      })
         reloadProxiesList()
     } catch (e) {
         createNotif(e, 'error')
@@ -1988,8 +1830,7 @@ document.getElementById('importNordVPN').addEventListener('click', async () => {
     createNotif(chrome.i18n.getMessage('importVPNStart', 'NordVPN'))
     try {
         let response = await fetch('https://api.nordvpn.com/server')
-        const transaction = db.transaction('proxies', 'readwrite')
-        const proxies = transaction.objectStore('proxies')
+        const tx = db.transaction('proxies', 'readwrite')
         let vpns = await response.json()
         for (const vpn of vpns) {
             const proxy = {
@@ -1998,19 +1839,12 @@ document.getElementById('importNordVPN').addEventListener('click', async () => {
                 scheme: 'https',
                 NordVPN: true
             }
-            proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
-                if (event.target.result === 0) {
-                    proxies.put(proxy).onsuccess = (event) => {
-                        proxy.key = event.target.result
-                        proxies.put(proxy, proxy.key)
-                    }
-                }
+            const found = await tx.store.index('ip, port').count([proxy.ip, proxy.port])
+            if (found === 0) {
+                proxy.key = await tx.store.add(proxy)
+                await tx.store.put(proxy, proxy.key)
             }
         }
-        await new Promise((resolve, reject) => {
-            transaction.oncomplete = resolve
-            transaction.onerror = reject
-        })
         reloadProxiesList()
     } catch (e) {
         createNotif(e, 'error')
@@ -2024,11 +1858,7 @@ document.getElementById('importNordVPN').addEventListener('click', async () => {
 
 async function addProxy(proxy, dontNotif) {
     if (!dontNotif) createNotif(chrome.i18n.getMessage('adding'))
-    const found = await new Promise((resolve, reject) => {
-        const request = db.transaction('proxies').objectStore('proxies').index('ip, port').count([proxy.ip, proxy.port])
-        request.onsuccess = (event) => resolve(event.target.result)
-        request.onerror = reject
-    })
+    const found = await db.countFromIndex('proxies', 'ip, port', [proxy.ip, proxy.port])
     if (found > 0) {
         if (!dontNotif) createNotif(chrome.i18n.getMessage('added'), 'success')
         return
@@ -2233,7 +2063,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             _return = true
         }
         if (!_return) {
-            db.put('other', settings, 'settings')
+            await db.put('other', settings, 'settings')
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         }
         blockButtons = false
@@ -2378,11 +2208,7 @@ document.getElementById('formProxyBlackList').addEventListener('submit', async (
         return
     }
     settings.proxyBlackList = bl
-    await new Promise((resolve, reject) => {
-        const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
-        request.onsuccess = resolve
-        request.onerror = reject
-    })
+    await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('proxyBLSet'), 'success')
     blockButtons = false
 })
@@ -2403,11 +2229,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
     }
     let coins = 0
     let votes = 0
-    const borealis = await new Promise((resolve, reject) => {
-        const request = db.transaction('borealis').objectStore('borealis').getAll()
-        request.onsuccess = (event) => resolve(event.targer.result)
-        request.onerror = reject
-    })
+    const borealis = await db.getAll('borealis')
     for (const acc of borealis) {
 		try {
             for (let i = 0; i < acc.cookies.length; i++) {
@@ -2566,13 +2388,8 @@ document.getElementById('AddNicksAccBorealis').addEventListener('click', async (
     }
     createNotif(chrome.i18n.getMessage('adding'))
     let array = [{top: 'TopCraft', id: '7126'}, {top: 'McTOP', id: '2241'}, {top: 'MinecraftRating', id: 'borealis'}]
-    const borealis = await new Promise((resolve, reject) => {
-        const request = db.transaction('borealis').objectStore('borealis').getAll()
-        request.onsuccess = (event) => resolve(event.targer.result)
-        request.onerror = reject
-    })
-    const transaction = db.transaction('projects', 'readwrite')
-    const projects = transaction.objectStore('projects')
+    const borealis = await db.getAll('borealis')
+    const tx = db.transaction('projects', 'readwrite')
     for (const acc of borealis) {
         for (let arr of array) {
             let project = {
@@ -2585,20 +2402,13 @@ document.getElementById('AddNicksAccBorealis').addEventListener('click', async (
                 },
                 time: null
             }
-            projects.index('rating, id, nick').count([project.rating, project.id, project.nick]).onsuccess = (event) => {
-                if (event.target.result === 0) {
-                    projects.put(project).onsuccess = (event) => {
-                        project.key = event.target.result
-                        projects.put(project, project.key)
-                    }
-                }
+            const found = await tx.store.index('rating, id, nick').count([project.rating, project.id, project.nick])
+            if (found === 0) {
+                project.key = await tx.store.add(project)
+                await tx.store.put(project, project.key)
             }
         }
     }
-    await new Promise((resolve, reject) => {
-        transaction.oncomplete = resolve
-        transaction.onerror = reject
-    })
     reloadProjectList()
     blockButtons = false
     createNotif('Успешно добавлены никнеймы Borealis', 'success')
@@ -2854,24 +2664,19 @@ async function addProject(project, element) {
     if (document.getElementById('importNicks').checked) {
         const file = document.getElementById('importNicksFile').files[0]
         const data = await new Response(file).text()
-        const transaction = db.transaction('projects', 'readwrite')
-        const projects = transaction.objectStore('projects')
+        const tx = db.transaction('projects', 'readwrite')
         for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
             if (nick == null || nick === '') continue
             const project2 = Object.assign({}, project)
             project2.nick = nick
-            projects.index('rating, id, nick').count([project2.rating, project2.id, project2.nick]).onsuccess = (event) => {
-                if (event.target.result === 0) {
-                    projects.add(project2)
-                    countNicks++
-                }
+            const found = await tx.store.index('rating, id, nick').count([project2.rating, project2.id, project2.nick])
+            if (found === 0) {
+                project2.key = await tx.store.add(project2)
+                await tx.store.put(project2, project2.key)
+                countNicks++
             }
         }
-        await new Promise((resolve, reject) => {
-            transaction.oncomplete = resolve
-            transaction.onerror = reject
-        })
         reloadProjectList()
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().reloadAllAlarms()
     } else {
@@ -3262,23 +3067,19 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         await db.clear('projects')
         const tx = db.transaction(['projects', 'other'], 'readwrite')
         for (const project of projects) {
-            tx.objectStore('projects').add(project, project.key)
+            await tx.objectStore('projects').add(project, project.key)
         }
         for (const vk of vks) {
-            tx.objectStore('vks').add(vk, vk.key)
+            await tx.objectStore('vks').add(vk, vk.key)
         }
         for (const proxy of proxies) {
-            tx.objectStore('proxies').add(proxy, proxy.key)
+            await tx.objectStore('proxies').add(proxy, proxy.key)
         }
         for (const accborealis of borealis) {
-            tx.objectStore('borealis').add(accborealis, accborealis.key)
+            await tx.objectStore('borealis').add(accborealis, accborealis.key)
         }
-        tx.objectStore('other').put(data.settings, 'settings')
-        tx.objectStore('other').put(data.generalStats, 'generalStats')
-        await new Promise((resolve, reject) => {
-            tx.oncomplete = (event) => resolve(event.target.result)
-            tx.onerror = (event) => reject(event.target.error)
-        })
+        await tx.objectStore('other').put(data.settings, 'settings')
+        await tx.objectStore('other').put(data.generalStats, 'generalStats')
 
         settings = data.settings
         generalStats = data.generalStats
@@ -3502,7 +3303,7 @@ async function fastAdd() {
     }
 }
 
-function addCustom() {
+async function addCustom() {
     if (document.querySelector('option[name="Custom"]').disabled) {
         document.querySelector('option[name="Custom"]').disabled = false
     }
@@ -3521,7 +3322,7 @@ function addCustom() {
 //  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
-        db.put('other', settings, 'settings')
+        await db.put('other', settings, 'settings')
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     }
 }

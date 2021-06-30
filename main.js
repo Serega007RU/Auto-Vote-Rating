@@ -690,7 +690,7 @@ let db
 //Инициализация настроек расширения
 async function initializeConfig(background) {
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 1, {
+    db = await idb.openDB('avr', 2, {
         upgrade(db, oldVersion/*, newVersion, transaction*/) {
             if (oldVersion === 0) {
                 const projects = db.createObjectStore('projects', {autoIncrement: true})
