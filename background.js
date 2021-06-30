@@ -173,7 +173,6 @@ async function checkOpen(project) {
         if (queueProjects.size === 0 && (currentVK != null || currentProxy != null)) {
             if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
             if (currentProxy != null) clearProxy()
-            currentProxy = null
             currentVK = null
         }
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
@@ -1699,7 +1698,6 @@ async function endVote(request, sender, project) {
         if (settings.useMultiVote && queueProjects.size === 0 && (currentVK != null || currentProxy != null)) {
             if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
             if (currentProxy != null) clearProxy()
-            currentProxy = null
             currentVK = null
         }
         checkVote()
@@ -1782,6 +1780,7 @@ async function removeCookie(url, name) {
 
 async function clearProxy() {
     if (debug) console.log('Удаляю прокси')
+    currentProxy = null
     return new Promise(resolve => {
         chrome.proxy.settings.clear({scope: 'regular'},function() {
             resolve()
@@ -1843,6 +1842,119 @@ function extractHostname(url) {
 
     return hostname
 }
+
+async function stopVote() {
+    if (debug) console.log('Отмена всех голосований и очистка всего')
+    await clearProxy()
+    currentVK = null
+    queueProjects.clear()
+    for (let[key,value] of openedProjects.entries()) {
+        chrome.tabs.remove(key, function() {
+            if (chrome.runtime.lastError) {
+                console.warn(chrome.runtime.lastError.message)
+                if (!settings.disabledNotifError)
+                    sendNotification(chrome.i18n.getMessage('closeTabError'), chrome.runtime.lastError.message)
+            }
+        })
+    }
+    controller.abort()
+    openedProjects.clear()
+    fetchProjects.clear()
+    break1 = true
+    break2 = true
+}
+
+//Если требуется авторизация для Прокси
+let errorProxy = {ip: '', count: 0}
+chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn) {
+    if (details.isProxy && currentProxy) {
+        if (errorProxy.ip !== currentProxy.ip) {
+            errorProxy.count = 0
+        }
+        errorProxy.ip = currentProxy.ip
+        if (errorProxy.count++ > 5) {
+            currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxy2')
+            console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxy2'))
+            if (!settings.disabledNotifError) {
+                sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxy2'))
+            }
+            callbackFn()
+            return
+        }
+        if (currentProxy.login) {
+            console.log(chrome.i18n.getMessage('proxyAuth'))
+            callbackFn({
+                authCredentials: {
+                    'username': currentProxy.login,
+                    'password': currentProxy.password
+                }
+            })
+            return
+        } else if (currentProxy.TunnelBear) {
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'TunnelBear'))
+            if (tunnelBear.token != null && tunnelBear.expires > Date.now()) {
+                callbackFn({
+                    authCredentials: {
+                        'username': tunnelBear.token,
+                        'password': tunnelBear.token
+                    }
+                })
+                return
+            } else {
+                settings.stopVote = Date.now() + 86400000
+                console.error(chrome.i18n.getMessage('errorAuthProxyTB'))
+                if (!settings.disabledNotifError) {
+                    sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyTB'))
+                }
+                await setValue('AVMRsettings', settings)
+                await stopVote()
+            }
+        } else if (currentProxy.Windscribe) {
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'Windscribe'))
+            callbackFn({
+                authCredentials: {
+                    'username': 'mdib1352-t94rvyq',
+                    'password': 'uem29h65n8'
+                }
+            })
+            return
+        } else if (currentProxy.HolaVPN) {
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'HolaVPN'))
+            callbackFn({
+                authCredentials: {
+                    'username': 'user-uuid-c1b9e2c1bbab1664da384d748ef3899c',
+                    'password': '6e07f7fa2eda'
+                }
+            })
+            return
+        } else if (currentProxy.ZenMate) {
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'ZenMate'))
+            callbackFn({
+                authCredentials: {
+                    'username': '97589925',
+                    'password': 'ef483afb122e05400f895434df1394a82d31e340'
+                }
+            })
+            return
+        } else if (currentProxy.NordVPN) {
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'NordVPN'))
+            callbackFn({
+                authCredentials: {
+                    'username': 'n2qNF1K4PBLbWWkJSTfmGEdX',
+                    'password': 'UKweV43HJP5QnWtVEaWnCChM'
+                }
+            })
+            return
+        } else {
+            currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword')
+            console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword'))
+            if (!settings.disabledNotifError) {
+                sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyNoPassword'))
+            }
+        }
+    }
+    callbackFn()
+}, {urls: ['<all_urls>']}, ['asyncBlocking'])
 
 chrome.runtime.onInstalled.addListener(async function(details) {
     if (details.reason === 'install') {

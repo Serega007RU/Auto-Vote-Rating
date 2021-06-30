@@ -401,7 +401,7 @@ ul {
 	overflow-y: auto;
     font-size: 15px;
     color: #fff;
-    text-align: center;
+    /*text-align: center;*/
     padding: 5px;
     margin: 20px auto;
 	max-height: 240px;
@@ -496,7 +496,7 @@ ul {
 	font-weight: 600;
 }
 
-.projectsBlock .contentBlock {
+.contentBlock {
 	margin-bottom: 15px;
 }
 
@@ -508,7 +508,7 @@ ul {
 	grid-gap: 15px;
 }
 
-.projectsBlock .contentBlock .listcontent li {
+.contentBlock .listcontent li {
 	background: #121214;
 	margin-bottom: 10px;
 	justify-content: space-between;
@@ -517,24 +517,24 @@ ul {
 	border-radius: 5px;
 }
 
-.projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
+.contentBlock .listcontent li img[src="images/icons/stats.svg"] {
 	margin-right: 10px;
 }
 
-.projectsBlock .contentBlock .listcontent li .controlItems {
+.contentBlock .listcontent li .controlItems {
 	display: flex;
 	margin: auto 0;
 	justify-content: space-between;
 }
 
-.projectsBlock .contentBlock .listcontent li .message {
+.contentBlock .listcontent li .message {
 	line-height: 1.5;
 	display: flex;
     flex-direction: column;
     justify-content: space-around;
 }
 
-.projectsBlock .contentBlock .listcontent li .controlItems img {
+.contentBlock .listcontent li .controlItems img {
 	width: 30px;
 	display: block;
 	padding: 10px;
@@ -544,29 +544,29 @@ ul {
 	border-radius: 5px;
 }
 
-.projectsBlock .contentBlock .listcontent li img:hover {
+.contentBlock .listcontent li img:hover {
 	cursor: pointer;
 	opacity: 1;
 }
 
 .contentBlock .listcontent li img[src="images/icons/repair.svg"]:hover,
-.projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
+.contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
 	background: #1a7bee;
 }
 
-.projectsBlock .contentBlock .listcontent li img[src="images/icons/delete.svg"]:hover {
+.contentBlock .listcontent li img[src="images/icons/delete.svg"]:hover {
 	background: #da5e5e;
 }
 
-.projectsBlock .contentBlock .listcontent li:nth-child(odd) {
+.contentBlock .listcontent li:nth-child(odd) {
 	background: #2a2a2f;
 }
 
-.projectsBlock .buttonBlock button {
+.buttonBlock button {
 	position: relative;
 }
 
-.projectsBlock .buttonBlock button > span {
+.buttonBlock button > span {
     top: -10px;
     font-weight: 600;
     pointer-events: none;
@@ -667,7 +667,7 @@ ul {
 	grid-template-columns: 7fr 2fr;
 }
 
-#BorealisTab > .inputEl {
+#borealisTab > .inputEl {
 	padding-top: 15px;
 }
 
@@ -714,23 +714,23 @@ ul {
 	margin-bottom: 0;
 }
 
-#VKTab .inputEl {
+#vksTab .inputEl {
 	display: flex;
 	margin-bottom: 20px;
 	justify-content: space-between;
 }
 
-#VKTab .inputEl > * {
+#vksTab .inputEl > * {
 	margin: 0;
 }
 
-#BorealisTab .inputEl {
+#borealisTab .inputEl {
 	display: flex;
 	margin-bottom: 20px;
 	justify-content: space-between;
 }
 
-#BorealisTab .inputEl > * {
+#borealisTab .inputEl > * {
 	margin: 0;
 }
 
@@ -783,11 +783,11 @@ ul {
 }
 
 @media(max-width: 450px) {
-	#VKTab .inputEl {
+	#vksTab .inputEl {
 		display: block;
 	}
 
-	#VKTab .inputEl > * {
+	#vksTab .inputEl > * {
 		margin: auto;
 		margin-bottom: 20px;
 	}

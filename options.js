@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
         window.history.replaceState(null, null, 'options.html')
         alert(chrome.i18n.getMessage('firstInstall'))
     }
+    checkUpdateAvailable()
 
     fastAdd()
 
@@ -50,6 +51,194 @@ document.addEventListener('DOMContentLoaded', async()=>{
         })
     }
 })
+
+async function checkUpdateAvailable(forced) {
+    const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/files/manifest.json/raw?ref=multivote')
+    const json = await response.json()
+    if (forced || new Version(chrome.runtime.getManifest().version).compareTo(new Version(json.version)) === -1) {
+        const button = document.createElement('button')
+        button.classList.add('btn')
+        button.id = 'updateBtn'
+        button.addEventListener('click', () => update(forced ? forced : json.version))
+        button.textContent = chrome.i18n.getMessage('update')
+        createNotif([chrome.i18n.getMessage('updateAvailbe', forced ? forced : json.version), button], 'success', 60000)
+    } else if (document.URL.endsWith('?updated')) {
+        window.history.replaceState(null, null, 'options.html')
+        createNotif(chrome.i18n.getMessage('updated', chrome.runtime.getManifest().version), 'success')
+        toggleModal('ChangeLog')
+    }
+}
+
+function Version(s){
+    this.arr = s.split('.').map(Number)
+}
+Version.prototype.compareTo = function(v){
+    for (let i=0; ;i++) {
+        if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1
+        if (i>=this.arr.length) return -1
+        const diff = this.arr[i]-v.arr[i]
+        if (diff) return diff>0 ? 1 : -1
+    }
+}
+
+//Автоматизированное обновление расширения с git
+async function update(version) {
+    if (window.opr) {//Если мы на Opera
+        chrome.tabs.create({url: 'https://avr-extension.ml/versions/auto_vote_rating-' + version + '-opera.crx'})
+        return
+    }
+    if (!chrome.app) {//Если мы на FireFox
+        chrome.tabs.create({url: 'https://avr-extension.ml/versions/auto_vote_rating-' + version + '-an+fx.xpi'})
+        return
+    }
+    document.querySelector('#updateVersion .content .message').parentNode.replaceChild(document.querySelector('#updateVersion .content .message').cloneNode(false), document.querySelector('#updateVersion .content .message'))
+    document.querySelector('#updateVersion .content .events').parentNode.replaceChild(document.querySelector('#updateVersion .content .events').cloneNode(false), document.querySelector('#updateVersion .content .events'))
+    const message = document.querySelector('#updateVersion > div.content > .message')
+    const events = document.querySelector('#updateVersion > div.content > .events')
+    const progress = document.createElement('progress')
+    events.append(progress)
+    try {
+        createNotif(chrome.i18n.getMessage('update1'), 'hint', 1000)
+        //Спрашиваем у пользователя папку где установлено расширение и получаем её
+        const dirHandle = await window.showDirectoryPicker()
+        if (!document.getElementById('updateVersion').className.includes('active')) toggleModal('updateVersion')
+        //Проверяем на соответствие манифеста
+//      message.append(chrome.i18n.getMessage('update2'))
+//      message.append(document.createElement('br'))
+//      message.scrollTop = message.scrollHeight
+//      let manifestHandle
+//      try {
+//           manifestHandle = await dirHandle.getFileHandle('manifest.json')
+//      } catch (e) {
+//          if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
+//              throw Error(chrome.i18n.getMessage('update3', 'Not found manifest'))
+//          } else {
+//              throw e
+//          }
+//      }
+//      const manifestFile = await manifestHandle.getFile()
+//      const manifest = await manifestFile.text()
+//      if (manifest != JSON.stringify(chrome.runtime.getManifest())) {
+//          throw Error(chrome.i18n.getMessage('update3', 'Invalid manifest'))
+//      }
+        //Также ещё проверим временным файлом в случае если у пользователя дубликат папки расширения. Засовываем в эту папку файл AVRtemp для проверки что пользователь указал дейсвительно правильную папку
+        await dirHandle.getFileHandle('AVRtemp', {create: true})
+        //Проверяем дейсвительно ли это та папка?
+        await new Promise((resolve, reject) => {
+            //Проверяем существует ли файл в AVRtemp в правильной папки расширения (этот метод даёт только изолированный доступ к папке расширения и мы можем только её читать чем мы и пользуемся)
+            chrome.runtime.getPackageDirectoryEntry(details => {
+                details.getFile('AVRtemp', {}, file => resolve(file), error => reject(error))
+            })
+        }).catch(e => {
+            if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
+                throw Error(chrome.i18n.getMessage('update3', 'Temporary file not found'))
+            } else {
+                throw e
+            }
+        }).finally(() => {
+            dirHandle.removeEntry('AVRtemp')
+        })
+
+        message.append(chrome.i18n.getMessage('update4'))
+        message.append(document.createElement('br'))
+        message.scrollTop = message.scrollHeight
+        document.getElementById('file-download').click()
+
+        //Удаляем все файлы для дальнейшего обновления
+        message.append(chrome.i18n.getMessage('update5'))
+        message.append(document.createElement('br'))
+        message.scrollTop = message.scrollHeight
+        for await (const entry of dirHandle.values()) {
+            await dirHandle.removeEntry(entry.name, {recursive: true})
+        }
+
+        //Обращаемся к git где все у нас файлы перечислены
+        message.append(chrome.i18n.getMessage('update6'))
+        message.append(document.createElement('br'))
+        message.scrollTop = message.scrollHeight
+        const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/tree?recursive=true&per_page=999&ref=multivote')
+        const json = await response.json()
+        progress.value = -1
+        progress.max = json.length
+        for (const file of json) {
+            progress.value = progress.value + 1
+            if (file.type === 'blob') {
+                message.append(chrome.i18n.getMessage('dowloading') + file.path)
+                message.append(document.createElement('br'))
+                message.scrollTop = message.scrollHeight
+                file.url = 'https://gitlab.com/api/v4/projects/19831620/repository/files/' + file.path.replaceAll('/', '%2F') + '/raw?ref=multivote'
+                await createFile(dirHandle, file.path.split('/'), file)
+            }
+        }
+
+        //Создаёт поддиректории если их не существует и создаёт файл в нужной дирректории
+        async function createFile(rootDirEntry, folders, file) {
+            if (folders.length === 1) {
+                //Создаём файл
+                const newFileHandle = await rootDirEntry.getFileHandle(file.name, {create: true})
+                await writeURLToFile(newFileHandle, file.url)
+                return
+            }
+            //Фильтруем './' и '/'
+            if (folders[0] === '.' || folders[0] === '') {
+                folders = folders.slice(1)
+            }
+            const dirEntry = await rootDirEntry.getDirectoryHandle(folders[0], {create: true})
+            if (folders.length) {//Если есть ещё поддиректории
+                createFile(dirEntry, folders.slice(1), file)
+            }
+        }
+
+        //Записывает в указанный файл содержимое из указанного URL
+        async function writeURLToFile(fileHandle, url) {
+            // Create a FileSystemWritableFileStream to write to.
+            const writable = await fileHandle.createWritable()
+            // Make an HTTP request for the contents.
+            const response = await fetch(url)
+            // Stream the response into the file.
+            await response.body.pipeTo(writable)
+            // pipeTo() closes the destination pipe by default, no need to close it.
+        }
+
+        message.append(createMessage(chrome.i18n.getMessage('update7'), 'warn'))
+        message.append(document.createElement('br'))
+        message.append(createMessage(chrome.i18n.getMessage('update8'), 'success'))
+        message.append(document.createElement('br'))
+        message.scrollTop = message.scrollHeight
+        const buttonReload = document.createElement('button')
+        buttonReload.classList.add('btn')
+        buttonReload.textContent = chrome.i18n.getMessage('reloadExtension')
+        document.querySelector('#updateVersion > div.content > .events').append(buttonReload)
+        buttonReload.addEventListener('click', () => {
+            chrome.runtime.reload()
+        })
+    } catch (e) {
+        if (document.getElementById('updateVersion').className.includes('active')) {
+            message.append(createMessage(e, 'error'))
+            message.append(document.createElement('br'))
+            message.append(chrome.i18n.getMessage('tryManuallyUpdate'))
+            message.append(' ')
+            let a = document.createElement('a')
+            a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/tree/multivote'
+            a.target = 'blank_'
+            a.textContent = 'https://gitlab.com/Serega007/auto-vote-rating/-/tree/multivote'
+            a.className = 'link'
+            message.append(a)
+            message.append(document.createElement('br'))
+        } else {
+            createNotif(e, 'error')
+        }
+        message.scrollTop = message.scrollHeight
+        if (!progress.value) progress.value = 0
+        const buttonRetry = document.createElement('button')
+        buttonRetry.classList.add('btn')
+        buttonRetry.textContent = chrome.i18n.getMessage('retry')
+        events.append(buttonRetry)
+        buttonRetry.addEventListener('click', () => {
+            update()
+        })
+    }
+}
 
 // Restores select box and checkbox state using the preferences
 async function restoreOptions() {
@@ -79,8 +268,25 @@ async function restoreOptions() {
     if (settings.stopVote > Date.now()) {
         document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
     }
+    let stopVoteButton = async function () {
+        if (settings.stopVote > Date.now()) {
+            settings.stopVote = 0
+            document.querySelector('#stopVote img').src = 'images/icons/start.svg'
+            createNotif(chrome.i18n.getMessage('voteResumed'), 'success', 5000)
+        } else {
+            settings.stopVote = 9000000000000000
+            document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
+            await chrome.extension.getBackgroundPage().stopVote()
+            createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
+        }
+        db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+    }
+    document.getElementById('stopVote').addEventListener('click', stopVoteButton)
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
+    await reloadVKsList()
+    await reloadProxiesList()
+    await reloadBorealisList()
 }
 
 //Добавить проект в список проекта
@@ -89,12 +295,9 @@ async function addProjectList(project) {
         generateBtnListRating(project.rating, 0)
     }
     if (!project.key) {
-        const projects = db.transaction('projects', 'readwrite').objectStore('projects')
         project.key = await new Promise((resolve, reject) => {
-            const request = projects.add(project)
-            request.onsuccess = function (event) {
-                resolve(event.target.result)
-            }
+            const request = db.transaction('projects', 'readwrite').objectStore('projects').add(project)
+            request.onsuccess = (event) => resolve(event.target.result)
             request.onerror = reject
         })
         await new Promise((resolve, reject) => {
@@ -267,10 +470,26 @@ function generateBtnListRating(rating, count) {
 }
 
 //Добавить аккаунт ВКонтакте в список
-async function addVKList(VK, visually) {
-    let listVK = document.getElementById('VKList')
+async function addVKList(VK) {
+    if (!VK.key) {
+        VK.key = await new Promise((resolve, reject) => {
+            const request = db.transaction('vks', 'readwrite').objectStore('vks').add(VK)
+            request.onsuccess = (event) => resolve(event.target.result)
+            request.onerror = reject
+        })
+        await new Promise((resolve, reject) => {
+            const request = db.transaction('vks', 'readwrite').objectStore('vks').put(VK, VK.key)
+            request.onsuccess = resolve
+            request.onerror = reject
+        })
+
+        const count = Number(document.querySelector('#VKButton > span').textContent)
+        document.querySelector('#VKButton > span').textContent = String(count + 1)
+    }
+    let listVK = document.getElementById('vksList')
+    if (listVK.childElementCount === 0 && listVK.parentElement.style.display === 'none') return
     let html = document.createElement('li')
-    html.id = VK.id + '_' + VK.name
+    html.id = VK.key
     let mesBlock = document.createElement('div')
     mesBlock.classList.add('message')
     let contBlock = document.createElement('div')
@@ -288,7 +507,7 @@ async function addVKList(VK, visually) {
     contBlock.append(delBtn)
 
     if (VK.notWorking) {
-        if (VK.notWorking == true) {
+        if (VK.notWorking === true) {
             mesBlock.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
         } else {
             mesBlock.append(createMessage(VK.notWorking, 'error'))
@@ -299,7 +518,7 @@ async function addVKList(VK, visually) {
 
     listVK.append(html)
     delBtn.addEventListener('click', function() {
-        removeVKList(VK, false)
+        removeVKList(VK)
     })
     repairBtn.addEventListener('click', async function() {
         if (blockButtons) {
@@ -326,29 +545,42 @@ async function addVKList(VK, visually) {
         await addVK(true)
         blockButtons = false
     })
-    infoBtn.addEventListener('click', function() {
+    infoBtn.addEventListener('click', async function() {
         document.querySelector('#info .content .message').parentNode.replaceChild(document.querySelector('#info .content .message').cloneNode(false), document.querySelector('#info .content .message'))
         document.querySelector('#info .content .events').parentNode.replaceChild(document.querySelector('#info .content .events').cloneNode(false), document.querySelector('#info .content .events'))
         toggleModal('info')
         const message = document.querySelector('#info > div.content > .message')
+        VK = await new Promise((resolve, reject) => {
+            const request = db.transaction('vks').objectStore('vks').get(VK.key)
+            request.onsuccess = (event) => resolve(event.target.result)
+            request.onerror = reject
+        })
         for (const [key, value] of Object.entries(VK)) {
-            if (key == 'cookies') continue
+            if (key === 'cookies') continue
             message.append(key + ': ' + JSON.stringify(value, null, '\t'))
             message.append(document.createElement('br'))
         }
     })
-    if (visually) {
-        document.querySelector('#VKButton > span').textContent = VKs.length
-        return
-    }
-    VKs.push(VK)
-    await setValue('AVMRVKs', VKs)
-    document.querySelector('#VKButton > span').textContent = VKs.length
 }
 
 //Добавить аккаунт Borealis в список
-async function addBorealisList(acc, visually) {
-    let listBorealis = document.getElementById('BorealisList')
+async function addBorealisList(acc) {
+    if (!acc.key) {
+        acc.key = await new Promise((resolve, reject) => {
+            const request = db.transaction('borealis', 'readwrite').objectStore('borealis').add(acc)
+            request.onsuccess = (event) => resolve(event.target.result)
+            request.onerror = reject
+        })
+        await new Promise((resolve, reject) => {
+            const request = db.transaction('borealis', 'readwrite').objectStore('borealis').put(acc, acc.key)
+            request.onsuccess = resolve
+            request.onerror = reject
+        })
+
+        const count = Number(document.querySelector('#BorealisButton > span').textContent)
+        document.querySelector('#BorealisButton > span').textContent = String(count + 1)
+    }
+    let listBorealis = document.getElementById('borealisList')
     let html = document.createElement('li')
     html.id = acc.nick
     let mesBlock = document.createElement('div')
@@ -368,7 +600,7 @@ async function addBorealisList(acc, visually) {
     contBlock.append(delBtn)
 
     if (acc.notWorking) {
-        if (acc.notWorking == true) {
+        if (acc.notWorking === true) {
             mesBlock.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
         } else {
             mesBlock.append(createMessage(acc.notWorking, 'error'))
@@ -379,7 +611,7 @@ async function addBorealisList(acc, visually) {
 
     listBorealis.append(html)
     delBtn.addEventListener('click', function() {
-        removeBorealisList(acc, false)
+        removeBorealisList(acc)
     })
     repairBtn.addEventListener('click', async function() {
         if (blockButtons) {
@@ -412,25 +644,36 @@ async function addBorealisList(acc, visually) {
         toggleModal('info')
         const message = document.querySelector('#info > div.content > .message')
         for (const [key, value] of Object.entries(acc)) {
-            if (key == 'cookies') continue
+            if (key === 'cookies') continue
             message.append(key + ': ' + JSON.stringify(value, null, '\t'))
             message.append(document.createElement('br'))
         }
     })
-    if (visually) {
-        document.querySelector('#BorealisButton > span').textContent = borealisAccounts.length
-        return
-    }
-    borealisAccounts.push(acc)
-    await setValue('borealisAccounts', borealisAccounts)
-    document.querySelector('#BorealisButton > span').textContent = borealisAccounts.length
 }
 
 //Добавить прокси в список
-async function addProxyList(proxy, visually) {
-    let listProxy = document.getElementById('ProxyList')
+async function addProxyList(proxy) {
+    if (!proxy.key) {
+        proxy.key = await new Promise((resolve, reject) => {
+            const request = db.transaction('proxies', 'readwrite').objectStore('proxies').add(proxy)
+            request.onsuccess = function (event) {
+                resolve(event.target.result)
+            }
+            request.onerror = reject
+        })
+        await new Promise((resolve, reject) => {
+            const request = db.transaction('proxies', 'readwrite').objectStore('proxies').put(proxy, proxy.key)
+            request.onsuccess = resolve
+            request.onerror = reject
+        })
+
+        const count = Number(document.querySelector('#ProxyButton > span').textContent)
+        document.querySelector('#ProxyButton > span').textContent = String(count + 1)
+    }
+
+    let listProxy = document.getElementById('proxiesList')
     let html = document.createElement('li')
-    html.id = proxy.ip + '_' + proxy.port
+    html.id = proxy.key
     let mes = document.createElement('div')
     mes.classList.add('message')
     let div = document.createElement('div')
@@ -442,7 +685,7 @@ async function addProxyList(proxy, visually) {
     control.append(del)
 
     if (proxy.notWorking) {
-        if (proxy.notWorking == true) {
+        if (proxy.notWorking === true) {
             mes.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
         } else {
             mes.append(createMessage(proxy.notWorking, 'error'))
@@ -452,15 +695,8 @@ async function addProxyList(proxy, visually) {
     html.append(control)
     listProxy.append(html)
     del.addEventListener('click', function() {
-        removeProxyList(proxy, false)
+        removeProxyList(proxy)
     })
-    if (visually) {
-        document.querySelector('#ProxyButton > span').textContent = proxies.length
-        return
-    }
-    proxies.push(proxy)
-    await setValue('AVMRproxies', proxies)
-    document.querySelector('#ProxyButton > span').textContent = proxies.length
 }
 
 //Удалить проект из списка проекта
@@ -508,78 +744,67 @@ async function removeProjectList(project) {
     }
     //Если в этот момент прокси использовался
     if (settings.useMultiVote && chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
-        if (chrome.extension.getBackgroundPage().queueProjects == 0) {
-            chrome.extension.getBackgroundPage().currentProxy = null
+        if (chrome.extension.getBackgroundPage().queueProjects === 0) {
             //Прекращаем использование прокси
             await clearProxy()
         }
     }
 }
 
-async function removeVKList(VK, visually) {
-    let li = document.getElementById(VK.id + '_' + VK.name)
+async function removeVKList(VK) {
+    let li = document.getElementById(VK.key)
     if (li != null) {
-        li.querySelector('img:nth-child(1)').removeEventListener('click', null)
-        li.querySelector('img:nth-child(2)').removeEventListener('click', null)
+        const count = Number(document.querySelector('#VKButton > span').textContent) - 1
         li.remove()
+        document.querySelector('#VKButton > span').textContent = String(count)
     } else {
         return
     }
-    if (visually) {
-        document.querySelector('#VKButton > span').textContent = VKs.length
-        return
-    }
-    for (let i = VKs.length; i--;) {
-        let temp = VKs[i]
-        if (temp.id == VK.id && temp.name == VK.name) VKs.splice(i, 1)
-    }
-    await setValue('AVMRVKs', VKs)
-    document.querySelector('#VKButton > span').textContent = VKs.length
+
+    const vks = db.transaction('vks', 'readwrite').objectStore('vks')
+    await new Promise((resolve, reject) => {
+        const request = vks.delete(VK.key)
+        request.onsuccess = resolve
+        request.onerror = reject
+    })
 }
 
-async function removeBorealisList(acc, visually) {
+async function removeBorealisList(acc) {
     let li = document.getElementById(acc.nick)
     if (li != null) {
-        li.querySelector('img:nth-child(1)').removeEventListener('click', null)
-        li.querySelector('img:nth-child(2)').removeEventListener('click', null)
+        const count = Number(document.querySelector('#BorealisButton > span').textContent) - 1
         li.remove()
+        document.querySelector('#BorealisButton > span').textContent = String(count)
     } else {
         return
     }
-    if (visually) {
-        document.querySelector('#BorealisButton > span').textContent = borealisAccounts.length
-        return
-    }
-    for (let i = borealisAccounts.length; i--;) {
-        let temp = borealisAccounts[i]
-        if (temp.nick == acc.nick) borealisAccounts.splice(i, 1)
-    }
-    await setValue('borealisAccounts', borealisAccounts)
-    document.querySelector('#BorealisButton > span').textContent = borealisAccounts.length
+
+    const borealis = db.transaction('borealis', 'readwrite').objectStore('borealis')
+    await new Promise((resolve, reject) => {
+        const request = borealis.delete(acc.key)
+        request.onsuccess = resolve
+        request.onerror = reject
+    })
 }
 
-async function removeProxyList(proxy, visually) {
+async function removeProxyList(proxy) {
     let li = document.getElementById(proxy.ip + '_' + proxy.port)
     if (li != null) {
-        li.querySelector('img:nth-child(1)').removeEventListener('click', null)
+        const count = Number(document.querySelector('#ProxyButton > span').textContent) - 1
         li.remove()
+        document.querySelector('#ProxyButton > span').textContent = String(count)
     } else {
         return
     }
-    if (visually) {
-        document.querySelector('#ProxyButton > span').textContent = proxies.length
-        return
-    }
-    for (let i = proxies.length; i--;) {
-        let temp = proxies[i]
-        if (temp.ip == proxy.ip && temp.port == proxy.port) proxies.splice(i, 1)
-    }
-    await setValue('AVMRproxies', proxies)
-    document.querySelector('#ProxyButton > span').textContent = proxies.length
+    const proxies = db.transaction('proxies', 'readwrite').objectStore('proxies')
+    await new Promise((resolve, reject) => {
+        const request = proxies.delete(proxy.key)
+        request.onsuccess = resolve
+        request.onerror = reject
+    })
     //Если в этот момент прокси использовался
     if (chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
-        if (chrome.extension.getBackgroundPage().currentProxy.ip == proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port == proxy.port) {
-            chrome.extension.getBackgroundPage().currentProxy = null
+        if (chrome.extension.getBackgroundPage().currentProxy.ip === proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port === proxy.port) {
             //Прекращаем использование прокси
             await clearProxy()
         }
@@ -611,6 +836,1204 @@ async function reloadProjectList() {
             }
         }
     }
+}
+
+async function reloadVKsList() {
+    document.getElementById('vksList').parentNode.replaceChild(document.getElementById('vksList').cloneNode(false), document.getElementById('vksList'))
+    document.querySelector('#VKButton > span').textContent = await new Promise((resolve, reject) => {
+        const request = db.transaction('vks').objectStore('vks').count()
+        request.onsuccess = (event) => resolve(event.target.result)
+        request.onerror = reject
+    })
+    if (document.getElementById('VKButton').classList.contains('activeList')) {
+        listSelect({currentTarget: document.getElementById('VKButton')}, 'vks')
+    }
+}
+
+async function reloadProxiesList() {
+    document.getElementById('proxiesList').parentNode.replaceChild(document.getElementById('proxiesList').cloneNode(false), document.getElementById('proxiesList'))
+    document.querySelector('#ProxyButton > span').textContent = await new Promise((resolve, reject) => {
+        const request = db.transaction('proxies').objectStore('proxies').count()
+        request.onsuccess = (event) => resolve(event.target.result)
+        request.onerror = reject
+    })
+    if (document.getElementById('ProxyButton').classList.contains('activeList')) {
+        listSelect({currentTarget: document.getElementById('ProxyButton')}, 'proxies')
+    }
+}
+
+async function reloadBorealisList() {
+    document.getElementById('borealisList').parentNode.replaceChild(document.getElementById('borealisList').cloneNode(false), document.getElementById('borealisList'))
+    document.querySelector('#BorealisButton > span').textContent = await new Promise((resolve, reject) => {
+        const request = db.transaction('borealis').objectStore('borealis').count()
+        request.onsuccess = (event) => resolve(event.target.result)
+        request.onerror = reject
+    })
+    if (document.getElementById('BorealisButton').classList.contains('activeList')) {
+        listSelect({currentTarget: document.getElementById('BorealisButton')}, 'borealis')
+    }
+}
+
+//Слушатель кнопки 'Добавить' на MultiVote VKontakte
+document.getElementById('AddVK').addEventListener('click', async (event) => {
+    event.preventDefault()
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    await addVK()
+    blockButtons = false
+})
+
+//Слушатель кнопки 'Импорт' на MultiVote VKontakte
+document.getElementById('importVK').addEventListener('change', async (event) => {
+    if (!document.getElementById('autoAuthVK').checked) {
+        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('autoAuthVK') + '"', 'error')
+        document.getElementById('importVK').value = ''
+        return
+    }
+    if (!document.getElementById('clearVKCookies').checked) {
+        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('clearVKCookies') + '"', 'error')
+        document.getElementById('importVK').value = ''
+        return
+    }
+    createNotif(chrome.i18n.getMessage('importing'))
+    try {
+        if (event.target.files.length === 0) return
+        const file = event.target.files[0]
+        const data = await new Response(file).text()
+        fastNotif = true
+        for (let VKString of data.split(/\n/g)) {
+            VKString = VKString.replace(/(?:\r\n|\r|\n)/g, '')
+            if (VKString == null || VKString === '') continue
+            const vk_string = VKString.split(':')
+            await addVK(false, {login: vk_string[0], password: vk_string[1]})
+        }
+        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
+    } catch (e) {
+        createNotif(e, 'error')
+    } finally {
+        fastNotif = false
+    }
+    document.getElementById('importVK').value = ''
+}, false)
+
+document.getElementById('importSettingsVK').addEventListener('change', async (event) => {
+    createNotif(chrome.i18n.getMessage('importing'))
+    try {
+        if (event.target.files.length === 0) return
+        const file = event.target.files[0]
+        const data = await new Response(file).json()
+        let count = 0
+        const transaction = db.transaction('vks', 'readwrite')
+        const vks = transaction.objectStore('vks')
+        for (const VK of data.vks) {
+            delete VK.key
+            vks.index('id').count(VK.id).onsuccess = (event) =>{
+                if (event.target.result === 0) {
+                    vks.put(VK).onsuccess = (event) => {
+                        VK.key = event.target.result
+                        vks.put(VK, VK.key)
+                    }
+                }
+            }
+            count++
+        }
+        await new Promise((resolve, reject) => {
+            transaction.oncomplete = resolve
+            transaction.onerror = reject
+        })
+        reloadVKsList()
+
+        createNotif(chrome.i18n.getMessage('importingSettingVKEnd', String(count)), 'success')
+    } catch (e) {
+        createNotif(e, 'error')
+    }
+    document.getElementById('importSettingsVK').value = ''
+}, false)
+
+//Слушатель на добавление аккаунтов Borealis по логин:пароль
+document.getElementById('importBorealis').addEventListener('change', async (event) => {
+    if (!document.getElementById('clearBorealisCookies').checked) {
+        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('clearVKCookies') + '"', 'error')
+        document.getElementById('importBorealis').value = ''
+        return
+    }
+    if (event.target.files.length === 0) return
+    createNotif(chrome.i18n.getMessage('importing'))
+    try {
+        const file = event.target.files[0]
+        const data = await new Response(file).text()
+        fastNotif = true
+        for (let nick of data.split(/\n/g)) {
+            nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
+            if (nick == null || nick === '') continue
+            nick = nick.split(':')
+            await addBorealis(false, {auth: true, login: nick[0], password: nick[1]})
+        }
+        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
+    } catch (e) {
+        createNotif(e, 'error')
+    } finally {
+        fastNotif = false
+        document.getElementById('importBorealis').value = ''
+    }
+}, false)
+
+//Слушатель на регистрацию аккаунтов Borealis по логин:пароль
+document.getElementById('importRegBorealis').addEventListener('change', async (evt) => {
+    if (!document.getElementById('clearBorealisCookies').checked) {
+        createNotif(chrome.i18n.getMessage('importVKRequred') + '"' + chrome.i18n.getMessage('clearVKCookies') + '"', 'error')
+        document.getElementById('importRegBorealis').value = ''
+        return
+    }
+    if (evt.target.files.length === 0) return
+    createNotif(chrome.i18n.getMessage('importing'))
+    try {
+        const file = evt.target.files[0]
+        const data = await new Response(file).text()
+        fastNotif = true
+        for (let nick of data.split(/\n/g)) {
+            nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
+            if (nick == null || nick === '') continue
+            nick = nick.split(':')
+            await addBorealis(false, {reg: true, login: nick[0], password: nick[1]})
+        }
+        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
+    } catch (e) {
+        createNotif(e, 'error')
+    } finally {
+        fastNotif = false
+        document.getElementById('importRegBorealis').value = ''
+    }
+}, false)
+
+window.onmessage = function (e) {
+    if (e.data.VKCredentials) {
+        currentVKCredentials.login = e.data.login
+        currentVKCredentials.password = e.data.password
+    } else if (e.data.BorealisCredentials) {
+        currentBorealisCredentials.login = e.data.login
+        currentBorealisCredentials.password = e.data.password
+    }
+}
+
+async function addVK(repair, imp) {
+    currentVKCredentials = {}
+    if (repair || !document.getElementById('clearVKCookies').checked || imp || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'VKontakte'))) {
+        if ((document.getElementById('clearVKCookies').checked && !repair) || imp) {
+            //Удаление всех куки и вкладок ВКонтакте перед добавлением нового аккаунта ВКонтакте
+            createNotif(chrome.i18n.getMessage('deletingAllAcc', 'VK'))
+
+            await new Promise(resolve => {
+                chrome.tabs.query({url: '*://*.vk.com/*'}, function(tabs) {
+                    for (tab of tabs) {
+                        chrome.tabs.remove(tab.id)
+                    }
+                    resolve()
+                })
+            })
+
+            let cookies = await new Promise(resolve => {
+                chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
+                    resolve(cookies)
+                })
+            })
+            for(let i=0; i<cookies.length;i++) {
+                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+            }
+
+            createNotif(chrome.i18n.getMessage('deletedAllAcc', 'VK'))
+        }
+
+        createNotif(chrome.i18n.getMessage('openPopupAcc', 'VK'))
+
+        //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
+        await new Promise(resolve=> {
+            let code = null
+            if (imp || document.getElementById('saveVKCredentials').checked) {
+                if (imp) {
+                    code = `
+                        if (document.querySelector('input[name="email"]') != null) {
+                            document.querySelector('input[name="email"]').value = '` + imp.login + `'
+                            document.querySelector('input[name="pass"]').value = '` + imp.password + `'
+                            if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) document.getElementById('install_allow').click()
+                        }
+                    `
+                } else if (document.getElementById('saveVKCredentials').checked) {
+                    code = `
+                        document.querySelector('#install_allow').addEventListener('click', function () {
+                            const credentials = {VKCredentials: true}
+                            credentials.login = document.querySelector('input[name="email"]').value
+                            credentials.password = document.querySelector('input[name="pass"]').value
+                            window.opener.postMessage(credentials, '*')
+                        })
+                    `
+                }
+            }
+            openPopup('https://oauth.vk.com/authorize?client_id=-1&display=widget&redirect_uri=close.html&widget=4', resolve, code)
+        })
+
+        //После закрытия окна авторизации попытка добавить аккаунт ВКонтакте
+        createNotif(chrome.i18n.getMessage('adding'))
+        let response
+        try {
+            response = await fetch('https://vk.com/')
+        } catch (e) {
+            if (e === 'TypeError: Failed to fetch') {
+                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error')
+                return
+            } else {
+                createNotif(e, 'error')
+                return
+            }
+        }
+        if (!response.ok) {
+            createNotif(chrome.i18n.getMessage('notConnect', 'https://vk.com/') + response.status, 'error')
+            return
+        }
+        let clone = response.clone()
+        let html = await response.text()
+        let doc = new DOMParser().parseFromString(html, 'text/html')
+        if (response.headers.get('Content-Type').includes('windows-1251')) {
+            //Почему не UTF-8?
+            response = await new Response(new TextDecoder('windows-1251').decode(await clone.arrayBuffer()))
+            html = await response.text()
+            doc = new DOMParser().parseFromString(html, 'text/html')
+        }
+        if (doc.querySelector('#index_login_button') != null) {
+            createNotif(chrome.i18n.getMessage('notAuthAcc', 'VK'), 'error')
+            return
+        }
+        let VK = {}
+        if (document.getElementById('saveVKCredentials').checked) {
+            if (imp) {
+                VK.login = imp.login
+                VK.password = imp.password
+            } else if (currentVKCredentials.login) {
+                VK.login = currentVKCredentials.login
+                VK.password = currentVKCredentials.password
+            }
+        }
+        try {
+            if (doc.querySelector('#login_blocked_wrap') != null) {
+                let text = doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
+                createNotif(text, 'error')
+                return
+            }
+            VK.name = doc.querySelector('#top_vkconnect_link > div > div.top_profile_vkconnect_name').textContent
+            VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
+        } catch(e) {
+            createNotif(e, 'error')
+            return
+        }
+
+        if (!repair) {
+            let vks = db.transaction('vks').objectStore('vks').index('id')
+            let found = await new Promise((resolve, reject) => {
+                const request = vks.get(VK.id)
+                request.onsuccess = function (event) {
+                    resolve(event.target.result)
+                }
+                request.onerror = reject
+            })
+            if (found) {
+                createNotif(chrome.i18n.getMessage('added'), 'success')
+                await checkAuthVK(found)
+                return
+            }
+        }
+
+        //Достаём все куки ВКонтакте и запоминаем их
+        VK.cookies = await new Promise(resolve => {
+            chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
+                resolve(cookies)
+            })
+        })
+
+        let i = 0
+        for (let cookie of VK.cookies) {
+            if (cookie.name === 'tmr_detect') {
+                VK.cookies.splice(i, 1)
+                break
+            }
+            i++
+        }
+
+        if (repair) {
+            let vks = db.transaction('vks').objectStore('vks').index('id')
+            let found = await new Promise((resolve, reject) => {
+                const request = vks.get(VK.id)
+                request.onsuccess = function (event) {
+                    resolve(event.target.result)
+                }
+                request.onerror = reject
+            })
+            if (found) {
+                for (const obj of Object.keys(found)) {//Совмещает данные со старым аккаунтом при этом перезаписывает новые данные если как такое были получены
+                    if (VK[obj] == null) {
+                        VK[obj] = found[obj]
+                    }
+                }
+                delete VK.notWorking
+                await new Promise(((resolve, reject) => {
+                    const request = db.transaction('vks', 'readwrite').objectStore('vks').put(VK, VK.key)
+                    request.onsuccess = resolve
+                    request.onerror = reject
+                }))
+                createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
+            }
+        } else {
+            await addVKList(VK)
+            createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
+        }
+
+        await checkAuthVK(VK)
+    }
+}
+
+//Слушатель кнопки 'Добавить' на MultiVote Borealis
+document.getElementById('AddBorealis').addEventListener('click', async () => {
+    event.preventDefault()
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    await addBorealis()
+    blockButtons = false
+})
+
+async function addBorealis(repair, imp) {
+    if (repair || !document.getElementById('clearVKCookies').checked || imp || confirm(chrome.i18n.getMessage('confirmDeleteAcc', 'Borealis'))) {
+        if ((document.getElementById('clearVKCookies').checked && !repair) || imp) {
+            //Удаление всех куки и вкладок Borealis перед добавлением нового аккаунта Borealis
+            createNotif(chrome.i18n.getMessage('deletingAllAcc', 'Borealis'))
+
+            await new Promise(resolve => {
+                chrome.tabs.query({url: '*://*.borealis.su/*'}, function(tabs) {
+                    for (tab of tabs) {
+                        chrome.tabs.remove(tab.id)
+                    }
+                    resolve()
+                })
+            })
+
+            if (document.getElementById('clearVKCookies').checked) {
+                let cookies = await new Promise(resolve => {
+                    chrome.cookies.getAll({domain: '.borealis.su'}, function(cookies) {
+                        resolve(cookies)
+                    })
+                })
+                for(let i=0; i<cookies.length;i++) {
+                    await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+                }
+            }
+
+            createNotif(chrome.i18n.getMessage('deletedAllAcc', 'Borealis'))
+        }
+
+        createNotif(chrome.i18n.getMessage('openPopupAcc', 'Borealis'))
+
+        //Открытие окна авторизации и ожидание когда пользователь пройдёт авторизацию
+        await new Promise(resolve => {
+            let code = null
+            if (imp) {
+                if (imp.auth) {
+                    code = `
+                        if (document.querySelector("#midside > div.clr.berrors") != null) {
+//                          window.close()
+                            if (!document.querySelector("#midside > div.clr.berrors").textContent.includes('Ошибка')) {
+                                window.close()
+                            }
+                        }
+                        document.getElementById('login_name').value = "` + imp.login + `"
+                        document.getElementById('login_password').value = "` + imp.password + `"
+                        document.querySelector('button[data-callback="executeLogin"]').click()
+                    `
+                } else if (imp.reg) {
+                    code = `
+// 	                    setInterval(()=>{
+// 	                	    if (document.getElementById('result-registration').textContent.includes('уже зарегистрировано')) {
+// 	                		    window.close()
+// 	                		}
+// 	                	}, 100)
+	                    if (document.getElementById('loginbtn') != null) window.close()
+                        if (document.querySelector("#midside > div.clr.berrors") != null) {
+//                          window.close()
+                            if (!document.querySelector("#midside > div.clr.berrors").textContent.includes('Ошибка')) {
+                                window.close()
+                            }
+                        }
+	                	document.getElementById('name').scrollIntoView()
+                        document.getElementById('name').value = "` + imp.login + `"
+                        document.querySelector('input[value="Проверить имя"]').click()
+                        document.querySelector('input[name="password1"]').value = "` + imp.password + `"
+                        document.querySelector('input[name="password2"]').value = "` + imp.password + `"
+                        document.querySelector('input[name="email"]').value = "` + imp.login + `@gmail.com"
+                        document.getElementById('rules').checked = true
+                    `
+                }
+            } else if (document.getElementById('saveBorealisCredentials').checked) {
+                code = `
+                    document.querySelector('button[data-callback="executeLogin"]').addEventListener('click', function () {
+                        const credentials = {BorealisCredentials: true}
+                        credentials.login = document.getElementById('login_name').value
+                        credentials.password = document.getElementById('login_password').value
+                        window.opener.postMessage(credentials, '*')
+                    })
+                `
+            }
+            openPopup('https://borealis.su/index.php?do=register', resolve, code)
+        })
+
+        //После закрытия окна авторизации попытка добавить аккаунт Borealis
+        createNotif(chrome.i18n.getMessage('adding'))
+        let response
+        try {
+            response = await fetch('https://borealis.su/')
+        } catch (e) {
+            if (e === 'TypeError: Failed to fetch') {
+                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error')
+                return
+            } else {
+                createNotif(e, 'error')
+                return
+            }
+        }
+        if (!response.ok) {
+            createNotif(chrome.i18n.getMessage('notConnect', 'https://borealis.su/') + response.status, 'error')
+            return
+        }
+        //Почему не UTF-8?
+        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+        let html = await response.text()
+        let doc = new DOMParser().parseFromString(html, 'text/html')
+        if (doc.querySelector('div.userinfo-pos > div.rcol2 a') == null) {
+            createNotif(chrome.i18n.getMessage('notAuthAcc', 'Borealis'), 'error')
+            return
+        }
+        let acc = {}
+        if (document.getElementById('saveBorealisCredentials').checked) {
+            if (imp) {
+                acc.login = imp.login
+                acc.password = imp.password
+            } else if (currentBorealisCredentials.login) {
+                acc.login = currentBorealisCredentials.login
+                acc.password = currentBorealisCredentials.password
+            }
+        }
+        try {
+            acc.nick = doc.querySelector('div.userinfo-pos > div.rcol2 a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '').replace('https://borealis.su/user/', '').replace('/', '')
+        } catch(e) {
+            createNotif(e, 'error')
+            return
+        }
+
+        if (!repair) {
+            const borealis = db.transaction('borealis').objectStore('borealis').index('nick')
+            let found = await new Promise((resolve, reject) => {
+                const request = borealis.get(acc.nick)
+                request.onsuccess = (event) => resolve(event.target.result)
+                request.onerror = reject
+            })
+            if (found) {
+                createNotif(chrome.i18n.getMessage('added'), 'success')
+                return
+            }
+        }
+
+        //Достаём все куки Borealis и запоминаем их
+        acc.cookies = await new Promise(resolve => {
+            chrome.cookies.getAll({domain: '.borealis.su'}, function(cookies) {
+                resolve(cookies)
+            })
+        })
+
+        let i = 0
+        for (let cookie of acc.cookies) {
+            if (cookie.name === 'xf_session') {
+                acc.cookies.splice(i, 1)
+                break
+            }
+            i++
+        }
+
+        if (repair) {
+            let borealis = db.transaction('borealis').objectStore('borealis').index('nick')
+            let found = await new Promise((resolve, reject) => {
+                const request = borealis.get(acc.nick)
+                request.onsuccess = (event) => resolve(event.target.result)
+                request.onerror = reject
+            })
+            if (found) {
+                await new Promise(((resolve, reject) => {
+                    const request = db.transaction('borealis', 'readwrite').objectStore('borealis').put(acc, found.key)
+                    request.onsuccess = resolve
+                    request.onerror = reject
+                }))
+                createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
+            }
+            createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + acc.nick, 'success')
+        } else {
+            await addBorealisList(acc)
+            createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + acc.nick, 'success')
+        }
+    }
+}
+
+//Проверяем авторизацию на всех Майнкрафт рейтингах где есть авторизация ВКонтакте и если пользователь не авторизован - предлагаем ему авторизоваться
+async function checkAuthVK(VK) {
+    document.querySelector('#notifBlock ')
+    createNotif(chrome.i18n.getMessage('checkAuthVK'))
+    let authStatus = []
+    let idAuth = document.createElement('div')
+    idAuth.id = 'notAuthVK'
+    authStatus.push(idAuth)
+    authStatus.push(chrome.i18n.getMessage('notAuthVKTop'))
+    let needReturn = false
+    for (let [key, value] of authVKUrls) {
+        let response2
+        try {
+            response2 = await fetch(value, {redirect: 'manual'})
+        } catch (e) {
+            if (e === 'TypeError: Failed to fetch') {
+                createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error')
+            } else {
+                createNotif(e, 'error')
+            }
+            needReturn = true
+        }
+
+        if (response2.ok) {
+            if (document.getElementById('autoAuthVK').checked) {
+                createNotif(chrome.i18n.getMessage('autoAuthVKStart', key))
+                response2.html = await response2.text()
+                response2.doc = new DOMParser().parseFromString(response2.html, 'text/html')
+                const text = response2.doc.querySelector('head > script:nth-child(9)').text
+                const url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
+                response2 = await fetch(url)
+            } else {
+                let a = document.createElement('a')
+                a.href = '#'
+                a.classList.add('link')
+                a.id = 'authvk' + key
+                a.textContent = key
+                a.addEventListener('click', function() {
+                    openPopup(value, function () {
+                        if (document.getElementById('notAuthVK') != null) {
+                            removeNotif(document.getElementById('notAuthVK').parentElement.parentElement)
+                        }
+                        checkAuthVK(VK)
+                    })
+                })
+                authStatus.push(a)
+                authStatus.push(' ')
+                needReturn = true
+            }
+        } else if (response2.status !== 0) {
+            createNotif(chrome.i18n.getMessage('notConnect', extractHostname(response.url)) + response2.status, 'error')
+            needReturn = true
+        }
+
+        if (!needReturn && (key === 'TopCraft' || key === 'McTOP') && document.getElementById('antiBanVK').checked && VK['password' + key] == null) {
+            try {
+                let url
+                if (key === 'TopCraft') {
+                    url = 'topcraft.ru'
+                } else if (key === 'McTOP') {
+                    url = 'mctop.su'
+                }
+                createNotif(chrome.i18n.getMessage('antiBanVKStart', key))
+                let response = await fetch('https://' + url + '/accounts/vk/login/?process=login')
+                response.html = await response.text()
+                response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+                const csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
+                function makeid(length) {
+                    const result = []
+                    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+                    const charactersLength = characters.length
+                    for (let i = 0; i < length; i++ ) {
+                        result.push(characters.charAt(Math.floor(Math.random() * charactersLength)))
+                    }
+                    return result.join('')
+                }
+                let password = makeid(15)
+                if (settings.singlePassword) password = settings.singlePassword
+                response = await fetch('https://' + url + '/account/profile/', {
+                    'headers': {
+                        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    'body': 'csrfmiddlewaretoken=' + csrftoken + '&type=password&password-password1=' + password + '&password-password2=' + password,
+                    'method': 'POST'
+                })
+                response.html = await response.text()
+                response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+                VK.numberId = Number(response.doc.getElementById('id_profile-vk').value.replace('http://vk.com/id', ''))
+                VK['password' + key] = password
+                await new Promise(((resolve, reject) => {
+                    const request = db.transaction('vks', 'readwrite').objectStore('vks').put(VK, VK.key)
+                    request.onsuccess = resolve
+                    request.onerror = reject
+                }))
+                createNotif(chrome.i18n.getMessage('antiBanVKEnd', [password, key]), 'success')
+            } catch (e) {
+                createNotif(e, 'error')
+            }
+        }
+    }
+    if (needReturn) {
+        authStatus.push(chrome.i18n.getMessage('notAcceptAuth'))
+        createNotif(authStatus, 'warn', 30000)
+        return
+    }
+    createNotif(chrome.i18n.getMessage('authOK'), 'success')
+}
+
+// //Слушатель кнопки 'Удалить куки' на MultiVote VKontakte
+// document.getElementById('deleteAllVKCookies').addEventListener('click', async () => {
+//     createNotif(chrome.i18n.getMessage('deletingAllVKCookies'))
+//     let cookies = await new Promise(resolve => {
+//         chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
+//             resolve(cookies)
+//         })
+//     })
+//     for(let i=0; i<cookies.length;i++) {
+//         await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+//     }
+//     createNotif(createMessage(chrome.i18n.getMessage('deletedAllVKCookies'), 'success')
+// })
+
+//Слушатель кнопки 'Удалить нерабочие' прокси
+document.getElementById('deleteNotWorkingProxies').addEventListener('click', async () => {
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('deletingNotWorkingProxies'))
+    let proxiesCopy = [...proxies]
+    for (let prox of proxiesCopy) {
+        if (prox.notWorking) {
+            await removeProxyList(prox, false)
+        }
+    }
+    createNotif(chrome.i18n.getMessage('deletedNotWorkingProxies'), 'success')
+    blockButtons = false
+})
+
+//Слушатель кнопки 'Удалить всё' на Прокси
+document.getElementById('deleteAllProxies').addEventListener('click', async () => {
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('deletingAllProxies'))
+    await new Promise((resolve, reject) => {
+        const request = db.transaction('proxies', 'readwrite').objectStore('proxies').clear()
+        request.onsuccess = resolve
+        request.onerror = reject
+    })
+    reloadProxiesList()
+    createNotif(chrome.i18n.getMessage('deletedAllProxies'), 'success')
+    blockButtons = false
+})
+
+//Слушатель кнопки 'Добавить' на Прокси
+document.getElementById('addProxy').addEventListener('submit', async (event) => {
+    event.preventDefault()
+
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+
+    let proxy = {}
+    proxy.ip = document.querySelector('#ip').value
+    proxy.port = parseInt(document.querySelector('#port').value)
+    if (document.querySelector('#proxyType').value !== '') {
+        proxy.scheme = document.querySelector('#proxyType').value
+//     } else {
+//         //Если не указан тип прокси пытаемся его определить самому
+//         createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'socks5'))
+//         let error = await checkProxy(proxy, 'socks5')
+//         if (!error) {
+//             proxy.scheme = 'socks5'
+//         }
+
+//         if (error) {
+//             createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'socks4'))
+//             error = await checkProxy(proxy, 'socks4')
+//             if (!error) {
+//                 proxy.scheme = 'socks4'
+//             }
+//         }
+
+//         if (error) {
+//             createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'https'))
+//             error = await checkProxy(proxy, 'https')
+//             if (!error) {
+//                 proxy.scheme = 'https'
+//             }
+//         }
+
+//         if (error) {
+//             createNotif(chrome.i18n.getMessage('checkSchemeProxy', 'http'))
+//             error = await checkProxy(proxy, 'http')
+//             if (!error) {
+//                 proxy.scheme = 'http'
+//             }
+//         }
+
+//         if (error) {
+//             createNotif(chrome.i18n.getMessage('errorCheckSchemeProxy'), 'error')
+//             return
+//         }
+    }
+    if (document.querySelector('#login').value !== '') {
+        proxy.login = document.querySelector('#login').value
+        proxy.password = document.querySelector('#password').value
+    }
+
+    await addProxy(proxy)
+    blockButtons = false
+})
+
+//Слушатель на импорт с TunnelBear
+let token
+document.getElementById('importTunnelBear').addEventListener('click', async () => {
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'TunnelBear'))
+    try {
+        if (token == null) {
+            let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
+                'headers': {
+                    'accept': 'application/json, text/plain, */*',
+                    'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                    'authorization': 'Bearer undefined',
+                    'cache-control': 'no-cache',
+                    'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
+                    'pragma': 'no-cache',
+                    'sec-fetch-dest': 'empty',
+                    'sec-fetch-mode': 'cors',
+                    'sec-fetch-site': 'none',
+                    'tunnelbear-app-id': 'com.tunnelbear',
+                    'tunnelbear-app-version': '1.0',
+                    'tunnelbear-platform': 'Chrome',
+                    'tunnelbear-platform-version': 'c3.3.3'
+                },
+                'referrerPolicy': 'strict-origin-when-cross-origin',
+                'body': null,
+                'method': 'POST',
+                'mode': 'cors',
+                'credentials': 'include'
+            })
+            if (!response.ok) {
+                if (response.status === 401) {
+                    let a = document.createElement('a')
+                    a.target = 'blank_'
+                    a.href = 'https://www.tunnelbear.com/account/login'
+                    a.textContent = chrome.i18n.getMessage('authButton')
+                    createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
+                    blockButtons = false
+                    return
+                }
+                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
+                blockButtons = false
+                return
+            }
+            let json = await response.json()
+            token = 'Bearer ' + json.access_token
+        }
+
+        let countries = ['AR', 'BR', 'AU', 'CA', 'DK', 'FI', 'FR', 'DE', 'IN', 'IE', 'IT', 'JP', 'MX', 'NL', 'NZ', 'NO', 'RO', 'SG', 'ES', 'SE', 'CH', 'GB', 'US']
+        for (let country of countries) {
+            const response = await fetch('https://api.polargrizzly.com/vpns/countries/' + country, {'headers': {'authorization': token}})
+            if (!response.ok) {
+                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
+                if (response.status === 401) {
+                    let a = document.createElement('a')
+                    a.target = 'blank_'
+                    a.href = 'https://www.tunnelbear.com/account/login'
+                    a.textContent = chrome.i18n.getMessage('authButton')
+                    createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
+                    blockButtons = false
+                    return
+                } else {
+                    continue
+                }
+            }
+            const json = await response.json()
+            const transaction = db.transaction('proxies', 'readwrite')
+            const proxies = transaction.objectStore('proxies')
+            for (const vpn of json.vpns) {
+                const proxy = {
+                    ip: vpn.url,
+                    port: 8080,
+                    scheme: 'https',
+                    TunnelBear: true
+                }
+                proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
+                    if (event.target.result === 0) {
+                        proxies.put(proxy).onsuccess = (event) => {
+                            proxy.key = event.target.result
+                            proxies.put(proxy, proxy.key)
+                        }
+                    }
+                }
+            }
+            await new Promise((resolve, reject) => {
+                transaction.oncomplete = resolve
+                transaction.onerror = reject
+            })
+            db.transaction('proxies').objectStore('proxies').count().onsuccess = (event) => document.querySelector('#ProxyButton > span').textContent = event.target.result
+        }
+        reloadProxiesList()
+    } catch (e) {
+        createNotif(e, 'error')
+        blockButtons = false
+        return
+    }
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'TunnelBear'), 'success')
+    blockButtons = false
+})
+
+//Слушатель на импорт с Windscribe
+document.getElementById('importWindscribe').addEventListener('click', async () => {
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'Windscribe'))
+    let i = 0
+    while (i < 1) {
+        i++
+        try {
+            let response
+            if (i === 1) {
+                response = await fetch('https://assets.windscribe.com/serverlist/openvpn/0/ef53494bc440751713a7ad93e939aa190cee7458')
+            } else if (false) {//Для Pro аккаунта
+                response = await fetch('https://assets.windscribe.com/serverlist/openvpn/1/ef53494bc440751713a7ad93e939aa190cee7458')
+            }
+            if (!response.ok) {
+                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
+                blockButtons = false
+                return
+            }
+            const json = await response.json()
+            const transaction = db.transaction('proxies', 'readwrite')
+            const proxies = transaction.objectStore('proxies')
+            for (const data of json.data) {
+                if (data.nodes) {
+                    for (const node of data.nodes) {
+                        if (node.hostname) {
+                            const proxy = {
+                                ip: node.hostname,
+                                port: 443,
+                                scheme: 'https',
+                                Windscribe: true
+                            }
+                            proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
+                                if (event.target.result === 0) {
+                                    proxies.put(proxy).onsuccess = (event) => {
+                                        proxy.key = event.target.result
+                                        proxies.put(proxy, proxy.key)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            await new Promise((resolve, reject) => {
+                transaction.oncomplete = resolve
+                transaction.onerror = reject
+            })
+            reloadProxiesList()
+        } catch (e) {
+            createNotif(e, 'error')
+            console.error(e)
+            blockButtons = false
+            return
+        }
+    }
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'Windscribe'), 'success')
+    blockButtons = false
+})
+
+//Слушатель на импорт с HolaVPN
+document.getElementById('importHolaVPN').addEventListener('click', async () => {
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'HolaVPN'))
+    try {
+        let response = await fetch('https://client.hola.org/client_cgi/vpn_countries.json')
+        const countries = await response.json()
+        for (country of countries) {
+            response = await fetch('https://client.hola.org/client_cgi/zgettunnels?country=' + country + '&limit=999&is_premium=1', {
+                "headers": {
+                    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                },
+                "body": "uuid=9cbc8085ce543d2ae846e8283e765ba9&session_key=2831647035",
+                "method": "POST"
+            })
+            const vpns = await response.json()
+            const transaction = db.transaction('proxies', 'readwrite')
+            const proxies = transaction.objectStore('proxies')
+            for (vpn of vpns.ztun[country]) {
+                let host = vpn.replace('HTTP ', '').split(':')
+                let port = 22223
+                if (host[1] !== '22222') port = Number(host[1])
+                const proxy = {
+                    ip:host[0],
+                    port: port,
+                    scheme: 'https',
+                    HolaVPN: true
+                }
+                proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
+                    if (event.target.result === 0) {
+                        proxies.put(proxy).onsuccess = (event) => {
+                            proxy.key = event.target.result
+                            proxies.put(proxy, proxy.key)
+                        }
+                    }
+                }
+            }
+            await new Promise((resolve, reject) => {
+                transaction.oncomplete = resolve
+                transaction.onerror = reject
+            })
+            db.transaction('proxies').objectStore('proxies').count().onsuccess = (event) => document.querySelector('#ProxyButton > span').textContent = event.target.result
+        }
+        reloadProxiesList()
+    } catch (e) {
+        createNotif(e, 'error')
+        console.error(e)
+        blockButtons = false
+        return
+    }
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'HolaVPN'), 'success')
+    blockButtons = false
+})
+
+//Слушатель на импорт с ZenMate
+document.getElementById('importZenMate').addEventListener('click', async () => {
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'ZenMate'))
+    try {
+        let response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/103", {
+            "headers": {
+                "accept": "application/json, text/plain, */*",
+                "accept-language": "ru,en-US;q=0.9,en;q=0.8",
+                "cache-control": "no-cache",
+                "pragma": "no-cache",
+                "sec-ch-ua": "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "none",
+                "x-app-key": "ZMEx4hfuto83htix763jf9cz3n59f73v659f",
+                "x-device-id": "97589925",
+                "x-device-secret": "ef483afb122e05400f895434df1394a82d31e340"
+            },
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": null,
+            "method": "GET",
+            "mode": "cors",
+            "credentials": "include"
+        })
+        let vpns = await response.json()
+        const transaction = db.transaction('proxies', 'readwrite')
+        const proxies = transaction.objectStore('proxies')
+        for (const vpn of vpns) {
+            let host = vpn.dnsname.split(':')
+            const proxy = {
+                ip: host[0],
+                port: Number(host[1]),
+                scheme: 'https',
+                ZenMate: true
+            }
+            proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
+                if (event.target.result === 0) {
+                    proxies.put(proxy).onsuccess = (event) => {
+                        proxy.key = event.target.result
+                        proxies.put(proxy, proxy.key)
+                    }
+                }
+            }
+        }
+        await new Promise((resolve, reject) => {
+            transaction.oncomplete = resolve
+            transaction.onerror = reject
+        })
+//      await setValue('AVMRproxies', proxies)
+
+//      response = await fetch("https://apiv2.zenguard.biz/v2/my/servers/filters/104", {
+//        "headers": {
+//          "accept": "application/json, text/plain, */*",
+//          "accept-language": "ru,en-US;q=0.9,en;q=0.8",
+//          "cache-control": "no-cache",
+//          "pragma": "no-cache",
+//          "sec-ch-ua": "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"",
+//          "sec-ch-ua-mobile": "?0",
+//          "sec-fetch-dest": "empty",
+//          "sec-fetch-mode": "cors",
+//          "sec-fetch-site": "none",
+//          "x-app-key": "ZMEx4hfuto83htix763jf9cz3n59f73v659f",
+//          "x-device-id": "97589925",
+//          "x-device-secret": "ef483afb122e05400f895434df1394a82d31e340"
+//        },
+//        "referrerPolicy": "strict-origin-when-cross-origin",
+//        "body": null,
+//        "method": "GET",
+//        "mode": "cors",
+//        "credentials": "include"
+//      })
+//      vpns = await response.json()
+//      const transaction = db.transaction('proxies', 'readwrite')
+//      const proxies = transaction.objectStore('proxies')
+//      for (const vpn of vpns) {
+//          let host = vpn.dnsname.split(':')
+//          const proxy = {
+//              ip: host[0],
+//              port: Number(host[1]),
+//              scheme: 'https',
+//              ZenMate: true
+//          }
+//          proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
+//              if (event.target.result === 0) {
+//                  proxies.put(proxy).onsuccess = (event) => {
+//                      proxy.key = event.target.result
+//                      proxies.put(proxy, proxy.key)
+//                  }
+//              }
+//          }
+//      }
+//      await new Promise((resolve, reject) => {
+//          transaction.oncomplete = resolve
+//          transaction.onerror = reject
+//      })
+        reloadProxiesList()
+    } catch (e) {
+        createNotif(e, 'error')
+        blockButtons = false
+        return
+    }
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'ZenMate'), 'success')
+    blockButtons = false
+})
+
+//Слушатель на импорт с NordVPN
+document.getElementById('importNordVPN').addEventListener('click', async () => {
+    if (blockButtons) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        blockButtons = true
+    }
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'NordVPN'))
+    try {
+        let response = await fetch('https://api.nordvpn.com/server')
+        const transaction = db.transaction('proxies', 'readwrite')
+        const proxies = transaction.objectStore('proxies')
+        let vpns = await response.json()
+        for (const vpn of vpns) {
+            const proxy = {
+                ip: vpn.domain,
+                port: 89,
+                scheme: 'https',
+                NordVPN: true
+            }
+            proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
+                if (event.target.result === 0) {
+                    proxies.put(proxy).onsuccess = (event) => {
+                        proxy.key = event.target.result
+                        proxies.put(proxy, proxy.key)
+                    }
+                }
+            }
+        }
+        await new Promise((resolve, reject) => {
+            transaction.oncomplete = resolve
+            transaction.onerror = reject
+        })
+        reloadProxiesList()
+    } catch (e) {
+        createNotif(e, 'error')
+        console.error(e)
+        blockButtons = false
+        return
+    }
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'NordVPN'), 'success')
+    blockButtons = false
+})
+
+async function addProxy(proxy, dontNotif) {
+    if (!dontNotif) createNotif(chrome.i18n.getMessage('adding'))
+    const found = await new Promise((resolve, reject) => {
+        const request = db.transaction('proxies').objectStore('proxies').index('ip, port').count([proxy.ip, proxy.port])
+        request.onsuccess = (event) => resolve(event.target.result)
+        request.onerror = reject
+    })
+    if (found > 0) {
+        if (!dontNotif) createNotif(chrome.i18n.getMessage('added'), 'success')
+        return
+    }
+
+    await addProxyList(proxy)
+    if (!dontNotif) createNotif(chrome.i18n.getMessage('addSuccess'), 'success')
+}
+
+async function checkProxy(proxy, scheme) {
+    var config = {
+        mode: 'fixed_servers',
+        rules: {
+            singleProxy: {
+                scheme: scheme,
+                host: proxy.ip,
+                port: proxy.port
+            }
+        }
+    }
+    await new Promise(resolve => {
+        chrome.proxy.settings.set({value: config, scope: 'regular'},function() {
+            resolve()
+        })
+    })
+    let error = false
+    try {
+        let response = await fetch('http://example.com/')
+        error = !response.ok
+    } catch (e) {
+        error = true
+    }
+    await clearProxy()
+    return error
 }
 
 //Слушатель дополнительных настроек
@@ -725,7 +2148,62 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('label8').style.display = 'none'
             }
             _return = true
+        } else if (this.id === 'useMultiVote') {
+            settings.useMultiVote = this.checked
+        } else if (this.id === 'repeatAttemptLater') {
+            settings.repeatAttemptLater = this.checked
+        } else if (this.id === 'useProxyOnUnProxyTop') {
+            settings.useProxyOnUnProxyTop = this.checked
+        } else if (this.id === 'autoAuthVK') {
+            if (this.checked && confirm(chrome.i18n.getMessage('confirmAutoAuthVK'))) {
+                settings.autoAuthVK = this.checked
+            } else if (this.checked) {
+                this.checked = false
+                _return = true
+            } else {
+                settings.autoAuthVK = this.checked
+            }
+        } else if (this.id === 'antiBanVK') {
+            settings.antiBanVK = this.checked
+        } else if (this.id === 'clearVKCookies') {
+            settings.clearVKCookies = this.checked
+        } else if (this.id === 'clearBorealisCookies') {
+            settings.clearBorealisCookies = this.checked
+        } else if (this.id === 'saveVKCredentials') {
+            if (this.checked && confirm(chrome.i18n.getMessage('confirmSaveVKCredentials'))) {
+                settings.saveVKCredentials = this.checked
+            } else if (this.checked) {
+                this.checked = false
+                _return = true
+            } else {
+                settings.saveVKCredentials = this.checked
+            }
+        } else if (this.id === 'saveBorealisCredentials') {
+            if (this.checked && confirm(chrome.i18n.getMessage('confirmSaveVKCredentials'))) {
+                settings.saveBorealisCredentials = this.checked
+            } else if (this.checked) {
+                this.checked = false
+                _return = true
+            } else {
+                settings.saveBorealisCredentials = this.checked
+            }
+        } else if (this.id === 'importNicks') {
+            if (this.checked) {
+                document.querySelector('label[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNicks')
+                document.getElementById('nick').required = false
+                document.getElementById('nick').style.display = 'none'
+                document.getElementById('importNicksFile').required = true
+                document.getElementById('importNicksFile').parentElement.removeAttribute('style')
+            } else {
+                document.querySelector('label[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
+                document.getElementById('nick').required = true
+                document.getElementById('nick').removeAttribute('style')
+                document.getElementById('importNicksFile').required = false
+                document.getElementById('importNicksFile').parentElement.style.display = 'none'
+            }
+            _return = true
         }
+
         if (!_return) {
             await new Promise((resolve, reject) => {
                 const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
@@ -859,7 +2337,7 @@ document.getElementById('addProject').addEventListener('submit', async()=>{
 // })
 
 //Слушатель кнопки 'Установить' на blacklist proxy
-document.getElementById('formProxyBlackList').addEventListener('submit', async ()=>{
+document.getElementById('formProxyBlackList').addEventListener('submit', async (event)=>{
     event.preventDefault()
     if (blockButtons) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
@@ -876,7 +2354,11 @@ document.getElementById('formProxyBlackList').addEventListener('submit', async (
         return
     }
     settings.proxyBlackList = bl
-    await setValue('AVMRsettings', settings)
+    await new Promise((resolve, reject) => {
+        const request = db.transaction('other', 'readwrite').objectStore('other').put(settings, 'settings')
+        request.onsuccess = resolve
+        request.onerror = reject
+    })
     createNotif(chrome.i18n.getMessage('proxyBLSet'), 'success')
     blockButtons = false
 })
@@ -897,7 +2379,12 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
     }
     let coins = 0
     let votes = 0
-    for (const acc of borealisAccounts) {
+    const borealis = await new Promise((resolve, reject) => {
+        const request = db.transaction('borealis').objectStore('borealis').getAll()
+        request.onsuccess = (event) => resolve(event.targer.result)
+        request.onerror = reject
+    })
+    for (const acc of borealis) {
 		try {
             for (let i = 0; i < acc.cookies.length; i++) {
                 let cookie = acc.cookies[i]
@@ -924,17 +2411,17 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
             })
             //Почему не UTF-8?
 		    response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
-            html = await response.text()
+            let html = await response.text()
 		    if (html.length < 250) {
 		    	createNotif(acc.nick + ' ' + html, 'error', 3000)
 		    	continue
 		    }
-            doc = new DOMParser().parseFromString(html, 'text/html')
+            let doc = new DOMParser().parseFromString(html, 'text/html')
             let number = doc.querySelector('.lk-desc2.border-rad.block-desc-padding').textContent.match(/\d+/g).map(Number)
             let coin = number[1]
             let vote = number[2]
 
-            if (document.getElementById('BorealisWhatToSend').value == 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value == 'Только бореалики') {
+            if (document.getElementById('BorealisWhatToSend').value === 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value === 'Только бореалики') {
                 coins = coins + coin
                 if (coin > 0) {
                     response = await fetch('https://borealis.su/index.php?do=lk', {
@@ -960,7 +2447,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async ()=>{
                 }
             }
 
-            if (document.getElementById('BorealisWhatToSend').value == 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value == 'Только голоса') {
+            if (document.getElementById('BorealisWhatToSend').value === 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value === 'Только голоса') {
                 votes = votes + vote
                 if (vote > 0) {
                     response = await fetch('https://borealis.su/index.php?do=lk', {
@@ -1055,33 +2542,40 @@ document.getElementById('AddNicksAccBorealis').addEventListener('click', async (
     }
     createNotif(chrome.i18n.getMessage('adding'))
     let array = [{top: 'TopCraft', id: '7126'}, {top: 'McTOP', id: '2241'}, {top: 'MinecraftRating', id: 'borealis'}]
-    for (const borealisAcc of borealisAccounts) {
+    const borealis = await new Promise((resolve, reject) => {
+        const request = db.transaction('borealis').objectStore('borealis').getAll()
+        request.onsuccess = (event) => resolve(event.targer.result)
+        request.onerror = reject
+    })
+    const transaction = db.transaction('projects', 'readwrite')
+    const projects = transaction.objectStore('projects')
+    for (const acc of borealis) {
         for (let arr of array) {
             let project = {
-                [arr.top]: true,
+                rating: arr.top,
                 id: arr.id,
                 name: 'borealis',
-                nick: borealisAcc.nick,
+                nick: acc.nick,
                 stats: {
                     added: Date.now()
                 },
                 time: null
             }
-            _continue = false
-            await forLoopAllProjects(function(proj) {
-                if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project.id) && proj.nick == project.nick) {
-            	    _continue = true
-            	    return
+            projects.index('rating, id, nick').count([project.rating, project.id, project.nick]).onsuccess = (event) => {
+                if (event.target.result === 0) {
+                    projects.put(project).onsuccess = (event) => {
+                        project.key = event.target.result
+                        projects.put(project, project.key)
+                    }
                 }
-            })
-            if (_continue) continue
-            getProjectList(project).push(project)
+            }
         }
     }
-    for (let arr of array) {
-        await setValue('AVMRprojects' + arr.top, window['projects' + arr.top])
-    }
-    updateProjectList()
+    await new Promise((resolve, reject) => {
+        transaction.oncomplete = resolve
+        transaction.onerror = reject
+    })
+    reloadProjectList()
     blockButtons = false
     createNotif('Успешно добавлены никнеймы Borealis', 'success')
 })
@@ -1104,9 +2598,9 @@ async function addProject(project, element) {
         secondBonusButton.className = 'secondBonus'
     }
 
-    let projects = db.transaction('projects').objectStore('projects').index('rating, id')
+    let projects = db.transaction('projects').objectStore('projects').index(settings.useMultiVote ? 'rating, id, nick' : 'rating, id')
     let found = await new Promise((resolve, reject) => {
-        const request = projects.count([project.rating, project.id])
+        const request = projects.count(settings.useMultiVote ? [project.rating, project.id, project.nick] : [project.rating, project.id])
         request.onsuccess = function (event) {
             resolve(event.target.result)
         }
@@ -1345,24 +2839,26 @@ async function addProject(project, element) {
     if (document.getElementById('importNicks').checked) {
         const file = document.getElementById('importNicksFile').files[0]
         const data = await new Response(file).text()
+        const transaction = db.transaction('projects', 'readwrite')
+        const projects = transaction.objectStore('projects')
         for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
             if (nick == null || nick === '') continue
-            let _continue = false
             const project2 = Object.assign({}, project)
             project2.nick = nick
-            await forLoopAllProjects(function(proj) {
-                if (getProjectName(proj) == getProjectName(project) && JSON.stringify(proj.id) == JSON.stringify(project2.id) && proj.nick == project2.nick) {
-            	    _continue = true
-            	    return
+            projects.index('rating, id, nick').count([project2.rating, project2.id, project2.nick]).onsuccess = (event) => {
+                if (event.target.result === 0) {
+                    projects.add(project2)
+                    countNicks++
                 }
-            })
-            if (_continue) continue
-            countNicks++
-            getProjectList(project2).push(project2)
+            }
         }
-        await setValue('AVMRprojects' + getProjectName(project), window['projects' + getProjectName(project)])
-        updateProjectList()
+        await new Promise((resolve, reject) => {
+            transaction.oncomplete = resolve
+            transaction.onerror = reject
+        })
+        reloadProjectList()
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().reloadAllAlarms()
     } else {
         await addProjectList(project)
     }
@@ -1629,6 +3125,27 @@ document.getElementById('file-download').addEventListener('click', async ()=>{
         }
         request.onerror = reject
     })
+    allSetting.vks = await new Promise((resolve, reject) => {
+        const request = db.transaction('vks').objectStore('vks').getAll()
+        request.onsuccess = function (event) {
+            resolve(event.target.result)
+        }
+        request.onerror = reject
+    })
+    allSetting.proxies = await new Promise((resolve, reject) => {
+        const request = db.transaction('proxies').objectStore('proxies').getAll()
+        request.onsuccess = function (event) {
+            resolve(event.target.result)
+        }
+        request.onerror = reject
+    })
+    allSetting.borealis = await new Promise((resolve, reject) => {
+        const request = db.transaction('borealis').objectStore('borealis').getAll()
+        request.onsuccess = function (event) {
+            resolve(event.target.result)
+        }
+        request.onerror = reject
+    })
     const text = JSON.stringify(allSetting, null, '\t')
     const blob = new Blob([text],{type: 'text/json;charset=UTF-8;'})
     const anchor = document.createElement('a')
@@ -1641,66 +3158,60 @@ document.getElementById('file-download').addEventListener('click', async ()=>{
 })
 
 //Слушатель на импорт прокси листа
-document.getElementById('importProxy').addEventListener('change', (evt) => {
+document.getElementById('importProxy').addEventListener('change', async (event) => {
     createNotif(chrome.i18n.getMessage('importing'))
     try {
-        if (evt.target.files.length == 0) return
-        let file = evt.target.files[0]
-        var reader = new FileReader()
-        reader.onload = (function(theFile) {
-            return async function(e) {
-                try {
-                    let proxiesList = e.target.result
-                    for (let proxyString of proxiesList.split(/\n/g)) {
-                        proxyString = proxyString.replace(/(?:\r\n|\r|\n)/g, '')
-                        if (proxyString == null || proxyString == '') {
-                            continue
-                        }
-                        let varProxy = {}
-                        let num = 0
-                        let continueFor = false
-                        for (let proxyElement of proxyString.split(':')) {
-                            if (proxyElement == null || proxyElement == '') {
-                                continueFor = true
-                                break
-                            }
-                            if (num == 0) {
-                                varProxy.ip = proxyElement
-                            } else if (num == 1) {
-                                varProxy.port = parseInt(proxyElement)
-                            } else if (num == 2) {
-                                varProxy.scheme = proxyElement
-                            } else if (num == 3) {
-                                varProxy.login = proxyElement
-                            } else if (num == 4) {
-                                varProxy.password = proxyElement
-                            }
-                            num++
-                        }
-                        if (continueFor) {
-                            continue
-                        }
-                        if (!varProxy.scheme) varProxy.scheme = 'https'
-                        if (await addProxy(varProxy, true, true)) {
-                            proxies.push(varProxy)
-                        }
+        if (event.target.files.length === 0) return
+        let file = event.target.files[0]
+        const data = await new Response(file).text()
+        const transaction = db.transaction('proxies', 'readwrite')
+        const proxies = transaction.objectStore('proxies')
+        for (let proxyString of data.split(/\n/g)) {
+            proxyString = proxyString.replace(/(?:\r\n|\r|\n)/g, '')
+            if (proxyString == null || proxyString === '') continue
+            let proxy = {}
+            let num = 0
+            let _continue = false
+            for (let proxyElement of proxyString.split(':')) {
+                if (proxyElement == null || proxyElement === '') {
+                    _continue = true
+                    break
+                }
+                if (num === 0) {
+                    proxy.ip = proxyElement
+                } else if (num === 1) {
+                    proxy.port = parseInt(proxyElement)
+                } else if (num === 2) {
+                    proxy.scheme = proxyElement
+                } else if (num === 3) {
+                    proxy.login = proxyElement
+                } else if (num === 4) {
+                    proxy.password = proxyElement
+                }
+                num++
+            }
+            if (_continue) continue
+            if (!proxy.scheme) proxy.scheme = 'https'
+            proxies.index('ip, port').count([proxy.ip, proxy.port]).onsuccess = (event) =>{
+                if (event.target.result === 0) {
+                    proxies.put(proxy).onsuccess = (event) => {
+                        proxy.key = event.target.result
+                        proxies.put(proxy, proxy.key)
                     }
-
-                    await setValue('AVMRproxies', proxies)
-
-                    createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
-                } catch (e) {
-                    console.error(e)
-                    createNotif(e, 'error')
                 }
             }
-        })(file)
-        reader.readAsText(file)
-        document.getElementById('importProxy').value = ''
+        }
+        await new Promise((resolve, reject) => {
+            transaction.oncomplete = resolve
+            transaction.onerror = reject
+        })
+        reloadProxiesList()
+        createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
     } catch (e) {
         console.error(e)
         createNotif(e, 'error')
     }
+    document.getElementById('importProxy').value = ''
 }, false)
 
 document.getElementById('logs-download').addEventListener('click', ()=>{
@@ -1788,8 +3299,13 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
         const data = await new Response(file).json()
         
         let projects = []
+        let vks = []
+        let proxies = []
+        let borealis = []
         if (data.projectsTopCraft) {
+            let key
             createNotif(chrome.i18n.getMessage('oldSettings'))
+            key = 0
             for (const item of Object.keys(allProjects)) {
                 for (const project of data['projects' + item]) {
                     delete project[item]
@@ -1806,26 +3322,80 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
                     if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
                     if (project.stats.errorVotes == null) project.stats.errorVotes = 0
                     if (project.stats.laterVotes == null) project.stats.laterVotes = 0
+                    key++
+                    project.key = key
                     projects.push(project)
+                }
+            }
+
+            if (data.VKs) {
+                key = 0
+                for (const vk of data.VKs) {
+                    key++
+                    vk.key = key
+                    vks.push(vk)
+                }
+            }
+            if (data.proxies) {
+                key = 0
+                for (const proxy of data.proxies) {
+                    key++
+                    proxy.key = key
+                    proxies.push(proxy)
+                }
+            }
+            if (data.borealisAccounts) {
+                key = 0
+                for (const accborealis of data.borealisAccounts) {
+                    key++
+                    accborealis.key = key
+                    borealis.push(accborealis)
                 }
             }
             createNotif(chrome.i18n.getMessage('importing'))
         } else {
             projects = data.projects
         }
+        if (data.vks) vks = data.vks
+        if (data.proxies && !proxies.length) proxies = data.proxies
+        if (data.borealis) borealis = data.borealis
+        if (data.settings.useMultiVote == null) {
+            data.settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
+            data.settings.stopVote = 0
+            data.settings.autoAuthVK = false
+            data.settings.clearVKCookies = true
+            data.settings.clearBorealisCookies = true
+            data.settings.repeatAttemptLater = true
+            data.settings.saveVKCredentials = false
+            data.settings.saveBorealisCredentials = false
+            data.settings.useMultiVote = true
+            data.settings.useProxyOnUnProxyTop = false
+        }
 
         if (!await checkPermissions(projects)) return
         
-        const projectsts = db.transaction(['projects', 'other'], 'readwrite')
-        projectsts.objectStore('projects').clear()
+        const transaction = db.transaction(['projects', 'vks', 'proxies', 'borealis', 'other'], 'readwrite')
+        transaction.objectStore('projects').clear()
+        transaction.objectStore('vks').clear()
+        transaction.objectStore('proxies').clear()
+        transaction.objectStore('borealis').clear()
         for (const project of projects) {
-            projectsts.objectStore('projects').add(project, project.key)
+            transaction.objectStore('projects').add(project, project.key)
         }
-        projectsts.objectStore('other').put(data.settings, 'settings')
-        projectsts.objectStore('other').put(data.generalStats, 'generalStats')
+        for (const vk of vks) {
+            transaction.objectStore('vks').add(vk, vk.key)
+        }
+        for (const proxy of proxies) {
+            transaction.objectStore('proxies').add(proxy, proxy.key)
+        }
+        for (const accborealis of borealis) {
+            transaction.objectStore('borealis').add(accborealis, accborealis.key)
+        }
+        transaction.objectStore('other').put(data.settings, 'settings')
+        transaction.objectStore('other').put(data.generalStats, 'generalStats')
         await new Promise((resolve, reject) => {
-            projectsts.oncomplete = resolve
-            projectsts.onerror = reject
+            transaction.oncomplete = resolve
+            transaction.onerror = reject
         })
         
         settings = data.settings
@@ -2104,8 +3674,8 @@ async function openPopup(url, onClose, code) {
     })
     if (code) {
         function onUpdated(tabId, changeInfo, tab) {
-            if (tabID == tabId) {
-                if (changeInfo.status && changeInfo.status == 'complete') {
+            if (tabID === tabId) {
+                if (changeInfo.status && changeInfo.status === 'complete') {
                     chrome.tabs.executeScript(tabID, {code}, function(result) {
                         if (chrome.runtime.lastError) createNotif(chrome.runtime.lastError.message, 'error')
                     })
@@ -2134,7 +3704,7 @@ document.querySelector('.burger').addEventListener('click', ()=>{
 
 //Переключение между вкладками
 document.querySelectorAll('.tablinks').forEach((item)=> {
-    if (item.id == 'stopVote') return
+    if (item.id === 'stopVote') return
     item.addEventListener('click', ()=> {
         if (item.classList.contains('active')) return
 
@@ -2160,7 +3730,7 @@ document.querySelectorAll('.tablinks').forEach((item)=> {
 })
 
 //Переключение между списками добавленных проектов
-function listSelect(evt, tabs) {
+function listSelect(event, tabs) {
     let listcontent, selectsite
 
     listcontent = document.getElementsByClassName('listcontent')
@@ -2174,7 +3744,7 @@ function listSelect(evt, tabs) {
     }
 
     document.getElementById(tabs + 'Tab').style.display = 'block'
-    evt.currentTarget.className += ' activeList'
+    event.currentTarget.className += ' activeList'
 
     const list = document.getElementById(tabs + 'List')
     if (list.childElementCount === 0) {//Если список проектов данного рейтинга пустой - заполняем его
@@ -2182,14 +3752,29 @@ function listSelect(evt, tabs) {
         div.setAttribute('data-resource', 'load')
         div.textContent = chrome.i18n.getMessage('load')
         list.append(div)
-        const projects = db.transaction('projects').objectStore('projects').index('rating')
-        projects.openCursor(tabs).onsuccess = function(event) {
-            const cursor = event.target.result
-            if (cursor) {
-                addProjectList(cursor.value, cursor.primaryKey)
-                cursor.continue()
-            } else {
-                div.remove()
+        if (tabs === 'vks' || tabs === 'proxies' || tabs === 'borealis') {
+            const list = db.transaction(tabs).objectStore(tabs)
+            list.openCursor().onsuccess = function(event) {
+                const cursor = event.target.result
+                if (cursor) {
+                    if (tabs === 'vks') addVKList(cursor.value)
+                    else if (tabs === 'proxies') addProxyList(cursor.value)
+                    else if (tabs === 'borealis') addBorealisList(cursor.value)
+                    cursor.continue()
+                } else {
+                    div.remove()
+                }
+            }
+        } else {
+            const projects = db.transaction('projects').objectStore('projects').index('rating')
+            projects.openCursor(tabs).onsuccess = function(event) {
+                const cursor = event.target.result
+                if (cursor) {
+                    addProjectList(cursor.value, cursor.primaryKey)
+                    cursor.continue()
+                } else {
+                    div.remove()
+                }
             }
         }
     }
@@ -2203,16 +3788,16 @@ if (document.getElementById('CustomButton')) {
 }
 
 document.getElementById('VKButton').addEventListener('click', function() {
-    listSelect(event, 'VKTab')
+    listSelect(event, 'vks')
 })
 document.getElementById('ProxyButton').addEventListener('click', function() {
-    listSelect(event, 'ProxyTab')
+    listSelect(event, 'proxies')
 })
 // document.getElementById('IonMcButton').addEventListener('click', function() {
 //     listSelect(event, 'IonMcTab')
 // })
 document.getElementById('BorealisButton').addEventListener('click', function() {
-    listSelect(event, 'BorealisTab')
+    listSelect(event, 'borealis')
 })
 
 //Слушатель закрытия модалки статистики и её сброс
@@ -2577,7 +4162,7 @@ function toggleModal(modalID) {
 modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     const activeModal = modalsBlock.querySelector('.modal.active')
     if (activeModal.id === 'stats' || activeModal.id === 'info') {
-        document.querySelector('#stats .close').click()
+        document.querySelector('#' + activeModal.id + ' .close').click()
         return
     }
     activeModal.style.transform = 'scale(1.1)'
