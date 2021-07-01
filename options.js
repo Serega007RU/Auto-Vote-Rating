@@ -2404,7 +2404,11 @@ async function addProject(project, element) {
         addProjectsBonus(project, element)
         return
     } else if (project.rating === 'MCRate' || project.rating === 'ServerPact' || project.rating === 'MinecraftServersOrg' || project.rating === 'HotMC' || project.rating === 'MMoTopRU' || project.rating === 'MinecraftIpList') {
-        found = await db.countFromIndex('projects', 'rating', project.rating)
+        if (settings.useMultiVote) {
+            found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
+        } else {
+            found = await db.countFromIndex('projects', 'rating', project.rating)
+        }
         if (project.rating === 'MinecraftIpList') {
             if (found >= 5) {
                 createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
