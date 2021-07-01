@@ -190,7 +190,10 @@ async function checkOpen(project) {
                     if (project.rating === 'McTOP' && (vkontakte.passwordMcTOP || project.AuthURLMcTOP)) _continue = false
                     if (project.rating === 'MinecraftRating' && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
                     if (project.rating === 'MonitoringMinecraft' && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
-                    if (_continue) cursor = await cursor.continue()
+                    if (_continue) {
+                        cursor = await cursor.continue()
+                        continue
+                    }
                 }
                 let usedProjects = getTopFromList(vkontakte, project)
                 let used = false
@@ -273,10 +276,13 @@ async function checkOpen(project) {
             }
             //Ищет не юзанный свободный прокси
             let found = false
-            let cursor = await db.transaction('vks').store.openCursor()
+            let cursor = await db.transaction('proxies').store.openCursor()
             while (cursor) {
                 const proxy = cursor.value
-                if (proxy.notWorking) cursor = await cursor.continue()
+                if (proxy.notWorking) {
+                    cursor = await cursor.continue()
+                    continue
+                }
                 let usedProjects = getTopFromList(proxy, project)
                 let used = false
                 for (let usedProject of usedProjects) {
@@ -1981,6 +1987,12 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                     }
                 }
             }
+            let vks = await getValue('AVMRVKs')
+            if (!vks) vks = []
+            let proxies = await getValue('AVMRproxies')
+            if (!proxies) proxies = []
+            let borealis = await getValue('borealisAccounts')
+            if (!borealis) borealis = []
             if (!db) {
                 await new Promise(resolve => {//Да это странно выглядит
                     setInterval(() => {
@@ -1991,15 +2003,48 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                 })
             }
             await db.clear('projects')
-            const tx = db.transaction(['projects', 'other'], 'readwrite')
+            const tx = db.transaction(['projects', 'vks', 'proxies', 'borealis', 'other'], 'readwrite')
             for (const project of projects) {
                 await tx.objectStore('projects').add(project, project.key)
+            }
+            key = 0
+            for (const vk of vks) {
+                key++
+                vk.key = key
+                await tx.objectStore('proxies').put(vk, vk.key)
+            }
+            key = 0
+            for (const proxy of proxies) {
+                key++
+                proxy.key = key
+                await tx.objectStore('proxies').put(proxy, proxy.key)
+            }
+            key = 0
+            for (const acc of borealis) {
+                key++
+                acc.key = key
+                await tx.objectStore('borealis').put(acc, acc.key)
+            }
+            if (oldSettings.useMultiVote == null) {
+                oldSettings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
+                oldSettings.stopVote = 0
+                oldSettings.autoAuthVK = false
+                oldSettings.clearVKCookies = true
+                oldSettings.clearBorealisCookies = true
+                oldSettings.repeatAttemptLater = true
+                oldSettings.saveVKCredentials = false
+                oldSettings.saveBorealisCredentials = false
+                oldSettings.useMultiVote = true
+                oldSettings.useProxyOnUnProxyTop = false
             }
             await tx.objectStore('other').put(oldSettings, 'settings')
             await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
             for (const item of Object.keys(allProjects)) {
                 await removeValue('AVMRprojects' + item)
             }
+            await removeValue('AVMRVKs')
+            await removeValue('AVMRproxies')
+            await removeValue('borealisAccounts')
             await removeValue('AVMRsettings')
             await removeValue('generalStats')
             await removeValue('storageArea', 'local')

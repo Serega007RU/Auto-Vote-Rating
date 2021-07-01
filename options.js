@@ -267,29 +267,36 @@ async function restoreOptions() {
     if (settings.stopVote > Date.now()) {
         document.querySelector('#stopVote img').setAttribute('src', 'images/icons/stop.svg')
     }
-    let stopVoteButton = async function () {
-        if (settings.stopVote > Date.now()) {
-            settings.stopVote = 0
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
-            chrome.extension.getBackgroundPage().checkVote()
-            document.querySelector('#stopVote img').src = 'images/icons/start.svg'
-            createNotif(chrome.i18n.getMessage('voteResumed'), 'success', 5000)
-        } else {
-            settings.stopVote = 9000000000000000
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
-            document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
-            if (chrome.extension.getBackgroundPage()) await chrome.extension.getBackgroundPage().stopVote()
-            createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
-        }
-        await db.put('other', settings, 'settings')
-    }
-    document.getElementById('stopVote').addEventListener('click', stopVoteButton)
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
     await reloadVKsList()
     await reloadProxiesList()
     await reloadBorealisList()
 }
+
+document.getElementById('stopVote').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        event.target.classList.add('disabled')
+    }
+    if (settings.stopVote > Date.now()) {
+        settings.stopVote = 0
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+        chrome.extension.getBackgroundPage().checkVote()
+        document.querySelector('#stopVote img').src = 'images/icons/start.svg'
+        createNotif(chrome.i18n.getMessage('voteResumed'), 'success', 5000)
+    } else {
+        settings.stopVote = 9000000000000000
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+        document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
+        if (chrome.extension.getBackgroundPage()) await chrome.extension.getBackgroundPage().stopVote()
+        createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
+    }
+    await db.put('other', settings, 'settings')
+    event.target.classList.remove('disabled')
+})
 
 //Добавить проект в список проекта
 async function addProjectList(project) {
