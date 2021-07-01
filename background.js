@@ -61,14 +61,11 @@ async function checkVote() {
     } else {
         return
     }
-
-    let cursor = await db.transaction('projects').store.openCursor()
-    while (cursor) {
-        const project = cursor.value
+    const projects = await db.getAll('projects')
+    for (const project of projects) {
         if (project.time == null || project.time < Date.now()) {
-            checkOpen(project, cursor.key)
+            await checkOpen(project)
         }
-        cursor = await cursor.continue()
     }
 
     check = true
@@ -184,15 +181,16 @@ async function checkOpen(project) {
         if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
-            let VKs = await db.getAll('vks')
-            for (let vkontakte of VKs) {
+            let cursor = await db.transaction('vks').store.openCursor()
+            while (cursor) {
+                const vkontakte = cursor.value
                 if (vkontakte.notWorking) {
                     let _continue = true
                     if (project.rating === 'TopCraft' && (vkontakte.passwordTopCraft || vkontakte.AuthURLTopCraft)) _continue = false
                     if (project.rating === 'McTOP' && (vkontakte.passwordMcTOP || project.AuthURLMcTOP)) _continue = false
                     if (project.rating === 'MinecraftRating' && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
                     if (project.rating === 'MonitoringMinecraft' && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
-                    if (_continue) continue
+                    if (_continue) cursor = await cursor.continue()
                 }
                 let usedProjects = getTopFromList(vkontakte, project)
                 let used = false
@@ -237,6 +235,7 @@ async function checkOpen(project) {
                     currentVK = vkontakte
                     break
                 }
+                cursor = await cursor.continue()
             }
             //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк
             if (!found) {
@@ -274,9 +273,10 @@ async function checkOpen(project) {
             }
             //Ищет не юзанный свободный прокси
             let found = false
-            const proxies = await db.getAll('proxies')
-            for (let proxy of proxies) {
-                if (proxy.notWorking) continue
+            let cursor = await db.transaction('vks').store.openCursor()
+            while (cursor) {
+                const proxy = cursor.value
+                if (proxy.notWorking) cursor = await cursor.continue()
                 let usedProjects = getTopFromList(proxy, project)
                 let used = false
                 for (let usedProject of usedProjects) {
@@ -354,6 +354,7 @@ async function checkOpen(project) {
                     currentProxy = proxy
                     break
                 }
+                cursor = await cursor.continue()
             }
 
             //Если не удалось найти хотя бы одно свободное не заюзанное прокси
@@ -472,47 +473,6 @@ async function checkOpen(project) {
             }
         }
     }
-
-//  //Обновление никнейма для Borealis если истёк его срок действия
-//  if (project.borealisNickExpires <= Date.now()) {
-//      console.log(getProjectPrefix(project, true) + 'Истёк срок действия никнейма Borealis, обновляю его...')
-//      try {
-//          let response = await fetch('https://borealis.su/engine/ajax/newAlias.php')
-//          if (!response.ok) {
-//              throw chrome.i18n.getMessage('notConnect', [response.url, String(response.status)])
-//          }
-//          let html = await response.text()
-//          let find = html.match('Код для голосования: ')
-//          if (find == null) {
-//              throw html
-//          }
-//          html = html.substring(find.index + find[0].length, html.length)
-//          forLoopAllProjects(function(proj) {
-//              if (proj.borealisNickExpires != null && proj.nick == project.nick) {
-//                  proj.nick = html
-//                  proj.borealisNickExpires = Date.now() + 82800000
-//              }
-//          })
-//          await setValue('AVMRprojectsTopCraft', projectsTopCraft)
-//          await setValue('AVMRprojectsMcTOP', projectsMcTOP)
-//          await setValue('AVMRprojectsMinecraftRating', projectsMinecraftRating)
-//      } catch (e) {
-//          console.error(getProjectPrefix(project, true) + e)
-//          if (!settings.disabledNotifError) {
-//              sendNotification(getProjectPrefix(project, false), e)
-//          }
-//          project.error = e
-//          forLoopAllProjects(function(proj) {
-//              if (proj.borealisNickExpires != null) {
-//                  proj.time = Date.now() + 300000
-//              }
-//          })
-//          await setValue('AVMRprojectsTopCraft', projectsTopCraft)
-//          await setValue('AVMRprojectsMcTOP', projectsMcTOP)
-//          await setValue('AVMRprojectsMinecraftRating', projectsMinecraftRating)
-//          return
-//      }
-//  }
 
     let retryCoolDown
     if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {

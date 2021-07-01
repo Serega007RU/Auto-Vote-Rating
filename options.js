@@ -1389,10 +1389,14 @@ document.getElementById('deleteNotWorkingProxies').addEventListener('click', asy
         event.target.classList.add('disabled')
     }
     createNotif(chrome.i18n.getMessage('deletingNotWorkingProxies'))
-    let cursor = await db.transaction('proxies').store.openCursor()
+    let cursor = await db.transaction('proxies', 'readwrite').store.openCursor()
     while (cursor) {
-        if (cursor.value.notWorking) await removeProxyList(cursor.value)
+        if (cursor.value.notWorking) {
+            await cursor.delete()
+        }
+        cursor = await cursor.continue()
     }
+    reloadProxiesList()
     createNotif(chrome.i18n.getMessage('deletedNotWorkingProxies'), 'success')
     event.target.classList.remove('disabled')
 })
@@ -2320,56 +2324,6 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
     createNotif('Всё передано, в сумме было передано ' + coins + ' бореаликов и ' + votes + ' голосов', 'success', 7000)
     event.target.classList.remove('disabled')
 })
-
-/*//Слушатель кнопки 'Добавить никнеймы' на Borealis
-document.getElementById('FormAddNicksBorealis').addEventListener('submit', async ()=>{
-    event.preventDefault()
-    if (event.target.classList.contains('disabled')) {
-	    createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-	    return
-    } else {
-	    event.target.classList.add('disabled')
-    }
-    if (settings.stopVote < Date.now()) {
-        document.getElementById('stopVote').click()
-    }
-    createNotif(chrome.i18n.getMessage('adding'))
-    let array = [{top: 'TopCraft', id: '7126'}, {top: 'McTOP', id: '2241'}, {top: 'MinecraftRating', id: 'borealis'}]
-    try {
-        for (let i = 0; i < this.countNicksBorealis.valueAsNumber; i++) {
-            let response = await fetch('https://borealis.su/engine/ajax/newAlias.php')
-            if (!response.ok) {
-                throw chrome.i18n.getMessage('notConnect', [response.url, String(response.status)])
-            }
-            let html = await response.text()
-            let find = html.match('Код для голосования: ')
-            if (find == null) {
-                throw html
-            }
-            html = html.substring(find.index + find[0].length, html.length)
-            for (let arr of array) {
-                let project = {
-                    [arr.top]: true,
-                    id: arr.id,
-                    name: 'borealis',
-                    nick: html,
-                    stats: {
-                        added: Date.now()
-                    },
-                    time: null,
-                    borealisNickExpires: Date.now() + 82800000
-                }
-                await addProjectList(project)
-            }
-        }
-    } catch(e) {
-        createNotif(e, 'error')
-        return
-    } finally {
-        event.target.classList.remove('disabled')
-    }
-    createNotif('Успешно добавлены никнеймы Borealis', 'success')
-})*/
 
 document.getElementById('AddNicksAccBorealis').addEventListener('click', async event => {
     if (event.target.classList.contains('disabled')) {
