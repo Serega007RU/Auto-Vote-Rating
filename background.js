@@ -61,11 +61,22 @@ async function checkVote() {
     } else {
         return
     }
+
+    if (lastErrorNotFound != null) lastErrorNotFound = null
+
     const projects = await db.getAll('projects')
     for (const project of projects) {
         if (project.time == null || project.time < Date.now()) {
             await checkOpen(project)
         }
+    }
+
+    if (lastErrorNotFound != null) {
+        settings.stopVote = Date.now() + 86400000
+        console.error(lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
+        if (!settings.disabledNotifError) sendNotification(lastErrorNotFound, lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
+        await db.put('other', settings, 'settings')
+        await stopVote()
     }
 
     check = true
