@@ -1,7 +1,5 @@
 //Где храним настройки
 // let storageArea = 'local'
-//Блокировать ли кнопки которые требуют времени на выполнение?
-let blockButtons = false
 
 const authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -130,27 +128,27 @@ async function addProjectList(project) {
     
     listProject.append(li)
     //Слушатель кнопки Удалить на проект
-    img2.addEventListener('click', async function() {
-        if (blockButtons) {
+    img2.addEventListener('click', async event => {
+        if (event.target.classList.contains('disabled')) {
             createNotif(chrome.i18n.getMessage('notFast'), 'warn')
             return
         } else {
-            blockButtons = true
+            event.target.classList.add('disabled')
         }
         await removeProjectList(project)
-        blockButtons = false
+        event.target.classList.remove('disabled')
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', function() {
-        updateModalStats(project)
+        updateModalStats(project, true)
     })
     if (document.getElementById('stats').classList.contains('active') && document.getElementById('stats' + project.key) != null) {
         updateModalStats(project)
     }
 }
 
-function updateModalStats(project) {
-    toggleModal('stats')
+function updateModalStats(project, toggle) {
+    if (toggle) toggleModal('stats')
     document.querySelector('.statsSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
     document.querySelector('.statsSubtitle').id = 'stats' + project.key
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
@@ -287,12 +285,12 @@ async function reloadProjectList() {
 
 //Слушатель дополнительных настроек
 for (const check of document.querySelectorAll('input[name=checkbox]')) {
-    check.addEventListener('change', async function() {
-        if (blockButtons) {
+    check.addEventListener('change', async event => {
+        if (event.target.classList.contains('disabled')) {
             createNotif(chrome.i18n.getMessage('notFast'), 'warn')
             return
         } else {
-            blockButtons = true
+            event.target.classList.add('disabled')
         }
         let _return = false
         if (this.id === 'disabledNotifStart')
@@ -366,7 +364,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
 //              if (await getValue('AVMRsettings', 'sync') != null) {
 //                  toggleModal('conflictSync')
 //                  this.checked = false
-//                  blockButtons = false
+//                  event.target.classList.remove('disabled')
 //                  return
 //              }
 //              storageArea = 'sync'
@@ -402,18 +400,18 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             await db.put('other', settings, 'settings')
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         }
-        blockButtons = false
+        event.target.classList.remove('disabled')
     })
 }
 
 //Слушатель кнопки "Добавить"
 document.getElementById('addProject').addEventListener('submit', async(event)=>{
     event.preventDefault()
-    if (blockButtons) {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     const project = {}
     let name
@@ -422,7 +420,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     }
     if (name == null) {
         createNotif(chrome.i18n.getMessage('errorSelectSiteRating'), 'error')
-        blockButtons = false
+        event.target.classList.remove('disabled')
         return
     }
     project.rating = name
@@ -504,7 +502,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
             body = JSON.parse(document.getElementById('customBody').value)
         } catch (e) {
             createNotif(e, 'error')
-            blockButtons = false
+            event.target.classList.remove('disabled')
             return
         }
 //      project.id = body
@@ -514,21 +512,8 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     } else {
         await addProject(project, null)
     }
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
-
-//Слушатель кнопки "Установить" на кулдауне
-// document.getElementById('timeout').addEventListener('submit', async ()=>{
-//     event.preventDefault()
-//     if (blockButtons) {
-//         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-//         return
-//     } else {
-//         blockButtons = true
-//     }
-//     await setCoolDown()
-//     blockButtons = false
-// })
 
 async function addProject(project, element) {
     createNotif(chrome.i18n.getMessage('adding'), null, null, element)
@@ -744,15 +729,15 @@ async function addProject(project, element) {
                             document.location.reload(true)
                         })
                     } else {
-                        openPopup(url2, async function() {
-                            if (blockButtons) {
+                        openPopup(url2, async event => {
+                            if (event.target.classList.contains('disabled')) {
                                 createNotif(chrome.i18n.getMessage('notFast'), 'warn')
                                 return
                             } else {
-                                blockButtons = true
+                                event.target.classList.add('disabled')
                             }
                             await addProject(project, element)
-                            blockButtons = false
+                            event.target.classList.remove('disabled')
                         })
                     }
                 })
@@ -859,12 +844,12 @@ function addProjectsBonus(project, element) {
 //          await addProject('Custom', 'MythicalWorldBonusMith', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"type=1&bonus=1&value=5","method":"POST","mode":"cors"}', null, 'https://mythicalworld.su/bonus', {ms: 86400000}, priorityOption, null)
 //      })
 /*  } else */if (project.id === 'victorycraft' || project.id === 8179 || project.id === 4729) {
-        document.getElementById('secondBonusVictoryCraft').addEventListener('click', async()=>{
-            if (blockButtons) {
+        document.getElementById('secondBonusVictoryCraft').addEventListener('click', async event => {
+            if (event.target.classList.contains('disabled')) {
                 createNotif(chrome.i18n.getMessage('notFast'), 'warn')
                 return
             } else {
-                blockButtons = true
+                event.target.classList.add('disabled')
             }
             let vict = {
                 Custom: true,
@@ -888,7 +873,7 @@ function addProjectsBonus(project, element) {
             }
             await addProject(vict, element)
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null)
-            blockButtons = false
+            event.target.classList.remove('disabled')
         })
     }
 }
@@ -1048,10 +1033,6 @@ document.getElementById('logs-clear').addEventListener('click', async ()=>{
 
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', async (evt)=>{
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    }
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (evt.target.files.length === 0) return
@@ -1125,17 +1106,17 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
 
 //Слушатель переключателя режима голосования
 let modeVote = document.getElementById('enabledSilentVote')
-modeVote.addEventListener('change', async function() {
-    if (blockButtons) {
+modeVote.addEventListener('change', async event => {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     settings.enabledSilentVote = modeVote.value === 'enabled'
     await db.put('other', settings, 'settings')
     if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Достаёт все проекты указанные в URL

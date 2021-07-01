@@ -681,9 +681,11 @@ const allProjects = {
 }
 
 //Настройки
-let settings
+// noinspection ES6ConvertVarToLetConst
+var settings
 //Общая статистика
-let generalStats
+// noinspection ES6ConvertVarToLetConst
+var generalStats
 //База данных
 let db
 
