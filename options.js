@@ -281,22 +281,25 @@ document.getElementById('stopVote').addEventListener('click', async event => {
     } else {
         event.target.classList.add('disabled')
     }
-    if (settings.stopVote > Date.now()) {
+    await stopVote()
+    event.target.classList.remove('disabled')
+})
+async function stopVote(stop) {
+    if (settings.stopVote > Date.now() && !stop) {
         settings.stopVote = 0
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         chrome.extension.getBackgroundPage().checkVote()
         document.querySelector('#stopVote img').src = 'images/icons/start.svg'
         createNotif(chrome.i18n.getMessage('voteResumed'), 'success', 5000)
-    } else {
-        settings.stopVote = 9000000000000000
+    }  else if (settings.stopVote < Date.now()) {
+        settings.stopVote = Number.POSITIVE_INFINITY
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
         if (chrome.extension.getBackgroundPage()) await chrome.extension.getBackgroundPage().stopVote()
         createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
     }
     await db.put('other', settings, 'settings')
-    event.target.classList.remove('disabled')
-})
+}
 
 //Добавить проект в список проекта
 async function addProjectList(project) {
@@ -2339,9 +2342,7 @@ document.getElementById('AddNicksAccBorealis').addEventListener('click', async e
     } else {
         event.target.classList.add('disabled')
     }
-    if (settings.stopVote < Date.now()) {
-        document.getElementById('stopVote').click()
-    }
+    await stopVote(true)
     createNotif(chrome.i18n.getMessage('adding'))
     let array = [{top: 'TopCraft', id: '7126'}, {top: 'McTOP', id: '2241'}, {top: 'MinecraftRating', id: 'borealis'}]
     const borealis = await db.getAll('borealis')
@@ -2935,12 +2936,14 @@ document.getElementById('logs-clear').addEventListener('click', async ()=>{
 })
 
 //Слушатель на импорт настроек
-document.getElementById('file-upload').addEventListener('change', async (evt)=>{
+document.getElementById('file-upload').addEventListener('change', async event=> {
     createNotif(chrome.i18n.getMessage('importing'))
     try {
-        if (evt.target.files.length === 0) return
-        const file = evt.target.files[0]
+        if (event.target.files.length === 0) return
+        const file = event.target.files[0]
         const data = await new Response(file).json()
+
+        await stopVote(true)
         
         let projects = []
         let vks = []

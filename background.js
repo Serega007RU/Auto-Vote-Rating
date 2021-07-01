@@ -2013,8 +2013,8 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                     }, 1000)
                 })
             }
-            await db.clear('projects')
             const tx = db.transaction(['projects', 'vks', 'proxies', 'borealis', 'other'], 'readwrite')
+            await tx.objectStore('projects').clear()
             for (const project of projects) {
                 await tx.objectStore('projects').add(project, project.key)
             }
@@ -2022,7 +2022,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
             for (const vk of vks) {
                 key++
                 vk.key = key
-                await tx.objectStore('proxies').put(vk, vk.key)
+                await tx.objectStore('vks').put(vk, vk.key)
             }
             key = 0
             for (const proxy of proxies) {
