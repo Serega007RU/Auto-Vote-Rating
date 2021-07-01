@@ -504,12 +504,12 @@ async function addVKList(VK) {
     delBtn.addEventListener('click', function() {
         removeVKList(VK)
     })
-    repairBtn.addEventListener('click', async function() {
-        if (blockButtons) {
+    repairBtn.addEventListener('click', async event => {
+        if (event.target.classList.contains('disabled')) {
             createNotif(chrome.i18n.getMessage('notFast'), 'warn')
             return
         } else {
-            blockButtons = true
+            event.target.classList.add('disabled')
         }
         for (let i = 0; i < VK.cookies.length; i++) {
             let cookie = VK.cookies[i]
@@ -527,7 +527,7 @@ async function addVKList(VK) {
             })
         }
         await addVK(true)
-        blockButtons = false
+        event.target.classList.remove('disabled')
     })
     infoBtn.addEventListener('click', async function() {
         document.querySelector('#info .content .message').parentNode.replaceChild(document.querySelector('#info .content .message').cloneNode(false), document.querySelector('#info .content .message'))
@@ -585,12 +585,12 @@ async function addBorealisList(acc) {
     delBtn.addEventListener('click', function() {
         removeBorealisList(acc)
     })
-    repairBtn.addEventListener('click', async function() {
-        if (blockButtons) {
+    repairBtn.addEventListener('click', async event => {
+        if (event.target.classList.contains('disabled')) {
             createNotif(chrome.i18n.getMessage('notFast'), 'warn')
             return
         } else {
-            blockButtons = true
+            event.target.classList.add('disabled')
         }
         for (let i = 0; i < acc.cookies.length; i++) {
             let cookie = acc.cookies[i]
@@ -608,7 +608,7 @@ async function addBorealisList(acc) {
             })
         }
         await addBorealis(true)
-        blockButtons = false
+        event.target.classList.remove('disabled')
     })
     infoBtn.addEventListener('click', function() {
         document.querySelector('#info .content .message').parentNode.replaceChild(document.querySelector('#info .content .message').cloneNode(false), document.querySelector('#info .content .message'))
@@ -799,14 +799,14 @@ async function reloadBorealisList() {
 //Слушатель кнопки 'Добавить' на MultiVote VKontakte
 document.getElementById('AddVK').addEventListener('click', async (event) => {
     event.preventDefault()
-    if (blockButtons) {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     await addVK()
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Слушатель кнопки 'Импорт' на MultiVote VKontakte
@@ -1091,14 +1091,14 @@ async function addVK(repair, imp) {
 //Слушатель кнопки 'Добавить' на MultiVote Borealis
 document.getElementById('AddBorealis').addEventListener('click', async (event) => {
     event.preventDefault()
-    if (blockButtons) {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     await addBorealis()
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 async function addBorealis(repair, imp) {
@@ -1381,12 +1381,12 @@ async function checkAuthVK(VK) {
 // })
 
 //Слушатель кнопки 'Удалить нерабочие' прокси
-document.getElementById('deleteNotWorkingProxies').addEventListener('click', async () => {
-    if (blockButtons) {
+document.getElementById('deleteNotWorkingProxies').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     createNotif(chrome.i18n.getMessage('deletingNotWorkingProxies'))
     let cursor = await db.transaction('proxies').store.openCursor()
@@ -1394,33 +1394,32 @@ document.getElementById('deleteNotWorkingProxies').addEventListener('click', asy
         if (cursor.value.notWorking) await removeProxyList(cursor.value)
     }
     createNotif(chrome.i18n.getMessage('deletedNotWorkingProxies'), 'success')
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Слушатель кнопки 'Удалить всё' на Прокси
-document.getElementById('deleteAllProxies').addEventListener('click', async () => {
-    if (blockButtons) {
+document.getElementById('deleteAllProxies').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     createNotif(chrome.i18n.getMessage('deletingAllProxies'))
     await db.clear('proxies')
     reloadProxiesList()
     createNotif(chrome.i18n.getMessage('deletedAllProxies'), 'success')
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Слушатель кнопки 'Добавить' на Прокси
 document.getElementById('addProxy').addEventListener('submit', async (event) => {
     event.preventDefault()
-
-    if (blockButtons) {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
 
     let proxy = {}
@@ -1471,7 +1470,7 @@ document.getElementById('addProxy').addEventListener('submit', async (event) => 
     }
 
     await addProxy(proxy)
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Слушатель на импорт прокси листа
@@ -1525,12 +1524,12 @@ document.getElementById('importProxy').addEventListener('change', async (event) 
 
 //Слушатель на импорт с TunnelBear
 let token
-document.getElementById('importTunnelBear').addEventListener('click', async () => {
-    if (blockButtons) {
+document.getElementById('importTunnelBear').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     createNotif(chrome.i18n.getMessage('importVPNStart', 'TunnelBear'))
     try {
@@ -1564,11 +1563,11 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     a.href = 'https://www.tunnelbear.com/account/login'
                     a.textContent = chrome.i18n.getMessage('authButton')
                     createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
-                    blockButtons = false
+                    event.target.classList.remove('disabled')
                     return
                 }
                 createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
-                blockButtons = false
+                event.target.classList.remove('disabled')
                 return
             }
             let json = await response.json()
@@ -1586,7 +1585,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
                     a.href = 'https://www.tunnelbear.com/account/login'
                     a.textContent = chrome.i18n.getMessage('authButton')
                     createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
-                    blockButtons = false
+                    event.target.classList.remove('disabled')
                     return
                 } else {
                     continue
@@ -1612,20 +1611,20 @@ document.getElementById('importTunnelBear').addEventListener('click', async () =
         reloadProxiesList()
     } catch (e) {
         createNotif(e, 'error')
-        blockButtons = false
+        event.target.classList.remove('disabled')
         return
     }
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'TunnelBear'), 'success')
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Слушатель на импорт с Windscribe
-document.getElementById('importWindscribe').addEventListener('click', async () => {
-    if (blockButtons) {
+document.getElementById('importWindscribe').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     createNotif(chrome.i18n.getMessage('importVPNStart', 'Windscribe'))
     let i = 0
@@ -1640,7 +1639,7 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
             }*/
             if (!response.ok) {
                 createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
-                blockButtons = false
+                event.target.classList.remove('disabled')
                 return
             }
             const json = await response.json()
@@ -1669,21 +1668,21 @@ document.getElementById('importWindscribe').addEventListener('click', async () =
         } catch (e) {
             createNotif(e, 'error')
             console.error(e)
-            blockButtons = false
+            event.target.classList.remove('disabled')
             return
         }
     }
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'Windscribe'), 'success')
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Слушатель на импорт с HolaVPN
-document.getElementById('importHolaVPN').addEventListener('click', async () => {
-    if (blockButtons) {
+document.getElementById('importHolaVPN').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     createNotif(chrome.i18n.getMessage('importVPNStart', 'HolaVPN'))
     try {
@@ -1721,20 +1720,20 @@ document.getElementById('importHolaVPN').addEventListener('click', async () => {
     } catch (e) {
         createNotif(e, 'error')
         console.error(e)
-        blockButtons = false
+        event.target.classList.remove('disabled')
         return
     }
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'HolaVPN'), 'success')
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Слушатель на импорт с ZenMate
-document.getElementById('importZenMate').addEventListener('click', async () => {
-    if (blockButtons) {
+document.getElementById('importZenMate').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     createNotif(chrome.i18n.getMessage('importVPNStart', 'ZenMate'))
     try {
@@ -1817,20 +1816,20 @@ document.getElementById('importZenMate').addEventListener('click', async () => {
         reloadProxiesList()
     } catch (e) {
         createNotif(e, 'error')
-        blockButtons = false
+        event.target.classList.remove('disabled')
         return
     }
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'ZenMate'), 'success')
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Слушатель на импорт с NordVPN
-document.getElementById('importNordVPN').addEventListener('click', async () => {
-    if (blockButtons) {
+document.getElementById('importNordVPN').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     createNotif(chrome.i18n.getMessage('importVPNStart', 'NordVPN'))
     try {
@@ -1854,11 +1853,11 @@ document.getElementById('importNordVPN').addEventListener('click', async () => {
     } catch (e) {
         createNotif(e, 'error')
         console.error(e)
-        blockButtons = false
+        event.target.classList.remove('disabled')
         return
     }
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'NordVPN'), 'success')
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 async function addProxy(proxy, dontNotif) {
@@ -2189,38 +2188,38 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
 //Слушатель кнопки 'Установить' на blacklist proxy
 document.getElementById('formProxyBlackList').addEventListener('submit', async (event)=>{
     event.preventDefault()
-    if (blockButtons) {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     let bl
     try {
         bl = JSON.parse(document.getElementById('proxyBlackList').value)
     } catch (e) {
         createNotif(e, 'error')
-        blockButtons = false
+        event.target.classList.remove('disabled')
         return
     }
     settings.proxyBlackList = bl
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('proxyBLSet'), 'success')
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 //Слушатель кнопки 'Отправить' на Borealis
 document.getElementById('sendBorealis').addEventListener('submit', async (event)=>{
     event.preventDefault()
-    if (blockButtons) {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     let nick = document.getElementById('sendBorealisNick').value
     if (!confirm('Вы дейсвительно хотите отправить все бореалики и голоса на аккаунт ' + nick + '?')) {
-        blockButtons = false
+        event.target.classList.remove('disabled')
         return
     }
     let coins = 0
@@ -2319,17 +2318,17 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
 		}
     }
     createNotif('Всё передано, в сумме было передано ' + coins + ' бореаликов и ' + votes + ' голосов', 'success', 7000)
-    blockButtons = false
+    event.target.classList.remove('disabled')
 })
 
 /*//Слушатель кнопки 'Добавить никнеймы' на Borealis
 document.getElementById('FormAddNicksBorealis').addEventListener('submit', async ()=>{
     event.preventDefault()
-    if (blockButtons) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
+    if (event.target.classList.contains('disabled')) {
+	    createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+	    return
     } else {
-        blockButtons = true
+	    event.target.classList.add('disabled')
     }
     if (settings.stopVote < Date.now()) {
         document.getElementById('stopVote').click()
@@ -2367,17 +2366,17 @@ document.getElementById('FormAddNicksBorealis').addEventListener('submit', async
         createNotif(e, 'error')
         return
     } finally {
-        blockButtons = false
+        event.target.classList.remove('disabled')
     }
     createNotif('Успешно добавлены никнеймы Borealis', 'success')
 })*/
 
-document.getElementById('AddNicksAccBorealis').addEventListener('click', async ()=>{
-    if (blockButtons) {
+document.getElementById('AddNicksAccBorealis').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
         return
     } else {
-        blockButtons = true
+        event.target.classList.add('disabled')
     }
     if (settings.stopVote < Date.now()) {
         document.getElementById('stopVote').click()
@@ -2406,7 +2405,7 @@ document.getElementById('AddNicksAccBorealis').addEventListener('click', async (
         }
     }
     reloadProjectList()
-    blockButtons = false
+    event.target.classList.remove('disabled')
     createNotif('Успешно добавлены никнеймы Borealis', 'success')
 })
 
