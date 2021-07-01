@@ -3017,8 +3017,11 @@ document.getElementById('file-upload').addEventListener('change', async (evt)=>{
 
         if (!await checkPermissions(projects)) return
 
-        await db.clear('projects')
         const tx = db.transaction(['projects', 'other', 'vks', 'proxies', 'borealis'], 'readwrite')
+        await tx.objectStore('projects').clear()
+        await tx.objectStore('vks').clear()
+        await tx.objectStore('proxies').clear()
+        await tx.objectStore('borealis').clear()
         let key = 0
         for (const project of projects) {
             if (project.key == null) {
