@@ -141,9 +141,7 @@ async function addProjectList(project) {
         event.target.classList.remove('disabled')
     })
     //Слушатель кнопки Статистики и вывод её в модалку
-    img1.addEventListener('click', function() {
-        updateModalStats(project, true)
-    })
+    img1.addEventListener('click', () => updateModalStats(project, true))
     updateModalStats(project)
 }
 
@@ -290,7 +288,7 @@ async function reloadProjectList() {
 
 //Слушатель дополнительных настроек
 for (const check of document.querySelectorAll('input[name=checkbox]')) {
-    check.addEventListener('change', async event => {
+    check.addEventListener('change', async function (event) {
         if (event.target.classList.contains('disabled')) {
             createNotif(chrome.i18n.getMessage('notFast'), 'warn')
             return
@@ -1019,11 +1017,11 @@ document.getElementById('logs-clear').addEventListener('click', async ()=>{
 })
 
 //Слушатель на импорт настроек
-document.getElementById('file-upload').addEventListener('change', async (evt)=>{
+document.getElementById('file-upload').addEventListener('change', async (event)=>{
     createNotif(chrome.i18n.getMessage('importing'))
     try {
-        if (evt.target.files.length === 0) return
-        const file = evt.target.files[0]
+        if (event.target.files.length === 0) return
+        const file = event.target.files[0]
         const data = await new Response(file).json()
         
         let projects = []
@@ -1239,9 +1237,7 @@ async function fastAdd() {
             buttonRetry.classList.add('btn')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
             document.querySelector('#addFastProject > div.content > .events').append(buttonRetry)
-            buttonRetry.addEventListener('click', ()=> {
-                document.location.reload(true)
-            })
+            buttonRetry.addEventListener('click', ()=> document.location.reload(true))
             return
         }
 
@@ -1269,9 +1265,7 @@ async function fastAdd() {
             buttonRetry.classList.add('btn')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
             document.querySelector('#addFastProject > div.content > .events').append(buttonRetry)
-            buttonRetry.addEventListener('click', ()=> {
-                document.location.reload(true)
-            })
+            buttonRetry.addEventListener('click', ()=> document.location.reload(true))
         } else if (document.querySelector('#addFastProject > div.content > div.message').childElementCount > 0) {
             const successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
@@ -1287,9 +1281,7 @@ async function fastAdd() {
         buttonClose.classList.add('btn', 'redBtn')
         buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
         document.querySelector('#addFastProject > div.content > .events').append(buttonClose)
-        buttonClose.addEventListener('click', ()=> {
-            window.close()
-        })
+        buttonClose.addEventListener('click', ()=> window.close())
     }
 }
 
@@ -1306,9 +1298,7 @@ async function addCustom() {
 //      buttonMS.textContent = chrome.i18n.getMessage('Custom')
 //      document.querySelector('#added > div > div:nth-child(4)').insertBefore(buttonMS, document.querySelector('#added > div > div:nth-child(4)').children[4])
 
-//      document.getElementById('CustomButton').addEventListener('click', function() {
-//          listSelect(event, 'CustomTab')
-//      })
+//      document.getElementById('CustomButton').addEventListener('click', event => listSelect(event, 'CustomTab'))
 //  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
@@ -1409,9 +1399,7 @@ async function listSelect(event, tabs) {
 
 //Слушатели кнопок списка доавленных проектов
 if (document.getElementById('CustomButton')) {
-    document.getElementById('CustomButton').addEventListener('click', (event)=> {
-        listSelect(event, 'CustomTab')
-    })
+    document.getElementById('CustomButton').addEventListener('click', (event)=> listSelect(event, 'CustomTab'))
 }
 
 //Слушатель закрытия модалки статистики и её сброс
