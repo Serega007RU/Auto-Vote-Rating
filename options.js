@@ -987,16 +987,7 @@ document.getElementById('file-download').addEventListener('click', async ()=>{
 
 document.getElementById('logs-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))
-    const logsdb = await idb.openDB('logs', 1, {
-        upgrade(db) {
-            db.createObjectStore('logs', {autoIncrement: true})
-            if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
-        }
-    })
-    logsdb.onerror = event => {
-        createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
-    }
-    const logs = await logsdb.getAll('logs')
+    const logs = await dbLogs.getAll('logs')
     let text = ''
     for (const log of logs) {
         text += log
@@ -1018,16 +1009,7 @@ document.getElementById('logs-download').addEventListener('click', async ()=>{
 //Очистка логов
 document.getElementById('logs-clear').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('clearingLogs'))
-    const logsdb = await idb.openDB('logs', 1, {
-        upgrade(db) {
-            db.createObjectStore('logs', {autoIncrement: true})
-            if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
-        }
-    })
-    logsdb.onerror = event => {
-        createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
-    }
-    await logsdb.clear('logs')
+    await dbLogs.clear('logs')
     createNotif(chrome.i18n.getMessage('clearedLogs'), 'success')
 })
 

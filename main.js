@@ -686,11 +686,30 @@ var settings
 //Общая статистика
 // noinspection ES6ConvertVarToLetConst
 var generalStats
-//База данных
+//Оновная база данных
 let db
+//База данных логов
+let dbLogs
 
 //Инициализация настроек расширения
 async function initializeConfig(background, version) {
+    if (!dbLogs) {
+        dbLogs = await idb.openDB('logs', 1, {
+            upgrade(db/*, oldVersion, newVersion, transaction*/) {
+                db.createObjectStore('logs', {autoIncrement: true})
+            }
+        })
+        window.onerror = (errorMsg, url, lineNumber) => {
+            const time = new Date().toLocaleString().replace(',', '')
+            const log = '[' + time + ' ERROR]: ' + errorMsg + ' at ' + url + ':' + lineNumber
+            dbLogs.add('logs', log)
+        }
+        window.onunhandledrejection = event => {
+            const time = new Date().toLocaleString().replace(',', '')
+            const log = '[' + time + ' ERROR]: ' + event.reason.stack
+            dbLogs.add('logs', log)
+        }
+    }
     // noinspection JSUnusedGlobalSymbols
     try {
         db = await idb.openDB('avr', version ? version : 1, {
@@ -700,7 +719,6 @@ async function initializeConfig(background, version) {
                 projects.createIndex('rating, id', ['rating', 'id'])
                 projects.createIndex('rating', 'rating')
                 const other = db.createObjectStore('other')
-                // const other = transaction.objectStore('other')
                 settings = {
                     disabledNotifStart: true,
                     disabledNotifInfo: false,
@@ -728,13 +746,22 @@ async function initializeConfig(background, version) {
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
-            await initializeConfig(background, 2)
+            if (version) {
+                dbError({target: {source: {name: 'avr'}}, error: error.message})
+                return
+            }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
+            await initializeConfig(background, 2)
             return
         }
+        dbError({target: {source: {name: 'avr'}}, error: error.message})
+        return
     }
-    db.onerror = event => {
+    db.onerror = dbError
+    dbLogs.onerror = dbError
+    function dbError(event) {
         if (background) {
+            if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error)
             console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
         } else {
             createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
@@ -744,6 +771,7 @@ async function initializeConfig(background, version) {
     generalStats = await db.get('other', 'generalStats')
 
     if (!background) return
+    console.log(chrome.i18n.getMessage('start'))
 
     if (settings && !settings.disabledCheckTime) checkTime()
 
