@@ -1501,7 +1501,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('hour').required = false
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
-        document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
+        if (document.querySelector('[data-resource="yourNick"]').textContent !== '') document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         if (laterChoose && (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MMoTopRU')) {
             document.getElementById('selectLang' + laterChoose).style.display = 'none'
