@@ -99,6 +99,7 @@ async function addProjectList(project) {
     
     const img1 = document.createElement('img')
     img1.src = 'images/icons/stats.svg'
+    img1.classList.add('projectStats')
     div.appendChild(img1)
     
     const img2 = document.createElement('img')
@@ -120,6 +121,7 @@ async function addProjectList(project) {
     }
     
     const nextVoteMes = document.createElement('div')
+    nextVoteMes.classList.add('textNextVote')
     nextVoteMes.textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
     contDiv.append(nextVoteMes)
     
@@ -142,13 +144,16 @@ async function addProjectList(project) {
     img1.addEventListener('click', function() {
         updateModalStats(project, true)
     })
-    if (document.getElementById('stats').classList.contains('active') && document.getElementById('stats' + project.key) != null) {
-        updateModalStats(project)
-    }
+    updateModalStats(project)
 }
 
-function updateModalStats(project, toggle) {
-    if (toggle) toggleModal('stats')
+async function updateModalStats(project, toggle) {
+    if (toggle) {
+        toggleModal('stats')
+        project = await db.get('projects', project.key)
+    } else {
+        if (!document.getElementById('stats').classList.contains('active') || document.getElementById('stats' + project.key) == null) return
+    }
     document.querySelector('.statsSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
     document.querySelector('.statsSubtitle').id = 'stats' + project.key
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
@@ -1703,8 +1708,22 @@ chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/)
     if (request.updateProject) {
         const el = document.getElementById(request.project.key)
         if (el != null) {
-            el.remove()
-            addProjectList(request.project, request.project.key)
+            let text = chrome.i18n.getMessage('soon')
+            if (!(request.project.time == null || request.project.time === '') && Date.now() < request.project.time) {
+                text = new Date(request.project.time).toLocaleString().replace(',', '')
+            } else if (chrome.extension.getBackgroundPage()) {
+                for (const value of chrome.extension.getBackgroundPage().queueProjects) {
+                    if (value.rating === request.project.rating) {
+                        text = chrome.i18n.getMessage('inQueue')
+                        if (JSON.stringify(value.id) === JSON.stringify(request.project.id) && value.nick === request.project.nick) {
+                            text = chrome.i18n.getMessage('now')
+                            break
+                        }
+                    }
+                }
+            }
+            el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
+            updateModalStats(request.project)
         }
     }
 })
