@@ -690,40 +690,49 @@ var generalStats
 let db
 
 //Инициализация настроек расширения
-async function initializeConfig(background) {
+async function initializeConfig(background, version) {
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 1, {
-        upgrade(db/*, oldVersion, newVersion, transaction*/) {
-            const projects = db.createObjectStore('projects', {autoIncrement: true})
-            projects.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
-            projects.createIndex('rating, id', ['rating', 'id'])
-            projects.createIndex('rating', 'rating')
-            const other = db.createObjectStore('other')
-            // const other = transaction.objectStore('other')
-            settings = {
-                disabledNotifStart: true,
-                disabledNotifInfo: false,
-                disabledNotifWarn: false,
-                disabledNotifError: false,
-                enabledSilentVote: true,
-                disabledCheckTime: false,
-                disabledCheckInternet: false,
-                enableCustom: false,
+    try {
+        db = await idb.openDB('avr', version ? version : 1, {
+            upgrade(db/*, oldVersion, newVersion, transaction*/) {
+                const projects = db.createObjectStore('projects', {autoIncrement: true})
+                projects.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
+                projects.createIndex('rating, id', ['rating', 'id'])
+                projects.createIndex('rating', 'rating')
+                const other = db.createObjectStore('other')
+                // const other = transaction.objectStore('other')
+                settings = {
+                    disabledNotifStart: true,
+                    disabledNotifInfo: false,
+                    disabledNotifWarn: false,
+                    disabledNotifError: false,
+                    enabledSilentVote: true,
+                    disabledCheckTime: false,
+                    disabledCheckInternet: false,
+                    enableCustom: false,
+                }
+                other.add(settings, 'settings')
+                generalStats = {
+                    successVotes: 0,
+                    monthSuccessVotes: 0,
+                    lastMonthSuccessVotes: 0,
+                    errorVotes: 0,
+                    laterVotes: 0,
+                    lastSuccessVote: null,
+                    lastAttemptVote: null,
+                    added: Date.now()
+                }
+                other.add(generalStats, 'generalStats')
             }
-            other.add(settings, 'settings')
-            generalStats = {
-                successVotes: 0,
-                monthSuccessVotes: 0,
-                lastMonthSuccessVotes: 0,
-                errorVotes: 0,
-                laterVotes: 0,
-                lastSuccessVote: null,
-                lastAttemptVote: null,
-                added: Date.now()
-            }
-            other.add(generalStats, 'generalStats')
+        })
+    } catch (error) {
+        //На случай если это версия MultiVote
+        if (error.name === 'VersionError') {
+            await initializeConfig(background, 2)
+            console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
+            return
         }
-    })
+    }
     db.onerror = event => {
         if (background) {
             console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
