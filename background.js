@@ -718,7 +718,7 @@ async function silentVote(project) {
             }
         }
     } catch (e) {
-        if (e === 'TypeError: Failed to fetch') {
+        if (e.message === 'Failed to fetch') {
 //          endVote({notConnectInternet: true}, null, project)
         } else {
             endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
