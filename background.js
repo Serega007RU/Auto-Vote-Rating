@@ -1150,7 +1150,7 @@ async function silentVote(project) {
             }
         }
     } catch (e) {
-        if (e === 'TypeError: Failed to fetch' || e.message === 'The user aborted a request.') {
+        if (e.message === 'TypeError: Failed to fetch' || e.message === 'The user aborted a request.') {
 //          endVote({notConnectInternet: true}, null, project)
         } else {
             endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
@@ -2096,11 +2096,6 @@ console._warn = console.warn
 console._error = console.error
 console._debug = console.debug
 
-/* Declare our console history variable. */
-// console.history = []
-if (!localStorage.consoleHistory)
-    localStorage.consoleHistory = ''
-
 /* Redirect all calls to the collector. */
 console.log = function () { return console._intercept('log', arguments) }
 console.info = function () { return console._intercept('info', arguments) }
@@ -2118,46 +2113,23 @@ console._intercept = function (type, args) {
     console._collect(type, args)
 }
 
-let logsdb
-const logsopenRequest = indexedDB.open('logs', 1)
-logsopenRequest.onupgradeneeded = function() {
-    // срабатывает, если на клиенте нет базы данных
-    // ...выполнить инициализацию...
-    logsopenRequest.result.createObjectStore('logs', {autoIncrement: true})
-    //Удаляем старые логи из localStorage
-    if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
-}
-logsopenRequest.onerror = function() {
-    console._error(chrome.i18n.getMessage('errordb', ['logs', logsopenRequest.error]))
-}
-logsopenRequest.onsuccess = function() {
-    logsdb = logsopenRequest.result
-    logsdb.onerror = event => {
-        console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), )
+console._collect = function (type, args) {
+    const time = new Date().toLocaleString().replace(',', '')
+
+    if (!type) type = 'log'
+
+    if (!args || args.length === 0) return
+
+    console['_' + type].apply(console, args)
+
+    let log = '[' + time + ' ' + type.toUpperCase() + ']:'
+
+    for (let arg of args) {
+        if (typeof arg != 'string') arg = JSON.stringify(arg)
+        log += ' ' + arg
     }
 
-    console._collect = function (type, args) {
-        let time = new Date().toLocaleString().replace(',', '')
-        
-        if (!type) type = 'log'
-        
-        if (!args || args.length === 0) return
-        
-        console['_' + type].apply(console, args)
-    
-        const logs = logsdb.transaction('logs', 'readwrite').objectStore('logs')
-        
-        let log = '[' + time + ' ' + type.toUpperCase() + ']:'
-    
-        for (let arg of args) {
-            if (typeof arg != 'string') arg = JSON.stringify(arg)
-            log += ' ' + arg
-        }
-    
-        logs.add(log)
-    }
-    
-    console.log(chrome.i18n.getMessage('start'))
+    if (dbLogs) dbLogs.add('logs', log)
 }
 
 /*

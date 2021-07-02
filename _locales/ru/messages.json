@@ -1119,6 +1119,14 @@
       }
     }
   },
+  "errordbTitle": {
+    "message": "Ошибка с базой данных $db$",
+    "placeholders": {
+      "db": {
+        "content": "$1"
+      }
+    }
+  },
   "errorSelectSiteRating": {
     "message": "Неверно указан 'Сайт рейтинга', выберите нужный из списка"
   },

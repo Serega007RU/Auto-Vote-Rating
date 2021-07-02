@@ -346,6 +346,7 @@ async function addProjectList(project) {
     
     const img1 = document.createElement('img')
     img1.src = 'images/icons/stats.svg'
+    img1.classList.add('projectStats')
     div.appendChild(img1)
     
     const img2 = document.createElement('img')
@@ -367,6 +368,7 @@ async function addProjectList(project) {
     }
     
     const nextVoteMes = document.createElement('div')
+    nextVoteMes.classList.add('textNextVote')
     nextVoteMes.textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
     contDiv.append(nextVoteMes)
     
@@ -386,16 +388,17 @@ async function addProjectList(project) {
         event.target.classList.remove('disabled')
     })
     //Слушатель кнопки Статистики и вывод её в модалку
-    img1.addEventListener('click', function() {
-        updateModalStats(project, true)
-    })
-    if (document.getElementById('stats').classList.contains('active') && document.getElementById('stats' + project.key) != null) {
-        updateModalStats(project)
-    }
+    img1.addEventListener('click', () => updateModalStats(project, true))
+    updateModalStats(project)
 }
 
-function updateModalStats(project, toggle) {
-    if (toggle) toggleModal('stats')
+async function updateModalStats(project, toggle) {
+    if (toggle) {
+        toggleModal('stats')
+        project = await db.get('projects', project.key)
+    } else {
+        if (!document.getElementById('stats').classList.contains('active') || document.getElementById('stats' + project.key) == null) return
+    }
     document.querySelector('.statsSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
     document.querySelector('.statsSubtitle').id = 'stats' + project.key
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
@@ -1915,7 +1918,7 @@ async function addProxy(proxy, dontNotif) {
 
 //Слушатель дополнительных настроек
 for (const check of document.querySelectorAll('input[name=checkbox]')) {
-    check.addEventListener('change', async event => {
+    check.addEventListener('change', async function (event) {
         if (event.target.classList.contains('disabled')) {
             createNotif(chrome.i18n.getMessage('notFast'), 'warn')
             return
@@ -2891,16 +2894,7 @@ document.getElementById('file-download').addEventListener('click', async ()=>{
 
 document.getElementById('logs-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))
-    const logsdb = await idb.openDB('logs', 1, {
-        upgrade(db) {
-            db.createObjectStore('logs', {autoIncrement: true})
-            if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
-        }
-    })
-    logsdb.onerror = event => {
-        createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
-    }
-    const logs = await logsdb.getAll('logs')
+    const logs = await dbLogs.getAll('logs')
     let text = ''
     for (const log of logs) {
         text += log
@@ -2922,21 +2916,12 @@ document.getElementById('logs-download').addEventListener('click', async ()=>{
 //Очистка логов
 document.getElementById('logs-clear').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('clearingLogs'))
-    const logsdb = await idb.openDB('logs', 1, {
-        upgrade(db) {
-            db.createObjectStore('logs', {autoIncrement: true})
-            if (localStorage.consoleHistory) localStorage.removeItem('consoleHistory')
-        }
-    })
-    logsdb.onerror = event => {
-        createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
-    }
-    await logsdb.clear('logs')
+    await dbLogs.clear('logs')
     createNotif(chrome.i18n.getMessage('clearedLogs'), 'success')
 })
 
 //Слушатель на импорт настроек
-document.getElementById('file-upload').addEventListener('change', async event=> {
+document.getElementById('file-upload').addEventListener('change', async (event)=>{
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (event.target.files.length === 0) return
@@ -2944,7 +2929,7 @@ document.getElementById('file-upload').addEventListener('change', async event=> 
         const data = await new Response(file).json()
 
         await stopVote(true)
-        
+
         let projects = []
         let vks = []
         let proxies = []
@@ -3213,9 +3198,7 @@ async function fastAdd() {
             buttonRetry.classList.add('btn')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
             document.querySelector('#addFastProject > div.content > .events').append(buttonRetry)
-            buttonRetry.addEventListener('click', ()=> {
-                document.location.reload(true)
-            })
+            buttonRetry.addEventListener('click', ()=> document.location.reload(true))
             return
         }
 
@@ -3243,9 +3226,7 @@ async function fastAdd() {
             buttonRetry.classList.add('btn')
             buttonRetry.textContent = chrome.i18n.getMessage('retry')
             document.querySelector('#addFastProject > div.content > .events').append(buttonRetry)
-            buttonRetry.addEventListener('click', ()=> {
-                document.location.reload(true)
-            })
+            buttonRetry.addEventListener('click', ()=> document.location.reload(true))
         } else if (document.querySelector('#addFastProject > div.content > div.message').childElementCount > 0) {
             const successFastAdd = document.createElement('div')
             successFastAdd.setAttribute('class', 'successFastAdd')
@@ -3261,9 +3242,7 @@ async function fastAdd() {
         buttonClose.classList.add('btn', 'redBtn')
         buttonClose.textContent = chrome.i18n.getMessage('closeTabButton')
         document.querySelector('#addFastProject > div.content > .events').append(buttonClose)
-        buttonClose.addEventListener('click', ()=> {
-            window.close()
-        })
+        buttonClose.addEventListener('click', ()=> window.close())
     }
 }
 
@@ -3280,9 +3259,7 @@ async function addCustom() {
 //      buttonMS.textContent = chrome.i18n.getMessage('Custom')
 //      document.querySelector('#added > div > div:nth-child(4)').insertBefore(buttonMS, document.querySelector('#added > div > div:nth-child(4)').children[4])
 
-//      document.getElementById('CustomButton').addEventListener('click', function() {
-//          listSelect(event, 'CustomTab')
-//      })
+//      document.getElementById('CustomButton').addEventListener('click', event => listSelect(event, 'CustomTab'))
 //  }
     if (!settings.enableCustom) {
         settings.enableCustom = true
@@ -3407,9 +3384,7 @@ async function listSelect(event, tabs) {
 
 //Слушатели кнопок списка доавленных проектов
 if (document.getElementById('CustomButton')) {
-    document.getElementById('CustomButton').addEventListener('click', (event)=> {
-        listSelect(event, 'CustomTab')
-    })
+    document.getElementById('CustomButton').addEventListener('click', (event)=> listSelect(event, 'CustomTab'))
 }
 
 document.getElementById('VKButton').addEventListener('click', event => listSelect(event, 'vks'))
@@ -3504,7 +3479,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('hour').required = false
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
-        document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
+        if (document.querySelector('[data-resource="yourNick"]').textContent !== '') document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         if (laterChoose && (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MMoTopRU')) {
             document.getElementById('selectLang' + laterChoose).style.display = 'none'
@@ -3733,8 +3708,22 @@ chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/)
     if (request.updateProject) {
         const el = document.getElementById(request.project.key)
         if (el != null) {
-            el.remove()
-            addProjectList(request.project, request.project.key)
+            let text = chrome.i18n.getMessage('soon')
+            if (!(request.project.time == null || request.project.time === '') && Date.now() < request.project.time) {
+                text = new Date(request.project.time).toLocaleString().replace(',', '')
+            } else if (chrome.extension.getBackgroundPage()) {
+                for (const value of chrome.extension.getBackgroundPage().queueProjects) {
+                    if (value.rating === request.project.rating) {
+                        text = chrome.i18n.getMessage('inQueue')
+                        if (JSON.stringify(value.id) === JSON.stringify(request.project.id) && value.nick === request.project.nick) {
+                            text = chrome.i18n.getMessage('now')
+                            break
+                        }
+                    }
+                }
+            }
+            el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
+            updateModalStats(request.project)
         }
     }
 })
