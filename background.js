@@ -1108,13 +1108,9 @@ async function endVote(request, sender, project) {
         }
         checkVote()
     }
-    if (settings.cooldown >= 10000) {
+    setTimeout(()=>{
         removeQueue()
-    } else {
-        setTimeout(()=>{
-            removeQueue()
-        }, 10000)
-    }
+    }, 10000)
 }
 
 //Отправитель уведомлений
