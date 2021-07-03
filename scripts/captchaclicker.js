@@ -45,7 +45,7 @@ if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anch
     
     //Проверяет прошла ли проверка hCaptcha
     const timer5 = setInterval(()=>{
-        if (document.getElementsByClassName('checkbox checked').length >= 1) {
+        if (document.getElementById('checkbox') != null && document.getElementById('checkbox').ariaChecked === 'true') {
             window.top.postMessage('vote', '*')
             clearInterval(timer5)
         }
