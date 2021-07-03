@@ -692,7 +692,7 @@ let db
 let dbLogs
 
 //Инициализация настроек расширения
-async function initializeConfig(background, version) {
+async function initializeConfig(background/*, version*/) {
     if (!dbLogs) {
         dbLogs = await idb.openDB('logs', 1, {
             upgrade(db/*, oldVersion, newVersion, transaction*/) {

@@ -136,7 +136,7 @@ async function checkOpen(project) {
                 if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
             }
         }
-        if (settings.useMultiVote && !settings.useProxyOnUnProxyTop) {
+        if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && !settings.useProxyOnUnProxyTop) {
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
             if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') {
                 if (value.rating !== 'TopCraft' && value.rating !== 'McTOP' && value.rating !== 'MinecraftRating') {
@@ -153,7 +153,7 @@ async function checkOpen(project) {
             }
         }
     }
-    if (settings.useMultiVote) {
+    if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
         if (queueProjects.size === 0 && (currentVK != null || currentProxy != null)) {
             if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
             if (currentProxy != null) clearProxy()
@@ -522,7 +522,7 @@ async function checkOpen(project) {
     if (!settings.disabledNotifStart)
         sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
 
-    if (project.rating === 'MonitoringMinecraft' && !settings.useMultiVote) {
+    if (project.rating === 'MonitoringMinecraft' && !settings.useMultiVote && !project.useMultiVote) {
         let url
         if (project.rating === 'MonitoringMinecraft') {
             url = '.monitoringminecraft.ru'
@@ -1360,7 +1360,7 @@ async function endVote(request, sender, project) {
     //Если усё успешно
     let sendMessage
     if (request.successfully || request.later) {
-        if (settings.useMultiVote && settings.repeatAttemptLater) {
+        if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && settings.repeatAttemptLater) {
             if (request.successfully) {
                 delete project.later
             } else {
@@ -1467,7 +1467,7 @@ async function endVote(request, sender, project) {
             project.time = project.time + Math.floor(Math.random() * 43200000)
         }
 
-        if (settings.useMultiVote)  {
+        if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote)  {
             if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')/* && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) !== -1*/) {
                 if (request.later && settings.repeatAttemptLater && project.later != null) {
                     if (project.rating === 'TopCraft' || project.rating === 'McTOP') {
@@ -1533,7 +1533,7 @@ async function endVote(request, sender, project) {
             generalStats.lastSuccessVote = Date.now()
             delete project.later
         } else {
-            if (settings.useMultiVote && settings.repeatAttemptLater && project.later && !(project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
+            if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && settings.repeatAttemptLater && project.later && !(project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
                 if (project.later < 15) {
                     project.time = null
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
@@ -1565,7 +1565,7 @@ async function endVote(request, sender, project) {
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
-        if (settings.useMultiVote) {
+        if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
             sendMessage = message
             if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
@@ -1602,7 +1602,7 @@ async function endVote(request, sender, project) {
         if (project.randomize) {
             retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)
         }
-        if (!settings.useMultiVote) {
+        if (!settings.useMultiVote && !project.useMultiVote) {
             project.time = Date.now() + retryCoolDown
         } else {
             project.time = null
@@ -1645,14 +1645,14 @@ async function endVote(request, sender, project) {
                 queueProjects.delete(value)
             }
         }
-        if (settings.useMultiVote && queueProjects.size === 0 && (currentVK != null || currentProxy != null)) {
+        if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && queueProjects.size === 0 && (currentVK != null || currentProxy != null)) {
             if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
             if (currentProxy != null) clearProxy()
             currentVK = null
         }
         checkVote()
     }
-    if (settings.useMultiVote /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
+    if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
         removeQueue()
     } else {
         setTimeout(()=>{

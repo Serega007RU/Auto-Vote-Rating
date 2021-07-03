@@ -1039,6 +1039,21 @@
   "voteMode": {
     "message": "Выставить принудительно режим голосования"
   },
+  "multivoteMode": {
+    "message": "Выставить принудительно режим MultiVote"
+  },
+  "enableMultiVoteMode": {
+    "message": "Режим MultiVote"
+  },
+  "enabledMultiVoteModeTooltip": {
+    "message": "Выставляет режим MultiVote отдельно для добавляемого проекта, игнорирует общую настройку переключения MultiVote"
+  },
+  "withMultiVote": {
+    "message": "С MultiVote"
+  },
+  "withoutMultiVote": {
+    "message": "Без MultiVote"
+  },
   "updated": {
     "message": "Расширение успешно обновлено до версии $version$",
     "placeholders": {

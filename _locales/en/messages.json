@@ -1081,6 +1081,21 @@
   "voteMode": {
     "message": "Force the voting mode to be set"
   },
+  "multivoteMode": {
+    "message": "Force the MultiVote mode to be set"
+  },
+  "enableMultiVoteMode": {
+    "message": "MultiVote Mode"
+  },
+  "enabledMultiVoteModeTooltip": {
+    "message": "Sets the MultiVote mode separately for the project being added, ignores the general MultiVote switching setting"
+  },
+  "withMultiVote": {
+    "message": "With MultiVote"
+  },
+  "withoutMultiVote": {
+    "message": "Without MultiVote"
+  },
   "updated": {
     "message": "Extension successfully updated to $version$",
     "placeholders": {

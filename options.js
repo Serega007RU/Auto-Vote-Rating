@@ -357,7 +357,7 @@ async function addProjectList(project) {
     contDiv.classList.add('message')
     
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
+    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '') + (project.useMultiVote != null ? project.useMultiVote ? ' (' + chrome.i18n.getMessage('withMultiVote') + ')' : ' (' + chrome.i18n.getMessage('withoutMultiVote') + ')' : '')
     contDiv.append(nameProjectMes)
     
     if (project.error) {
@@ -2028,6 +2028,13 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('label8').style.display = 'none'
             }
             _return = true
+        } else if (this.id === 'multivoteMode') {
+            if (this.checked) {
+                document.getElementById('label11').removeAttribute('style')
+            } else {
+                document.getElementById('label11').style.display = 'none'
+            }
+            _return = true
         } else if (this.id === 'useMultiVote') {
             settings.useMultiVote = this.checked
         } else if (this.id === 'repeatAttemptLater') {
@@ -2147,11 +2154,19 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     if (document.getElementById('lastDayMonth').checked) {
         project.lastDayMonth = true
     }
-    if (project.rating !== 'Custom' && document.getElementById('voteMode').checked) {
-        if (document.getElementById('voteModeSelect').value === 'silentMode') {
-            project.silentMode = true
-        } else if (document.getElementById('voteModeSelect').value === 'emulateMode') {
-            project.emulateMode = true
+    if (project.rating !== 'Custom') {
+        if (document.getElementById('voteMode').checked) {
+            if (document.getElementById('voteModeSelect').value === 'silentMode') {
+                project.silentMode = true
+            } else if (document.getElementById('voteModeSelect').value === 'emulateMode') {
+                project.emulateMode = true
+            }
+        } else if (document.getElementById('multivoteMode').checked) {
+            if (document.getElementById('multivoteModeSelect').value === 'withMultiVote') {
+                project.useMultiVote = true
+            } else if (document.getElementById('multivoteModeSelect').value === 'withoutMultiVote') {
+                project.useMultiVote = false
+            }
         }
     }
     if (document.getElementById('priority').checked) {

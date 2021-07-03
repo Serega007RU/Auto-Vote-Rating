@@ -103,6 +103,13 @@
                                 <option data-resource="enabledSilentVoteNoSilent" value="emulateMode"></option>
                             </select>
                         </div>
+                        <div style="display: none;" id="label11" class="input-block">
+                            <label for="voteModeSelect" data-resource="enableMultiVoteMode"></label>
+                            <select id="multivoteModeSelect" class="select">
+                                <option data-resource="withMultiVote" value="withMultiVote"></option>
+                                <option data-resource="withoutMultiVote" value="withoutMultiVote"></option>
+                            </select>
+                        </div>
                         <!--TopGG-->
                         <div style="display: none;" id="chooseTopGG1" class="input-block">
                             <label data-resource="chooseTopGG" for="chooseTopGG">
@@ -505,6 +512,14 @@
                         <div class="check-block">
                             <input class="checkbox" id="voteMode" type="checkbox" name="checkbox"/>
                             <label data-resource="voteMode" for="voteMode"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="multivoteMode" type="checkbox" name="checkbox"/>
+                            <label data-resource="multivoteMode" for="multivoteMode">
+                                <span class="tooltip2">
+                                    <span data-resource="enabledMultiVoteModeTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
                         </div>
                         <div class="check-block">
                             <input class="checkbox" id="importNicks" type="checkbox" name="checkbox"/>
