@@ -964,7 +964,7 @@ async function endVote(request, sender, project) {
                 hour = 4
             } else if (project.rating === 'MMoTopRU') {
                 hour = 20
-            } else if (project.rating === 'BotsForDiscord') {
+            } else if (project.rating === 'Discords') {
                 hour = 12
             }
             if (hour != null) {
@@ -1318,6 +1318,20 @@ chrome.runtime.onInstalled.addListener(async function(details) {
             await removeValue('storageArea', 'local')
             await reloadAllAlarms()
             console.log(chrome.i18n.getMessage('importingEnd'))
+            const botsForDiscord = await getValue('AVMRprojectsBotsForDiscord')
+            if (botsForDiscord) {
+                if (botsForDiscord.length > 0) {
+                    let bots = ''
+                    for (const bfd of botsForDiscord) {
+                        bots += bfd.name ? bfd.name : bfd.id
+                        bots += ' '
+                    }
+                    let text = 'There was a rebranding on Discords on BotsForDiscord and it was found that you are auto voting on BotsForDiscord, you will have to configure the extension for Discords again in order to auto vote. The bots that you used on BotsForDiscord: ' + bots
+                    sendNotification('BotsForDiscord rebranding', text)
+                    console.log(text)
+                }
+                await removeValue('AVMRprojectsBotsForDiscord')
+            }
         }
     }
 })

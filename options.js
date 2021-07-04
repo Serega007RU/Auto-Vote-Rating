@@ -431,7 +431,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     if (project.rating === 'Custom') {
         project.id = document.getElementById('nick').value
         project.nick = ''
-    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'BotsForDiscord' && document.getElementById('nick').value !== '') {
+    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && document.getElementById('nick').value !== '') {
         project.nick = document.getElementById('nick').value
     } else {
         project.nick = ''
@@ -642,7 +642,7 @@ async function addProject(project, element) {
 //                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
 //              }
-//          } else if (project.rating == 'BotsForDiscord') {
+//          } else if (project.rating == 'Discords') {
 //              if (doc.getElementById("sign-in") != null) {
 //                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
 //                  return
@@ -891,7 +891,7 @@ async function checkPermissions(projects, element) {
         if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') {
             if (!origins.includes('*://*.vk.com/*')) origins.push('*://*.vk.com/*')
         }
-        if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'BotsForDiscord') {
+        if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'Discords') {
             if (!origins.includes('https://discord.com/oauth2/*')) origins.push('https://discord.com/oauth2/*')
         }
         if (project.rating === 'MonitoringMinecraft') {
@@ -1613,10 +1613,10 @@ selectedTop.addEventListener('change', function() {
         }
     }
 
-    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'BotsForDiscord') {
+    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords') {
         document.getElementById('nick').required = false
         document.getElementById('nick').parentElement.style.display = 'none'
-    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'BotsForDiscord') {
+    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords') {
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
     }
@@ -1627,7 +1627,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('urlGame').removeAttribute('style')
         document.getElementById('chooseGameListForge').required = true
     } else if (laterChoose === 'ListForge') {
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'BotsForDiscord') document.getElementById('nick').required = true
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords') document.getElementById('nick').required = true
         if (name !== 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('urlGame').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
@@ -1637,7 +1637,7 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('nick').required = false
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
     } else if (laterChoose === 'BestServersCom') {
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'BotsForDiscord' && name !== 'BestServersCom') document.getElementById('nick').required = true
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'BestServersCom') document.getElementById('nick').required = true
         if (name !== 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
     }
 
