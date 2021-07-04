@@ -84,9 +84,9 @@ async function addProjectList(project) {
         text = new Date(project.time).toLocaleString().replace(',', '')
     } else if (chrome.extension.getBackgroundPage()) {
         for (const value of chrome.extension.getBackgroundPage().queueProjects) {
-            if (value.rating === project.rating) {
+            if (project.rating === value.rating) {
                 text = chrome.i18n.getMessage('inQueue')
-                if (JSON.stringify(value.id) === JSON.stringify(project.id) && value.nick === project.nick) {
+                if (project.key === value.key) {
                     text = chrome.i18n.getMessage('now')
                     break
                 }
@@ -1701,9 +1701,9 @@ chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/)
                 text = new Date(request.project.time).toLocaleString().replace(',', '')
             } else if (chrome.extension.getBackgroundPage()) {
                 for (const value of chrome.extension.getBackgroundPage().queueProjects) {
-                    if (value.rating === request.project.rating) {
+                    if (request.project.rating === value.rating) {
                         text = chrome.i18n.getMessage('inQueue')
-                        if (JSON.stringify(value.id) === JSON.stringify(request.project.id) && value.nick === request.project.nick) {
+                        if (request.project.key === value.key) {
                             text = chrome.i18n.getMessage('now')
                             break
                         }

@@ -1263,60 +1263,62 @@ chrome.runtime.onInstalled.addListener(async function(details) {
             }
         }
         const oldSettings = await getValue('AVMRsettings')
-        if (oldSettings == null) return
-        const oldGeneralStats = await getValue('generalStats')
-        
-        console.log(chrome.i18n.getMessage('oldSettings'))
-        const projects = []
-        let key = 0
-        for (const item of Object.keys(allProjects)) {
-            const list = await getValue('AVMRprojects' + item)
-            if (list) {
-                for (const project of list) {
-                    delete project[item]
-                    project.rating = item
-                    if (item === 'Custom') {
-                        project.body = project.id
-                        delete project.id
-                        project.id = project.nick
-                        project.nick = ''
+        if (oldSettings != null) {
+            const oldGeneralStats = await getValue('generalStats')
+
+            console.log(chrome.i18n.getMessage('oldSettings'))
+            const projects = []
+            let key = 0
+            for (const item of Object.keys(allProjects)) {
+                const list = await getValue('AVMRprojects' + item)
+                if (list) {
+                    for (const project of list) {
+                        delete project[item]
+                        project.rating = item
+                        if (item === 'Custom') {
+                            project.body = project.id
+                            delete project.id
+                            project.id = project.nick
+                            project.nick = ''
+                        }
+                        if (project.nick == null) project.nick = ''
+                        if (project.stats.successVotes == null) project.stats.successVotes = 0
+                        if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
+                        if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
+                        if (project.stats.errorVotes == null) project.stats.errorVotes = 0
+                        if (project.stats.laterVotes == null) project.stats.laterVotes = 0
+                        key++
+                        project.key = key
+                        projects.push(project)
                     }
-                    if (project.nick == null) project.nick = ''
-                    if (project.stats.successVotes == null) project.stats.successVotes = 0
-                    if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
-                    if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
-                    if (project.stats.errorVotes == null) project.stats.errorVotes = 0
-                    if (project.stats.laterVotes == null) project.stats.laterVotes = 0
-                    key++
-                    project.key = key
-                    projects.push(project)
                 }
             }
+            if (!db) {
+                await new Promise(resolve => {//Да это странно выглядит
+                    setInterval(() => {
+                        if (db) {
+                            resolve()
+                        }
+                    }, 1000)
+                })
+            }
+            const tx = db.transaction(['projects', 'other'], 'readwrite')
+            await tx.objectStore('projects').clear()
+            for (const project of projects) {
+                await tx.objectStore('projects').add(project, project.key)
+            }
+            settings = oldSettings
+            await tx.objectStore('other').put(oldSettings, 'settings')
+            await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
+            for (const item of Object.keys(allProjects)) {
+                await removeValue('AVMRprojects' + item)
+            }
+            await removeValue('AVMRsettings')
+            await removeValue('generalStats')
+            await removeValue('storageArea', 'local')
+            await reloadAllAlarms()
+            console.log(chrome.i18n.getMessage('importingEnd'))
         }
-        if (!db) {
-            await new Promise(resolve => {//Да это странно выглядит
-                setInterval(() => {
-                    if (db) {
-                        resolve()
-                    }
-                }, 1000)
-            })
-        }
-        await db.clear('projects')
-        const tx = db.transaction(['projects', 'other'], 'readwrite')
-        for (const project of projects) {
-            await tx.objectStore('projects').add(project, project.key)
-        }
-        await tx.objectStore('other').put(oldSettings, 'settings')
-        await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
-        for (const item of Object.keys(allProjects)) {
-            await removeValue('AVMRprojects' + item)
-        }
-        await removeValue('AVMRsettings')
-        await removeValue('generalStats')
-        await removeValue('storageArea', 'local')
-        await reloadAllAlarms()
-        console.log(chrome.i18n.getMessage('importingEnd'))
     }
 })
 
