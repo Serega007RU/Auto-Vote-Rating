@@ -139,12 +139,12 @@ async function checkOpen(project) {
         if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && !settings.useProxyOnUnProxyTop) {
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
             if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') {
-                if (value.rating !== 'TopCraft' && value.rating !== 'McTOP' && value.rating !== 'MinecraftRating') {
+                if (value.rating !== 'TopCraft' && value.rating !== 'McTOP' && value.rating !== 'MinecraftRating' && value.useMultiVote !== false) {
                     return
                 }
             }
             if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MinecraftRating') {
-                if (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating') {
+                if (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating' && value.useMultiVote !== false) {
                     //Если безпроксиевый рейтинг закончил голосование, позволяет проксиевым начать голосовать ради экономии времени
                     if (value.time < Date.now()) {
                         return
