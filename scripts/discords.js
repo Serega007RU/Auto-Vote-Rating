@@ -20,33 +20,80 @@ async function vote(first) {
             return
         }
 
+        const project = await getProject()
         if (document.querySelector('a[href="/bots/auth"]') != null) {
             document.querySelector('a[href="/bots/auth"]').click()
             //Старый код BotsForDiscord
             // document.querySelector('a[href="/bots/login"]').click()
             return
-        } else if (document.URL === 'https://discords.com/bots/me') {//Костыль перадресации на страницу голосования (на время перехода с BotsForDiscord на Discords)
-            const project = await getProject()
-            document.location.replace('https://discords.com/bots/bot/' + project.id + '/vote')
+        } else if (document.URL === 'https://discords.com/bots/me' || document.URL === 'https://discords.com/u/dashboard') {//Костыль переадресации на страницу голосования (на время перехода с BotsForDiscord на Discords)
+            document.location.replace('https://discords.com/' + project.game + '/' + project.id + (project.game === 'servers' ? '/upvote' : '/vote'))
         }
 
-        if (document.querySelector('#votecontainer > h2') != null && document.querySelector('#votecontainer > h2').textContent.includes('already voted')) {
-            chrome.runtime.sendMessage({later: true})
-            return
-        }
-
-        if (document.getElementById('errorsubtitle') != null) {
-            if (document.getElementById('errorsubtitle').firstChild.textContent.includes('successfully voted')) {
-                chrome.runtime.sendMessage({successfully: true})
+        if (project.game === 'servers') {
+            const button = document.querySelector('.card-body button')
+            if (button.disabled && button.textContent === 'Upvote') {
+                await new Promise(resolve => {
+                    setInterval(()=>{
+                        if (!button.disabled || button.textContent !== 'Upvote') resolve()
+                    }, 1000)
+                })
+            }
+            if (!project.name) {
+                project.name = document.querySelector('.card-body h1').textContent
+                chrome.runtime.sendMessage({changeProject: true, project})
+            }
+            if (button.textContent === 'Upvote') {
+                button.click()
+                const timer = setInterval(()=> {
+                    if (button.textContent !== 'Upvote') {
+                        chrome.runtime.sendMessage({successfully: true})
+                    }
+                    clearInterval(timer)
+                }, 1000)
+            } else if (button.textContent === 'Login to upvote') {
+                button.click()
+                // return
+            } else {
+                //Из полученного текста достаёт все цифры в Array List
+                const numbers = button.textContent.match(/\d+/g).map(Number)
+                let count = 0
+                let hour = 0
+                let min = 0
+                let sec = 0
+                for (const i in numbers) {
+                    if (count === 0) {
+                        hour = numbers[i]
+                    } else if (count === 1) {
+                        min = numbers[i]
+                    } else if (count === 2) {
+                        sec = numbers[i]
+                    }
+                    count++
+                }
+                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                const later = Date.now() + milliseconds
+                chrome.runtime.sendMessage({later: later})
+            }
+        } else {
+            if (document.querySelector('#votecontainer > h2') != null && document.querySelector('#votecontainer > h2').textContent.includes('already voted')) {
+                chrome.runtime.sendMessage({later: true})
                 return
             }
-            chrome.runtime.sendMessage({message: document.getElementById('errorsubtitle').firstChild.textContent.trim()})
-            return
-        }
 
-        if (first) return
-        
-        document.querySelector('button[type="submit"]').click()
+            if (document.getElementById('errorsubtitle') != null) {
+                if (document.getElementById('errorsubtitle').firstChild.textContent.includes('successfully voted')) {
+                    chrome.runtime.sendMessage({successfully: true})
+                    return
+                }
+                chrome.runtime.sendMessage({message: document.getElementById('errorsubtitle').firstChild.textContent.trim()})
+                return
+            }
+
+            if (first) return
+
+            document.querySelector('button[type="submit"]').click()
+        }
     } catch (e) {
         throwError(e)
     }

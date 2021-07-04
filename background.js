@@ -964,7 +964,7 @@ async function endVote(request, sender, project) {
                 hour = 4
             } else if (project.rating === 'MMoTopRU') {
                 hour = 20
-            } else if (project.rating === 'Discords') {
+            } else if (project.rating === 'Discords' && project.game === 'bots/bot') {
                 hour = 12
             }
             if (hour != null) {
@@ -1008,6 +1008,8 @@ async function endVote(request, sender, project) {
                 time.setUTCHours(time.getUTCHours() + 2)
             } else if (project.rating === 'CraftList') {
                 time = new Date(request.successfully)
+            } else if (project.rating === 'Discords' && project.game === 'servers') {
+                time.setUTCHours(time.getUTCHours() + 6)
             } else {
                 time.setUTCDate(time.getUTCDate() + 1)
             }

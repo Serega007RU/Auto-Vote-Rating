@@ -494,9 +494,9 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseGameMMoTopRU').value
         project.lang = document.getElementById('selectLangMMoTopRU').value
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
-    } else if (project.rating === 'TopGG') {
+    } else if (project.rating === 'TopGG' || project.rating === 'Discords') {
         project.game = document.getElementById('chooseTopGG').value
-        project.addition = document.getElementById('additionTopGG').value
+        if (project.rating === 'TopGG') project.addition = document.getElementById('additionTopGG').value
     }
     
     if (project.rating === 'Custom') {
@@ -1482,6 +1482,8 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('label9').style.display = 'none'
         document.getElementById('label10').style.display = 'none'
         document.getElementById('idGame').style.display = 'none'
+        document.getElementById('chooseTopGG1').style.display = 'none'
+        document.getElementById('additionTopGG1').style.display = 'none'
         document.getElementById('countVote').required = false
         document.getElementById('id').required = false
         document.getElementById('ordinalWorld').required = false
@@ -1651,10 +1653,26 @@ selectedTop.addEventListener('change', function() {
 
     if (name === 'TopGG') {
         document.getElementById('chooseTopGG1').removeAttribute('style')
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://top.gg/'
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bot'
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/270904126974590976/vote'
+        document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bot'
+        document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
         document.getElementById('additionTopGG1').removeAttribute('style')
     } else if (laterChoose === 'TopGG') {
         document.getElementById('chooseTopGG1').style.display = 'none'
         document.getElementById('additionTopGG1').style.display = 'none'
+    }
+
+    if (name === 'Discords') {
+        document.getElementById('chooseTopGG1').removeAttribute('style')
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://discords.com/'
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bots/bot'
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/469610550159212554/vote'
+        document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bots/bot'
+        document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
+    } else if (laterChoose === 'Discords') {
+        document.getElementById('chooseTopGG1').style.display = 'none'
     }
 
     laterChoose = name
@@ -1688,6 +1706,7 @@ function generateDataList() {
     }
     document.querySelector('option[name="ListForge"]').textContent = 'or Minecraft-MP.com'
     document.querySelector('option[name="TopGames"]').textContent = 'or Top-Serveurs.net'
+    document.querySelector('option[name="Discords"]').textContent = 'or BotsForDiscord.com'
     document.querySelector('option[name="Custom"]').textContent = chrome.i18n.getMessage('Custom')
     document.querySelector('option[name="Custom"]').disabled = true
 }

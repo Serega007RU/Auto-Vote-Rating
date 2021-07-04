@@ -327,11 +327,11 @@ const allProjects = {
     Discords: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://discords.com/bots/bot/' + project.id + '/vote'
+                return 'https://discords.com/' + project.game + '/' + project.id + (project.game === 'servers' ? '/upvote' : '/vote')
             case 'pageURL':
-                return 'https://discords.com/bots/bot/' + project.id + '/vote'
+                return 'https://discords.com/' + project.game + '/' + project.id + (project.game === 'servers' ? '/upvote' : '/vote')
             case 'jsPath':
-                return '#votecontainer .subtitle b'
+                return project.game === 'servers' ? '.card-body h1' : '#votecontainer .subtitle b'
             case 'exampleURL':
                 return ['https://discords.com/bots/bot/', '469610550159212554', '/vote']
             case 'URL':
