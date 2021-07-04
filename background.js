@@ -260,7 +260,7 @@ async function checkOpen(project) {
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
                 for (const value of queueProjects) {
-                    if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
+                    if (project.key === value.key) {
                         queueProjects.delete(value)
                     }
                 }
@@ -383,7 +383,7 @@ async function checkOpen(project) {
 //              await setValue('AVMRsettings', settings)
 //              await stopVote()
                 for (const value of queueProjects) {
-                    if (project.nick === value.nick && project.id === value.id && project.rating === value.rating) {
+                    if (project.key === value.key) {
                         queueProjects.delete(value)
                     }
                 }
