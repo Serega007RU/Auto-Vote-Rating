@@ -77,7 +77,7 @@ async function addProjectList(project) {
     const listProject = document.getElementById(project.rating + 'List')
     if (listProject.childElementCount === 0 && listProject.parentElement.style.display === 'none') return
     const li = document.createElement('li')
-    li.id = project.key
+    li.id = 'projects' + project.key
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon')
     if (!(project.time == null || project.time === '') && Date.now() < project.time) {
@@ -229,7 +229,7 @@ function generateBtnListRating(rating, count) {
 
 //Удалить проект из списка проекта
 async function removeProjectList(project) {
-    const li = document.getElementById(project.key)
+    const li = document.getElementById('projects' + project.key)
     if (li != null) {
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
         if (count <= 0) {
@@ -252,13 +252,13 @@ async function removeProjectList(project) {
     
     if (!chrome.extension.getBackgroundPage()) return
     for (const value of chrome.extension.getBackgroundPage().queueProjects) {
-        if (value.key === project.key) {
+        if (project.key === value.key) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
         }
     }
     //Если эта вкладка была уже открыта, он закрывает её
     for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-        if (value.key === project.key) {
+        if (project.key === value.key) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
             chrome.tabs.remove(key)
         }
@@ -1711,7 +1711,7 @@ function generateDataList() {
 
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
     if (request.updateProject) {
-        const el = document.getElementById(request.project.key)
+        const el = document.getElementById('projects' + request.project.key)
         if (el != null) {
             let text = chrome.i18n.getMessage('soon')
             if (!(request.project.time == null || request.project.time === '') && Date.now() < request.project.time) {
