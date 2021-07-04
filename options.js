@@ -324,7 +324,7 @@ async function addProjectList(project) {
     const listProject = document.getElementById(project.rating + 'List')
     if (listProject.childElementCount === 0 && listProject.parentElement.style.display === 'none') return
     const li = document.createElement('li')
-    li.id = project.key
+    li.id = 'projects' + project.key
     //Расчёт времени
     let text = chrome.i18n.getMessage('soon')
     if (!(project.time == null || project.time === '') && Date.now() < project.time) {
@@ -486,7 +486,7 @@ async function addVKList(VK) {
     let listVK = document.getElementById('vksList')
     if (listVK.childElementCount === 0 && listVK.parentElement.style.display === 'none') return
     let html = document.createElement('li')
-    html.id = VK.key
+    html.id = 'vks' + VK.key
     let mesBlock = document.createElement('div')
     mesBlock.classList.add('message')
     let contBlock = document.createElement('div')
@@ -567,7 +567,7 @@ async function addBorealisList(acc) {
     }
     let listBorealis = document.getElementById('borealisList')
     let html = document.createElement('li')
-    html.id = acc.nick
+    html.id = 'borealis' + acc.key
     let mesBlock = document.createElement('div')
     mesBlock.classList.add('message')
     let contBlock = document.createElement('div')
@@ -648,7 +648,7 @@ async function addProxyList(proxy) {
 
     let listProxy = document.getElementById('proxiesList')
     let html = document.createElement('li')
-    html.id = proxy.key
+    html.id = 'proxies' + proxy.key
     let mes = document.createElement('div')
     mes.classList.add('message')
     let div = document.createElement('div')
@@ -676,7 +676,7 @@ async function addProxyList(proxy) {
 
 //Удалить проект из списка проекта
 async function removeProjectList(project) {
-    const li = document.getElementById(project.key)
+    const li = document.getElementById('projects' + project.key)
     if (li != null) {
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
         if (count <= 0) {
@@ -699,13 +699,13 @@ async function removeProjectList(project) {
     
     if (!chrome.extension.getBackgroundPage()) return
     for (const value of chrome.extension.getBackgroundPage().queueProjects) {
-        if (value.key === project.key) {
+        if (project.key === value.key) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
         }
     }
     //Если эта вкладка была уже открыта, он закрывает её
     for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-        if (value.key === project.key) {
+        if (project.key === value.key) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
             chrome.tabs.remove(key)
         }
@@ -720,7 +720,7 @@ async function removeProjectList(project) {
 }
 
 async function removeVKList(VK) {
-    let li = document.getElementById(VK.key)
+    let li = document.getElementById('vks' + VK.key)
     if (li != null) {
         const count = Number(document.querySelector('#VKButton > span').textContent) - 1
         li.remove()
@@ -746,7 +746,7 @@ async function removeBorealisList(acc) {
 }
 
 async function removeProxyList(proxy) {
-    let li = document.getElementById(proxy.key)
+    let li = document.getElementById('proxies' + proxy.key)
     if (li != null) {
         const count = Number(document.querySelector('#ProxyButton > span').textContent) - 1
         li.remove()
@@ -3738,7 +3738,7 @@ function generateDataList() {
 
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
     if (request.updateProject) {
-        const el = document.getElementById(request.project.key)
+        const el = document.getElementById('projects' + request.project.key)
         if (el != null) {
             let text = chrome.i18n.getMessage('soon')
             if (!(request.project.time == null || request.project.time === '') && Date.now() < request.project.time) {
