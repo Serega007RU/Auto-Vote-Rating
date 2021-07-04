@@ -1130,7 +1130,7 @@ function getProjectPrefix(project, detailed) {
     if (detailed) {
         return '[' + project.rating + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + ' '
     } else {
-        return '[' + project.rating + '] ' + (project.nick != null && project.nick !== '' ? project.nick : project.game != null ? project.game : project.name) + (project.name != null ? ' – ' + project.name : ' – ' + project.id)
+        return '[' + project.rating + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' ' : '') + (project.name != null ? '– ' + project.name : '– ' + project.id)
     }
 }
 

@@ -726,13 +726,11 @@ async function addProject(project, element) {
                 text.textContent = chrome.i18n.getMessage('authButton')
                 button.append(text)
                 createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
-                button.addEventListener('click', function() {
+                button.addEventListener('click', event => {
                     if (element != null) {
-                        openPopup(url2, function() {
-                            document.location.reload(true)
-                        })
+                        openPopup(url2, ()=> document.location.reload(true))
                     } else {
-                        openPopup(url2, async event => {
+                        openPopup(url2, async () => {
                             if (event.target.classList.contains('disabled')) {
                                 createNotif(chrome.i18n.getMessage('notFast'), 'warn')
                                 return
