@@ -306,14 +306,21 @@ async function addProjectList(project) {
     if (document.getElementById(project.rating + 'Button') == null) {
         generateBtnListRating(project.rating, 0)
     }
+    let preBend = false
     if (!project.key) {
-        const found = await db.getKeyFromIndex('projects', 'rating, id, nick', [project.rating, project.id, project.nick])
-        if (found == null) {
-            project.key = await db.put('projects', project)
+        if (project.priority) {
+            preBend = true
+            const cursor = await db.transaction('projects').store.openCursor()
+            if (cursor.key === 1) {
+                project.key = -1
+            } else {
+                project.key = cursor.key - 1
+            }
+            await db.put('projects', project, project.key)
         } else {
-            project.key = found
+            project.key = await db.put('projects', project)
+            await db.put('projects', project, project.key)
         }
-        await db.put('projects', project, project.key)
 
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent)
         document.querySelector('#' + project.rating + 'Button > span').textContent = String(count + 1)
@@ -359,13 +366,11 @@ async function addProjectList(project) {
     const nameProjectMes = document.createElement('div')
     nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '') + (project.useMultiVote != null ? project.useMultiVote ? ' (' + chrome.i18n.getMessage('withMultiVote') + ')' : ' (' + chrome.i18n.getMessage('withoutMultiVote') + ')' : '')
     contDiv.append(nameProjectMes)
-    
-    if (project.error) {
-        const div2 = document.createElement('div')
-        div2.style.color = '#da5e5e'
-        div2.append(project.error)
-        contDiv.appendChild(div2)
-    }
+
+    const div2 = document.createElement('div')
+    div2.classList.add('error')
+    div2.textContent = project.error
+    contDiv.appendChild(div2)
     
     const nextVoteMes = document.createElement('div')
     nextVoteMes.classList.add('textNextVote')
@@ -375,7 +380,11 @@ async function addProjectList(project) {
     li.append(contDiv)
     li.append(div)
     
-    listProject.append(li)
+    if (preBend) {
+        listProject.prepend(li)
+    } else {
+        listProject.append(li)
+    }
     //Слушатель кнопки Удалить на проект
     img2.addEventListener('click', async event => {
         if (event.target.classList.contains('disabled')) {
@@ -3379,6 +3388,7 @@ async function listSelect(event, tabs) {
         if (tabs === 'vks' || tabs === 'proxies' || tabs === 'borealis') {
             let cursor = await db.transaction(tabs).store.openCursor()
             while (cursor) {
+                if (!cursor.value.key) cursor.value.key = cursor.key
                 if (tabs === 'vks') addVKList(cursor.value)
                 else if (tabs === 'proxies') addProxyList(cursor.value)
                 else if (tabs === 'borealis') addBorealisList(cursor.value)
@@ -3387,6 +3397,7 @@ async function listSelect(event, tabs) {
         } else {
             let cursor = await db.transaction('projects').store.index('rating').openCursor(tabs)
             while (cursor) {
+                if (!cursor.value.key) cursor.value.key = cursor.key
                 addProjectList(cursor.value)
                 cursor = await cursor.continue()
             }
@@ -3755,6 +3766,7 @@ chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/)
                 }
             }
             el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
+            el.querySelector('.error').textContent = request.project.error
             updateModalStats(request.project)
         }
     }
