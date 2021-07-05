@@ -154,11 +154,6 @@ async function checkOpen(project) {
         }
     }
     if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
-        if (queueProjects.size === 0 && (currentVK != null || currentProxy != null)) {
-            if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
-            if (currentProxy != null) clearProxy()
-            currentVK = null
-        }
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
         if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
             let usedProjects = getTopFromList(currentVK, project)
@@ -1647,10 +1642,31 @@ async function endVote(request, sender, project) {
                 queueProjects.delete(value)
             }
         }
-        if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && queueProjects.size === 0 && (currentVK != null || currentProxy != null)) {
-            if (debug) console.log('queueProjects.size == 0, удаляю прокси и очищаю текущий ВК и прокси')
-            if (currentProxy != null) clearProxy()
-            currentVK = null
+        if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
+            if (currentVK != null || currentProxy != null) {
+                if (queueProjects.size === 0) {
+                    if (currentProxy != null) clearProxy()
+                    currentVK = null
+                } else {
+                    let countVK = 0
+                    let countProxy = 0
+                    for (const value of queueProjects) {
+                        if (countVK > 0 && countProxy > 0) break
+                        if (value.useMultiVote !== false) {
+                            if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || value.rating === 'MinecraftRating' || value.rating === 'MonitoringMinecraft' || value.rating === 'QTop') {
+                                countVK++
+                            }
+                            if (settings.useProxyOnUnProxyTop) {
+                                countProxy++
+                            } else if (value.rating !== 'TopCraft' || value.rating !== 'McTOP' || value.rating !== 'MinecraftRating') {
+                                countProxy++
+                            }
+                        }
+                    }
+                    if (countVK === 0) currentVK = null
+                    if (countProxy === 0) clearProxy()
+                }
+            }
         }
         checkVote()
     }
