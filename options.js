@@ -2802,6 +2802,9 @@ async function checkPermissions(projects, element) {
         if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'Discords') {
             if (!origins.includes('https://discord.com/oauth2/*')) origins.push('https://discord.com/oauth2/*')
         }
+        if (project.rating === 'BestServersCom' || project.rating === 'ListForge') {
+            if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
+        }
         if (project.rating === 'MonitoringMinecraft') {
             if (!permissions.includes('cookies')) permissions.push('cookies')
         }
@@ -3748,26 +3751,28 @@ function generateDataList() {
 }
 
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
-    if (request.updateProject) {
-        const el = document.getElementById('projects' + request.project.key)
-        if (el != null) {
-            let text = chrome.i18n.getMessage('soon')
-            if (!(request.project.time == null || request.project.time === '') && Date.now() < request.project.time) {
-                text = new Date(request.project.time).toLocaleString().replace(',', '')
-            } else if (chrome.extension.getBackgroundPage()) {
-                for (const value of chrome.extension.getBackgroundPage().queueProjects) {
-                    if (request.project.rating === value.rating) {
-                        text = chrome.i18n.getMessage('inQueue')
-                        if (request.project.key === value.key) {
-                            text = chrome.i18n.getMessage('now')
-                            break
+    if (request.updateValue) {
+        if (request.updateValue === 'projects') {
+            const el = document.getElementById('projects' + request.value.key)
+            if (el != null) {
+                let text = chrome.i18n.getMessage('soon')
+                if (!(request.value.time == null || request.value.time === '') && Date.now() < request.value.time) {
+                    text = new Date(request.value.time).toLocaleString().replace(',', '')
+                } else if (chrome.extension.getBackgroundPage()) {
+                    for (const value of chrome.extension.getBackgroundPage().queueProjects) {
+                        if (request.value.rating === value.rating) {
+                            text = chrome.i18n.getMessage('inQueue')
+                            if (request.value.key === value.key) {
+                                text = chrome.i18n.getMessage('now')
+                                break
+                            }
                         }
                     }
                 }
+                el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
+                el.querySelector('.error').textContent = request.value.error
+                updateModalStats(request.value)
             }
-            el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
-            el.querySelector('.error').textContent = request.project.error
-            updateModalStats(request.project)
         }
     }
 })
