@@ -36,6 +36,8 @@ try {
             text = document.querySelector('#login_blocked_wrap div.header').textContent + ' ' + document.querySelector('#login_blocked_wrap div.content').textContent.trim()
         } else if (document.querySelector('div.login_blocked_panel') != null) {
             text = document.querySelector('div.login_blocked_panel').textContent.trim()
+        } else if (document.body.innerText.length < 500) {
+            text = document.body.innerText
         } else {
             text = 'null'
         }
@@ -120,5 +122,5 @@ function throwError(error) {
         message = error
     }
 
-    chrome.runtime.sendMessage({errorVoteNoElement2: message + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+    chrome.runtime.sendMessage({errorVoteNoElement2: message + (document.body.innerText.trim().length < 500 ? ' ' + document.body.innerText.trim() : '')})
 }
