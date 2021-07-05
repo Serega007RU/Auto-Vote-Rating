@@ -2416,32 +2416,34 @@ async function addProject(project, element) {
         secondBonusButton.className = 'secondBonus'
     }
 
-    let found
-    if (settings.useMultiVote) {
-        found = await db.countFromIndex('projects', 'rating, id, nick', [project.rating, project.id, project.nick])
-    } else {
-        found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
-    }
-    if (found > 0) {
-        const message = chrome.i18n.getMessage('alreadyAdded')
-        if (!secondBonusText) {
-            createNotif(message, 'success', null, element)
+    if (!document.getElementById('disableCheckProjects').checked && settings.useMultiVote ? project.rating !== 'MCRate' : true) {
+        let found
+        if (settings.useMultiVote) {
+            found = await db.countFromIndex('projects', 'rating, id, nick', [project.rating, project.id, project.nick])
         } else {
-            createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
+            found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
         }
-        addProjectsBonus(project, element)
-        return
-    } else if ((project.rating === 'MCRate' || project.rating === 'ServerPact' || project.rating === 'MinecraftServersOrg' || project.rating === 'HotMC' || project.rating === 'MMoTopRU' || project.rating === 'MinecraftIpList') && !settings.useMultiVote) {
-        found = await db.countFromIndex('projects', 'rating', project.rating)
-        if (project.rating === 'MinecraftIpList') {
-            if (found >= 5) {
-                createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
-                return
+        if (found > 0) {
+            const message = chrome.i18n.getMessage('alreadyAdded')
+            if (!secondBonusText) {
+                createNotif(message, 'success', null, element)
+            } else {
+                createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
             }
-        } else {
-            if (found > 0) {
-                createNotif(chrome.i18n.getMessage('oneProject', project.rating), 'error', null, element)
-                return
+            addProjectsBonus(project, element)
+            return
+        } else if ((project.rating === 'MCRate' || project.rating === 'ServerPact' || project.rating === 'MinecraftServersOrg' || project.rating === 'HotMC' || project.rating === 'MMoTopRU' || project.rating === 'MinecraftIpList') && !settings.useMultiVote) {
+            found = await db.countFromIndex('projects', 'rating', project.rating)
+            if (project.rating === 'MinecraftIpList') {
+                if (found >= 5) {
+                    createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
+                    return
+                }
+            } else {
+                if (found > 0) {
+                    createNotif(chrome.i18n.getMessage('oneProject', project.rating), 'error', null, element)
+                    return
+                }
             }
         }
     }
@@ -3781,7 +3783,7 @@ chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/)
         }
     } else if (request.stopVote) {
         document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
-        createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
+        createNotif(chrome.i18n.getMessage('voteSuspended') + ' ' + request.stopVote, 'error')
     }
 })
 

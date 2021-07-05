@@ -77,6 +77,7 @@ async function checkVote() {
         if (!settings.disabledNotifError) sendNotification(lastErrorNotFound, lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
         await db.put('other', settings, 'settings')
         await stopVote()
+        chrome.runtime.sendMessage({stopVote: lastErrorNotFound})
     }
 
     check = true
@@ -278,6 +279,7 @@ async function checkOpen(project) {
                 }
                 await db.put('other', settings, 'settings')
                 await stopVote()
+                chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('otherProxy')})
                 return
             }
             //Ищет не юзанный свободный прокси
@@ -332,9 +334,11 @@ async function checkOpen(project) {
                             await stopVote()
                             if (response.status === 401) {
                                 console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
+                                chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2')})
                                 if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
                                 return
                             }
+                            chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('notConnect', response.url) + response.status})
                             console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status)
                             return
                         }
@@ -1828,7 +1832,6 @@ function extractHostname(url) {
 
 async function stopVote() {
     if (debug) console.log('Отмена всех голосований и очистка всего')
-    chrome.runtime.sendMessage({stopVote: true})
     await clearProxy()
     currentVK = null
     queueProjects.clear()
@@ -1892,6 +1895,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 }
                 await db.put('other', settings, 'settings')
                 await stopVote()
+                chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('errorAuthProxyTB')})
             }
         } else if (currentProxy.Windscribe) {
             console.log(chrome.i18n.getMessage('proxyAuthOther', 'Windscribe'))
