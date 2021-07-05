@@ -176,7 +176,7 @@ async function newWindow(project) {
     }
     generalStats.lastAttemptVote = Date.now()
     await db.put('other', generalStats, 'generalStats')
-    await updateProject(project)
+    await updateValue('projects', project)
     
     let create = true
     await new Promise(resolve => {
@@ -785,7 +785,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                     if (chrome.runtime.lastError.message !== 'The tab was closed.') {
                         if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                         project.error = chrome.runtime.lastError.message
-                        updateProject(project)
+                        updateValue('projects', project)
                     }
                 }
                 resolve()
@@ -804,7 +804,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 if (chrome.runtime.lastError.message !== 'The frame was removed.') {
                     if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
-                    updateProject(project)
+                    updateValue('projects', project)
                 }
             }
         })
@@ -886,11 +886,11 @@ chrome.runtime.onMessage.addListener(async function(request, sender/*, sendRespo
         delete project.nextAttempt
         openedProjects.delete(sender.tab.id)
         openedProjects.set(sender.tab.id, project)
-        await updateProject(project)
+        await updateValue('projects', project)
     } else if (request.changeProject) {
         openedProjects.delete(sender.tab.id)
         openedProjects.set(sender.tab.id, request.project)
-        await updateProject(request.project)
+        await updateValue('projects', request.project)
     } else {
         endVote(request, sender, null)
     }
@@ -1080,7 +1080,7 @@ async function endVote(request, sender, project) {
     }
     
     await db.put('other', generalStats, 'generalStats')
-    await updateProject(project)
+    await updateValue('projects', project)
 
     chrome.alarms.clear(String(project.key))
     if (project.time != null && project.time > Date.now()) {
@@ -1190,13 +1190,13 @@ async function wait(ms) {
     })
 }
 
-async function updateProject(project) {
-    const found = await db.count('projects', project.key)
+async function updateValue(objStore, value) {
+    const found = await db.count(objStore, value.key)
     if (found) {
-        await db.put('projects', project, project.key)
-        chrome.runtime.sendMessage({updateProject: true, project})
+        await db.put(objStore, value, value.key)
+        chrome.runtime.sendMessage({updateValue: objStore, value})
     } else {
-        console.warn('This project could not be found, it may have been deleted', JSON.stringify(project))
+        console.warn('The ' + objStore + ' could not be found, it may have been deleted', JSON.stringify(value))
     }
 }
 
