@@ -3773,7 +3773,15 @@ chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/)
                 el.querySelector('.error').textContent = request.value.error
                 updateModalStats(request.value)
             }
+        } else if (request.updateValue === 'vks' || request.updateValue === 'proxies') {
+            const el = document.getElementById(request.updateValue + request.value.key)
+            if (el != null) {
+                el.querySelector('.error').textContent = request.value.error
+            }
         }
+    } else if (request.stopVote) {
+        document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
+        createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
     }
 })
 

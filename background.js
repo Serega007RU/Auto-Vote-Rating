@@ -1495,7 +1495,7 @@ async function endVote(request, sender, project) {
                         getTopFromList(currentVK, project).splice(index, 1)
                     }
                     getTopFromList(currentVK, project).push(usedProject)
-                    await db.put('vks', currentVK, currentVK.key)
+                    await updateValue('vks', currentVK)
                 }
             }
 
@@ -1509,7 +1509,7 @@ async function endVote(request, sender, project) {
                     getTopFromList(currentProxy, project).splice(index, 1)
                 }
                 getTopFromList(currentProxy, project).push(usedProject)
-                await db.put('proxies', currentProxy, currentProxy.key)
+                await updateValue('proxies', currentProxy)
             } else if (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) {
                 console.warn('currentProxy is null or not found')
             }
@@ -1566,7 +1566,7 @@ async function endVote(request, sender, project) {
             sendMessage = message
             if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
-                await db.put('vks', currentVK, currentVK.key)
+                await updateValue('vks', currentVK)
             } else if (project.rating === 'MCRate' && message.includes('Ваш аккаунт заблокирован для голосования за этот проект')) {
                 let usedProject = {
                     id: project.id,
@@ -1578,14 +1578,14 @@ async function endVote(request, sender, project) {
                     getTopFromList(currentVK, project).splice(index, 1)
                 }
                 getTopFromList(currentVK, project).push(usedProject)
-                await db.put('vks', currentVK, currentVK.key)
+                await updateValue('vks', currentVK)
             } else if (project.rating === 'MCRate' && message.includes('Ваш ВК ID заблокирован для голосовани')) {
                 currentVK.MCRate = message
-                await db.put('vks', currentVK, currentVK.key)
+                await updateValue('vks', currentVK)
             } else if (currentProxy != null && request && request.errorVoteNetwork) {
                 if (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT')) {
                     currentProxy.notWorking = request.errorVoteNetwork[0]
-                    await db.put('proxies', currentProxy, currentProxy.key)
+                    await updateValue('proxies', currentProxy)
                     await stopVote()
                 }
             }
@@ -1828,6 +1828,7 @@ function extractHostname(url) {
 
 async function stopVote() {
     if (debug) console.log('Отмена всех голосований и очистка всего')
+    chrome.runtime.sendMessage({stopVote: true})
     await clearProxy()
     currentVK = null
     queueProjects.clear()
