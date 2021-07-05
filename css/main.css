@@ -940,6 +940,10 @@ input.checkbox:disabled + label {
     background: #da5e5e;
 }
 
+.error {
+	color: #da5e5e;
+}
+
 .btn:hover {
     opacity: 1
 }
