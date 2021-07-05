@@ -899,17 +899,66 @@
                         			<div class="timeline-icon"></div>
                         		</div>
                         		<div class="changes timeline-content">
+                                    <h4>
+                                        v6.0.0 Оптимизация!
+                                    </h4>
+                                    <small>released on ??.07.2021</small>
                         			<div class="changes-entry">
                         				<ul>
-                        					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
-                        						Исправление ошибки импорта старых настроек
-                        					</li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-performance">Performance</span>
+                                                Оптимизация! Было очень много работы проделано в сторону оптимизации и других технических изменений (см подробнее ниже)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-performance">Performance</span>
+                                                Хранилище было переведено с chrome.storage на IndexedDB (База данных в браузере)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-performance">Performance</span>
+                                                Было отказано от использования setInterval и перешли на chrome.alarms (триггер голосования)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-removed">Removed</span>
+                                                CoolDown удалён (причина выше)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-performance">Performance</span>
+                                                Для каждого проекта теперь назначается id что теперь позволяет добавлять проекты с одним и тем же ником что позволило разрешить голосовать на MCRate с разных аккаунтов на один и тот же ник
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Теперь более корректно работаем с CloudFlare (его проверками)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок на TopGames
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Более корректное определение ошибки на McRate
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок с addFastProject
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Теперь только одна кнопка блокируется при выполнении операции в настройках
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибки импорта старых настроек
+                                            </li>
                         					<li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
                         						Для режима эмуляции расширение теперь видит код ошибки (status code)
                         					</li>
                         					<li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
                         						Увеличен размер popup
                         					</li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                В настройках теперь у уведомлениях отображается причина приостановки голосования (для тех индивидов что отрубают уведомления напрочь а потом спрашивают "А пачаму ничаго ни работаит")
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Ошибки (типа ReferenceError) теперь логируются (спасибо MaNNaZuRuS#4042)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление определения прохождения hCaptcha
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавлена возможность настроить режим MultiVote отдельно на проект (по инициативе MaNNaZuRuS#4042)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Произошёл ребрендинг рейтинга BotsForDiscord на Discords, внесены соответствующие изменения и исправления
+                                            </li>
                         				</ul>
                         			</div>
                         		</div>
