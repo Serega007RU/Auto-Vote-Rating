@@ -285,6 +285,7 @@ document.getElementById('stopVote').addEventListener('click', async event => {
     event.target.classList.remove('disabled')
 })
 async function stopVote(stop) {
+    settings = await db.get('other', 'settings')
     if (settings.stopVote > Date.now() && !stop) {
         settings.stopVote = 0
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
