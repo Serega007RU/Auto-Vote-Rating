@@ -1201,7 +1201,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
         return false
     }
-    if (response.statusText) {
+    if (response.statusText && response.statusText !== '' && response.statusText !== 'ok' && response.statusText !== 'OK') {
         endVote(response.statusText, null, project)
         return false
     }
