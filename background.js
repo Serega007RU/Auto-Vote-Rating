@@ -1933,7 +1933,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             console.log(chrome.i18n.getMessage('proxyAuthOther', 'NordVPN'))
             callbackFn({
                 authCredentials: {
-                    'username': 'n2qNF1K4PBLbWWkJSTfmGEdX1',
+                    'username': 'n2qNF1K4PBLbWWkJSTfmGEdX',
                     'password': 'UKweV43HJP5QnWtVEaWnCChM'
                 }
             })
