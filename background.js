@@ -729,7 +729,7 @@ async function silentVote(project) {
 async function checkResponseError(project, response, url, bypassCodes, vk) {
     let host = extractHostname(response.url)
     if (vk && host.includes('vk.com')) {
-        if (response.headers.get('Content-Type').includes('windows-1251')) {
+        if (response.headers.get('Content-Type') && response.headers.get('Content-Type').includes('windows-1251')) {
             //Почему не UTF-8?
             response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
         }
@@ -768,6 +768,10 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     if (!response.ok) {
         endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
+        return false
+    }
+    if (response.statusText && response.statusText !== '' && response.statusText !== 'ok' && response.statusText !== 'OK') {
+        endVote(response.statusText, null, project)
         return false
     }
     return true
