@@ -512,13 +512,11 @@ async function addVKList(VK) {
     let delBtn = svgDelete.cloneNode(true)
     contBlock.append(delBtn)
 
-    if (VK.notWorking) {
-        if (VK.notWorking === true) {
-            mesBlock.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
-        } else {
-            mesBlock.append(createMessage(VK.notWorking, 'error'))
-        }
-    }
+    const div2 = document.createElement('div')
+    div2.classList.add('error')
+    div2.textContent = VK.notWorking
+    mesBlock.appendChild(div2)
+
     html.append(mesBlock)
     html.append(contBlock)
 
@@ -668,13 +666,11 @@ async function addProxyList(proxy) {
     let del = (svgDelete.cloneNode(true))
     control.append(del)
 
-    if (proxy.notWorking) {
-        if (proxy.notWorking === true) {
-            mes.append(createMessage(chrome.i18n.getMessage('notWork'), 'error'))
-        } else {
-            mes.append(createMessage(proxy.notWorking, 'error'))
-        }
-    }
+    const div2 = document.createElement('div')
+    div2.classList.add('error')
+    div2.textContent = proxy.notWorking
+    mes.appendChild(div2)
+
     html.append(mes)
     html.append(control)
     listProxy.append(html)
@@ -1860,8 +1856,8 @@ document.getElementById('importNordVPN').addEventListener('click', async event =
     createNotif(chrome.i18n.getMessage('importVPNStart', 'NordVPN'))
     try {
         let response = await fetch('https://api.nordvpn.com/server')
-        const tx = db.transaction('proxies', 'readwrite')
         let vpns = await response.json()
+        const tx = db.transaction('proxies', 'readwrite')
         for (const vpn of vpns) {
             const proxy = {
                 ip: vpn.domain,
@@ -3778,7 +3774,7 @@ chrome.runtime.onMessage.addListener(async function(request/*, sender, sendRespo
         } else if (request.updateValue === 'vks' || request.updateValue === 'proxies') {
             const el = document.getElementById(request.updateValue + request.value.key)
             if (el != null) {
-                el.querySelector('.error').textContent = request.value.error
+                el.querySelector('.error').textContent = request.value.notWorking
             }
         }
     } else if (request.stopVote) {

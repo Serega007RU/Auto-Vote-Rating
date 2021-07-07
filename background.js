@@ -1160,7 +1160,7 @@ async function silentVote(project) {
 async function checkResponseError(project, response, url, bypassCodes, vk) {
     let host = extractHostname(response.url)
     if (vk && host.includes('vk.com')) {
-        if (response.headers.get('Content-Type').includes('windows-1251')) {
+        if (response.headers.get('Content-Type') && response.headers.get('Content-Type').includes('windows-1251')) {
             //Почему не UTF-8?
             response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
         }
@@ -1199,6 +1199,10 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     if (!response.ok) {
         endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
+        return false
+    }
+    if (response.statusText) {
+        endVote(response.statusText, null, project)
         return false
     }
     return true
@@ -1929,7 +1933,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             console.log(chrome.i18n.getMessage('proxyAuthOther', 'NordVPN'))
             callbackFn({
                 authCredentials: {
-                    'username': 'n2qNF1K4PBLbWWkJSTfmGEdX',
+                    'username': 'n2qNF1K4PBLbWWkJSTfmGEdX1',
                     'password': 'UKweV43HJP5QnWtVEaWnCChM'
                 }
             })
