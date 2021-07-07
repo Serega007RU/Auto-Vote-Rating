@@ -1865,6 +1865,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             if (!settings.disabledNotifError) {
                 sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxy2'))
             }
+            await updateValue('proxies', currentProxy)
             callbackFn()
             return
         }
@@ -1939,6 +1940,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             if (!settings.disabledNotifError) {
                 sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyNoPassword'))
             }
+            await updateValue('proxies', currentProxy)
         }
     }
     callbackFn()

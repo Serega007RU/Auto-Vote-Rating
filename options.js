@@ -285,7 +285,6 @@ document.getElementById('stopVote').addEventListener('click', async event => {
     event.target.classList.remove('disabled')
 })
 async function stopVote(stop) {
-    settings = await db.get('other', 'settings')
     if (settings.stopVote > Date.now() && !stop) {
         settings.stopVote = 0
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
@@ -3753,7 +3752,7 @@ function generateDataList() {
     document.querySelector('option[name="Custom"]').disabled = true
 }
 
-chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
+chrome.runtime.onMessage.addListener(async function(request/*, sender, sendResponse*/) {
     if (request.updateValue) {
         if (request.updateValue === 'projects') {
             const el = document.getElementById('projects' + request.value.key)
@@ -3785,6 +3784,7 @@ chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/)
     } else if (request.stopVote) {
         document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
         createNotif(chrome.i18n.getMessage('voteSuspended') + ' ' + request.stopVote, 'error')
+        settings = await db.get('other', 'settings')
     }
 })
 
