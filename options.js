@@ -719,7 +719,7 @@ async function removeProjectList(project) {
     if (settings.useMultiVote && chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
         if (chrome.extension.getBackgroundPage().queueProjects.size === 0) {
             //Прекращаем использование прокси
-            await clearProxy()
+            await chrome.extension.getBackgroundPage().clearProxy()
         }
     }
 }
@@ -764,7 +764,7 @@ async function removeProxyList(proxy) {
     if (chrome.extension.getBackgroundPage().currentProxy != null && chrome.extension.getBackgroundPage().currentProxy.ip != null) {
         if (chrome.extension.getBackgroundPage().currentProxy.ip === proxy.ip && chrome.extension.getBackgroundPage().currentProxy.port === proxy.port) {
             //Прекращаем использование прокси
-            await clearProxy()
+            await chrome.extension.getBackgroundPage().clearProxy()
         }
     }
 }
@@ -1917,7 +1917,7 @@ async function addProxy(proxy, dontNotif) {
 //     } catch (e) {
 //         error = true
 //     }
-//     await clearProxy()
+//     await chrome.extension.getBackgroundPage().clearProxy()
 //     return error
 // }
 
