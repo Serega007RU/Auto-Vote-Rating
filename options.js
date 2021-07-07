@@ -1710,7 +1710,8 @@ document.getElementById('importHolaVPN').addEventListener('click', async event =
     try {
         let response = await fetch('https://client.hola.org/client_cgi/vpn_countries.json')
         const countries = await response.json()
-        for (country of countries) {
+        countries.sort(() => Math.random() - 0.5)
+        for (const country of countries) {
             response = await fetch('https://client.hola.org/client_cgi/zgettunnels?country=' + country + '&limit=999&is_premium=1', {
                 "headers": {
                     "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
@@ -1719,8 +1720,9 @@ document.getElementById('importHolaVPN').addEventListener('click', async event =
                 "method": "POST"
             })
             const vpns = await response.json()
+            vpns.ztun[country].sort(() => Math.random() - 0.5)
             const tx = db.transaction('proxies', 'readwrite')
-            for (vpn of vpns.ztun[country]) {
+            for (const vpn of vpns.ztun[country]) {
                 let host = vpn.replace('HTTP ', '').split(':')
                 let port = 22223
                 if (host[1] !== '22222') port = Number(host[1])
@@ -1781,6 +1783,7 @@ document.getElementById('importZenMate').addEventListener('click', async event =
             "credentials": "include"
         })
         let vpns = await response.json()
+        vpns.sort(() => Math.random() - 0.5)
         const tx = db.transaction('proxies', 'readwrite')
         for (const vpn of vpns) {
             let host = vpn.dnsname.split(':')
@@ -1820,6 +1823,7 @@ document.getElementById('importZenMate').addEventListener('click', async event =
 //        "credentials": "include"
 //      })
 //      vpns = await response.json()
+//      vpns.sort(() => Math.random() - 0.5)
 //      const tx = db.transaction('proxies', 'readwrite')
 //      for (const vpn of vpns) {
 //          let host = vpn.dnsname.split(':')
@@ -1857,6 +1861,7 @@ document.getElementById('importNordVPN').addEventListener('click', async event =
     try {
         let response = await fetch('https://api.nordvpn.com/server')
         let vpns = await response.json()
+        vpns.sort(() => Math.random() - 0.5)
         const tx = db.transaction('proxies', 'readwrite')
         for (const vpn of vpns) {
             const proxy = {
