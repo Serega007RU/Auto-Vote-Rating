@@ -165,10 +165,10 @@ async function checkOpen(project) {
             }
             if (currentVK.notWorking) {
                 let _return = true
-                if (project.rating === 'TopCraft' && (currentVK.passwordTopCraft || project.AuthURLTopCraft)) _return = false
-                if (project.rating === 'McTOP' && (currentVK.passwordMcTOP || project.AuthURLMcTOP)) _return = false
-                if (project.rating === 'MinecraftRating' && currentVK['AuthURLMinecraftRating' + project.id] != null) _return = false
-                if (project.rating === 'MonitoringMinecraft' && currentVK['AuthURLMonitoringMinecraft' + project.id] != null) _return = false
+                if (project.rating === 'TopCraft' && (currentVK.passwordTopCraft/* || project.AuthURLTopCraft*/)) _return = false
+                if (project.rating === 'McTOP' && (currentVK.passwordMcTOP/* || project.AuthURLMcTOP*/)) _return = false
+//              if (project.rating === 'MinecraftRating' && currentVK['AuthURLMinecraftRating' + project.id] != null) _return = false
+//              if (project.rating === 'MonitoringMinecraft' && currentVK['AuthURLMonitoringMinecraft' + project.id] != null) _return = false
                 if (_return) return
             }
         }
@@ -193,10 +193,10 @@ async function checkOpen(project) {
                 const vkontakte = cursor.value
                 if (vkontakte.notWorking) {
                     let _continue = true
-                    if (project.rating === 'TopCraft' && (vkontakte.passwordTopCraft || vkontakte.AuthURLTopCraft)) _continue = false
-                    if (project.rating === 'McTOP' && (vkontakte.passwordMcTOP || project.AuthURLMcTOP)) _continue = false
-                    if (project.rating === 'MinecraftRating' && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
-                    if (project.rating === 'MonitoringMinecraft' && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
+                    if (project.rating === 'TopCraft' && (vkontakte.passwordTopCraft/* || vkontakte.AuthURLTopCraft*/)) _continue = false
+                    if (project.rating === 'McTOP' && (vkontakte.passwordMcTOP/* || project.AuthURLMcTOP*/)) _continue = false
+//                  if (project.rating === 'MinecraftRating' && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
+//                  if (project.rating === 'MonitoringMinecraft' && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
                     if (_continue) {
                         cursor = await cursor.continue()
                         continue
