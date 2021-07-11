@@ -639,6 +639,7 @@ async function silentVote(project) {
                     if (response.doc.querySelector('.errorlist').textContent.includes('Имя пользователя и/или пароль не верны')) {
                         endVote({message: response.doc.querySelector('.errorlist').textContent + ' passwordTopCraft: ' + currentVK.passwordTopCraft}, null, project)
                         delete currentVK.passwordTopCraft
+                        updateValue('vks', currentVK)
                     } else {
                         endVote({message: response.doc.querySelector('.errorlist').textContent}, null, project)
                     }
@@ -688,6 +689,7 @@ async function silentVote(project) {
                     if (response.doc.querySelector('.errorlist').textContent.includes('Имя пользователя и/или пароль не верны')) {
                         endVote({message: response.doc.querySelector('.errorlist').textContent + ' passwordMcTOP: ' + currentVK.passwordMcTOP}, null, project)
                         delete currentVK.passwordMcTOP
+                        updateValue('vks', currentVK)
                     } else {
                         endVote({message: response.doc.querySelector('.errorlist').textContent}, null, project)
                     }
