@@ -134,8 +134,6 @@ async function checkOpen(project) {
         }
     }
 
-    delete project.error
-
     console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
     if (!settings.disabledNotifStart)
         sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
