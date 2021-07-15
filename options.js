@@ -2245,6 +2245,7 @@ document.getElementById('formProxyBlackList').addEventListener('submit', async (
         return
     }
     settings.proxyBlackList = bl
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('proxyBLSet'), 'success')
     event.target.classList.remove('disabled')
