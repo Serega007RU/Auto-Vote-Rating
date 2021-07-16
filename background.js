@@ -154,6 +154,7 @@ async function checkOpen(project) {
             }
         }
     }
+    if (currentProxy != null && project.useMultiVote === false) return//Если пытается пройти проект с отключённым MultiVote, он не должен пройти с включённым прокси
     if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
         if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
