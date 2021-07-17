@@ -1,4 +1,4 @@
-function vote(first) {
+async function vote(first) {
     if (first === false) return
     try {
         if (document.URL.startsWith('https://discord.com/')) {
@@ -34,26 +34,55 @@ function vote(first) {
             }
         }
 
-        document.getElementById('votingvoted').click()
-        
+        //Пилюля от жадности
+        document.getElementById('video-root').style.display = 'none'
+        document.getElementById('vote-root').style.display = 'block'
+        document.querySelector('.slider-root').removeAttribute('style')
+        document.querySelector('#vote-button-container > a').click()
+
+        //Ждём загрузки bot manager (а зачем нам это делать адекватно?)
+        await new Promise(resolve => {
+            const timer3 = setInterval(()=>{
+                if (document.getElementById('vote-label') != null) {
+                    if (document.getElementById('vote-label').textContent === 'Ready to vote') {
+                        resolve()
+                        clearInterval(timer3)
+                    }
+                }
+            }, 1000)
+        })
+
+        //Пилюля от жадности
+        document.getElementById('video-root').style.display = 'none'
+        document.getElementById('vote-root').style.display = 'block'
+        document.querySelector('.slider-root').removeAttribute('style')
+        document.querySelector('#vote-button-container > a').click()
+        //Мы типо не роботы, мы человеки
+        for (let i = 0; i < 20; i++) {
+            triggerMouseEvent(document, 'mousedown')
+            triggerMouseEvent(document, 'mousemove')
+        }
+        function triggerMouseEvent(node, eventType) {
+            const clickEvent = document.createEvent('MouseEvents')
+            clickEvent.initEvent(eventType, true, true)
+            node.dispatchEvent(clickEvent)
+        }
+        document.querySelector('.vote-slider').value = 250
+        document.querySelector('.vote-slider').dispatchEvent(new Event('touchend'))
+
         const timer2 = setInterval(()=>{
             try {
-                if (document.getElementById('votingvoted').textContent.includes('already voted') || document.getElementById('votingvoted').value.includes('already voted')) {
+                const text = document.getElementById('vote-label').textContent
+                if (text.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
-                    clearInterval(timer2)
-                } else if (document.getElementById("reminder").style.display !== 'none' || document.getElementById("successful-reminder").style.display !== 'none' || document.getElementById("failure-reminder").style.display !== 'none') {
+                } else if (document.getElementById('reminder').textContent.includes('Thanks for voting!')) {
                     chrome.runtime.sendMessage({successfully: true})
-                    clearInterval(timer2)
-                } else if (document.getElementById('votingvoted').textContent === 'Voting...' || document.getElementById('votingvoted').value === 'Voting...' || document.getElementById('votingvoted').textContent === 'Vote' || document.getElementById('votingvoted').value === 'Vote') {
-                    //None
-                } else if (document.getElementById('votingvoted').textContent !== '' || document.getElementById('votingvoted').value !== '') {
-                    if (document.getElementById('votingvoted').textContent !== '') {
-                        chrome.runtime.sendMessage({message: document.getElementById('votingvoted').textContent.trim()})
-                    } else {
-                        chrome.runtime.sendMessage({message: document.getElementById('votingvoted').value})
-                    }
-                    clearInterval(timer2)
+                } else if (text.includes('Ready to vote')) {
+                    return
+                } else {
+                    chrome.runtime.sendMessage({message: text})
                 }
+                clearInterval(timer2)
             } catch (e) {
                 throwError(e)
                 clearInterval(timer2)
