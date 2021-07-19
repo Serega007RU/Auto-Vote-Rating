@@ -1039,6 +1039,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
             createNotif(chrome.i18n.getMessage('oldSettings'))
             let key = 0
             for (const item of Object.keys(allProjects)) {
+                if (!data['projects' + item]) continue
                 for (const project of data['projects' + item]) {
                     delete project[item]
                     project.rating = item
