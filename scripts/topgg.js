@@ -67,8 +67,7 @@ async function vote(first) {
             clickEvent.initEvent(eventType, true, true)
             node.dispatchEvent(clickEvent)
         }
-        document.querySelector('.vote-slider').value = 250
-        document.querySelector('.vote-slider').dispatchEvent(new Event('touchend'))
+        document.querySelector('.vote-slider').click()
 
         const timer2 = setInterval(()=>{
             try {
