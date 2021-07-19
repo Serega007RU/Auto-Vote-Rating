@@ -311,7 +311,7 @@ async function addProjectList(project) {
         if (project.priority) {
             preBend = true
             const cursor = await db.transaction('projects').store.openCursor()
-            if (cursor.key === 1) {
+            if (!cursor || cursor.key === 1) {
                 project.key = -1
             } else {
                 project.key = cursor.key - 1
@@ -2967,6 +2967,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
             createNotif(chrome.i18n.getMessage('oldSettings'))
             let key = 0
             for (const item of Object.keys(allProjects)) {
+                if (!data['projects' + item]) continue
                 for (const project of data['projects' + item]) {
                     delete project[item]
                     project.rating = item
