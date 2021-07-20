@@ -903,8 +903,15 @@ async function checkPermissions(projects, element) {
         if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'Discords') {
             if (!origins.includes('https://discord.com/oauth2/*')) origins.push('https://discord.com/oauth2/*')
         }
-        if (project.rating === 'BestServersCom' || project.rating === 'ListForge') {
-            if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
+        if (project.rating === 'BestServersCom') {
+            // if (project.game !== 'minecraft' && project.game !== 'metine2' && project.game !== 'minecraftpe' && project.game !== 'runescape' && project.game !== 'world-of-warcraft') {
+                if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
+            // }
+        }
+        if (project.rating === 'ListForge') {
+            if (project.game !== 'cubeworld-servers.com' && project.game !== 'hytale-servers.io' && project.game !== 'minecraft-mp.com' && project.game !== 'minecraftpocket-servers.com' && project.game !== 'terraria-servers.com' && project.game !== 'valheim-servers.io') {
+                if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
+            }
         }
         if (project.rating === 'MonitoringMinecraft') {
             if (!permissions.includes('cookies')) permissions.push('cookies')
