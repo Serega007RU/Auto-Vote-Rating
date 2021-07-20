@@ -28,7 +28,7 @@ async function vote(first) {
                 chrome.runtime.sendMessage({requiredNick: true})
                 return
             }
-            document.querySelector('input[name="username"]').value = nick
+            document.querySelector('input[name="username"]').value = project.nick
         }
         document.querySelector('#serverPage > form button[type="submit"]').click()
     } catch (e) {
