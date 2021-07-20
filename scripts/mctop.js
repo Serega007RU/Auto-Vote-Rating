@@ -25,8 +25,7 @@ async function vote(first) {
             if (document.querySelector('#loginModal > div > div > div.modal-body > div > ul > li > a') != null) {
                 //Клик VK
                 document.querySelector('#loginModal > div > div > div.modal-body > div > ul > li > a').click()
-                clearInterval(this.check)
-                clearInterval(this.check2)
+                clearInterval(timer)
             } else {
                 const project = await getProject('McTOP')
                 document.querySelector('input[name=nick]').value = project.nick
