@@ -467,6 +467,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
             project.timeoutHour = Number(document.getElementById('hour').value.split(':')[0])
             project.timeoutMinute = Number(document.getElementById('hour').value.split(':')[1])
             project.timeoutSecond = Number(document.getElementById('hour').value.split(':')[2])
+            project.timeoutMS = Number(document.getElementById('hour').value.split('.')[1])
         }
     }
     if (document.getElementById('lastDayMonth').checked) {
@@ -870,6 +871,7 @@ function addProjectsBonus(project, element) {
                 timeoutHour: 0,
                 timeoutMinute: 10,
                 timeoutSecond: 0,
+                timeoutMS: 0,
                 stats: {
                     successVotes: 0,
                     monthSuccessVotes: 0,

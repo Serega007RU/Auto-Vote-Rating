@@ -931,10 +931,11 @@ async function endVote(request, sender, project) {
             if (project.timeoutHour) {
                 if (!project.timeoutMinute) project.timeoutMinute = 0
                 if (!project.timeoutSecond) project.timeoutSecond = 0
+                if (!project.timeoutMS) project.timeoutMS = 0
                 if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                     time.setDate(time.getDate() + 1)
                 }
-                time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
+                time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
             } else {
                 time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
             }
@@ -999,10 +1000,11 @@ async function endVote(request, sender, project) {
                 if (project.timeoutHour != null) {
                     if (!project.timeoutMinute) project.timeoutMinute = 0
                     if (!project.timeoutSecond) project.timeoutSecond = 0
+                    if (!project.timeoutMS) project.timeoutMS = 0
                     if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                         time.setDate(time.getDate() + 1)
                     }
-                    time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, 0)
+                    time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
                 } else {
                     time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
                 }
