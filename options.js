@@ -545,28 +545,30 @@ async function addProject(project, element) {
         secondBonusButton.id = 'secondBonusVictoryCraft'
         secondBonusButton.className = 'secondBonus'
     }
-
-    let found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
-    if (found > 0) {
-        const message = chrome.i18n.getMessage('alreadyAdded')
-        if (!secondBonusText) {
-            createNotif(message, 'success', null, element)
-        } else {
-            createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
-        }
-        addProjectsBonus(project, element)
-        return
-    } else if (project.rating === 'MCRate' || project.rating === 'ServerPact' || project.rating === 'MinecraftServersOrg' || project.rating === 'HotMC' || project.rating === 'MMoTopRU' || project.rating === 'MinecraftIpList') {
-        found = await db.countFromIndex('projects', 'rating', project.rating)
-        if (project.rating === 'MinecraftIpList') {
-            if (found >= 5) {
-                createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
-                return
+    
+    if (!document.getElementById('disableCheckProjects').checked) {
+        let found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
+        if (found > 0) {
+            const message = chrome.i18n.getMessage('alreadyAdded')
+            if (!secondBonusText) {
+                createNotif(message, 'success', null, element)
+            } else {
+                createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
             }
-        } else {
-            if (found > 0) {
-                createNotif(chrome.i18n.getMessage('oneProject', project.rating), 'error', null, element)
-                return
+            addProjectsBonus(project, element)
+            return
+        } else if (project.rating === 'MCRate' || project.rating === 'ServerPact' || project.rating === 'MinecraftServersOrg' || project.rating === 'HotMC' || project.rating === 'MMoTopRU' || project.rating === 'MinecraftIpList') {
+            found = await db.countFromIndex('projects', 'rating', project.rating)
+            if (project.rating === 'MinecraftIpList') {
+                if (found >= 5) {
+                    createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
+                    return
+                }
+            } else {
+                if (found > 0) {
+                    createNotif(chrome.i18n.getMessage('oneProject', project.rating), 'error', null, element)
+                    return
+                }
             }
         }
     }
