@@ -35,10 +35,10 @@ async function vote(first) {
         }
 
         //Пилюля от жадности
-        document.getElementById('video-root').style.display = 'none'
-        document.getElementById('vote-root').style.display = 'block'
-        document.querySelector('.slider-root').removeAttribute('style')
-        document.querySelector('#vote-button-container > a').click()
+        if (document.getElementById('video-root')) document.getElementById('video-root').style.display = 'none'
+        if (document.getElementById('vote-root')) document.getElementById('vote-root').style.display = 'block'
+        if (document.querySelector('.slider-root')) document.querySelector('.slider-root').removeAttribute('style')
+        if (document.querySelector('#vote-button-container > a')) document.querySelector('#vote-button-container > a').click()
 
         //Ждём загрузки bot manager (а зачем нам это делать адекватно?)
         await new Promise(resolve => {
@@ -53,10 +53,10 @@ async function vote(first) {
         })
 
         //Пилюля от жадности
-        document.getElementById('video-root').style.display = 'none'
-        document.getElementById('vote-root').style.display = 'block'
-        document.querySelector('.slider-root').removeAttribute('style')
-        document.querySelector('#vote-button-container > a').click()
+        if (document.getElementById('video-root')) document.getElementById('video-root').style.display = 'none'
+        if (document.getElementById('vote-root')) document.getElementById('vote-root').style.display = 'block'
+        if (document.querySelector('.slider-root')) document.querySelector('.slider-root').removeAttribute('style')
+        if (document.querySelector('#vote-button-container > a')) document.querySelector('#vote-button-container > a').click()
         //Мы типо не роботы, мы человеки
         for (let i = 0; i < 20; i++) {
             triggerMouseEvent(document, 'mousedown')

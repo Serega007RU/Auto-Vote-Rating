@@ -85,9 +85,8 @@ async function checkVote() {
     // break2 = false
 }
 
-chrome.alarms.onAlarm.addListener(async function (alarm) {
-    checkOpen(await db.get('projects', Number(alarm.name)))
-})
+//Триггер на голосование когда подходит время голосования
+chrome.alarms.onAlarm.addListener(checkVote)
 
 async function reloadAllAlarms() {
     await new Promise(resolve => chrome.alarms.clearAll(resolve))
@@ -1473,6 +1472,9 @@ async function endVote(request, sender, project) {
 
         if (project.randomize) {
             project.time = project.time + Math.floor(Math.random() * 43200000)
+        } else if ((project.rating === 'TopCraft' || project.rating === 'McTop') && !project.priority) {
+            //Рандомизация по умолчанию (в пределах 5-ти минут) для бедного TopCraft/McTop который легко ддосится от массового автоматического голосования
+            project.time = project.time + Math.floor(Math.random() * (300000 - -300000) + -300000)
         }
 
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote)  {
@@ -1629,12 +1631,12 @@ async function endVote(request, sender, project) {
 
     chrome.alarms.clear(String(project.key))
     if (project.time != null && project.time > Date.now()) {
-        let create = true
+        let create2 = true
         await new Promise(resolve => {
             chrome.alarms.getAll(function(alarms) {
                 for (const alarm of alarms) {
                     if (alarm.scheduledTime === project.time) {
-                        create = false
+                        create2 = false
                         resolve()
                         break
                     }
@@ -1642,7 +1644,7 @@ async function endVote(request, sender, project) {
                 resolve()
             })
         })
-        if (create) {
+        if (create2) {
             chrome.alarms.create(String(project.key), {when: project.time})
         }
     }
