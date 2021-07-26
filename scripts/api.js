@@ -122,5 +122,5 @@ function throwError(error) {
         message = error
     }
 
-    chrome.runtime.sendMessage({errorVoteNoElement2: message + (document.body.innerText.trim().length < 250 ? ' ' + document.body.innerText.trim() : '')})
+    chrome.runtime.sendMessage({errorVoteNoElement2: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
 }
