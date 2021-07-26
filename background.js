@@ -1615,7 +1615,7 @@ async function endVote(request, sender, project) {
         if (!settings.useMultiVote && !project.useMultiVote) {
             project.time = Date.now() + retryCoolDown
         } else {
-            project.time = null
+            project.time = Date.now() + 15000
         }
         project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
