@@ -1024,6 +1024,9 @@ async function endVote(request, sender, project) {
 
         if (project.randomize) {
             project.time = project.time + Math.floor(Math.random() * 43200000)
+        } else if ((project.rating === 'TopCraft' || project.rating === 'McTop') && !project.priority) {
+            //Рандомизация по умолчанию (в пределах 5-ти минут) для бедного TopCraft/McTop который легко ддосится от массового автоматического голосования
+            project.time = project.time + Math.floor(Math.random() * (300000 - -300000) + -300000)
         }
 
         delete project.error
