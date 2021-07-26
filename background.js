@@ -56,9 +56,8 @@ async function checkVote() {
     check = true
 }
 
-chrome.alarms.onAlarm.addListener(async function (alarm) {
-    checkOpen(await db.get('projects', Number(alarm.name)))
-})
+//Триггер на голосование когда подходит время голосования
+chrome.alarms.onAlarm.addListener(checkVote)
 
 async function reloadAllAlarms() {
     await new Promise(resolve => chrome.alarms.clearAll(resolve))
