@@ -1439,6 +1439,7 @@ function resetModalStats() {
         document.querySelector('td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = ''
         document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = ''
+        document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsAdded')
         document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = ''
     }
 }

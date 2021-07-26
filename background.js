@@ -1088,12 +1088,12 @@ async function endVote(request, sender, project) {
 
     chrome.alarms.clear(String(project.key))
     if (project.time != null && project.time > Date.now()) {
-        let create = true
+        let create2 = true
         await new Promise(resolve => {
             chrome.alarms.getAll(function(alarms) {
                 for (const alarm of alarms) {
                     if (alarm.scheduledTime === project.time) {
-                        create = false
+                        create2 = false
                         resolve()
                         break
                     }
@@ -1101,7 +1101,7 @@ async function endVote(request, sender, project) {
                 resolve()
             })
         })
-        if (create) {
+        if (create2) {
             chrome.alarms.create(String(project.key), {when: project.time})
         }
     }
