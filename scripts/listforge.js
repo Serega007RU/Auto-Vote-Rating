@@ -59,8 +59,11 @@ async function vote(first) {
             if (document.getElementById('voteBtn') != null) {
                 document.getElementById('voteBtn').click()
             //Если hCaptcha
-            } else {
+            } else if (document.querySelector('button[form="vote_form"]') != null) {
                 document.querySelector('button[form="vote_form"]').click()
+            //Ещё какая-то разновидность кнопки Vote (Specially for Minecraft Pocket Servers)
+            } else {
+                document.querySelector('a[href="javascript:document.vote_form.submit();"]').click()
             }
         } else {
             // noinspection ExceptionCaughtLocallyJS
