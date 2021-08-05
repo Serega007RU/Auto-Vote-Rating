@@ -174,7 +174,7 @@ async function newWindow(project) {
     generalStats.lastAttemptVote = Date.now()
     await db.put('other', generalStats, 'generalStats')
     await updateValue('projects', project)
-    
+
     let create = true
     await new Promise(resolve => {
         chrome.alarms.getAll(function(alarms) {

@@ -78,7 +78,26 @@ async function addProjectList(project) {
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent)
         document.querySelector('#' + project.rating + 'Button > span').textContent = String(count + 1)
 
-        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkOpen(project)
+        if (project.time != null && project.time > Date.now()) {
+            let create = true
+            await new Promise(resolve => {
+                chrome.alarms.getAll(function(alarms) {
+                    for (const alarm of alarms) {
+                        if (alarm.scheduledTime === project.time) {
+                            create = false
+                            resolve()
+                            break
+                        }
+                    }
+                    resolve()
+                })
+            })
+            if (create) {
+                chrome.alarms.create(String(project.key), {when: project.time})
+            }
+        } else {
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkOpen(project)
+        }
     }
     
     const listProject = document.getElementById(project.rating + 'List')
