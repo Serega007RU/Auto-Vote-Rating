@@ -668,6 +668,20 @@ const allProjects = {
                 return 'ServerListe.net'
         }
     },
+    gTop100: (type, project) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://gtop100.com/topsites/' + project.game + '/sitedetails/' + project.id + '?vote=1&pingUsername=' + project.nick
+            case 'pageURL':
+                return 'https://gtop100.com/topsites/' + project.game + '/sitedetails/' + project.id + '?vote=1'
+            case 'jsPath':
+                return '[itemprop="name"]'
+            case 'exampleURL':
+                return ['https://gtop100.com/topsites/MapleStory/sitedetails/', 'Ristonia--v224--98344', '?vote=1&pingUsername=kingcloudian']
+            case 'URL':
+                return 'gTop100.com'
+        }
+    },
     Custom: (type, project) => {
         switch (type) {
             case 'pageURL':

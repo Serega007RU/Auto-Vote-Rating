@@ -509,6 +509,8 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseGameListForge').value
     } else if (project.rating === 'TopG') {
         project.game = document.getElementById('chooseGameTopG').value
+    } else if (project.rating === 'gTop100') {
+        project.game = document.getElementById('chooseGamegTop100').value
     } else if (project.rating === 'TopGames') {
         project.game = document.getElementById('chooseGameTopGames').value
         project.lang = document.getElementById('selectLangTopGames').value
@@ -849,7 +851,7 @@ async function addProject(project, element) {
         createNotif(array, 'success', null, element)
     }
 
-    if (project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers') {
+    if (project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100') {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 
@@ -1677,6 +1679,14 @@ selectedTop.addEventListener('change', function() {
         if (name !== 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('urlGame').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
+    }
+
+    if (name === 'gTop100') {
+        document.getElementById('urlGame2').removeAttribute('style')
+        document.getElementById('chooseGamegTop100').required = true
+    } else if (laterChoose === 'gTop100') {
+        document.getElementById('urlGame2').style.display = 'none'
+        document.getElementById('chooseGamegTop100').required = false
     }
 
     if (name === 'BestServersCom') {
