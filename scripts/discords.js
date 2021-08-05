@@ -82,11 +82,11 @@ async function vote(first) {
             }
 
             if (document.getElementById('errorsubtitle') != null) {
-                if (document.getElementById('errorsubtitle').firstChild.textContent.includes('successfully voted')) {
+                if (document.getElementById('errorsubtitle').textContent.toLowerCase().includes('successfully')) {
                     chrome.runtime.sendMessage({successfully: true})
                     return
                 }
-                chrome.runtime.sendMessage({message: document.getElementById('errorsubtitle').firstChild.textContent.trim()})
+                chrome.runtime.sendMessage({message: document.getElementById('errorsubtitle').textContent.trim()})
                 return
             }
 
