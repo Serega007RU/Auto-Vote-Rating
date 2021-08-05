@@ -1088,7 +1088,7 @@ async function endVote(request, sender, project) {
     await db.put('other', generalStats, 'generalStats')
     await updateValue('projects', project)
 
-    chrome.alarms.clear(String(project.key))
+    await new Promise(resolve => chrome.alarms.clear(String(project.key), resolve))
     if (project.time != null && project.time > Date.now()) {
         let create2 = true
         await new Promise(resolve => {
