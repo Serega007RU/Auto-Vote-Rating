@@ -2172,12 +2172,13 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
             } else if (document.getElementById('voteModeSelect').value === 'emulateMode') {
                 project.emulateMode = true
             }
-        } else if (document.getElementById('multivoteMode').checked) {
-            if (document.getElementById('multivoteModeSelect').value === 'withMultiVote') {
-                project.useMultiVote = true
-            } else if (document.getElementById('multivoteModeSelect').value === 'withoutMultiVote') {
-                project.useMultiVote = false
-            }
+        }
+    }
+    if (document.getElementById('multivoteMode').checked) {
+        if (document.getElementById('multivoteModeSelect').value === 'withMultiVote') {
+            project.useMultiVote = true
+        } else if (document.getElementById('multivoteModeSelect').value === 'withoutMultiVote') {
+            project.useMultiVote = false
         }
     }
     if (document.getElementById('priority').checked) {
