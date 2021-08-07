@@ -488,6 +488,40 @@ async function checkOpen(project) {
                 }
             }
         }
+        //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
+    } else if (project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
+        //Удаляет все существующие куки ВК
+        let cookies = await new Promise(resolve=>{
+            chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
+                resolve(cookies)
+            })
+        })
+        for (let i = 0; i < cookies.length; i++) {
+            await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+        }
+
+        const vkontakte = await db.get('vks', 1)
+
+        console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
+
+        //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
+        for (let i = 0; i < vkontakte.cookies.length; i++) {
+            let cookie = vkontakte.cookies[i]
+            await setCookieDetails({
+                url: 'https://' + cookie.domain.substring(1, cookie.domain.length) + cookie.path,
+                name: cookie.name,
+                value: cookie.value,
+                domain: cookie.domain,
+                path: cookie.path,
+                secure: cookie.secure,
+                httpOnly: cookie.httpOnly,
+                sameSite: cookie.sameSite,
+                expirationDate: cookie.expirationDate,
+                storeId: cookie.storeId
+            })
+        }
+
+        currentVK = vkontakte
     }
 
     let retryCoolDown
