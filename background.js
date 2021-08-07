@@ -1822,8 +1822,13 @@ async function removeCookie(url, name) {
 async function clearProxy() {
     if (debug) console.log('Удаляю прокси')
     currentProxy = null
+//     return new Promise(resolve => {
+//         chrome.proxy.settings.clear({scope: 'regular'},function() {
+//             resolve()
+//         })
+//     })
     return new Promise(resolve => {
-        chrome.proxy.settings.clear({scope: 'regular'},function() {
+        chrome.proxy.settings.set({value: {mode: 'system'}, scope: 'regular'},function() {
             resolve()
         })
     })
