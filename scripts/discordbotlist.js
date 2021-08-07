@@ -46,6 +46,13 @@ function vote(first) {
                 clearInterval(timer5)
             }
         }, 1000)
+
+        const timer6 = setInterval(()=> {
+            if (document.querySelector('a[style="font-size: 32px;"]') != null && document.querySelector('a[style="font-size: 32px;"]').href.includes('thanks')) {
+                document.querySelector('a[style="font-size: 32px;"]').click()
+                clearInterval((timer6))
+            }
+        }, 1000)
         
         const timer3 = setInterval(()=>{
             try {
