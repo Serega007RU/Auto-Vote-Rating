@@ -1449,8 +1449,6 @@ async function endVote(request, sender, project) {
                 hour = 4
             } else if (project.rating === 'MMoTopRU') {
                 hour = 20
-            } else if (project.rating === 'Discords' && project.game === 'bots/bot') {
-                hour = 12
             }
             if (hour != null) {
                 if (time.getUTCHours() > hour || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
@@ -1458,7 +1456,7 @@ async function endVote(request, sender, project) {
                 }
                 time.setUTCHours(hour, (project.priority ? 0 : 10), 0, 0)
             //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
-            } else if (project.rating === 'TopG' || project.rating === 'MinecraftServersBiz' || project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'MCListsOrg') {
+            } else if (project.rating === 'TopG' || project.rating === 'MinecraftServersBiz' || project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'MCListsOrg' || (project.rating === 'Discords' && project.game === 'bots/bot')) {
                 time.setUTCHours(time.getUTCHours() + 12)
             } else if (project.rating === 'MinecraftIpList' || project.rating === 'HotMC' || project.rating === 'MinecraftServerNet' || project.rating === 'TMonitoring' || project.rating === 'MCServers' || project.rating === 'CraftList' || project.rating === 'CzechCraft' || project.rating === 'TopMCServersCom' || project.rating === 'CraftListNet') {
                 time.setUTCDate(time.getUTCDate() + 1)
