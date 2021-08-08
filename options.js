@@ -2983,13 +2983,12 @@ document.getElementById('logs-clear').addEventListener('click', async ()=>{
 
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', async (event)=>{
+    await stopVote(true)
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (event.target.files.length === 0) return
         const file = event.target.files[0]
         const data = await new Response(file).json()
-
-        await stopVote(true)
 
         let projects = []
         let vks = []
@@ -3089,6 +3088,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         for (const accborealis of borealis) {
             await tx.objectStore('borealis').add(accborealis, accborealis.key)
         }
+        data.settings.stopVote = Number.POSITIVE_INFINITY
         await tx.objectStore('other').put(data.settings, 'settings')
         await tx.objectStore('other').put(data.generalStats, 'generalStats')
 
