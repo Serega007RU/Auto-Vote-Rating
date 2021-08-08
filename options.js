@@ -2969,7 +2969,8 @@ document.getElementById('logs-download').addEventListener('click', async ()=>{
     anchor.href = (window.webkitURL || window.URL).createObjectURL(blob)
     anchor.dataset.downloadurl = ['text/plain;charset=UTF-8;', anchor.download, anchor.href].join(':')
 
-    openPopup(anchor.href)
+    // openPopup(anchor.href)
+    anchor.click()
 
     createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
 })
