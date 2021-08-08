@@ -136,6 +136,10 @@ async function checkOpen(project) {
                 if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
             }
         }
+
+        //Проект с MultiVote и с без MultiVote не должны вместе голосовать
+        if (settings.useMultiVote && (project.useMultiVote == null ? true : project.useMultiVote) !== (value.useMultiVote == null ? true : value.useMultiVote)) return
+
         if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && !settings.useProxyOnUnProxyTop) {
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
             if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') {
@@ -489,7 +493,7 @@ async function checkOpen(project) {
             }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
-    } else if (project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
+    } else if (settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
         //Удаляет все существующие куки ВК
         let cookies = await new Promise(resolve=>{
             chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
