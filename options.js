@@ -1010,7 +1010,11 @@ async function addVK(repair, imp) {
                         if (document.querySelector('input[name="email"]') != null) {
                             document.querySelector('input[name="email"]').value = '` + imp.login + `'
                             document.querySelector('input[name="pass"]').value = '` + imp.password + `'
-                            if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) document.getElementById('install_allow').click()
+                            if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) {
+                                document.getElementById('install_allow').click()
+                            } else {
+                                window.close()
+                            }
                         }
                     `
                 } else if (document.getElementById('saveVKCredentials').checked) {
