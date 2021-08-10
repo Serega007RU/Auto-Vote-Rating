@@ -557,7 +557,7 @@ async function checkOpen(project) {
     if (!settings.disabledNotifStart)
         sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
 
-    if (project.rating === 'MonitoringMinecraft' && (!settings.useMultiVote || !project.useMultiVote === false)) {
+    if (project.rating === 'MonitoringMinecraft' && (!settings.useMultiVote || project.useMultiVote === false)) {
         let url
         if (project.rating === 'MonitoringMinecraft') {
             url = '.monitoringminecraft.ru'
