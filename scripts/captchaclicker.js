@@ -22,7 +22,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
     const timer7 = setInterval(()=>{
         if (document.getElementById('solver-button') != null && !document.getElementById('solver-button').className.includes('working')) {
             document.getElementById('solver-button').click()
-            clearInterval(timer7)
+            // clearInterval(timer7)
         }
     }, 1000)
     
