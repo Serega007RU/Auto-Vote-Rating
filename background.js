@@ -926,11 +926,11 @@ async function endVote(request, sender, project) {
     let sendMessage
     if (request.successfully || request.later) {
         let time = new Date()
-        if (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getFullYear(),time.getMonth() + 1,0).getDate() !== new Date().getDate())) {
-            if (project.timeoutHour) {
-                if (!project.timeoutMinute) project.timeoutMinute = 0
-                if (!project.timeoutSecond) project.timeoutSecond = 0
-                if (!project.timeoutMS) project.timeoutMS = 0
+        if (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null) && !(project.lastDayMonth && new Date(time.getFullYear(),time.getMonth() + 1,0).getDate() !== new Date().getDate())) {
+            if (project.timeoutHour != null) {
+                if (project.timeoutMinute == null) project.timeoutMinute = 0
+                if (project.timeoutSecond == null) project.timeoutSecond = 0
+                if (project.timeoutMS == null) project.timeoutMS = 0
                 if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                     time.setDate(time.getDate() + 1)
                 }
@@ -995,9 +995,9 @@ async function endVote(request, sender, project) {
                 time.setUTCMinutes(time.getUTCMinutes() + 7)
             } else if (project.rating === 'Custom') {
                 if (project.timeoutHour != null) {
-                    if (!project.timeoutMinute) project.timeoutMinute = 0
-                    if (!project.timeoutSecond) project.timeoutSecond = 0
-                    if (!project.timeoutMS) project.timeoutMS = 0
+                    if (project.timeoutMinute == null) project.timeoutMinute = 0
+                    if (project.timeoutSecond == null) project.timeoutSecond = 0
+                    if (project.timeoutMS == null) project.timeoutMS = 0
                     if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                         time.setDate(time.getDate() + 1)
                     }
