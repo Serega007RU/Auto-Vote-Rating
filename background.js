@@ -529,7 +529,7 @@ async function checkOpen(project) {
     }
 
     let retryCoolDown
-    if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
+    if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -617,10 +617,10 @@ async function newWindow(project) {
     if (project.rating === 'Custom') {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
+        if (!project.emulateMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
             silentVoteMode = true
         }
-    } else if (project.silentMode && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
+    } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
         silentVoteMode = true
     }
     if (debug) console.log('[' + project.rating + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (silentVoteMode ? ' Начинаю Fetch запрос' : ' Открываю вкладку'))
@@ -1413,11 +1413,11 @@ async function endVote(request, sender, project) {
             }
         }
         let time = new Date()
-        if (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) && !(project.lastDayMonth && new Date(time.getFullYear(),time.getMonth() + 1,0).getDate() !== new Date().getDate())) {
-            if (project.timeoutHour) {
-                if (!project.timeoutMinute) project.timeoutMinute = 0
-                if (!project.timeoutSecond) project.timeoutSecond = 0
-                if (!project.timeoutMS) project.timeoutMS = 0
+        if (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null) && !(project.lastDayMonth && new Date(time.getFullYear(),time.getMonth() + 1,0).getDate() !== new Date().getDate())) {
+            if (project.timeoutHour != null) {
+                if (project.timeoutMinute == null) project.timeoutMinute = 0
+                if (project.timeoutSecond == null) project.timeoutSecond = 0
+                if (project.timeoutMS == null) project.timeoutMS = 0
                 if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                     time.setDate(time.getDate() + 1)
                 }
@@ -1482,9 +1482,9 @@ async function endVote(request, sender, project) {
                 time.setUTCMinutes(time.getUTCMinutes() + 7)
             } else if (project.rating === 'Custom') {
                 if (project.timeoutHour != null) {
-                    if (!project.timeoutMinute) project.timeoutMinute = 0
-                    if (!project.timeoutSecond) project.timeoutSecond = 0
-                    if (!project.timeoutMS) project.timeoutMS = 0
+                    if (project.timeoutMinute == null) project.timeoutMinute = 0
+                    if (project.timeoutSecond == null) project.timeoutSecond = 0
+                    if (project.timeoutMS == null) project.timeoutMS = 0
                     if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                         time.setDate(time.getDate() + 1)
                     }
@@ -1507,7 +1507,11 @@ async function endVote(request, sender, project) {
         project.time = time
 
         if (project.randomize) {
-            project.time = project.time + Math.floor(Math.random() * 43200000)
+            if (project.randomize.min == null) {
+                project.randomize.min = 0
+                project.randomize.max = 43200000
+            }
+            project.time = project.time + Math.floor(Math.random() * (project.randomize.max - project.randomize.min) + project.randomize.min)
         } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && !project.priority) {
             //Рандомизация по умолчанию (в пределах 5-ти минут) для бедного TopCraft/McTOP который легко ддосится от массового автоматического голосования
             project.time = project.time + Math.floor(Math.random() * (300000 - -300000) + -300000)
@@ -1638,7 +1642,7 @@ async function endVote(request, sender, project) {
                     await stopVote()
                 }
             }
-        } else if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
+        } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
             retryCoolDown = 300000
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
         } else {

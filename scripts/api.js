@@ -99,6 +99,17 @@ try {
     throwError(e)
 }
 
+const timer1 = setInterval(()=>{
+    if (document.querySelector('head > captcha-widgets') != null) {
+        document.querySelectorAll('.captcha-solver').forEach(el => {
+            if (el.dataset.state === 'solved') {
+                window.postMessage('vote', '*')
+                clearInterval(timer1)
+            }
+        })
+    }
+})
+
 async function getProject() {
     if (proj == null) {
         return await new Promise(resolve => {

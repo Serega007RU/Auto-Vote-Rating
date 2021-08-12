@@ -1314,5 +1314,8 @@
   },
   "oldSettings": {
     "message": "Old type settings were found (chrome.storage), I convert them to the new type (IndexedDB)"
+  },
+  "randomizeInput": {
+    "message": "Specify the randomization limits (min and max) in milliseconds"
   }
 }

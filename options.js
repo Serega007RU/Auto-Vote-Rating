@@ -383,7 +383,7 @@ async function addProjectList(project) {
     contDiv.classList.add('message')
     
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (project.rating !== 'Custom' && (project.timeout || project.timeoutHour) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '') + (project.useMultiVote != null ? project.useMultiVote ? ' (' + chrome.i18n.getMessage('withMultiVote') + ')' : ' (' + chrome.i18n.getMessage('withoutMultiVote') + ')' : '')
+    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '') + (project.useMultiVote != null ? project.useMultiVote ? ' (' + chrome.i18n.getMessage('withMultiVote') + ')' : ' (' + chrome.i18n.getMessage('withoutMultiVote') + ')' : '')
     contDiv.append(nameProjectMes)
 
     const div2 = document.createElement('div')
@@ -459,7 +459,7 @@ function generateBtnListRating(rating, count) {
 //  div.setAttribute('data-resource', 'notAdded')
 //  div.textContent = chrome.i18n.getMessage('notAdded')
 //  ul.append(div)
-    if (!(rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
+    if (!(/*rating === 'TopCraft' || rating === 'McTOP' || */rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
         const label = document.createElement('label')
         label.setAttribute('data-resource', 'notAvailableInSilent')
         label.textContent = chrome.i18n.getMessage('notAvailableInSilent')
@@ -2012,7 +2012,18 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('hour').required = false
             }
             _return = true
-        } else if (this.id === 'lastDayMonth' || this.id === 'randomize') {
+        } else if (this.id === 'lastDayMonth') {
+            _return = true
+        } else if (this.id === 'randomize') {
+            if (this.checked) {
+                document.getElementById('label11').removeAttribute('style')
+                document.getElementById('randomizeMin').required = true
+                document.getElementById('randomizeMax').required = true
+            } else {
+                document.getElementById('label11').style.display = 'none'
+                document.getElementById('randomizeMin').required = false
+                document.getElementById('randomizeMax').required = false
+            }
             _return = true
         } else if (this.id === 'scheduleTimeCheckbox') {
             if (this.checked) {
@@ -2208,7 +2219,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.priority = true
     }
     if (document.getElementById('randomize').checked) {
-        project.randomize = true
+        project.randomize = {min: document.getElementById('randomizeMin').valueAsNumber, max: document.getElementById('randomizeMax').valueAsNumber}
     }
     if (project.rating === 'ListForge') {
         project.game = document.getElementById('chooseGameListForge').value

@@ -1,4 +1,4 @@
-if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) {
+if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) && document.querySelector('head > captcha-widgets') == null/*Интеграция с 2Captcha Solver*/) {
     const timer1 = setInterval(()=>{
         if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null
             && isScrolledIntoView(document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border'))
