@@ -1,5 +1,5 @@
 async function vote(first) {
-    if (first === false) return
+    if (first) return
     try {
         //Если погльзователь уже авторизован в вк, сразу голосует
         if (document.querySelector('button[data-type=vote]') == null) {

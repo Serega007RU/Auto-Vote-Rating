@@ -1,14 +1,14 @@
 //Совместимость с Rocket Loader и jQuery
-document.addEventListener('DOMContentLoaded', ()=>{
-//  const script = document.createElement('script')
-//  script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
-//  document.documentElement.appendChild(script)
-//  script.remove()
-    vote()
-})
+// document.addEventListener('DOMContentLoaded', ()=>{
+// //  const script = document.createElement('script')
+// //  script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
+// //  document.documentElement.appendChild(script)
+// //  script.remove()
+//     vote()
+// })
 
 async function vote(first) {
-    if (first === true || first === false) return
+    if (first) return
     try {
         //Если погльзователь уже авторизован в вк, сразу голосует
         if (document.querySelector('button[data-type=vote]') == null) {

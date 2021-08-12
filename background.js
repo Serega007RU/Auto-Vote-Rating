@@ -109,7 +109,7 @@ async function checkOpen(project) {
     }
 
     let retryCoolDown
-    if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
+    if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -196,10 +196,10 @@ async function newWindow(project) {
     if (project.rating === 'Custom') {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
+        if (!project.emulateMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
             silentVoteMode = true
         }
-    } else if (project.silentMode && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
+    } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
@@ -1063,7 +1063,7 @@ async function endVote(request, sender, project) {
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
-        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
+        if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
             retryCoolDown = 300000
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
         } else {

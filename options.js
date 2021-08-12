@@ -212,7 +212,7 @@ function generateBtnListRating(rating, count) {
 //  div.setAttribute('data-resource', 'notAdded')
 //  div.textContent = chrome.i18n.getMessage('notAdded')
 //  ul.append(div)
-    if (!(rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
+    if (!(/*rating === 'TopCraft' || rating === 'McTOP' || */rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
         const label = document.createElement('label')
         label.setAttribute('data-resource', 'notAvailableInSilent')
         label.textContent = chrome.i18n.getMessage('notAvailableInSilent')
