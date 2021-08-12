@@ -1151,3 +1151,9 @@ input.checkbox:disabled + label {
 	width: 5px;
 	height: 5px;
 }
+
+#randomizeMin,
+#randomizeMax {
+     width: calc(100% - 268px);
+     display: inline;
+}

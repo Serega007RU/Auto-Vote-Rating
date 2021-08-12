@@ -377,7 +377,18 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('hour').required = false
             }
             _return = true
-        } else if (this.id === 'lastDayMonth' || this.id === 'randomize') {
+        } else if (this.id === 'lastDayMonth') {
+            _return = true
+        } else if (this.id === 'randomize') {
+            if (this.checked) {
+                document.getElementById('label11').removeAttribute('style')
+                document.getElementById('randomizeMin').required = true
+                document.getElementById('randomizeMax').required = true
+            } else {
+                document.getElementById('label11').style.display = 'none'
+                document.getElementById('randomizeMin').required = false
+                document.getElementById('randomizeMax').required = false
+            }
             _return = true
         } else if (this.id === 'scheduleTimeCheckbox') {
             if (this.checked) {
@@ -503,7 +514,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.priority = true
     }
     if (document.getElementById('randomize').checked) {
-        project.randomize = true
+        project.randomize = {min: document.getElementById('randomizeMin').valueAsNumber, max: document.getElementById('randomizeMax').valueAsNumber}
     }
     if (project.rating === 'ListForge') {
         project.game = document.getElementById('chooseGameListForge').value
