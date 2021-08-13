@@ -108,7 +108,7 @@
                                 <option data-resource="enabledSilentVoteNoSilent" value="emulateMode"></option>
                             </select>
                         </div>
-                        <div style="display: none;" id="label11" class="input-block">
+                        <div style="display: none;" id="label12" class="input-block">
                             <label for="voteModeSelect" data-resource="enableMultiVoteMode"></label>
                             <select id="multivoteModeSelect" class="select">
                                 <option data-resource="withMultiVote" value="withMultiVote"></option>
@@ -988,9 +988,9 @@
                                 </div>
                                 <div class="changes timeline-content">
                                     <h4>
-                                        v6.0.3
+                                        v6.1.0
                                     </h4>
-                                    <small>released on xx.xx.2021 In development</small>
+                                    <small>released on 13.08.2021</small>
                                     <div class="changes-entry">
                                         <ul>
                                             <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
@@ -1004,6 +1004,57 @@
                                             </li>
                                             <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
                                                 Исправлено выставление принудительного режима MultiVote для Custom
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление определения успешного голосования на Discords.com
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Планирование голосования теперь корректно работает
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок голосования на ListForge (Minecraft Pocket Servers)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исключение TopCraft/McTop из тихого режима голосования, добавление поддержки ReCaptcha
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Более точное определение кастомного таймаута
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок с интеграцией с расширением Buster: Captcha Solver for Humans
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавление поддержки рейтинга gtop100
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                DiscordBotList добавление поддержки мобильной версии
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавлена возможность настраивать предел рандомизации
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавлена Интеграция с расширением 2Captcha Solver
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                По просьбе 10-Bit#6942 на ListForge добавлена возможность задать дополнительные параметры URL
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Интеграция с Yandex Captcha Solver
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Изменение таймаута для Discord.com (bots) на каждые 12 часов
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Логи теперь экспортируются в файл (а не в popup)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Ошибки 5xx теперь не отправляются в уведомления (дабы не беспокоить пользователя)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Более точное объяснение (гайд) как избавится от вопросов капчи
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-removed">Removed</span>
+                                                Убрано предупреждение об notAvailableInSilent, задолбали тупыми вопросами (а надо ли переключать режим голосования)
                                             </li>
                                         </ul>
                                     </div>

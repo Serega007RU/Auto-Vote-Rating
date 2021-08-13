@@ -2078,9 +2078,9 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             _return = true
         } else if (this.id === 'multivoteMode') {
             if (this.checked) {
-                document.getElementById('label11').removeAttribute('style')
+                document.getElementById('label12').removeAttribute('style')
             } else {
-                document.getElementById('label11').style.display = 'none'
+                document.getElementById('label12').style.display = 'none'
             }
             _return = true
         } else if (this.id === 'useMultiVote') {
