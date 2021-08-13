@@ -1616,7 +1616,7 @@ async function endVote(request, sender, project) {
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
         if ((project.rating === 'TopCraft' && currentVK.passwordTopCraft) || (project.rating === 'McTOP' && currentVK.passwordMcTOP)) {
-            if (request.message.includes('Имя пользователя и/или пароль не верны')) {
+            if (request && request.message && request.message.includes('Имя пользователя и/или пароль не верны')) {
                 delete currentVK['password' + project.rating]
                 await updateValue('vks', currentVK)
             }
