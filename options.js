@@ -459,20 +459,20 @@ function generateBtnListRating(rating, count) {
 //  div.setAttribute('data-resource', 'notAdded')
 //  div.textContent = chrome.i18n.getMessage('notAdded')
 //  ul.append(div)
-    if (!(/*rating === 'TopCraft' || rating === 'McTOP' || */rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
-        const label = document.createElement('label')
-        label.setAttribute('data-resource', 'notAvailableInSilent')
-        label.textContent = chrome.i18n.getMessage('notAvailableInSilent')
-        const span = document.createElement('span')
-        span.classList.add('tooltip2')
-        const span2 = document.createElement('span')
-        span2.setAttribute('data-resource', 'warnSilentVoteTooltip')
-        span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
-        span2.classList.add('tooltip2text')
-        span.append(span2)
-        label.append(span)
-        ul.append(label)
-    }
+//     if (!(/*rating === 'TopCraft' || rating === 'McTOP' || */rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
+//         const label = document.createElement('label')
+//         label.setAttribute('data-resource', 'notAvailableInSilent')
+//         label.textContent = chrome.i18n.getMessage('notAvailableInSilent')
+//         const span = document.createElement('span')
+//         span.classList.add('tooltip2')
+//         const span2 = document.createElement('span')
+//         span2.setAttribute('data-resource', 'warnSilentVoteTooltip')
+//         span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
+//         span2.classList.add('tooltip2text')
+//         span.append(span2)
+//         label.append(span)
+//         ul.append(label)
+//     }
     const div2 = document.createElement('div')
     div2.id = rating + 'List'
     ul.append(div2)
@@ -2227,6 +2227,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     }
     if (project.rating === 'ListForge') {
         project.game = document.getElementById('chooseGameListForge').value
+        project.addition = document.getElementById('additionTopGG').value
     } else if (project.rating === 'TopG') {
         project.game = document.getElementById('chooseGameTopG').value
     } else if (project.rating === 'gTop100') {
@@ -2739,38 +2740,19 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (project.rating === 'MinecraftServersOrg' || project.rating === 'ListForge' || project.rating === 'ServerList101') {
+    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
         array.push(document.createElement('br'))
-        array.push(chrome.i18n.getMessage('privacyPass'))
+        array.push(document.createElement('br'))
+        array.push(chrome.i18n.getMessage('passageCaptcha'))
         const a = document.createElement('a')
         a.target = 'blank_'
         a.classList.add('link')
-        a.href = 'https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'
-//      a.href = 'https://addons.mozilla.org/ru/firefox/addon/privacy-pass/'
-        a.textContent = 'Privacy Pass'
+        a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+        a.textContent = chrome.i18n.getMessage('here')
         array.push(a)
-        array.push(chrome.i18n.getMessage('privacyPass2'))
-        array.push(document.createElement('br'))
-        array.push(chrome.i18n.getMessage('privacyPass3'))
-        const a2 = document.createElement('a')
-        a2.target = 'blank_'
-        a2.classList.add('link')
-        a2.href = 'https://www.hcaptcha.com/accessibility'
-        a2.textContent = 'https://www.hcaptcha.com/accessibility'
-        array.push(a2)
-        array.push(chrome.i18n.getMessage('privacyPass4'))
-        const a3 = document.createElement('a')
-        a3.target = 'blank_'
-        a3.classList.add('link')
-        a3.href = 'https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg'
-//      a3.href = 'https://addons.mozilla.org/ru/firefox/addon/etc2/'
-//      a3.href = 'https://addons.opera.com/ru/extensions/details/edit-this-cookie/'
-        a3.textContent = chrome.i18n.getMessage('this')
-        array.push(a3)
-        array.push(chrome.i18n.getMessage('privacyPass5'))
     }
     if (array.length > 1) {
-        createNotif(array, 'success', 60000, element)
+        createNotif(array, 'success', 15000, element)
     } else {
         createNotif(array, 'success', null, element)
     }
@@ -3710,11 +3692,15 @@ selectedTop.addEventListener('change', function() {
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
         document.getElementById('urlGame').removeAttribute('style')
         document.getElementById('chooseGameListForge').required = true
+        document.getElementById('additionTopGG1').removeAttribute('style')
+        document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://minecraft-mp.com/server/288761/vote/'
+        document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(2)").textContent = '?alternate_captcha=1'
     } else if (laterChoose === 'ListForge') {
         if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords') document.getElementById('nick').required = true
         if (name !== 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('urlGame').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
+        if (name !== 'TopGG') document.getElementById('additionTopGG1').style.display = 'none'
     }
 
     if (name === 'gTop100') {
@@ -3749,9 +3735,11 @@ selectedTop.addEventListener('change', function() {
         document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bot'
         document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
         document.getElementById('additionTopGG1').removeAttribute('style')
+        document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://top.gg/bot/617037497574359050/vote'
+        document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(2)").textContent = '?currency=DOGE'
     } else if (laterChoose === 'TopGG') {
         document.getElementById('chooseTopGG1').style.display = 'none'
-        document.getElementById('additionTopGG1').style.display = 'none'
+        if (name !== 'ListForge') document.getElementById('additionTopGG1').style.display = 'none'
     }
 
     if (name === 'Discords') {
