@@ -96,7 +96,7 @@ try {
                     document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
                 }
             }
-            if (vote) {
+            if (typeof vote !== 'undefined') {
                 vote(true)
             } else {
                 console.warn('А где функция vote(true)? У вас там чо, стоит этот тупорылый Rocket Loader?')
