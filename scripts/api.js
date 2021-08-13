@@ -96,7 +96,11 @@ try {
                     document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
                 }
             }
-            vote(true)
+            if (vote) {
+                vote(true)
+            } else {
+                console.warn('А где функция vote(true)? У вас там чо, стоит этот тупорылый Rocket Loader?')
+            }
         }
     }
 } catch (e) {
