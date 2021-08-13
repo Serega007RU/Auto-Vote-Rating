@@ -224,6 +224,7 @@ async function checkOpen(project) {
                         })
                     })
                     for (let i = 0; i < cookies.length; i++) {
+                        if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                         await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
                     }
 
@@ -232,8 +233,9 @@ async function checkOpen(project) {
                     //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
                     for (let i = 0; i < vkontakte.cookies.length; i++) {
                         let cookie = vkontakte.cookies[i]
+                        if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
                         await setCookieDetails({
-                            url: 'https://' + cookie.domain.substring(1, cookie.domain.length) + cookie.path,
+                            url: 'https://' + cookie.domain + cookie.path,
                             name: cookie.name,
                             value: cookie.value,
                             domain: cookie.domain,
@@ -485,11 +487,8 @@ async function checkOpen(project) {
             })
             if (debug) console.log('Удаляю куки ' + url)
             for (let i = 0; i < cookies.length; i++) {
-                if (cookies[i].domain.charAt(0) === '.') {
-                    await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
-                } else {
-                    await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
-                }
+                if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+                await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
             }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
@@ -501,7 +500,8 @@ async function checkOpen(project) {
             })
         })
         for (let i = 0; i < cookies.length; i++) {
-            await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+            if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+            await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
         }
 
         const vkontakte = await db.get('vks', 1)
@@ -511,8 +511,9 @@ async function checkOpen(project) {
         //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
         for (let i = 0; i < vkontakte.cookies.length; i++) {
             let cookie = vkontakte.cookies[i]
+            if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
             await setCookieDetails({
-                url: 'https://' + cookie.domain.substring(1, cookie.domain.length) + cookie.path,
+                url: 'https://' + cookie.domain + cookie.path,
                 name: cookie.name,
                 value: cookie.value,
                 domain: cookie.domain,
@@ -569,11 +570,8 @@ async function checkOpen(project) {
         })
         if (debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
         for (let i = 0; i < cookies.length; i++) {
-            if (cookies[i].domain.charAt(0) === '.') {
-                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
-            } else {
-                await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
-            }
+            if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+            await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
         }
     }
 

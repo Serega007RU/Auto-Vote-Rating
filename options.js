@@ -552,8 +552,9 @@ async function addVKList(VK) {
         }
         for (let i = 0; i < VK.cookies.length; i++) {
             let cookie = VK.cookies[i]
+            if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
             await setCookieDetails({
-                url: 'https://' + cookie.domain.substring(1, cookie.domain.length) + cookie.path,
+                url: 'https://' + cookie.domain + cookie.path,
                 name: cookie.name,
                 value: cookie.value,
                 domain: cookie.domain,
@@ -633,8 +634,9 @@ async function addBorealisList(acc) {
         }
         for (let i = 0; i < acc.cookies.length; i++) {
             let cookie = acc.cookies[i]
+            if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
             await setCookieDetails({
-                url: 'https://' + cookie.domain.substring(1, cookie.domain.length) + cookie.path,
+                url: 'https://' + cookie.domain + cookie.path,
                 name: cookie.name,
                 value: cookie.value,
                 domain: cookie.domain,
@@ -993,7 +995,8 @@ async function addVK(repair, imp) {
                 })
             })
             for(let i=0; i<cookies.length;i++) {
-                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+                if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+                await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
             }
 
             createNotif(chrome.i18n.getMessage('deletedAllAcc', 'VK'))
@@ -1101,14 +1104,14 @@ async function addVK(repair, imp) {
             })
         })
 
-        let i = 0
-        for (let cookie of VK.cookies) {
-            if (cookie.name === 'tmr_detect') {
-                VK.cookies.splice(i, 1)
-                break
-            }
-            i++
-        }
+        // let i = 0
+        // for (let cookie of VK.cookies) {
+        //     if (cookie.name === 'tmr_detect') {
+        //         VK.cookies.splice(i, 1)
+        //         break
+        //     }
+        //     i++
+        // }
 
         if (repair) {
             const found = await db.getFromIndex('vks', 'id', VK.id)
@@ -1164,7 +1167,8 @@ async function addBorealis(repair, imp) {
                     })
                 })
                 for(let i=0; i<cookies.length;i++) {
-                    await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+                    if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+                    await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
                 }
             }
 
@@ -1283,14 +1287,14 @@ async function addBorealis(repair, imp) {
             })
         })
 
-        let i = 0
-        for (let cookie of acc.cookies) {
-            if (cookie.name === 'xf_session') {
-                acc.cookies.splice(i, 1)
-                break
-            }
-            i++
-        }
+        // let i = 0
+        // for (let cookie of acc.cookies) {
+        //     if (cookie.name === 'xf_session') {
+        //         acc.cookies.splice(i, 1)
+        //         break
+        //     }
+        //     i++
+        // }
 
         if (repair) {
             const found = await db.getFromIndex('borealis', 'nick', acc.nick)
@@ -2310,8 +2314,9 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
 		try {
             for (let i = 0; i < acc.cookies.length; i++) {
                 let cookie = acc.cookies[i]
+                if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
                 await setCookieDetails({
-                    url: 'https://' + cookie.domain.substring(1, cookie.domain.length) + cookie.path,
+                    url: 'https://' + cookie.domain + cookie.path,
                     name: cookie.name,
                     value: cookie.value,
                     domain: cookie.domain,
