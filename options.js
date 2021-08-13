@@ -518,6 +518,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     }
     if (project.rating === 'ListForge') {
         project.game = document.getElementById('chooseGameListForge').value
+        project.addition = document.getElementById('additionTopGG').value
     } else if (project.rating === 'TopG') {
         project.game = document.getElementById('chooseGameTopG').value
     } else if (project.rating === 'gTop100') {
@@ -536,9 +537,9 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseGameMMoTopRU').value
         project.lang = document.getElementById('selectLangMMoTopRU').value
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
-    } else if (project.rating === 'TopGG' || project.rating === 'Discords' || project.rating === 'ListForge') {
+    } else if (project.rating === 'TopGG' || project.rating === 'Discords') {
         project.game = document.getElementById('chooseTopGG').value
-        if (project.rating === 'TopGG' || project.rating === 'ListForge') project.addition = document.getElementById('additionTopGG').value
+        if (project.rating === 'TopGG') project.addition = document.getElementById('additionTopGG').value
     }
     
     if (project.rating === 'Custom') {
