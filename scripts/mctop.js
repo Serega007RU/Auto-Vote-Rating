@@ -13,10 +13,10 @@ async function vote(first) {
         const project = await getProject('McTOP')
         //Авторизованы ли мы в аккаунте?
         if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
-            if (vkontakte != null && vkontakte.passwordTopCraft) {
+            if (vkontakte != null && vkontakte.passwordMcTOP) {
                 document.querySelector('.usr-login-lnk').click()
                 document.getElementById('id_login').value = vkontakte.id + vkontakte.numberId
-                document.getElementById('id_password').value = vkontakte.passwordTopCraft
+                document.getElementById('id_password').value = vkontakte.passwordMcTOP
                 document.querySelector('button[type="submit"].btn-login').click()
                 return
             }
