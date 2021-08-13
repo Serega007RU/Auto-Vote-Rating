@@ -90,6 +90,8 @@ try {
                     vote(false)
                 } else if (e.data === 'voteReady') {
                     vote()
+                } else if (e.data === 'reloadCaptcha') {
+                    document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
                 }
             }
             vote(true)
