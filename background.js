@@ -1249,7 +1249,6 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
     if (details.frameId === 0) {
-        console.log(getProjectPrefix(project, true), details)
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {
@@ -1616,7 +1615,7 @@ async function endVote(request, sender, project) {
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
-        if ((project.rating === 'TopCraft' && project.passwordTopCraft) || (project.rating === 'McTOP' && project.passwordMcTOP)) {
+        if ((project.rating === 'TopCraft' && currentVK.passwordTopCraft) || (project.rating === 'McTOP' && currentVK.passwordMcTOP)) {
             if (request.message.includes('Имя пользователя и/или пароль не верны')) {
                 delete currentVK['password' + project.rating]
                 await updateValue('vks', currentVK)
