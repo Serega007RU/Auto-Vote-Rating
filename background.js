@@ -1249,6 +1249,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
     if (details.frameId === 0) {
+        console.log(getProjectPrefix(project, true), details)
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {
@@ -1642,15 +1643,13 @@ async function endVote(request, sender, project) {
                 currentVK.MCRate = message
                 await updateValue('vks', currentVK)
             } else if (currentProxy != null && request) {
-                if (request.errorVoteNetwork) {
-                    if (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT')) {
-                        currentProxy.notWorking = request.errorVoteNetwork[0]
-                        await updateValue('proxies', currentProxy)
-                        await stopVote()
-                    } else if (request.errorCaptcha) {
-                        currentProxy.notWorking = request.errorCaptcha
-                        await updateValue('proxies', currentProxy)
-                    }
+                if (request.errorVoteNetwork && (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT'))) {
+                    currentProxy.notWorking = request.errorVoteNetwork[0]
+                    await updateValue('proxies', currentProxy)
+                    await stopVote()
+                } else if (request.errorCaptcha) {
+                    currentProxy.notWorking = request.errorCaptcha
+                    await updateValue('proxies', currentProxy)
                 }
             }
         } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
