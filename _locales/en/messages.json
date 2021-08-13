@@ -1317,5 +1317,13 @@
   },
   "randomizeInput": {
     "message": "Specify the randomization limits (min and max) in milliseconds"
+  },
+  "errorCaptcha": {
+    "message": "Error with captcha: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   }
 }

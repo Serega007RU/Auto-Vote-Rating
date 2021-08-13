@@ -16,13 +16,33 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             clearInterval(timer2)
         }
     }, 1000)
+
+    window.onmessage = function(e) {
+        if (e.data === 'reloadCaptcha') {
+            if (!(document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0))) {
+                document.location.reload()
+            }
+        }
+    }
 } else if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) {
     //Интеграция с расширением Buster: Captcha Solver for Humans
     //Работает весьма хреново, + требуется в этом расширении удалить проверку isTrusted для того что б можно было нажать на кнопку
     const timer7 = setInterval(()=>{
         if (document.getElementById('solver-button') != null && !document.getElementById('solver-button').className.includes('working')) {
-            document.getElementById('solver-button').click()
+            if (document.querySelector('.rc-audiochallenge-error-message') != null) {
+                if (document.querySelector('.rc-audiochallenge-error-message').style.display !== 'none') {
+                    document.getElementById('solver-button').click()
+                } else {
+                    window.top.postMessage('reloadCaptcha', '*')
+                }
+            } else {
+                document.getElementById('solver-button').click()
+            }
             // clearInterval(timer7)
+        }
+
+        if (document.querySelector('.rc-doscaptcha-body-text') != null && document.querySelector('.rc-doscaptcha-body-text').style.display !== 'none') {
+            chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-doscaptcha-body-text').textContent})
         }
     }, 1000)
     

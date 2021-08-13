@@ -1275,5 +1275,13 @@
   },
   "randomizeInput": {
     "message": "Укажите пределы рандомизации (мин и макс) в миллисекундах"
+  },
+  "errorCaptcha": {
+    "message": "Ошибка с капчей: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   }
 }
