@@ -253,7 +253,7 @@ async function silentVote(project) {
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
                 } else {
-                    endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
+                    endVote({errorVote: String(response.status)}, null, project)
                 }
                 return
             }
@@ -278,7 +278,7 @@ async function silentVote(project) {
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
                 } else {
-                    endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
+                    endVote({errorVote: String(response.status)}, null, project)
                 }
                 return
             }
@@ -701,7 +701,7 @@ async function silentVote(project) {
                     endVote({successfully: true}, null, project)
                 }
             } else {
-                endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
+                endVote({errorVote: String(response.status)}, null, project)
             }
         } else
 
@@ -711,7 +711,7 @@ async function silentVote(project) {
             if (response.ok) {
                 endVote({successfully: true}, null, project)
             } else {
-                endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
+                endVote({errorVote: String(response.status)}, null, project)
             }
         }
     } catch (e) {
@@ -764,7 +764,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         }
     }
     if (!response.ok) {
-        endVote({message: chrome.i18n.getMessage('errorVote', String(response.status))}, null, project)
+        endVote({errorVote: String(response.status)}, null, project)
         return false
     }
     if (response.statusText && response.statusText !== '' && response.statusText !== 'ok' && response.statusText !== 'OK') {
@@ -1080,7 +1080,7 @@ async function endVote(request, sender, project) {
         project.time = Date.now() + retryCoolDown
         project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), sendMessage)
+        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote.charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage)
 
         project.stats.errorVotes++
 
