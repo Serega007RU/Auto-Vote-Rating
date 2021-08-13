@@ -1,44 +1,37 @@
-//Совместимость с Rocket Loader и jQuery
-// document.addEventListener('DOMContentLoaded', ()=>{
-// //  const script = document.createElement('script')
-// //  script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
-// //  document.documentElement.appendChild(script)
-// //  script.remove()
-//     vote()
-// })
+// Совместимость с Rocket Loader и jQuery
+document.addEventListener('DOMContentLoaded', ()=>{
+//  const script = document.createElement('script')
+//  script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
+//  document.documentElement.appendChild(script)
+//  script.remove()
+    vote()
+})
 
 async function vote(first) {
-    if (first) return
+    if (first === true) return
     try {
-        //Если погльзователь уже авторизован в вк, сразу голосует
-        if (document.querySelector('button[data-type=vote]') == null) {
-            //Клик 'Голосовать'
-            document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
-            //Вводит никнейм
-            const project = await getProject('McTOP')
-            document.querySelector('input[name=nick]').value = project.nick
-            //Клик 'Голосовать' в окне голосования
-            document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
-        } else {
-            document.querySelector('button[data-type=vote]').click()
-            const project = await getProject('McTOP')
-            //Надо ли авторизовываться в вк, если не надо то сразу голосует
-            if (document.querySelector('#loginModal > div > div > div.modal-body > div > ul > li > a') != null) {
-                if (vkontakte != null && vkontakte.passwordMcTOP) {
-                    document.querySelector('.usr-login-lnk').click()
-                    document.getElementById('id_login').value = vkontakte.id + vkontakte.numberId
-                    document.getElementById('id_password').value = vkontakte.passwordMcTOP
-                    document.querySelector('button[type="submit"].btn-login').click()
-                    return
-                }
-                //Клик VK
-                document.querySelector('#loginModal > div > div > div.modal-body > div > ul > li > a').click()
-                clearInterval(timer)
-            } else {
-                document.querySelector('input[name=nick]').value = project.nick
-                document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
+        const project = await getProject('McTOP')
+        //Авторизованы ли мы в аккаунте?
+        if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
+            if (vkontakte != null && vkontakte.passwordTopCraft) {
+                document.querySelector('.usr-login-lnk').click()
+                document.getElementById('id_login').value = vkontakte.id + vkontakte.numberId
+                document.getElementById('id_password').value = vkontakte.passwordTopCraft
+                document.querySelector('button[type="submit"].btn-login').click()
+                return
             }
+            document.querySelector('button[data-type=vote]').click()
+            document.querySelector('a.modalVkLogin').click()
+            return
         }
+        if (first || first == null) return
+        if (document.querySelector('#voteModal').style.display === 'none') {
+            document.querySelector('button.openVoteModal')
+        }
+        //Вводит никнейм
+        document.querySelector('input[name=nick]').value = project.nick
+        //Клик 'Голосовать' в окне голосования
+        document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
     } catch (e) {
         throwError(e)
     }
