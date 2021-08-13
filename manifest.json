@@ -38,11 +38,11 @@
 		"https://www.recaptcha.net/recaptcha/*"
 	],
 	"optional_permissions": [
-	    "cookies",
+		"cookies",
 		"<all_urls>"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "6.0.2",
+	"version": "6.1.0",
 	"default_locale": "en",
 	"web_accessible_resources": [
 		"options.html"
