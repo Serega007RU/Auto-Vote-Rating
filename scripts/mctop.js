@@ -1,10 +1,10 @@
 // Совместимость с Rocket Loader и jQuery
 document.addEventListener('DOMContentLoaded', ()=>{
-    const script = document.createElement('script')
-    script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
-    document.documentElement.appendChild(script)
-    script.remove()
-    // vote()
+    // const script = document.createElement('script')
+    // script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
+    // document.documentElement.appendChild(script)
+    // script.remove()
+    vote()
 })
 
 async function vote(first) {
@@ -18,6 +18,7 @@ async function vote(first) {
                 document.getElementById('id_login').value = vkontakte.id + vkontakte.numberId
                 document.getElementById('id_password').value = vkontakte.passwordMcTOP
                 document.querySelector('button[type="submit"].btn-login').click()
+                setTimeout(()=>vote(), 3000)
                 return
             }
             document.querySelector('button[data-type=vote]').click()
