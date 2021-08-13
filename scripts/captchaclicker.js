@@ -32,10 +32,10 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             if (document.querySelector('.rc-audiochallenge-error-message') != null) {
                 if (document.querySelector('.rc-audiochallenge-error-message').style.display !== 'none') {
                     document.getElementById('solver-button').click()
-                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 6000)
+                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 4500)
                 } else {
                     //Костыль с таймаутом (хз как ещё сделать)
-                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 4000)
+                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 2500)
                 }
             } else {
                 document.getElementById('solver-button').click()
