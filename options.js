@@ -1015,7 +1015,7 @@ async function addVK(repair, imp) {
                             document.querySelector('input[name="pass"]').value = '` + imp.password + `'
                             if (document.querySelector('img.oauth_captcha') == null && document.querySelector('div.box_error') == null) {
                                 document.getElementById('install_allow').click()
-                            } else {
+                            } else if (document.querySelector('img.oauth_captcha') == null) {
                                 window.close()
                             }
                         }

@@ -1615,6 +1615,12 @@ async function endVote(request, sender, project) {
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
+        if ((project.rating === 'TopCraft' && project.passwordTopCraft) || (project.rating === 'McTOP' && project.passwordMcTOP)) {
+            if (request.message.includes('Имя пользователя и/или пароль не верны')) {
+                delete currentVK['password' + project.rating]
+                await updateValue('vks', currentVK)
+            }
+        }
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
             sendMessage = message
             if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {

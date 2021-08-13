@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 async function vote(first) {
     if (first === true) return
+    if (first == null) {
+        //Агась, костыли, ненавижу Rocket Loader
+        await wait(3000)
+    }
     try {
         const project = await getProject('McTOP')
         //Авторизованы ли мы в аккаунте?
@@ -18,7 +22,12 @@ async function vote(first) {
                 document.getElementById('id_login').value = vkontakte.id + vkontakte.numberId
                 document.getElementById('id_password').value = vkontakte.passwordMcTOP
                 document.querySelector('button[type="submit"].btn-login').click()
-                setTimeout(()=>vote(), 3000)
+                const timer1 = setInterval(()=>{
+                    if (document.querySelector('#loginForm > .error') != null) {
+                        chrome.runtime.sendMessage({message: document.querySelector('#loginForm > .error').textContent})
+                        clearInterval(timer1)
+                    }
+                }, 1000)
                 return
             }
             document.querySelector('button[data-type=vote]').click()
@@ -35,6 +44,7 @@ async function vote(first) {
         document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
     } catch (e) {
         throwError(e)
+        console.error(e)
     }
 }
 
@@ -59,3 +69,12 @@ const timer = setInterval(()=>{
         clearInterval(timer)
     }
 }, 1000)
+
+//Грёбаный логин/пароль
+async function wait(ms) {
+    return new Promise(resolve=>{
+        setTimeout(()=>{
+            resolve()
+        }, ms)
+    })
+}
