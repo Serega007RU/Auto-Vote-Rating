@@ -1,7 +1,7 @@
 async function vote(first) {
     if (first) return
     try {
-        //Если погльзователь уже авторизован в вк, сразу голосует
+        //Если пользователь уже авторизован в вк, сразу голосует
         if (document.querySelector('button[data-type=vote]') == null) {
             //Клик 'Голосовать'
             document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
@@ -12,13 +12,20 @@ async function vote(first) {
             document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
         } else {
             document.querySelector('button[data-type=vote]').click()
+            const project = await getProject('TopCraft')
             //Надо ли авторизовываться в вк, если не надо то сразу голосует
             if (document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i') != null) {
+                if (vkontakte != null && vkontakte.passwordTopCraft) {
+                    document.querySelector('.usr-login-lnk').click()
+                    document.getElementById('id_login').value = vkontakte.id + vkontakte.numberId
+                    document.getElementById('id_password').value = vkontakte.passwordTopCraft
+                    document.querySelector('button[type="submit"].btn-login').click()
+                    return
+                }
                 //Клик VK
                 document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i').click()
                 clearInterval(timer)
             } else {
-                const project = await getProject('TopCraft')
                 document.querySelector('input[name=nick]').value = project.nick
                 document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
             }

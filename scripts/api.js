@@ -1,7 +1,9 @@
 let proj
+let vkontakte
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
     if (request.sendProject) {
         proj = request.project
+        if (request.vkontakte) vkontakte = request.vkontakte
     }
 })
 

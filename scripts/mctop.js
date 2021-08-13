@@ -21,13 +21,20 @@ async function vote(first) {
             document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
         } else {
             document.querySelector('button[data-type=vote]').click()
+            const project = await getProject('McTOP')
             //Надо ли авторизовываться в вк, если не надо то сразу голосует
             if (document.querySelector('#loginModal > div > div > div.modal-body > div > ul > li > a') != null) {
+                if (vkontakte != null && vkontakte.passwordMcTOP) {
+                    document.querySelector('.usr-login-lnk').click()
+                    document.getElementById('id_login').value = vkontakte.id + vkontakte.numberId
+                    document.getElementById('id_password').value = vkontakte.passwordMcTOP
+                    document.querySelector('button[type="submit"].btn-login').click()
+                    return
+                }
                 //Клик VK
                 document.querySelector('#loginModal > div > div > div.modal-body > div > ul > li > a').click()
                 clearInterval(timer)
             } else {
-                const project = await getProject('McTOP')
                 document.querySelector('input[name=nick]').value = project.nick
                 document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
             }

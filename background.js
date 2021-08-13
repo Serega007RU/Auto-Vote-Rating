@@ -1267,7 +1267,9 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 resolve()
             })
         })
-        chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
+        let send = {sendProject: true, project}
+        if (currentVK != null) send.vkontakte = currentVK
+        chrome.tabs.sendMessage(details.tabId, send)
     } else if (details.frameId !== 0 && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/))) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
