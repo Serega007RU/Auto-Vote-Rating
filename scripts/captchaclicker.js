@@ -32,9 +32,10 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             if (document.querySelector('.rc-audiochallenge-error-message') != null) {
                 if (document.querySelector('.rc-audiochallenge-error-message').style.display !== 'none') {
                     document.getElementById('solver-button').click()
+                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 6000)
                 } else {
                     //Костыль с таймаутом (хз как ещё сделать)
-                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 3000)
+                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 4000)
                 }
             } else {
                 document.getElementById('solver-button').click()
@@ -45,7 +46,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
         if (document.querySelector('.rc-doscaptcha-body-text') != null && document.querySelector('.rc-doscaptcha-body-text').style.display !== 'none') {
             chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-doscaptcha-body-text').textContent})
         }
-    }, 1000)
+    }, 2000)
     
     const timer3 = setInterval(()=>{
         //Если требуется ручное прохождение капчи
