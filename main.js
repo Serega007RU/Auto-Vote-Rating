@@ -147,7 +147,7 @@ const allProjects = {
     ListForge: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://' + project.game + '/server/' + project.id + '/vote/' + project.addition
+                return 'https://' + project.game + '/server/' + project.id + '/vote/' + (project.addition != null ? project.addition : '')
             case 'pageURL':
                 return 'https://' + project.game + '/server/' + project.id + '/vote/'
             case 'jsPath':
