@@ -827,35 +827,16 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (project.rating === 'MinecraftServersOrg' || project.rating === 'ListForge' || project.rating === 'ServerList101') {
+    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
         array.push(document.createElement('br'))
-        array.push(chrome.i18n.getMessage('privacyPass'))
+        array.push(document.createElement('br'))
+        array.push(chrome.i18n.getMessage('passageCaptcha'))
         const a = document.createElement('a')
         a.target = 'blank_'
         a.classList.add('link')
-        a.href = 'https://chrome.google.com/webstore/detail/privacy-pass/ajhmfdgkijocedmfjonnpjfojldioehi'
-//      a.href = 'https://addons.mozilla.org/ru/firefox/addon/privacy-pass/'
-        a.textContent = 'Privacy Pass'
+        a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+        a.textContent = chrome.i18n.getMessage('here')
         array.push(a)
-        array.push(chrome.i18n.getMessage('privacyPass2'))
-        array.push(document.createElement('br'))
-        array.push(chrome.i18n.getMessage('privacyPass3'))
-        const a2 = document.createElement('a')
-        a2.target = 'blank_'
-        a2.classList.add('link')
-        a2.href = 'https://www.hcaptcha.com/accessibility'
-        a2.textContent = 'https://www.hcaptcha.com/accessibility'
-        array.push(a2)
-        array.push(chrome.i18n.getMessage('privacyPass4'))
-        const a3 = document.createElement('a')
-        a3.target = 'blank_'
-        a3.classList.add('link')
-        a3.href = 'https://chrome.google.com/webstore/detail/editthiscookie/fngmhnnpilhplaeedifhccceomclgfbg'
-//      a3.href = 'https://addons.mozilla.org/ru/firefox/addon/etc2/'
-//      a3.href = 'https://addons.opera.com/ru/extensions/details/edit-this-cookie/'
-        a3.textContent = chrome.i18n.getMessage('this')
-        array.push(a3)
-        array.push(chrome.i18n.getMessage('privacyPass5'))
     }
     if (array.length > 1) {
         createNotif(array, 'success', 60000, element)
