@@ -839,7 +839,7 @@ async function addProject(project, element) {
         array.push(a)
     }
     if (array.length > 1) {
-        createNotif(array, 'success', 60000, element)
+        createNotif(array, 'success', 15000, element)
     } else {
         createNotif(array, 'success', null, element)
     }
