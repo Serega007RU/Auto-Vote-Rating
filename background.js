@@ -1642,7 +1642,7 @@ async function endVote(request, sender, project) {
                 currentVK.MCRate = message
                 await updateValue('vks', currentVK)
             } else if (currentProxy != null && request && request.errorVoteNetwork) {
-                if (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT')) {
+                if (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT') || request.errorCaptcha) {
                     currentProxy.notWorking = request.errorVoteNetwork[0]
                     await updateValue('proxies', currentProxy)
                     await stopVote()
