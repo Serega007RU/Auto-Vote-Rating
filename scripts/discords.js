@@ -90,6 +90,11 @@ async function vote(first) {
                 return
             }
 
+            if (document.querySelector('.upvotes-result-up') != null && document.querySelector('.upvotes-result-up').textContent.includes('uccessfully')) {
+                chrome.runtime.sendMessage({successfully: true})
+                return
+            }
+
             if (first) return
 
             document.querySelector('button[type="submit"]').click()
