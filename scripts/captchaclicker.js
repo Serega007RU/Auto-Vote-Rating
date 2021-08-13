@@ -33,7 +33,8 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
                 if (document.querySelector('.rc-audiochallenge-error-message').style.display !== 'none') {
                     document.getElementById('solver-button').click()
                 } else {
-                    window.top.postMessage('reloadCaptcha', '*')
+                    //Костыль с таймаутом (хз как ещё сделать)
+                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 3000)
                 }
             } else {
                 document.getElementById('solver-button').click()
