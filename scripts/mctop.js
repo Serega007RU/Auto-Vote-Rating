@@ -1,10 +1,10 @@
 // Совместимость с Rocket Loader и jQuery
 document.addEventListener('DOMContentLoaded', ()=>{
-//  const script = document.createElement('script')
-//  script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
-//  document.documentElement.appendChild(script)
-//  script.remove()
-    vote()
+    const script = document.createElement('script')
+    script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
+    document.documentElement.appendChild(script)
+    script.remove()
+    // vote()
 })
 
 async function vote(first) {

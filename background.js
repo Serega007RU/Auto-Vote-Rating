@@ -530,7 +530,7 @@ async function checkOpen(project) {
     }
 
     let retryCoolDown
-    if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
+    if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) || /*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -1655,7 +1655,7 @@ async function endVote(request, sender, project) {
         if (!settings.useMultiVote && !project.useMultiVote) {
             project.time = Date.now() + retryCoolDown
         } else {
-            project.time = Date.now() + 15000
+            project.time = Date.now() + 150000
         }
         project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
