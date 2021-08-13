@@ -1641,11 +1641,11 @@ async function endVote(request, sender, project) {
             } else if (project.rating === 'MCRate' && message.includes('Ваш ВК ID заблокирован для голосовани')) {
                 currentVK.MCRate = message
                 await updateValue('vks', currentVK)
-            } else if (currentProxy != null && request && request.errorVoteNetwork) {
-                if (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT') || request.errorCaptcha) {
+            } else if (currentProxy != null && request && (request.errorVoteNetwork || request.errorCaptcha)) {
+                if (request.errorCaptcha || request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT')) {
                     currentProxy.notWorking = request.errorVoteNetwork[0]
                     await updateValue('proxies', currentProxy)
-                    await stopVote()
+                    if (!request.errorCaptcha) await stopVote()
                 }
             }
         } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
