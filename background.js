@@ -1734,6 +1734,22 @@ async function endVote(request, sender, project) {
                 }
             }
         }
+        if (settings.useMultiVote && project.useMultiVote === false) {
+            if (currentVK != null) {
+                if (queueProjects.size === 0) {
+                    currentVK = null
+                } else {
+                    let countVK = 0
+                    for (const value of queueProjects) {
+                        if (countVK > 0) break
+                        if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || value.rating === 'MinecraftRating' || value.rating === 'MonitoringMinecraft' || value.rating === 'QTop') {
+                            countVK++
+                        }
+                    }
+                    if (countVK === 0) currentVK = null
+                }
+            }
+        }
         checkVote()
     }
     if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
