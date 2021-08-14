@@ -3141,6 +3141,12 @@ modeVote.addEventListener('change', async event => {
     event.target.classList.remove('disabled')
 })
 
+document.getElementById('forceUpdate').addEventListener('click', async () => {
+    const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/files/manifest.json/raw?ref=multivote')
+    const json = await response.json()
+    checkUpdateAvailable(json.version)
+})
+
 //Достаёт все проекты указанные в URL
 function getUrlProjects() {
     let projects = []

@@ -1477,3 +1477,7 @@ input.checkbox:disabled + label {
      width: calc(100% - 268px);
      display: inline;
 }
+
+#forceUpdate {
+	margin: unset;
+}

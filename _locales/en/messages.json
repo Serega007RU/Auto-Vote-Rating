@@ -1331,5 +1331,8 @@
   },
   "here": {
     "message": "here"
+  },
+  "forceUpdate": {
+    "message": "Force to update the extension"
   }
 }
