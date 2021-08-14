@@ -9,7 +9,7 @@ async function vote(first) {
                 document.getElementById('id_password').value = vkontakte.passwordTopCraft
                 document.querySelector('button[type="submit"].btn-login').click()
                 const timer1 = setInterval(()=>{
-                    if (document.querySelector('#loginForm > .error') != null) {
+                    if (document.querySelector('#loginForm .error') != null) {
                         chrome.runtime.sendMessage({message: document.querySelector('#loginForm > .error').textContent})
                         clearInterval(timer1)
                     }
