@@ -1076,8 +1076,19 @@ async function addVK(repair, imp) {
             }
         }
         try {
-            if (doc.querySelector('#login_blocked_wrap') != null) {
-                let text = doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
+            let text
+            if (doc.querySelector('div.oauth_form_access') != null) {
+                text = doc.querySelector('div.oauth_form_access').textContent.replace(doc.querySelector('div.oauth_access_items').textContent, '').trim()
+            } else if (doc.querySelector('div.oauth_content > div') != null) {
+                text = doc.querySelector('div.oauth_content > div').textContent
+            } else if (doc.querySelector('#login_blocked_wrap') != null) {
+                text = doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
+            } else if (doc.querySelector('div.login_blocked_panel') != null) {
+                text = doc.querySelector('div.login_blocked_panel').textContent.trim()
+            } else if (doc.querySelector('.profile_deleted_text') != null) {
+                text = doc.querySelector('.profile_deleted_text').textContent.trim()
+            }
+            if (text) {
                 createNotif(text, 'error')
                 return
             }
