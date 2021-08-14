@@ -27,15 +27,15 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
 } else if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) && document.querySelector('head > yandex-captcha-solver') == null) {
     //Интеграция с расширением Buster: Captcha Solver for Humans
     //Работает весьма хреново, + требуется в этом расширении удалить проверку isTrusted для того что б можно было нажать на кнопку
-    const timer7 = setInterval(()=>{
+    const timer7 = setInterval(() => {
         if (document.getElementById('solver-button') != null && !document.getElementById('solver-button').className.includes('working')) {
             if (document.querySelector('.rc-audiochallenge-error-message') != null) {
                 if (document.querySelector('.rc-audiochallenge-error-message').style.display !== 'none') {
                     document.getElementById('solver-button').click()
-                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 4500)
+                    setTimeout(() => window.top.postMessage('reloadCaptcha', '*'), 4500)
                 } else {
                     //Костыль с таймаутом (хз как ещё сделать)
-                    setTimeout(()=>window.top.postMessage('reloadCaptcha', '*'), 2500)
+                    setTimeout(() => window.top.postMessage('reloadCaptcha', '*'), 2500)
                 }
             } else {
                 document.getElementById('solver-button').click()
@@ -47,14 +47,16 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-doscaptcha-body-text').textContent})
         }
     }, 2000)
-    
-    const timer3 = setInterval(()=>{
+
+    const timer3 = setInterval(() => {
         //Если требуется ручное прохождение капчи
         if (document.getElementById("solver-button") == null && document.getElementById("rc-imageselect") != null && isScrolledIntoView(document.getElementById("rc-imageselect"))) {
             chrome.runtime.sendMessage({captcha: true})
             clearInterval(timer3)
         }
     }, 1000)
+} else if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)) {
+    chrome.runtime.sendMessage({errorCaptcha: document.body.innerText.trim()})
 } else if (window.location.href.match(/.hcaptcha.com\/captcha.v\d\//)) {
     const timer4 = setInterval(()=>{
         if (document.getElementById('checkbox') != null
