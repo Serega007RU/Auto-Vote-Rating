@@ -76,7 +76,7 @@ try {
             }
         }
         //Если идёт проверка CloudFlare
-        if (document.querySelector('#cf-content') != null) {
+        if (document.getElementById('cf-content') != null || document.getElementById('cf-wrapper') != null) {
             check = false
         }
         //Если мы находимся на странице проверки ReCaptcha
