@@ -970,7 +970,7 @@ async function endVote(request, sender, project) {
                 hour = 20
             }
             if (hour != null) {
-                if (time.getUTCHours() > hour || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+                if (time.getUTCHours() >= hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
                     time.setUTCDate(time.getUTCDate() + 1)
                 }
                 time.setUTCHours(hour, (project.priority ? 0 : 10), 0, 0)
