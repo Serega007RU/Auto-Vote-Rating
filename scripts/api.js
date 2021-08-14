@@ -76,7 +76,13 @@ try {
             }
         }
         //Если идёт проверка CloudFlare
-        if (document.getElementById('cf-content') != null || document.getElementById('cf-wrapper') != null) {
+        if (document.getElementById('cf-content') != null) {
+            check = false
+        }
+        if (document.getElementById('cf-wrapper') != null) {
+            if (document.querySelector('span[data-translate="complete_sec_check"]') == null && document.querySelector('span[data-translate="managed_checking_msg"]') == null) {
+                chrome.runtime.sendMessage({message: document.body.innerText.trim()})
+            }
             check = false
         }
         //Если мы находимся на странице проверки ReCaptcha
