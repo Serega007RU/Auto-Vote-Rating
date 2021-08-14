@@ -225,7 +225,7 @@ async function checkOpen(project) {
                     })
                     for (let i = 0; i < cookies.length; i++) {
                         if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
-                        await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
+                        await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
                     }
 
                     console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
@@ -487,6 +487,7 @@ async function checkOpen(project) {
             })
             if (debug) console.log('Удаляю куки ' + url)
             for (let i = 0; i < cookies.length; i++) {
+                if (cookies[i].name === 'csrf_cookie_name' || cookies[i].name === 'cf_chl_prog' || cookies[i].name === 'cf_chl_2' || cookies[i].name === 'cf_clearance') continue
                 if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
             }
