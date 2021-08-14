@@ -1649,6 +1649,7 @@ async function endVote(request, sender, project) {
                 } else if (request.errorCaptcha) {
                     currentProxy.notWorking = request.errorCaptcha
                     await updateValue('proxies', currentProxy)
+                    await stopVote()
                 }
             }
         } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
@@ -1904,6 +1905,7 @@ async function stopVote() {
     fetchProjects.clear()
     // break1 = true
     // break2 = true
+    checkVote()
 }
 
 //Если требуется авторизация для Прокси
@@ -1921,6 +1923,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxy2'))
             }
             await updateValue('proxies', currentProxy)
+            await stopVote()
             callbackFn()
             return
         }
@@ -1996,6 +1999,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyNoPassword'))
             }
             await updateValue('proxies', currentProxy)
+            await stopVote()
         }
     }
     callbackFn()
