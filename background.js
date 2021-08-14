@@ -1305,16 +1305,14 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
             }
             endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
         }
-    } else if (details.type === 'main_frame') {
-        if (openedProjects.has(details.tabId)) {
+    } else if (openedProjects.has(details.tabId)) {
             let project = openedProjects.get(details.tabId)
-            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED')) {
-                console.warn(getProjectPrefix(project, true) + details.error)
+            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')) {
+                // console.warn(getProjectPrefix(project, true) + details.error)
                 return
             }
             const sender = {tab: {id: details.tabId}}
             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
-        }
     }
 }, {urls: ['<all_urls>']})
 
@@ -1617,7 +1615,7 @@ async function endVote(request, sender, project) {
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
-        if ((project.rating === 'TopCraft' && currentVK.passwordTopCraft) || (project.rating === 'McTOP' && currentVK.passwordMcTOP)) {
+        if (currentVK != null && ((project.rating === 'TopCraft' && currentVK.passwordTopCraft) || (project.rating === 'McTOP' && currentVK.passwordMcTOP))) {
             if (request && request.message && (request.message.includes('Имя пользователя и/или пароль не верны') || request.message.includes('бедитесь, что это значение содержит не более'))) {
                 delete currentVK['password' + project.rating]
                 await updateValue('vks', currentVK)

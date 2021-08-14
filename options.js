@@ -2473,7 +2473,7 @@ async function addProject(project, element) {
         secondBonusButton.className = 'secondBonus'
     }
 
-    if (!document.getElementById('disableCheckProjects').checked && settings.useMultiVote ? project.rating !== 'MCRate' : true) {
+    if (!document.getElementById('importNicks').checked && !document.getElementById('disableCheckProjects').checked && settings.useMultiVote ? project.rating !== 'MCRate' : true) {
         let found
         if (settings.useMultiVote) {
             found = await db.countFromIndex('projects', 'rating, id, nick', [project.rating, project.id, project.nick])
