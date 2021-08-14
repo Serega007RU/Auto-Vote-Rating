@@ -1299,10 +1299,10 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
     if (details.initiator === 'chrome-extension://' + chrome.runtime.id) {
         if (fetchProjects.has(details.requestId)) {
             let project = fetchProjects.get(details.requestId)
-            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')) {
-                console.warn(getProjectPrefix(project, true) + details.error)
-                return
-            }
+//          if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED')) {
+//              console.warn(getProjectPrefix(project, true) + details.error)
+//              return
+//          }
             endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
         }
     } else if (openedProjects.has(details.tabId)) {
@@ -1457,7 +1457,7 @@ async function endVote(request, sender, project) {
                 hour = 20
             }
             if (hour != null) {
-                if (time.getUTCHours() > hour || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))) {
+                if (time.getUTCHours() >= hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
                     time.setUTCDate(time.getUTCDate() + 1)
                 }
                 time.setUTCHours(hour, (project.priority ? 0 : 10), 0, 0)
