@@ -1214,6 +1214,8 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
             text = response.doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + response.doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
         } else if (response.doc.querySelector('div.login_blocked_panel') != null) {
             text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
+        } else if (response.doc.querySelector('.profile_deleted_text') != null) {
+            text = response.doc.querySelector('.profile_deleted_text').textContent.trim()
         } else if (response.html.length < 500) {
             text = response.html
         } else {
