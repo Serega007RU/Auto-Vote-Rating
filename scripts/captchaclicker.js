@@ -27,20 +27,20 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
 } else if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) && document.querySelector('head > yandex-captcha-solver') == null) {
     //Интеграция с расширением Buster: Captcha Solver for Humans
     //Работает весьма хреново, + требуется в этом расширении удалить проверку isTrusted для того что б можно было нажать на кнопку
+    let count = 0
+    let repeat = 3
     const timer7 = setInterval(() => {
-        if (document.getElementById('solver-button') != null && !document.getElementById('solver-button').className.includes('working')) {
-            if (document.querySelector('.rc-audiochallenge-error-message') != null) {
-                if (document.querySelector('.rc-audiochallenge-error-message').style.display !== 'none') {
-                    document.getElementById('solver-button').click()
-                    setTimeout(() => window.top.postMessage('reloadCaptcha', '*'), 4500)
-                } else {
-                    //Костыль с таймаутом (хз как ещё сделать)
-                    setTimeout(() => window.top.postMessage('reloadCaptcha', '*'), 2500)
-                }
-            } else {
-                document.getElementById('solver-button').click()
+        if (document.getElementById('solver-button') != null && !document.getElementById('solver-button').className.includes('working') && !document.getElementById('recaptcha-verify-button').disabled) {
+            if (document.querySelector('.rc-audiochallenge-error-message') != null && document.querySelector('.rc-audiochallenge-error-message').style.display !== 'none' && document.querySelector('.rc-audiochallenge-error-message').textContent > 0) {
+                repeat = 4
             }
-            // clearInterval(timer7)
+            if (count >= repeat) {
+                window.top.postMessage('reloadCaptcha', '*')
+                clearInterval(timer7)
+                return
+            }
+            document.getElementById('solver-button').click()
+            count++
         }
 
         if (document.querySelector('.rc-doscaptcha-body-text') != null && document.querySelector('.rc-doscaptcha-body-text').style.display !== 'none') {
