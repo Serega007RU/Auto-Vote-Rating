@@ -20,10 +20,10 @@ async function vote(first) {
             document.querySelector('a.modalVkLogin').click()
             return
         }
-        if (first) return
-        if (document.querySelector('#voteModal').style.display === 'none') {
-            document.querySelector('button.openVoteModal')
+        if (!document.querySelector('#voteModal').classList.contains('in')) {
+            document.querySelector('button.openVoteModal').click()
         }
+        if (first) return
         //Вводит никнейм
         document.querySelector('input[name=nick]').value = project.nick
         //Клик 'Голосовать' в окне голосования
