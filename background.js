@@ -134,6 +134,12 @@ async function checkOpen(project) {
                 queueProjects.delete(value)
                 console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
                 if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
+                if (currentProxy != null) {
+                    currentProxy.notWorking = chrome.i18n.getMessage('timeout')
+                    await updateValue('proxies', currentProxy)
+                    await stopVote()
+                    return
+                }
             }
         }
 
