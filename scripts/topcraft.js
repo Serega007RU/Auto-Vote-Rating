@@ -26,6 +26,7 @@ async function vote(first) {
         if (first) return
         //Вводит никнейм
         document.querySelector('input[name=nick]').value = project.nick
+        document.querySelector('input[name=nick]').click()
         //Клик 'Голосовать' в окне голосования
         document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
     } catch (e) {
