@@ -26,13 +26,13 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
     }
 } else if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) && document.querySelector('head > yandex-captcha-solver') == null) {
     //Интеграция с расширением Buster: Captcha Solver for Humans
-    //Работает весьма хреново, + требуется в этом расширении удалить проверку isTrusted для того что б можно было нажать на кнопку
+    //Требуется в этом расширении удалить проверку isTrusted для того что б можно было нажать на кнопку и также разрешить shadowRoot
     let count = 0
-    let repeat = 3
+    let repeat = 2
     const timer7 = setInterval(() => {
         if (document.getElementById('solver-button') != null && !document.getElementById('solver-button').className.includes('working') && !document.getElementById('recaptcha-verify-button').disabled) {
             if (document.querySelector('.rc-audiochallenge-error-message') != null && document.querySelector('.rc-audiochallenge-error-message').style.display !== 'none' && document.querySelector('.rc-audiochallenge-error-message').textContent > 0) {
-                repeat = 4
+                repeat = 3
             }
             if (count >= repeat) {
                 window.top.postMessage('reloadCaptcha', '*')
