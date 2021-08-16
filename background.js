@@ -1517,6 +1517,7 @@ async function endVote(request, sender, project) {
 
         if (project.randomize) {
             if (project.randomize.min == null) {
+                project.randomize = {}
                 project.randomize.min = 0
                 project.randomize.max = 43200000
             }
