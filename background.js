@@ -1522,10 +1522,10 @@ async function endVote(request, sender, project) {
                 project.randomize.max = 43200000
             }
             project.time = project.time + Math.floor(Math.random() * (project.randomize.max - project.randomize.min) + project.randomize.min)
-        } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && !project.priority) {
+        }/* else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && !project.priority) {
             //Рандомизация по умолчанию (в пределах 5-ти минут) для бедного TopCraft/McTOP который легко ддосится от массового автоматического голосования
             project.time = project.time + Math.floor(Math.random() * (300000 - -300000) + -300000)
-        }
+        }*/
 
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote)  {
             if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')/* && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) !== -1*/) {
