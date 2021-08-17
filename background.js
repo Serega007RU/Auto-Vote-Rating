@@ -2147,7 +2147,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                 await tx.objectStore('borealis').put(acc, acc.key)
             }
             if (oldSettings.useMultiVote == null) {
-                oldSettings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
+                oldSettings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"]
                 oldSettings.stopVote = 0
                 oldSettings.autoAuthVK = false
                 oldSettings.clearVKCookies = true
