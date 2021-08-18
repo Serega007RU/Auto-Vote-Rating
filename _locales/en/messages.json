@@ -783,7 +783,7 @@
     "message": "Auto-voting stopped"
   },
   "voteSuspendedDay": {
-    "message": "Voting suspended for 24 hours"
+    "message": "Voting suspended for 6 hours"
   },
   "voteResumed": {
     "message": "Auto-voting resumed"
@@ -999,7 +999,7 @@
     "message": "Authorization with TunnelBear is required"
   },
   "proxyTBAuth2": {
-    "message": "Log in using the following link: https://www.tunnelbear.com/account/login Voting suspended for 24 hours"
+    "message": "Log in using the following link: https://www.tunnelbear.com/account/login Voting suspended for 6 hours"
   },
   "alreadyVotedRepeat": {
     "message": "You have already voted, we are going to try again with a different proxy..."
@@ -1028,7 +1028,7 @@
     }
   },
   "errorAuthProxyTB": {
-    "message": "The TunnelBear token is null or it has expired, there is nothing to log in to the proxy with! Voting suspended for 24 hours"
+    "message": "The TunnelBear token is null or it has expired, there is nothing to log in to the proxy with! Voting suspended for 6 hours"
   },
   "errorAuthProxyNoPassword": {
     "message": "This proxy requires authorization by username and password but you did not set it in the proxy"
@@ -1054,7 +1054,7 @@
     "message": "Pattern: "
   },
   "otherProxy": {
-    "message": "Some other extension on the VPN/proxy is interfering with us, disable these extensions and then we can manage the proxy. Voting suspended for 24 hours"
+    "message": "Some other extension on the VPN/proxy is interfering with us, disable these extensions and then we can manage the proxy. Voting suspended for 6 hours"
   },
   "oauthVK": {
     "message": "The $rating$ app requests access to your account.",

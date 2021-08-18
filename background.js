@@ -72,7 +72,7 @@ async function checkVote() {
     }
 
     if (lastErrorNotFound != null) {
-        settings.stopVote = Date.now() + 86400000
+        settings.stopVote = Date.now() + 21600000
         console.error(lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
         if (!settings.disabledNotifError) sendNotification(lastErrorNotFound, lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
         await db.put('other', settings, 'settings')
@@ -261,7 +261,7 @@ async function checkOpen(project) {
             }
             //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк
             if (!found) {
-//              settings.stopVote = Date.now() + 86400000
+//              settings.stopVote = Date.now() + 21600000
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundVK')
 //              console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
 //              if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
@@ -284,7 +284,7 @@ async function checkOpen(project) {
                 })
             })
             if (!(proxyDetails.levelOfControl === 'controllable_by_this_extension' || proxyDetails.levelOfControl === 'controlled_by_this_extension')) {
-                settings.stopVote = Date.now() + 86400000
+                settings.stopVote = Date.now() + 21600000
                 console.error(chrome.i18n.getMessage('otherProxy'))
                 if (!settings.disabledNotifError) {
                     sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
@@ -341,7 +341,7 @@ async function checkOpen(project) {
                             'credentials': 'include'
                         })
                         if (!response.ok) {
-                            settings.stopVote = Date.now() + 86400000
+                            settings.stopVote = Date.now() + 21600000
                             await db.put('other', settings, 'settings')
                             await stopVote()
                             if (response.status === 401) {
@@ -387,7 +387,7 @@ async function checkOpen(project) {
 
             //Если не удалось найти хотя бы одно свободное не заюзанное прокси
             if (!found) {
-//              settings.stopVote = Date.now() + 86400000
+//              settings.stopVote = Date.now() + 21600000
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundProxy')
 //              console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
 //              if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
@@ -1972,7 +1972,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 })
                 return
             } else {
-                settings.stopVote = Date.now() + 86400000
+                settings.stopVote = Date.now() + 21600000
                 console.error(chrome.i18n.getMessage('errorAuthProxyTB'))
                 if (!settings.disabledNotifError) {
                     sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyTB'))
