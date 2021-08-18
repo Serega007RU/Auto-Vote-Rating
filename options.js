@@ -129,11 +129,11 @@ async function update(version) {
                 details.getFile('AVRtemp', {}, file => resolve(file), error => reject(error))
             })
         }).catch(e => {
-            // if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
-            //     throw Error(chrome.i18n.getMessage('update3', 'Temporary file not found'))
-            // } else {
-            //     throw e
-            // }
+            if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
+                throw Error(chrome.i18n.getMessage('update3', 'Temporary file not found'))
+            } else {
+                throw e
+            }
         }).finally(() => {
             dirHandle.removeEntry('AVRtemp')
         })
