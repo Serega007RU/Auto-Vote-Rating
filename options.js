@@ -129,11 +129,11 @@ async function update(version) {
                 details.getFile('AVRtemp', {}, file => resolve(file), error => reject(error))
             })
         }).catch(e => {
-            if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
-                throw Error(chrome.i18n.getMessage('update3', 'Temporary file not found'))
-            } else {
-                throw e
-            }
+            // if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
+            //     throw Error(chrome.i18n.getMessage('update3', 'Temporary file not found'))
+            // } else {
+            //     throw e
+            // }
         }).finally(() => {
             dirHandle.removeEntry('AVRtemp')
         })
@@ -155,18 +155,25 @@ async function update(version) {
         message.append(chrome.i18n.getMessage('update6'))
         message.append(document.createElement('br'))
         message.scrollTop = message.scrollHeight
-        const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/tree?recursive=true&per_page=999&ref=multivote')
-        const json = await response.json()
+        let response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/tree?recursive=true&per_page=100&ref=multivote')
+        let json = await response.json()
         progress.value = -1
-        progress.max = json.length
-        for (const file of json) {
-            progress.value = progress.value + 1
-            if (file.type === 'blob') {
-                message.append(chrome.i18n.getMessage('dowloading') + file.path)
-                message.append(document.createElement('br'))
-                message.scrollTop = message.scrollHeight
-                file.url = 'https://gitlab.com/api/v4/projects/19831620/repository/files/' + file.path.replaceAll('/', '%2F') + '/raw?ref=multivote'
-                await createFile(dirHandle, file.path.split('/'), file)
+        progress.max = Number(response.headers.get('x-total'))
+        const pages = Number(response.headers.get('x-total-pages')) + 1
+        for (let i = 1; i < pages; i++) {
+            if (i > 1) {
+                response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/tree?recursive=true&per_page=100&ref=multivote&page=' + i)
+                json = await response.json()
+            }
+            for (const file of json) {
+                progress.value = progress.value + 1
+                if (file.type === 'blob') {
+                    message.append(chrome.i18n.getMessage('dowloading') + file.path)
+                    message.append(document.createElement('br'))
+                    message.scrollTop = message.scrollHeight
+                    file.url = 'https://gitlab.com/api/v4/projects/19831620/repository/files/' + file.path.replaceAll('/', '%2F') + '/raw?ref=multivote'
+                    await createFile(dirHandle, file.path.split('/'), file)
+                }
             }
         }
 
