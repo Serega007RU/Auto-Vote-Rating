@@ -2032,7 +2032,6 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
 }, {urls: ['<all_urls>']}, ['asyncBlocking'])
 
 chrome.runtime.onInstalled.addListener(async function(details) {
-    console.log(details)
     if (details.reason === 'install') {
         chrome.tabs.create({url: 'options.html?installed'})
     } else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
