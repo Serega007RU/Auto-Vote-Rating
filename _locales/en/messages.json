@@ -453,10 +453,13 @@
     }
   },
   "errorVote": {
-    "message": "Voting error! HTTP response: $code$",
+    "message": "Voting error! HTTP response: $code$ URL: $url$",
     "placeholders": {
       "code": {
         "content": "$1"
+      },
+      "url": {
+        "content": "$2"
       }
     }
   },

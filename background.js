@@ -66,7 +66,7 @@ async function checkVote() {
 
     const projects = await db.getAll('projects')
     for (const project of projects) {
-        if (project.time == null || project.time < Date.now()) {
+        if (!project.time || project.time < Date.now()) {
             await checkOpen(project)
         }
     }
@@ -705,7 +705,7 @@ async function silentVote(project) {
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
                 } else {
-                    endVote({errorVote: String(response.status)}, null, project)
+                    endVote({errorVote: [String(response.status), response.url]}, null, project)
                 }
                 return
             }
@@ -755,7 +755,7 @@ async function silentVote(project) {
                 } else if (response.html.length > 0 && response.html.length < 500) {
                     endVote({message: response.html}, null, project)
                 } else {
-                    endVote({errorVote: String(response.status)}, null, project)
+                    endVote({errorVote: [String(response.status), response.url]}, null, project)
                 }
                 return
             }
@@ -1178,7 +1178,7 @@ async function silentVote(project) {
                     endVote({successfully: true}, null, project)
                 }
             } else {
-                endVote({errorVote: String(response.status)}, null, project)
+                endVote({errorVote: [String(response.status), response.url]}, null, project)
             }
         } else
 
@@ -1188,7 +1188,7 @@ async function silentVote(project) {
             if (response.ok) {
                 endVote({successfully: true}, null, project)
             } else {
-                endVote({errorVote: String(response.status)}, null, project)
+                endVote({errorVote: [String(response.status), response.url]}, null, project)
             }
         }
     } catch (e) {
@@ -1243,7 +1243,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         }
     }
     if (!response.ok) {
-        endVote({errorVote: String(response.status)}, null, project)
+        endVote({errorVote: [String(response.status), response.url]}, null, project)
         return false
     }
     if (response.statusText && response.statusText !== '' && response.statusText !== 'ok' && response.statusText !== 'OK') {
@@ -1298,7 +1298,7 @@ chrome.webRequest.onCompleted.addListener(function(details) {
     if (project == null) return
     if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
         const sender = {tab: {id: details.tabId}}
-        endVote({errorVote: String(details.statusCode)}, sender, project)
+        endVote({errorVote: [String(details.statusCode), details.url]}, sender, project)
     }
 }, {urls: ['<all_urls>']})
 
@@ -1679,7 +1679,7 @@ async function endVote(request, sender, project) {
         }
         project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote.charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage)
+        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage)
 
         project.stats.errorVotes++
 

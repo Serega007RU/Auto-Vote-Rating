@@ -1,13 +1,9 @@
-//Совместимость с Rocket Loader
-document.addEventListener('DOMContentLoaded', ()=>{
-    const timer = setInterval(()=>{
-        //Ожидаем загрузки reCAPTCHA
-        if (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value && document.getElementById('g-recaptcha-response').value !== '') {
-            vote()
-            clearInterval(timer)
-        }
-    }, 1000)
-})
+//Костыли для Rocket Loader
+if (typeof loaded2 === 'undefined') {
+    // noinspection ES6ConvertVarToLetConst
+    var loaded2 = true
+    runVote()
+}
 
 async function vote(first) {
     if (first === true || first === false) return
@@ -24,23 +20,36 @@ async function vote(first) {
     }
 }
 
-//Ждёт готовности recaptcha (Anti Spam check) и проверяет что с голосованием и пытается вновь нажать vote()
-const timer2 = setInterval(()=>{
-    try {
-        if (document.querySelector('#voteerror > font') != null) {
-            if (document.querySelector('#voteerror > font').textContent.includes('Vote Registered')) {
-                chrome.runtime.sendMessage({successfully: true})
-            } else if (document.querySelector('#voteerror > font').textContent.includes('already voted')) {
-                chrome.runtime.sendMessage({later: true})
-            } else if (document.querySelector('#voteerror > font').textContent.includes('Please Wait')) {
-                return
-            } else {
-                chrome.runtime.sendMessage({message: document.querySelector('#voteerror > font').textContent})
+function runVote() {
+    //Совместимость с Rocket Loader
+    document.addEventListener('DOMContentLoaded', ()=>{
+        const timer = setInterval(()=>{
+            //Ожидаем загрузки reCAPTCHA
+            if (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value && document.getElementById('g-recaptcha-response').value !== '') {
+                vote()
+                clearInterval(timer)
             }
+        }, 1000)
+    })
+
+    //Ждёт готовности recaptcha (Anti Spam check) и проверяет что с голосованием и пытается вновь нажать vote()
+    const timer2 = setInterval(()=>{
+        try {
+            if (document.querySelector('#voteerror > font') != null) {
+                if (document.querySelector('#voteerror > font').textContent.includes('Vote Registered')) {
+                    chrome.runtime.sendMessage({successfully: true})
+                } else if (document.querySelector('#voteerror > font').textContent.includes('already voted')) {
+                    chrome.runtime.sendMessage({later: true})
+                } else if (document.querySelector('#voteerror > font').textContent.includes('Please Wait')) {
+                    return
+                } else {
+                    chrome.runtime.sendMessage({message: document.querySelector('#voteerror > font').textContent})
+                }
+                clearInterval(timer2)
+            }
+        } catch (e) {
+            throwError(e)
             clearInterval(timer2)
         }
-    } catch (e) {
-        throwError(e)
-        clearInterval(timer2)
-    }
-}, 1000)
+    }, 1000)
+}

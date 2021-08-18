@@ -413,10 +413,13 @@
     }
   },
   "errorVote": {
-    "message": "Ошибка голосования! Код состояния HTTP: $code$",
+    "message": "Ошибка голосования! Код состояния HTTP: $code$ URL: $url$",
     "placeholders": {
       "code": {
         "content": "$1"
+      },
+      "url": {
+        "content": "$2"
       }
     }
   },
