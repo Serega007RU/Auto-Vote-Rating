@@ -3066,7 +3066,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         if (data.proxies && !proxies.length) proxies = data.proxies
         if (data.borealis) borealis = data.borealis
         if (data.settings.useMultiVote == null) {
-            data.settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*google.com", "*gstatic.com", "*cloudflare.com", "<local>"]
+            data.settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"]
             data.settings.stopVote = 0
             data.settings.autoAuthVK = false
             data.settings.clearVKCookies = true
