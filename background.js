@@ -47,7 +47,7 @@ async function checkVote() {
     let cursor = await db.transaction('projects').store.openCursor()
     while (cursor) {
         const project = cursor.value
-        if (project.time == null || project.time < Date.now()) {
+        if (!project.time || project.time < Date.now()) {
             checkOpen(project, cursor.key)
         }
         cursor = await cursor.continue()
