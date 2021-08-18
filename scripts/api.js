@@ -113,7 +113,18 @@ function run() {
                         document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
                     }
                 }
-                if (typeof vote !== 'undefined') {
+
+                const domain = getDomainWithoutSubdomain(document.URL)
+                if (domain === 'mctop.su'/* || domain === 'minecraft-server-list.com'*/) {
+                    //Совместимость с Rocket Loader и jQuery
+                    document.addEventListener('DOMContentLoaded', ()=>{
+                        // const script = document.createElement('script')
+                        // script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
+                        // document.documentElement.appendChild(script)
+                        // script.remove()
+                        vote(true)
+                    })
+                } else if (typeof vote !== 'undefined') {
                     vote(true)
                 } else {
                     console.warn('А где функция vote(true)?')
@@ -160,4 +171,13 @@ function throwError(error) {
     }
 
     chrome.runtime.sendMessage({errorVoteNoElement2: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
+}
+
+function getDomainWithoutSubdomain (url) {
+    const urlParts = new URL(url).hostname.split('.')
+
+    return urlParts
+        .slice(0)
+        .slice(-(urlParts.length === 4 ? 3 : 2))
+        .join('.')
 }

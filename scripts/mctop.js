@@ -6,7 +6,6 @@ if (typeof loaded2 === 'undefined') {
 }
 
 async function vote(first) {
-    if (first === true) return
     try {
         const project = await getProject('McTOP')
         //Авторизованы ли мы в аккаунте?
@@ -31,7 +30,7 @@ async function vote(first) {
         if (!document.querySelector('#voteModal').classList.contains('in')) {
             document.querySelector('button.openVoteModal').click()
         }
-        if (first || first == null) return
+        if (first) return
         //Вводит никнейм
         document.querySelector('input[name=nick]').value = project.nick
         document.querySelector('input[name=nick]').click()
@@ -44,15 +43,6 @@ async function vote(first) {
 }
 
 function runVote() {
-    //Совместимость с Rocket Loader и jQuery
-    document.addEventListener('DOMContentLoaded', ()=>{
-        // const script = document.createElement('script')
-        // script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
-        // document.documentElement.appendChild(script)
-        // script.remove()
-        vote()
-    })
-
     const timer = setInterval(()=>{
         try {
             //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
