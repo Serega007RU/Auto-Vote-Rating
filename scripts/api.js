@@ -108,7 +108,7 @@ function run() {
                     if (e.data === 'vote') {
                         vote(false)
                     } else if (e.data === 'voteReady') {
-                        vote()
+                        vote(true)
                     } else if (e.data === 'reloadCaptcha') {
                         document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
                     }
@@ -117,13 +117,27 @@ function run() {
                 const domain = getDomainWithoutSubdomain(document.URL)
                 if (domain === 'mctop.su'/* || domain === 'minecraft-server-list.com'*/) {
                     //Совместимость с Rocket Loader и jQuery
-                    document.addEventListener('DOMContentLoaded', ()=>{
-                        // const script = document.createElement('script')
-                        // script.textContent = `$(document).ready(function() {window.postMessage('voteReady', '*')})`
-                        // document.documentElement.appendChild(script)
-                        // script.remove()
-                        vote(true)
-                    })
+                    const script = document.createElement('script')
+                    script.textContent = `
+                    if (!window.jQuery) {
+                        document.addEventListener('DOMContentLoaded', ()=>{
+                            if (!$.isReady) {
+                                $(document).ready(function() {
+                                    window.postMessage('voteReady', '*')
+                                })
+                            } else {
+                                window.postMessage('voteReady', '*')
+                            }
+                        })
+                    } else {
+                        window.postMessage('voteReady', '*')
+                    }
+                    `
+                    document.documentElement.appendChild(script)
+                    // script.remove()
+                    // document.addEventListener('DOMContentLoaded', ()=>{
+                    //     vote(true)
+                    // })
                 } else if (typeof vote !== 'undefined') {
                     vote(true)
                 } else {
