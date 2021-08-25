@@ -1633,6 +1633,13 @@ async function endVote(request, sender, project) {
         }
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
             sendMessage = message
+            //Костыль (возможно временный) если аккаунт ВКонтакте забанен но авторизация всё равно прошла
+            if (request.errorVote && (project.rating === 'TopCraft' || project.rating === 'McTOP') && request.errorVote[0] === '500' && request.errorVote[1].includes('/accounts/vk/login/callback/?code=')) {
+                request.errorAuthVK = sendMessage
+            }
+            if (project.rating === 'MCRate' && message.includes('Неправильный токен ВК')) {
+                request.errorAuthVK = sendMessage
+            }
             if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
                 await updateValue('vks', currentVK)
