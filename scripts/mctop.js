@@ -7,6 +7,14 @@ if (typeof loaded2 === 'undefined') {
 
 async function vote(first) {
     try {
+        if (document.querySelector('#container > h1') != null) {
+            let message = document.querySelector('#container > h1').textContent
+            if (document.querySelector('#container > h1').nextElementSibling != null) {
+                message = message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
+            }
+            chrome.runtime.sendMessage({message})
+            return
+        }
         const project = await getProject('McTOP')
         //Авторизованы ли мы в аккаунте?
         if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
