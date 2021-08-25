@@ -1,28 +1,21 @@
 async function vote(first) {
-    if (first) return
     try {
-        //Если погльзователь уже авторизован в вк, сразу голосует
-        if (document.querySelector('button[data-type=vote]') == null) {
-            //Клик 'Голосовать'
-            document.querySelector('button.btn.btn-info.btn-vote.openVoteModal').click()
-            //Вводит никнейм
-            const project = await getProject('TopCraft')
-            document.querySelector('input[name=nick]').value = project.nick
-            //Клик 'Голосовать' в окне голосования
-            document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
-        } else {
+        const project = await getProject('TopCraft')
+        //Авторизованы ли мы в аккаунте?
+        if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
             document.querySelector('button[data-type=vote]').click()
-            //Надо ли авторизовываться в вк, если не надо то сразу голосует
-            if (document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i') != null) {
-                //Клик VK
-                document.querySelector('#loginModal > div.modal-dialog > div > div.modal-body > div > ul > li > a > i').click()
-                clearInterval(timer)
-            } else {
-                const project = await getProject('TopCraft')
-                document.querySelector('input[name=nick]').value = project.nick
-                document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
-            }
+            document.querySelector('a.modalVkLogin').click()
+            return
         }
+        if (!document.querySelector('#voteModal').classList.contains('in')) {
+            document.querySelector('button.openVoteModal').click()
+        }
+        if (first) return
+        //Вводит никнейм
+        document.querySelector('input[name=nick]').value = project.nick
+        document.querySelector('input[name=nick]').click()
+        //Клик 'Голосовать' в окне голосования
+        document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
     } catch (e) {
         throwError(e)
     }
