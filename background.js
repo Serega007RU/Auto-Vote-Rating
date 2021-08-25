@@ -1245,8 +1245,8 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {
-                    console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                     if (chrome.runtime.lastError.message !== 'The tab was closed.') {
+                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                         if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                         project.error = chrome.runtime.lastError.message
                         updateValue('projects', project)
@@ -1266,8 +1266,8 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     } else if (details.frameId !== 0 && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/))) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
-                console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                 if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id')) {
+                    console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                     if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
                     updateValue('projects', project)
