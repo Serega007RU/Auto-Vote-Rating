@@ -1028,9 +1028,9 @@ async function endVote(request, sender, project) {
                 project.randomize.max = 43200000
             }
             project.time = project.time + Math.floor(Math.random() * (project.randomize.max - project.randomize.min) + project.randomize.min)
-        } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && !project.priority) {
-            //Рандомизация по умолчанию (в пределах 5-ти минут) для бедного TopCraft/McTOP который легко ддосится от массового автоматического голосования
-            project.time = project.time + Math.floor(Math.random() * (300000 - -300000) + -300000)
+        } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') && !project.priority && project.timeoutHour == null) {
+            //Рандомизация по умолчанию (в пределах 5-10 минут) для бедного TopCraft/McTOP который легко ддосится от массового автоматического голосования
+            project.time = project.time + Math.floor(Math.random() * (600000 - -300000) + -300000)
         }
 
         delete project.error
