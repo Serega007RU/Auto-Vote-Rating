@@ -119,8 +119,11 @@ function run() {
                     //Совместимость с Rocket Loader и jQuery
                     const script = document.createElement('script')
                     script.textContent = `
+                    //console.log('window.jQuery', window.jQuery)
                     if (!window.jQuery) {
+                        //console.log('$.isReady', $?.isReady)
                         document.addEventListener('DOMContentLoaded', ()=>{
+                            //console.log('$.isReady2', $.isReady)
                             if (!$.isReady) {
                                 $(document).ready(function() {
                                     window.postMessage('voteReady', '*')
@@ -130,7 +133,13 @@ function run() {
                             }
                         })
                     } else {
-                        window.postMessage('voteReady', '*')
+                        if (!$.isReady) {
+                            $(document).ready(function() {
+                                window.postMessage('voteReady', '*')
+                            })
+                        } else {
+                            window.postMessage('voteReady', '*')
+                        }
                     }
                     `
                     document.documentElement.appendChild(script)
