@@ -167,11 +167,8 @@ async function checkOpen(project) {
     if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
         if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
-            let usedProjects = getTopFromList(currentVK, project)
-            for (let usedProject of usedProjects) {
-                if (project.id === usedProject.id && usedProject.nextFreeVote > Date.now()) {
-                    return
-                }
+            if (currentVK[project.rating]?.[project.id] > Date.now()) {
+                return
             }
             if (currentVK.notWorking) {
                 let _return = true
@@ -188,11 +185,8 @@ async function checkOpen(project) {
             if (!settings.useProxyOnUnProxyTop && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {
                 return
             }
-            let usedProjects = getTopFromList(currentProxy, project)
-            for (let usedProject of usedProjects) {
-                if (project.id === usedProject.id && usedProject.nextFreeVote > Date.now()) {
-                    return
-                }
+            if (currentProxy[project.rating]?.[project.id] > Date.now()) {
+                return
             }
         }
 
@@ -216,52 +210,45 @@ async function checkOpen(project) {
                         continue
                     }
                 }
-                let usedProjects = getTopFromList(vkontakte, project)
-                let used = false
-                for (let usedProject of usedProjects) {
-                    if (project.id === usedProject.id && usedProject.nextFreeVote > Date.now()) {
-                        used = true
-                        break
-                    }
+                if (vkontakte[project.rating]?.[project.id] > Date.now()) {
+                    cursor = await cursor.continue()
+                    continue
                 }
-                if (!used) {
-                    found = true
+                found = true
 
-                    //Удаляет все существующие куки ВК
-                    let cookies = await new Promise(resolve=>{
-                        chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
-                            resolve(cookies)
-                        })
+                //Удаляет все существующие куки ВК
+                let cookies = await new Promise(resolve=>{
+                    chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
+                        resolve(cookies)
                     })
-                    for (let i = 0; i < cookies.length; i++) {
-                        if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
-                        await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
-                    }
-
-                    console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
-
-                    //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
-                    for (let i = 0; i < vkontakte.cookies.length; i++) {
-                        let cookie = vkontakte.cookies[i]
-                        if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
-                        await setCookieDetails({
-                            url: 'https://' + cookie.domain + cookie.path,
-                            name: cookie.name,
-                            value: cookie.value,
-                            domain: cookie.domain,
-                            path: cookie.path,
-                            secure: cookie.secure,
-                            httpOnly: cookie.httpOnly,
-                            sameSite: cookie.sameSite,
-                            expirationDate: cookie.expirationDate,
-                            storeId: cookie.storeId
-                        })
-                    }
-
-                    currentVK = vkontakte
-                    break
+                })
+                for (let i = 0; i < cookies.length; i++) {
+                    if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+                    await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
                 }
-                cursor = await cursor.continue()
+
+                console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
+
+                //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
+                for (let i = 0; i < vkontakte.cookies.length; i++) {
+                    let cookie = vkontakte.cookies[i]
+                    if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
+                    await setCookieDetails({
+                        url: 'https://' + cookie.domain + cookie.path,
+                        name: cookie.name,
+                        value: cookie.value,
+                        domain: cookie.domain,
+                        path: cookie.path,
+                        secure: cookie.secure,
+                        httpOnly: cookie.httpOnly,
+                        sameSite: cookie.sameSite,
+                        expirationDate: cookie.expirationDate,
+                        storeId: cookie.storeId
+                    })
+                }
+
+                currentVK = vkontakte
+                break
             }
             //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк
             if (!found) {
@@ -307,74 +294,69 @@ async function checkOpen(project) {
                     cursor = await cursor.continue()
                     continue
                 }
-                let usedProjects = getTopFromList(proxy, project)
-                let used = false
-                for (let usedProject of usedProjects) {
-                    if (project.id === usedProject.id && usedProject.nextFreeVote > Date.now()) {
-                        used = true
-                        break
-                    }
+                if (proxy[project.rating]?.[project.id] > Date.now()) {
+                    cursor = await cursor.continue()
+                    continue
                 }
-                if (!used) {
-                    found = true
-                    //Применяет найденный незаюзанный свободный прокси
-                    console.log(chrome.i18n.getMessage('applyProxy', proxy.ip + ':' + proxy.port + ' ' + proxy.scheme))
+                found = true
+                //Применяет найденный незаюзанный свободный прокси
+                console.log(chrome.i18n.getMessage('applyProxy', proxy.ip + ':' + proxy.port + ' ' + proxy.scheme))
 
-                    if (proxy.TunnelBear && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
-                        console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
-                        let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
-                            'headers': {
-                                'accept': 'application/json, text/plain, */*',
-                                'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
-                                'authorization': 'Bearer undefined',
-                                'cache-control': 'no-cache',
-                                'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
-                                'pragma': 'no-cache',
-                                'sec-fetch-dest': 'empty',
-                                'sec-fetch-mode': 'cors',
-                                'sec-fetch-site': 'none',
-                                'tunnelbear-app-id': 'com.tunnelbear',
-                                'tunnelbear-app-version': '1.0',
-                                'tunnelbear-platform': 'Chrome',
-                                'tunnelbear-platform-version': 'c3.3.3'
-                            },
-                            'referrerPolicy': 'strict-origin-when-cross-origin',
-                            'body': null,
-                            'method': 'POST',
-                            'mode': 'cors',
-                            'credentials': 'include'
-                        })
-                        if (!response.ok) {
-                            settings.stopVote = Date.now() + 21600000
-                            await db.put('other', settings, 'settings')
-                            await stopVote()
-                            if (response.status === 401) {
-                                console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
-                                chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2')})
-                                if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
-                                return
-                            }
-                            chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('notConnect', response.url) + response.status})
-                            console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status)
+                if (proxy.TunnelBear && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
+                    console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
+                    let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
+                        'headers': {
+                            'accept': 'application/json, text/plain, */*',
+                            'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                            'authorization': 'Bearer undefined',
+                            'cache-control': 'no-cache',
+                            'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
+                            'pragma': 'no-cache',
+                            'sec-fetch-dest': 'empty',
+                            'sec-fetch-mode': 'cors',
+                            'sec-fetch-site': 'none',
+                            'tunnelbear-app-id': 'com.tunnelbear',
+                            'tunnelbear-app-version': '1.0',
+                            'tunnelbear-platform': 'Chrome',
+                            'tunnelbear-platform-version': 'c3.3.3'
+                        },
+                        'referrerPolicy': 'strict-origin-when-cross-origin',
+                        'body': null,
+                        'method': 'POST',
+                        'mode': 'cors',
+                        'credentials': 'include'
+                    })
+                    if (!response.ok) {
+                        settings.stopVote = Date.now() + 21600000
+                        await db.put('other', settings, 'settings')
+                        await stopVote()
+                        if (response.status === 401) {
+                            console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
+                            chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2')})
+                            if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
                             return
                         }
-                        let json = await response.json()
-                        tunnelBear.token = 'Bearer ' + json.access_token
-                        tunnelBear.expires = Date.now() + 86400000
+                        chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('notConnect', response.url) + response.status})
+                        console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status)
+                        return
                     }
+                    let json = await response.json()
+                    tunnelBear.token = 'Bearer ' + json.access_token
+                    tunnelBear.expires = Date.now() + 86400000
+                }
 
-                    let config = {
-                        mode: 'fixed_servers',
-                        rules: {
-                            singleProxy: {
-                                scheme: proxy.scheme,
-                                host: proxy.ip,
-                                port: proxy.port
-                            },
-                            bypassList: settings.proxyBlackList
-                        }
+                let config = {
+                    mode: 'fixed_servers',
+                    rules: {
+                        singleProxy: {
+                            scheme: proxy.scheme,
+                            host: proxy.ip,
+                            port: proxy.port
+                        },
+                        bypassList: settings.proxyBlackList
                     }
-                    await setProxy(config)
+                }
+                await setProxy(config)
 
 //                     if (chrome.benchmarking) {
 //                         await chrome.benchmarking.closeConnections()
@@ -383,10 +365,8 @@ async function checkOpen(project) {
 //                         await chrome.benchmarking.clearPredictorCache()
 //                     }
 
-                    currentProxy = proxy
-                    break
-                }
-                cursor = await cursor.continue()
+                currentProxy = proxy
+                break
             }
 
             //Если не удалось найти хотя бы одно свободное не заюзанное прокси
@@ -1553,29 +1533,15 @@ async function endVote(request, sender, project) {
                     await useVK()
                 }
                 async function useVK() {
-                    let usedProject = {
-                        id: project.id,
-                        nextFreeVote: time
-                    }
-                    const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id === usedProject.id})
-                    if (index > -1) {
-                        getTopFromList(currentVK, project).splice(index, 1)
-                    }
-                    getTopFromList(currentVK, project).push(usedProject)
+                    if (!currentVK[project.rating] || Array.isArray(currentVK[project.rating])) currentVK[project.rating] = {}
+                    currentVK[project.rating][project.id] = time
                     await updateValue('vks', currentVK)
                 }
             }
 
             if (currentProxy != null && (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) /*&& proxies.findIndex(function(element) { return element.ip === currentProxy.ip && element.port === currentProxy.port}) !== -1*/) {
-                let usedProject = {
-                    id: project.id,
-                    nextFreeVote: time
-                }
-                const index = getTopFromList(currentProxy, project).findIndex(function(el) {return el.id === usedProject.id})
-                if (index > -1) {
-                    getTopFromList(currentProxy, project).splice(index, 1)
-                }
-                getTopFromList(currentProxy, project).push(usedProject)
+                if (!currentProxy[project.rating] || Array.isArray(currentVK[project.rating])) currentProxy[project.rating] = {}
+                currentProxy[project.rating][project.id] = time
                 await updateValue('proxies', currentProxy)
             } else if (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) {
                 console.warn('currentProxy is null or not found')
@@ -1648,16 +1614,8 @@ async function endVote(request, sender, project) {
                 currentVK.notWorking = request.errorAuthVK
                 await updateValue('vks', currentVK)
             } else if (project.rating === 'MCRate' && message.includes('Ваш аккаунт заблокирован для голосования за этот проект')) {
-                let usedProject = {
-                    id: project.id,
-                    nextFreeVote: 999999999999999,
-                    error: message
-                }
-                const index = getTopFromList(currentVK, project).findIndex(function(el) {return el.id === usedProject.id})
-                if (index > -1) {
-                    getTopFromList(currentVK, project).splice(index, 1)
-                }
-                getTopFromList(currentVK, project).push(usedProject)
+                if (!currentVK[project.rating] || Array.isArray(currentVK[project.rating])) currentVK[project.rating] = {}
+                currentVK[project.rating][project.id] = Number.POSITIVE_INFINITY
                 await updateValue('vks', currentVK)
             } else if (project.rating === 'MCRate' && message.includes('Ваш ВК ID заблокирован для голосовани')) {
                 currentVK.MCRate = message
@@ -2205,14 +2163,6 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         chrome.tabs.create({url: 'options.html'})
     }
 })
-
-function getTopFromList(list, project) {
-    if (typeof list[project.rating] === 'string') {
-        return [{id: project.id, nextFreeVote: Number.POSITIVE_INFINITY}]
-    }
-    if (!list[project.rating]) list[project.rating] = []
-    return list[project.rating]
-}
 
 function Version(s){
   this.arr = s.split('.').map(Number)
