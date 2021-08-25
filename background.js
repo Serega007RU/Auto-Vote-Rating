@@ -804,7 +804,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
                 console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                if (chrome.runtime.lastError.message !== 'The frame was removed.') {
+                if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id')) {
                     if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                     project.error = chrome.runtime.lastError.message
                     updateValue('projects', project)
