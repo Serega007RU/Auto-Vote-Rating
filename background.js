@@ -1506,9 +1506,9 @@ async function endVote(request, sender, project) {
                 project.randomize.max = 43200000
             }
             project.time = project.time + Math.floor(Math.random() * (project.randomize.max - project.randomize.min) + project.randomize.min)
-        }/* else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && !project.priority) {
+        }/* else if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') && !project.priority && project.timeoutHour == null) {
             //Рандомизация по умолчанию (в пределах 5-ти минут) для бедного TopCraft/McTOP который легко ддосится от массового автоматического голосования
-            project.time = project.time + Math.floor(Math.random() * (300000 - -300000) + -300000)
+            project.time = project.time + Math.floor(Math.random() * (600000 - -300000) + -300000)
         }*/
 
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote)  {
@@ -1546,6 +1546,9 @@ async function endVote(request, sender, project) {
             } else if (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) {
                 console.warn('currentProxy is null or not found')
             }
+        } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') && !project.priority && project.timeoutHour == null) {
+            //Рандомизация по умолчанию (в пределах 5-10 минут) для бедного TopCraft/McTOP который легко ддосится от массового автоматического голосования
+            project.time = project.time + Math.floor(Math.random() * (600000 - -300000) + -300000)
         }
 
         delete project.error
