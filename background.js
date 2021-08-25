@@ -1610,6 +1610,9 @@ async function endVote(request, sender, project) {
             if (project.rating === 'MCRate' && message.includes('Неправильный токен ВК')) {
                 request.errorAuthVK = sendMessage
             }
+            if (request.errorVote && request.errorVote[0] === '401' && request.errorVote[1] === 'https://oauth.vk.com/join') {
+                request.errorAuthVK = sendMessage
+            }
             if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
                 await updateValue('vks', currentVK)
