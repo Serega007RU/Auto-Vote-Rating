@@ -1540,7 +1540,7 @@ async function endVote(request, sender, project) {
             }
 
             if (currentProxy != null && (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) /*&& proxies.findIndex(function(element) { return element.ip === currentProxy.ip && element.port === currentProxy.port}) !== -1*/) {
-                if (!currentProxy[project.rating] || Array.isArray(currentVK[project.rating])) currentProxy[project.rating] = {}
+                if (!currentProxy[project.rating] || Array.isArray(currentProxy[project.rating])) currentProxy[project.rating] = {}
                 currentProxy[project.rating][project.id] = time
                 await updateValue('proxies', currentProxy)
             } else if (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) {
