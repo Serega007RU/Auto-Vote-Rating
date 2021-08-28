@@ -1337,5 +1337,11 @@
   },
   "forceUpdate": {
     "message": "Force to update the extension"
+  },
+  "addBannedVK": {
+    "message": "Add a VK account even if it is banned"
+  },
+  "notRegVK":{
+    "message": "Registration of this account is not completed (phone number is not specified)"
   }
 }

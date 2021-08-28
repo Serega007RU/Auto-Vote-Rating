@@ -755,6 +755,7 @@ async function initializeConfig(background/*, version*/) {
                     stopVote: 0,
                     autoAuthVK: false,
                     clearVKCookies: true,
+                    addBannedVK: false,
                     clearBorealisCookies: true,
                     repeatAttemptLater: true,
                     saveVKCredentials: false,
@@ -782,6 +783,7 @@ async function initializeConfig(background/*, version*/) {
                     settings.stopVote = 0
                     settings.autoAuthVK = false
                     settings.clearVKCookies = true
+                    settings.addBannedVK = false
                     settings.clearBorealisCookies = true
                     settings.repeatAttemptLater = true
                     settings.saveVKCredentials = false

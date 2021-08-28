@@ -269,6 +269,7 @@ async function restoreOptions() {
         document.querySelector('div.antiBanVK').removeAttribute('style')
     }
     if (settings.clearVKCookies != null) document.getElementById('clearVKCookies').checked = settings.clearVKCookies
+    if (settings.addBannedVK != null) document.getElementById('addBannedVK').checked = settings.addBannedVK
     if (settings.clearBorealisCookies != null) document.getElementById('clearBorealisCookies').checked = settings.clearBorealisCookies
     document.getElementById('autoAuthVK').checked = settings.autoAuthVK
     if (settings.stopVote > Date.now()) {
@@ -584,6 +585,7 @@ async function addVKList(VK) {
         VK = await db.get('vks', VK.key)
         for (const [key, value] of Object.entries(VK)) {
             if (key === 'cookies') continue
+            if (allProjects[key] != null) continue
             message.append(key + ': ' + JSON.stringify(value, null, '\t'))
             message.append(document.createElement('br'))
         }
@@ -1088,19 +1090,33 @@ async function addVK(repair, imp) {
                 text = doc.querySelector('div.oauth_form_access').textContent.replace(doc.querySelector('div.oauth_access_items').textContent, '').trim()
             } else if (doc.querySelector('div.oauth_content > div') != null) {
                 text = doc.querySelector('div.oauth_content > div').textContent
+                VK.notAuth = true
             } else if (doc.querySelector('#login_blocked_wrap') != null) {
                 text = doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
             } else if (doc.querySelector('div.login_blocked_panel') != null) {
                 text = doc.querySelector('div.login_blocked_panel').textContent.trim()
             } else if (doc.querySelector('.profile_deleted_text') != null) {
                 text = doc.querySelector('.profile_deleted_text').textContent.trim()
+            } else if (response.url.startsWith('https://vk.com/join')) {
+                text = chrome.i18n.getMessage('notRegVK')
+                VK.notAuth = true
             }
             if (text) {
                 createNotif(text, 'error')
-                return
+                VK.notWorking = text
+                if (VK.notAuth || !document.getElementById('addBannedVK').checked) {
+                    return
+                }
+            } else {
+                delete VK.notWorking
             }
-            VK.name = doc.querySelector('#top_vkconnect_link > div > div.top_profile_vkconnect_name').textContent
-            VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
+            if (doc.querySelector('.top_profile_vkconnect_name') != null) {
+                VK.name = doc.querySelector('.top_profile_vkconnect_name').textContent
+                VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
+            } else {
+                VK.name = doc.querySelector('title').textContent
+                VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
+            }
         } catch(e) {
             createNotif(e, 'error')
             return
@@ -1138,7 +1154,6 @@ async function addVK(repair, imp) {
                     VK[obj] = found[obj]
                 }
             }
-            delete VK.notWorking
             await db.put('vks', VK, VK.key)
             createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
         } else {
@@ -2120,6 +2135,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.antiBanVK = this.checked
         } else if (this.id === 'clearVKCookies') {
             settings.clearVKCookies = this.checked
+        } else if (this.id === 'addBannedVK') {
+            settings.addBannedVK = this.checked
         } else if (this.id === 'clearBorealisCookies') {
             settings.clearBorealisCookies = this.checked
         } else if (this.id === 'saveVKCredentials') {
@@ -3077,6 +3094,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
             data.settings.stopVote = 0
             data.settings.autoAuthVK = false
             data.settings.clearVKCookies = true
+            data.settings.addBannedVK = false
             data.settings.clearBorealisCookies = true
             data.settings.repeatAttemptLater = true
             data.settings.saveVKCredentials = false

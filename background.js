@@ -174,8 +174,8 @@ async function checkOpen(project) {
                 let _return = true
                 if (project.rating === 'TopCraft' && (currentVK.passwordTopCraft/* || project.AuthURLTopCraft*/)) _return = false
                 if (project.rating === 'McTOP' && (currentVK.passwordMcTOP/* || project.AuthURLMcTOP*/)) _return = false
-                if (project.rating === 'MinecraftRating' && !currentVK.notWorking.includes('Sign in') && !currentVK.notWorking.includes('Login ke') && !currentVK.notWorking.includes('вам необходимо войти') && !currentVK.notWorking.includes('MinecraftRatingVKAuth')) _return = false
-                if (project.rating === 'MonitoringMinecraft' && !currentVK.notWorking.includes('Sign in') && !currentVK.notWorking.includes('Login ke') && !currentVK.notWorking.includes('вам необходимо войти') && !currentVK.notWorking.includes('MinecraftRatingVKAuth')) _return = false
+                if (project.rating === 'MinecraftRating' && !currentVK.notAuth) _return = false
+                if (project.rating === 'MonitoringMinecraft' && !currentVK.notAuth) _return = false
 //              if (project.rating === 'MinecraftRating' && currentVK['AuthURLMinecraftRating' + project.id] != null) _return = false
 //              if (project.rating === 'MonitoringMinecraft' && currentVK['AuthURLMonitoringMinecraft' + project.id] != null) _return = false
                 if (_return) return
@@ -201,8 +201,8 @@ async function checkOpen(project) {
                     let _continue = true
                     if (project.rating === 'TopCraft' && (vkontakte.passwordTopCraft/* || vkontakte.AuthURLTopCraft*/)) _continue = false
                     if (project.rating === 'McTOP' && (vkontakte.passwordMcTOP/* || project.AuthURLMcTOP*/)) _continue = false
-                    if (project.rating === 'MinecraftRating' && !vkontakte.notWorking.includes('Sign in') && !vkontakte.notWorking.includes('Login ke') && !vkontakte.notWorking.includes('вам необходимо войти') && !vkontakte.notWorking.includes('MinecraftRatingVKAuth')) _continue = false
-                    if (project.rating === 'MonitoringMinecraft' && !vkontakte.notWorking.includes('Sign in') && !vkontakte.notWorking.includes('Login ke') && !vkontakte.notWorking.includes('вам необходимо войти') && !vkontakte.notWorking.includes('MinecraftRatingVKAuth')) _continue = false
+                    if (project.rating === 'MinecraftRating' && !currentVK.notAuth) _continue = false
+                    if (project.rating === 'MonitoringMinecraft' && !currentVK.notAuth) _continue = false
 //                  if (project.rating === 'MinecraftRating' && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
 //                  if (project.rating === 'MonitoringMinecraft' && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
                     if (_continue) {
@@ -1197,10 +1197,12 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     if (vk && host.includes('vk.com')) {
         //Узнаём причину почему мы зависли на авторизации ВК
         let text
+        let notAuth = false
         if (response.doc.querySelector('div.oauth_form_access') != null) {
             text = response.doc.querySelector('div.oauth_form_access').textContent.replace(response.doc.querySelector('div.oauth_access_items').textContent, '').trim()
         } else if (response.doc.querySelector('div.oauth_content > div') != null) {
             text = response.doc.querySelector('div.oauth_content > div').textContent
+            notAuth = true
         } else if (response.doc.querySelector('#login_blocked_wrap') != null) {
             text = response.doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + response.doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
         } else if (response.doc.querySelector('div.login_blocked_panel') != null) {
@@ -1209,10 +1211,13 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
             text = response.doc.querySelector('.profile_deleted_text').textContent.trim()
         } else if (response.html.length < 500) {
             text = response.html
+        } else if (response.url.startsWith('https://vk.com/join')) {
+            text = chrome.i18n.getMessage('notRegVK')
+            notAuth = true
         } else {
             text = 'null'
         }
-        endVote({errorAuthVK: text}, null, project)
+        endVote({errorAuthVK: text, notAuth}, null, project)
         return false
     }
     if (!host.includes(url)) {
@@ -1615,7 +1620,9 @@ async function endVote(request, sender, project) {
             }
             if (request.errorVote && request.errorVote[0] === '401' && request.errorVote[1] === 'https://oauth.vk.com/join') {
                 request.errorAuthVK = sendMessage
+                if (currentVK != null) currentVK.notAuth = true
             }
+            if (request.notAuth && currentVK != null) currentVK.notAuth = true
             if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
                 await updateValue('vks', currentVK)
@@ -2126,6 +2133,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                 oldSettings.stopVote = 0
                 oldSettings.autoAuthVK = false
                 oldSettings.clearVKCookies = true
+                oldSettings.addBannedVK = false
                 oldSettings.clearBorealisCookies = true
                 oldSettings.repeatAttemptLater = true
                 oldSettings.saveVKCredentials = false

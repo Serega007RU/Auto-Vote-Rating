@@ -39,22 +39,27 @@ function run() {
             }, 1000)
         } else if (document.URL.includes('vk.com/')) {
             let text
+            let notAuth = false
             if (document.querySelector('div.oauth_form_access') != null) {
                 text = document.querySelector('div.oauth_form_access').textContent.replace(document.querySelector('div.oauth_access_items').textContent, '').trim()
             } else if (document.querySelector('div.oauth_content > div') != null) {
                 text = document.querySelector('div.oauth_content > div').textContent
+                notAuth = true
             } else if (document.querySelector('#login_blocked_wrap') != null) {
                 text = document.querySelector('#login_blocked_wrap div.header').textContent + ' ' + document.querySelector('#login_blocked_wrap div.content').textContent.trim()
             } else if (document.querySelector('div.login_blocked_panel') != null) {
                 text = document.querySelector('div.login_blocked_panel').textContent.trim()
             } else if (document.querySelector('.profile_deleted_text') != null) {
                 text = document.querySelector('.profile_deleted_text').textContent.trim()
+            } else if (response.url.startsWith('https://vk.com/join')) {
+                text = chrome.i18n.getMessage('notRegVK')
+                notAuth = true
             } else if (document.body.innerText.length < 500) {
                 text = document.body.innerText
             } else {
                 text = 'null'
             }
-            chrome.runtime.sendMessage({errorAuthVK: text})
+            chrome.runtime.sendMessage({errorAuthVK: text, notAuth})
         } else {
             let check = true
             //Если мы находимся на странице проверки CloudFlare
