@@ -1402,7 +1402,7 @@ async function checkAuthVK(VK) {
             needReturn = true
         }
 
-        if (!needReturn && (key === 'TopCraft' || key === 'McTOP') && document.getElementById('antiBanVK').checked && VK['password' + key] == null) {
+        if (!needReturn && (key === 'TopCraft' || key === 'McTOP') && document.getElementById('antiBanVK').checked && VK['password' + key] == null && !VK.notWorking) {
             try {
                 let url
                 if (key === 'TopCraft') {
