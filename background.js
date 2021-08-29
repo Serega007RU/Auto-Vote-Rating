@@ -1200,6 +1200,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
         let notAuth = false
         if (response.doc.querySelector('div.oauth_form_access') != null) {
             text = response.doc.querySelector('div.oauth_form_access').textContent.replace(response.doc.querySelector('div.oauth_access_items').textContent, '').trim()
+            notAuth = true
         } else if (response.doc.querySelector('div.oauth_content > div') != null) {
             text = response.doc.querySelector('div.oauth_content > div').textContent
             notAuth = true

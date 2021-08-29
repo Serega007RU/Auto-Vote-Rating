@@ -42,6 +42,7 @@ function run() {
             let notAuth = false
             if (document.querySelector('div.oauth_form_access') != null) {
                 text = document.querySelector('div.oauth_form_access').textContent.replace(document.querySelector('div.oauth_access_items').textContent, '').trim()
+                notAuth = true
             } else if (document.querySelector('div.oauth_content > div') != null) {
                 text = document.querySelector('div.oauth_content > div').textContent
                 notAuth = true

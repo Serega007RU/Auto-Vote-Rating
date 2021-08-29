@@ -1086,11 +1086,13 @@ async function addVK(repair, imp) {
         }
         try {
             let text
+            let notAuth = false
             if (doc.querySelector('div.oauth_form_access') != null) {
                 text = doc.querySelector('div.oauth_form_access').textContent.replace(doc.querySelector('div.oauth_access_items').textContent, '').trim()
+                notAuth = true
             } else if (doc.querySelector('div.oauth_content > div') != null) {
                 text = doc.querySelector('div.oauth_content > div').textContent
-                VK.notAuth = true
+                notAuth = true
             } else if (doc.querySelector('#login_blocked_wrap') != null) {
                 text = doc.querySelector('#login_blocked_wrap div.header').textContent + ' ' + doc.querySelector('#login_blocked_wrap div.content').textContent.trim()
             } else if (doc.querySelector('div.login_blocked_panel') != null) {
@@ -1099,7 +1101,7 @@ async function addVK(repair, imp) {
                 text = doc.querySelector('.profile_deleted_text').textContent.trim()
             } else if (response.url.startsWith('https://vk.com/join')) {
                 text = chrome.i18n.getMessage('notRegVK')
-                VK.notAuth = true
+                notAuth = true
             }
             if (text) {
                 createNotif(text, 'error')
@@ -1109,6 +1111,11 @@ async function addVK(repair, imp) {
                 }
             } else {
                 delete VK.notWorking
+            }
+            if (notAuth) {
+                VK.notAuth = true
+            } else {
+                delete VK.notAuth
             }
             if (doc.querySelector('.top_profile_vkconnect_name') != null) {
                 VK.name = doc.querySelector('.top_profile_vkconnect_name').textContent
