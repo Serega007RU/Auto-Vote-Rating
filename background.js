@@ -201,8 +201,8 @@ async function checkOpen(project) {
                     let _continue = true
                     if (project.rating === 'TopCraft' && (vkontakte.passwordTopCraft/* || vkontakte.AuthURLTopCraft*/)) _continue = false
                     if (project.rating === 'McTOP' && (vkontakte.passwordMcTOP/* || project.AuthURLMcTOP*/)) _continue = false
-                    if (project.rating === 'MinecraftRating' && !currentVK.notAuth) _continue = false
-                    if (project.rating === 'MonitoringMinecraft' && !currentVK.notAuth) _continue = false
+                    if (project.rating === 'MinecraftRating' && !vkontakte.notAuth) _continue = false
+                    if (project.rating === 'MonitoringMinecraft' && !vkontakte.notAuth) _continue = false
 //                  if (project.rating === 'MinecraftRating' && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
 //                  if (project.rating === 'MonitoringMinecraft' && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
                     if (_continue) {
