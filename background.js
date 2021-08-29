@@ -1210,6 +1210,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
             text = response.doc.querySelector('div.login_blocked_panel').textContent.trim()
         } else if (response.doc.querySelector('.profile_deleted_text') != null) {
             text = response.doc.querySelector('.profile_deleted_text').textContent.trim()
+            notAuth = true
         } else if (response.html.length < 500) {
             text = response.html
         } else if (response.url.startsWith('https://vk.com/join')) {

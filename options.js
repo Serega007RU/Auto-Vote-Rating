@@ -1099,9 +1099,16 @@ async function addVK(repair, imp) {
                 text = doc.querySelector('div.login_blocked_panel').textContent.trim()
             } else if (doc.querySelector('.profile_deleted_text') != null) {
                 text = doc.querySelector('.profile_deleted_text').textContent.trim()
+                notAuth = true
             } else if (response.url.startsWith('https://vk.com/join')) {
                 text = chrome.i18n.getMessage('notRegVK')
                 notAuth = true
+            }
+
+            if (notAuth) {
+                VK.notAuth = true
+            } else {
+                delete VK.notAuth
             }
             if (text) {
                 createNotif(text, 'error')
@@ -1112,11 +1119,7 @@ async function addVK(repair, imp) {
             } else {
                 delete VK.notWorking
             }
-            if (notAuth) {
-                VK.notAuth = true
-            } else {
-                delete VK.notAuth
-            }
+
             if (doc.querySelector('.top_profile_vkconnect_name') != null) {
                 VK.name = doc.querySelector('.top_profile_vkconnect_name').textContent
                 VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
