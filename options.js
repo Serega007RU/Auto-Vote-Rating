@@ -1162,8 +1162,8 @@ async function addVK(repair, imp) {
                 }
             }
             await db.put('vks', VK, VK.key)
+            await updateValue({updateValue: 'vks', value: VK})
             createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
-            chrome.runtime.sendMessage({updateValue: 'vks', VK})
         } else {
             await addVKList(VK)
             createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
@@ -3855,7 +3855,8 @@ function generateDataList() {
     document.querySelector('option[name="Custom"]').disabled = true
 }
 
-chrome.runtime.onMessage.addListener(async function(request/*, sender, sendResponse*/) {
+chrome.runtime.onMessage.addListener(updateValue)
+async function updateValue(request/*, sender, sendResponse*/) {
     if (request.updateValue) {
         if (request.updateValue === 'projects') {
             const el = document.getElementById('projects' + request.value.key)
@@ -3889,7 +3890,7 @@ chrome.runtime.onMessage.addListener(async function(request/*, sender, sendRespo
         createNotif(chrome.i18n.getMessage('voteSuspended') + ' ' + request.stopVote, 'error')
         settings = await db.get('other', 'settings')
     }
-})
+}
 
 //Локализация
 const elements = document.querySelectorAll('[data-resource]')
