@@ -1163,6 +1163,7 @@ async function addVK(repair, imp) {
             }
             await db.put('vks', VK, VK.key)
             createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + VK.name, 'success')
+            chrome.runtime.sendMessage({updateValue: 'vks', VK})
         } else {
             await addVKList(VK)
             createNotif(chrome.i18n.getMessage('addSuccess') + ' ' + VK.name, 'success')
