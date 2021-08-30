@@ -212,20 +212,19 @@ function generateBtnListRating(rating, count) {
 //  div.setAttribute('data-resource', 'notAdded')
 //  div.textContent = chrome.i18n.getMessage('notAdded')
 //  ul.append(div)
-//     if (!(/*rating === 'TopCraft' || rating === 'McTOP' || */rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
-//         const label = document.createElement('label')
-//         label.setAttribute('data-resource', 'notAvailableInSilent')
-//         label.textContent = chrome.i18n.getMessage('notAvailableInSilent')
-//         const span = document.createElement('span')
-//         span.classList.add('tooltip2')
-//         const span2 = document.createElement('span')
-//         span2.setAttribute('data-resource', 'warnSilentVoteTooltip')
-//         span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
-//         span2.classList.add('tooltip2text')
-//         span.append(span2)
-//         label.append(span)
-//         ul.append(label)
-//     }
+    if (!(/*rating === 'TopCraft' || rating === 'McTOP' || */rating === 'MCRate' || rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
+        const label = document.createElement('label')
+        label.setAttribute('data-resource', 'passageCaptcha')
+        label.textContent = chrome.i18n.getMessage('passageCaptcha')
+        const link = document.createElement('a')
+        link.classList.add('link')
+        link.target = 'blank_'
+        link.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+        link.textContent = chrome.i18n.getMessage('here')
+        link.setAttribute('data-resource', 'here')
+        label.append(link)
+        ul.append(label)
+    }
     const div2 = document.createElement('div')
     div2.id = rating + 'List'
     ul.append(div2)
