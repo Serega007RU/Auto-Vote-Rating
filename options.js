@@ -1341,7 +1341,8 @@ async function addBorealis(repair, imp) {
 
         if (repair) {
             const found = await db.getFromIndex('borealis', 'nick', acc.nick)
-            await db.put('borealis', found, found.key)
+            acc.key = found.key
+            await db.put('borealis', acc, found.key)
             createNotif(chrome.i18n.getMessage('reAddSuccess') + ' ' + acc.nick, 'success')
         } else {
             await addBorealisList(acc)
