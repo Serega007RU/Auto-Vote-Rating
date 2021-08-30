@@ -993,6 +993,133 @@
                                 </div>
                                 <div class="changes timeline-content">
                                     <h4>
+                                        v6.2.0
+                                    </h4>
+                                    <small>released on 31.08.2021</small>
+                                    <div class="changes-entry">
+                                        <ul>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Для ListForge исправлена ошибка если дополнительный параметр не был указан
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок с интеграцией с Buster
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок совместимости с Rocket Loader и jQuery (в особенности для McTOP)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Предусмотрена ошибка если аккаунт ВКонтакте удалён (спасибо saqult#0303)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Теперь бесконечно не голосует за 10 минут до наступления следующего голосования
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                net::ERR ошибки теперь определяются и на капчи (фреймы)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Предусмотрены все (наверно) вероятности ошибок с CloudFlare
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Предусмотрена ошибка reCAPTCHA fallback
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибки бесконечного голосования с рандомизацией
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                В ошибке с status code выводится теперь URL
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                MinecraftRating тоже теперь ддосится от массового автоматического голосования, включена для него по умолчанию рандомизация.
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Рандомизация по умолчанию не действует если пользователь настроил кастомный таймаут
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Предусмотрена "ошибка авторизации через социальную сеть" на TopCraft/McTOP (спасибо Maks Haswell)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлена проблема если человек пройдёт капчу раньше чем страница загрузится
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Для FireFox исправлена ошибка "Script result is non-structured-clonable data" (спасибо Raphaël#1111)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Переписан код голосования для TopCraft/McTOP (что возможно исправит ещё несколько мелких ошибок)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Ошибка с капчей теперь приравняется как ошибка с прокси
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                При импорте никнеймов больше не будет проблемы с "Уже добавлено"
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Куки CloudFlare больше не очищаются
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                При истечении таймаута голосования, прокси считается не рабочим и голосование перезапускается
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок обновления расширения с gitlab (скачивал не все файлы)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Предусмотрена ошибка если аккаунт ВКонтакте не до конца был зарегистрирован (не указан номер телефона)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Если с аккаунта слетела авторизация, больше с него голосование не ведётся (это для забаненных аккаунтов)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                При передобавлении аккаунта notWorking теперь правильно перезаписывается
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлена ошибка авторизации на QTop
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                В списки добавленных проектов добавлена ссылка на гайд по решению проблем с капчей
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Для Opera добавлен гайд по решению ошибки "This page cannot be scripted due to an ExtensionsSettings policy."
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавлена возможность принудительно обновить расширение
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Теперь при перезапуске расширения открываются настройки
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                На MinecraftRating и MonitoringMinecraft теперь можно голосовать с забаненных аккаунтов ВКонтакте
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавлена возможность добавлять забаненные аккаунты ВК (так как появилась возможность голосовать с забаненных аккаунтов)
+                                            </li>
+
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Рандомизация по умолчанию увеличена до 10-ти минут
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Авто голосование теперь приостанавливается на 6 часов, а не на 24
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Оптимизация пометки сохранения голоса на ВКонтакте/прокси
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-removed">Removed</span>
+                                                Рандомизация на TopCraft/McTOP не нужна для ветки MultiVote
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-removed">Removed</span>
+                                                В чёрном списке прокси по умолчанию теперь нет reCAPTCHA
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-removed">Removed</span>
+                                                В информации об аккаунте больше не отображается время рейтингов
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-left">
+                                    <div class="timeline-icon"></div>
+                                </div>
+                                <div class="changes timeline-content">
+                                    <h4>
                                         v6.1.0
                                     </h4>
                                     <small>released on 13.08.2021</small>
