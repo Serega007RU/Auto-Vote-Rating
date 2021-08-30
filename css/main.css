@@ -864,7 +864,8 @@ ul {
 	margin: 10px 0;
 }
 
-[data-resource="notAvailableInSilent"] {
+/*[data-resource="notAvailableInSilent"] {*/
+[data-resource="passageCaptcha"] {
 	position: relative;
 	display: block;
 	text-align: center;

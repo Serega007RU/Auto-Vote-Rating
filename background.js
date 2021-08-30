@@ -1274,9 +1274,13 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
                 if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id')) {
-                    console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                    let error = chrome.runtime.lastError.message
+                    if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
+                        error += ' Try this solution: https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Problems-with-Opera'
+                    }
+                    console.error(getProjectPrefix(project, true) + error)
                     if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                    project.error = chrome.runtime.lastError.message
+                    project.error = error
                     updateValue('projects', project)
                 }
             }
