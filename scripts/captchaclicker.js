@@ -13,7 +13,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
         //Если капча пройдена
         if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0)) {
             window.top.postMessage('vote', '*')
-            clearInterval(timer2)
+            // clearInterval(timer2)
         }
     }, 1000)
 
@@ -22,6 +22,8 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             if (!(document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0))) {
                 document.location.reload()
             }
+        } else if (e.data === 'startedVote') {
+            clearInterval(timer2)
         }
     }
 } else if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) && document.querySelector('head > yandex-captcha-solver') == null) {
@@ -71,7 +73,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
     const timer5 = setInterval(()=>{
         if (document.getElementById('checkbox') != null && document.getElementById('checkbox').ariaChecked === 'true') {
             window.top.postMessage('vote', '*')
-            clearInterval(timer5)
+            // clearInterval(timer5)
         }
     }, 1000)
     
@@ -82,6 +84,12 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             clearInterval(timer6)
         }
     }, 1000)
+
+    window.onmessage = function(e) {
+        if (e.data === 'startedVote') {
+            clearInterval(timer5)
+        }
+    }
 }
 
 function isScrolledIntoView(el) {

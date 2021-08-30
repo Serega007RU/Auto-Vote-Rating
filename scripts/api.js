@@ -103,6 +103,7 @@ function run() {
             if (check) {
                 window.onmessage = function(e) {
                     if (e.data === 'vote') {
+                        e.source.postMessage('startedVote', '*')
                         vote(false)
                     } else if (e.data === 'voteReady') {
                         vote(true)
