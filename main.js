@@ -4,7 +4,7 @@ const allProjects = {
     TopCraft: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
+                return 'https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/'
             case 'pageURL':
                 return 'https://topcraft.ru/servers/' + project.id + '/'
             case 'jsPath':
@@ -18,7 +18,7 @@ const allProjects = {
     McTOP: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/'
+                return 'https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/'
             case 'pageURL':
                 return 'https://mctop.su/servers/' + project.id + '/'
             case 'jsPath':
