@@ -494,9 +494,13 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
             project.timeout = document.getElementById('time').valueAsNumber
         } else {
             project.timeoutHour = Number(document.getElementById('hour').value.split(':')[0])
+            if (Number.isNaN(project.timeoutHour)) project.timeoutHour = 0
             project.timeoutMinute = Number(document.getElementById('hour').value.split(':')[1])
+            if (Number.isNaN(project.timeoutMinute)) project.timeoutMinute = 0
             project.timeoutSecond = Number(document.getElementById('hour').value.split(':')[2])
+            if (Number.isNaN(project.timeoutSecond)) project.timeoutSecond = 0
             project.timeoutMS = Number(document.getElementById('hour').value.split('.')[1])
+            if (Number.isNaN(project.timeoutMS)) project.timeoutMS = 0
         }
     }
     if (document.getElementById('lastDayMonth').checked) {
@@ -1201,7 +1205,6 @@ async function fastAdd() {
         toggleModal('addFastProject')
         const vars = getUrlVars()
         if (vars['name'] != null) document.querySelector('[data-resource="fastAdd"]').textContent = getUrlVars()['name']
-            
         const listFastAdd = document.querySelector('#addFastProject > div.content > .message')
         listFastAdd.textContent = ''
 
