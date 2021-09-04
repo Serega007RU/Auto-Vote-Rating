@@ -1524,7 +1524,7 @@ async function endVote(request, sender, project) {
 
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote)  {
             if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')/* && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) !== -1*/) {
-                if (request.later && settings.repeatAttemptLater && project.later != null) {
+                if (request.later && settings.repeatAttemptLater && project.later != null && !(project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {
                     if (project.rating === 'TopCraft' || project.rating === 'McTOP') {
                         if (request.later === 'nick_error') {
                             //None
