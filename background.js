@@ -1970,8 +1970,8 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             console.log(chrome.i18n.getMessage('proxyAuthOther', 'Windscribe'))
             callbackFn({
                 authCredentials: {
-                    'username': 'mdib1352-t94rvyq',
-                    'password': 'uem29h65n8'
+                    'username': '35jqgsi6-cmxwpa8',
+                    'password': 'fgj28zynq6'
                 }
             })
             return
@@ -1997,8 +1997,8 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             console.log(chrome.i18n.getMessage('proxyAuthOther', 'NordVPN'))
             callbackFn({
                 authCredentials: {
-                    'username': 'n2qNF1K4PBLbWWkJSTfmGEdX',
-                    'password': 'UKweV43HJP5QnWtVEaWnCChM'
+                    'username': 'HX53u8JzxjGKbNJt9Bdf5nNG',
+                    'password': 'Nwn98baQJZ8q5GTjz59szaJ4'
                 }
             })
             return

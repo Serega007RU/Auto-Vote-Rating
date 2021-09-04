@@ -1721,15 +1721,15 @@ document.getElementById('importWindscribe').addEventListener('click', async even
     }
     createNotif(chrome.i18n.getMessage('importVPNStart', 'Windscribe'))
     let i = 0
-    while (i < 1) {
+    while (i < 2) {
         i++
         try {
             let response
             if (i === 1) {
                 response = await fetch('https://assets.windscribe.com/serverlist/openvpn/0/ef53494bc440751713a7ad93e939aa190cee7458')
-            }/* else if (false) {//Для Pro аккаунта
+            } else if (i === 2) {//Для Pro аккаунта
                 response = await fetch('https://assets.windscribe.com/serverlist/openvpn/1/ef53494bc440751713a7ad93e939aa190cee7458')
-            }*/
+            }
             if (!response.ok) {
                 createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
                 event.target.classList.remove('disabled')
