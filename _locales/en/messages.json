@@ -715,6 +715,9 @@
   "importNordVPN": {
     "message": "Import proxies from NordVPN"
   },
+  "importSurfShark": {
+    "message": "Import proxies from SurfShark"
+  },
   "importVPNStart": {
     "message": "Importing from $vpn$",
     "placeholders": {

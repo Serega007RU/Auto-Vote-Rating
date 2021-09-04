@@ -2002,6 +2002,15 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 }
             })
             return
+        } else if (currentProxy.SurfShark) {
+            console.log(chrome.i18n.getMessage('proxyAuthOther', 'SurfShark'))
+            callbackFn({
+                authCredentials: {
+                    'username': 'WZUGAQF4Qd6CP4qD99EnkZNG',
+                    'password': 'ZMqnjVeKPzPphEMn3uwKgtmr'
+                }
+            })
+            return
         } else {
             currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword')
             console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword'))

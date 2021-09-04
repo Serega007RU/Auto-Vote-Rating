@@ -675,6 +675,9 @@
   "importNordVPN": {
     "message": "Импорт прокси с NordVPN"
   },
+  "importSurfShark": {
+    "message": "Импорт прокси с SurfShark"
+  },
   "importVPNStart": {
     "message": "Начинаю импорт с $vpn$",
     "placeholders": {

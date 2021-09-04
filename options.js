@@ -1921,6 +1921,57 @@ document.getElementById('importZenMate').addEventListener('click', async event =
 })
 
 //Слушатель на импорт с NordVPN
+document.getElementById('importSurfShark').addEventListener('click', async event => {
+    if (event.target.classList.contains('disabled')) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        event.target.classList.add('disabled')
+    }
+    createNotif(chrome.i18n.getMessage('importVPNStart', 'SurfShark'))
+    try {
+        let response = await fetch('https://api.surfshark.com/v4/server/clusters/all')
+        let vpns = await response.json()
+        vpns.sort(() => Math.random() - 0.5)
+        const tx = db.transaction('proxies', 'readwrite')
+        for (const vpn of vpns) {
+            const proxy = {
+                ip: vpn.connectionName,
+                port: 443,
+                scheme: 'https',
+                SurfShark: true
+            }
+            const found = await tx.store.index('ip, port').count([proxy.ip, proxy.port])
+            if (found === 0) {
+                proxy.key = await tx.store.add(proxy)
+                await tx.store.put(proxy, proxy.key)
+            }
+            if (vpn.transitCluster) {
+                const proxy2 = {
+                    ip: vpn.transitCluster.connectionName,
+                    port: 443,
+                    scheme: 'https',
+                    SurfShark: true
+                }
+                const found2 = await tx.store.index('ip, port').count([proxy2.ip, proxy2.port])
+                if (found2 === 0) {
+                    proxy2.key = await tx.store.add(proxy2)
+                    await tx.store.put(proxy2, proxy2.key)
+                }
+            }
+        }
+        reloadProxiesList()
+    } catch (e) {
+        createNotif(e, 'error')
+        console.error(e)
+        event.target.classList.remove('disabled')
+        return
+    }
+    createNotif(chrome.i18n.getMessage('importVPNEnd', 'SurfShark'), 'success')
+    event.target.classList.remove('disabled')
+})
+
+//Слушатель на импорт с NordVPN
 document.getElementById('importNordVPN').addEventListener('click', async event => {
     if (event.target.classList.contains('disabled')) {
         createNotif(chrome.i18n.getMessage('notFast'), 'warn')
