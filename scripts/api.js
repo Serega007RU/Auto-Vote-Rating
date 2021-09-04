@@ -104,9 +104,9 @@ function run() {
                 window.onmessage = function(e) {
                     if (e.data === 'vote') {
                         e.source.postMessage('startedVote', '*')
-                        vote(false)
+                        startVote(false)
                     } else if (e.data === 'voteReady') {
-                        vote(true)
+                        startVote(true)
                     } else if (e.data === 'reloadCaptcha') {
                         document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
                     }
@@ -143,12 +143,10 @@ function run() {
                     document.documentElement.appendChild(script)
                     // script.remove()
                     // document.addEventListener('DOMContentLoaded', ()=>{
-                    //     vote(true)
+                    //     startVote(true)
                     // })
-                } else if (typeof vote !== 'undefined') {
-                    vote(true)
                 } else {
-                    console.warn('А где функция vote(true)?')
+                    startVote(true)
                 }
             }
         }
@@ -166,6 +164,15 @@ function run() {
             })
         }
     })
+}
+
+async function startVote(first) {
+    const timer3 = setInterval(()=>{
+        if (typeof vote === 'function') {
+            vote(first)
+            clearInterval(timer3)
+        }
+    }, 100)
 }
 
 async function getProject() {

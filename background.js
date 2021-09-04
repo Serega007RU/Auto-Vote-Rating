@@ -1197,12 +1197,8 @@ async function removeCookie(url, name) {
     })
 }
 
-async function wait(ms) {
-    return new Promise(resolve=>{
-        setTimeout(()=>{
-            resolve()
-        }, ms)
-    })
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function updateValue(objStore, value) {
