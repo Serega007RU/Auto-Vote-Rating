@@ -751,7 +751,7 @@ async function initializeConfig(background/*, version*/) {
                     disabledCheckTime: false,
                     disabledCheckInternet: false,
                     enableCustom: false,
-                    proxyBlackList: ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"],
+                    proxyBlackList: ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"],
                     stopVote: 0,
                     autoAuthVK: false,
                     clearVKCookies: true,
@@ -779,7 +779,7 @@ async function initializeConfig(background/*, version*/) {
                 const other = transaction.objectStore('other')
                 other.get('settings').onsuccess = (event)=> {
                     const settings = event.target.result
-                    settings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"]
+                    settings.proxyBlackList = ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"]
                     settings.stopVote = 0
                     settings.autoAuthVK = false
                     settings.clearVKCookies = true

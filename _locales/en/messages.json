@@ -1111,7 +1111,7 @@
     }
   },
   "useProxyOnUnProxyTop": {
-    "message": "Use a proxy on ratings where no proxy is used (TopCraft, McTOP and MinecraftRating)"
+    "message": "Use a proxy on ratings where no proxy is used (MinecraftRating)"
   },
   "reAddSuccess": {
     "message": "Successfully re-added"

@@ -148,13 +148,13 @@ async function checkOpen(project) {
 
         if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && !settings.useProxyOnUnProxyTop) {
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
-            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') {
+            if (project.rating === 'MinecraftRating') {
                 if (value.rating !== 'TopCraft' && value.rating !== 'McTOP' && value.rating !== 'MinecraftRating' && value.useMultiVote !== false) {
                     return
                 }
             }
-            if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MinecraftRating') {
-                if (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating' && value.useMultiVote !== false) {
+            if (value.rating === 'MinecraftRating') {
+                if (project.rating !== 'MinecraftRating' && value.useMultiVote !== false) {
                     //Если безпроксиевый рейтинг закончил голосование, позволяет проксиевым начать голосовать ради экономии времени
                     if (value.time < Date.now()) {
                         return
@@ -182,7 +182,7 @@ async function checkOpen(project) {
             }
         }
         if (currentProxy != null) {
-            if (!settings.useProxyOnUnProxyTop && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {
+            if (!settings.useProxyOnUnProxyTop && (project.rating === 'MinecraftRating')) {
                 return
             }
             if (currentProxy[project.rating]?.[project.id] > Date.now()) {
@@ -268,7 +268,7 @@ async function checkOpen(project) {
             }
         }
 
-        if (currentProxy == null && (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))) {
+        if (currentProxy == null && (settings.useProxyOnUnProxyTop || (project.rating !== 'MinecraftRating'))) {
             let proxyDetails = await new Promise(resolve => {
                 chrome.proxy.settings.get({}, async function(details) {
                     resolve(details)
@@ -1438,11 +1438,11 @@ async function endVote(request, sender, project) {
                 }
             }
 
-            if (currentProxy != null && (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) /*&& proxies.findIndex(function(element) { return element.ip === currentProxy.ip && element.port === currentProxy.port}) !== -1*/) {
+            if (currentProxy != null && (settings.useProxyOnUnProxyTop || (project.rating !== 'MinecraftRating')) /*&& proxies.findIndex(function(element) { return element.ip === currentProxy.ip && element.port === currentProxy.port}) !== -1*/) {
                 if (!currentProxy[project.rating] || Array.isArray(currentProxy[project.rating])) currentProxy[project.rating] = {}
                 currentProxy[project.rating][project.id] = time
                 await updateValue('proxies', currentProxy)
-            } else if (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating')) {
+            } else if (settings.useProxyOnUnProxyTop || (project.rating !== 'MinecraftRating')) {
                 console.warn('currentProxy is null or not found')
             }
         } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating') && !project.priority && project.timeoutHour == null) {
@@ -1465,7 +1465,7 @@ async function endVote(request, sender, project) {
             generalStats.lastSuccessVote = Date.now()
             delete project.later
         } else {
-            if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && settings.repeatAttemptLater && project.later && !(project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
+            if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && settings.repeatAttemptLater && project.later && !(project.rating === 'MinecraftRating')) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
                 if (project.later < 15) {
                     project.time = null
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
@@ -1607,7 +1607,7 @@ async function endVote(request, sender, project) {
                             }
                             if (settings.useProxyOnUnProxyTop) {
                                 countProxy++
-                            } else if (value.rating !== 'TopCraft' || value.rating !== 'McTOP' || value.rating !== 'MinecraftRating') {
+                            } else if (value.rating !== 'MinecraftRating') {
                                 countProxy++
                             }
                         }
@@ -2028,7 +2028,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                 await tx.objectStore('borealis').put(acc, acc.key)
             }
             if (oldSettings.useMultiVote == null) {
-                oldSettings.proxyBlackList = ["*vk.com", "*topcraft.ru", "*mctop.su", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"]
+                oldSettings.proxyBlackList = ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"]
                 oldSettings.stopVote = 0
                 oldSettings.autoAuthVK = false
                 oldSettings.clearVKCookies = true

@@ -1069,7 +1069,7 @@
     }
   },
   "useProxyOnUnProxyTop": {
-    "message": "Использовать прокси на рейтингах где не используется прокси (TopCraft, McTOP и MinecraftRating)"
+    "message": "Использовать прокси на рейтингах где не используется прокси (MinecraftRating)"
   },
   "reAddSuccess": {
     "message": "Успешно передобавлен"
