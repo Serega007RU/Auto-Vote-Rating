@@ -235,56 +235,6 @@ async function newWindow(project) {
 
 async function silentVote(project) {
     try {
-        if (project.rating === 'TopCraft') {
-            let response = await _fetch('https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
-            if (!await checkResponseError(project, response, 'topcraft.ru', null, true)) return
-            let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
-            response = await _fetch('https://topcraft.ru/projects/vote/', {
-                'headers': {
-                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                },
-                'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
-                'method': 'POST'
-            }, project)
-            if (!await checkResponseError(project, response, 'topcraft.ru', [400], true)) return
-            if (response.status === 400) {
-                if (response.html === 'vk_error' || response.html === 'nick_error') {
-                    endVote({later: response.html}, null, project)
-                } else if (response.html.length > 0 && response.html.length < 500) {
-                    endVote({message: response.html}, null, project)
-                } else {
-                    endVote({errorVote: [String(response.status), response.url]}, null, project)
-                }
-                return
-            }
-            endVote({successfully: true}, null, project)
-        } else
-
-        if (project.rating === 'McTOP') {
-            let response = await _fetch('https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/?voting=' + project.id + '/', null, project)
-            if (!await checkResponseError(project, response, 'mctop.su', null, true)) return
-            let csrftoken = response.doc.querySelector('input[name="csrfmiddlewaretoken"]').value
-            response = await _fetch('https://mctop.su/projects/vote/', {
-                'headers': {
-                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                },
-                'body': 'csrfmiddlewaretoken=' + csrftoken + '&project_id=' + project.id + '&nick=' + project.nick,
-                'method': 'POST'
-            }, project)
-            if (!await checkResponseError(project, response, 'mctop.su', [400], true)) return
-            if (response.status === 400) {
-                if (response.html === 'vk_error' || response.html === 'nick_error') {
-                    endVote({later: response.html}, null, project)
-                } else if (response.html.length > 0 && response.html.length < 500) {
-                    endVote({message: response.html}, null, project)
-                } else {
-                    endVote({errorVote: [String(response.status), response.url]}, null, project)
-                }
-                return
-            }
-            endVote({successfully: true}, null, project)
-        } else
-
         if (project.rating === 'MCRate') {
             let response = await _fetch('https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code', null, project)
             if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
