@@ -34,11 +34,9 @@ const timer = setInterval(()=>{
         //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
         if (document.readyState === 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
             const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
-            if (textContent === 'Сегодня Вы уже голосовали с данного вк') {
-                chrome.runtime.sendMessage({later: 'vk_error'})
-            } else if (textContent === 'Сегодня Вы уже голосовали с этим ником') {
-                chrome.runtime.sendMessage({later: 'nick_error'})
-            } else if (textContent === 'Спасибо за Ваш голос, Вы сможете повторно проголосовать завтра.') {
+            if (textContent.includes('вы уже голосовали')) {
+                chrome.runtime.sendMessage({later: true})
+            } else if (textContent.includes('спасибо за ваш голос')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
                 chrome.runtime.sendMessage({message: textContent})
