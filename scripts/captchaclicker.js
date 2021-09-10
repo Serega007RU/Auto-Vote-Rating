@@ -92,6 +92,20 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
     }
 }
 
+const script = document.createElement('script')
+script.textContent = `
+Object.defineProperty(document, 'visibilityState', {
+    get() {
+        return 'visible'
+    }
+})
+Object.defineProperty(document, 'hidden', {
+    get() {
+        return false
+    }
+})
+`
+
 function isScrolledIntoView(el) {
     const rect = el.getBoundingClientRect()
     const elemTop = rect.top
