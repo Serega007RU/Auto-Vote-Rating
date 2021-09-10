@@ -19,16 +19,29 @@ async function vote(first) {
         //Авторизованы ли мы в аккаунте?
         if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
             if (vkontakte != null && vkontakte.passwordMcTOP) {
-                document.querySelector('.usr-login-lnk').click()
-                document.getElementById('id_login').value = vkontakte.id + vkontakte.numberId
-                document.getElementById('id_password').value = vkontakte.passwordMcTOP
-                document.querySelector('button[type="submit"].btn-login').click()
-                const timer1 = setInterval(()=>{
-                    if (document.querySelector('#loginForm .error') != null) {
-                        chrome.runtime.sendMessage({message: document.querySelector('#loginForm > .error').textContent})
-                        clearInterval(timer1)
-                    }
-                }, 1000)
+                // document.querySelector('.usr-login-lnk').click()
+                // document.getElementById('id_login').value = vkontakte.id + vkontakte.numberId
+                // document.getElementById('id_password').value = vkontakte.passwordMcTOP
+                // document.querySelector('button[type="submit"].btn-login').click()
+                // const timer1 = setInterval(()=>{
+                //     if (document.querySelector('#loginForm .error') != null) {
+                //         chrome.runtime.sendMessage({message: document.querySelector('#loginForm > .error').textContent})
+                //         clearInterval(timer1)
+                //     }
+                // }, 1000)
+                const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                try {
+                    await fetch('https://mctop.su/accounts/login/', {
+                        'headers': {
+                            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        },
+                        'body': 'csrfmiddlewaretoken=' + csrftoken + '&login=' + vkontakte.id + vkontakte.numberId + '&password=' + vkontakte.passwordMcTOP,
+                        'method': 'POST'
+                    })
+                } catch (e) {
+
+                }
+                document.location.reload()
                 return
             }
             document.querySelector('button[data-type=vote]').click()
