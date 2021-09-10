@@ -59,7 +59,7 @@ const timer = setInterval(()=>{
     try {
         //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
         if (document.readyState === 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
-            const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent
+            const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent.toLowerCase()
             if (textContent.includes('вы уже голосовали')) {
                 chrome.runtime.sendMessage({later: true})
             } else if (textContent.includes('спасибо за ваш голос')) {
