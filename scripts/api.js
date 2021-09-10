@@ -53,6 +53,20 @@ function run() {
             }
             chrome.runtime.sendMessage({errorAuthVK: text})
         } else {
+            const script = document.createElement('script')
+            script.textContent = `
+            Object.defineProperty(document, 'visibilityState', {
+                get() {
+                    return 'visible'
+                }
+            })
+            Object.defineProperty(document, 'hidden', {
+                get() {
+                    return false
+                }
+            })
+            `
+
             let check = true
             //Если мы находимся на странице проверки CloudFlare
             if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
