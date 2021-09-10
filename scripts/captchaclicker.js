@@ -105,6 +105,7 @@ Object.defineProperty(document, 'hidden', {
     }
 })
 `
+document.head.appendChild(script)
 
 function isScrolledIntoView(el) {
     const rect = el.getBoundingClientRect()
