@@ -76,6 +76,7 @@ function run() {
                 }
             })
             `
+            document.head.appendChild(script)
 
             let check = true
             //Если мы находимся на странице проверки CloudFlare
