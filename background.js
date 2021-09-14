@@ -226,9 +226,13 @@ async function newWindow(project) {
         
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url, active: false}, function(tab_) {
+                if (chrome.runtime.lastError) {
+                    endVote({message: chrome.runtime.lastError.message}, null, project)
+                }
                 resolve(tab_)
             })
         })
+        if (tab == null) return
         openedProjects.set(tab.id, project)
     }
 }
