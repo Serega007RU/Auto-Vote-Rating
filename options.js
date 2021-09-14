@@ -1404,8 +1404,8 @@ document.querySelectorAll('.tablinks').forEach((item)=> {
         let genStats = document.querySelector('#generalStats')
         let todStats = document.querySelector('#todayStats')
         if (item.getAttribute('data-tab') === 'added') {
-            genStats.style.visibility = 'visible'
-            todStats.style.visibility = 'visible'
+            genStats.style.display = 'block'
+            todStats.style.display = 'block'
         } else {
             genStats.removeAttribute('style')
             todStats.removeAttribute('style')

@@ -218,6 +218,11 @@ nav .logo img {
 	height: 365px;
 }
 
+
+#modals .modal#statsToday {
+	height: 215px;
+}
+
 #modals .modal#stats {
 	height: 300px;
 }
@@ -284,6 +289,7 @@ nav .logo img {
 	max-height: 240px;
 }
 
+#modals .modal#statsToday .content .message,
 #modals .modal#stats .content .message {
 	margin-top: 5px;
 }
@@ -495,14 +501,31 @@ nav .logo img {
 }
 
 .bottomLabel {
-	display: flex;
-	justify-content: space-between;
+	align-items: flex-end;
+    display: grid;
+    grid-row-gap: 20px;
+    grid-column-gap: 100px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 }
 
 @media(max-width: 1250px) {
+	#donate {
+	    grid-column-start: 2;
+	}
+
+	#versionLabel {
+		display: none;
+	}
+
     .container {
     	width: 800px;
     }
+}
+
+@media(max-width: 543px) {
+	#donate {
+	    grid-column-start: 1;
+	}
 }
 
 @media(max-width: 950px) {
@@ -587,13 +610,22 @@ nav .logo img {
 	margin: 10px 0;
 }
 
+#todayStats,
 #generalStats {
-	visibility: hidden;
-	display: block;
+	text-align: center;
+	opacity: .9;
+    background: #1a7bee;
+	cursor: pointer;
+	color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+	display: none;
+	transition: .2s opacity;
 }
-#todayStats {
-	visibility: hidden;
-	display: block;
+
+#todayStats:hover,
+#generalStats:hover {
+	opacity: 1;
 }
 
 #authvk {
@@ -613,6 +645,7 @@ nav .logo img {
 }
 
 .link {
+	outline: none !important;
 	text-decoration: underline;
 	cursor: pointer;
 	color: #275daf !important;
