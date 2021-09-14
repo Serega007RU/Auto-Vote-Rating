@@ -686,6 +686,9 @@ var settings
 //Общая статистика
 // noinspection ES6ConvertVarToLetConst
 var generalStats
+//Статистика за сегодня
+// noinspection ES6ConvertVarToLetConst
+var todayStats
 //Оновная база данных
 let db
 //База данных логов
@@ -740,7 +743,15 @@ async function initializeConfig(background, version) {
                     lastAttemptVote: null,
                     added: Date.now()
                 }
+                todayStats = {
+                    successVotes: 0,
+                    errorVotes: 0,
+                    laterVotes: 0,
+                    lastSuccessVote: null,
+                    lastAttemptVote: null
+                }
                 other.add(generalStats, 'generalStats')
+                other.add(todayStats, 'todayStats')
             }
         })
     } catch (error) {
@@ -769,6 +780,17 @@ async function initializeConfig(background, version) {
     }
     settings = await db.get('other', 'settings')
     generalStats = await db.get('other', 'generalStats')
+    todayStats = await db.get('other', 'todayStats')
+    if (!todayStats) {
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+        await db.put('other', todayStats, 'todayStats')
+    }
 
     if (!background) return
     console.log(chrome.i18n.getMessage('start'))

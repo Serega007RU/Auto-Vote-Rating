@@ -172,7 +172,19 @@ async function newWindow(project) {
         generalStats.monthSuccessVotes = 0
     }
     generalStats.lastAttemptVote = Date.now()
+
+    if (new Date(todayStats.lastAttemptVote).getDay() < new Date().getDay()) {
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+    }
+    todayStats.lastAttemptVote = Date.now()
     await db.put('other', generalStats, 'generalStats')
+    await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
     let create = true
@@ -1004,6 +1016,8 @@ async function endVote(request, sender, project) {
             generalStats.successVotes++
             generalStats.monthSuccessVotes++
             generalStats.lastSuccessVote = Date.now()
+            todayStats.successVotes++
+            todayStats.lastSuccessVote = Date.now()
         } else {
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
 //          if (typeof request.later == 'string') sendMessage = sendMessage + ' ' + request.later
@@ -1012,6 +1026,7 @@ async function endVote(request, sender, project) {
             project.stats.laterVotes++
 
             generalStats.laterVotes++
+            todayStats.laterVotes++
         }
         console.log(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
         //Если ошибка
@@ -1046,9 +1061,11 @@ async function endVote(request, sender, project) {
         project.stats.errorVotes++
 
         generalStats.errorVotes++
+        todayStats.errorVotes++
     }
     
     await db.put('other', generalStats, 'generalStats')
+    await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
     await new Promise(resolve => chrome.alarms.clear(String(project.key), resolve))
@@ -1232,6 +1249,13 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         const oldSettings = await getValue('AVMRsettings')
         if (oldSettings != null) {
             const oldGeneralStats = await getValue('generalStats')
+            todayStats = {
+                successVotes: 0,
+                errorVotes: 0,
+                laterVotes: 0,
+                lastSuccessVote: null,
+                lastAttemptVote: null
+            }
 
             console.log(chrome.i18n.getMessage('oldSettings'))
             const projects = []
@@ -1277,6 +1301,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
             settings = oldSettings
             await tx.objectStore('other').put(oldSettings, 'settings')
             await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
+            await tx.objectStore('other').put(todayStats, 'todayStats')
             for (const item of Object.keys(allProjects)) {
                 await removeValue('AVMRprojects' + item)
             }

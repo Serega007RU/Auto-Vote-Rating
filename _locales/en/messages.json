@@ -690,6 +690,9 @@
   "generalStats": {
     "message": "General stats"
   },
+  "todayStats": {
+    "message": "Statistics for today"
+  },
   "selectTime": {
     "message": "Choose what timeout to use"
   },

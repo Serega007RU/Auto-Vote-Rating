@@ -591,6 +591,10 @@ nav .logo img {
 	visibility: hidden;
 	display: block;
 }
+#todayStats {
+	visibility: hidden;
+	display: block;
+}
 
 #authvk {
 	padding: 0 8px;
