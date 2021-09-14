@@ -17,7 +17,7 @@
             <div class="logo">
                 <img src="images/logo.png">
                 <div>A.V.R.</div>
-                <div>MultiVote</div>
+                <div id="versionLabel">MultiVote</div>
             </div>
             <div class="navigation">
                 <button class="tablinks active" id="addTab" data-tab="append">
@@ -950,7 +950,8 @@
             </div>
             <!-- Ассеты -->
             <div class="bottomLabel">
-                <a id="generalStats" data-resource="generalStats" class="link"></a>
+                <a id="generalStats" data-resource="generalStats"></a>
+                <a id="todayStats" data-resource="todayStats"></a>
                 <a class="link" id="donate" data-resource="supportDev" target="blank_" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
             </div>
         </div>
@@ -1578,6 +1579,44 @@
                                     <td data-resource="statsAdded"></td>
                                     <th></th>
                                 </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Сегодняшняя статистика -->
+            <div class="modal" id="statsToday">
+                <div class="head">
+                    <div class="title">
+                        <h3 data-resource="stats2"></h3>
+                        <div class="statsSubtitle" data-resource="todayStats"></div>
+                    </div>
+                    <div class="close"></div>
+                </div>
+                <div class="content">
+                    <div class="message">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td data-resource="statsSuccessVotes"></td>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td data-resource="statsLaterVotes"></td>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td data-resource="statsErrorVotes"></td>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td data-resource="statsLastSuccessVote"></td>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <td data-resource="statsLastAttemptVote"></td>
+                                <th></th>
+                            </tr>
                             </tbody>
                         </table>
                     </div>

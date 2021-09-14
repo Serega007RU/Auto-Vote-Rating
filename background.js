@@ -582,7 +582,19 @@ async function newWindow(project) {
         generalStats.monthSuccessVotes = 0
     }
     generalStats.lastAttemptVote = Date.now()
+
+    if (new Date(todayStats.lastAttemptVote).getDay() < new Date().getDay()) {
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+    }
+    todayStats.lastAttemptVote = Date.now()
     await db.put('other', generalStats, 'generalStats')
+    await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
     let create = true
@@ -637,9 +649,13 @@ async function newWindow(project) {
         
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url, active: false}, function(tab_) {
+                if (chrome.runtime.lastError) {
+                    endVote({message: chrome.runtime.lastError.message}, null, project)
+                }
                 resolve(tab_)
             })
         })
+        if (tab == null) return
         openedProjects.set(tab.id, project)
     }
 }
@@ -1463,6 +1479,8 @@ async function endVote(request, sender, project) {
             generalStats.successVotes++
             generalStats.monthSuccessVotes++
             generalStats.lastSuccessVote = Date.now()
+            todayStats.successVotes++
+            todayStats.lastSuccessVote = Date.now()
             delete project.later
         } else {
             if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && settings.repeatAttemptLater && project.later && !(project.rating === 'MinecraftRating')) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
@@ -1481,6 +1499,7 @@ async function endVote(request, sender, project) {
             project.stats.laterVotes++
 
             generalStats.laterVotes++
+            todayStats.laterVotes++
         }
         console.log(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
         //Если ошибка
@@ -1560,9 +1579,11 @@ async function endVote(request, sender, project) {
         project.stats.errorVotes++
 
         generalStats.errorVotes++
+        todayStats.errorVotes++
     }
     
     await db.put('other', generalStats, 'generalStats')
+    await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
     await new Promise(resolve => chrome.alarms.clear(String(project.key), resolve))
@@ -1961,6 +1982,13 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         const oldSettings = await getValue('AVMRsettings')
         if (oldSettings != null) {
             const oldGeneralStats = await getValue('generalStats')
+            todayStats = {
+                successVotes: 0,
+                errorVotes: 0,
+                laterVotes: 0,
+                lastSuccessVote: null,
+                lastAttemptVote: null
+            }
 
             console.log(chrome.i18n.getMessage('oldSettings'))
             const projects = []
@@ -2043,6 +2071,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
             settings = oldSettings
             await tx.objectStore('other').put(oldSettings, 'settings')
             await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
+            await tx.objectStore('other').put(todayStats, 'todayStats')
             for (const item of Object.keys(allProjects)) {
                 await removeValue('AVMRprojects' + item)
             }

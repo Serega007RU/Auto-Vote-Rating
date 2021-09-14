@@ -9,7 +9,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://topcraft.ru/servers/' + project.id + '/'
             case 'jsPath':
-                return '#project-about > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
+                return 'table.project-info-table a'
             case 'exampleURL':
                 return ['https://topcraft.ru/servers/', '10496', '/']
             case 'URL':
@@ -24,7 +24,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://mctop.su/servers/' + project.id + '/'
             case 'jsPath':
-                return '#project-about > div.row > div:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2) > a'
+                return 'table.project-info-table a'
             case 'exampleURL':
                 return ['https://mctop.su/servers/', '5231', '/']
             case 'URL':
@@ -66,7 +66,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://monitoringminecraft.ru/top/' + project.id + '/'
             case 'jsPath':
-                return '#page > div.box.visible.main > div.left > table > tbody > tr:nth-child(1) > td.wid > noindex > a'
+                return 'table.info a'
             case 'exampleURL':
                 return ['https://monitoringminecraft.ru/top/', 'gg', '/vote']
             case 'URL':
@@ -76,11 +76,10 @@ const allProjects = {
     IonMc: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://ionmc.top/projects/' + project.id + '/vote'
             case 'pageURL':
                 return 'https://ionmc.top/projects/' + project.id + '/vote'
             case 'jsPath':
-                return '#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.mx-2.-mt-1.mb-1.sm\\:mx-5.sm\\:my-2 > ul > li:nth-child(2) > a'
+                return 'div > ul > li:nth-child(2) > a'
             case 'exampleURL':
                 return ['https://ionmc.top/projects/', '80', '/vote']
             case 'URL':
@@ -94,7 +93,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://minecraftservers.org/server/' + project.id
             case 'jsPath':
-                return '#left > div > h1'
+                return '#left h1'
             case 'exampleURL':
                 return ['https://minecraftservers.org/vote/', '25531', '']
             case 'URL':
@@ -111,7 +110,7 @@ const allProjects = {
                     return 'https://serveur-prive.net/' + project.game + '/' + project.id + '/vote'
                 }
             case 'jsPath':
-                return '#t > div > div > h2'
+                return '#t h2'
             case 'exampleURL':
                 return ['https://serveur-prive.net/minecraft/', 'gommehd-net-4932', '/vote']
             case 'URL':
@@ -167,7 +166,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://minecraft-server-list.com/server/' + project.id + '/'
             case 'jsPath':
-                return '#site-wrapper > section > div.hfeed > span > div.serverdatadiv > table > tbody > tr:nth-child(5) > td > a'
+                return 'div.serverdatadiv a[rel="nofollow noopener noreferrer"]'
             case 'exampleURL':
                 return ['https://minecraft-server-list.com/server/', '292028', '/vote/']
             case 'URL':
@@ -181,7 +180,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://www.serverpact.com/vote-' + project.id
             case 'jsPath':
-                return 'body > div.container.sp-o > div.row > div.col-md-9 > div.row > div:nth-child(2) > div > div.panel-body > table > tbody > tr:nth-child(6) > td:nth-child(2) > a'
+                return 'div.panel table a'
             case 'exampleURL':
                 return ['https://www.serverpact.com/vote-', '26492123', '']
             case 'URL':
@@ -209,7 +208,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://topminecraftservers.org/server/' + project.id
             case 'jsPath':
-                return 'body > div.container > div > div > div > div.col-md-8 > h1'
+                return 'h1[property="name"]'
             case 'exampleURL':
                 return ['https://topminecraftservers.org/vote/', '9126', '']
             case 'URL':
@@ -219,11 +218,10 @@ const allProjects = {
     MinecraftServersBiz: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://minecraftservers.biz/' + project.id + '/'
             case 'pageURL':
                 return 'https://minecraftservers.biz/' + project.id + '/'
             case 'jsPath':
-                return 'table[class="table table-hover table-striped"] > tbody > tr:nth-child(4) > td:nth-child(2)'
+                return 'div.panel table tr:nth-child(4)'
             case 'exampleURL':
                 return ['https://minecraftservers.biz/', 'servers/145999', '/']
             case 'URL':
@@ -277,7 +275,7 @@ const allProjects = {
                     return 'https://' + project.lang + '.top-games.net/' + project.game + '/' + project.id
                 }
             case 'jsPath':
-                return 'body > div.game-jumbotron > div > div > h1'
+                return 'div.top-description h1'
             case 'exampleURL':
                 return ['https://top-serveurs.net/minecraft/', 'icesword-pvpfaction-depuis-2014-crack-on', '']
             case 'URL':
@@ -287,7 +285,6 @@ const allProjects = {
     TMonitoring: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://tmonitoring.com/server/' + project.id + '/'
             case 'pageURL':
                 return 'https://tmonitoring.com/server/' + project.id + '/'
             case 'jsPath':
@@ -383,7 +380,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://minecraftlist.org/server/' + project.id
             case 'jsPath':
-                return 'h1'
+                return '#main-content h1'
             case 'exampleURL':
                 return ['https://minecraftlist.org/vote/', '11227', '']
             case 'URL':
@@ -435,7 +432,6 @@ const allProjects = {
     CraftList: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://craftlist.org/' + project.id
             case 'pageURL':
                 return 'https://craftlist.org/' + project.id
             case 'jsPath':
@@ -463,7 +459,6 @@ const allProjects = {
     PixelmonServers: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://pixelmonservers.com/server/' + project.id + '/vote'
             case 'pageURL':
                 return 'https://pixelmonservers.com/server/' + project.id + '/vote'
             case 'jsPath':
@@ -477,7 +472,6 @@ const allProjects = {
     QTop: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'http://q-top.ru/vote' + project.id
             case 'pageURL':
                 return 'http://q-top.ru/vote' + project.id
             case 'jsPath':
@@ -505,7 +499,6 @@ const allProjects = {
     MinecraftServery: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://minecraftservery.eu/server/' + project.id
             case 'pageURL':
                 return 'https://minecraftservery.eu/server/' + project.id
             case 'jsPath':
@@ -519,7 +512,6 @@ const allProjects = {
     RPGParadize: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id
             case 'pageURL':
                 return 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id
             case 'jsPath':
@@ -533,7 +525,6 @@ const allProjects = {
     MinecraftServerListNet: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://www.minecraft-serverlist.net/vote/' + project.id
             case 'pageURL':
                 return 'https://www.minecraft-serverlist.net/vote/' + project.id
             case 'jsPath':
@@ -561,7 +552,6 @@ const allProjects = {
     MinecraftKrant: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://www.minecraftkrant.nl/serverlijst/' + project.id
             case 'pageURL':
                 return 'https://www.minecraftkrant.nl/serverlijst/' + project.id
             case 'jsPath':
@@ -575,7 +565,6 @@ const allProjects = {
     TrackyServer: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://www.trackyserver.com/server/' + project.id
             case 'pageURL':
                 return 'https://www.trackyserver.com/server/' + project.id
             case 'jsPath':
@@ -589,7 +578,6 @@ const allProjects = {
     MCListsOrg: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://mc-lists.org/' + project.id + '/vote'
             case 'pageURL':
                 return 'https://mc-lists.org/' + project.id + '/vote'
             case 'jsPath':
@@ -617,7 +605,6 @@ const allProjects = {
     BestServersCom: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://bestservers.com/server/' + project.id + '/vote'
             case 'pageURL':
                 return 'https://bestservers.com/server/' + project.id + '/vote'
             case 'jsPath':
@@ -659,7 +646,6 @@ const allProjects = {
     ServerListe: (type, project) => {
         switch (type) {
             case 'voteURL':
-                return 'https://www.serverliste.net/vote/' + project.id
             case 'pageURL':
                 return 'https://www.serverliste.net/vote/' + project.id
             case 'jsPath':
@@ -702,6 +688,9 @@ var settings
 //Общая статистика
 // noinspection ES6ConvertVarToLetConst
 var generalStats
+//Статистика за сегодня
+// noinspection ES6ConvertVarToLetConst
+var todayStats
 //Оновная база данных
 let db
 //База данных логов
@@ -774,7 +763,15 @@ async function initializeConfig(background/*, version*/) {
                     lastAttemptVote: null,
                     added: Date.now()
                 }
+                todayStats = {
+                    successVotes: 0,
+                    errorVotes: 0,
+                    laterVotes: 0,
+                    lastSuccessVote: null,
+                    lastAttemptVote: null
+                }
                 other.add(generalStats, 'generalStats')
+                other.add(todayStats, 'todayStats')
             } else if (oldVersion === 1) {
                 const other = transaction.objectStore('other')
                 other.get('settings').onsuccess = (event)=> {
@@ -811,6 +808,17 @@ async function initializeConfig(background/*, version*/) {
     }
     settings = await db.get('other', 'settings')
     generalStats = await db.get('other', 'generalStats')
+    todayStats = await db.get('other', 'todayStats')
+    if (!todayStats) {
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+        await db.put('other', todayStats, 'todayStats')
+    }
 
     if (!background) return
     console.log(chrome.i18n.getMessage('start'))

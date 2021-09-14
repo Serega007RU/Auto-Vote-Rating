@@ -3036,9 +3036,11 @@ const getDomainWithoutSubdomain = url => {
 document.getElementById('file-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))
     generalStats = await db.get('other', 'generalStats')
+    todayStats = await db.get('other', 'todayStats')
     const allSetting = {
         settings,
         generalStats,
+        todayStats,
         version: db.version
     }
     allSetting.projects = await db.getAll('projects')
@@ -3196,12 +3198,15 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         data.settings.stopVote = Number.POSITIVE_INFINITY
         await tx.objectStore('other').put(data.settings, 'settings')
         await tx.objectStore('other').put(data.generalStats, 'generalStats')
+        await tx.objectStore('other').put(data.todayStats, 'todayStats')
 
         settings = data.settings
         generalStats = data.generalStats
+        todayStats = data.todayStats
         if (chrome.extension.getBackgroundPage()) {
             chrome.extension.getBackgroundPage().settings = settings
             chrome.extension.getBackgroundPage().generalStats = generalStats
+            chrome.extension.getBackgroundPage().todayStats = todayStats
             chrome.extension.getBackgroundPage().reloadAllAlarms()
             chrome.extension.getBackgroundPage().checkVote()
         }
@@ -3504,9 +3509,15 @@ document.querySelectorAll('.tablinks').forEach((item)=> {
         })
 
         let genStats = document.querySelector('#generalStats')
-        if (item.getAttribute('data-tab') === 'added') genStats.style.visibility = 'visible'
-        else genStats.removeAttribute('style')
- 
+        let todStats = document.querySelector('#todayStats')
+        if (item.getAttribute('data-tab') === 'added') {
+            genStats.style.display = 'block'
+            todStats.style.display = 'block'
+        } else {
+            genStats.removeAttribute('style')
+            todStats.removeAttribute('style')
+        }
+
         item.classList.add('active')
         document.getElementById(item.getAttribute('data-tab')).style.display = 'block'
     })
@@ -3589,10 +3600,14 @@ function resetModalStats() {
 
 //Слушатель общей статистики и вывод её в модалку
 document.getElementById('generalStats').addEventListener('click', async()=> {
-    // document.getElementById('modalStats').click()
-    toggleModal('stats')
-    document.querySelector('.statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
     generalStats = await db.get('other', 'generalStats')
+    if (new Date(generalStats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(generalStats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
+        generalStats.lastMonthSuccessVotes = generalStats.monthSuccessVotes
+        generalStats.monthSuccessVotes = 0
+    }
+    toggleModal('stats')
+    await db.put('other', generalStats, 'generalStats')
+    document.querySelector('.statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = generalStats.successVotes
     document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.monthSuccessVotes
     document.querySelector('td[data-resource="statsLastMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.lastMonthSuccessVotes
@@ -3602,6 +3617,27 @@ document.getElementById('generalStats').addEventListener('click', async()=> {
     document.querySelector('td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = generalStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
     document.querySelector('td[data-resource="statsAdded"]').textContent = chrome.i18n.getMessage('statsInstalled')
     document.querySelector('td[data-resource="statsAdded"]').nextElementSibling.textContent = generalStats.added ? new Date(generalStats.added).toLocaleString().replace(',', '') : 'None'
+})
+
+//Слушатель сегодняшней статистики и вывод её в модалку
+document.getElementById('todayStats').addEventListener('click', async()=> {
+    todayStats = await db.get('other', 'todayStats')
+    if (new Date(todayStats.lastAttemptVote).getDay() < new Date().getDay()) {
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+    }
+    toggleModal('statsToday')
+    await db.put('other', todayStats, 'todayStats')
+    document.querySelector('#statsToday td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = todayStats.successVotes
+    document.querySelector('#statsToday td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = todayStats.errorVotes
+    document.querySelector('#statsToday td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = todayStats.laterVotes
+    document.querySelector('#statsToday td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = todayStats.lastSuccessVote ? new Date(generalStats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
+    document.querySelector('#statsToday td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = todayStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
 })
 
 // document.getElementById('localStorage').addEventListener('click', async ()=>{
@@ -3988,7 +4024,7 @@ function toggleModal(modalID) {
 
 modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     const activeModal = modalsBlock.querySelector('.modal.active')
-    if (activeModal.id === 'stats' || activeModal.id === 'info') {
+    if (activeModal.id === 'stats' || activeModal.id === 'statsToday' || activeModal.id === 'info') {
         document.querySelector('#' + activeModal.id + ' .close').click()
         return
     }
