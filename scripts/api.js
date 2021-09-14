@@ -143,7 +143,7 @@ function run() {
                     const script = document.createElement('script')
                     //Агась, дикие костыли с ожиданием загрузки jQuery и Rocket Loader (виновник всему этому Rocket Loader)
                     script.textContent = `
-                    if (!__rocketLoaderLoadProgressSimulator) {
+                    if (typeof __rocketLoaderLoadProgressSimulator === 'undefined') {
                         window.postMessage('voteReady', '*')
                     } else if (!window.jQuery) {
                         if (__rocketLoaderLoadProgressSimulator.simulatedReadyState === 'complete') {
