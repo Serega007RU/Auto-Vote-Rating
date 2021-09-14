@@ -141,12 +141,12 @@ function run() {
                 if (domain === 'mctop.su'/* || domain === 'minecraft-server-list.com'*/) {
                     //Совместимость с Rocket Loader и jQuery
                     const script = document.createElement('script')
+                    //Агась, дикие костыли с ожиданием загрузки jQuery и Rocket Loader (виновник всему этому Rocket Loader)
                     script.textContent = `
-                    //console.log('window.jQuery', window.jQuery)
-                    if (!window.jQuery) {
-                        //console.log('$.isReady', $?.isReady)
+                    if (!__rocketLoaderLoadProgressSimulator) {
+                        window.postMessage('voteReady', '*')
+                    } else if (!window.jQuery) {
                         document.addEventListener('DOMContentLoaded', ()=>{
-                            //console.log('$.isReady2', $.isReady)
                             if (!$.isReady) {
                                 $(document).ready(function() {
                                     window.postMessage('voteReady', '*')

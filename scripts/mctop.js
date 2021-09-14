@@ -7,6 +7,17 @@ if (typeof loaded2 === 'undefined') {
 
 async function vote(first) {
     try {
+        if (document.getElementById('summary') != null) {
+            if (document.getElementById('summary').textContent.includes('Ошибка проверки CSRF')) {
+                //Костыль костыля, перезагружаем страницу в случае возникновения Ошибки проверки CSRF (данная ошибка выскакивает после прохождения проверки CloudFlare)
+                document.location.reload()
+                return
+            } else if (document.querySelector('#summary > h1') != null && document.querySelector('#summary > p') != null) {
+                chrome.runtime.sendMessage({message: document.getElementById('summary').textContent})
+                return
+            }
+        }
+
         if (document.querySelector('#container > h1') != null) {
             let message = document.querySelector('#container > h1').textContent
             if (document.querySelector('#container > h1').nextElementSibling != null) {
