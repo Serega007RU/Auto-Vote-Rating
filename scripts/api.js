@@ -136,15 +136,19 @@ function run() {
                     if (!__rocketLoaderLoadProgressSimulator) {
                         window.postMessage('voteReady', '*')
                     } else if (!window.jQuery) {
-                        document.addEventListener('DOMContentLoaded', ()=>{
-                            if (!$.isReady) {
-                                $(document).ready(function() {
+                        if (__rocketLoaderLoadProgressSimulator.simulatedReadyState === 'complete') {
+                            window.postMessage('voteReady', '*')
+                        } else {
+                            document.addEventListener('DOMContentLoaded', ()=>{
+                                if (window.jQuery && !$.isReady) {
+                                    $(document).ready(function() {
+                                        window.postMessage('voteReady', '*')
+                                    })
+                                } else {
                                     window.postMessage('voteReady', '*')
-                                })
-                            } else {
-                                window.postMessage('voteReady', '*')
-                            }
-                        })
+                                }
+                            })
+                        }
                     } else {
                         if (!$.isReady) {
                             $(document).ready(function() {
