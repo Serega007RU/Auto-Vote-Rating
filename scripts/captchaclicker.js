@@ -82,6 +82,9 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
         if (document.querySelector('body[class="no-selection"]') != null && document.querySelector('body[class="no-selection"]').ariaHidden == null && document.querySelector('body[class="no-selection"]').style.display === '' && document.querySelector('head > yandex-captcha-solver') == null) {
             chrome.runtime.sendMessage({captcha: true})
             clearInterval(timer6)
+        } else if (document.querySelector('head > yandex-captcha-solver') != null && document.querySelector('div[style="text-align: right; color: rgb(218, 94, 94);"]') != null) {
+            chrome.runtime.sendMessage({errorCaptcha: document.querySelector('div[style="text-align: right; color: rgb(218, 94, 94);"]').textContent})
+            clearInterval(timer5)
         }
     }, 1000)
 

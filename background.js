@@ -66,7 +66,7 @@ async function checkVote() {
 
     const projects = await db.getAll('projects')
     for (const project of projects) {
-        if (!project.time || project.time < Date.now()) {
+        if ((!project.time || project.time < Date.now()) && project.rating !== 'MCRate') {
             await checkOpen(project)
         }
     }
@@ -480,6 +480,18 @@ async function checkOpen(project) {
                 if (cookies[i].name === 'csrf_cookie_name' || cookies[i].name.startsWith('cf_') || cookies[i].name.startsWith('__cf')) continue
                 if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
+            }
+
+            let cookies2 = await new Promise(resolve=>{
+                chrome.cookies.getAll({domain: '.yandex.ru'}, function(cookies2) {
+                    resolve(cookies2)
+                })
+            })
+            if (debug) console.log('Удаляю куки ' + '.yandex.ru')
+            for (let i = 0; i < cookies2.length; i++) {
+                if (cookies2[i].name === 'csrf_cookie_name' || cookies2[i].name.startsWith('cf_') || cookies2[i].name.startsWith('__cf')) continue
+                if (cookies2[i].domain.charAt(0) === '.') cookies2[i].domain = cookies2[i].domain.substring(1, cookies2[i].domain.length)
+                await removeCookie('https://' + cookies2[i].domain + cookies2[i].path, cookies2[i].name)
             }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
