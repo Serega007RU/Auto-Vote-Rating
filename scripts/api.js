@@ -127,46 +127,41 @@ function run() {
                     }
                 }
 
-                const domain = getDomainWithoutSubdomain(document.URL)
-                if (domain === 'mctop.su'/* || domain === 'minecraft-server-list.com'*/) {
-                    //Совместимость с Rocket Loader и jQuery
-                    const script = document.createElement('script')
-                    //Агась, дикие костыли с ожиданием загрузки jQuery и Rocket Loader (виновник всему этому Rocket Loader)
-                    script.textContent = `
-                    if (typeof __rocketLoaderLoadProgressSimulator === 'undefined') {
+                //Совместимость с Rocket Loader и jQuery
+                const script = document.createElement('script')
+                //Агась, дикие костыли с ожиданием загрузки jQuery и Rocket Loader (виновник всему этому Rocket Loader)
+                script.textContent = `
+                if (typeof __rocketLoaderLoadProgressSimulator === 'undefined') {
+                    window.postMessage('voteReady', '*')
+                } else if (!window.jQuery) {
+                    if (__rocketLoaderLoadProgressSimulator.simulatedReadyState === 'complete') {
                         window.postMessage('voteReady', '*')
-                    } else if (!window.jQuery) {
-                        if (__rocketLoaderLoadProgressSimulator.simulatedReadyState === 'complete') {
-                            window.postMessage('voteReady', '*')
-                        } else {
-                            document.addEventListener('DOMContentLoaded', ()=>{
-                                if (window.jQuery && !$.isReady) {
-                                    $(document).ready(function() {
-                                        window.postMessage('voteReady', '*')
-                                    })
-                                } else {
-                                    window.postMessage('voteReady', '*')
-                                }
-                            })
-                        }
                     } else {
-                        if (!$.isReady) {
-                            $(document).ready(function() {
+                        document.addEventListener('DOMContentLoaded', ()=>{
+                            if (window.jQuery && !$.isReady) {
+                                $(document).ready(function() {
+                                    window.postMessage('voteReady', '*')
+                                })
+                            } else {
                                 window.postMessage('voteReady', '*')
-                            })
-                        } else {
-                            window.postMessage('voteReady', '*')
-                        }
+                            }
+                        })
                     }
-                    `
-                    document.documentElement.appendChild(script)
-                    // script.remove()
-                    // document.addEventListener('DOMContentLoaded', ()=>{
-                    //     startVote(true)
-                    // })
                 } else {
-                    startVote(true)
+                    if (!$.isReady) {
+                        $(document).ready(function() {
+                            window.postMessage('voteReady', '*')
+                        })
+                    } else {
+                        window.postMessage('voteReady', '*')
+                    }
                 }
+                `
+                document.documentElement.appendChild(script)
+                // script.remove()
+                // document.addEventListener('DOMContentLoaded', ()=>{
+                //     startVote(true)
+                // })
             }
         }
     } catch (e) {
@@ -218,13 +213,4 @@ function throwError(error) {
     }
 
     chrome.runtime.sendMessage({errorVoteNoElement2: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
-}
-
-function getDomainWithoutSubdomain (url) {
-    const urlParts = new URL(url).hostname.split('.')
-
-    return urlParts
-        .slice(0)
-        .slice(-(urlParts.length === 4 ? 3 : 2))
-        .join('.')
 }
