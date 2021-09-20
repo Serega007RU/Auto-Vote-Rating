@@ -1567,6 +1567,10 @@ async function endVote(request, sender, project) {
                     currentProxy.notWorking = request.errorCaptcha
                     await updateValue('proxies', currentProxy)
                     await stopVote()
+                } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && request.message === 'Григорию не нравится ваше поведение!') {
+                    currentProxy.notWorking = request.message
+                    await updateValue('proxies', currentProxy)
+                    await stopVote()
                 }
             }
         } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
