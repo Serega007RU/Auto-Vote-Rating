@@ -56,7 +56,7 @@ const timer = setInterval(()=>{
             } else if (textContent.includes('спасибо за ваш голос')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
-                chrome.runtime.sendMessage({message: textContent})
+                chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
             }
             clearInterval(timer)
         }
