@@ -63,6 +63,12 @@ async function vote(first) {
             document.querySelector('button.openVoteModal').click()
         }
         if (first) return
+
+        //Обход fingerprint
+        if (document.querySelector('input[name="v"]') != null) {
+            document.querySelector('input[name="v"]').value = makeid(32)
+        }
+
         //Вводит никнейм
         document.querySelector('input[name=nick]').value = project.nick
         document.querySelector('input[name=nick]').click()
@@ -85,7 +91,7 @@ function runVote() {
                 } else if (textContent.includes('спасибо за ваш голос')) {
                     chrome.runtime.sendMessage({successfully: true})
                 } else {
-                    chrome.runtime.sendMessage({message: textContent})
+                    chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
                 }
                 clearInterval(timer)
             }
@@ -94,4 +100,15 @@ function runVote() {
             clearInterval(timer)
         }
     }, 1000)
+}
+
+function makeid(length) {
+    let result           = ''
+    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const charactersLength = characters.length
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            charactersLength))
+    }
+    return result
 }
