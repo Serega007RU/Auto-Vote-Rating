@@ -1442,7 +1442,9 @@ async function listSelect(event, tabs) {
         let cursor = await db.transaction('projects').store.index('rating').openCursor(tabs)
         while (cursor) {
             if (!cursor.value.key) cursor.value.key = cursor.key
-            addProjectList(cursor.value)
+            //ToDo <Serega007> костыль для FireFox для решения проблемы "can't access dead object", возможно это не решение
+            const project = cursor.value
+            addProjectList(project)
             cursor = await cursor.continue()
         }
         div.remove()
