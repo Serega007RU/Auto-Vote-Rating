@@ -483,12 +483,13 @@ async function checkOpen(project) {
             }
 
             let cookies2 = await new Promise(resolve=>{
-                chrome.cookies.getAll({domain: '.yandex.ru'}, function(cookies2) {
+                chrome.cookies.getAll({}, function(cookies2) {
                     resolve(cookies2)
                 })
             })
-            if (debug) console.log('Удаляю куки ' + '.yandex.ru')
+            if (debug) console.log('Удаляю куки ' + 'yandex')
             for (let i = 0; i < cookies2.length; i++) {
+                if (!cookies2[i].domain.includes('.yandex.')) continue
                 if (cookies2[i].name === 'csrf_cookie_name' || cookies2[i].name.startsWith('cf_') || cookies2[i].name.startsWith('__cf')) continue
                 if (cookies2[i].domain.charAt(0) === '.') cookies2[i].domain = cookies2[i].domain.substring(1, cookies2[i].domain.length)
                 await removeCookie('https://' + cookies2[i].domain + cookies2[i].path, cookies2[i].name)
@@ -1567,7 +1568,7 @@ async function endVote(request, sender, project) {
                     currentProxy.notWorking = request.errorCaptcha
                     await updateValue('proxies', currentProxy)
                     await stopVote()
-                } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && request.message === 'Григорию не нравится ваше поведение!') {
+                } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && request.message.includes('Григори')) {
                     currentProxy.notWorking = request.message
                     await updateValue('proxies', currentProxy)
                     await stopVote()
