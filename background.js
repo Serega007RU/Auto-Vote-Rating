@@ -1568,7 +1568,7 @@ async function endVote(request, sender, project) {
                     currentProxy.notWorking = request.errorCaptcha
                     await updateValue('proxies', currentProxy)
                     await stopVote()
-                } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && request.message.includes('Григори')) {
+                } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && request.message && request.message.includes('Григори')) {
                     currentProxy.notWorking = request.message
                     await updateValue('proxies', currentProxy)
                     await stopVote()
