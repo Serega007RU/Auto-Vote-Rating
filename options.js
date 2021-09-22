@@ -96,7 +96,7 @@ async function addProjectList(project) {
                 chrome.alarms.create(String(project.key), {when: project.time})
             }
         } else {
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkOpen(project)
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkVote()
         }
     }
     
