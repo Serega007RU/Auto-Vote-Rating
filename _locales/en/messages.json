@@ -1349,5 +1349,8 @@
   },
   "notRegVK":{
     "message": "Registration of this account is not completed (phone number is not specified)"
+  },
+  "version": {
+    "message": "Version: "
   }
 }

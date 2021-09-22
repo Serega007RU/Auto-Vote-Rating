@@ -1519,3 +1519,7 @@ input.checkbox:disabled + label {
 #forceUpdate {
 	margin: unset;
 }
+
+.version {
+	margin-bottom: 15px !important;
+}

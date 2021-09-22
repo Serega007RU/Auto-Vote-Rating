@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', async()=>{
     }
     checkUpdateAvailable()
 
+    document.querySelector('div[data-resource="version"]').textContent+= chrome.runtime.getManifest().version
+
     fastAdd()
 
     //Для FireFox почему-то не доступно это API
@@ -351,7 +353,7 @@ async function addProjectList(project) {
                 chrome.alarms.create(String(project.key), {when: project.time})
             }
         } else {
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkOpen(project)
+            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkVote()
         }
     }
     
@@ -3559,7 +3561,9 @@ async function listSelect(event, tabs) {
             let cursor = await db.transaction('projects').store.index('rating').openCursor(tabs)
             while (cursor) {
                 if (!cursor.value.key) cursor.value.key = cursor.key
-                addProjectList(cursor.value)
+                //ToDo <Serega007> костыль для FireFox для решения проблемы "can't access dead object", возможно это не решение
+                const project = cursor.value
+                addProjectList(project)
                 cursor = await cursor.continue()
             }
         }
