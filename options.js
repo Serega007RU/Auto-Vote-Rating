@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', async()=>{
         alert(chrome.i18n.getMessage('firstInstall'))
     }
 
+    document.querySelector('div[data-resource="version"]').textContent+= chrome.runtime.getManifest().version
+
     fastAdd()
 
     //Для FireFox почему-то не доступно это API

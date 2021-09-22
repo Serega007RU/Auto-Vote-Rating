@@ -888,5 +888,8 @@
   },
   "here": {
     "message": "here"
+  },
+  "version": {
+    "message": "Version: "
   }
 }

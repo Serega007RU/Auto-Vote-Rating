@@ -1195,3 +1195,7 @@ input.checkbox:disabled + label {
      width: calc(100% - 268px);
      display: inline;
 }
+
+.version {
+	margin-bottom: 15px !important;
+}

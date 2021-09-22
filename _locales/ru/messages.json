@@ -851,5 +851,8 @@
   },
   "here": {
     "message": "тут"
+  },
+  "version": {
+    "message": "Версия: "
   }
 }
