@@ -66,7 +66,7 @@ async function checkVote() {
 
     const projects = await db.getAll('projects')
     for (const project of projects) {
-        if ((!project.time || project.time < Date.now()) && project.rating !== 'MCRate') {
+        if (!project.time || project.time < Date.now()) {
             await checkOpen(project)
         }
     }
