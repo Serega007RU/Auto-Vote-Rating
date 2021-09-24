@@ -1,14 +1,10 @@
 async function vote(first) {
-    if (first === false) return
     try {
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
         //Авторизован ли пользователь в вк?
         if (document.querySelector('a[class=vk_authorization]') != null) {
             document.querySelector('a[class=vk_authorization]').click()
         } else if (document.querySelector('input[name=login_player]') != null) {
+            if (first) return
             //Ввод ника и голосование
             const project = await getProject('MCRate')
             document.querySelector('input[name=login_player]').value = project.nick

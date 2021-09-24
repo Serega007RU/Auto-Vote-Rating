@@ -534,7 +534,7 @@ async function checkOpen(project) {
     }
 
     let retryCoolDown
-    if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) || /*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
+    if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) || /*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -631,10 +631,10 @@ async function newWindow(project) {
     if (project.rating === 'Custom') {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
+        if (!project.emulateMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
             silentVoteMode = true
         }
-    } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
+    } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
         silentVoteMode = true
     }
     if (debug) console.log('[' + project.rating + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (silentVoteMode ? ' Начинаю Fetch запрос' : ' Открываю вкладку'))
@@ -675,58 +675,6 @@ async function newWindow(project) {
 
 async function silentVote(project) {
     try {
-        if (project.rating === 'MCRate') {
-            let response = await _fetch('https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code', null, project)
-            if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
-            let code = response.url.substring(response.url.length - 18)
-            if (response.doc.querySelector('input[name=login_player]') != null) {
-                response = await _fetch('http://mcrate.su/save/rate', {
-                    'headers': {
-                        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                        'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
-                        'cache-control': 'max-age=0',
-                        'content-type': 'application/x-www-form-urlencoded',
-                        'upgrade-insecure-requests': '1'
-                    },
-                    'referrer': 'http://mcrate.su/add/rate?idp=' + project.id + '&code=' + code,
-                    'referrerPolicy': 'no-referrer-when-downgrade',
-                    'body': 'login_player=' + project.nick + '&token_vk_secure=' + response.doc.getElementsByName('token_vk_secure').item(0).value + '&uid_vk_secure=' + response.doc.getElementsByName('uid_vk_secure').item(0).value + '&id_project=' + project.id + '&code_vk_secure=' + response.doc.getElementsByName('code_vk_secure').item(0).value + '&mcrate_hash=' + response.doc.getElementsByName('mcrate_hash').item(0).value,
-                    'method': 'POST'
-                }, project)
-                if (!await checkResponseError(project, response, 'mcrate.su', null, true)) return
-            }
-            if (response.doc.querySelector('div[class=report]') != null) {
-                if (response.doc.querySelector('div[class=report]').textContent.includes('Ваш голос засчитан')) {
-                    endVote({successfully: true}, null, project)
-                } else {
-                    endVote({message: response.doc.querySelector('div[class=report]').textContent}, null, project)
-                }
-            } else if (response.doc.querySelector('span[class=count_hour]') != null) {
-//              Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
-//              Берёт из скрипта переменную в которой хранится сколько осталось до следующего голосования
-//              let count2 = response.doc.querySelector('#center-main > div.center_panel > script:nth-child(2)').text.substring(30, 45)
-//              let count = count2.match(/\d+/g).map(Number)
-//              let hour = parseInt(count / 3600)
-//              let min = parseInt((count - hour * 3600) / 60)
-//              let sec = parseInt(count - (hour * 3600 + min * 60))
-//              let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-//              if (milliseconds == 0) return
-//              let later = Date.now() - (86400000 - milliseconds)
-                endVote({later: true}, null, project)
-            } else if (response.doc.querySelector('div[class="error"]') != null) {
-                const error = response.doc.querySelector('div[class="error"]').textContent
-                if (error.includes('уже голосовали')) {
-                    endVote({later: true}, null, project)
-//              } else if (error.includes('Ваш ВК ID заблокирован для голосовани') || error.includes('Ваш аккаунт заблокирован')) {
-//                  endVote({errorAuthVK: error}, null, project)
-                } else {
-                    endVote({message: response.doc.querySelector('div[class="error"]').textContent}, null, project)
-                }
-            } else {
-                endVote({errorVoteNoElement: true}, null, project)
-            }
-        } else
-
         if (project.rating === 'MinecraftRating') {
             let response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
             if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
@@ -1574,7 +1522,7 @@ async function endVote(request, sender, project) {
                     await stopVote()
                 }
             }
-        } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' ||*/ project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
+        } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
             retryCoolDown = 300000
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
         } else {
