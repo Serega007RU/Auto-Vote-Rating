@@ -832,7 +832,7 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
+    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || project.rating === 'Custom')) {
         array.push(document.createElement('br'))
         array.push(document.createElement('br'))
         array.push(chrome.i18n.getMessage('passageCaptcha'))
