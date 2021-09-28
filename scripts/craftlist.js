@@ -1,7 +1,7 @@
 async function vote(first) {
     try {
         if (document.querySelector('div.alert.alert-success') != null) {
-            if (document.querySelector('div.alert.alert-success').textContent.includes('vote was successfully')) {
+            if (document.querySelector('div.alert.alert-success').textContent.includes('vote was successfully') || document.querySelector('div.alert.alert-success').textContent.includes('Tvůj hlas byl úspěšně přijatý a na serveru tě čeká odměna')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
                 chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-success').textContent})
@@ -41,7 +41,7 @@ async function vote(first) {
             }
             return
         }
-        if (document.querySelector('a.btn-vote').textContent.includes('Next possible vote')) {
+        if (document.querySelector('a.btn-vote').textContent.includes('Next possible vote') || document.querySelector('a.btn-vote').textContent.includes('alší možný')) {
             //Из текста достаёт все цифры в Array List
             const numbers = document.querySelector('a.btn-vote').textContent.match(/\d+/g).map(Number)
             let count = 0
