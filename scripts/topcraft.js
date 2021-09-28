@@ -58,9 +58,9 @@ async function vote(first) {
         if (first) return
 
         //Обход fingerprint
-        if (document.querySelector('input[name="v"]') != null) {
-            document.querySelector('input[name="v"]').value = makeid(32)
-        }
+        if (document.querySelector('input[name="v"]') != null) document.querySelector('input[name="v"]').value = makeid(32)
+        if (document.querySelector('input[name="vv"]') != null) document.querySelector('input[name="vv"]').value = makeid(32)
+        if (document.querySelector('input[name="vs"]') != null) document.querySelector('input[name="vs"]').value = makeid(32)
 
         //Вводит никнейм
         document.querySelector('input[name=nick]').value = project.nick
@@ -77,9 +77,9 @@ const timer = setInterval(()=>{
         //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
         if (document.readyState === 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
             const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent.toLowerCase()
-            if (textContent.includes('вы уже голосовали')) {
+            if (textContent.includes('уже голосовали') || textContent.includes('уже проголосовали') || textContent.includes('сможете проголосовать')) {
                 chrome.runtime.sendMessage({later: true})
-            } else if (textContent.includes('спасибо за ваш голос')) {
+            } else if (textContent.includes('за ваш голос') || textContent.includes('спасибо за голос') ||  textContent.includes('голос принят') || textContent.includes('голос засчитан') || textContent.includes('успех') || textContent.includes('успешн')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
