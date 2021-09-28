@@ -27,7 +27,14 @@ async function vote(first) {
             return
         }
         if (!document.querySelector('#voteModal').classList.contains('in')) {
-            document.querySelector('button.openVoteModal').click()
+            if (document.querySelector('button.openVoteModal') === null) {
+                //Костыль для владельцев проектов если они голосуют за свой же проект
+                let url = new URL(document.URL)
+                url.searchParams.append('voting', '10895')
+                document.location.replace(url.toString())
+            } else {
+                document.querySelector('button.openVoteModal').click()
+            }
         }
         if (first) return
 
