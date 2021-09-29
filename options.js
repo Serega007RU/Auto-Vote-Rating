@@ -1102,11 +1102,12 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         await tx.objectStore('other').put(data.generalStats, 'generalStats')
         await tx.objectStore('other').put(data.todayStats, 'todayStats')
 
-        await upgrade(db, data.version, db.version, tx)
-
         settings = data.settings
         generalStats = data.generalStats
         todayStats = data.todayStats
+
+        await upgrade(db, data.version, db.version, tx)
+
         if (chrome.extension.getBackgroundPage()) {
             chrome.extension.getBackgroundPage().settings = settings
             chrome.extension.getBackgroundPage().generalStats = generalStats
