@@ -666,11 +666,33 @@ ul {
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 }
 
-#formProxyBlackList .inputEl {
+#formProxyBlackList .inputEl,
+#formProxyPacScript .inputEl {
 	display: grid;
 	margin-bottom: 20px;
 	grid-gap: 20px;
 	grid-template-columns: 7fr 2fr;
+}
+
+.repeatLater {
+    display: flex;
+}
+#repeatLater {
+    width: 35px;
+}
+
+.repeatLater label {
+    line-height: 1.2;
+    display: inline-block;
+    position: relative;
+    padding: 4px 0 4px 35px;
+    font-size: 15px;
+    color: #ddd;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 #borealisTab > .inputEl {
@@ -1157,7 +1179,7 @@ ul {
 
 .checkbox + label {
 	line-height: 1.2;
-    display: inline-block;
+	display: inline-block;
 	position: relative;
 	padding: 4px 0 4px 35px;
 	font-size: 15px;

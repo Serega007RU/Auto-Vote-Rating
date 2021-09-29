@@ -747,10 +747,16 @@ async function initializeConfig(background/*, version*/) {
                     addBannedVK: false,
                     clearBorealisCookies: true,
                     repeatAttemptLater: true,
+                    repeatLater: 5,
                     saveVKCredentials: false,
                     saveBorealisCredentials: false,
                     useMultiVote: true,
-                    useProxyOnUnProxyTop: false
+                    useProxyOnUnProxyTop: false,
+                    useProxyPacScript: false,
+                    proxyPacScript:
+`function FindProxyForURL(url, host) {
+    return "HTTPS $ip$:$port$";
+}`
                 }
                 other.add(settings, 'settings')
                 generalStats = {
@@ -783,10 +789,16 @@ async function initializeConfig(background/*, version*/) {
                     settings.addBannedVK = false
                     settings.clearBorealisCookies = true
                     settings.repeatAttemptLater = true
+                    settings.repeatLater = 5
                     settings.saveVKCredentials = false
                     settings.saveBorealisCredentials = false
                     settings.useMultiVote = true
                     settings.useProxyOnUnProxyTop = false
+                    settings.useProxyPacScript = false
+                    settings.proxyPacScript =
+`function FindProxyForURL(url, host) {
+    return "$scheme$ $ip$:$port$";
+}`
                     other.put(settings, 'settings')
                 }
                 const vks = db.createObjectStore('vks', {autoIncrement: true})
@@ -818,6 +830,15 @@ async function initializeConfig(background/*, version*/) {
             lastAttemptVote: null
         }
         await db.put('other', todayStats, 'todayStats')
+    }
+    if (settings.proxyPacScript == null) {
+        settings.useProxyPacScript = false
+        settings.proxyPacScript =
+`function FindProxyForURL(url, host) {
+    return "$scheme$ $ip$:$port$";
+}`
+        settings.repeatLater = 5
+        await db.put('other', settings, 'settings')
     }
 
     if (!background) return

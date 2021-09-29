@@ -263,7 +263,10 @@ async function restoreOptions() {
     document.getElementById('useMultiVote').checked = settings.useMultiVote
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
+    document.getElementById('repeatLater').value = settings.repeatLater
     document.getElementById('useProxyOnUnProxyTop').checked = settings.useProxyOnUnProxyTop
+    document.getElementById('useProxyPacScript').checked = settings.useProxyPacScript
+    document.getElementById('proxyPacScript').value = settings.proxyPacScript
     document.getElementById('antiBanVK').checked = settings.antiBanVK
     document.getElementById('saveVKCredentials').checked = settings.saveVKCredentials
     document.getElementById('saveBorealisCredentials').checked = settings.saveBorealisCredentials
@@ -2186,6 +2189,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.repeatAttemptLater = this.checked
         } else if (this.id === 'useProxyOnUnProxyTop') {
             settings.useProxyOnUnProxyTop = this.checked
+        } else if (this.id === 'useProxyPacScript') {
+            settings.useProxyPacScript = this.checked
         } else if (this.id === 'autoAuthVK') {
             if (this.checked && confirm(chrome.i18n.getMessage('confirmAutoAuthVK'))) {
                 settings.autoAuthVK = this.checked
@@ -2395,6 +2400,27 @@ document.getElementById('formProxyBlackList').addEventListener('submit', async (
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('proxyBLSet'), 'success')
     event.target.classList.remove('disabled')
+})
+//Слушатель кнопки 'Установить' на pacsript proxy
+document.getElementById('formProxyPacScript').addEventListener('submit', async (event)=>{
+    event.preventDefault()
+    if (event.target.classList.contains('disabled')) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        event.target.classList.add('disabled')
+    }
+    settings.proxyPacScript = document.getElementById('proxyPacScript').value
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+    await db.put('other', settings, 'settings')
+    createNotif(chrome.i18n.getMessage('successSave'), 'success')
+    event.target.classList.remove('disabled')
+})
+
+document.getElementById('repeatLater').addEventListener('input', async (event)=>{
+    settings.repeatLater = event.target.value
+    await db.put('other', settings, 'settings')
+    createNotif(chrome.i18n.getMessage('successSave'), 'success')
 })
 
 //Слушатель кнопки 'Отправить' на Borealis
@@ -3167,10 +3193,12 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
             data.settings.addBannedVK = false
             data.settings.clearBorealisCookies = true
             data.settings.repeatAttemptLater = true
+            data.settings.repeatLater = 5
             data.settings.saveVKCredentials = false
             data.settings.saveBorealisCredentials = false
             data.settings.useMultiVote = true
             data.settings.useProxyOnUnProxyTop = false
+            data.settings.useProxyPacScript = false
         }
 
         if (!await checkPermissions(projects)) return

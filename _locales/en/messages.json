@@ -768,7 +768,10 @@
     "message": "Vote expecting time has expired, restarting the vote"
   },
   "repeatAttemptLater": {
-    "message": "Ignore the 'You have already voted' error at least 15 times"
+    "message": "Ignore the 'You have already voted' error at least"
+  },
+  "least": {
+    "message": "least"
   },
   "chooseLang": {
     "message": "Choose language/region"
@@ -1055,6 +1058,9 @@
   },
   "proxyBlackList": {
     "message": "Blacklist of sites for proxies"
+  },
+  "proxyPacScript": {
+    "message": "Proxy PacScript"
   },
   "proxyBLSet": {
     "message": "Black list of proxy sites updated"
@@ -1352,5 +1358,8 @@
   },
   "version": {
     "message": "Version: "
+  },
+  "useProxyPacScript": {
+    "message": "Use proxy PacScript"
   }
 }

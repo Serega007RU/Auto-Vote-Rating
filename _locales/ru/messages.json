@@ -728,7 +728,10 @@
     "message": "Истекло время ожидания голосования, перезапускаю голосование"
   },
   "repeatAttemptLater": {
-    "message": "Игнорировать ошибку 'Вы уже голосовали' не меньше 15 раз"
+    "message": "Игнорировать ошибку 'Вы уже голосовали' не меньше"
+  },
+  "least": {
+    "message": "раз"
   },
   "chooseLang": {
     "message": "Выберите язык/регион"
@@ -1013,6 +1016,9 @@
   },
   "proxyBlackList": {
     "message": "Чёрный список сайтов для прокси"
+  },
+  "proxyPacScript": {
+    "message": "PacScript прокси"
   },
   "proxyBLSet": {
     "message": "Чёрный список сайтов прокси обновлён"
@@ -1310,5 +1316,8 @@
   },
   "version": {
     "message": "Версия: "
+  },
+  "useProxyPacScript": {
+    "message": "Использовать PacScript прокси"
   }
 }

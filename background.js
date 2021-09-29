@@ -35,6 +35,8 @@ let lastErrorNotFound
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
 let closeTabs = true
 
+let nextLoop = false
+
 //Где храним настройки
 // let storageArea = 'local'
 
@@ -45,6 +47,7 @@ initializeConfig(true)
 async function checkVote() {
 
     if (settings.stopVote > Date.now()) return
+    if (nextLoop) return
 
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
     if (!settings.disabledCheckInternet && !online) {
@@ -302,6 +305,16 @@ async function checkOpen(project) {
                 //Применяет найденный незаюзанный свободный прокси
                 console.log(chrome.i18n.getMessage('applyProxy', proxy.ip + ':' + proxy.port + ' ' + proxy.scheme))
 
+                //Костыль сброса авторизации на прокси (специально для https://socproxy.ru/)
+                const options = {}
+                options.origins = []
+                options.origins.push('http://'+ '194.113.107.131')
+                options.origins.push('https://'+ '194.113.107.131')
+                const types = {"cookies": true}
+                await new Promise(resolve => {
+                    chrome.browsingData.remove(options, types, resolve)
+                })
+
                 if (proxy.TunnelBear && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
                     console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
                     let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
@@ -345,15 +358,25 @@ async function checkOpen(project) {
                     tunnelBear.expires = Date.now() + 86400000
                 }
 
-                let config = {
-                    mode: 'fixed_servers',
-                    rules: {
-                        singleProxy: {
-                            scheme: proxy.scheme,
-                            host: proxy.ip,
-                            port: proxy.port
-                        },
-                        bypassList: settings.proxyBlackList
+                let config
+                if (settings.useProxyPacScript) {
+                    config = {
+                        mode: 'pac_script',
+                        pacScript: {
+                            data: settings.proxyPacScript.replace('$ip$', proxy.ip).replace('$port$', proxy.port).replace('$scheme$', proxy.scheme.toUpperCase)
+                        }
+                    }
+                } else {
+                    config = {
+                        mode: 'fixed_servers',
+                        rules: {
+                            singleProxy: {
+                                scheme: proxy.scheme,
+                                host: proxy.ip,
+                                port: proxy.port
+                            },
+                            bypassList: settings.proxyBlackList
+                        }
                     }
                 }
                 await setProxy(config)
@@ -482,18 +505,18 @@ async function checkOpen(project) {
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
             }
 
-            let cookies2 = await new Promise(resolve=>{
-                chrome.cookies.getAll({}, function(cookies2) {
-                    resolve(cookies2)
-                })
-            })
-            if (debug) console.log('Удаляю куки ' + 'yandex')
-            for (let i = 0; i < cookies2.length; i++) {
-                if (!cookies2[i].domain.includes('.yandex.')) continue
-                if (cookies2[i].name === 'csrf_cookie_name' || cookies2[i].name.startsWith('cf_') || cookies2[i].name.startsWith('__cf')) continue
-                if (cookies2[i].domain.charAt(0) === '.') cookies2[i].domain = cookies2[i].domain.substring(1, cookies2[i].domain.length)
-                await removeCookie('https://' + cookies2[i].domain + cookies2[i].path, cookies2[i].name)
-            }
+//             let cookies2 = await new Promise(resolve=>{
+//                 chrome.cookies.getAll({}, function(cookies2) {
+//                     resolve(cookies2)
+//                 })
+//             })
+//             if (debug) console.log('Удаляю куки ' + 'yandex')
+//             for (let i = 0; i < cookies2.length; i++) {
+//                 if (!cookies2[i].domain.includes('.yandex.')) continue
+//                 if (cookies2[i].name === 'csrf_cookie_name' || cookies2[i].name.startsWith('cf_') || cookies2[i].name.startsWith('__cf')) continue
+//                 if (cookies2[i].domain.charAt(0) === '.') cookies2[i].domain = cookies2[i].domain.substring(1, cookies2[i].domain.length)
+//                 await removeCookie('https://' + cookies2[i].domain + cookies2[i].path, cookies2[i].name)
+//             }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
     } else if (settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
@@ -1187,7 +1210,7 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
     } else if (openedProjects.has(details.tabId)) {
         if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
             let project = openedProjects.get(details.tabId)
-            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR')) {
+            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR')) {
                 // console.warn(getProjectPrefix(project, true) + details.error)
                 return
             }
@@ -1402,7 +1425,7 @@ async function endVote(request, sender, project) {
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote)  {
             if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')/* && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) !== -1*/) {
                 if (request.later && settings.repeatAttemptLater && project.later != null && !(project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {
-                    if (project.later >= 15) {
+                    if (project.later >= settings.repeatLater) {
                         await useVK()
                     }
                 } else {
@@ -1445,7 +1468,7 @@ async function endVote(request, sender, project) {
             delete project.later
         } else {
             if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && settings.repeatAttemptLater && project.later && !(project.rating === 'MinecraftRating')) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
-                if (project.later < 15) {
+                if (project.later < settings.repeatLater) {
                     project.time = null
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
                 } else {
@@ -1515,7 +1538,8 @@ async function endVote(request, sender, project) {
                 } else if (request.errorCaptcha) {
                     currentProxy.notWorking = request.errorCaptcha
                     await updateValue('proxies', currentProxy)
-                    await stopVote()
+                    nextLoop = true
+//                  await stopVote()
                 } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && request.message && request.message.includes('Григори')) {
                     currentProxy.notWorking = request.message
                     await updateValue('proxies', currentProxy)
@@ -1582,6 +1606,7 @@ async function endVote(request, sender, project) {
                 if (queueProjects.size === 0) {
                     if (currentProxy != null) clearProxy()
                     currentVK = null
+                    nextLoop = false
                 } else {
                     let countVK = 0
                     let countProxy = 0
@@ -1598,8 +1623,14 @@ async function endVote(request, sender, project) {
                             }
                         }
                     }
-                    if (countVK === 0) currentVK = null
-                    if (countProxy === 0) clearProxy()
+                    if (countVK === 0) {
+                        currentVK = null
+                        nextLoop = false
+                    }
+                    if (countProxy === 0) {
+                        clearProxy()
+                        nextLoop = false
+                    }
                 }
             }
         }
@@ -1607,6 +1638,7 @@ async function endVote(request, sender, project) {
             if (currentVK != null) {
                 if (queueProjects.size === 0) {
                     currentVK = null
+                    nextLoop = false
                 } else {
                     let countVK = 0
                     for (const value of queueProjects) {
@@ -1615,11 +1647,16 @@ async function endVote(request, sender, project) {
                             countVK++
                         }
                     }
-                    if (countVK === 0) currentVK = null
+                    if (countVK === 0) {
+                        currentVK = null
+                        nextLoop = false
+                    }
                 }
             }
         }
-        checkVote()
+        setTimeout(()=>{
+            checkVote()
+        }, 10000)
     }
     if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
         removeQueue()
@@ -1795,7 +1832,7 @@ async function stopVote() {
 //Если требуется авторизация для Прокси
 let errorProxy = {ip: '', count: 0}
 chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn) {
-    if (details.isProxy && currentProxy) {
+    if (details.isProxy && (currentProxy || settings.useProxyOnUnProxyTop)) {
         if (errorProxy.ip !== currentProxy.ip) {
             errorProxy.count = 0
         }
@@ -1810,6 +1847,21 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             await stopVote()
             callbackFn()
             return
+        }
+        if (settings.useProxyPacScript) {
+            if (details.challenger.host !== currentProxy.ip) {
+                const proxy = await db.getFromIndex('proxies', 'ip, port', [details.challenger.host, details.challenger.port])
+                if (proxy && proxy.login) {
+                    console.log(chrome.i18n.getMessage('proxyAuth') + ' (PacScript)')
+                    callbackFn({
+                        authCredentials: {
+                            'username': proxy.login,
+                            'password': proxy.password
+                        }
+                    })
+                    return
+                }
+            }
         }
         if (currentProxy.login) {
             console.log(chrome.i18n.getMessage('proxyAuth'))
@@ -2028,6 +2080,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
                 oldSettings.addBannedVK = false
                 oldSettings.clearBorealisCookies = true
                 oldSettings.repeatAttemptLater = true
+                oldSettings.repeatLater = 5
                 oldSettings.saveVKCredentials = false
                 oldSettings.saveBorealisCredentials = false
                 oldSettings.useMultiVote = true

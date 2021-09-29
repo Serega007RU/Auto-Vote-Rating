@@ -742,9 +742,11 @@
 							<input class="checkbox" id="useMultiVote" type="checkbox" name="checkbox" />
 							<label data-resource="useMultiVote" for="useMultiVote"></label>
 						</div>
-						<div class="check-block">
+						<div class="check-block repeatLater">
 							<input class="checkbox" id="repeatAttemptLater" type="checkbox" name="checkbox" />
 							<label data-resource="repeatAttemptLater" for="repeatAttemptLater"></label>
+                            <input id="repeatLater" type="number" class="input">
+                            <label data-resource="least"></label>
 						</div>
 					</div>
 					<div class="buttonBlock">
@@ -815,6 +817,23 @@
             		        		<button data-resource="setCooldown" type="submit" class="justBtn"></button>
             		        	</div>
             		        </form>
+                            <div class="check-block">
+                                <input class="checkbox" id="useProxyPacScript" type="checkbox" name="checkbox" />
+                                <label data-resource="useProxyPacScript" for="useProxyPacScript"></label>
+                            </div>
+                            <form id="formProxyPacScript">
+                                <div class="label-block">
+                                    <label data-resource="proxyPacScript" for="proxyPacScript">
+            		        			<span class="tooltip1">
+            		        				<span class="tooltip1text" data-resource="pattern"><a class="link" target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_PAC_file">https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_PAC_file</a></span>
+            		        			</span>
+                                    </label>
+                                </div>
+                                <div class="inputEl">
+                                    <textarea id="proxyPacScript" type="text" name="text" class="textarea"></textarea>
+                                    <button data-resource="setCooldown" type="submit" class="justBtn"></button>
+                                </div>
+                            </form>
 
             		        <form id="addProxy">
             		        	<div class="input-block">
