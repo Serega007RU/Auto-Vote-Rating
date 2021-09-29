@@ -69,7 +69,7 @@ async function checkVote() {
 
     const projects = await db.getAll('projects')
     for (const project of projects) {
-        if (!project.time || project.time < Date.now()) {
+        if ((!project.time || project.time < Date.now()) && project.id !== 'borealis' && project.id !== '2241' && project.id !== '7126') {
             await checkOpen(project)
         }
     }
@@ -363,7 +363,7 @@ async function checkOpen(project) {
                     config = {
                         mode: 'pac_script',
                         pacScript: {
-                            data: settings.proxyPacScript.replace('$ip$', proxy.ip).replace('$port$', proxy.port).replace('$scheme$', proxy.scheme.toUpperCase)
+                            data: settings.proxyPacScript.replace('$ip$', proxy.ip).replace('$port$', proxy.port).replace('$scheme$', proxy.scheme.toUpperCase())
                         }
                     }
                 } else {
@@ -1528,7 +1528,7 @@ async function endVote(request, sender, project) {
                 currentVK[project.rating][project.id] = Number.POSITIVE_INFINITY
                 await updateValue('vks', currentVK)
             } else if (project.rating === 'MCRate' && message.includes('Ваш ВК ID заблокирован для голосовани')) {
-                currentVK.MCRate = message
+                currentVK[project.rating][project.id] = Number.POSITIVE_INFINITY
                 await updateValue('vks', currentVK)
             } else if (currentProxy != null && request) {
                 if (request.errorVoteNetwork && (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT'))) {
