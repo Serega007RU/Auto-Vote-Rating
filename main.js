@@ -715,45 +715,7 @@ async function initializeConfig(background, version) {
     }
     // noinspection JSUnusedGlobalSymbols
     try {
-        db = await idb.openDB('avr', version ? version : 1, {
-            upgrade(db/*, oldVersion, newVersion, transaction*/) {
-                const projects = db.createObjectStore('projects', {autoIncrement: true})
-                projects.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
-                projects.createIndex('rating, id', ['rating', 'id'])
-                projects.createIndex('rating', 'rating')
-                const other = db.createObjectStore('other')
-                settings = {
-                    disabledNotifStart: true,
-                    disabledNotifInfo: false,
-                    disabledNotifWarn: false,
-                    disabledNotifError: false,
-                    enabledSilentVote: true,
-                    disabledCheckTime: false,
-                    disabledCheckInternet: false,
-                    enableCustom: false,
-                }
-                other.add(settings, 'settings')
-                generalStats = {
-                    successVotes: 0,
-                    monthSuccessVotes: 0,
-                    lastMonthSuccessVotes: 0,
-                    errorVotes: 0,
-                    laterVotes: 0,
-                    lastSuccessVote: null,
-                    lastAttemptVote: null,
-                    added: Date.now()
-                }
-                todayStats = {
-                    successVotes: 0,
-                    errorVotes: 0,
-                    laterVotes: 0,
-                    lastSuccessVote: null,
-                    lastAttemptVote: null
-                }
-                other.add(generalStats, 'generalStats')
-                other.add(todayStats, 'todayStats')
-            }
-        })
+        db = await idb.openDB('avr', version ? version : 2, {upgrade})
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
@@ -762,7 +724,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 2)
+            await initializeConfig(background, 20)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error.message})
@@ -781,16 +743,6 @@ async function initializeConfig(background, version) {
     settings = await db.get('other', 'settings')
     generalStats = await db.get('other', 'generalStats')
     todayStats = await db.get('other', 'todayStats')
-    if (!todayStats) {
-        todayStats = {
-            successVotes: 0,
-            errorVotes: 0,
-            laterVotes: 0,
-            lastSuccessVote: null,
-            lastAttemptVote: null
-        }
-        await db.put('other', todayStats, 'todayStats')
-    }
 
     if (!background) return
     console.log(chrome.i18n.getMessage('start'))
@@ -798,4 +750,58 @@ async function initializeConfig(background, version) {
     if (settings && !settings.disabledCheckTime) checkTime()
 
     checkVote()
+}
+
+async function upgrade(db, oldVersion, newVersion, transaction) {
+    if (oldVersion === 0) {
+        const projects = db.createObjectStore('projects', {autoIncrement: true})
+        projects.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
+        projects.createIndex('rating, id', ['rating', 'id'])
+        projects.createIndex('rating', 'rating')
+        const other = db.createObjectStore('other')
+        settings = {
+            disabledNotifStart: true,
+            disabledNotifInfo: false,
+            disabledNotifWarn: false,
+            disabledNotifError: false,
+            enabledSilentVote: true,
+            disabledCheckTime: false,
+            disabledCheckInternet: false,
+            enableCustom: false,
+        }
+        other.add(settings, 'settings')
+        generalStats = {
+            successVotes: 0,
+            monthSuccessVotes: 0,
+            lastMonthSuccessVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null,
+            added: Date.now()
+        }
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+        other.add(generalStats, 'generalStats')
+        other.add(todayStats, 'todayStats')
+    } else if (oldVersion === 1) {
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+        if (!transaction) transaction = db.transaction('other', 'readwrite')
+        const store = transaction.objectStore('other')
+        store.put(todayStats, 'todayStats')
+        settings = await store.get('settings')
+        settings.timeout = 10000
+        transaction.objectStore('other').put(settings, 'settings')
+    }
 }
