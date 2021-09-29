@@ -218,6 +218,7 @@ function generateBtnListRating(rating, count) {
         const label = document.createElement('label')
         label.setAttribute('data-resource', 'passageCaptcha')
         label.textContent = chrome.i18n.getMessage('passageCaptcha')
+        label.style.color = '#f1af4c'
         const link = document.createElement('a')
         link.classList.add('link')
         link.target = 'blank_'
@@ -851,7 +852,7 @@ async function addProject(project, element) {
     if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || project.rating === 'Custom')) {
         array.push(document.createElement('br'))
         array.push(document.createElement('br'))
-        array.push(chrome.i18n.getMessage('passageCaptcha'))
+        array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
         const a = document.createElement('a')
         a.target = 'blank_'
         a.classList.add('link')
@@ -993,6 +994,21 @@ async function checkPermissions(projects, element) {
     }
     if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', null, element)
     return true
+}
+
+function createMessage(text, level) {
+    const span = document.createElement('span')
+    if (level) {
+        if (level === 'success') {
+            span.style.color = '#4CAF50'
+        } else if (level === 'error') {
+            span.style.color = '#da5e5e'
+        } else if (level === 'warn') {
+            span.style.color = '#f1af4c'
+        }
+    }
+    span.textContent = text
+    return span
 }
 
 function extractHostname(url) {
