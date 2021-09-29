@@ -308,8 +308,8 @@ async function checkOpen(project) {
                 //Костыль сброса авторизации на прокси (специально для https://socproxy.ru/)
                 const options = {}
                 options.origins = []
-                options.origins.push('http://'+ '194.113.107.131')
-                options.origins.push('https://'+ '194.113.107.131')
+                options.origins.push('http://'+ proxy.ip)
+                options.origins.push('https://'+ proxy.ip)
                 const types = {"cookies": true}
                 await new Promise(resolve => {
                     chrome.browsingData.remove(options, types, resolve)
