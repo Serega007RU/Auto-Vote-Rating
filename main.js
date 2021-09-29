@@ -716,7 +716,7 @@ async function initializeConfig(background/*, version*/) {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 20, {upgrade})
+    db = await idb.openDB('avr', 30, {upgrade})
     db.onerror = event => {
         if (background) {
             if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error)
