@@ -818,7 +818,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
 `function FindProxyForURL(url, host) {
     return "$scheme$ $ip$:$port$";
 }`
-        other.put(settings, 'settings')
+        await other.put(settings, 'settings')
 
         const vks = db.createObjectStore('vks', {autoIncrement: true})
         vks.createIndex('id', 'id')
@@ -835,6 +835,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
 return "$scheme$ $ip$:$port$";
 }`
         settings.repeatLater = 5
-        await db.put('other', settings, 'settings')
+        await other.put(settings, 'settings')
     }
 }
