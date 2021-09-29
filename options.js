@@ -1550,14 +1550,15 @@ const selectedTop = document.getElementById('project')
 // })
 
 let laterChoose
-selectedTop.addEventListener('change', function() {
+selectedTop.addEventListener('input', function() {
     document.getElementById('id').value = ''
     let name
     if (document.querySelector('#projectList > option[value="' + this.value + '"]') != null) {
         name = document.querySelector('#projectList > option[value="' + this.value + '"]').getAttribute('name')
     }
     if (name == null) {
-        this.value = ''
+        if (laterChoose == null) return
+        // this.value = ''
         document.getElementById('idSelector').style.display = 'none'
         document.getElementById('label1').style.display = 'none'
         document.getElementById('label2').style.display = 'none'
@@ -1587,6 +1588,7 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('chooseGame' + laterChoose).style.display = 'none'
             document.getElementById('chooseGame' + laterChoose).required = false
         }
+        laterChoose = null
         return
     }
     document.getElementById('idSelector').removeAttribute('style')
