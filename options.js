@@ -476,6 +476,7 @@ function generateBtnListRating(rating, count) {
         const label = document.createElement('label')
         label.setAttribute('data-resource', 'passageCaptcha')
         label.textContent = chrome.i18n.getMessage('passageCaptcha')
+        label.style.color = '#f1af4c'
         const link = document.createElement('a')
         link.classList.add('link')
         link.target = 'blank_'
@@ -2888,7 +2889,7 @@ async function addProject(project, element) {
     if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || project.rating === 'Custom')) {
         array.push(document.createElement('br'))
         array.push(document.createElement('br'))
-        array.push(chrome.i18n.getMessage('passageCaptcha'))
+        array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
         const a = document.createElement('a')
         a.target = 'blank_'
         a.classList.add('link')
@@ -3642,14 +3643,15 @@ const selectedTop = document.getElementById('project')
 // })
 
 let laterChoose
-selectedTop.addEventListener('change', function() {
+selectedTop.addEventListener('input', function() {
     document.getElementById('id').value = ''
     let name
     if (document.querySelector('#projectList > option[value="' + this.value + '"]') != null) {
         name = document.querySelector('#projectList > option[value="' + this.value + '"]').getAttribute('name')
     }
     if (name == null) {
-        this.value = ''
+        if (laterChoose == null) return
+        // this.value = ''
         document.getElementById('idSelector').style.display = 'none'
         document.getElementById('label1').style.display = 'none'
         document.getElementById('label2').style.display = 'none'
@@ -3679,6 +3681,7 @@ selectedTop.addEventListener('change', function() {
             document.getElementById('chooseGame' + laterChoose).style.display = 'none'
             document.getElementById('chooseGame' + laterChoose).required = false
         }
+        laterChoose = null
         return
     }
     document.getElementById('idSelector').removeAttribute('style')
