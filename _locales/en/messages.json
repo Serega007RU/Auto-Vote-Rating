@@ -126,7 +126,7 @@
     "description": "Input. Mode."
   },
   "cooldown": {
-    "message": "Time between check-ups in ms.",
+    "message": "Voting timeout in milliseconds between projects for 1 rating",
     "description": "Label. Cooldown input"
   },
   "setCooldown": {

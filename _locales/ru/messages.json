@@ -96,7 +96,7 @@
     "message": "Режим эмуляции"
   },
   "cooldown": {
-    "message": "Время между проверками в ms."
+    "message": "Voting timeout in ms between projects for 1 rating"
   },
   "setCooldown": {
     "message": "Установить"

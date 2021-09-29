@@ -1656,19 +1656,20 @@ async function endVote(request, sender, project) {
         }
         setTimeout(()=>{
             checkVote()
-        }, 10000)
+        }, settings.timeout)
     }
     if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
         removeQueue()
     } else {
         setTimeout(()=>{
             removeQueue()
-        }, 10000)
+        }, settings.timeout)
     }
 }
 
 //Отправитель уведомлений
 function sendNotification(title, message) {
+    if (!message) message = ''
     let notification = {
         type: 'basic',
         iconUrl: 'images/icon128.png',
@@ -1953,170 +1954,9 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
 chrome.runtime.onInstalled.addListener(async function(details) {
     if (details.reason === 'install') {
         chrome.tabs.create({url: 'options.html?installed'})
-    } else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
-        let storageArea = 'local'
-        //Асинхронно достаёт/сохраняет настройки в chrome.storage
-        async function getValue(name, area) {
-            if (!area) {
-                area = storageArea
-            }
-            return new Promise((resolve, reject)=>{
-                chrome.storage[area].get(name, function(data) {
-                    if (chrome.runtime.lastError) {
-                        sendNotification(chrome.i18n.getMessage('storageError'), chrome.runtime.lastError)
-                        console.error(chrome.i18n.getMessage('storageError', chrome.runtime.lastError))
-                        reject(chrome.runtime.lastError)
-                    } else {
-                        resolve(data[name])
-                    }
-                })
-            })
-        }
-        async function removeValue(name, area) {
-            if (!area) {
-                area = storageArea
-            }
-            return new Promise((resolve, reject)=>{
-                chrome.storage[area].remove(name, function(data) {
-                    if (chrome.runtime.lastError) {
-                        sendNotification(chrome.i18n.getMessage('storageErrorSave'), chrome.runtime.lastError)
-                        console.error(chrome.i18n.getMessage('storageErrorSave', chrome.runtime.lastError))
-                        reject(chrome.runtime.lastError.message)
-                    } else {
-                        resolve(data)
-                    }
-                })
-            })
-        }
-        storageArea = await getValue('storageArea', 'local')
-        if (storageArea == null || storageArea === '') {
-            if (await getValue('AVMRsettings', 'sync') != null) {
-                storageArea = 'sync'
-            } else {
-                storageArea = 'local'
-            }
-        }
-        const oldSettings = await getValue('AVMRsettings')
-        if (oldSettings != null) {
-            const oldGeneralStats = await getValue('generalStats')
-            todayStats = {
-                successVotes: 0,
-                errorVotes: 0,
-                laterVotes: 0,
-                lastSuccessVote: null,
-                lastAttemptVote: null
-            }
+    }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
 
-            console.log(chrome.i18n.getMessage('oldSettings'))
-            const projects = []
-            let key = 0
-            for (const item of Object.keys(allProjects)) {
-                const list = await getValue('AVMRprojects' + item)
-                if (list) {
-                    for (const project of list) {
-                        delete project[item]
-                        project.rating = item
-                        if (item === 'Custom') {
-                            project.body = project.id
-                            delete project.id
-                            project.id = project.nick
-                            project.nick = ''
-                        }
-                        if (project.nick == null) project.nick = ''
-                        if (project.stats.successVotes == null) project.stats.successVotes = 0
-                        if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
-                        if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
-                        if (project.stats.errorVotes == null) project.stats.errorVotes = 0
-                        if (project.stats.laterVotes == null) project.stats.laterVotes = 0
-                        key++
-                        project.key = key
-                        projects.push(project)
-                    }
-                }
-            }
-            let vks = await getValue('AVMRVKs')
-            if (!vks) vks = []
-            let proxies = await getValue('AVMRproxies')
-            if (!proxies) proxies = []
-            let borealis = await getValue('borealisAccounts')
-            if (!borealis) borealis = []
-            if (!db) {
-                await new Promise(resolve => {//Да это странно выглядит
-                    setInterval(() => {
-                        if (db) {
-                            resolve()
-                        }
-                    }, 1000)
-                })
-            }
-            const tx = db.transaction(['projects', 'vks', 'proxies', 'borealis', 'other'], 'readwrite')
-            await tx.objectStore('projects').clear()
-            for (const project of projects) {
-                await tx.objectStore('projects').add(project, project.key)
-            }
-            key = 0
-            for (const vk of vks) {
-                key++
-                vk.key = key
-                await tx.objectStore('vks').put(vk, vk.key)
-            }
-            key = 0
-            for (const proxy of proxies) {
-                key++
-                proxy.key = key
-                await tx.objectStore('proxies').put(proxy, proxy.key)
-            }
-            key = 0
-            for (const acc of borealis) {
-                key++
-                acc.key = key
-                await tx.objectStore('borealis').put(acc, acc.key)
-            }
-            if (oldSettings.useMultiVote == null) {
-                oldSettings.proxyBlackList = ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"]
-                oldSettings.stopVote = 0
-                oldSettings.autoAuthVK = false
-                oldSettings.clearVKCookies = true
-                oldSettings.addBannedVK = false
-                oldSettings.clearBorealisCookies = true
-                oldSettings.repeatAttemptLater = true
-                oldSettings.repeatLater = 5
-                oldSettings.saveVKCredentials = false
-                oldSettings.saveBorealisCredentials = false
-                oldSettings.useMultiVote = true
-                oldSettings.useProxyOnUnProxyTop = false
-            }
-            settings = oldSettings
-            await tx.objectStore('other').put(oldSettings, 'settings')
-            await tx.objectStore('other').put(oldGeneralStats, 'generalStats')
-            await tx.objectStore('other').put(todayStats, 'todayStats')
-            for (const item of Object.keys(allProjects)) {
-                await removeValue('AVMRprojects' + item)
-            }
-            await removeValue('AVMRVKs')
-            await removeValue('AVMRproxies')
-            await removeValue('borealisAccounts')
-            await removeValue('AVMRsettings')
-            await removeValue('generalStats')
-            await removeValue('storageArea', 'local')
-            await reloadAllAlarms()
-            console.log(chrome.i18n.getMessage('importingEnd'))
-            const botsForDiscord = await getValue('AVMRprojectsBotsForDiscord')
-            if (botsForDiscord) {
-                if (botsForDiscord.length > 0) {
-                    let bots = ''
-                    for (const bfd of botsForDiscord) {
-                        bots += bfd.name ? bfd.name : bfd.id
-                        bots += ' '
-                    }
-                    let text = 'There was a rebranding on Discords on BotsForDiscord and it was found that you are auto voting on BotsForDiscord, you will have to configure the extension for Discords again in order to auto vote. The bots that you used on BotsForDiscord: ' + bots
-                    sendNotification('BotsForDiscord rebranding', text)
-                    console.log(text)
-                }
-                await removeValue('AVMRprojectsBotsForDiscord')
-            }
-        }
-    }
+    }*/
     if (details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version(chrome.runtime.getManifest().version)) === -1) {
         chrome.tabs.create({url: 'options.html?updated'})
     } else if (details.previousVersion === chrome.runtime.getManifest().version) {

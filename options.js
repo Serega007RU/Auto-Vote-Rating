@@ -2378,6 +2378,21 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     event.target.classList.remove('disabled')
 })
 
+//Слушатель кнопки "Установить" на таймауте
+document.getElementById('timeout').addEventListener('submit', async (event)=>{
+    event.preventDefault()
+    if (event.target.classList.contains('disabled')) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        event.target.classList.add('disabled')
+    }
+    settings.timeout = document.getElementById('timeoutValue').valueAsNumber
+    await db.put('other', settings, 'settings')
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+    event.target.classList.remove('disabled')
+})
+
 //Слушатель кнопки 'Установить' на blacklist proxy
 document.getElementById('formProxyBlackList').addEventListener('submit', async (event)=>{
     event.preventDefault()
@@ -3123,83 +3138,8 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         if (event.target.files.length === 0) return
         const file = event.target.files[0]
         const data = await new Response(file).json()
-
-        let projects = []
-        let vks = []
-        let proxies = []
-        let borealis = []
-        if (data.projectsTopCraft) {
-            createNotif(chrome.i18n.getMessage('oldSettings'))
-            let key = 0
-            for (const item of Object.keys(allProjects)) {
-                if (!data['projects' + item]) continue
-                for (const project of data['projects' + item]) {
-                    delete project[item]
-                    project.rating = item
-                    if (item === 'Custom') {
-                        project.body = project.id
-                        delete project.id
-                        project.id = project.nick
-                        project.nick = ''
-                    }
-                    if (project.nick == null) project.nick = ''
-                    if (project.stats.successVotes == null) project.stats.successVotes = 0
-                    if (project.stats.monthSuccessVotes == null) project.stats.monthSuccessVotes = 0
-                    if (project.stats.lastMonthSuccessVotes == null) project.stats.lastMonthSuccessVotes = 0
-                    if (project.stats.errorVotes == null) project.stats.errorVotes = 0
-                    if (project.stats.laterVotes == null) project.stats.laterVotes = 0
-                    key++
-                    project.key = key
-                    projects.push(project)
-                }
-            }
-
-            if (data.VKs) {
-                key = 0
-                for (const vk of data.VKs) {
-                    key++
-                    vk.key = key
-                    vks.push(vk)
-                }
-            }
-            if (data.proxies) {
-                key = 0
-                for (const proxy of data.proxies) {
-                    key++
-                    proxy.key = key
-                    proxies.push(proxy)
-                }
-            }
-            if (data.borealisAccounts) {
-                key = 0
-                for (const accborealis of data.borealisAccounts) {
-                    key++
-                    accborealis.key = key
-                    borealis.push(accborealis)
-                }
-            }
-            createNotif(chrome.i18n.getMessage('importing'))
-        } else {
-            projects = data.projects
-        }
-        if (data.vks) vks = data.vks
-        if (data.proxies && !proxies.length) proxies = data.proxies
-        if (data.borealis) borealis = data.borealis
-        if (data.settings.useMultiVote == null) {
-            data.settings.proxyBlackList = ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"]
-            data.settings.stopVote = 0
-            data.settings.autoAuthVK = false
-            data.settings.clearVKCookies = true
-            data.settings.addBannedVK = false
-            data.settings.clearBorealisCookies = true
-            data.settings.repeatAttemptLater = true
-            data.settings.repeatLater = 5
-            data.settings.saveVKCredentials = false
-            data.settings.saveBorealisCredentials = false
-            data.settings.useMultiVote = true
-            data.settings.useProxyOnUnProxyTop = false
-            data.settings.useProxyPacScript = false
-        }
+        
+        const projects = data.projects
 
         if (!await checkPermissions(projects)) return
 
@@ -3229,6 +3169,8 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         await tx.objectStore('other').put(data.settings, 'settings')
         await tx.objectStore('other').put(data.generalStats, 'generalStats')
         await tx.objectStore('other').put(data.todayStats, 'todayStats')
+
+        await upgrade(db, data.version, db.version, tx)
 
         settings = data.settings
         generalStats = data.generalStats
