@@ -2389,6 +2389,7 @@ document.getElementById('timeout').addEventListener('submit', async (event)=>{
     }
     settings.timeout = document.getElementById('timeoutValue').valueAsNumber
     await db.put('other', settings, 'settings')
+    createNotif(chrome.i18n.getMessage('successSave'), 'success')
     if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
     event.target.classList.remove('disabled')
 })
