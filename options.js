@@ -259,7 +259,7 @@ async function restoreOptions() {
 //  if (storageArea == 'sync') document.getElementById('enableSyncStorage').checked = true
     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
-    // document.getElementById('cooldown').value = settings.cooldown
+    document.getElementById('timeoutValue').value = settings.timeout
     document.getElementById('useMultiVote').checked = settings.useMultiVote
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
