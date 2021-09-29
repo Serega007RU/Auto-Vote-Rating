@@ -51,7 +51,7 @@ async function restoreOptions() {
 //  if (storageArea == 'sync') document.getElementById('enableSyncStorage').checked = true
     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
-    // document.getElementById('cooldown').value = settings.cooldown
+    document.getElementById('timeoutValue').value = settings.timeout
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
 }

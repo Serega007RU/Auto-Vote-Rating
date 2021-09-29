@@ -724,7 +724,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 20)
+            await initializeConfig(background, 30)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error.message})
@@ -768,6 +768,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             disabledCheckTime: false,
             disabledCheckInternet: false,
             enableCustom: false,
+            timeout: 10000
         }
         other.add(settings, 'settings')
         generalStats = {
