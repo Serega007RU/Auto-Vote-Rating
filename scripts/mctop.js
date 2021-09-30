@@ -71,10 +71,10 @@ async function vote(first) {
         }
         if (first) return
 
-        //Обход fingerprint
-        if (document.querySelector('input[name="v"]') != null) document.querySelector('input[name="v"]').value = makeid(32)
-        if (document.querySelector('input[name="vv"]') != null) document.querySelector('input[name="vv"]').value = makeid(32)
-        if (document.querySelector('input[name="vs"]') != null) document.querySelector('input[name="vs"]').value = makeid(32)
+        // //Обход fingerprint
+        // if (document.querySelector('input[name="v"]') != null) document.querySelector('input[name="v"]').value = makeid(32)
+        // if (document.querySelector('input[name="vv"]') != null) document.querySelector('input[name="vv"]').value = makeid(32)
+        // if (document.querySelector('input[name="vs"]') != null) document.querySelector('input[name="vs"]').value = makeid(32)
 
         //Вводит никнейм
         document.querySelector('input[name=nick]').value = project.nick

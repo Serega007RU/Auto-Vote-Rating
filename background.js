@@ -47,7 +47,6 @@ initializeConfig(true)
 async function checkVote() {
 
     if (settings.stopVote > Date.now()) return
-    if (nextLoop) return
 
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
     if (!settings.disabledCheckInternet && !online) {
@@ -129,6 +128,7 @@ async function checkOpen(project) {
 
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
+        if (nextLoop) return
         if (project.rating === value.rating || value.randomize && project.randomize) {
             if (!value.nextAttempt) return
             if (Date.now() < value.nextAttempt) {
@@ -304,16 +304,6 @@ async function checkOpen(project) {
                 found = true
                 //Применяет найденный незаюзанный свободный прокси
                 console.log(chrome.i18n.getMessage('applyProxy', proxy.ip + ':' + proxy.port + ' ' + proxy.scheme))
-
-                //Костыль сброса авторизации на прокси (специально для https://socproxy.ru/)
-                const options = {}
-                options.origins = []
-                options.origins.push('http://'+ proxy.ip)
-                options.origins.push('https://'+ proxy.ip)
-                const types = {"cookies": true}
-                await new Promise(resolve => {
-                    chrome.browsingData.remove(options, types, resolve)
-                })
 
                 if (proxy.TunnelBear && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
                     console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
@@ -1763,6 +1753,17 @@ async function removeCookie(url, name) {
 
 async function clearProxy() {
     if (debug) console.log('Удаляю прокси')
+    //Костыль сброса авторизации на прокси (специально для https://socproxy.ru/)
+    if (currentProxy != null) {
+        const options = {}
+        options.origins = []
+        options.origins.push('http://'+ currentProxy.ip)
+        options.origins.push('https://'+ currentProxy.ip)
+        const types = {"cookies": true}
+        await new Promise(resolve => {
+            chrome.browsingData.remove(options, types, resolve)
+        })
+    }
     currentProxy = null
     await new Promise(resolve => chrome.proxy.settings.set({value: {mode: 'system'}, scope: 'regular'}, resolve))
     await new Promise(resolve => chrome.proxy.settings.clear({scope: 'regular'},resolve))
