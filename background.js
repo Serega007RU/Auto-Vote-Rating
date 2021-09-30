@@ -68,7 +68,7 @@ async function checkVote() {
 
     const projects = await db.getAll('projects')
     for (const project of projects) {
-        if ((!project.time || project.time < Date.now()) && project.id !== 'borealis' && project.id !== '2241' && project.id !== '7126') {
+        if (!project.time || project.time < Date.now()) {
             await checkOpen(project)
         }
     }
