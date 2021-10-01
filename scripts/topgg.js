@@ -27,8 +27,13 @@ async function vote(first) {
             return
         }
 
-        const vote = findElement('button', ['vote'])
-        vote.click()
+        const timer2 = setInterval(()=>{
+            const vote = findElement('button', ['vote'])
+            if (!vote.disabled) {
+                vote.click()
+                clearInterval(timer2)
+            }
+        })
 
         const timer1 = setInterval(()=>{
             const result = findElement('p.chakra-text', ['thanks for voting', 'already voted', 'something went wrong'])
