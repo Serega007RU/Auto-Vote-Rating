@@ -1834,7 +1834,7 @@ async function stopVote() {
 //Если требуется авторизация для Прокси
 let errorProxy = {ip: '', count: 0}
 chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn) {
-    if (details.isProxy && (currentProxy || settings.useProxyOnUnProxyTop)) {
+    if (details.isProxy && (currentProxy || settings.useProxyPacScript)) {
         if (errorProxy.ip !== currentProxy.ip) {
             errorProxy.count = 0
         }
