@@ -1513,6 +1513,10 @@ async function endVote(request, sender, project) {
             if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
                 await updateValue('vks', currentVK)
+            } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && message.includes('Ваш аккаунт заблокирован во Вконтакте')) {
+                currentVK.notWorking = message
+                delete currentVK['password' + project.rating]
+                await updateValue('vks', currentVK)
             } else if (project.rating === 'MCRate' && message.includes('Ваш аккаунт заблокирован для голосования за этот проект')) {
                 if (!currentVK[project.rating] || Array.isArray(currentVK[project.rating])) currentVK[project.rating] = {}
                 currentVK[project.rating][project.id] = Number.POSITIVE_INFINITY
