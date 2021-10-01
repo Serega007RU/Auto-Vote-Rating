@@ -770,7 +770,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             enableCustom: false,
             timeout: 10000
         }
-        other.add(settings, 'settings')
+        await other.add(settings, 'settings')
         generalStats = {
             successVotes: 0,
             monthSuccessVotes: 0,
@@ -788,8 +788,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             lastSuccessVote: null,
             lastAttemptVote: null
         }
-        other.add(generalStats, 'generalStats')
-        other.add(todayStats, 'todayStats')
+        await other.add(generalStats, 'generalStats')
+        await other.add(todayStats, 'todayStats')
     } else if (oldVersion === 1) {
         todayStats = {
             successVotes: 0,
@@ -800,9 +800,9 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
         if (!transaction) transaction = db.transaction('other', 'readwrite')
         const store = transaction.objectStore('other')
-        store.put(todayStats, 'todayStats')
+        await store.put(todayStats, 'todayStats')
         settings = await store.get('settings')
         settings.timeout = 10000
-        transaction.objectStore('other').put(settings, 'settings')
+        await transaction.objectStore('other').put(settings, 'settings')
     }
 }
