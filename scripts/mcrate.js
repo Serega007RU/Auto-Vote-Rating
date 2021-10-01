@@ -32,7 +32,7 @@ async function vote(first) {
 //                  clearInterval(timer)
 //              }
 //          }, 2000)
-            chrome.runtime.sendMessage({later: true})
+            chrome.runtime.sendMessage({later: document.querySelector('.warning').innerText.slice(0, document.querySelector('.warning').innerText.indexOf('Спасибо за ваш голос'))})
         } else if (document.querySelector('div[class="error"]') != null) {
             chrome.runtime.sendMessage({message: document.querySelector('div[class="error"]').textContent})
         } else {
