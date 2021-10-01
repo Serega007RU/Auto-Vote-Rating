@@ -750,7 +750,7 @@
     "message": "Randomize the next vote"
   },
   "randomizeTooltip": {
-    "message": "The time of the next vote will be randomized within 0-12 hours, this is mainly necessary to make it harder for server admins to assume that you are using auto-voting"
+    "message": "Within the specified limits, the time of the next vote will be randomized, this is mainly necessary to make it harder for server admins to assume that you are using auto-voting"
   },
   "inRandomize": {
     "message": "Randomized"

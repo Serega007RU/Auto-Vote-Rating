@@ -779,7 +779,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     return "HTTPS $ip$:$port$";
 }`
         }
-        other.add(settings, 'settings')
+        await other.add(settings, 'settings')
         generalStats = {
             successVotes: 0,
             monthSuccessVotes: 0,
@@ -797,8 +797,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             lastSuccessVote: null,
             lastAttemptVote: null
         }
-        other.add(generalStats, 'generalStats')
-        other.add(todayStats, 'todayStats')
+        await other.add(generalStats, 'generalStats')
+        await other.add(todayStats, 'todayStats')
     } else if (oldVersion === 1 || oldVersion === 3) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
