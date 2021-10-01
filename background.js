@@ -143,8 +143,8 @@ async function checkOpen(project) {
                     return
                 }
             }
-            if (nextLoop) return
         }
+        if (nextLoop) return
 
         //Проект с MultiVote и с без MultiVote не должны вместе голосовать
         if (settings.useMultiVote && (project.useMultiVote == null ? true : project.useMultiVote) !== (value.useMultiVote == null ? true : value.useMultiVote)) return
