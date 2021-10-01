@@ -128,7 +128,6 @@ async function checkOpen(project) {
 
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
-        if (nextLoop) return
         if (project.rating === value.rating || value.randomize && project.randomize) {
             if (!value.nextAttempt) return
             if (Date.now() < value.nextAttempt) {
@@ -144,6 +143,7 @@ async function checkOpen(project) {
                     return
                 }
             }
+            if (nextLoop) return
         }
 
         //Проект с MultiVote и с без MultiVote не должны вместе голосовать
