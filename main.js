@@ -822,6 +822,15 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
 }`
         await other.put(settings, 'settings')
 
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+        await other.put(settings, 'settings')
+
         const vks = db.createObjectStore('vks', {autoIncrement: true})
         vks.createIndex('id', 'id')
         const proxies = db.createObjectStore('proxies', {autoIncrement: true})
@@ -838,6 +847,15 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
 return "$scheme$ $ip$:$port$";
 }`
         settings.repeatLater = 5
+        await other.put(settings, 'settings')
+
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
         await other.put(settings, 'settings')
     }
 }
