@@ -889,6 +889,9 @@
   "here": {
     "message": "here"
   },
+  "notRegVK":{
+    "message": "VKontakte authorization error: Registration is not completed (it looks like the phone number is not specified)"
+  },
   "version": {
     "message": "Version: "
   }

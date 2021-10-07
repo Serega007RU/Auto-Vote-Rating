@@ -46,6 +46,8 @@ function run() {
                 text = document.querySelector('div.login_blocked_panel').textContent.trim()
             } else if (document.querySelector('.profile_deleted_text') != null) {
                 text = document.querySelector('.profile_deleted_text').textContent.trim()
+            } else if (document.URL.startsWith('https://vk.com/join')) {
+                text = chrome.i18n.getMessage('notRegVK')
             } else if (document.body.innerText.length < 500) {
                 text = document.body.innerText
             } else {
