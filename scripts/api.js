@@ -53,7 +53,7 @@ function run() {
             } else if (document.querySelector('.profile_deleted_text') != null) {
                 text = document.querySelector('.profile_deleted_text').textContent.trim()
                 notAuth = true
-            } else if (response.url.startsWith('https://vk.com/join')) {
+            } else if (document.URL.startsWith('https://vk.com/join')) {
                 text = chrome.i18n.getMessage('notRegVK')
                 notAuth = true
             } else if (document.body.innerText.length < 500) {
