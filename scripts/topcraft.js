@@ -64,11 +64,6 @@ async function vote(first) {
         }
         if (first) return
 
-        // //Обход fingerprint
-        // if (document.querySelector('input[name="v"]') != null) document.querySelector('input[name="v"]').value = makeid(32)
-        // if (document.querySelector('input[name="vv"]') != null) document.querySelector('input[name="vv"]').value = makeid(32)
-        // if (document.querySelector('input[name="vs"]') != null) document.querySelector('input[name="vs"]').value = makeid(32)
-
         //Вводит никнейм
         document.querySelector('input[name=nick]').value = project.nick
         document.querySelector('input[name=nick]').click()
@@ -98,14 +93,3 @@ const timer = setInterval(()=>{
         clearInterval(timer)
     }
 }, 1000)
-
-function makeid(length) {
-    let result           = ''
-    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    const charactersLength = characters.length
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() *
-            charactersLength))
-    }
-    return result
-}

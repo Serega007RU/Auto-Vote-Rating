@@ -130,7 +130,7 @@ function run() {
                     if (e.data === 'vote') {
                         e.source.postMessage('startedVote', '*')
                         startVote(false)
-                    } else if (e.data === 'voteReady') {
+                    } else if (e.data === 'readyVote') {
                         startVote(true)
                     } else if (e.data === 'reloadCaptcha') {
                         document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
@@ -142,28 +142,28 @@ function run() {
                 //Агась, дикие костыли с ожиданием загрузки jQuery и Rocket Loader (виновник всему этому Rocket Loader)
                 script.textContent = `
                 if (typeof __rocketLoaderLoadProgressSimulator === 'undefined') {
-                    window.postMessage('voteReady', '*')
+                    window.postMessage('readyVote', '*')
                 } else if (!window.jQuery) {
                     if (__rocketLoaderLoadProgressSimulator.simulatedReadyState === 'complete') {
-                        window.postMessage('voteReady', '*')
+                        window.postMessage('readyVote', '*')
                     } else {
                         document.addEventListener('DOMContentLoaded', ()=>{
                             if (window.jQuery && !$.isReady) {
                                 $(document).ready(function() {
-                                    window.postMessage('voteReady', '*')
+                                    window.postMessage('readyVote', '*')
                                 })
                             } else {
-                                window.postMessage('voteReady', '*')
+                                window.postMessage('readyVote', '*')
                             }
                         })
                     }
                 } else {
                     if (!$.isReady) {
                         $(document).ready(function() {
-                            window.postMessage('voteReady', '*')
+                            window.postMessage('readyVote', '*')
                         })
                     } else {
-                        window.postMessage('voteReady', '*')
+                        window.postMessage('readyVote', '*')
                     }
                 }
                 `
