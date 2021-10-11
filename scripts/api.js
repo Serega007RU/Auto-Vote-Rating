@@ -7,8 +7,6 @@ if (typeof loaded === 'undefined') {
     // noinspection ES6ConvertVarToLetConst
     var vkontakte
     // noinspection ES6ConvertVarToLetConst
-    var vkontakte
-    // noinspection ES6ConvertVarToLetConst
     var loaded = true
     run()
 }
