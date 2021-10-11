@@ -1,4 +1,4 @@
-//Костыли для Rocket Loader
+//Фикс-костыль двойной загрузки (для Rocket Loader)
 if (typeof loaded2 === 'undefined') {
     // noinspection ES6ConvertVarToLetConst
     var loaded2 = true
