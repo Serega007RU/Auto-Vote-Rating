@@ -12,7 +12,11 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
     const timer2 = setInterval(()=>{
         //Если капча пройдена
         if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0)) {
-            window.top.postMessage('vote', '*')
+            chrome.runtime.sendMessage('vote', function (response) {
+                if (response === 'startedVote') {
+                    clearInterval(timer2)
+                }
+            })
             // clearInterval(timer2)
         }
     }, 1000)
@@ -22,13 +26,10 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             if (!(document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0))) {
                 document.location.reload()
             }
-        } else if (e.data === 'startedVote') {
-            clearInterval(timer2)
         }
     }
 } else if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) && document.querySelector('head > yandex-captcha-solver') == null) {
     //Интеграция с расширением Buster: Captcha Solver for Humans
-    //Требуется в этом расширении удалить проверку isTrusted для того что б можно было нажать на кнопку и также разрешить shadowRoot
     let count = 0
     let repeat = 2
     const timer7 = setInterval(() => {
@@ -37,7 +38,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
                 repeat = 3
             }
             if (count >= repeat) {
-                window.top.postMessage('reloadCaptcha', '*')
+                chrome.runtime.sendMessage('reloadCaptcha')
                 clearInterval(timer7)
                 return
             }
@@ -68,15 +69,19 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             clearInterval(timer4)
         }
     }, 1000)
-    
+
     //Проверяет прошла ли проверка hCaptcha
     const timer5 = setInterval(()=>{
         if (document.getElementById('checkbox') != null && document.getElementById('checkbox').ariaChecked === 'true') {
-            window.top.postMessage('vote', '*')
+            chrome.runtime.sendMessage('vote', function (response) {
+                if (response === 'startedVote') {
+                    clearInterval(timer5)
+                }
+            })
             // clearInterval(timer5)
         }
     }, 1000)
-    
+
     //Если требуется ручное прохождение капчи
     const timer6 = setInterval(()=>{
         if (document.querySelector('body[class="no-selection"]') != null && document.querySelector('body[class="no-selection"]').ariaHidden == null && document.querySelector('body[class="no-selection"]').style.display === '' && document.querySelector('head > yandex-captcha-solver') == null) {
@@ -87,12 +92,6 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             clearInterval(timer5)
         }
     }, 1000)
-
-    window.onmessage = function(e) {
-        if (e.data === 'startedVote') {
-            clearInterval(timer5)
-        }
-    }
 }
 
 const script = document.createElement('script')

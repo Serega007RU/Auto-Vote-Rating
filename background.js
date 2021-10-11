@@ -1246,24 +1246,28 @@ async function _fetch(url, options, project) {
 }
 
 //Слушатель сообщений и ошибок
-chrome.runtime.onMessage.addListener(async function(request, sender/*, sendResponse*/) {
-    //Если требует ручное прохождение капчи
-    if ((request.captcha || request.authSteam || request.discordLogIn) && sender && openedProjects.has(sender.tab.id)) {
-        let project = openedProjects.get(sender.tab.id)
-        let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage(Object.keys(request)[0])
-        console.warn(getProjectPrefix(project, true) + message)
-        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
-        project.error = message
-        delete project.nextAttempt
-        openedProjects.delete(sender.tab.id)
-        openedProjects.set(sender.tab.id, project)
-        await updateValue('projects', project)
-    } else if (request.changeProject) {
-        openedProjects.delete(sender.tab.id)
-        openedProjects.set(sender.tab.id, request.project)
-        await updateValue('projects', request.project)
-    } else {
-        endVote(request, sender, null)
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (sender && openedProjects.has(sender.tab.id)) {
+        if (request === 'vote' /*|| request === 'voteReady'*/ || request === 'reloadCaptcha' /*|| request === 'startedVote'*/) {
+            chrome.tabs.sendMessage(sender.tab.id, request, sendResponse)
+            if (request === 'vote') return true
+        } else if (request.captcha || request.authSteam || request.discordLogIn) {//Если требует ручное прохождение капчи
+            let project = openedProjects.get(sender.tab.id)
+            let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage(Object.keys(request)[0])
+            console.warn(getProjectPrefix(project, true) + message)
+            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
+            project.error = message
+            delete project.nextAttempt
+            openedProjects.delete(sender.tab.id)
+            openedProjects.set(sender.tab.id, project)
+            updateValue('projects', project)
+        } else if (request.changeProject) {
+            openedProjects.delete(sender.tab.id)
+            openedProjects.set(sender.tab.id, request.project)
+            updateValue('projects', request.project)
+        } else {
+            endVote(request, sender, null)
+        }
     }
 })
 
