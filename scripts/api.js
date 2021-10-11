@@ -1,6 +1,10 @@
+const voteReady = makeId(Math.random() * 32)
+
 if (typeof loaded === 'undefined') {
     // noinspection ES6ConvertVarToLetConst
     var proj
+    // noinspection ES6ConvertVarToLetConst
+    var vkontakte
     // noinspection ES6ConvertVarToLetConst
     var loaded = true
     run()
@@ -10,6 +14,9 @@ function run() {
     chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
         if (request.sendProject) {
             proj = request.project
+            if (request.vkontakte) vkontakte = request.vkontakte
+        } else if (request === 'reloadCaptcha') {
+            document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
         }
     })
 
@@ -36,24 +43,29 @@ function run() {
             }, 1000)
         } else if (document.URL.includes('vk.com/')) {
             let text
+            let notAuth = false
             if (document.querySelector('div.oauth_form_access') != null) {
                 text = document.querySelector('div.oauth_form_access').textContent.replace(document.querySelector('div.oauth_access_items').textContent, '').trim()
+                notAuth = true
             } else if (document.querySelector('div.oauth_content > div') != null) {
                 text = document.querySelector('div.oauth_content > div').textContent
+                notAuth = true
             } else if (document.querySelector('#login_blocked_wrap') != null) {
                 text = document.querySelector('#login_blocked_wrap div.header').textContent + ' ' + document.querySelector('#login_blocked_wrap div.content').textContent.trim()
             } else if (document.querySelector('div.login_blocked_panel') != null) {
                 text = document.querySelector('div.login_blocked_panel').textContent.trim()
             } else if (document.querySelector('.profile_deleted_text') != null) {
                 text = document.querySelector('.profile_deleted_text').textContent.trim()
+                notAuth = true
             } else if (document.URL.startsWith('https://vk.com/join')) {
                 text = chrome.i18n.getMessage('notRegVK')
+                notAuth = true
             } else if (document.body.innerText.length < 500) {
                 text = document.body.innerText
             } else {
                 text = 'null'
             }
-            chrome.runtime.sendMessage({errorAuthVK: text})
+            chrome.runtime.sendMessage({errorAuthVK: text, notAuth})
         } else {
             const script = document.createElement('script')
             script.textContent = `
@@ -118,14 +130,15 @@ function run() {
             }
 
             if (check) {
-                window.onmessage = function(e) {
-                    if (e.data === 'vote') {
-                        e.source.postMessage('startedVote', '*')
+                chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+                    if (request === 'vote') {
+                        sendResponse('startedVote')
                         startVote(false)
-                    } else if (e.data === 'readyVote') {
+                    }
+                })
+                window.onmessage = function (e) {
+                    if (e.data === voteReady) {
                         startVote(true)
-                    } else if (e.data === 'reloadCaptcha') {
-                        document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
                     }
                 }
 
@@ -134,28 +147,28 @@ function run() {
                 //Агась, дикие костыли с ожиданием загрузки jQuery и Rocket Loader (виновник всему этому Rocket Loader)
                 script.textContent = `
                 if (typeof __rocketLoaderLoadProgressSimulator === 'undefined') {
-                    window.postMessage('readyVote', '*')
+                    window.postMessage('`+voteReady+`', '*')
                 } else if (!window.jQuery) {
                     if (__rocketLoaderLoadProgressSimulator.simulatedReadyState === 'complete') {
-                        window.postMessage('readyVote', '*')
+                        window.postMessage('`+voteReady+`', '*')
                     } else {
                         document.addEventListener('DOMContentLoaded', ()=>{
                             if (window.jQuery && !$.isReady) {
                                 $(document).ready(function() {
-                                    window.postMessage('readyVote', '*')
+                                    window.postMessage('`+voteReady+`', '*')
                                 })
                             } else {
-                                window.postMessage('readyVote', '*')
+                                window.postMessage('`+voteReady+`', '*')
                             }
                         })
                     }
                 } else {
                     if (!$.isReady) {
                         $(document).ready(function() {
-                            window.postMessage('readyVote', '*')
+                            window.postMessage('`+voteReady+`', '*')
                         })
                     } else {
-                        window.postMessage('readyVote', '*')
+                        window.postMessage('`+voteReady+`', '*')
                     }
                 }
                 `
@@ -174,7 +187,7 @@ function run() {
         if (document.querySelector('head > captcha-widgets') != null) {
             document.querySelectorAll('.captcha-solver').forEach(el => {
                 if (el.dataset.state === 'solved') {
-                    window.postMessage('vote', '*')
+                    startVote(false)
                     clearInterval(timer1)
                 }
             })
@@ -215,4 +228,14 @@ function throwError(error) {
     }
 
     chrome.runtime.sendMessage({errorVoteNoElement2: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
+}
+
+function makeId(length) {
+    let result             = ''
+    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const charactersLength = characters.length
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
+    }
+    return result
 }
