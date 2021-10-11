@@ -1,17 +1,21 @@
-//Костыли для Rocket Loader
+//Фикс-костыль двойной загрузки (для Rocket Loader)
 if (typeof loaded2 === 'undefined') {
     // noinspection ES6ConvertVarToLetConst
     var loaded2 = true
     runVote()
 }
 
-async function vote(first) {
-    if (first === true || first === false) return
+async function vote() {
     try {
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]') != null) {
-            return
-        }
+        await new Promise(resolve => {
+            const timer = setInterval(()=>{
+                //Ожидаем загрузки reCAPTCHA
+                if (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value && document.getElementById('g-recaptcha-response').value !== '') {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 1000)
+        })
         const project = await getProject('MinecraftServerList')
         document.getElementById('ignn').value = project.nick
         document.querySelector('#voteform > input.buttonsmall.pointer.green.size10').click()
@@ -21,18 +25,6 @@ async function vote(first) {
 }
 
 function runVote() {
-    //Совместимость с Rocket Loader
-    document.addEventListener('DOMContentLoaded', ()=>{
-        const timer = setInterval(()=>{
-            //Ожидаем загрузки reCAPTCHA
-            if (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value && document.getElementById('g-recaptcha-response').value !== '') {
-                vote()
-                clearInterval(timer)
-            }
-        }, 1000)
-    })
-
-    //Ждёт готовности recaptcha (Anti Spam check) и проверяет что с голосованием и пытается вновь нажать vote()
     const timer2 = setInterval(()=>{
         try {
             if (document.querySelector('#voteerror > font') != null) {

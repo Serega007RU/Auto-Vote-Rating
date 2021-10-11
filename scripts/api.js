@@ -1,5 +1,6 @@
 // const voteReady = makeId(Math.random() * 32)
 
+//Фикс-костыль двойной загрузки (для Rocket Loader)
 if (typeof loaded === 'undefined') {
     // noinspection ES6ConvertVarToLetConst
     var proj
