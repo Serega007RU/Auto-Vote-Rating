@@ -11,7 +11,7 @@ if (typeof loaded === 'undefined') {
     run()
 }
 
-function run() {
+async function run() {
     chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
         if (request.sendProject) {
             proj = request.project
@@ -144,18 +144,32 @@ function run() {
                 // }
 
                 //Совместимость с Rocket Loader
-                let include = false
                 for (const entry of window.performance.getEntries()) {
                     if (entry.name.includes('rocket-loader')) {
-                        include = true
-                        window.addEventListener('load', function () {
-                            startVote(true)
+                        await new Promise(resolve => {
+                            window.addEventListener('load', resolve)
                         })
+                        break
                     }
                 }
-                if (!include) {
-                    startVote(true)
+                //Совместимость с jQuery
+                for (const script of document.querySelectorAll('script')) {
+                    if (script.src.toLowerCase().includes('jquery')) {
+                        await new Promise(resolve => {
+                            const timer = setInterval(()=>{
+                                for (const entry of window.performance.getEntries()) {
+                                    if (entry.name.toLowerCase().includes('jquery')) {
+                                        clearInterval(timer)
+                                        resolve()
+                                        break
+                                    }
+                                }
+                            }, 1000)
+                        })
+                        break
+                    }
                 }
+                startVote(true)
                 // const script = document.createElement('script')
                 // //Агась, дикие костыли с ожиданием загрузки jQuery и Rocket Loader (виновник всему этому Rocket Loader)
                 // script.textContent = `
