@@ -266,3 +266,8 @@ function throwError(error) {
 //     }
 //     return result
 // }
+
+//Костыль для FireFox
+let result = ''
+// noinspection BadExpressionStatementJS
+result
