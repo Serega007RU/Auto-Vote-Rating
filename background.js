@@ -302,7 +302,7 @@ async function silentVote(project) {
             let i = 0
             while (i <= 3) {
                 i++
-                let response = await _fetch('https://monitoringminecraft123.ru/top/' + project.id + '/vote', {
+                let response = await _fetch('https://monitoringminecraft.ru/top/' + project.id + '/vote', {
                     'headers': {
                         'content-type': 'application/x-www-form-urlencoded'
                     },
@@ -631,8 +631,13 @@ async function silentVote(project) {
             }
         }
     } catch (e) {
-        if (e.message === 'Failed to fetch') {
-//          endVote({notConnectInternet: true}, null, project)
+        if (e.message === 'Failed to fetch' || e.message === 'NetworkError when attempting to fetch resource.') {
+            for (const p of fetchProjects.values()) {
+                if (p.key === project.key) {
+                    // endVote({notConnectInternet: true}, null, project)
+                    endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
+                }
+            }
         } else {
             endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
         }
@@ -746,7 +751,6 @@ chrome.webRequest.onCompleted.addListener(function(details) {
 chrome.webRequest.onErrorOccurred.addListener(function(details) {
     // noinspection JSUnresolvedVariable
     if (details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) {
-        console.log('Шота есть')
         if (fetchProjects.has(details.requestId)) {
             let project = fetchProjects.get(details.requestId)
             endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
