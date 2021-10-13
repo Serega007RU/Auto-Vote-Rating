@@ -348,35 +348,34 @@ async function checkOpen(project) {
                     tunnelBear.expires = Date.now() + 86400000
                 }
 
-                let config
-                if (settings.useProxyPacScript) {
-                    config = {
-                        mode: 'pac_script',
-                        pacScript: {
-                            data: settings.proxyPacScript.replace('$ip$', proxy.ip).replace('$port$', proxy.port).replace('$scheme$', proxy.scheme.toUpperCase())
-                        }
-                    }
+                // noinspection JSUnresolvedVariable
+                if (typeof InstallTrigger !== 'undefined') {
+                    // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                    browser.proxy.onRequest.addListener(firefoxProxyRequestHandler, {urls: ['<all_urls>']})
                 } else {
-                    config = {
-                        mode: 'fixed_servers',
-                        rules: {
-                            singleProxy: {
-                                scheme: proxy.scheme,
-                                host: proxy.ip,
-                                port: proxy.port
-                            },
-                            bypassList: settings.proxyBlackList
+                    let config
+                    if (settings.useProxyPacScript) {
+                        config = {
+                            mode: 'pac_script',
+                            pacScript: {
+                                data: settings.proxyPacScript.replace('$ip$', proxy.ip).replace('$port$', proxy.port).replace('$scheme$', proxy.scheme.toUpperCase())
+                            }
+                        }
+                    } else {
+                        config = {
+                            mode: 'fixed_servers',
+                            rules: {
+                                singleProxy: {
+                                    scheme: proxy.scheme,
+                                    host: proxy.ip,
+                                    port: proxy.port
+                                },
+                                bypassList: settings.proxyBlackList
+                            }
                         }
                     }
+                    await setProxy(config)
                 }
-                await setProxy(config)
-
-//                     if (chrome.benchmarking) {
-//                         await chrome.benchmarking.closeConnections()
-//                         await chrome.benchmarking.clearCache()
-//                         await chrome.benchmarking.clearHostResolverCache()
-//                         await chrome.benchmarking.clearPredictorCache()
-//                     }
 
                 currentProxy = proxy
                 break
@@ -1791,8 +1790,14 @@ async function clearProxy() {
         })
     }
     currentProxy = null
-    await new Promise(resolve => chrome.proxy.settings.set({value: {mode: 'system'}, scope: 'regular'}, resolve))
-    await new Promise(resolve => chrome.proxy.settings.clear({scope: 'regular'},resolve))
+    // noinspection JSUnresolvedVariable
+    if (typeof InstallTrigger !== 'undefined') {
+        // noinspection JSUnresolvedVariable
+        browser.proxy.onRequest.removeListener(firefoxProxyRequestHandler)
+    } else {
+        await new Promise(resolve => chrome.proxy.settings.set({value: {mode: 'system'}, scope: 'regular'}, resolve))
+        await new Promise(resolve => chrome.proxy.settings.clear({scope: 'regular'},resolve))
+    }
 }
 
 async function setProxy(config) {
@@ -1801,6 +1806,15 @@ async function setProxy(config) {
             resolve()
         })
     })
+}
+
+function firefoxProxyRequestHandler(details) {
+    console.log(details)
+    if (currentProxy == null) {
+        return {type: "direct"}
+    } else {
+        return {type: currentProxy.scheme, host: currentProxy.ip, port: currentProxy.port}
+    }
 }
 
 function wait(ms) {
