@@ -302,7 +302,7 @@ async function silentVote(project) {
             let i = 0
             while (i <= 3) {
                 i++
-                let response = await _fetch('https://monitoringminecraft.ru/top/' + project.id + '/vote', {
+                let response = await _fetch('https://monitoringminecraft123.ru/top/' + project.id + '/vote', {
                     'headers': {
                         'content-type': 'application/x-www-form-urlencoded'
                     },
@@ -535,8 +535,8 @@ async function silentVote(project) {
                 return
             }
 
-            if (!await getRecipe(response.doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com'))) {
-                endVote({message: 'Couldnt find the recipe: ' + response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace('chrome-extension://' + chrome.runtime.id, 'https://minecraftiplist.com')}, null, project)
+            if (!await getRecipe(response.doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace(/^.*\/\/[^\/]+/, 'https://minecraftiplist.com'))) {
+                endVote({message: 'Couldnt find the recipe: ' + response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace(/^.*\/\/[^\/]+/, 'https://minecraftiplist.com')}, null, project)
                 return
             }
             await craft(response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
@@ -744,7 +744,9 @@ chrome.webRequest.onCompleted.addListener(function(details) {
 }, {urls: ['<all_urls>']})
 
 chrome.webRequest.onErrorOccurred.addListener(function(details) {
-    if (details.initiator === 'chrome-extension://' + chrome.runtime.id) {
+    // noinspection JSUnresolvedVariable
+    if (details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) {
+        console.log('Шота есть')
         if (fetchProjects.has(details.requestId)) {
             let project = fetchProjects.get(details.requestId)
             endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
@@ -777,7 +779,8 @@ async function _fetch(url, options, project) {
 
     listener = (details)=>{
         //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net::ERR из fetch запроса?
-        if (details.initiator === 'chrome-extension://' + chrome.runtime.id && details.url.includes(url)) {
+        // noinspection JSUnresolvedVariable
+        if ((details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) && details.url.includes(url)) {
             fetchProjects.set(details.requestId, project)
             removeListener()
         }
