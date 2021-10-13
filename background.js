@@ -1250,7 +1250,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (sender && openedProjects.has(sender.tab.id)) {
         if (request === 'vote' /*|| request === 'voteReady'*/ || request === 'reloadCaptcha' /*|| request === 'startedVote'*/) {
             chrome.tabs.sendMessage(sender.tab.id, request, sendResponse)
-            if (request === 'vote') return true
+            if (request === 'vote' && sender.tab.status === 'complete') return true
         } else if (request.captcha || request.authSteam || request.discordLogIn) {//Если требует ручное прохождение капчи
             let project = openedProjects.get(sender.tab.id)
             let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage(Object.keys(request)[0])
