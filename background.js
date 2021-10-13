@@ -632,11 +632,16 @@ async function silentVote(project) {
         }
     } catch (e) {
         if (e.message === 'Failed to fetch' || e.message === 'NetworkError when attempting to fetch resource.') {
+            let found = false
             for (const p of fetchProjects.values()) {
                 if (p.key === project.key) {
-                    // endVote({notConnectInternet: true}, null, project)
-                    endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
+                    found = true
+                    break
                 }
+            }
+            if (!found) {
+                // endVote({notConnectInternet: true}, null, project)
+                endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
             }
         } else {
             endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
