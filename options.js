@@ -1127,10 +1127,12 @@ async function addVK(repair, imp) {
 
             if (doc.querySelector('.top_profile_vkconnect_name') != null) {
                 VK.name = doc.querySelector('.top_profile_vkconnect_name').textContent
-                VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
+                VK.id = doc.querySelector('#l_pr > a').href.replace(/^.*\/\/[^\/]+/, '')
+                VK.id = VK.id.substring(1, VK.id.length)
             } else {
                 VK.name = doc.querySelector('title').textContent
-                VK.id = doc.querySelector('#l_pr > a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '')
+                VK.id = doc.querySelector('#l_pr > a').href.replace(/^.*\/\/[^\/]+/, '')
+                VK.id = VK.id.substring(1, VK.id.length)
             }
         } catch(e) {
             createNotif(e, 'error')
@@ -1316,7 +1318,7 @@ async function addBorealis(repair, imp) {
             }
         }
         try {
-            acc.nick = doc.querySelector('div.userinfo-pos > div.rcol2 a').href.replace('chrome-extension://' + chrome.runtime.id + '/', '').replace('https://borealis.su/user/', '').replace('/', '')
+            acc.nick = doc.querySelector('div.userinfo-pos > div.rcol2 a').href.replace(/^.*\/\/[^\/]+/, '').replace('https://borealis.su/user/', '').replace('/', '')
         } catch(e) {
             createNotif(e, 'error')
             return
