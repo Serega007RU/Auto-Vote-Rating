@@ -1778,11 +1778,15 @@ async function clearProxy() {
     //Костыль сброса авторизации на прокси (специально для https://socproxy.ru/)
     if (currentProxy != null) {
         const options = {}
-        options.origins = []
-        options.origins.push('http://'+ currentProxy.ip)
-        options.origins.push('https://'+ currentProxy.ip)
+        let name
+        //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
+        // noinspection JSUnresolvedVariable
+        typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
+        options[name] = []
+        options[name].push(currentProxy.ip)
         const types = {"cookies": true}
         await new Promise(resolve => {
+            // noinspection JSCheckFunctionSignatures
             chrome.browsingData.remove(options, types, resolve)
         })
     }
