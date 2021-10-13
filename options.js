@@ -3432,7 +3432,8 @@ async function openPopup(url, onClose, code) {
     const left = parseInt(Math.max(0, (screen.width - width) / 2) + (screen.availLeft | 0))
         , top = parseInt(Math.max(0, (screen.height - height) / 2) + (screen.availTop | 0))
     let close = 'setSelfAsOpener'
-    if (!chrome.app) {//Костыль с FireFox
+    // noinspection JSUnresolvedVariable
+    if (typeof InstallTrigger !== 'undefined') {//Костыль с FireFox
         //FireFox зачем-то решил это называть allowScriptsToClose когда в Chrome это называется setSelfAsOpener, как же это "удобно"
         close = 'allowScriptsToClose'
     }
@@ -3540,7 +3541,6 @@ async function listSelect(event, tabs) {
             let cursor = await db.transaction('projects').store.index('rating').openCursor(tabs)
             while (cursor) {
                 if (!cursor.value.key) cursor.value.key = cursor.key
-                //ToDo <Serega007> костыль для FireFox для решения проблемы "can't access dead object", возможно это не решение
                 const project = cursor.value
                 addProjectList(project)
                 cursor = await cursor.continue()
