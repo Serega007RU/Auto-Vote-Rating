@@ -1361,5 +1361,11 @@
   },
   "useProxyPacScript": {
     "message": "Use proxy PacScript"
+  },
+  "min": {
+    "message": "Minimum"
+  },
+  "max": {
+    "message": "Maximum"
   }
 }

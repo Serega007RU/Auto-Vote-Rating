@@ -1191,18 +1191,18 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
     if (details.initiator === 'chrome-extension://' + chrome.runtime.id) {
         if (fetchProjects.has(details.requestId)) {
             let project = fetchProjects.get(details.requestId)
-//          if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_CONNECTION_CLOSED') || details.error.includes('net::ERR_NETWORK_CHANGED')) {
-//              console.warn(getProjectPrefix(project, true) + details.error)
-//              return
-//          }
             endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
         }
     } else if (openedProjects.has(details.tabId)) {
         if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
             let project = openedProjects.get(details.tabId)
-            if (details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR')) {
-                // console.warn(getProjectPrefix(project, true) + details.error)
-                return
+            if (
+                //Chrome
+                details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
+                //FireFox
+                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR')) {
+                    // console.warn(getProjectPrefix(project, true) + details.error)
+                    return
             }
             const sender = {tab: {id: details.tabId}}
             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)

@@ -1319,5 +1319,11 @@
   },
   "useProxyPacScript": {
     "message": "Использовать PacScript прокси"
+  },
+  "min": {
+    "message": "Минимум"
+  },
+  "max": {
+    "message": "Максимум"
   }
 }
