@@ -47,7 +47,6 @@ async function checkVote() {
     let cursor = await db.transaction('projects').store.openCursor()
     while (cursor) {
         const project = cursor.value
-        //ToDo <Serega007> костыль для FireFox для решения проблемы "can't access dead object", возможно это не решение
         const key = cursor.key
         if (!project.time || project.time < Date.now()) {
             checkOpen(project, key)
