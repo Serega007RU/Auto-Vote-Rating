@@ -21,70 +21,60 @@ function vote(first) {
             return
         }
 
-        const timer4 = setInterval(()=>{
+        const vote = findElement('button', ['upvote'])
+        const timer1 = setInterval(()=>{
+            if (!vote.disabled) {
+                clearInterval(timer1)
+                vote.click()
+            }
+        }, 1000)
+
+        const timer2 = setInterval(()=>{
             try {
-                if (document.querySelector('div.main-content') != null && document.querySelector('div.main-content').textContent === 'Logging you in...') {
-                    //Фикс (костыль) зависания авторизации
-                    if (document.title === '| Discord Bot List') {
-                        document.location.reload()
-                        clearInterval(timer4)
+                const result = findElement('h1', ['thank you for voting'])
+                if (result != null) {
+                    clearInterval(timer2)
+                    if (result.textContent.toLowerCase().includes('thank you for voting')) {
+                        chrome.runtime.sendMessage({successfully: true})
                     }
-                    return
                 }
-                document.querySelector('button.btn.btn-blurple').click()
-                clearInterval(timer4)
             } catch (e) {
                 throwError(e)
-                clearInterval(timer4)
+                clearInterval(timer2)
             }
         }, 1000)
 
-        const timer5 = setInterval(()=>{
-            //Фикс (костыль) зависания redirect
-            if (document.location.pathname === '/auth') {
-                document.location.replace(document.URL)
-                clearInterval(timer5)
-            }
-        }, 1000)
-
-        const timer6 = setInterval(()=> {
-            if (document.querySelector('a[style="font-size: 32px;"]') != null && document.querySelector('a[style="font-size: 32px;"]').href.includes('thanks')) {
-                document.querySelector('a[style="font-size: 32px;"]').click()
-                clearInterval((timer6))
-            }
-        }, 1000)
-        
         const timer3 = setInterval(()=>{
             try {
-                if (document.querySelector('div[role="status"][aria-live="polite"]') != null && document.querySelector('div[role="status"][aria-live="polite"]').textContent === 'User has already voted.') {
-                    chrome.runtime.sendMessage({later: true})
-                    clearInterval(timer3)
-                } else if (document.querySelector('div[class="col-12 col-md-6 text-center"] > h1') != null && document.querySelector('div[class="col-12 col-md-6 text-center"] > h1').textContent === 'Thank you for voting!') {
-                    chrome.runtime.sendMessage({successfully: true})
-                    clearInterval(timer3)
-                } else if (document.querySelector('div[role="status"][aria-live="polite"]') != null && document.querySelector('div[role="status"][aria-live="polite"]').textContent !== '') {
-                    chrome.runtime.sendMessage({message: document.querySelector('div[role="status"][aria-live="polite"]').textContent})
-                    clearInterval(timer3)
-                } else {
-                    for (const el of document.querySelectorAll('link')) {
-                        if (el.href.includes('thanks')) {
-                            chrome.runtime.sendMessage({successfully: true})
-                            clearInterval(timer3)
-                            break
+                if (document.querySelector('div[role="status"]').children.length > 0) {
+                    clearTimeout(timer3)
+                    let text
+                    for (const el of document.querySelector('.toasted-container').children) {
+                        if (el.textContent.includes('already voted')) {
+                            chrome.runtime.sendMessage({later: true})
+                            return
+                        } else {
+                            text = el.textContent
                         }
                     }
-                    if (document.URL.includes('thanks')) {
-                        chrome.runtime.sendMessage({successfully: true})
-                        clearInterval(timer3)
-                    }
+                    chrome.runtime.sendMessage({message: text})
                 }
             } catch (e) {
                 throwError(e)
                 clearInterval(timer3)
             }
         }, 1000)
-
     } catch (e) {
         throwError(e)
+    }
+}
+
+function findElement(selector, text) {
+    for (const element of document.querySelectorAll(selector)) {
+        for (const t of text) {
+            if (element.textContent.toLowerCase().includes(t)) {
+                return element
+            }
+        }
     }
 }
