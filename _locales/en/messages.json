@@ -894,5 +894,11 @@
   },
   "version": {
     "message": "Version: "
+  },
+  "min": {
+    "message": "Minimum"
+  },
+  "max": {
+    "message": "Maximum"
   }
 }
