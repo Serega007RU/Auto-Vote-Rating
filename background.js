@@ -1191,10 +1191,12 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             if (currentVK != null) send.vkontakte = currentVK
             chrome.tabs.sendMessage(details.tabId, send, function (){
                 if (chrome.runtime.lastError) {
-                    console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                    if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                    project.error = chrome.runtime.lastError.message
-                    updateValue('projects', project)
+                    if (!chrome.runtime.lastError.message.includes('Could not establish connection. Receiving end does not exist')) {
+                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                        project.error = chrome.runtime.lastError.message
+                        updateValue('projects', project)
+                    }
                 }
                 resolve()
             })
