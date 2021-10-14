@@ -26,8 +26,6 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             if (!(document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0))) {
                 document.location.reload()
             }
-        } else if (e.data.alert) {
-            chrome.runtime.sendMessage({errorCaptcha: message})
         }
     }
 } else if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) && document.querySelector('head > yandex-captcha-solver') == null) {
@@ -60,12 +58,6 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             clearInterval(timer3)
         }
     }, 1000)
-
-    window.onmessage = function(e) {
-        if (e.data.alert) {
-            chrome.runtime.sendMessage({errorCaptcha: e.data.message})
-        }
-    }
 } else if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)) {
     chrome.runtime.sendMessage({errorCaptcha: document.body.innerText.trim()})
 } else if (window.location.href.match(/.hcaptcha.com\/captcha.v\d\//)) {
@@ -114,10 +106,6 @@ Object.defineProperty(document, 'hidden', {
         return false
     }
 })
-
-alert = function(message) {
-    window.postMessage({alert: true, message: message}, '*')
-}
 `
 document.head.appendChild(script)
 
