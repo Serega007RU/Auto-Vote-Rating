@@ -39,8 +39,7 @@
 		"alarms",
 		"cookies",
 		"proxy",
-		"<all_urls>",
-		"browsingData"
+		"<all_urls>"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
 	"version": "6.2.4",
