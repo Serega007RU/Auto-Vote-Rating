@@ -122,6 +122,6 @@ function isScrolledIntoView(el) {
 }
 
 //Костыль для FireFox
-let result = ''
+let result2 = ''
 // noinspection BadExpressionStatementJS
-result
+result2
