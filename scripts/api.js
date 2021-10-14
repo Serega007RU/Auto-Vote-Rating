@@ -281,6 +281,9 @@ function throwError(error) {
 // }
 
 //Костыль для FireFox
-let result = ''
+if (typeof result === 'undefined') {
+    // noinspection ES6ConvertVarToLetConst
+    var result = ''
+}
 // noinspection BadExpressionStatementJS
 result
