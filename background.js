@@ -236,6 +236,9 @@ async function checkOpen(project) {
                 for (let i = 0; i < vkontakte.cookies.length; i++) {
                     let cookie = vkontakte.cookies[i]
                     if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
+                    //Костыль для FireFox, почему-то не воспринимает куки unspecified
+                    // noinspection JSUnresolvedVariable
+                    if (cookie.sameSite === 'unspecified' && typeof InstallTrigger !== 'undefined') cookie.sameSite = 'no_restriction'
                     await setCookieDetails({
                         url: 'https://' + cookie.domain + cookie.path,
                         name: cookie.name,
@@ -1816,6 +1819,7 @@ async function setProxy(config) {
     })
 }
 
+// noinspection JSUnusedLocalSymbols
 function firefoxProxyRequestHandler(details) {
     if (currentProxy == null) {
         return {type: "direct"}
