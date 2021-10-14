@@ -80,6 +80,10 @@ async function run() {
                     return false
                 }
             })
+            
+            alert = function(message) {
+                window.postMessage({alert: true, message: message}, '*')
+            }
             `
             document.head.appendChild(script)
 
@@ -142,6 +146,15 @@ async function run() {
                 //         startVote(true)
                 //     }
                 // }
+                window.onmessage = function (e) {
+                    if (e.data.alert) {
+                        if (e.data.message.includes('reCAPTCHA')) {
+                            chrome.runtime.sendMessage({errorCaptcha: e.data.message})
+                        } else {
+                            chrome.runtime.sendMessage({message: e.data.message})
+                        }
+                    }
+                }
 
                 //Для FireFox это не нужно
                 // noinspection JSUnresolvedVariable

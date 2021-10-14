@@ -566,6 +566,8 @@ async function addVKList(VK) {
         for (let i = 0; i < VK.cookies.length; i++) {
             let cookie = VK.cookies[i]
             if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
+            // noinspection JSUnresolvedVariable
+            if (cookie.sameSite === 'unspecified' && typeof InstallTrigger !== 'undefined') cookie.sameSite = 'no_restriction'
             await setCookieDetails({
                 url: 'https://' + cookie.domain + cookie.path,
                 name: cookie.name,

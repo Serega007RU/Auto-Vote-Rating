@@ -11,6 +11,11 @@
 		],
 		"persistent": true
 	},
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "{087d39d4-1a27-4105-89d4-40f7970475c4}"
+		}
+	},
 	"description": "__MSG_appDesc__",
 	"manifest_version": 2,
 	"name": "__MSG_appName__",
