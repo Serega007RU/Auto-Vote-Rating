@@ -1230,11 +1230,9 @@ chrome.webRequest.onCompleted.addListener(function(details) {
 
 chrome.webRequest.onErrorOccurred.addListener(function(details) {
     // noinspection JSUnresolvedVariable
-    if (details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) {
-        if (fetchProjects.has(details.requestId)) {
-            let project = fetchProjects.get(details.requestId)
-            endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
-        }
+    if ((details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) && fetchProjects.has(details.requestId)) {
+        let project = fetchProjects.get(details.requestId)
+        endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
     } else if (openedProjects.has(details.tabId)) {
         if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
             let project = openedProjects.get(details.tabId)
