@@ -19,6 +19,14 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             })
             // clearInterval(timer2)
         }
+
+        if (document.querySelector('.rc-anchor-error-msg-container').style.display !== 'none' && document.querySelector('.rc-anchor-error-msg-container').textContent.length > 0) {
+            if (document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Try reloading the page')) {
+                document.location.reload()
+            } else {
+                chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-anchor-error-msg-container').textContent})
+            }
+        }
     }, 1000)
 
     window.onmessage = function(e) {

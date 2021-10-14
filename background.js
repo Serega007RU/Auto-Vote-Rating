@@ -1163,7 +1163,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {
-                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
+                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')) {
                         console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                         if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                         project.error = chrome.runtime.lastError.message
@@ -1176,7 +1176,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'}, function() {
                 if (chrome.runtime.lastError) {
-                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
+                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal') && !chrome.runtime.lastError.message.includes('Missing host permission for the tab')) {
                         console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                         if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                         project.error = chrome.runtime.lastError.message
