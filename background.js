@@ -1191,7 +1191,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             if (currentVK != null) send.vkontakte = currentVK
             chrome.tabs.sendMessage(details.tabId, send, function (){
                 if (chrome.runtime.lastError) {
-                    if (!chrome.runtime.lastError.message.includes('Could not establish connection. Receiving end does not exist')) {
+                    if (!chrome.runtime.lastError.message.includes('Could not establish connection. Receiving end does not exist') && !chrome.runtime.lastError.message.includes('The message port closed before a response was received')) {
                         console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                         if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                         project.error = chrome.runtime.lastError.message
