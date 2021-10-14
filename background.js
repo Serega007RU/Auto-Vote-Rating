@@ -709,7 +709,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {
-                    if (chrome.runtime.lastError.message !== 'The tab was closed.') {
+                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
                         console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                         if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                         project.error = chrome.runtime.lastError.message
@@ -721,14 +721,32 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         })
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'}, function() {
+                if (chrome.runtime.lastError) {
+                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
+                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                        project.error = chrome.runtime.lastError.message
+                        updateValue('projects', project)
+                    }
+                }
                 resolve()
             })
         })
-        chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
+        await new Promise(resolve => {
+            chrome.tabs.sendMessage(details.tabId, {sendProject: true, project}, function (){
+                if (chrome.runtime.lastError) {
+                    console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                    if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                    project.error = chrome.runtime.lastError.message
+                    updateValue('projects', project)
+                }
+                resolve()
+            })
+        })
     } else if (details.frameId !== 0 && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/))) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
-                if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id')) {
+                if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id') && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
                     let error = chrome.runtime.lastError.message
                     if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
                         error += ' Try this solution: https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Problems-with-Opera'
