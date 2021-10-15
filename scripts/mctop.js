@@ -71,6 +71,7 @@ async function vote(first) {
         }
         if (first) return
 
+        if (vkontakte != null) await new Promise(resolve => chrome.runtime.sendMessage({changeProxy: 'mctop'}, resolve))
         //Вводит никнейм
         document.querySelector('input[name=nick]').value = project.nick
         document.querySelector('input[name=nick]').click()

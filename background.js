@@ -368,7 +368,7 @@ async function checkOpen(project) {
                         config = {
                             mode: 'pac_script',
                             pacScript: {
-                                data: settings.proxyPacScript.replace('$ip$', proxy.ip).replace('$port$', proxy.port).replace('$scheme$', proxy.scheme.toUpperCase())
+                                data: settings.proxyPacScript.replace('$ip$', proxy.ip).replace('$port$', proxy.port).replace('$scheme$', proxy.scheme.toUpperCase()).replace('$topcraft$', 'false/*topcraft*/').replace('$mctop$', 'false/*mctop*/')
                             }
                         }
                     } else {
@@ -1299,6 +1299,23 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 } else {
                     return true
                 }
+            }
+        } else if (request.changeProxy) {
+            if (settings.useProxyPacScript && currentProxy != null) {
+                chrome.proxy.settings.get({}, function(details) {
+                    console.log('Смена прокси для', request.changeProxy)
+                    let script = details.value.pacScript.data
+                    if (script.includes('false/*' + request.changeProxy)) {
+                        script = script.replace('false/*' + request.changeProxy + '*/', 'true/*' + request.changeProxy + '*/')
+                        const config = {mode: 'pac_script', pacScript: {data: script}}
+                        chrome.proxy.settings.set({value: config, scope: 'regular'}, () => sendResponse('success'))
+                    } else {
+                        sendResponse('none')
+                    }
+                })
+                return true
+            } else {
+                sendResponse('none')
             }
         } else if (request.captcha || request.authSteam || request.discordLogIn) {//Если требует ручное прохождение капчи
             let project = openedProjects.get(sender.tab.id)
