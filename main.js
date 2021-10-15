@@ -837,6 +837,12 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         proxies.createIndex('ip, port', ['ip', 'port'])
         const borealis = db.createObjectStore('borealis', {autoIncrement: true})
         borealis.createIndex('nick', 'nick')
+
+        if (typeof createNotif !== 'undefined') {
+            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        } else {
+            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        }
     } else if (oldVersion === 2) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
@@ -857,5 +863,11 @@ return "$scheme$ $ip$:$port$";
             lastAttemptVote: null
         }
         await other.add(todayStats, 'todayStats')
+
+        if (typeof createNotif !== 'undefined') {
+            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        } else {
+            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        }
     }
 }
