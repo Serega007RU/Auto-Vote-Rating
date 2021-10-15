@@ -1343,12 +1343,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
-    if (request && request.errorCaptcha && request.errorCaptcha.includes('Не удается связаться с сервисом reCAPTCH')) {
-        console.error('Сработало')
-        closeTabs = false
-        check = false
-        return
-    }
     if (sender && openedProjects.has(sender.tab.id)) {
         //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         project = openedProjects.get(sender.tab.id)
