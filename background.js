@@ -282,21 +282,25 @@ async function checkOpen(project) {
         }
 
         if (currentProxy == null && (settings.useProxyOnUnProxyTop || (project.rating !== 'MinecraftRating'))) {
-            let proxyDetails = await new Promise(resolve => {
-                chrome.proxy.settings.get({}, async function(details) {
-                    resolve(details)
+            //Для FireFox эту проверку нет смысла выполнять
+            // noinspection JSUnresolvedVariable
+            if (typeof InstallTrigger === 'undefined') {
+                let proxyDetails = await new Promise(resolve => {
+                    chrome.proxy.settings.get({}, async function(details) {
+                        resolve(details)
+                    })
                 })
-            })
-            if (!(proxyDetails.levelOfControl === 'controllable_by_this_extension' || proxyDetails.levelOfControl === 'controlled_by_this_extension')) {
-                settings.stopVote = Date.now() + 21600000
-                console.error(chrome.i18n.getMessage('otherProxy'))
-                if (!settings.disabledNotifError) {
-                    sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
+                if (!(proxyDetails.levelOfControl === 'controllable_by_this_extension' || proxyDetails.levelOfControl === 'controlled_by_this_extension')) {
+                    settings.stopVote = Date.now() + 21600000
+                    console.error(chrome.i18n.getMessage('otherProxy'))
+                    if (!settings.disabledNotifError) {
+                        sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
+                    }
+                    await db.put('other', settings, 'settings')
+                    await stopVote()
+                    chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('otherProxy')})
+                    return
                 }
-                await db.put('other', settings, 'settings')
-                await stopVote()
-                chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('otherProxy')})
-                return
             }
             //Ищет не юзанный свободный прокси
             let found = false
