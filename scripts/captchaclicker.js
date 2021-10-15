@@ -130,9 +130,9 @@ function isScrolledIntoView(el) {
 }
 
 //Костыль для FireFox
-if (typeof result === 'undefined') {
+if (typeof result2 === 'undefined') {
     // noinspection ES6ConvertVarToLetConst
-    var result = ''
+    var result2 = ''
 }
 // noinspection BadExpressionStatementJS
-result
+result2
