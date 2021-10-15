@@ -829,7 +829,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             lastSuccessVote: null,
             lastAttemptVote: null
         }
-        await other.put(settings, 'settings')
+        await other.add(todayStats, 'todayStats')
 
         const vks = db.createObjectStore('vks', {autoIncrement: true})
         vks.createIndex('id', 'id')
@@ -856,6 +856,6 @@ return "$scheme$ $ip$:$port$";
             lastSuccessVote: null,
             lastAttemptVote: null
         }
-        await other.put(settings, 'settings')
+        await other.add(todayStats, 'todayStats')
     }
 }
