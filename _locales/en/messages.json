@@ -870,7 +870,15 @@
     "message": "Not granted"
   },
   "oldSettings": {
-    "message": "Old type settings were found (chrome.storage), I convert them to the new type (IndexedDB)"
+    "message": "The settings of the old version $old$ have been detected, I am updating them to the new version $new$",
+    "placeholders": {
+      "old": {
+        "content": "$1"
+      },
+      "new": {
+        "content": "$2"
+      }
+    }
   },
   "randomizeInput": {
     "message": "Specify the randomization limits (min and max) in milliseconds"

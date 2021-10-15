@@ -804,5 +804,11 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         settings = await store.get('settings')
         settings.timeout = 10000
         await transaction.objectStore('other').put(settings, 'settings')
+
+        if (typeof createNotif !== 'undefined') {
+            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        } else {
+            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        }
     }
 }
