@@ -1307,9 +1307,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         } else if (request.changeProxy) {
             if (settings.useProxyPacScript && currentProxy != null) {
                 chrome.proxy.settings.get({}, function(details) {
-                    console.log('Смена прокси для', request.changeProxy)
                     let script = details.value.pacScript.data
                     if (script.includes('false/*' + request.changeProxy)) {
+                        console.log('Смена прокси для', request.changeProxy)
                         script = script.replace('false/*' + request.changeProxy + '*/', 'true/*' + request.changeProxy + '*/')
                         const config = {mode: 'pac_script', pacScript: {data: script}}
                         chrome.proxy.settings.set({value: config, scope: 'regular'}, () => sendResponse('success'))
@@ -1643,6 +1643,24 @@ async function endVote(request, sender, project) {
 
         generalStats.errorVotes++
         todayStats.errorVotes++
+    }
+
+    if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
+        if (project.rating === 'TopCraft' || project.rating === 'McTOP') {
+            if (settings.useProxyPacScript && currentProxy != null) {
+                const proxyDetails = await new Promise(resolve => {
+                    chrome.proxy.settings.get({}, async function(details) {
+                        resolve(details)
+                    })
+                })
+                let script = proxyDetails.value.pacScript.data
+                if (script.includes('true/*' + project.rating.toLowerCase())) {
+                    script = script.replace('true/*' + project.rating.toLowerCase() + '*/', 'false/*' + project.rating.toLowerCase() + '*/')
+                    const config = {mode: 'pac_script', pacScript: {data: script}}
+                    await setProxy(config)
+                }
+            }
+        }
     }
     
     await db.put('other', generalStats, 'generalStats')
