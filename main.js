@@ -850,7 +850,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         settings.useProxyPacScript = false
         settings.proxyPacScript =
 `function FindProxyForURL(url, host) {
-return "$scheme$ $ip$:$port$";
+    return "$scheme$ $ip$:$port$";
 }`
         settings.repeatLater = 5
         await other.put(settings, 'settings')
@@ -862,7 +862,7 @@ return "$scheme$ $ip$:$port$";
             lastSuccessVote: null,
             lastAttemptVote: null
         }
-        await other.add(todayStats, 'todayStats')
+        await other.put(todayStats, 'todayStats')
 
         if (typeof createNotif !== 'undefined') {
             createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
