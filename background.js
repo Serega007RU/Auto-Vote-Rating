@@ -844,7 +844,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 sendResponse(response)
             })
             if (request === 'vote' && sender.tab.status === 'complete') {
-                return true
+                if (request === 'vote' && sender.tab.status === 'complete') {
+                    //Костыль для FireFox, FireFox почему-то не передаёт функцию sendResponse и по этому мы её вызываем сами не дожидаясь загрузки api.js, тут ничо не поделаешь
+                    // noinspection JSUnresolvedVariable
+                    if (typeof InstallTrigger !== 'undefined') {
+                        sendResponse('startedVote')
+                    } else {
+                        return true
+                    }
+                }
             }
         } else if (request.captcha || request.authSteam || request.discordLogIn) {//Если требует ручное прохождение капчи
             let project = openedProjects.get(sender.tab.id)
