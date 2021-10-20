@@ -830,15 +830,21 @@ async function _fetch(url, options, project) {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (sender && openedProjects.has(sender.tab.id)) {
         if (request === 'vote' /*|| request === 'voteReady'*/ || request === 'reloadCaptcha' /*|| request === 'startedVote'*/) {
-            chrome.tabs.sendMessage(sender.tab.id, request, sendResponse)
-            if (request === 'vote' && sender.tab.status === 'complete') {
-                //Костыль для FireFox, FireFox почему-то не передаёт функцию sendResponse и по этому мы её вызываем сами не дожидаясь загрузки api.js, тут ничо не поделаешь
-                // noinspection JSUnresolvedVariable
-                if (typeof InstallTrigger !== 'undefined') {
-                    sendResponse('startedVote')
-                } else {
-                    return true
+            chrome.tabs.sendMessage(sender.tab.id, request, function (response) {
+                if (chrome.runtime.lastError) {
+                    if (!chrome.runtime.lastError.message.includes('Could not establish connection. Receiving end does not exist') && !chrome.runtime.lastError.message.includes('The message port closed before a response was received')) {
+                        const project = openedProjects.get(sender.tab.id)
+                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                        project.error = chrome.runtime.lastError.message
+                        updateValue('projects', project)
+                        return
+                    }
                 }
+                sendResponse(response)
+            })
+            if (request === 'vote' && sender.tab.status === 'complete') {
+                return true
             }
         } else if (request.captcha || request.authSteam || request.discordLogIn) {//Если требует ручное прохождение капчи
             let project = openedProjects.get(sender.tab.id)
@@ -1200,17 +1206,17 @@ chrome.runtime.onInstalled.addListener(async function(details) {
     }*/
 })
 
-function Version(s){
-  this.arr = s.split('.').map(Number)
-}
-Version.prototype.compareTo = function(v){
-    for (let i=0; ;i++) {
-        if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1
-        if (i>=this.arr.length) return -1
-        const diff = this.arr[i]-v.arr[i]
-        if (diff) return diff>0 ? 1 : -1
-    }
-}
+// function Version(s){
+//   this.arr = s.split('.').map(Number)
+// }
+// Version.prototype.compareTo = function(v){
+//     for (let i=0; ;i++) {
+//         if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1
+//         if (i>=this.arr.length) return -1
+//         const diff = this.arr[i]-v.arr[i]
+//         if (diff) return diff>0 ? 1 : -1
+//     }
+// }
 
 
 /* Store the original log functions. */
