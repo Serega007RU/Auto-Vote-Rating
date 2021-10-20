@@ -1308,7 +1308,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 sendResponse(response)
             })
             if (request === 'vote' && sender.tab.status === 'complete') {
-                return true
+                if (request === 'vote' && sender.tab.status === 'complete') {
+                    //Костыль для FireFox, FireFox почему-то не передаёт функцию sendResponse и по этому мы её вызываем сами не дожидаясь загрузки api.js, тут ничо не поделаешь
+                    // noinspection JSUnresolvedVariable
+                    if (typeof InstallTrigger !== 'undefined') {
+                        sendResponse('startedVote')
+                    } else {
+                        return true
+                    }
+                }
             }
         } else if (request.changeProxy) {
             if (settings.useProxyPacScript && currentProxy != null) {
