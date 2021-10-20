@@ -2086,17 +2086,17 @@ chrome.runtime.onInstalled.addListener(async function(details) {
     }
 })
 
-// function Version(s){
-//   this.arr = s.split('.').map(Number)
-// }
-// Version.prototype.compareTo = function(v){
-//     for (let i=0; ;i++) {
-//         if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1
-//         if (i>=this.arr.length) return -1
-//         const diff = this.arr[i]-v.arr[i]
-//         if (diff) return diff>0 ? 1 : -1
-//     }
-// }
+function Version(s){
+  this.arr = s.split('.').map(Number)
+}
+Version.prototype.compareTo = function(v){
+    for (let i=0; ;i++) {
+        if (i>=v.arr.length) return i>=this.arr.length ? 0 : 1
+        if (i>=this.arr.length) return -1
+        const diff = this.arr[i]-v.arr[i]
+        if (diff) return diff>0 ? 1 : -1
+    }
+}
 
 
 /* Store the original log functions. */
