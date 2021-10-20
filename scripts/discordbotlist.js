@@ -37,6 +37,18 @@ function vote(first) {
                     if (result.textContent.toLowerCase().includes('thank you for voting')) {
                         chrome.runtime.sendMessage({successfully: true})
                     }
+                } else {
+                    for (const el of document.querySelectorAll('link')) {
+                        if (el.href.includes('thanks')) {
+                            chrome.runtime.sendMessage({successfully: true})
+                            clearInterval(timer2)
+                            return
+                        }
+                    }
+                    if (document.URL.includes('thanks')) {
+                        chrome.runtime.sendMessage({successfully: true})
+                        clearInterval(timer2)
+                    }
                 }
             } catch (e) {
                 throwError(e)
