@@ -1292,7 +1292,7 @@ async function _fetch(url, options, project) {
 
 let promises = []
 //Слушатель сообщений и ошибок
-chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (sender && openedProjects.has(sender.tab.id)) {
         if (request === 'vote' /*|| request === 'voteReady'*/ || request === 'reloadCaptcha' /*|| request === 'startedVote'*/) {
             chrome.tabs.sendMessage(sender.tab.id, request, function (response) {
@@ -1321,23 +1321,24 @@ chrome.runtime.onMessage.addListener(async function(request, sender, sendRespons
             }
         } else if (request.changeProxy) {
             if (settings.useProxyPacScript && currentProxy != null) {
-                await Promise.all(promises)
-                promises.push(new Promise(resolve => {
-                    chrome.proxy.settings.get({}, function(details) {
-                        let script = details.value.pacScript.data
-                        if (script.includes('false/*' + request.changeProxy)) {
-                            console.log('Смена прокси для', request.changeProxy)
-                            script = script.replace('false/*' + request.changeProxy + '*/', 'true/*' + request.changeProxy + '*/')
-                            const config = {mode: 'pac_script', pacScript: {data: script}}
-                            chrome.proxy.settings.set({value: config, scope: 'regular'}, () => {
-                                sendResponse('success')
-                                resolve()
-                            })
-                        } else {
-                            sendResponse('none')
-                        }
-                    })
-                }))
+                Promise.all(promises).then(()=>{
+                    promises.push(new Promise(resolve => {
+                        chrome.proxy.settings.get({}, function(details) {
+                            let script = details.value.pacScript.data
+                            if (script.includes('false/*' + request.changeProxy)) {
+                                console.log('Смена прокси для', request.changeProxy)
+                                script = script.replace('false/*' + request.changeProxy + '*/', 'true/*' + request.changeProxy + '*/')
+                                const config = {mode: 'pac_script', pacScript: {data: script}}
+                                chrome.proxy.settings.set({value: config, scope: 'regular'}, () => {
+                                    sendResponse('success')
+                                    resolve()
+                                })
+                            } else {
+                                sendResponse('none')
+                            }
+                        })
+                    }))
+                })
                 return true
             } else {
                 sendResponse('none')
