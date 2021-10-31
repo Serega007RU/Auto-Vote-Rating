@@ -1022,6 +1022,39 @@
                                 </div>
                                 <div class="changes timeline-content">
                                     <h4>
+                                        v6.3.0
+                                    </h4>
+                                    <small>released on 31.10.2021</small>
+                                    <div class="changes-entry">
+                                        <ul>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Теперь игнорируется ожидание загрузки Rocket Loader (он не всегда отрабатывал), вместо этого ожидается загрузка JQuery
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Очень много технических исправлений ошибок на FireFox (фактически расширение протестировано на FireFox и оно там работает, но так как сам браузер говно говняное, там ничего адекватно не работает, в особенности много проблем с reCaptcha)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Для DiscordBotList возвращён костыль определения успешности голосования
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Предусмотрена ещё один вид ошибок для reCAPTCHA
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                chrome.runtime.lastError теперь не игнорируется (но всё равно большинство от туда ошибок пришлось игнорировать)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Для TopCraft/McTOP добавлена смена прокси (в момент нажатия "Проголосовать") для AstroProxy (в обход ошибки что айпи адрес в базе данных спамеров)
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-left">
+                                    <div class="timeline-icon"></div>
+                                </div>
+                                <div class="changes timeline-content">
+                                    <h4>
                                         v6.2.4
                                     </h4>
                                     <small>released on 13.10.2021</small>
