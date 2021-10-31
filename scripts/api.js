@@ -158,17 +158,17 @@ async function run() {
 
                 //Для FireFox это не нужно
                 // noinspection JSUnresolvedVariable
-                if (typeof InstallTrigger === 'undefined') {
-                    //Совместимость с Rocket Loader
-                    for (const entry of window.performance.getEntries()) {
-                        if (entry.name.includes('rocket-loader')) {
-                            await new Promise(resolve => {
-                                window.addEventListener('load', resolve)
-                            })
-                            break
-                        }
-                    }
-                }
+                // if (typeof InstallTrigger === 'undefined') {
+                //     //Совместимость с Rocket Loader
+                //     for (const entry of window.performance.getEntries()) {
+                //         if (entry.name.includes('rocket-loader')) {
+                //             await new Promise(resolve => {
+                //                 window.addEventListener('load', resolve)
+                //             })
+                //             break
+                //         }
+                //     }
+                // }
                 //Совместимость с jQuery
                 for (const script of document.querySelectorAll('script')) {
                     if (script.src.toLowerCase().includes('jquery')) {
