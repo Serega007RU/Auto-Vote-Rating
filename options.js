@@ -31,12 +31,15 @@ document.addEventListener('DOMContentLoaded', async()=>{
     fastAdd()
 
     //Для FireFox почему-то не доступно это API
-    if (chrome.notifications.getPermissionLevel != null) {
-        chrome.notifications.getPermissionLevel(function(callback) {
-            if (callback !== 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
-                createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
-            }
-        })
+    // noinspection JSUnresolvedVariable
+    if (typeof InstallTrigger === 'undefined') {
+        if (chrome.notifications.getPermissionLevel != null) {
+            chrome.notifications.getPermissionLevel(function(callback) {
+                if (callback !== 'granted' && (!settings.disabledNotifError || !settings.disabledNotifWarn)) {
+                    createNotif(chrome.i18n.getMessage('notificationsDisabled'), 'error')
+                }
+            })
+        }
     }
 })
 
