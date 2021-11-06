@@ -2504,7 +2504,11 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
 		    	continue
 		    }
             let doc = new DOMParser().parseFromString(html, 'text/html')
-            let number = doc.querySelector('.lk-desc2.border-rad.block-desc-padding').textContent.match(/\d+/g).map(Number)
+            const bal = doc.querySelector('.lk-desc2.border-rad.block-desc-padding')
+            if (bal.querySelector('font[color="red"]') != null) {
+                bal.querySelector('font[color="red"]').remove()
+            }
+            let number = bal.textContent.match(/\d+/g).map(Number)
             let coin = number[1]
             let vote = number[2]
 
@@ -2528,7 +2532,9 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
 		            	continue
 		            }
                     doc = new DOMParser().parseFromString(html, 'text/html')
-                    createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + coin + ' бореалисиков', 'hint', 1000)
+                    const result = doc.querySelector('div.alert.alert-block')
+                    result.querySelector('button').remove()
+                    createNotif(acc.nick + ' - ' + result.textContent + ' ' + coin + ' бореалисиков', 'hint', 1000)
                 } else {
                     createNotif('На ' + acc.nick + ' 0 бореаликов', 'warn', 2000)
                 }
@@ -2554,7 +2560,9 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
 		            	continue
 		            }
                     doc = new DOMParser().parseFromString(html, 'text/html')
-                    createNotif(acc.nick + ' - ' + doc.querySelector('div.alert.alert-block').textContent + ' ' + vote + ' голосов', 'hint', 1000)
+                    const result = doc.querySelector('div.alert.alert-block')
+                    result.querySelector('button').remove()
+                    createNotif(acc.nick + ' - ' + result.textContent + ' ' + vote + ' голосов', 'hint', 1000)
                 } else {
                     createNotif('На ' + acc.nick + ' 0 голосов', 'warn', 2000)
                 }
