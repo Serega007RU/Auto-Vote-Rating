@@ -760,7 +760,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             disabledCheckTime: false,
             disabledCheckInternet: false,
             enableCustom: false,
-            timeout: 10000,
+            timeout: 1000,
             proxyBlackList: ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"],
             stopVote: 0,
             autoAuthVK: false,
@@ -802,7 +802,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     } else if (oldVersion === 1 || oldVersion === 3) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
-        if (oldVersion === 1) settings.timeout = 10000
+        if (oldVersion === 1) settings.timeout = 1000
         settings.proxyBlackList = ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"]
         settings.stopVote = 0
         settings.autoAuthVK = false
@@ -846,7 +846,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     } else if (oldVersion === 2) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
-        settings.timeout = 10000
+        settings.timeout = 1000
         settings.useProxyPacScript = false
         settings.proxyPacScript =
 `function FindProxyForURL(url, host) {
