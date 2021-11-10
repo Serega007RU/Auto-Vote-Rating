@@ -56,7 +56,16 @@ async function vote(first) {
                 return
             }
             document.querySelector('button[data-type=vote]').click()
-            document.querySelector('a.modalVkLogin').click()
+            if (document.querySelector('a.modalVkLogin') == null) {
+                const timerLogin = setInterval(() => {
+                    if (document.querySelector('a.modalVkLogin') != null) {
+                        document.querySelector('a.modalVkLogin').click()
+                        clearInterval(timerLogin)
+                    }
+                }, 1000)
+            } else {
+                document.querySelector('a.modalVkLogin').click()
+            }
             return
         }
         if (!document.querySelector('#voteModal').classList.contains('in')) {
