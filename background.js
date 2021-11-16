@@ -997,6 +997,8 @@ async function endVote(request, sender, project) {
                 time = new Date(request.successfully)
             } else if (project.rating === 'Discords' && project.game === 'servers') {
                 time.setUTCHours(time.getUTCHours() + 6)
+            } else if (project.rating === 'WARGM') {
+                time.setUTCHours(time.getUTCHours() + 16)
             } else {
                 time.setUTCDate(time.getUTCDate() + 1)
             }

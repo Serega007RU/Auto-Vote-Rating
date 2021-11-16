@@ -668,6 +668,104 @@ const allProjects = {
                 return 'gTop100.com'
         }
     },
+    WARGM: (type, project) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://wargm.ru/server/' + project.id + '/votes'
+            case 'pageURL':
+                return 'https://wargm.ru/server/' + project.id
+            case 'jsPath':
+                return '#header h1'
+            case 'exampleURL':
+                return ['https://wargm.ru/server/', '23394', '/votes']
+            case 'URL':
+                return 'WARGM.ru'
+        }
+    },
+    MineStatus: (type, project) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://minestatus.net/server/vote/' + project.id
+            case 'pageURL':
+                return 'https://minestatus.net/server/' + project.id
+            case 'jsPath':
+                return 'h1.section-title'
+            case 'exampleURL':
+                return ['https://minestatus.net/server/vote/', 'mine.sylphmc.com', '']
+            case 'URL':
+                return 'MineStatus.net'
+        }
+    },
+    MisterLauncher: (type, project) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code'
+            case 'pageURL':
+                return 'https://misterlauncher.org/projects/' + project.id + '/'
+            case 'jsPath':
+                return 'table[class="table server-table"] > tbody > tr:nth-child(2) > td:nth-child(2) > a'
+            case 'exampleURL':
+                return ['https://misterlauncher.org/projects/', 'omegamc', '/']
+            case 'URL':
+                return 'MisterLauncher.org'
+        }
+    },
+    MinecraftServersDe: (type, project) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://minecraft-servers.de/server/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://minecraft-servers.de/server/' + project.id
+            case 'jsPath':
+                return 'div.container h1'
+            case 'exampleURL':
+                return ['https://minecraft-servers.de/server/', 'twerion', '/vote']
+            case 'URL':
+                return 'Minecraft-Servers.de'
+        }
+    },
+    DiscordBoats: (type, project) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://discord.boats/bot/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://discord.boats/bot/' + project.id
+            case 'jsPath':
+                return 'div.container h3 > span'
+            case 'exampleURL':
+                return ['https://discord.boats/bot/', '557628352828014614', '/vote']
+            case 'URL':
+                return 'Discord.Boats'
+        }
+    },
+    ServerListGames: (type, project) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://serverlist.games/vote/' + project.id
+            case 'pageURL':
+                return 'https://serverlist.games/server/' + project.id
+            case 'jsPath':
+                return 'div.card-title-server h5'
+            case 'exampleURL':
+                return ['https://serverlist.games/vote/', '2052', '']
+            case 'URL':
+                return 'ServerList.Games'
+        }
+    },
+    BestMinecraftServers: (type, project) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://serverlist.games/vote/' + project.id
+            case 'pageURL':
+                return 'https://best-minecraft-servers.co/' + project.id + '/vote'
+            case 'jsPath':
+                return 'table.info th'
+            case 'exampleURL':
+                return ['https://best-minecraft-servers.co/', 'server-hypixel-network.30', '/vote']
+            case 'URL':
+                return 'Best-Minecraft-Servers.co'
+        }
+    },
     Custom: (type, project) => {
         switch (type) {
             case 'pageURL':
