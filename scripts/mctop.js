@@ -29,17 +29,14 @@ async function vote(first) {
         const project = await getProject('McTOP')
         //Авторизованы ли мы в аккаунте?
         if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
-            document.querySelector('button[data-type=vote]').click()
-            if (document.querySelector('a.modalVkLogin') == null) {
-                const timerLogin = setInterval(() => {
-                    if (document.querySelector('a.modalVkLogin') != null) {
-                        document.querySelector('a.modalVkLogin').click()
-                        clearInterval(timerLogin)
-                    }
-                }, 1000)
-            } else {
-                document.querySelector('a.modalVkLogin').click()
-            }
+            const timerLogin = setInterval(() => {
+                if (document.querySelector('a.modalVkLogin') != null) {
+                    document.querySelector('a.modalVkLogin').click()
+                    clearInterval(timerLogin)
+                } else {
+                    document.querySelector('button[data-type=vote]').click()
+                }
+            }, 1000)
             return
         }
         if (!document.querySelector('#voteModal').classList.contains('in')) {
