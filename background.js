@@ -392,6 +392,20 @@ async function checkOpen(project) {
                 }
 
                 currentProxy = proxy
+
+                if (settings.yandexCaptchaSolver) {
+                    let cookies = await new Promise(resolve=>{
+                        chrome.cookies.getAll({}, function(cookies) {
+                            resolve(cookies)
+                        })
+                    })
+                    if (debug) console.log('Удаляю куки Yandex')
+                    for (let i = 0; i < cookies.length; i++) {
+                        if (!cookies[i].domain.includes('.yandex.')) continue
+                        if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+                        await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
+                    }
+                }
                 break
             }
 
@@ -507,19 +521,6 @@ async function checkOpen(project) {
                 if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
             }
-
-//             let cookies2 = await new Promise(resolve=>{
-//                 chrome.cookies.getAll({}, function(cookies2) {
-//                     resolve(cookies2)
-//                 })
-//             })
-//             if (debug) console.log('Удаляю куки ' + 'yandex')
-//             for (let i = 0; i < cookies2.length; i++) {
-//                 if (!cookies2[i].domain.includes('.yandex.')) continue
-//                 if (cookies2[i].name === 'csrf_cookie_name' || cookies2[i].name.startsWith('cf_') || cookies2[i].name.startsWith('__cf')) continue
-//                 if (cookies2[i].domain.charAt(0) === '.') cookies2[i].domain = cookies2[i].domain.substring(1, cookies2[i].domain.length)
-//                 await removeCookie('https://' + cookies2[i].domain + cookies2[i].path, cookies2[i].name)
-//             }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
     } else if (settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
