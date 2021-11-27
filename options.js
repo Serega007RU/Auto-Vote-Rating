@@ -750,6 +750,8 @@ async function addProject(project, element) {
                     projectURL = projectURL.substring(9, projectURL.length)
                 } else if (project.rating === 'MinecraftList') {
                     projectURL = projectURL.replace(' Minecraft Server', '')
+                } else if (project.rating === 'MinecraftServers100') {
+                    projectURL = projectURL.replace('Vote for Minecraft ', '')
                 }
                 project.name = projectURL
             }

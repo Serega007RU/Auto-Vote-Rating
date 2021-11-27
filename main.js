@@ -766,6 +766,20 @@ const allProjects = {
                 return 'Best-Minecraft-Servers.co'
         }
     },
+    MinecraftServers100: (type, project) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://minecraftservers100.com/vote/' + project.id
+            case 'pageURL':
+                return 'https://minecraftservers100.com/vote/' + project.id
+            case 'jsPath':
+                return 'div.page-header'
+            case 'exampleURL':
+                return ['https://minecraftservers100.com/vote/', '2340', '']
+            case 'URL':
+                return 'MinecraftServers100.com'
+        }
+    },
     Custom: (type, project) => {
         switch (type) {
             case 'pageURL':
