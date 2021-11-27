@@ -1,14 +1,13 @@
 async function vote(first) {
     try {
-        if (document.querySelector('article.message.is-success') != null && document.querySelector('article.message.is-success').textContent.includes('Úspěšně jste zahlasoval')) {
-            chrome.runtime.sendMessage({successfully: true})
-            return
-        }
-        if (document.querySelector('article.message.is-danger') != null) {
-            if (document.querySelector('article.message.is-danger').textContent.includes('Hlasovat můžete až')) {
+        if (document.querySelector('.notification') != null) {
+            if (document.querySelector('.notification.is-success') != null) {
+                chrome.runtime.sendMessage({successfully: true})
+            } else if (document.querySelector('.notification.is-warning') != null && document.querySelector('.notification.is-warning').textContent.includes('Hlasovat můžete až')) {
+                //Сайт предоставляет когда следующее голосование но не понятно в каком часовом поясе указано время, также не указывается день (пишет только часы и минуты) что ещё больше осложняет определение времени следующего голосования
                 chrome.runtime.sendMessage({later: Date.now() + 7200000})
             } else {
-                chrome.runtime.sendMessage({message: document.querySelector('article.message.is-danger').textContent})
+                chrome.runtime.sendMessage({message: document.querySelector('.notification').textContent.trim()})
             }
             return
         }
@@ -18,8 +17,8 @@ async function vote(first) {
             return
         }
         let project = await getProject('MinecraftServery')
-        document.querySelector('input[name="nickname"]').value = project.nick
-        document.querySelector('input[name="vote"]').click()
+        document.querySelector('#vote-modal form input[name="nickname"]').value = project.nick
+        document.querySelector('#vote-modal form button[type="submit"]').click()
     } catch (e) {
         throwError(e)
     }
