@@ -48,12 +48,16 @@ async function initializeConfig(background, version) {
         dbError({target: {source: {name: 'avr'}}, error: error.message})
         return
     }
-    db.onerror = dbError
-    dbLogs.onerror = dbError
-    function dbError(event) {
+    db.onerror = (event) => dbError(event, false)
+    dbLogs.onerror = (event) => dbError(event, true)
+    function dbError(event, logs) {
         if (background) {
             if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error)
-            console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
+            if (logs) {
+                console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
+            } else {
+                console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
+            }
         } else {
             createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
         }
