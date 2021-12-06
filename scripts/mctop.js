@@ -55,17 +55,14 @@ async function vote(first) {
                 document.location.reload()
                 return
             }
-            document.querySelector('button[data-type=vote]').click()
-            if (document.querySelector('a.modalVkLogin') == null) {
-                const timerLogin = setInterval(() => {
-                    if (document.querySelector('a.modalVkLogin') != null) {
-                        document.querySelector('a.modalVkLogin').click()
-                        clearInterval(timerLogin)
-                    }
-                }, 1000)
-            } else {
-                document.querySelector('a.modalVkLogin').click()
-            }
+            const timerLogin = setInterval(() => {
+                if (document.querySelector('a.modalVkLogin') != null) {
+                    document.querySelector('a.modalVkLogin').click()
+                    clearInterval(timerLogin)
+                } else {
+                    document.querySelector('button[data-type=vote]').click()
+                }
+            }, 1000)
             return
         }
         if (!document.querySelector('#voteModal').classList.contains('in')) {
@@ -88,7 +85,6 @@ async function vote(first) {
         document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
     } catch (e) {
         throwError(e)
-        console.error(e)
     }
 }
 

@@ -6,8 +6,8 @@ async function vote(first) {
             return
         }
 
-        if (document.querySelector('a[href="https://mmotop.ru/users/sign_in"]') != null) {
-            chrome.runtime.sendMessage({auth: true})
+        if (document.querySelector('a[href="/users/sign_in"]') != null) {
+            chrome.runtime.sendMessage({auth: document.querySelector('a[href="/users/sign_in"]').parentElement.innerText})
             return
         }
         

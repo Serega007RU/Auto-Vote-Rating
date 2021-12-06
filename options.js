@@ -9,8 +9,7 @@ const authVKUrls = new Map([
     ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
     ['MCRate', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
     ['MinecraftRating', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
-    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
-    ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&response_type=token&redirect_uri=close.html']
+    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html']
 ])
 
 const svgInfo = document.createElement('img')
@@ -2648,25 +2647,15 @@ async function addProject(project, element) {
             }
             addProjectsBonus(project, element)
             return
-        } else if ((project.rating === 'MCRate' || project.rating === 'ServerPact' || project.rating === 'MinecraftServersOrg' || project.rating === 'HotMC' || project.rating === 'MMoTopRU' || project.rating === 'MinecraftIpList') && !settings.useMultiVote) {
+        } else if (allProjects[project.rating]('oneProject') > 0) {
             found = await db.countFromIndex('projects', 'rating', project.rating)
-            if (project.rating === 'MinecraftIpList') {
-                if (found >= 5) {
-                    createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
-                    return
-                }
-            } else {
-                if (found > 0) {
-                    createNotif(chrome.i18n.getMessage('oneProject', project.rating), 'error', null, element)
-                    return
-                }
+            if (found >= allProjects[project.rating]('oneProject')) {
+                createNotif(chrome.i18n.getMessage('oneProject', [project.rating, String(allProjects[project.rating]('oneProject'))]), 'error', null, element)
+                return
             }
         }
     }
 
-    let projectURL = ''
-    const url = allProjects[project.rating]('pageURL', project)
-    const jsPath = allProjects[project.rating]('jsPath', project)
 
     if (!await checkPermissions([project])) return
 
@@ -2675,6 +2664,7 @@ async function addProject(project, element) {
 
         let response
         try {
+            const url = allProjects[project.rating]('pageURL', project)
             if (project.rating === 'MinecraftIpList') {
                 response = await fetch(url, {credentials: 'omit'})
             } else {
@@ -2694,11 +2684,7 @@ async function addProject(project, element) {
             createNotif(chrome.i18n.getMessage('notFoundProjectCode', String(response.status)), 'error', null, element)
             return
         } else if (response.redirected) {
-            if (project.rating === 'ServerPact' || project.rating === 'TopMinecraftServers' || project.rating === 'MCServers' || project.rating === 'MinecraftList' || project.rating === 'MinecraftIndex' || project.rating === 'ServerList101' || project.rating === 'CraftList' || project.rating === 'MinecraftBuzz') {
-                createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
-                return
-            }
-            createNotif(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notFoundProjectRedirect', response.url), 'error', null, element)
             return
         } else if (response.status === 503) {//None
         } else if (!response.ok) {
@@ -2706,102 +2692,30 @@ async function addProject(project, element) {
             return
         }
 
+        let html = await response.text()
+        let doc = new DOMParser().parseFromString(html, 'text/html')
+
         try {
-            let html = await response.text()
-            let doc = new DOMParser().parseFromString(html, 'text/html')
-            if (project.rating === 'MCRate') {
-                //А зачем 404 отдавать в status код? Мы лучше отошлём 200 и только потом на странице напишем что не найдено 404
-                if (doc.querySelector('div[class=error]') != null) {
-                    createNotif(doc.querySelector('div[class=error]').textContent, 'error', null, element)
-                    return
-                }
-            } else if (project.rating === 'ServerPact') {
-                if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center') != null && doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center').textContent.includes('This server does not exist')) {
+            const notFound = allProjects[project.rating]('notFound', project, doc)
+            if (notFound) {
+                if (notFound === true) {
                     createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
-                    return
+                } else {
+                    createNotif(notFound, 'error', null, element)
                 }
-            } else if (project.rating === 'ListForge') {
-                if (doc.querySelector('a[href="https://listforge.net/"]') == null && doc.querySelector('a[href="http://listforge.net/"]') == null) {
-                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
-                    return
-                }
-            } else if (project.rating === 'MinecraftIpList') {
-                if (doc.querySelector(jsPath) == null) {
-                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
-                    return
-                }
-            } else if (project.rating === 'IonMc') {
-                if (doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div') != null) {
-                    createNotif(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, 'error', null, element)
-                    return
-                }
-//          } else if (project.rating == 'TopGG') {
-//              if (doc.querySelector('a.btn.primary') != null && doc.querySelector('a.btn.primary').textContent.includes('Login')) {
-//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
-//                  return
-//              }
-//          } else if (project.rating == 'DiscordBotList') {
-//              if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
-//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
-//                  return
-//              }
-//          } else if (project.rating == 'Discords') {
-//              if (doc.getElementById("sign-in") != null) {
-//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
-//                  return
-//              }
-            } else if (project.rating === 'MMoTopRU') {
-                if (doc.querySelector('body > div') == null && doc.querySelectorAll('body > script[type="text/javascript"]').length === 1) {
-                    createNotif(chrome.i18n.getMessage('emptySite'), 'error', null, element)
-                    return
-                } else if (doc.querySelector('a[href="https://mmotop.ru/users/sign_in"]') != null) {
-                    createNotif(chrome.i18n.getMessage('auth'), 'error', null, element)
-                    return
-                }
-            }
-            
-            if (project.rating === 'MCServerList') {
-                projectURL = JSON.parse(html)[0].name
-            } else
-            if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text !== '') {
-                projectURL = extractHostname(doc.querySelector(jsPath).text)
-            } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent !== '') {
-                projectURL = extractHostname(doc.querySelector(jsPath).textContent)
-            } else if (doc.querySelector(jsPath).value != null && doc.querySelector(jsPath).value !== '') {
-                projectURL = extractHostname(doc.querySelector(jsPath).value)
-            } else if (doc.querySelector(jsPath).href != null && doc.querySelector(jsPath).href !== '') {
-                projectURL = extractHostname(doc.querySelector(jsPath).href)
-            } else {
-                projectURL = ''
+                return
             }
 
-            if (projectURL !== '') {
-                projectURL = projectURL.trim()
-                if (project.rating === 'HotMC') {
-                    projectURL = projectURL.replace(' сервер Майнкрафт', '')
-                } else if (project.rating === 'ListForge') {
-                    projectURL = projectURL.substring(9, projectURL.length)
-                } else if (project.rating === 'MinecraftList') {
-                    projectURL = projectURL.replace(' Minecraft Server', '')
-                }
-                project.name = projectURL
-            }
-
-//          if (project.nick == '') {
-//              if (projectURL != '') {
-//                  delete project.name
-//                  project.nick = projectURL
-//              } else {
-//                  project.nick = project.id
-//              }
-//          }
+            project.name = allProjects[project.rating]('projectName', project, doc)
+            if (!project.name) project.name = ''
         } catch (e) {
             console.error(e)
+            if (!project.name) project.name = ''
         }
         createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
 
         //Проверка авторизации ВКонтакте
-        if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && !settings.useMultiVote) {
+        if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft') && !settings.useMultiVote) {
             createNotif(chrome.i18n.getMessage('checkAuthVK'), null, null, element)
             let url2 = authVKUrls.get(project.rating)
             let response2
@@ -2888,9 +2802,9 @@ async function addProject(project, element) {
     } else*/
     const array = []
     if (document.getElementById('importNicks').checked) {
-        array.push(chrome.i18n.getMessage('addSuccessNicks', String(countNicks)) + ' ' + projectURL)
+        array.push(chrome.i18n.getMessage('addSuccessNicks', String(countNicks)) + ' ' + project.name)
     } else {
-        array.push(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL)
+        array.push(chrome.i18n.getMessage('addSuccess') + ' ' + project.name)
     }
 //  if ((project.rating == 'PlanetMinecraft' || project.rating == 'TopG' || project.rating == 'MinecraftServerList' || project.rating == 'IonMc' || project.rating == 'MinecraftServersOrg' || project.rating == 'ServeurPrive' || project.rating == 'TopMinecraftServers' || project.rating == 'MinecraftServersBiz' || project.rating == 'HotMC' || project.rating == 'MinecraftServerNet' || project.rating == 'TopGames' || project.rating == 'TMonitoring' || project.rating == 'TopGG' || project.rating == 'DiscordBotList' || project.rating == 'MMoTopRU' || project.rating == 'MCServers' || project.rating == 'MinecraftList' || project.rating == 'MinecraftIndex' || project.rating == 'ServerList101') && settings.enabledSilentVote && !element) {
 //      const messageWSV = chrome.i18n.getMessage('warnSilentVote', getProjectName(project))
@@ -2997,11 +2911,14 @@ async function checkPermissions(projects, element) {
         const url = allProjects[project.rating]('pageURL', project)
         const domain = getDomainWithoutSubdomain(url)
         if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
-        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') {
+        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft') {
             if (!origins.includes('*://*.vk.com/*')) origins.push('*://*.vk.com/*')
         }
         if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'Discords') {
             if (!origins.includes('https://discord.com/oauth2/*')) origins.push('https://discord.com/oauth2/*')
+        }
+        if (project.rating === 'WARGM') {
+            if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
         }
         if (project.rating === 'BestServersCom') {
             // if (project.game !== 'minecraft' && project.game !== 'metine2' && project.game !== 'minecraftpe' && project.game !== 'runescape' && project.game !== 'world-of-warcraft') {

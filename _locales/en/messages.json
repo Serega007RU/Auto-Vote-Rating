@@ -219,14 +219,14 @@
   "oneProjectFairTop": {
     "message": "You can only vote for one project on FairTop at once. In order to vote for multiple projects, do not allow FairTop.in to save cookies, google how to do it. Then disable check-up when adding a project in the advanced settings and try adding this project again. Be careful with the project ID: when adding a project with disabled check-up, extension will accept project even with a non-existent ID."
   },
-  "oneProjectMinecraftIpList": {
-    "message": "On MinecraftIpList, you can only vote for 5 projects at once."
-  },
   "oneProject": {
-    "message": "On $project$, you can only vote for 1 project at once",
+    "message": "On $project$, you can only vote for $count$ project at once",
     "placeholders": {
       "project": {
         "content": "$1"
+      },
+      "count": {
+        "content": "$2"
       }
     }
   },
@@ -237,7 +237,7 @@
     "message": "It seems that you don't have an Internet connection or page is not available, see the details in the console"
   },
   "notFoundProjectCode": {
-    "message": "There is no such project! HTTP response: $code$",
+    "message": "There is no such project! HTTP response: $code$ Check the correctness of the entered ID (and other parameters, if any)",
     "placeholders": {
       "code": {
         "content": "$1"
@@ -245,10 +245,15 @@
     }
   },
   "notFoundProject": {
-    "message": "There is no such project!"
+    "message": "There is no such project! Check the correctness of the entered ID (and other parameters, if any)"
   },
   "notFoundProjectRedirect": {
-    "message": "There was a redirect, most likely there is no such project! Check the URL: "
+    "message": "There was a redirect, most likely there is no such project! Check the URL: $url$ Also check the correctness of the entered ID (and other parameters, if any)",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
   },
   "notConnectInternetVPN": {
     "message": "It seems that you don't have an Internet connection or page is not available (Are you from Ukraine? Enable the VPN and keep it enabled while auto-voting), see the details in the console"

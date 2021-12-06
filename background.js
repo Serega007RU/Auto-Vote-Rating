@@ -1344,9 +1344,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             } else {
                 sendResponse('none')
             }
-        } else if (request.captcha || request.authSteam || request.discordLogIn) {//Если требует ручное прохождение капчи
+        } else if (request.captcha || request.authSteam || request.discordLogIn || request.auth) {//Если требует ручное прохождение капчи
             let project = openedProjects.get(sender.tab.id)
-            let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage(Object.keys(request)[0])
+            let message
+            if (request.captcha) {
+                message = chrome.i18n.getMessage('requiresCaptcha')
+            } else if (request.auth !== true) {
+                message = request.auth
+            } else {
+                message = chrome.i18n.getMessage(Object.keys(request)[0])
+            }
             console.warn(getProjectPrefix(project, true) + message)
             if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
             project.error = message
@@ -1354,7 +1361,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             openedProjects.delete(sender.tab.id)
             openedProjects.set(sender.tab.id, project)
             updateValue('projects', project)
-        } else if (request.errorCaptcha && (request.errorCaptcha.includes('Время проверки истекло. Установите флажок и повторите попытку') || request.errorCaptcha.includes('Verification expired. Check the checkbox again'))) {
+        } else if (request.errorCaptcha && !request.restartVote) {
             const project = openedProjects.get(sender.tab.id)
             const message = chrome.i18n.getMessage('errorCaptcha', request.errorCaptcha)
             console.warn(getProjectPrefix(project, true) + message)
@@ -1438,7 +1445,7 @@ async function endVote(request, sender, project) {
         } else {
             //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
             let hour
-            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'IonMc' || project.rating === 'QTop') {
+            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'IonMc') {
                 //Топы на которых время сбрасывается в 00:00 по МСК
                 hour = 21
             } else if (project.rating === 'MCRate') {
@@ -1462,7 +1469,7 @@ async function endVote(request, sender, project) {
             //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
             } else if (project.rating === 'TopG' || project.rating === 'MinecraftServersBiz' || project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'MCListsOrg' || (project.rating === 'Discords' && project.game === 'bots/bot')) {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.rating === 'MinecraftIpList' || project.rating === 'HotMC' || project.rating === 'MinecraftServerNet' || project.rating === 'TMonitoring' || project.rating === 'MCServers' || project.rating === 'CraftList' || project.rating === 'CzechCraft' || project.rating === 'TopMCServersCom' || project.rating === 'CraftListNet') {
+            } else if (project.rating === 'MinecraftIpList' || project.rating === 'HotMC' || project.rating === 'MinecraftServerNet' || project.rating === 'TMonitoring' || project.rating === 'MCServers' || project.rating === 'CraftList' || project.rating === 'TopMCServersCom' || project.rating === 'CraftListNet' || project.rating === 'MinecraftServers100') {
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames') {
                 project.countVote = project.countVote + 1
@@ -1492,12 +1499,14 @@ async function endVote(request, sender, project) {
                 } else {
                     time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
                 }
-            } else if (project.rating === 'MCServerList') {
+            } else if (project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery') {
                 time.setUTCHours(time.getUTCHours() + 2)
             } else if (project.rating === 'CraftList') {
                 time = new Date(request.successfully)
             } else if (project.rating === 'Discords' && project.game === 'servers') {
                 time.setUTCHours(time.getUTCHours() + 6)
+            } else if (project.rating === 'WARGM') {
+                time.setUTCHours(time.getUTCHours() + 16)
             } else {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
@@ -1688,7 +1697,7 @@ async function endVote(request, sender, project) {
             }
         }
     }
-    
+
     await db.put('other', generalStats, 'generalStats')
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
