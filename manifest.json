@@ -5,6 +5,7 @@
 	"background": {
 		"scripts": [
 			"idb-min.js",
+			"projects.js",
 		    "main.js",
 			"background.js",
 			"scripts/minecraftiplist.js"
