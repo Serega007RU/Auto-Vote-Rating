@@ -219,14 +219,14 @@
   "oneProjectFairTop": {
     "message": "You can only vote for one project on FairTop at once. In order to vote for multiple projects, do not allow FairTop.in to save cookies, google how to do it. Then disable check-up when adding a project in the advanced settings and try adding this project again. Be careful with the project ID: when adding a project with disabled check-up, extension will accept project even with a non-existent ID."
   },
-  "oneProjectMinecraftIpList": {
-    "message": "On MinecraftIpList, you can only vote for 5 projects at once."
-  },
   "oneProject": {
-    "message": "On $project$, you can only vote for 1 project at once",
+    "message": "On $project$, you can only vote for $count$ project at once",
     "placeholders": {
       "project": {
         "content": "$1"
+      },
+      "count": {
+        "content": "$2"
       }
     }
   },

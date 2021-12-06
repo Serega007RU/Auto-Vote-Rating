@@ -41,6 +41,8 @@ const allProjects = {
                 return ['http://mcrate.su/rate/', '4396', '']
             case 'URL':
                 return 'MCRate.su'
+            case 'oneProject':
+                return 1
         }
     },
     MinecraftRating: (type, project) => {
@@ -96,6 +98,8 @@ const allProjects = {
                 return ['https://minecraftservers.org/vote/', '25531', '']
             case 'URL':
                 return 'MinecraftServers.org'
+            case 'oneProject':
+                return 1
         }
     },
     ServeurPrive: (type, project) => {
@@ -183,6 +187,8 @@ const allProjects = {
                 return ['https://www.serverpact.com/vote-', '26492123', '']
             case 'URL':
                 return 'ServerPact.com'
+            case 'oneProject':
+                return 1
         }
     },
     MinecraftIpList: (type, project) => {
@@ -197,6 +203,8 @@ const allProjects = {
                 return ['https://minecraftiplist.com/index.php?action=vote&listingID=', '2576', '']
             case 'URL':
                 return 'MinecraftIpList.com'
+            case 'oneProject':
+                return 5
         }
     },
     TopMinecraftServers: (type, project) => {
@@ -238,6 +246,8 @@ const allProjects = {
                 return ['https://hotmc.ru/vote-', '199493', '']
             case 'URL':
                 return 'HotMC.ru'
+            case 'oneProject':
+                return 1
         }
     },
     MinecraftServerNet: (type, project) => {
@@ -355,6 +365,8 @@ const allProjects = {
                 return ['https://pw.mmotop.ru/servers/', '25895', '/votes/new']
             case 'URL':
                 return 'MMoTop.ru'
+            case 'oneProject':
+                return 1
         }
     },
     MCServers: (type, project) => {

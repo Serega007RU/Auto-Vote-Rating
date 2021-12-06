@@ -615,18 +615,11 @@ async function addProject(project, element) {
             }
             addProjectsBonus(project, element)
             return
-        } else if (project.rating === 'MCRate' || project.rating === 'ServerPact' || project.rating === 'MinecraftServersOrg' || project.rating === 'HotMC' || project.rating === 'MMoTopRU' || project.rating === 'MinecraftIpList') {
+        } else if (allProjects[project.rating]('oneProject') > 0) {
             found = await db.countFromIndex('projects', 'rating', project.rating)
-            if (project.rating === 'MinecraftIpList') {
-                if (found >= 5) {
-                    createNotif(chrome.i18n.getMessage('oneProjectMinecraftIpList'), 'error', null, element)
-                    return
-                }
-            } else {
-                if (found > 0) {
-                    createNotif(chrome.i18n.getMessage('oneProject', project.rating), 'error', null, element)
-                    return
-                }
+            if (found >= allProjects[project.rating]('oneProject')) {
+                createNotif(chrome.i18n.getMessage('oneProject', [project.rating, allProjects[project.rating]('oneProject').toString()]), 'error', null, element)
+                return
             }
         }
     }
