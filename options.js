@@ -618,7 +618,7 @@ async function addProject(project, element) {
         } else if (allProjects[project.rating]('oneProject') > 0) {
             found = await db.countFromIndex('projects', 'rating', project.rating)
             if (found >= allProjects[project.rating]('oneProject')) {
-                createNotif(chrome.i18n.getMessage('oneProject', [project.rating, allProjects[project.rating]('oneProject').toString()]), 'error', null, element)
+                createNotif(chrome.i18n.getMessage('oneProject', [project.rating, String(allProjects[project.rating]('oneProject'))]), 'error', null, element)
                 return
             }
         }
@@ -654,11 +654,7 @@ async function addProject(project, element) {
             createNotif(chrome.i18n.getMessage('notFoundProjectCode', String(response.status)), 'error', null, element)
             return
         } else if (response.redirected) {
-            if (project.rating === 'ServerPact' || project.rating === 'TopMinecraftServers' || project.rating === 'MCServers' || project.rating === 'MinecraftList' || project.rating === 'MinecraftIndex' || project.rating === 'ServerList101' || project.rating === 'CraftList' || project.rating === 'MinecraftBuzz') {
-                createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
-                return
-            }
-            createNotif(chrome.i18n.getMessage('notFoundProjectRedirect') + response.url, 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notFoundProjectRedirect', response.url), 'error', null, element)
             return
         } else if (response.status === 503) {//None
         } else if (!response.ok) {
@@ -669,55 +665,14 @@ async function addProject(project, element) {
         try {
             let html = await response.text()
             let doc = new DOMParser().parseFromString(html, 'text/html')
-            if (project.rating === 'MCRate') {
-                //А зачем 404 отдавать в status код? Мы лучше отошлём 200 и только потом на странице напишем что не найдено 404
-                if (doc.querySelector('div[class=error]') != null) {
-                    createNotif(doc.querySelector('div[class=error]').textContent, 'error', null, element)
-                    return
-                }
-            } else if (project.rating === 'ServerPact') {
-                if (doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center') != null && doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > center').textContent.includes('This server does not exist')) {
+            const notFound = allProjects[project.rating]('notFound', project, doc)
+            if (notFound) {
+                if (notFound === true) {
                     createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
-                    return
+                } else {
+                    createNotif(notFound, 'error', null, element)
                 }
-            } else if (project.rating === 'ListForge') {
-                if (doc.querySelector('a[href="https://listforge.net/"]') == null && doc.querySelector('a[href="http://listforge.net/"]') == null) {
-                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
-                    return
-                }
-            } else if (project.rating === 'MinecraftIpList') {
-                if (doc.querySelector(jsPath) == null) {
-                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
-                    return
-                }
-            } else if (project.rating === 'IonMc') {
-                if (doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div') != null) {
-                    createNotif(doc.querySelector('#app > div.mt-2.md\\:mt-0.wrapper.container.mx-auto > div.flex.items-start.mx-0.sm\\:mx-5 > div > div:nth-child(3) > div').innerText, 'error', null, element)
-                    return
-                }
-//          } else if (project.rating == 'TopGG') {
-//              if (doc.querySelector('a.btn.primary') != null && doc.querySelector('a.btn.primary').textContent.includes('Login')) {
-//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
-//                  return
-//              }
-//          } else if (project.rating == 'DiscordBotList') {
-//              if (doc.querySelector('#nav-collapse > ul.navbar-nav.ml-auto > li > a').firstElementChild.textContent.includes('Log in')) {
-//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
-//                  return
-//              }
-//          } else if (project.rating == 'Discords') {
-//              if (doc.getElementById("sign-in") != null) {
-//                  createNotif(chrome.i18n.getMessage('discordLogIn'), 'error', null, element)
-//                  return
-//              }
-            } else if (project.rating === 'MMoTopRU') {
-                if (doc.querySelector('body > div') == null && doc.querySelectorAll('body > script[type="text/javascript"]').length === 1) {
-                    createNotif(chrome.i18n.getMessage('emptySite'), 'error', null, element)
-                    return
-                } else if (doc.querySelector('a[href="https://mmotop.ru/users/sign_in"]') != null) {
-                    createNotif(chrome.i18n.getMessage('auth'), 'error', null, element)
-                    return
-                }
+                return
             }
             
             if (project.rating === 'MCServerList') {

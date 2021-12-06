@@ -854,9 +854,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                     }
                 }
             }
-        } else if (request.captcha || request.authSteam || request.discordLogIn) {//Если требует ручное прохождение капчи
+        } else if (request.captcha || request.authSteam || request.discordLogIn || request.auth) {//Если требует ручное прохождение капчи
             let project = openedProjects.get(sender.tab.id)
-            let message = request.captcha ? chrome.i18n.getMessage('requiresCaptcha') : chrome.i18n.getMessage(Object.keys(request)[0])
+            let message
+            if (request.captcha) {
+                message = chrome.i18n.getMessage('requiresCaptcha')
+            } else if (request.auth !== true) {
+                message = request.auth
+            } else {
+                message = chrome.i18n.getMessage(Object.keys(request)[0])
+            }
             console.warn(getProjectPrefix(project, true) + message)
             if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
             project.error = message

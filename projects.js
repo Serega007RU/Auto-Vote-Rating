@@ -29,7 +29,7 @@ const allProjects = {
                 return 'McTOP.su'
         }
     },
-    MCRate: (type, project) => {
+    MCRate: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
                 return 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code'
@@ -43,6 +43,8 @@ const allProjects = {
                 return 'MCRate.su'
             case 'oneProject':
                 return 1
+            case 'notFound':
+                return doc.querySelector('div[class=error]') != null && doc.querySelector('div[class=error]').textContent.includes('Проект с таким ID не найден')
         }
     },
     MinecraftRating: (type, project) => {
@@ -159,6 +161,17 @@ const allProjects = {
                 return ['https://minecraft-mp.com/server/', '81821', '/vote/']
             case 'URL':
                 return 'ListForge.net'
+            case 'notFound':
+                for (const el of document.querySelectorAll('div.alert.alert-info')) {
+                    if (el.textContent.includes('server has been removed')) {
+                        return el.textContent.trim()
+                    }
+                }
+                for (const el of document.querySelectorAll('span.badge')) {
+                    if (el.textContent.includes('server has been removed')) {
+                        return el.textContent.trim()
+                    }
+                }
         }
     },
     MinecraftServerList: (type, project) => {
@@ -175,7 +188,7 @@ const allProjects = {
                 return 'Minecraft-Server-List.com'
         }
     },
-    ServerPact: (type, project) => {
+    ServerPact: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
                 return 'https://www.serverpact.com/vote-' + project.id
@@ -189,9 +202,11 @@ const allProjects = {
                 return 'ServerPact.com'
             case 'oneProject':
                 return 1
+            case 'notFound':
+                return doc.querySelector('div.container > div.row > div > center') != null && doc.querySelector('div.container > div.row > div > center').textContent.includes('This server does not exist')
         }
     },
-    MinecraftIpList: (type, project) => {
+    MinecraftIpList: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
                 return 'https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id
@@ -205,6 +220,8 @@ const allProjects = {
                 return 'MinecraftIpList.com'
             case 'oneProject':
                 return 5
+            case 'notFound':
+                return doc.querySelector('#addr > span:nth-child(3)') == null
         }
     },
     TopMinecraftServers: (type, project) => {
