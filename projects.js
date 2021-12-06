@@ -501,19 +501,6 @@ const allProjects = {
                 return 'PixelmonServers.com'
         }
     },
-    QTop: (type, project, doc) => {
-        switch (type) {
-            case 'voteURL':
-            case 'pageURL':
-                return 'http://q-top.ru/vote' + project.id
-            case 'projectName':
-                return doc.querySelector('a[href="profile' + project.id + '"]').textContent
-            case 'exampleURL':
-                return ['http://q-top.ru/vote', '1549', '']
-            case 'URL':
-                return 'Q-Top.ru'
-        }
-    },
     MinecraftBuzz: (type, project, doc) => {
         switch (type) {
             case 'voteURL':

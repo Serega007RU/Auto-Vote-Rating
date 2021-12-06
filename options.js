@@ -6,8 +6,7 @@ const authVKUrls = new Map([
     ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
     ['MCRate', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
     ['MinecraftRating', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
-    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
-    ['QTop', 'https://oauth.vk.com/authorize?client_id=2856079&scope=SETTINGS&redirect_uri=close.html']
+    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html']
 ])
 
 const svgFail = document.createElement('img')
@@ -683,7 +682,7 @@ async function addProject(project, element) {
         createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
 
         //Проверка авторизации ВКонтакте
-        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') {
+        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft') {
             createNotif(chrome.i18n.getMessage('checkAuthVK'), null, null, element)
             let url2 = authVKUrls.get(project.rating)
             let response2
@@ -854,7 +853,7 @@ async function checkPermissions(projects, element) {
         const url = allProjects[project.rating]('pageURL', project)
         const domain = getDomainWithoutSubdomain(url)
         if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
-        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') {
+        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft') {
             if (!origins.includes('*://*.vk.com/*')) origins.push('*://*.vk.com/*')
         }
         if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'Discords') {

@@ -944,7 +944,7 @@ async function endVote(request, sender, project) {
         } else {
             //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
             let hour
-            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'IonMc' || project.rating === 'QTop') {
+            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'IonMc') {
                 //Топы на которых время сбрасывается в 00:00 по МСК
                 hour = 21
             } else if (project.rating === 'MCRate') {
