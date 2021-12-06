@@ -864,7 +864,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             openedProjects.delete(sender.tab.id)
             openedProjects.set(sender.tab.id, project)
             updateValue('projects', project)
-        } else if (request.errorCaptcha && (request.errorCaptcha.includes('Время проверки истекло. Установите флажок и повторите попытку') || request.errorCaptcha.includes('Verification expired. Check the checkbox again'))) {
+        } else if (request.errorCaptcha && !request.restartVote) {
             const project = openedProjects.get(sender.tab.id)
             const message = chrome.i18n.getMessage('errorCaptcha', request.errorCaptcha)
             console.warn(getProjectPrefix(project, true) + message)

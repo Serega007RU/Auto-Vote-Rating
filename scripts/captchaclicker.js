@@ -24,7 +24,9 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             if (document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Try reloading the page')) {
                 document.location.reload()
             } else {
+                // https://i.imgur.com/WJ3ce9s.png
                 chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-anchor-error-msg-container').textContent})
+                clearInterval(timer2)
             }
         }
     }, 1000)
@@ -55,7 +57,9 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
         }
 
         if (document.querySelector('.rc-doscaptcha-body-text') != null && document.querySelector('.rc-doscaptcha-body-text').style.display !== 'none') {
+            // https://i.imgur.com/q5BroJ7.png
             chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-doscaptcha-body-text').textContent})
+            clearInterval(timer7)
         }
     }, 2000)
 
@@ -67,7 +71,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
         }
     }, 1000)
 } else if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)) {
-    chrome.runtime.sendMessage({errorCaptcha: document.body.innerText.trim()})
+    chrome.runtime.sendMessage({errorCaptcha: document.body.innerText.trim(), restartVote: true})
 } else if (window.location.href.match(/.hcaptcha.com\/captcha.v\d\//)) {
     const timer4 = setInterval(()=>{
         if (document.getElementById('checkbox') != null
