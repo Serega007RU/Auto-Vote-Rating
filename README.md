@@ -9,7 +9,7 @@ List of sites that the extension supports: [TopCraft.ru](http://topcraft.ru/), [
 Перейдите во вкладку MultiVote
 
 ### Аккаунты ВК:
-Если вы собираетесь накручивать голоса на TopCraft, McTOP, MCRate, MinecraftRating, MonitoringMinecraft или QTop:   
+Если вы собираетесь накручивать голоса на TopCraft, McTOP, MCRate, MinecraftRating или MonitoringMinecraft:   
 Во вкладке ВКонтакте добавляйте аккаунты ВК и следуюте инструкциям расширения   
 Если просит авторизоваться на рейтинге на котором вы собираетесь авто голосовать то разрешаете авторизацию   
 

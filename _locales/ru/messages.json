@@ -1211,7 +1211,7 @@
     "message": "Автоматически разрешать доступ к аккаунту ВК рейтингам"
   },
   "confirmAutoAuthVK": {
-    "message": "Вы согласны передавать личную информацию и адрес электронной почты от последующих добавляемых аккаунтов рейтингам? (TopCraft, McTOP, MCRate, MinecraftRating, MonitoringMinecraft и QTop)"
+    "message": "Вы согласны передавать личную информацию и адрес электронной почты от последующих добавляемых аккаунтов рейтингам? (TopCraft, McTOP, MCRate, MinecraftRating и MonitoringMinecraft)"
   },
   "tryManuallyUpdate": {
     "message": "Если ошибка повторяется, попробуй обновить расширение вручную"

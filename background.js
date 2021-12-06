@@ -169,7 +169,7 @@ async function checkOpen(project) {
     if (currentProxy != null && project.useMultiVote === false) return//Если пытается пройти проект с отключённым MultiVote, он не должен пройти с включённым прокси
     if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
-        if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
+        if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft')) {
             if (currentVK[project.rating]?.[project.id] > Date.now()) {
                 return
             }
@@ -194,7 +194,7 @@ async function checkOpen(project) {
         }
 
         //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
-        if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
+        if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft')) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
             let cursor = await db.transaction('vks').store.openCursor()
@@ -502,8 +502,6 @@ async function checkOpen(project) {
             url = '.czech-craft.eu'
         } else if (project.rating === 'PixelmonServers') {
             url = '.pixelmonservers.com'
-        } else if (project.rating === 'QTop') {
-            url = '.q-top.ru'
         } else if (project.rating === 'MinecraftBuzz') {
             url = '.minecraft.buzz'
         }/* else if (project.rating === 'Custom') {
@@ -523,7 +521,7 @@ async function checkOpen(project) {
             }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
-    } else if (settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')) {
+    } else if (settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft')) {
         //Удаляет все существующие куки ВК
         let cookies = await new Promise(resolve=>{
             chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
@@ -1528,7 +1526,7 @@ async function endVote(request, sender, project) {
         }*/
 
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote)  {
-            if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop')/* && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) !== -1*/) {
+            if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft')/* && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) !== -1*/) {
                 if (request.later && settings.repeatAttemptLater && project.later != null && !(project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {
                     if (project.later >= settings.repeatLater) {
                         await useVK()
@@ -1625,7 +1623,7 @@ async function endVote(request, sender, project) {
                 if (currentVK != null) currentVK.notAuth = true
             }
             if (request.notAuth && currentVK != null) currentVK.notAuth = true
-            if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'QTop') && request.errorAuthVK && currentVK != null) {
+            if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
                 await updateValue('vks', currentVK)
             } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && message.includes('Ваш аккаунт заблокирован во Вконтакте')) {
@@ -1740,7 +1738,7 @@ async function endVote(request, sender, project) {
                     for (const value of queueProjects) {
                         if (countVK > 0 && countProxy > 0) break
                         if (value.useMultiVote !== false) {
-                            if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || value.rating === 'MinecraftRating' || value.rating === 'MonitoringMinecraft' || value.rating === 'QTop') {
+                            if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || value.rating === 'MinecraftRating' || value.rating === 'MonitoringMinecraft') {
                                 countVK++
                             }
                             if (settings.useProxyOnUnProxyTop) {
@@ -1770,7 +1768,7 @@ async function endVote(request, sender, project) {
                     let countVK = 0
                     for (const value of queueProjects) {
                         if (countVK > 0) break
-                        if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || value.rating === 'MinecraftRating' || value.rating === 'MonitoringMinecraft' || value.rating === 'QTop') {
+                        if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || value.rating === 'MinecraftRating' || value.rating === 'MonitoringMinecraft') {
                             countVK++
                         }
                     }
