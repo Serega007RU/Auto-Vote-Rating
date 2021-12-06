@@ -603,7 +603,7 @@ async function addProject(project, element) {
         secondBonusButton.id = 'secondBonusVictoryCraft'
         secondBonusButton.className = 'secondBonus'
     }
-    
+
     if (!document.getElementById('disableCheckProjects').checked) {
         let found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
         if (found > 0) {
@@ -624,9 +624,6 @@ async function addProject(project, element) {
         }
     }
 
-    let projectURL = ''
-    const url = allProjects[project.rating]('pageURL', project)
-    const jsPath = allProjects[project.rating]('jsPath', project)
 
     if (!await checkPermissions([project])) return
 
@@ -635,6 +632,7 @@ async function addProject(project, element) {
 
         let response
         try {
+            const url = allProjects[project.rating]('pageURL', project)
             if (project.rating === 'MinecraftIpList') {
                 response = await fetch(url, {credentials: 'omit'})
             } else {
@@ -662,9 +660,10 @@ async function addProject(project, element) {
             return
         }
 
+        let html = await response.text()
+        let doc = new DOMParser().parseFromString(html, 'text/html')
+
         try {
-            let html = await response.text()
-            let doc = new DOMParser().parseFromString(html, 'text/html')
             const notFound = allProjects[project.rating]('notFound', project, doc)
             if (notFound) {
                 if (notFound === true) {
@@ -674,46 +673,12 @@ async function addProject(project, element) {
                 }
                 return
             }
-            
-            if (project.rating === 'MCServerList') {
-                projectURL = JSON.parse(html)[0].name
-            } else
-            if (doc.querySelector(jsPath).text != null && doc.querySelector(jsPath).text !== '') {
-                projectURL = extractHostname(doc.querySelector(jsPath).text)
-            } else if (doc.querySelector(jsPath).textContent != null && doc.querySelector(jsPath).textContent !== '') {
-                projectURL = extractHostname(doc.querySelector(jsPath).textContent)
-            } else if (doc.querySelector(jsPath).value != null && doc.querySelector(jsPath).value !== '') {
-                projectURL = extractHostname(doc.querySelector(jsPath).value)
-            } else if (doc.querySelector(jsPath).href != null && doc.querySelector(jsPath).href !== '') {
-                projectURL = extractHostname(doc.querySelector(jsPath).href)
-            } else {
-                projectURL = ''
-            }
 
-            if (projectURL !== '') {
-                projectURL = projectURL.trim()
-                if (project.rating === 'HotMC') {
-                    projectURL = projectURL.replace(' сервер Майнкрафт', '')
-                } else if (project.rating === 'ListForge') {
-                    projectURL = projectURL.substring(9, projectURL.length)
-                } else if (project.rating === 'MinecraftList') {
-                    projectURL = projectURL.replace(' Minecraft Server', '')
-                } else if (project.rating === 'MinecraftServers100') {
-                    projectURL = projectURL.replace('Vote for Minecraft ', '')
-                }
-                project.name = projectURL
-            }
-
-//          if (project.nick == '') {
-//              if (projectURL != '') {
-//                  delete project.name
-//                  project.nick = projectURL
-//              } else {
-//                  project.nick = project.id
-//              }
-//          }
+            project.name = allProjects[project.rating]('projectName', project, doc)
+            if (!project.name) project.name = ''
         } catch (e) {
             console.error(e)
+            if (!project.name) project.name = ''
         }
         createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
 
@@ -783,7 +748,7 @@ async function addProject(project, element) {
         updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', project.rating) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element)
     } else*/
     const array = []
-    array.push(chrome.i18n.getMessage('addSuccess') + ' ' + projectURL)
+    array.push(chrome.i18n.getMessage('addSuccess') + ' ' + project.name)
 //  if ((project.rating == 'PlanetMinecraft' || project.rating == 'TopG' || project.rating == 'MinecraftServerList' || project.rating == 'IonMc' || project.rating == 'MinecraftServersOrg' || project.rating == 'ServeurPrive' || project.rating == 'TopMinecraftServers' || project.rating == 'MinecraftServersBiz' || project.rating == 'HotMC' || project.rating == 'MinecraftServerNet' || project.rating == 'TopGames' || project.rating == 'TMonitoring' || project.rating == 'TopGG' || project.rating == 'DiscordBotList' || project.rating == 'MMoTopRU' || project.rating == 'MCServers' || project.rating == 'MinecraftList' || project.rating == 'MinecraftIndex' || project.rating == 'ServerList101') && settings.enabledSilentVote && !element) {
 //      const messageWSV = chrome.i18n.getMessage('warnSilentVote', project.rating)
 //      const span = document.createElement('span')
