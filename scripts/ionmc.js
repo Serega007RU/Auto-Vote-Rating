@@ -1,30 +1,30 @@
 async function vote(first) {
     try {
         //Если пользователь не авторизован
-        if (document.querySelector('div[class="notification is-primary"]') != null) {
-            if (document.querySelector('div[class="notification is-primary"]').textContent.includes('Голосование в рейтинге разрешено только авторизированным пользователям')) {
-                chrome.runtime.sendMessage({auth: document.querySelector('div[class="notification is-primary"]').innerText})
+        if (document.querySelector('div.notification.is-primary') != null) {
+            if (document.querySelector('div.notification.is-primary').textContent.includes('Голосование в рейтинге разрешено только авторизированным пользователям')) {
+                chrome.runtime.sendMessage({auth: document.querySelector('div.notification.is-primary').innerText})
             } else {
-                chrome.runtime.sendMessage({message: document.querySelector('div[class="notification is-primary"]').innerText})
+                chrome.runtime.sendMessage({message: document.querySelector('div.notification.is-primary').innerText})
             }
             return
         }
         //Если есть ошибка
-        if (document.querySelector('div[class="notification is-danger"]') != null) {
+        if (document.querySelector('div.notification is-danger') != null) {
             //Если не удалось пройти капчу
             if (document.querySelector('div[class="notification is-danger"]').textContent != null) {
-                chrome.runtime.sendMessage({message: document.querySelector('div[class="notification is-danger"]').textContent})
+                chrome.runtime.sendMessage({message: document.querySelector('div.notification.is-danger').textContent})
             }
             return
         }
         //Если успешное автоголосование
-        if (document.querySelector('div[class="notification is-success"]') != null) {
-            if (document.querySelector('div[class="notification is-success"]').textContent.includes('Голос засчитан')) {
+        if (document.querySelector('div.notification.is-success') != null) {
+            if (document.querySelector('div.notification.is-success').textContent.includes('Голос засчитан')) {
                 chrome.runtime.sendMessage({successfully: true})
-            } else if (document.querySelector('div[class="notification is-success"]').textContent.includes('Вы уже голосовали')) {
+            } else if (document.querySelector('div.notification.is-success').textContent.includes('Вы уже голосовали')) {
                 chrome.runtime.sendMessage({later: true})
             } else {
-                chrome.runtime.sendMessage({message: document.querySelector('div[class="notification is-success"]').textContent})
+                chrome.runtime.sendMessage({message: document.querySelector('div.notification.is-success').textContent})
             }
             return
         }
