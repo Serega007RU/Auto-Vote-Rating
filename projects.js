@@ -776,9 +776,9 @@ const allProjects = {
     BestMinecraftServers: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                return 'https://best-minecraft-servers.co/' + project.id
-            case 'pageURL':
                 return 'https://best-minecraft-servers.co/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://best-minecraft-servers.co/' + project.id
             case 'projectName':
                 return doc.querySelector('table.info th').textContent.trim()
             case 'exampleURL':
