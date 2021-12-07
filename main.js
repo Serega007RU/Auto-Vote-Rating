@@ -142,5 +142,12 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             await cursor.update(project)
             cursor = await cursor.continue()
         }
+        cursor = await db.transaction('projects').store.index('rating').openCursor('MinecraftRating')
+        while (cursor) {
+            const project = cursor.value
+            project.game = 'projects'
+            await cursor.update(project)
+            cursor = await cursor.continue()
+        }
     }
 }

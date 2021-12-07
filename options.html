@@ -98,6 +98,20 @@
                                 <option data-resource="enabledSilentVoteNoSilent" value="emulateMode"></option>
                             </select>
                         </div>
+                        <!--MinecraftRating-->
+                        <div style="display: none;" id="chooseMinecraftRating1" class="input-block">
+                            <label data-resource="chooseTopGG" for="chooseMinecraftRating">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span>https://minecraftrating.ru/</span><span style="color:#d32f2f;">projects</span><span>/mcskill/</span>
+                                    </span>
+                                </span>
+                            </label>
+                            <select id="chooseMinecraftRating" class="select">
+                                <option value="projects" data-resource="projects"></option>
+                                <option style="color:red" value="servers" data-resource="serversMinecraftRating"></option>
+                            </select>
+                        </div>
                         <!--TopGG-->
                         <div style="display: none;" id="chooseTopGG1" class="input-block">
                             <label data-resource="chooseTopGG" for="chooseTopGG">
@@ -109,7 +123,7 @@
                             </label>
                             <select id="chooseTopGG" class="select">
                                 <option value="bot" data-resource="bots"></option>
-                                <option value="servers" data-resource="servers"></option>
+                                <option value="servers" data-resource="guilds"></option>
                             </select>
                         </div>
                         <div style="display: none;" id="additionTopGG1" class="input-block">

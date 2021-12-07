@@ -50,11 +50,14 @@ const allProjects = {
     MinecraftRating: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                return 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45'
+                if (project.game === 'projects') return 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45'
+                else return 'https://minecraftrating.ru/vote/' + project.id + '/'
             case 'pageURL':
-                return 'https://minecraftrating.ru/projects/' + project.id + '/'
+                if (project.game === 'projects') return 'https://minecraftrating.ru/projects/' + project.id + '/'
+                else return 'https://minecraftrating.ru/vote/' + project.id + '/'
             case 'projectName':
-                return doc.querySelector('h1[itemprop="name"]').textContent.replace(' Проект', '')
+                if (project.game === 'projects') return doc.querySelector('h1[itemprop="name"]').textContent.trim().replace('Проект ', '')
+                else return doc.querySelector('.page-header a').textContent
             case 'exampleURL':
                 return ['https://minecraftrating.ru/projects/', 'cubixworld', '/']
             case 'URL':
@@ -412,7 +415,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://minecraftlist.org/server/' + project.id
             case 'projectName':
-                return doc.querySelector('.container h1').textContent.replace(' Minecraft Server', '')
+                return doc.querySelector('.container h1').textContent.trim().replace('Minecraft Server', '')
             case 'exampleURL':
                 return ['https://minecraftlist.org/vote/', '11227', '']
             case 'URL':
@@ -724,7 +727,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://misterlauncher.org/projects/' + project.id + '/'
             case 'projectName':
-                return doc.querySelector('h1[itemprop="name"]').textContent.replace(' Проект', '')
+                return doc.querySelector('h1[itemprop="name"]').textContent.trim().replace('Проект ', '')
             case 'exampleURL':
                 return ['https://misterlauncher.org/projects/', 'omegamc', '/']
             case 'URL':

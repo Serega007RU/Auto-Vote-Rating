@@ -755,8 +755,17 @@
   "bots": {
     "message": "Bots"
   },
-  "servers": {
+  "guilds": {
     "message": "Guilds"
+  },
+  "servers": {
+    "message": "Servers"
+  },
+  "serversMinecraftRating": {
+    "message": "Servers (no reward for voting)"
+  },
+  "projects": {
+    "message": "Projects"
   },
   "additionTopGG": {
     "message": "Additional parameters (optional)"

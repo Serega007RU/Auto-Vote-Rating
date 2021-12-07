@@ -720,8 +720,17 @@
   "bots": {
     "message": "Боты"
   },
+  "guilds": {
+    "message": "Сервера"
+  },
   "servers": {
     "message": "Сервера"
+  },
+  "serversMinecraftRating": {
+    "message": "Сервера (нет награды за голосование)"
+  },
+  "projects": {
+    "message": "Проекты"
   },
   "additionTopGG": {
     "message": "Дополнительные параметры (необязательно)"
