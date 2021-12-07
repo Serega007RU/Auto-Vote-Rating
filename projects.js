@@ -723,11 +723,14 @@ const allProjects = {
     MisterLauncher: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                return 'https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code'
+                if (project.game === 'projects') return 'https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code'
+                else return 'https://misterlauncher.org/vote/' + project.id + '/'
             case 'pageURL':
-                return 'https://misterlauncher.org/projects/' + project.id + '/'
+                if (project.game === 'projects') return 'https://misterlauncher.org/projects/' + project.id + '/'
+                else return 'https://misterlauncher.org/vote/' + project.id + '/'
             case 'projectName':
-                return doc.querySelector('h1[itemprop="name"]').textContent.trim().replace('Проект ', '')
+                if (project.game === 'projects') return doc.querySelector('h1[itemprop="name"]').textContent.trim().replace('Проект ', '')
+                else return doc.querySelector('.page-vote a').textContent
             case 'exampleURL':
                 return ['https://misterlauncher.org/projects/', 'omegamc', '/']
             case 'URL':

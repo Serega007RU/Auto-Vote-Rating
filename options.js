@@ -549,7 +549,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     } else if (project.rating === 'TopGG' || project.rating === 'Discords' || project.rating === 'DiscordBotList') {
         project.game = document.getElementById('chooseTopGG').value
         if (project.rating === 'TopGG') project.addition = document.getElementById('additionTopGG').value
-    } else if (project.rating === 'MinecraftRating') {
+    } else if (project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') {
         project.game = document.getElementById('chooseMinecraftRating').value
     }
     
@@ -685,7 +685,7 @@ async function addProject(project, element) {
         createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
 
         //Проверка авторизации ВКонтакте
-        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'MisterLauncher') {
+        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
             createNotif(chrome.i18n.getMessage('checkAuthVK'), null, null, element)
             let url2 = authVKUrls.get(project.rating)
             let response2
@@ -769,7 +769,7 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || project.rating === 'MisterLauncher' || project.rating === 'Custom')) {
+    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'Custom')) {
         array.push(document.createElement('br'))
         array.push(document.createElement('br'))
         array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
@@ -856,7 +856,7 @@ async function checkPermissions(projects, element) {
         const url = allProjects[project.rating]('pageURL', project)
         const domain = getDomainWithoutSubdomain(url)
         if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
-        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'MisterLauncher') {
+        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
             if (!origins.includes('*://*.vk.com/*')) origins.push('*://*.vk.com/*')
         }
         if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'Discords' || project.rating === 'DiscordBoats') {
@@ -1716,7 +1716,19 @@ selectedTop.addEventListener('input', function() {
 
     if (name === 'MinecraftRating') {
         document.getElementById('chooseMinecraftRating1').removeAttribute('style')
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(1)").textContent = 'https://minecraftrating.ru/'
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(2)").textContent = 'projects'
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(3)").textContent = '/mcskill/'
     } else if (laterChoose === 'MinecraftRating') {
+        document.getElementById('chooseMinecraftRating1').style.display = 'none'
+    }
+
+    if (name === 'MisterLauncher') {
+        document.getElementById('chooseMinecraftRating1').removeAttribute('style')
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(1)").textContent = 'https://misterlauncher.org/'
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(2)").textContent = 'projects'
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(3)").textContent = '/omegamc/'
+    } else if (laterChoose === 'MisterLauncher') {
         document.getElementById('chooseMinecraftRating1').style.display = 'none'
     }
 
