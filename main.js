@@ -135,14 +135,14 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
     }
     if (oldVersion === 3) {
-        let cursor = await db.transaction('projects').store.index('rating').openCursor('DiscordBotList')
+        let cursor = await db.transaction('projects', 'readwrite').store.index('rating').openCursor('DiscordBotList')
         while (cursor) {
             const project = cursor.value
             project.game = 'bots'
             await cursor.update(project)
             cursor = await cursor.continue()
         }
-        cursor = await db.transaction('projects').store.index('rating').openCursor('MinecraftRating')
+        cursor = await db.transaction('projects', 'readwrite').store.index('rating').openCursor('MinecraftRating')
         while (cursor) {
             const project = cursor.value
             project.game = 'projects'
