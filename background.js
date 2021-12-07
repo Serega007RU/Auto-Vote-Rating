@@ -110,7 +110,7 @@ async function checkOpen(project) {
     }
 
     let retryCoolDown
-    if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList') {
+    if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || project.randomize === 'MisterLauncher') {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -209,10 +209,10 @@ async function newWindow(project) {
     if (project.rating === 'Custom') {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
+        if (!project.emulateMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || project.rating === 'MisterLauncher')) {
             silentVoteMode = true
         }
-    } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList')) {
+    } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || project.rating === 'MisterLauncher')) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
@@ -620,6 +620,51 @@ async function silentVote(project) {
             }
         } else
 
+        if (project.rating === 'MisterLauncher') {
+            let response = await _fetch('https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code', null, project)
+            if (!await checkResponseError(project, response, 'misterlauncher.org', null, true)) return
+            if (response.doc.querySelector('div.alert.alert-danger') != null) {
+                if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
+//                  let numbers = response.doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number)
+//                  let count = 0
+//                  let year = 0
+//                  let month = 0
+//                  let day = 0
+//                  let hour = 0
+//                  let min = 0
+//                  let sec = 0
+//                  for (let i in numbers) {
+//                      if (count == 0) {
+//                          hour = numbers[i]
+//                      } else if (count == 1) {
+//                          min = numbers[i]
+//                      } else if (count == 2) {
+//                          sec = numbers[i]
+//                      } else if (count == 3) {
+//                          day = numbers[i]
+//                      } else if (count == 4) {
+//                          month = numbers[i]
+//                      } else if (count == 5) {
+//                          year = numbers[i]
+//                      }
+//                      count++
+//                  }
+//                  let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000
+                    endVote({later: true}, null, project)
+                } else {
+                    endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
+                }
+            } else if (response.doc.querySelector('div.alert.alert-success') != null) {
+                if (response.doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
+                    endVote({successfully: true}, null, project)
+                } else {
+                    endVote({message: response.doc.querySelector('div.alert.alert-success').textContent}, null, project)
+                }
+            } else {
+                endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null'}, null, project)
+            }
+        } else
+
         if (project.rating === 'Custom') {
             let response = await _fetch(project.responseURL, {...project.body}, project)
             await response.text()
@@ -944,7 +989,7 @@ async function endVote(request, sender, project) {
         } else {
             //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
             let hour
-            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'IonMc') {
+            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'IonMc' || project.rating === 'MisterLauncher') {
                 //Топы на которых время сбрасывается в 00:00 по МСК
                 hour = 21
             } else if (project.rating === 'MCRate') {
@@ -1066,7 +1111,7 @@ async function endVote(request, sender, project) {
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
-        if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList') {
+        if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MisterLauncher') {
             retryCoolDown = 300000
             sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
         } else {
