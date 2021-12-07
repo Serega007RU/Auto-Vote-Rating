@@ -1051,6 +1051,8 @@ async function endVote(request, sender, project) {
                 time.setUTCHours(time.getUTCHours() + 6)
             } else if (project.rating === 'WARGM') {
                 time.setUTCHours(time.getUTCHours() + 16)
+            } else if (project.rating === 'ServerListGames') {
+                time.setUTCHours(time.getUTCHours() + 20)
             } else {
                 time.setUTCDate(time.getUTCDate() + 1)
             }
