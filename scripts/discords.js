@@ -20,7 +20,7 @@ async function vote(first) {
             return
         }
 
-        const project = await getProject()
+        const project = await getProject('Discords')
         if (document.querySelector('a[href="/bots/auth"]') != null) {
             document.querySelector('a[href="/bots/auth"]').click()
             //Старый код BotsForDiscord
