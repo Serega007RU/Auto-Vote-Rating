@@ -21,8 +21,8 @@ function vote(first) {
             return
         }
 
-        const vote = findElement('button', ['upvote'])
         const timer1 = setInterval(()=>{
+            const vote = findElement('button', ['upvote'])
             if (!vote.disabled) {
                 clearInterval(timer1)
                 vote.click()
@@ -37,6 +37,7 @@ function vote(first) {
                     if (result.textContent.toLowerCase().includes('thank you for voting')) {
                         chrome.runtime.sendMessage({successfully: true})
                     }
+                    return
                 } else {
                     for (const el of document.querySelectorAll('link')) {
                         if (el.href.includes('thanks')) {
@@ -48,7 +49,13 @@ function vote(first) {
                     if (document.URL.includes('thanks')) {
                         chrome.runtime.sendMessage({successfully: true})
                         clearInterval(timer2)
+                        return
                     }
+                }
+                //Костыль, на servers при успешном голосовании тупо перекидывает на страницу проекта
+                if (document.querySelector('.upvotes') != null) {
+                    chrome.runtime.sendMessage({successfully: true})
+                    clearInterval(timer2)
                 }
             } catch (e) {
                 throwError(e)

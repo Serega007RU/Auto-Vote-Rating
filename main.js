@@ -32,7 +32,7 @@ async function initializeConfig(background, version) {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 30, {upgrade})
+    db = await idb.openDB('avr', 40, {upgrade})
     db.onerror = (event) => dbError(event, false)
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {
@@ -164,7 +164,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         } else {
             console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
         }
-    } else if (oldVersion === 2) {
+    }
+    if (oldVersion === 2) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
         settings.timeout = 1000
@@ -189,6 +190,22 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
         } else {
             console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        }
+    }
+    if (oldVersion === 3 || oldVersion === 30) {
+        let cursor = await db.transaction('projects').store.index('rating').openCursor('DiscordBotList')
+        while (cursor) {
+            const project = cursor.value
+            project.game = 'bots'
+            await cursor.update(project)
+            cursor = await cursor.continue()
+        }
+        cursor = await db.transaction('projects').store.index('rating').openCursor('MinecraftRating')
+        while (cursor) {
+            const project = cursor.value
+            project.game = 'projects'
+            await cursor.update(project)
+            cursor = await cursor.continue()
         }
     }
 }

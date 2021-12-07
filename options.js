@@ -9,7 +9,8 @@ const authVKUrls = new Map([
     ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
     ['MCRate', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
     ['MinecraftRating', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
-    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html']
+    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
+    ['MisterLauncher', 'https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=close.html&response_type=token']
 ])
 
 const svgInfo = document.createElement('img')
@@ -474,7 +475,7 @@ function generateBtnListRating(rating, count) {
 //  div.setAttribute('data-resource', 'notAdded')
 //  div.textContent = chrome.i18n.getMessage('notAdded')
 //  ul.append(div)
-    if (!(/*rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' ||*/ rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'Custom')) {
+    if (!(/*rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' ||*/ rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'MisterLauncher' || rating === 'Custom')) {
         const label = document.createElement('label')
         label.setAttribute('data-resource', 'passageCaptcha')
         label.textContent = chrome.i18n.getMessage('passageCaptcha')
@@ -2290,7 +2291,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     if (project.rating === 'Custom') {
         project.id = document.getElementById('nick').value
         project.nick = ''
-    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && document.getElementById('nick').value !== '') {
+    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && ((project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') ? document.getElementById('chooseMinecraftRating').value !== 'servers' : true) && document.getElementById('nick').value !== '') {
         project.nick = document.getElementById('nick').value
     } else {
         project.nick = ''
@@ -2370,9 +2371,11 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseGameMMoTopRU').value
         project.lang = document.getElementById('selectLangMMoTopRU').value
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
-    } else if (project.rating === 'TopGG' || project.rating === 'Discords') {
+    } else if (project.rating === 'TopGG' || project.rating === 'Discords' || project.rating === 'DiscordBotList') {
         project.game = document.getElementById('chooseTopGG').value
         if (project.rating === 'TopGG') project.addition = document.getElementById('additionTopGG').value
+    } else if (project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') {
+        project.game = document.getElementById('chooseMinecraftRating').value
     }
     
     if (project.rating === 'Custom') {
@@ -2715,7 +2718,7 @@ async function addProject(project, element) {
         createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
 
         //Проверка авторизации ВКонтакте
-        if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft') && !settings.useMultiVote) {
+        if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || (project.rating === 'MisterLauncher' && project.game === 'projects')) && !settings.useMultiVote) {
             createNotif(chrome.i18n.getMessage('checkAuthVK'), null, null, element)
             let url2 = authVKUrls.get(project.rating)
             let response2
@@ -2824,7 +2827,7 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || project.rating === 'Custom')) {
+    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'Custom')) {
         array.push(document.createElement('br'))
         array.push(document.createElement('br'))
         array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
@@ -2911,10 +2914,10 @@ async function checkPermissions(projects, element) {
         const url = allProjects[project.rating]('pageURL', project)
         const domain = getDomainWithoutSubdomain(url)
         if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
-        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || project.rating === 'MinecraftRating' || project.rating === 'MonitoringMinecraft') {
+        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
             if (!origins.includes('*://*.vk.com/*')) origins.push('*://*.vk.com/*')
         }
-        if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'Discords') {
+        if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'Discords' || project.rating === 'DiscordBoats') {
             if (!origins.includes('https://discord.com/oauth2/*')) origins.push('https://discord.com/oauth2/*')
         }
         if (project.rating === 'WARGM') {
@@ -3605,6 +3608,7 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('label9').style.display = 'none'
         document.getElementById('label10').style.display = 'none'
         document.getElementById('idGame').style.display = 'none'
+        document.getElementById('chooseMinecraftRating1').style.display = 'none'
         document.getElementById('chooseTopGG1').style.display = 'none'
         document.getElementById('additionTopGG1').style.display = 'none'
         document.getElementById('countVote').required = false
@@ -3742,12 +3746,12 @@ selectedTop.addEventListener('input', function() {
         }
     }
 
-    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords') {
+    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords' || name === 'DiscordBoats') {
         document.getElementById('nick').required = false
         document.getElementById('nick').parentElement.style.display = 'none'
         if (document.getElementById('importNicks').checked) document.getElementById('importNicks').click()
         document.getElementById('importNicks').disabled = true
-    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords') {
+    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats') {
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
         document.getElementById('importNicks').disabled = false
@@ -3762,7 +3766,7 @@ selectedTop.addEventListener('input', function() {
         document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://minecraft-mp.com/server/288761/vote/'
         document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(2)").textContent = '?alternate_captcha=1'
     } else if (laterChoose === 'ListForge') {
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords') document.getElementById('nick').required = true
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats') document.getElementById('nick').required = true
         if (name !== 'Custom') document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('urlGame').style.display = 'none'
         document.getElementById('chooseGameListForge').required = false
@@ -3799,7 +3803,7 @@ selectedTop.addEventListener('input', function() {
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bot'
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/270904126974590976/vote'
         document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bot'
-        document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
+        document.querySelector('#chooseTopGG > option[data-resource="guilds"]').value = 'servers'
         document.getElementById('additionTopGG1').removeAttribute('style')
         document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://top.gg/bot/617037497574359050/vote'
         document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(2)").textContent = '?currency=DOGE'
@@ -3814,9 +3818,54 @@ selectedTop.addEventListener('input', function() {
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bots/bot'
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/469610550159212554/vote'
         document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bots/bot'
-        document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
+        document.querySelector('#chooseTopGG > option[data-resource="guilds"]').value = 'servers'
     } else if (laterChoose === 'Discords') {
         document.getElementById('chooseTopGG1').style.display = 'none'
+    }
+
+    if (name === 'DiscordBotList') {
+        document.getElementById('chooseTopGG1').removeAttribute('style')
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://discordbotlist.com/'
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bots'
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/dank-memer/upvote'
+        document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bots'
+        document.querySelector('#chooseTopGG > option[data-resource="guilds"]').value = 'servers'
+    } else if (laterChoose === 'Discords') {
+        document.getElementById('chooseTopGG1').style.display = 'none'
+    }
+
+    if (name === 'MinecraftRating') {
+        document.getElementById('chooseMinecraftRating1').removeAttribute('style')
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(1)").textContent = 'https://minecraftrating.ru/'
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(2)").textContent = 'projects'
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(3)").textContent = '/mcskill/'
+        if (document.getElementById('chooseMinecraftRating').value === 'servers') {
+            document.getElementById('nick').required = false
+            document.getElementById('nick').parentElement.style.display = 'none'
+        }
+    } else if (laterChoose === 'MinecraftRating') {
+        document.getElementById('chooseMinecraftRating1').style.display = 'none'
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats') {
+            document.getElementById('nick').required = true
+            document.getElementById('nick').parentElement.removeAttribute('style')
+        }
+    }
+
+    if (name === 'MisterLauncher') {
+        document.getElementById('chooseMinecraftRating1').removeAttribute('style')
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(1)").textContent = 'https://misterlauncher.org/'
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(2)").textContent = 'projects'
+        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(3)").textContent = '/omegamc/'
+        if (document.getElementById('chooseMinecraftRating').value === 'servers') {
+            document.getElementById('nick').required = false
+            document.getElementById('nick').parentElement.style.display = 'none'
+        }
+    } else if (laterChoose === 'MisterLauncher') {
+        document.getElementById('chooseMinecraftRating1').style.display = 'none'
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats') {
+            document.getElementById('nick').required = true
+            document.getElementById('nick').parentElement.removeAttribute('style')
+        }
     }
 
     laterChoose = name
@@ -3835,6 +3884,16 @@ document.getElementById('selectTime').addEventListener('change', function() {
         document.getElementById('hour').required = true
         document.getElementById('label3').style.display = 'none'
         document.getElementById('time').required = false
+    }
+})
+
+document.getElementById('chooseMinecraftRating').addEventListener('change', function () {
+    if (this.value === 'servers') {
+        document.getElementById('nick').required = false
+        document.getElementById('nick').parentElement.style.display = 'none'
+    } else {
+        document.getElementById('nick').required = true
+        document.getElementById('nick').parentElement.removeAttribute('style')
     }
 })
 
