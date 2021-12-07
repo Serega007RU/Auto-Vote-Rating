@@ -33,7 +33,7 @@ async function initializeConfig(background, version) {
     }
     // noinspection JSUnusedGlobalSymbols
     try {
-        db = await idb.openDB('avr', version ? version : 3, {upgrade})
+        db = await idb.openDB('avr', version ? version : 4, {upgrade})
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
@@ -42,7 +42,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 30)
+            await initializeConfig(background, 40)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error.message})
@@ -112,7 +112,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
         await other.add(generalStats, 'generalStats')
         await other.add(todayStats, 'todayStats')
-    } else if (oldVersion === 1) {
+    }
+    if (oldVersion === 1) {
         todayStats = {
             successVotes: 0,
             errorVotes: 0,
@@ -131,6 +132,15 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
         } else {
             console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        }
+    }
+    if (oldVersion === 2) {
+        let cursor = await db.transaction('projects').store.index('rating').openCursor('DiscordBotList')
+        while (cursor) {
+            const project = cursor.value
+            project.game = 'bots'
+            await cursor.update(project)
+            cursor = await cursor.continue()
         }
     }
 }

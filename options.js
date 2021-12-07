@@ -545,7 +545,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseGameMMoTopRU').value
         project.lang = document.getElementById('selectLangMMoTopRU').value
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
-    } else if (project.rating === 'TopGG' || project.rating === 'Discords') {
+    } else if (project.rating === 'TopGG' || project.rating === 'Discords' || project.rating === 'DiscordBotList') {
         project.game = document.getElementById('chooseTopGG').value
         if (project.rating === 'TopGG') project.addition = document.getElementById('additionTopGG').value
     }
@@ -1694,6 +1694,17 @@ selectedTop.addEventListener('input', function() {
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bots/bot'
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/469610550159212554/vote'
         document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bots/bot'
+        document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
+    } else if (laterChoose === 'Discords') {
+        document.getElementById('chooseTopGG1').style.display = 'none'
+    }
+
+    if (name === 'DiscordBotList') {
+        document.getElementById('chooseTopGG1').removeAttribute('style')
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://discordbotlist.com/'
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bots'
+        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/dank-memer/upvote'
+        document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bots'
         document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
     } else if (laterChoose === 'Discords') {
         document.getElementById('chooseTopGG1').style.display = 'none'

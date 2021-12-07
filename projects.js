@@ -342,9 +342,9 @@ const allProjects = {
     DiscordBotList: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                return 'https://discordbotlist.com/bots/' + project.id + '/upvote'
+                return 'https://discordbotlist.com/' + project.game + '/' + project.id + '/upvote'
             case 'pageURL':
-                return 'https://discordbotlist.com/bots/' + project.id
+                return 'https://discordbotlist.com/' + project.game + '/' + project.id
             case 'projectName':
                 return doc.querySelector('h1.bot-name').textContent.trim()
             case 'exampleURL':
