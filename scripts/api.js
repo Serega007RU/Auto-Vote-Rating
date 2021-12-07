@@ -149,7 +149,7 @@ async function run() {
                 window.onmessage = function (e) {
                     if (e.data.alert) {
                         if (e.data.message.includes('reCAPTCHA')) {
-                            chrome.runtime.sendMessage({errorCaptcha: e.data.message})
+                            chrome.runtime.sendMessage({errorCaptcha: e.data.message, restartVote: true})
                         } else {
                             chrome.runtime.sendMessage({message: e.data.message})
                         }
