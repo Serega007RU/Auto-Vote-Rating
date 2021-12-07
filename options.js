@@ -475,7 +475,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     if (project.rating === 'Custom') {
         project.id = document.getElementById('nick').value
         project.nick = ''
-    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && document.getElementById('nick').value !== '') {
+    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && ((project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') ? document.getElementById('chooseMinecraftRating').value !== 'servers' : true) && document.getElementById('nick').value !== '') {
         project.nick = document.getElementById('nick').value
     } else {
         project.nick = ''
@@ -1683,7 +1683,7 @@ selectedTop.addEventListener('input', function() {
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bot'
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/270904126974590976/vote'
         document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bot'
-        document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
+        document.querySelector('#chooseTopGG > option[data-resource="guilds"]').value = 'servers'
         document.getElementById('additionTopGG1').removeAttribute('style')
         document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://top.gg/bot/617037497574359050/vote'
         document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(2)").textContent = '?currency=DOGE'
@@ -1698,7 +1698,7 @@ selectedTop.addEventListener('input', function() {
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bots/bot'
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/469610550159212554/vote'
         document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bots/bot'
-        document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
+        document.querySelector('#chooseTopGG > option[data-resource="guilds"]').value = 'servers'
     } else if (laterChoose === 'Discords') {
         document.getElementById('chooseTopGG1').style.display = 'none'
     }
@@ -1709,7 +1709,7 @@ selectedTop.addEventListener('input', function() {
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bots'
         document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/dank-memer/upvote'
         document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bots'
-        document.querySelector('#chooseTopGG > option[data-resource="servers"]').value = 'servers'
+        document.querySelector('#chooseTopGG > option[data-resource="guilds"]').value = 'servers'
     } else if (laterChoose === 'Discords') {
         document.getElementById('chooseTopGG1').style.display = 'none'
     }
@@ -1719,8 +1719,16 @@ selectedTop.addEventListener('input', function() {
         document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(1)").textContent = 'https://minecraftrating.ru/'
         document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(2)").textContent = 'projects'
         document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(3)").textContent = '/mcskill/'
+        if (document.getElementById('chooseMinecraftRating').value === 'servers') {
+            document.getElementById('nick').required = false
+            document.getElementById('nick').parentElement.style.display = 'none'
+        }
     } else if (laterChoose === 'MinecraftRating') {
         document.getElementById('chooseMinecraftRating1').style.display = 'none'
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats') {
+            document.getElementById('nick').required = true
+            document.getElementById('nick').parentElement.removeAttribute('style')
+        }
     }
 
     if (name === 'MisterLauncher') {
@@ -1728,8 +1736,16 @@ selectedTop.addEventListener('input', function() {
         document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(1)").textContent = 'https://misterlauncher.org/'
         document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(2)").textContent = 'projects'
         document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(3)").textContent = '/omegamc/'
+        if (document.getElementById('chooseMinecraftRating').value === 'servers') {
+            document.getElementById('nick').required = false
+            document.getElementById('nick').parentElement.style.display = 'none'
+        }
     } else if (laterChoose === 'MisterLauncher') {
         document.getElementById('chooseMinecraftRating1').style.display = 'none'
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats') {
+            document.getElementById('nick').required = true
+            document.getElementById('nick').parentElement.removeAttribute('style')
+        }
     }
 
     laterChoose = name
@@ -1748,6 +1764,16 @@ document.getElementById('selectTime').addEventListener('change', function() {
         document.getElementById('hour').required = true
         document.getElementById('label3').style.display = 'none'
         document.getElementById('time').required = false
+    }
+})
+
+document.getElementById('chooseMinecraftRating').addEventListener('change', function () {
+    if (this.value === 'servers') {
+        document.getElementById('nick').required = false
+        document.getElementById('nick').parentElement.style.display = 'none'
+    } else {
+        document.getElementById('nick').required = true
+        document.getElementById('nick').parentElement.removeAttribute('style')
     }
 })
 
