@@ -134,7 +134,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
         }
     }
-    if (oldVersion === 2) {
+    if (oldVersion === 3) {
         let cursor = await db.transaction('projects').store.index('rating').openCursor('DiscordBotList')
         while (cursor) {
             const project = cursor.value
