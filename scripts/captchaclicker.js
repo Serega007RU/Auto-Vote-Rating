@@ -58,8 +58,10 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
 
         if (document.querySelector('.rc-doscaptcha-body-text') != null && document.querySelector('.rc-doscaptcha-body-text').style.display !== 'none') {
             // https://i.imgur.com/q5BroJ7.png
-            chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-doscaptcha-body-text').textContent, restartVote: true})
-            clearInterval(timer7)
+            if (!document.querySelector('.rc-doscaptcha-body-text').textContent.includes('Время проверки истекло. Установите флажок и повторите попытку') && !document.querySelector('.rc-doscaptcha-body-text').textContent.includes('Verification expired. Check the checkbox again')) {
+                chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-doscaptcha-body-text').textContent, restartVote: true})
+                clearInterval(timer7)
+            }
         }
     }, 2000)
 
