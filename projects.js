@@ -801,6 +801,20 @@ const allProjects = {
                 return 'MinecraftServers100.com'
         }
     },
+    MCServerListCZ: (type, project/*, doc*/) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://mc-serverlist.cz/' + project.id
+            case 'pageURL':
+                return 'https://mc-serverlist.cz/' + project.id
+            case 'projectName':
+                return ''
+            case 'exampleURL':
+                return ['https://mc-serverlist.cz/', '', '']
+            case 'URL':
+                return 'MC-ServerList.cz'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
