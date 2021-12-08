@@ -491,19 +491,6 @@ const allProjects = {
                 return 'Czech-Craft.eu'
         }
     },
-    PixelmonServers: (type, project, doc) => {
-        switch (type) {
-            case 'voteURL':
-            case 'pageURL':
-                return 'https://pixelmonservers.com/server/' + project.id + '/vote'
-            case 'projectName':
-                return doc.querySelector('#title').textContent.trim()
-            case 'exampleURL':
-                return ['https://pixelmonservers.com/server/', '8IO9idMv', '/vote']
-            case 'URL':
-                return 'PixelmonServers.com'
-        }
-    },
     MinecraftBuzz: (type, project, doc) => {
         switch (type) {
             case 'voteURL':

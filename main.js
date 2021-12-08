@@ -149,5 +149,13 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             await cursor.update(project)
             cursor = await cursor.continue()
         }
+        cursor = await db.transaction('projects', 'readwrite').store.index('rating').openCursor('PixelmonServers')
+        while (cursor) {
+            const project = cursor.value
+            project.game = 'pixelmonservers.com'
+            project.rating = 'MineServers'
+            await cursor.update(project)
+            cursor = await cursor.continue()
+        }
     }
 }
