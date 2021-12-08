@@ -1478,6 +1478,10 @@ selectedTop.addEventListener('input', function() {
     let name
     if (document.querySelector('#projectList > option[value="' + this.value + '"]') != null) {
         name = document.querySelector('#projectList > option[value="' + this.value + '"]').getAttribute('name')
+        if (name === 'ListForge' && this.value !== 'ListForge.net') {
+            document.getElementById('chooseGameListForge').value = this.value
+            this.value = 'ListForge.net'
+        }
     }
     if (name == null) {
         if (laterChoose == null) return
@@ -1497,6 +1501,12 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('chooseMinecraftRating1').style.display = 'none'
         document.getElementById('chooseTopGG1').style.display = 'none'
         document.getElementById('additionTopGG1').style.display = 'none'
+        document.getElementById('urlGame').style.display = 'none'
+        document.getElementById('urlGame2').style.display = 'none'
+        document.getElementById('urlGameTopG').style.display = 'none'
+        document.getElementById('chooseGamegTop100').required = false
+        document.getElementById('chooseGameTopG').required = false
+        document.getElementById('chooseGameListForge').required = false
         document.getElementById('countVote').required = false
         document.getElementById('id').required = false
         document.getElementById('ordinalWorld').required = false
@@ -1787,7 +1797,14 @@ function generateDataList() {
         option.value = url
         datalist.append(option)
     }
-    document.querySelector('option[name="ListForge"]').textContent = 'or Minecraft-MP.com'
+    //ListForge
+    for (const el of document.querySelector('#gameListListForge').children) {
+        const option = document.createElement('option')
+        option.setAttribute('name', 'ListForge')
+        option.value = el.value
+        datalist.append(option)
+    }
+    // document.querySelector('option[name="ListForge"]').textContent = 'or Minecraft-MP.com'
     document.querySelector('option[name="TopGames"]').textContent = 'or Top-Serveurs.net'
     document.querySelector('option[name="Discords"]').textContent = 'or BotsForDiscord.com'
     document.querySelector('option[name="Custom"]').textContent = chrome.i18n.getMessage('Custom')
