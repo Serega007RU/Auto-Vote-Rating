@@ -811,7 +811,12 @@
     "message": "Force the voting mode to be set"
   },
   "start": {
-    "message": "Launching the extension"
+    "message": "Launching the extension v$version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
   },
   "suspended": {
     "message": "Extension suspended"

@@ -28,6 +28,8 @@ initializeConfig(true)
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
 
+    if (!settings) return
+
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
     if (!settings.disabledCheckInternet && !online) {
         if (navigator.onLine) {
@@ -904,7 +906,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let message
             if (request.captcha) {
                 message = chrome.i18n.getMessage('requiresCaptcha')
-            } else if (request.auth !== true) {
+            } else if (request.auth && request.auth !== true) {
                 message = request.auth
             } else {
                 message = chrome.i18n.getMessage(Object.keys(request)[0])

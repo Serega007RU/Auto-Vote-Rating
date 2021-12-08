@@ -774,7 +774,12 @@
     "message": "Выставить принудительно режим голосования"
   },
   "start": {
-    "message": "Запуск расширения"
+    "message": "Запуск расширения, v$version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
   },
   "suspended": {
     "message": "Расширение приостановлено"

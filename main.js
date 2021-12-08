@@ -67,7 +67,7 @@ async function initializeConfig(background, version) {
     todayStats = await db.get('other', 'todayStats')
 
     if (!background) return
-    console.log(chrome.i18n.getMessage('start'))
+    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 
     // if (settings && !settings.disabledCheckTime) checkTime()
 
