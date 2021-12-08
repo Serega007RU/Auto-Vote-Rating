@@ -822,6 +822,20 @@ const allProjects = {
                 return 'MineServers.com'
         }
     },
+    ATLauncher: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://atlauncher.com/servers/server/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://atlauncher.com/servers/server/' + project.id + '/vote'
+            case 'projectName':
+                return doc.querySelector('ol li:nth-child(3)').textContent.trim()
+            case 'exampleURL':
+                return ['https://atlauncher.com/servers/server/', 'KineticNetworkSkyfactory4', '/vote']
+            case 'URL':
+                return 'ATLauncher.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
