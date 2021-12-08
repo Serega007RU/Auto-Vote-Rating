@@ -821,6 +821,20 @@ const allProjects = {
                 return 'MC-ServerList.cz'
         }
     },
+    MineServers: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://' + project.game + '/server/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://' + project.game + '/server/' + project.id + '/vote'
+            case 'projectName':
+                return doc.querySelector('#title h1').textContent
+            case 'exampleURL':
+                return ['https://mineservers.com/server/', 'jvvHdPJy', '/vote']
+            case 'URL':
+                return 'MineServers.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':

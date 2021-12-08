@@ -526,7 +526,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.randomize = {min: document.getElementById('randomizeMin').valueAsNumber, max: document.getElementById('randomizeMax').valueAsNumber}
     }
     if (project.rating === 'ListForge') {
-        project.game = document.getElementById('chooseGameListForge').value
+        project.game = document.getElementById('chooseGameListForge').value.toLowerCase()
         project.addition = document.getElementById('additionTopGG').value
     } else if (project.rating === 'TopG') {
         project.game = document.getElementById('chooseGameTopG').value
@@ -551,6 +551,8 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         if (project.rating === 'TopGG') project.addition = document.getElementById('additionTopGG').value
     } else if (project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') {
         project.game = document.getElementById('chooseMinecraftRating').value
+    } else if (project.rating === 'MineServers') {
+        project.game = document.getElementById('chooseGameMineServers').value.toLowerCase()
     }
     
     if (project.rating === 'Custom') {
@@ -769,7 +771,7 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'Custom')) {
+    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MineServers' || project.rating === 'Custom')) {
         array.push(document.createElement('br'))
         array.push(document.createElement('br'))
         array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
@@ -786,7 +788,7 @@ async function addProject(project, element) {
         createNotif(array, 'success', null, element)
     }
 
-    if (project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100') {
+    if (project.rating === 'MinecraftIndex' || project.rating === 'PixelmonServers' || project.rating === 'gTop100' || project.rating === 'MineServers') {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 
@@ -1481,6 +1483,10 @@ selectedTop.addEventListener('input', function() {
         if (name === 'ListForge' && this.value !== 'ListForge.net') {
             document.getElementById('chooseGameListForge').value = this.value
             this.value = 'ListForge.net'
+        } else if (name === 'MineServers') {
+            if (this.value === 'MineServers.com') document.getElementById('chooseGameMineServers').value = 'mineservers.com'
+            else document.getElementById('chooseGameMineServers').value = this.value
+            this.value = 'MineServers.com'
         }
     }
     if (name == null) {
@@ -1504,6 +1510,8 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('urlGame').style.display = 'none'
         document.getElementById('urlGame2').style.display = 'none'
         document.getElementById('urlGameTopG').style.display = 'none'
+        document.getElementById('urlGame3').style.display = 'none'
+        document.getElementById('chooseGameMineServers').required = false
         document.getElementById('chooseGamegTop100').required = false
         document.getElementById('chooseGameTopG').required = false
         document.getElementById('chooseGameListForge').required = false
@@ -1663,6 +1671,14 @@ selectedTop.addEventListener('input', function() {
         if (name !== 'TopGG') document.getElementById('additionTopGG1').style.display = 'none'
     }
 
+    if (name === 'MineServers') {
+        document.getElementById('urlGame3').removeAttribute('style')
+        document.getElementById('chooseGameMineServers').required = true
+    } else if (laterChoose === 'MineServers') {
+        document.getElementById('urlGame3').style.display = 'none'
+        document.getElementById('chooseGameMineServers').required = false
+    }
+
     if (name === 'gTop100') {
         document.getElementById('urlGame2').removeAttribute('style')
         document.getElementById('chooseGamegTop100').required = true
@@ -1801,6 +1817,14 @@ function generateDataList() {
     for (const el of document.querySelector('#gameListListForge').children) {
         const option = document.createElement('option')
         option.setAttribute('name', 'ListForge')
+        option.value = el.value
+        datalist.append(option)
+    }
+    //MineServers
+    for (const el of document.querySelector('#gameListMineServers').children) {
+        if (el.value === 'mineservers.com') continue
+        const option = document.createElement('option')
+        option.setAttribute('name', 'MineServers')
         option.value = el.value
         datalist.append(option)
     }
