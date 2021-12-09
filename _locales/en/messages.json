@@ -1134,7 +1134,7 @@
     }
   },
   "useProxyOnUnProxyTop": {
-    "message": "Use a proxy on ratings where no proxy is used (MinecraftRating)"
+    "message": "Use a proxy on ratings where no proxy is used (MinecraftRating and MisterLauncher)"
   },
   "reAddSuccess": {
     "message": "Successfully re-added"

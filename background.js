@@ -151,13 +151,13 @@ async function checkOpen(project) {
 
         if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && !settings.useProxyOnUnProxyTop) {
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
-            if ((project.rating === 'MinecraftRating' && project.game === 'projects')) {
-                if ((value.rating !== 'MinecraftRating' && project.game !== 'projects') && value.useMultiVote !== false) {
+            if ((project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
+                if (!(value.rating === 'MinecraftRating' && value.game === 'projects') && !(value.rating === 'MisterLauncher' && value.game === 'projects') && value.useMultiVote !== false) {
                     return
                 }
             }
-            if ((value.rating === 'MinecraftRating' && project.game === 'projects')) {
-                if ((project.rating !== 'MinecraftRating' && project.game !== 'projects') && value.useMultiVote !== false) {
+            if ((value.rating === 'MinecraftRating' && value.game === 'projects') || (value.rating === 'MisterLauncher' && value.game === 'projects')) {
+                if (!(project.rating === 'MinecraftRating' && project.game === 'projects') && !(project.rating === 'MisterLauncher' && project.game === 'projects') && project.useMultiVote !== false) {
                     //Если безпроксиевый рейтинг закончил голосование, позволяет проксиевым начать голосовать ради экономии времени
                     if (value.time < Date.now()) {
                         return
@@ -169,7 +169,7 @@ async function checkOpen(project) {
     if (currentProxy != null && project.useMultiVote === false) return//Если пытается пройти проект с отключённым MultiVote, он не должен пройти с включённым прокси
     if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
-        if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
+        if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
             if (currentVK[project.rating]?.[project.id] > Date.now()) {
                 return
             }
@@ -181,11 +181,12 @@ async function checkOpen(project) {
                 if (project.rating === 'MonitoringMinecraft' && !currentVK.notAuth) _return = false
 //              if (project.rating === 'MinecraftRating' && currentVK['AuthURLMinecraftRating' + project.id] != null) _return = false
 //              if (project.rating === 'MonitoringMinecraft' && currentVK['AuthURLMonitoringMinecraft' + project.id] != null) _return = false
+                if (project.rating === 'MisterLauncher' && project.game === 'projects' && !currentVK.notAuth) _return = falsen
                 if (_return) return
             }
         }
         if (currentProxy != null) {
-            if (!settings.useProxyOnUnProxyTop && (project.rating === 'MinecraftRating' && project.game === 'projects')) {
+            if (!settings.useProxyOnUnProxyTop && ((project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
                 return
             }
             if (currentProxy[project.rating]?.[project.id] > Date.now()) {
@@ -194,7 +195,7 @@ async function checkOpen(project) {
         }
 
         //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
-        if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
+        if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
             let cursor = await db.transaction('vks').store.openCursor()
@@ -208,6 +209,7 @@ async function checkOpen(project) {
                     if (project.rating === 'MonitoringMinecraft' && !vkontakte.notAuth) _continue = false
 //                  if (project.rating === 'MinecraftRating' && project.game === 'projects' && vkontakte['AuthURLMinecraftRating' + project.id] != null) _continue = false
 //                  if (project.rating === 'MonitoringMinecraft' && vkontakte['AuthURLMonitoringMinecraft' + project.id] != null) _continue = false
+                    if (project.rating === 'MisterLauncher' && project.game === 'projects' && !vkontakte.notAuth) _continue = false
                     if (_continue) {
                         cursor = await cursor.continue()
                         continue
@@ -281,7 +283,7 @@ async function checkOpen(project) {
             }
         }
 
-        if (currentProxy == null && (settings.useProxyOnUnProxyTop || (project.rating !== 'MinecraftRating' && project.game !== 'projects'))) {
+        if (currentProxy == null && (settings.useProxyOnUnProxyTop || !(project.rating === 'MinecraftRating' && project.game === 'projects') || !(project.rating === 'MisterLauncher' && project.game === 'projects'))) {
             //Для FireFox эту проверку нет смысла выполнять
             // noinspection JSUnresolvedVariable
             if (typeof InstallTrigger === 'undefined') {
@@ -521,7 +523,7 @@ async function checkOpen(project) {
             }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
-    } else if (settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
+    } else if (settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
         //Удаляет все существующие куки ВК
         let cookies = await new Promise(resolve=>{
             chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
@@ -559,7 +561,7 @@ async function checkOpen(project) {
     }
 
     let retryCoolDown
-    if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) || /*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
+    if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) || /*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -1573,7 +1575,7 @@ async function endVote(request, sender, project) {
         }*/
 
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote)  {
-            if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')/* && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) !== -1*/) {
+            if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')/* && VKs.findIndex(function(element) { return element.id == currentVK.id && element.name == currentVK.name}) !== -1*/) {
                 if (request.later && settings.repeatAttemptLater && project.later != null && !(project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MinecraftRating')) {
                     if (project.later >= settings.repeatLater) {
                         await useVK()
@@ -1588,14 +1590,14 @@ async function endVote(request, sender, project) {
                 }
             }
 
-            if (currentProxy != null && (settings.useProxyOnUnProxyTop || (project.rating !== 'MinecraftRating' && project.game !== 'projects')) /*&& proxies.findIndex(function(element) { return element.ip === currentProxy.ip && element.port === currentProxy.port}) !== -1*/) {
+            if (currentProxy != null && (settings.useProxyOnUnProxyTop || !(project.rating === 'MinecraftRating' && project.game === 'projects') || !(project.rating === 'MisterLauncher' && project.game === 'projects')) /*&& proxies.findIndex(function(element) { return element.ip === currentProxy.ip && element.port === currentProxy.port}) !== -1*/) {
                 if (!currentProxy[project.rating] || Array.isArray(currentProxy[project.rating])) currentProxy[project.rating] = {}
                 currentProxy[project.rating][project.id] = time
                 await updateValue('proxies', currentProxy)
-            } else if (settings.useProxyOnUnProxyTop || (project.rating !== 'MinecraftRating' && project.game !== 'projects')) {
+            } else if (settings.useProxyOnUnProxyTop || !(project.rating === 'MinecraftRating' && project.game === 'projects') || !(project.rating === 'MisterLauncher' && project.game === 'projects')) {
                 console.warn('currentProxy is null or not found')
             }
-        } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || (project.rating === 'MinecraftRating' && project.game === 'projects')) && !project.priority && project.timeoutHour == null) {
+        } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects')) && !project.priority && project.timeoutHour == null) {
             //Рандомизация по умолчанию (в пределах 5-10 минут) для бедного TopCraft/McTOP который легко ддосится от массового автоматического голосования
             project.time = project.time + Math.floor(Math.random() * (600000 - -300000) + -300000)
         }
@@ -1617,7 +1619,7 @@ async function endVote(request, sender, project) {
             todayStats.lastSuccessVote = Date.now()
             delete project.later
         } else {
-            if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && settings.repeatAttemptLater && project.later && !(project.rating === 'MinecraftRating' && project.game === 'projects')) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
+            if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && settings.repeatAttemptLater && project.later && !(project.rating === 'MinecraftRating' && project.game === 'projects') && !(project.rating === 'MisterLauncher' && project.game === 'projects')) {//Пока что для безпроксиевых рейтингов игнорируется отключение игнорирование ошибки "Вы уже голосовали" не смотря на настройку useProxyOnUnProxyTop, в случае если на этих рейтингах будет проверка на айпи, сюда нужна будет проверка useProxyOnUnProxyTop
                 if (project.later < settings.repeatLater) {
                     project.time = null
                     console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('alreadyVotedRepeat'))
@@ -1670,7 +1672,7 @@ async function endVote(request, sender, project) {
                 if (currentVK != null) currentVK.notAuth = true
             }
             if (request.notAuth && currentVK != null) currentVK.notAuth = true
-            if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft') && request.errorAuthVK && currentVK != null) {
+            if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft') && request.errorAuthVK && currentVK != null) {
                 currentVK.notWorking = request.errorAuthVK
                 await updateValue('vks', currentVK)
             } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && message.includes('Ваш аккаунт заблокирован во Вконтакте')) {
@@ -1785,12 +1787,12 @@ async function endVote(request, sender, project) {
                     for (const value of queueProjects) {
                         if (countVK > 0 && countProxy > 0) break
                         if (value.useMultiVote !== false) {
-                            if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || (value.rating === 'MinecraftRating' && project.game === 'projects') || value.rating === 'MonitoringMinecraft') {
+                            if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || (value.rating === 'MinecraftRating' && value.game === 'projects') || (value.rating === 'MisterLauncher' && value.game === 'projects') || value.rating === 'MonitoringMinecraft') {
                                 countVK++
                             }
                             if (settings.useProxyOnUnProxyTop) {
                                 countProxy++
-                            } else if (value.rating !== 'MinecraftRating' && project.game !== 'projects') {
+                            } else if (!(value.rating === 'MinecraftRating' && value.game === 'projects') && !(value.rating === 'MisterLauncher' && value.game === 'projects')) {
                                 countProxy++
                             }
                         }
@@ -1815,7 +1817,7 @@ async function endVote(request, sender, project) {
                     let countVK = 0
                     for (const value of queueProjects) {
                         if (countVK > 0) break
-                        if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || (value.rating === 'MinecraftRating' && project.game === 'projects') || value.rating === 'MonitoringMinecraft') {
+                        if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || (value.rating === 'MinecraftRating' && value.game === 'projects') || (value.rating === 'MisterLauncher' && value.game === 'projects') || value.rating === 'MonitoringMinecraft') {
                             countVK++
                         }
                     }
