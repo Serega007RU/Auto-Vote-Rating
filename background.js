@@ -464,7 +464,7 @@ async function checkOpen(project) {
         } else if (project.rating === 'TopMinecraftServers') {
             url = '.topminecraftservers.org'
         } else if (project.rating === 'MinecraftServersBiz') {
-            url = '.minecraftservers.biz'
+//             url = '.minecraftservers.biz'
         } else if (project.rating === 'HotMC') {
             url = '.hotmc.ru'
         } else if (project.rating === 'MinecraftServerNet') {

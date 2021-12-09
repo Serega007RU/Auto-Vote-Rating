@@ -786,7 +786,7 @@ async function removeVKList(VK) {
 }
 
 async function removeBorealisList(acc) {
-    let li = document.getElementById(acc.nick)
+    let li = document.getElementById('borealis' + acc.key)
     if (li != null) {
         const count = Number(document.querySelector('#BorealisButton > span').textContent) - 1
         li.remove()
@@ -1331,7 +1331,10 @@ async function addBorealis(repair, imp) {
             }
         }
         try {
-            acc.nick = doc.querySelector('div.userinfo-pos > div.rcol2 a').href.replace(/^.*\/\/[^\/]+/, '').replace('https://borealis.su/user/', '').replace('/', '')
+            acc.nick = doc.querySelector('div.userinfo-pos > div.rcol2 a').href
+            acc.nick = acc.nick.replace(/^.*\/\/[^\/]+/, '')
+            acc.nick = acc.nick.replace('user/', '')
+            acc.nick = acc.nick.replaceAll('/', '')
         } catch(e) {
             createNotif(e, 'error')
             return
