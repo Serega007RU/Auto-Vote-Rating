@@ -432,84 +432,8 @@ async function checkOpen(project) {
         lastErrorNotFound = null
 
         //Очистка куки
-        let url
-        if (project.rating === 'TopCraft') {
-            url = '.topcraft.ru'
-        } else if (project.rating === 'McTOP') {
-            url = '.mctop.su'
-        } else if (project.rating === 'MCRate') {
-            url = '.mcrate.su'
-        } else if (project.rating === 'MinecraftRating') {
-            url = '.minecraftrating.ru'
-        } else if (project.rating === 'MonitoringMinecraft') {
-            url = '.monitoringminecraft.ru'
-        } else if (project.rating === 'FairTop') {
-            url = '.fairtop.in'
-        } else if (project.rating === 'IonMc') {
-            url = '.ionmc.top'
-        } else if (project.rating === 'MinecraftServersOrg') {
-            url = '.minecraftservers.org'
-        } else if (project.rating === 'ServeurPrive') {
-            url = '.serveur-prive.net'
-        } else if (project.rating === 'PlanetMinecraft') {
-            url = '.planetminecraft.com'
-        } else if (project.rating === 'TopG') {
-            url = '.topg.org'
-        } else if (project.rating === 'ListForge') {
-            url = '.' + project.game
-        } else if (project.rating === 'MinecraftServerList') {
-            url = '.minecraft-server-list.com'
-        } else if (project.rating === 'ServerPact') {
-            url = '.serverpact.com'
-        } else if (project.rating === 'MinecraftIpList') {
-            url = '.minecraftiplist.com'
-        } else if (project.rating === 'TopMinecraftServers') {
-            url = '.topminecraftservers.org'
-        } else if (project.rating === 'MinecraftServersBiz') {
-//             url = '.minecraftservers.biz'
-        } else if (project.rating === 'HotMC') {
-            url = '.hotmc.ru'
-        } else if (project.rating === 'MinecraftServerNet') {
-            url = '.minecraft-server.net'
-        } else if (project.rating === 'TopGames') {
-            if (project.lang === 'fr') {
-                url = '.top-serveurs.net'
-            } else {
-                url = '.top-games.net'
-            }
-            url = '.minecraftservers.biz'
-        } else if (project.rating === 'TMonitoring') {
-            url = '.tmonitoring.com'
-        } else if (project.rating === 'TopGG') {
-            url = '.top.gg'
-        } else if (project.rating === 'DiscordBotList') {
-            url = '.discordbotlist.com'
-        } else if (project.rating === 'BotsForDiscord') {
-            url = '.botsfordiscord.com'
-        } else if (project.rating === 'MMoTopRU') {
-            url = '.mmotop.ru'
-        } else if (project.rating === 'MCServers') {
-            url = '.mc-servers.com'
-        } else if (project.rating === 'MinecraftList') {
-            url = '.minecraftlist.org'
-        } else if (project.rating === 'MinecraftIndex') {
-            url = '.minecraft-index.com'
-        } else if (project.rating === 'ServerList101') {
-            url = '.serverlist101.com'
-        } else if (project.rating === 'MCServerList') {
-            url = '.mcserver-list.eu'
-        } else if (project.rating === 'CraftList') {
-            url = '.craftlist.org'
-        } else if (project.rating === 'CzechCraft') {
-            url = '.czech-craft.eu'
-        } else if (project.rating === 'PixelmonServers') {
-            url = '.pixelmonservers.com'
-        } else if (project.rating === 'MinecraftBuzz') {
-            url = '.minecraft.buzz'
-        }/* else if (project.rating === 'Custom') {
-            url = '.custom.com'
-        }*/
-        if (url != null && url !== '') {
+        let url = '.' + extractHostname(allProjects[project.rating]('pageURL', project))
+        if (url) {
             let cookies = await new Promise(resolve=>{
                 chrome.cookies.getAll({domain: url}, function(cookies) {
                     resolve(cookies)
