@@ -135,27 +135,35 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
     }
     if (oldVersion === 3) {
-        let cursor = await db.transaction('projects', 'readwrite').store.index('rating').openCursor('DiscordBotList')
+        if (!transaction) transaction = db.transaction('projects', 'readwrite')
+        const store = transaction.objectStore('projects')
+        let cursor = await store.index('rating').openCursor('DiscordBotList')
         while (cursor) {
             const project = cursor.value
             project.game = 'bots'
             await cursor.update(project)
             cursor = await cursor.continue()
         }
-        cursor = await db.transaction('projects', 'readwrite').store.index('rating').openCursor('MinecraftRating')
+        cursor = await store.index('rating').openCursor('MinecraftRating')
         while (cursor) {
             const project = cursor.value
             project.game = 'projects'
             await cursor.update(project)
             cursor = await cursor.continue()
         }
-        cursor = await db.transaction('projects', 'readwrite').store.index('rating').openCursor('PixelmonServers')
+        cursor = await store.index('rating').openCursor('PixelmonServers')
         while (cursor) {
             const project = cursor.value
             project.game = 'pixelmonservers.com'
             project.rating = 'MineServers'
             await cursor.update(project)
             cursor = await cursor.continue()
+        }
+
+        if (typeof createNotif !== 'undefined') {
+            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        } else {
+            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
         }
     }
 }
