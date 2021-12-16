@@ -52,7 +52,7 @@ async function initializeConfig(background, version) {
     todayStats = await db.get('other', 'todayStats')
 
     if (!background) return
-    console.log(chrome.i18n.getMessage('start'))
+    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 
     // if (settings && !settings.disabledCheckTime) checkTime()
 
@@ -204,6 +204,14 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         while (cursor) {
             const project = cursor.value
             project.game = 'projects'
+            await cursor.update(project)
+            cursor = await cursor.continue()
+        }
+        cursor = await db.transaction('projects', 'readwrite').store.index('rating').openCursor('PixelmonServers')
+        while (cursor) {
+            const project = cursor.value
+            project.game = 'pixelmonservers.com'
+            project.rating = 'MineServers'
             await cursor.update(project)
             cursor = await cursor.continue()
         }

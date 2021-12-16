@@ -46,6 +46,7 @@ initializeConfig(true)
 //Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
 
+    if (!settings) return
     if (settings.stopVote > Date.now()) return
 
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
@@ -1318,7 +1319,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let message
             if (request.captcha) {
                 message = chrome.i18n.getMessage('requiresCaptcha')
-            } else if (request.auth !== true) {
+            } else if (request.auth && request.auth !== true) {
                 message = request.auth
             } else {
                 message = chrome.i18n.getMessage(Object.keys(request)[0])
@@ -1423,7 +1424,7 @@ async function endVote(request, sender, project) {
                 hour = 23
             } else if (project.rating === 'PlanetMinecraft' || project.rating === 'ListForge' || project.rating === 'MinecraftList') {
                 hour = 5
-            } else if (project.rating === 'MinecraftServersOrg' || project.rating === 'MinecraftIndex' || project.rating === 'MinecraftBuzz' || project.rating === 'PixelmonServers') {
+            } else if (project.rating === 'MinecraftServersOrg' || project.rating === 'MinecraftIndex' || project.rating === 'MinecraftBuzz' || project.rating === 'MineServers') {
                 hour = 0
             } else if (project.rating === 'TopMinecraftServers') {
                 hour = 4
@@ -1438,7 +1439,7 @@ async function endVote(request, sender, project) {
             //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
             } else if (project.rating === 'TopG' || project.rating === 'MinecraftServersBiz' || project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'MCListsOrg' || (project.rating === 'Discords' && project.game === 'bots/bot') || project.rating === 'DiscordBoats') {
                 time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.rating === 'MinecraftIpList' || project.rating === 'HotMC' || project.rating === 'MinecraftServerNet' || project.rating === 'TMonitoring' || project.rating === 'MCServers' || project.rating === 'CraftList' || project.rating === 'TopMCServersCom' || project.rating === 'CraftListNet' || project.rating === 'MinecraftServers100' || project.rating === 'MineStatus' || project.rating === 'MinecraftServersDe' || (project.rating === 'MinecraftRating' && project.game === 'servers') || (project.rating === 'MisterLauncher' && project.game === 'servers')) {
+            } else if (project.rating === 'MinecraftIpList' || project.rating === 'HotMC' || project.rating === 'MinecraftServerNet' || project.rating === 'TMonitoring' || project.rating === 'MCServers' || project.rating === 'CraftList' || project.rating === 'TopMCServersCom' || project.rating === 'CraftListNet' || project.rating === 'MinecraftServers100' || project.rating === 'MineStatus' || project.rating === 'MinecraftServersDe' || (project.rating === 'MinecraftRating' && project.game === 'servers') || (project.rating === 'MisterLauncher' && project.game === 'servers') || project.rating === 'ATLauncher') {
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames') {
                 project.countVote = project.countVote + 1

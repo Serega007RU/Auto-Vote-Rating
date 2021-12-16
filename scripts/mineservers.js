@@ -19,22 +19,23 @@ async function vote(first) {
                 console.warn(element.textContent)
             }
         }
-        
+
         document.getElementById('captcha-button').click()
-        const project = await getProject('PixelmonServers')
+        const project = await getProject('MineServers')
         document.getElementById('web_server_vote_username').value = project.nick
-        const timer = setInterval(()=>{
-            try {
-                if (document.getElementById('captcha-input').style.display !== 'none') {
-                    chrome.runtime.sendMessage({captcha: true})
-                    clearInterval(timer)
-                }
-            } catch (e) {
-                throwError(e)
-                clearInterval(timer)
-            }
-        }, 1000)
     } catch (e) {
         throwError(e)
     }
 }
+
+const timer = setInterval(()=>{
+    try {
+        if (document.getElementById('captcha-input').style.display !== 'none') {
+            chrome.runtime.sendMessage({captcha: true})
+            clearInterval(timer)
+        }
+    } catch (e) {
+        throwError(e)
+        clearInterval(timer)
+    }
+}, 1000)

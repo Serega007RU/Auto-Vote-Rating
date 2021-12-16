@@ -1151,7 +1151,12 @@
     "message": "Temporary nickname"
   },
   "start": {
-    "message": "Launching the extension"
+    "message": "Launching the extension v$version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
   },
   "suspended": {
     "message": "Extension suspended"

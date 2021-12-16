@@ -491,19 +491,6 @@ const allProjects = {
                 return 'Czech-Craft.eu'
         }
     },
-    PixelmonServers: (type, project, doc) => {
-        switch (type) {
-            case 'voteURL':
-            case 'pageURL':
-                return 'https://pixelmonservers.com/server/' + project.id + '/vote'
-            case 'projectName':
-                return doc.querySelector('#title').textContent.trim()
-            case 'exampleURL':
-                return ['https://pixelmonservers.com/server/', '8IO9idMv', '/vote']
-            case 'URL':
-                return 'PixelmonServers.com'
-        }
-    },
     MinecraftBuzz: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
@@ -819,6 +806,34 @@ const allProjects = {
                 return ['https://mc-serverlist.cz/', 'server-lendmark.27', '/vote']
             case 'URL':
                 return 'MC-ServerList.cz'
+        }
+    },
+    MineServers: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://' + project.game + '/server/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://' + project.game + '/server/' + project.id + '/vote'
+            case 'projectName':
+                return doc.querySelector('#title h1').textContent
+            case 'exampleURL':
+                return ['https://mineservers.com/server/', 'jvvHdPJy', '/vote']
+            case 'URL':
+                return 'MineServers.com'
+        }
+    },
+    ATLauncher: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://atlauncher.com/servers/server/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://atlauncher.com/servers/server/' + project.id + '/vote'
+            case 'projectName':
+                return doc.querySelector('ol li:nth-child(3)').textContent.trim()
+            case 'exampleURL':
+                return ['https://atlauncher.com/servers/server/', 'KineticNetworkSkyfactory4', '/vote']
+            case 'URL':
+                return 'ATLauncher.com'
         }
     },
     Custom: (type, project/*, doc*/) => {

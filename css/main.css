@@ -1084,7 +1084,7 @@ ul {
  	border-radius: 6px;
  	padding: 5px;
  	position: absolute;
- 	z-index: 1;
+ 	z-index: 10;
  	margin-left: -183px;
  	opacity: 0;
  	transition: opacity 0.3s;

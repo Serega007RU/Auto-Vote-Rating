@@ -1,10 +1,3 @@
-//Фикс-костыль двойной загрузки (для Rocket Loader)
-if (typeof loaded2 === 'undefined') {
-    // noinspection ES6ConvertVarToLetConst
-    var loaded2 = true
-    runVote()
-}
-
 async function vote(first) {
     try {
         if (document.getElementById('summary') != null) {
@@ -88,24 +81,22 @@ async function vote(first) {
     }
 }
 
-function runVote() {
-    const timer = setInterval(()=>{
-        try {
-            //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
-            if (document.readyState === 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
-                const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent.toLowerCase()
-                if (textContent.includes('уже голосовали') || textContent.includes('уже проголосовали') || textContent.includes('сможете проголосовать') || textContent.includes('вы сегодня голосовали') || textContent.includes('вы сегодня проголосовали')) {
-                    chrome.runtime.sendMessage({later: true})
-                } else if (textContent.includes('за ваш голос') || textContent.includes('спасибо за голос') ||  textContent.includes('голос принят') || textContent.includes('голос засчитан') || textContent.includes('успех') || textContent.includes('успешн')) {
-                    chrome.runtime.sendMessage({successfully: true})
-                } else {
-                    chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
-                }
-                clearInterval(timer)
+const timer = setInterval(()=>{
+    try {
+        //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
+        if (document.readyState === 'complete' && document.querySelectorAll('div[class=tooltip-inner]').item(0) != null) {
+            const textContent = document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent.toLowerCase()
+            if (textContent.includes('уже голосовали') || textContent.includes('уже проголосовали') || textContent.includes('сможете проголосовать') || textContent.includes('вы сегодня голосовали') || textContent.includes('вы сегодня проголосовали')) {
+                chrome.runtime.sendMessage({later: true})
+            } else if (textContent.includes('за ваш голос') || textContent.includes('спасибо за голос') ||  textContent.includes('голос принят') || textContent.includes('голос засчитан') || textContent.includes('успех') || textContent.includes('успешн')) {
+                chrome.runtime.sendMessage({successfully: true})
+            } else {
+                chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
             }
-        } catch (e) {
-            throwError(e)
             clearInterval(timer)
         }
-    }, 1000)
-}
+    } catch (e) {
+        throwError(e)
+        clearInterval(timer)
+    }
+}, 1000)

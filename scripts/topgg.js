@@ -12,7 +12,7 @@ async function vote(first) {
                 if (!document.URL.includes('prompt=none')) url = url.concat('&prompt=none')
                 document.location.replace(url)
             } else {
-                const timer = setTimeout(()=>{//Да это костыль, а есть варинт по лучше?
+                const timer = setTimeout(()=>{//Да это костыль, а есть вариант по лучше?
                     chrome.runtime.sendMessage({discordLogIn: true})
                 }, 10000)
                 window.onbeforeunload = ()=> clearTimeout(timer)
