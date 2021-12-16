@@ -771,7 +771,7 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'gTop100' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MineServers' || project.rating === 'Custom')) {
+    if (!(element != null || project.rating === 'MinecraftIndex' || project.rating === 'gTop100' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MineServers' || project.rating === 'gTop100' || project.rating === 'Custom')) {
         array.push(document.createElement('br'))
         array.push(document.createElement('br'))
         array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
@@ -788,7 +788,7 @@ async function addProject(project, element) {
         createNotif(array, 'success', null, element)
     }
 
-    if (project.rating === 'MinecraftIndex' || project.rating === 'gTop100' || project.rating === 'MineServers') {
+    if (project.rating === 'MinecraftIndex' || project.rating === 'MineServers') {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 

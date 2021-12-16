@@ -1,41 +1,36 @@
 async function vote(first) {
-    if (first === false) return
     try {
-        const timer = setInterval(()=>{
-            if (document.getElementById('FunCaptcha') != null) {
-                chrome.runtime.sendMessage({captcha: true})
-                clearInterval(timer)
-            }
-        }, 1000)
-        const timer2 = setInterval(()=>{
-            if (document.getElementById('captcha-status') != null && document.getElementById('captcha-status').textContent !== '') {
-                if (document.getElementById('captcha-status').textContent.includes('already voted')) {
-                    clearInterval(timer2)
-                    const numbers = document.getElementById('captcha-status').textContent.match(/\d+/g).map(Number)
-                    let count = 0
-                    let hour = 0
-                    let min = 0
-                    let sec = 0
-                    for (const i in numbers) {
-                        if (count === 0) {
-                            hour = numbers[i]
-                        } else if (count === 1) {
-                            min = numbers[i]
-                        } else if (count === 2) {
-                            sec = numbers[i]
-                        }
-                        count++
-                    }
-                    const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-                    const later = Date.now() + milliseconds
-                    chrome.runtime.sendMessage({later: later})
-                } else if (document.getElementById('captcha-status').textContent.includes('success')) {
-                    clearInterval(timer2)
-                    chrome.runtime.sendMessage({successfully: true})
-                }
-            }
-        }, 1000)
+        if (document.querySelector('#captcha-status').textContent) return
+
+        if (first) return
+
+        document.querySelector('#votebutton').click()
     } catch (e) {
         throwError(e)
     }
 }
+
+const timer = setInterval(()=>{
+    try {
+        if (document.querySelector('#captcha-status').textContent) {
+            clearInterval(timer)
+            const text = document.querySelector('#captcha-status').textContent
+            if (text.includes('already voted')) {
+                const numbers = text.match(/\d+/g).map(Number)
+                const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
+                const later = Date.now() + milliseconds
+                chrome.runtime.sendMessage({later})
+            } else if (text.includes('Thank you for voting')) {
+                chrome.runtime.sendMessage({successfully: true})
+            } else {
+                chrome.runtime.sendMessage({message: text})
+            }
+        } else if (document.querySelector('.sfs.s-server') != null) {
+            clearInterval(timer)
+            chrome.runtime.sendMessage({successfully: true})
+        }
+    } catch (e) {
+        throwError(e)
+        clearInterval(timer)
+    }
+}, 100)
