@@ -836,6 +836,20 @@ const allProjects = {
                 return 'ATLauncher.com'
         }
     },
+    ServersMinecraft: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://servers-minecraft.net/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://servers-minecraft.net/' + project.id
+            case 'projectName':
+                return doc.querySelector('table.info th').textContent.trim()
+            case 'exampleURL':
+                return ['https://servers-minecraft.net/', 'server-complex-gaming.58', '/vote']
+            case 'URL':
+                return 'Servers-Minecraft.net'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
