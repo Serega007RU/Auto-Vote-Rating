@@ -850,6 +850,20 @@ const allProjects = {
                 return 'Servers-Minecraft.net'
         }
     },
+    MinecraftListCZ: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://www.minecraft-list.cz/server/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://www.minecraft-list.cz/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('.content__box__server__content__detail__firstRow__name').textContent.trim()
+            case 'exampleURL':
+                return ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote']
+            case 'URL':
+                return 'Minecraft-List.cz'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':

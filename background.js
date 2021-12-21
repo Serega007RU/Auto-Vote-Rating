@@ -1045,7 +1045,7 @@ async function endVote(request, sender, project) {
                 } else {
                     time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
                 }
-            } else if (project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery') {
+            } else if (project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ') {
                 time.setUTCHours(time.getUTCHours() + 2)
             } else if (project.rating === 'CraftList') {
                 time = new Date(request.successfully)
