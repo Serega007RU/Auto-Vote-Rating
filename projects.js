@@ -836,6 +836,34 @@ const allProjects = {
                 return 'ATLauncher.com'
         }
     },
+    ServersMinecraft: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://servers-minecraft.net/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://servers-minecraft.net/' + project.id
+            case 'projectName':
+                return doc.querySelector('table.info th').textContent.trim()
+            case 'exampleURL':
+                return ['https://servers-minecraft.net/', 'server-complex-gaming.58', '/vote']
+            case 'URL':
+                return 'Servers-Minecraft.net'
+        }
+    },
+    MinecraftListCZ: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://www.minecraft-list.cz/server/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://www.minecraft-list.cz/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('.content__box__server__content__detail__firstRow__name').textContent.trim()
+            case 'exampleURL':
+                return ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote']
+            case 'URL':
+                return 'Minecraft-List.cz'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':

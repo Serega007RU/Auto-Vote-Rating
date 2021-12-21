@@ -32,7 +32,7 @@ async function initializeConfig(background, version) {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 40, {upgrade})
+    db = await idb.openDB('avr', 50, {upgrade})
     db.onerror = (event) => dbError(event, false)
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {
@@ -165,7 +165,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
         }
     }
-    if (oldVersion === 2) {
+    if (oldVersion === 2 || oldVersion === 20) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
         settings.timeout = 1000
@@ -185,12 +185,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             lastAttemptVote: null
         }
         await other.put(todayStats, 'todayStats')
-
-        if (typeof createNotif !== 'undefined') {
-            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        } else {
-            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        }
     }
     if (oldVersion === 3 || oldVersion === 30) {
         if (!transaction) transaction = db.transaction('projects', 'readwrite')
@@ -217,11 +211,39 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             await cursor.update(project)
             cursor = await cursor.continue()
         }
-
-        if (typeof createNotif !== 'undefined') {
-            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        } else {
-            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    }
+    if (oldVersion === 4 || oldVersion === 40) {
+        if (!transaction) transaction = db.transaction('projects', 'readwrite')
+        const store = transaction.objectStore('projects')
+        let cursor = await store.index('rating').openCursor('MCServerList')
+        while (cursor) {
+            const project = cursor.value
+            project.maxCountVote = 5
+            project.countVote = 0
+            await cursor.update(project)
+            cursor = await cursor.continue()
         }
+        let cursor2 = await store.index('rating').openCursor('CzechCraft')
+        while (cursor2) {
+            const project = cursor2.value
+            project.maxCountVote = 5
+            project.countVote = 0
+            await cursor2.update(project)
+            cursor2 = await cursor2.continue()
+        }
+        let cursor3 = await store.index('rating').openCursor('MinecraftServery')
+        while (cursor3) {
+            const project = cursor3.value
+            project.maxCountVote = 5
+            project.countVote = 0
+            await cursor3.update(project)
+            cursor3 = await cursor3.continue()
+        }
+    }
+
+    if (typeof createNotif !== 'undefined') {
+        createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    } else {
+        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
     }
 }
