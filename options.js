@@ -532,16 +532,16 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseGameTopG').value
     } else if (project.rating === 'gTop100') {
         project.game = document.getElementById('chooseGamegTop100').value
-    } else if (project.rating === 'TopGames') {
-        project.game = document.getElementById('chooseGameTopGames').value
-        project.lang = document.getElementById('selectLangTopGames').value
+    } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ') {
         project.maxCountVote = document.getElementById('countVote').valueAsNumber
         project.countVote = 0
-    } else if (project.rating === 'ServeurPrive') {
-        project.game = document.getElementById('chooseGameServeurPrive').value
-        project.lang = document.getElementById('selectLangServeurPrive').value
-        project.maxCountVote = document.getElementById('countVote').valueAsNumber
-        project.countVote = 0
+        if (project.rating === 'TopGames') {
+            project.game = document.getElementById('chooseGameTopGames').value
+            project.lang = document.getElementById('selectLangTopGames').value
+        } else if (project.rating === 'ServeurPrive') {
+            project.game = document.getElementById('chooseGameServeurPrive').value
+            project.lang = document.getElementById('selectLangServeurPrive').value
+        }
     } else if (project.rating === 'MMoTopRU') {
         project.game = document.getElementById('chooseGameMMoTopRU').value
         project.lang = document.getElementById('selectLangMMoTopRU').value
@@ -1616,10 +1616,7 @@ selectedTop.addEventListener('input', function() {
         } else if (name === 'TopGames' || name === 'ServeurPrive' || name === 'MMoTopRU') {
 //          document.getElementById('nick').required = false
             
-            if (name !== 'MMoTopRU') {
-                document.getElementById('countVote').required = true
-                document.getElementById('label5').removeAttribute('style')
-            } else {
+            if (name === 'MMoTopRU') {
                 document.getElementById('ordinalWorld').required = true
                 document.getElementById('label10').removeAttribute('style')
             }
@@ -1653,6 +1650,14 @@ selectedTop.addEventListener('input', function() {
     } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats') {
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
+    }
+
+    if (name === 'ServeurPrive' || name === 'TopGames' || name === 'MCServerList' || name === 'CzechCraft' || name === 'MinecraftServery' || name === 'MinecraftListCZ') {
+        document.getElementById('countVote').required = true
+        document.getElementById('label5').removeAttribute('style')
+    } else if (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MCServerList' || laterChoose === 'CzechCraft' || laterChoose === 'MinecraftServery' || laterChoose === 'MinecraftListCZ') {
+        document.getElementById('countVote').required = false
+        document.getElementById('label5').style.display = 'none'
     }
     
     if (name === 'ListForge') {

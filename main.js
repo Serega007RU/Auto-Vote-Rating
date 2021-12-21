@@ -33,7 +33,7 @@ async function initializeConfig(background, version) {
     }
     // noinspection JSUnusedGlobalSymbols
     try {
-        db = await idb.openDB('avr', version ? version : 4, {upgrade})
+        db = await idb.openDB('avr', version ? version : 5, {upgrade})
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
@@ -42,7 +42,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 40)
+            await initializeConfig(background, 50)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error.message})
@@ -127,12 +127,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         settings = await store.get('settings')
         settings.timeout = 10000
         await transaction.objectStore('other').put(settings, 'settings')
-
-        if (typeof createNotif !== 'undefined') {
-            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        } else {
-            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        }
     }
     if (oldVersion === 3) {
         if (!transaction) transaction = db.transaction('projects', 'readwrite')
@@ -159,11 +153,39 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             await cursor.update(project)
             cursor = await cursor.continue()
         }
-
-        if (typeof createNotif !== 'undefined') {
-            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        } else {
-            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    }
+    if (oldVersion === 4) {
+        if (!transaction) transaction = db.transaction('projects', 'readwrite')
+        const store = transaction.objectStore('projects')
+        let cursor = await store.index('rating').openCursor('MCServerList')
+        while (cursor) {
+            const project = cursor.value
+            project.maxCountVote = 5
+            project.countVote = 0
+            await cursor.update(project)
+            cursor = await cursor.continue()
         }
+        let cursor2 = await store.index('rating').openCursor('CzechCraft')
+        while (cursor2) {
+            const project = cursor2.value
+            project.maxCountVote = 5
+            project.countVote = 0
+            await cursor2.update(project)
+            cursor2 = await cursor2.continue()
+        }
+        let cursor3 = await store.index('rating').openCursor('MinecraftServery')
+        while (cursor3) {
+            const project = cursor3.value
+            project.maxCountVote = 5
+            project.countVote = 0
+            await cursor3.update(project)
+            cursor3 = await cursor3.continue()
+        }
+    }
+
+    if (typeof createNotif !== 'undefined') {
+        createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    } else {
+        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
     }
 }
