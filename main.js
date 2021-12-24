@@ -75,6 +75,12 @@ async function initializeConfig(background, version) {
 }
 
 async function upgrade(db, oldVersion, newVersion, transaction) {
+    if (typeof createNotif !== 'undefined') {
+        createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    } else {
+        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    }
+
     if (oldVersion === 0) {
         const projects = db.createObjectStore('projects', {autoIncrement: true})
         projects.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
@@ -112,8 +118,10 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
         await other.add(generalStats, 'generalStats')
         await other.add(todayStats, 'todayStats')
+        return
     }
-    if (oldVersion === 1) {
+
+    if (oldVersion <= 1) {
         todayStats = {
             successVotes: 0,
             errorVotes: 0,
@@ -128,7 +136,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         settings.timeout = 10000
         await transaction.objectStore('other').put(settings, 'settings')
     }
-    if (oldVersion === 3) {
+
+    if (oldVersion <= 3) {
         if (!transaction) transaction = db.transaction('projects', 'readwrite')
         const store = transaction.objectStore('projects')
         let cursor = await store.index('rating').openCursor('DiscordBotList')
@@ -154,7 +163,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             cursor = await cursor.continue()
         }
     }
-    if (oldVersion === 4) {
+
+    if (oldVersion <= 4) {
         if (!transaction) transaction = db.transaction('projects', 'readwrite')
         const store = transaction.objectStore('projects')
         let cursor = await store.index('rating').openCursor('MCServerList')
@@ -183,9 +193,32 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
     }
 
-    if (typeof createNotif !== 'undefined') {
-        createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-    } else {
-        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    if (!todayStats) {
+        if (!transaction) transaction = db.transaction('other', 'readwrite')
+        const other = transaction.objectStore('other')
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+        await other.add(todayStats, 'todayStats')
+    }
+
+    if (!generalStats) {
+        if (!transaction) transaction = db.transaction('other', 'readwrite')
+        const other = transaction.objectStore('other')
+        generalStats = {
+            successVotes: 0,
+            monthSuccessVotes: 0,
+            lastMonthSuccessVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null,
+            added: Date.now()
+        }
+        await other.add(generalStats, 'generalStats')
     }
 }
