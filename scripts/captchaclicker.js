@@ -25,8 +25,10 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
                 document.location.reload()
             } else {
                 // https://i.imgur.com/WJ3ce9s.png
-                chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-anchor-error-msg-container').textContent})
-                clearInterval(timer2)
+                if (!document.querySelector('.rc-doscaptcha-body-text').textContent.includes('Время проверки истекло. Установите флажок и повторите попытку') && !document.querySelector('.rc-doscaptcha-body-text').textContent.includes('Verification expired. Check the checkbox again')) {
+                    chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-anchor-error-msg-container').textContent})
+                    clearInterval(timer2)
+                }
             }
         }
     }, 1000)
@@ -58,10 +60,8 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
 
         if (document.querySelector('.rc-doscaptcha-body-text') != null && document.querySelector('.rc-doscaptcha-body-text').style.display !== 'none') {
             // https://i.imgur.com/q5BroJ7.png
-            if (!document.querySelector('.rc-doscaptcha-body-text').textContent.includes('Время проверки истекло. Установите флажок и повторите попытку') && !document.querySelector('.rc-doscaptcha-body-text').textContent.includes('Verification expired. Check the checkbox again')) {
-                chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-doscaptcha-body-text').textContent})
-                clearInterval(timer7)
-            }
+            chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-doscaptcha-body-text').textContent})
+            clearInterval(timer7)
         }
     }, 2000)
 
