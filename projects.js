@@ -864,6 +864,22 @@ const allProjects = {
                 return 'Minecraft-List.cz'
         }
     },
+    ListeServeursMinecraft: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://www.liste-serveurs-minecraft.org/vote/?idc=' + project.id
+            case 'pageURL':
+                return 'https://www.liste-serveurs-minecraft.org/vote/?idc=' + project.id
+            case 'projectName':
+                return doc.querySelector('#gdrtsvote font[color="blue"]').textContent
+            case 'exampleURL':
+                return ['https://www.liste-serveurs-minecraft.org/vote/?idc=', '202085', '']
+            case 'URL':
+                return 'Liste-Serveurs-Minecraft.org'
+            case 'notFound':
+                return doc.querySelector('#core_middle_column div.panel-body') != null && doc.querySelector('#core_middle_column div.panel-body').textContent.includes('serveur est introuvable')
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
