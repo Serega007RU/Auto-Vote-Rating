@@ -140,6 +140,7 @@ async function checkOpen(project) {
                 if (currentProxy != null) {
                     currentProxy.notWorking = chrome.i18n.getMessage('timeout')
                     await updateValue('proxies', currentProxy)
+                    //ToDo <Serega007> голосование не корректно перезапускается, нужно break loop поиска проектов в checkVote() также check нужен в false иначе голосование зависнет то запуска другого следующего голосования
                     await stopVote()
                     return
                 }
@@ -284,7 +285,7 @@ async function checkOpen(project) {
             }
         }
 
-        if (currentProxy == null && (settings.useProxyOnUnProxyTop || !(project.rating === 'MinecraftRating' && project.game === 'projects') || !(project.rating === 'MisterLauncher' && project.game === 'projects'))) {
+        if (currentProxy == null && (settings.useProxyOnUnProxyTop || (!(project.rating === 'MinecraftRating' && project.game === 'projects') && !(project.rating === 'MisterLauncher' && project.game === 'projects')))) {
             //Для FireFox эту проверку нет смысла выполнять
             // noinspection JSUnresolvedVariable
             if (typeof InstallTrigger === 'undefined') {
@@ -1519,7 +1520,7 @@ async function endVote(request, sender, project) {
                 if (!currentProxy[project.rating] || Array.isArray(currentProxy[project.rating])) currentProxy[project.rating] = {}
                 currentProxy[project.rating][project.id] = time
                 await updateValue('proxies', currentProxy)
-            } else if (settings.useProxyOnUnProxyTop || !(project.rating === 'MinecraftRating' && project.game === 'projects') || !(project.rating === 'MisterLauncher' && project.game === 'projects')) {
+            } else if (settings.useProxyOnUnProxyTop || (!(project.rating === 'MinecraftRating' && project.game === 'projects') && !(project.rating === 'MisterLauncher' && project.game === 'projects'))) {
                 console.warn('currentProxy is null or not found')
             }
         } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects')) && !project.priority && project.timeoutHour == null) {
@@ -1724,7 +1725,6 @@ async function endVote(request, sender, project) {
                     }
                     if (countVK === 0) {
                         currentVK = null
-                        nextLoop = false
                     }
                     if (countProxy === 0) {
                         clearProxy()
