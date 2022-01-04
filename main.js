@@ -75,6 +75,8 @@ async function initializeConfig(background, version) {
 }
 
 async function upgrade(db, oldVersion, newVersion, transaction) {
+    if (oldVersion == null) oldVersion = 1
+
     if (typeof createNotif !== 'undefined') {
         createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
     } else {
