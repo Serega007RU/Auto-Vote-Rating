@@ -2360,7 +2360,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseGameTopG').value
     } else if (project.rating === 'gTop100') {
         project.game = document.getElementById('chooseGamegTop100').value
-    } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ') {
+    } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft') {
         project.maxCountVote = document.getElementById('countVote').valueAsNumber
         project.countVote = 0
         if (project.rating === 'TopGames') {
@@ -3775,10 +3775,10 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('importNicks').disabled = false
     }
 
-    if (name === 'ServeurPrive' || name === 'TopGames' || name === 'MCServerList' || name === 'CzechCraft' || name === 'MinecraftServery' || name === 'MinecraftListCZ') {
+    if (name === 'ServeurPrive' || name === 'TopGames' || name === 'MCServerList' || name === 'CzechCraft' || name === 'MinecraftServery' || name === 'MinecraftListCZ' || name === 'ListeServeursMinecraft') {
         document.getElementById('countVote').required = true
         document.getElementById('label5').removeAttribute('style')
-    } else if (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MCServerList' || laterChoose === 'CzechCraft' || laterChoose === 'MinecraftServery' || laterChoose === 'MinecraftListCZ') {
+    } else if (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MCServerList' || laterChoose === 'CzechCraft' || laterChoose === 'MinecraftServery' || laterChoose === 'MinecraftListCZ' || laterChoose === 'ListeServeursMinecraft') {
         document.getElementById('countVote').required = false
         document.getElementById('label5').style.display = 'none'
     }

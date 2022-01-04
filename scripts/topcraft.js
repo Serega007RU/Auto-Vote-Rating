@@ -62,8 +62,10 @@ async function vote(first) {
             if (document.querySelector('button.openVoteModal') === null) {
                 //Костыль для владельцев проектов если они голосуют за свой же проект
                 let url = new URL(document.URL)
-                url.searchParams.append('voting', project.id)
-                document.location.replace(url.toString())
+                if (!url.searchParams.has('voting')) {
+                    url.searchParams.append('voting', project.id)
+                    document.location.replace(url.toString())
+                }
             } else {
                 document.querySelector('button.openVoteModal').click()
             }

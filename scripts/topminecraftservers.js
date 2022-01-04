@@ -2,10 +2,13 @@ async function vote(first) {
     if (first === false) return
     try {
         if (document.querySelector('div.alert.alert-danger') != null) {
-            if (document.querySelector('div.alert.alert-danger').textContent.includes('already voted')) {
+            const text = document.querySelector('div.alert.alert-danger').textContent
+            if (text.includes('already voted')) {
                 chrome.runtime.sendMessage({later: true})
+            } else if (text.includes('captcha')) {
+                chrome.runtime.sendMessage({errorCaptcha: text, restartVote: true})
             } else {
-                chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
+                chrome.runtime.sendMessage({message: text})
             }
         } else if (document.querySelector('body > div.container > div > div > div > div.col-md-4 > button') != null) {
             if (document.querySelector('body > div.container > div > div > div > div.col-md-4 > button').textContent.includes('already voted')) {

@@ -60,6 +60,14 @@ async function initializeConfig(background, version) {
 }
 
 async function upgrade(db, oldVersion, newVersion, transaction) {
+    if (oldVersion == null) oldVersion = 1
+
+    if (typeof createNotif !== 'undefined') {
+        createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    } else {
+        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    }
+
     if (oldVersion === 0) {
         const projects = db.createObjectStore('projects', {autoIncrement: true})
         projects.createIndex('rating, id, nick', ['rating', 'id', 'nick'])
@@ -120,7 +128,10 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
         await other.add(generalStats, 'generalStats')
         await other.add(todayStats, 'todayStats')
-    } else if (oldVersion === 1 || oldVersion === 3) {
+        return
+    }
+
+    if (oldVersion <= 1 || oldVersion <= 3) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
         if (oldVersion === 1) settings.timeout = 1000
@@ -143,15 +154,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
 }`
         await other.put(settings, 'settings')
 
-        todayStats = {
-            successVotes: 0,
-            errorVotes: 0,
-            laterVotes: 0,
-            lastSuccessVote: null,
-            lastAttemptVote: null
-        }
-        await other.put(todayStats, 'todayStats')
-
         const vks = db.createObjectStore('vks', {autoIncrement: true})
         vks.createIndex('id', 'id')
         const proxies = db.createObjectStore('proxies', {autoIncrement: true})
@@ -165,7 +167,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
         }
     }
-    if (oldVersion === 2 || oldVersion === 20) {
+
+    if (oldVersion <= 2 || oldVersion <= 20) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
         settings.timeout = 1000
@@ -176,17 +179,9 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
 }`
         settings.repeatLater = 5
         await other.put(settings, 'settings')
-
-        todayStats = {
-            successVotes: 0,
-            errorVotes: 0,
-            laterVotes: 0,
-            lastSuccessVote: null,
-            lastAttemptVote: null
-        }
-        await other.put(todayStats, 'todayStats')
     }
-    if (oldVersion === 3 || oldVersion === 30) {
+
+    if (oldVersion <= 3 || oldVersion <= 30) {
         if (!transaction) transaction = db.transaction('projects', 'readwrite')
         const store = transaction.objectStore('projects')
         let cursor = await store.index('rating').openCursor('DiscordBotList')
@@ -212,7 +207,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             cursor = await cursor.continue()
         }
     }
-    if (oldVersion === 4 || oldVersion === 40) {
+
+    if (oldVersion <= 4 || oldVersion <= 40) {
         if (!transaction) transaction = db.transaction('projects', 'readwrite')
         const store = transaction.objectStore('projects')
         let cursor = await store.index('rating').openCursor('MCServerList')
@@ -241,9 +237,32 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
     }
 
-    if (typeof createNotif !== 'undefined') {
-        createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-    } else {
-        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+    if (!todayStats) {
+        if (!transaction) transaction = db.transaction('other', 'readwrite')
+        const other = transaction.objectStore('other')
+        todayStats = {
+            successVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null
+        }
+        await other.add(todayStats, 'todayStats')
+    }
+
+    if (!generalStats) {
+        if (!transaction) transaction = db.transaction('other', 'readwrite')
+        const other = transaction.objectStore('other')
+        generalStats = {
+            successVotes: 0,
+            monthSuccessVotes: 0,
+            lastMonthSuccessVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null,
+            added: Date.now()
+        }
+        await other.add(generalStats, 'generalStats')
     }
 }

@@ -6,27 +6,31 @@ async function vote(first) {
         }
         if (document.querySelector('div.alert.alert-error') != null) {
             if (document.querySelector('div.alert.alert-error').textContent.includes('Již si hlasoval')) {
-                const numbers = document.querySelector('div.alert.alert-error').textContent.match(/\d+/g).map(Number)
-                let count = 0
-                let hour = 0
-                let min = 0
-                let sec = 0
-                for (const i in numbers) {
-                    if (count === 0) {
-                        hour = numbers[i]
-                    } else if (count === 1) {
-                        min = numbers[i]
-                    } else if (count === 2) {
-                        sec = numbers[i]
+                if (document.querySelector('div.alert.alert-error').textContent.match(/\d+/g)) {
+                    const numbers = document.querySelector('div.alert.alert-error').textContent.match(/\d+/g).map(Number)
+                    let count = 0
+                    let hour = 0
+                    let min = 0
+                    let sec = 0
+                    for (const i in numbers) {
+                        if (count === 0) {
+                            hour = numbers[i]
+                        } else if (count === 1) {
+                            min = numbers[i]
+                        } else if (count === 2) {
+                            sec = numbers[i]
+                        }
+                        count++
                     }
-                    count++
+                    let time = new Date()
+                    if (time.getUTCHours() > hour || (time.getUTCHours() === hour && time.getUTCMinutes() >= min) || (time.getUTCHours() === hour && time.getUTCMinutes() === min && time.getUTCMinutes() >= sec)) {
+                        time.setUTCDate(time.getUTCDate() + 1)
+                    }
+                    time.setUTCHours(hour, min, sec, 0)
+                    chrome.runtime.sendMessage({later: time.getTime()})
+                } else {
+                    chrome.runtime.sendMessage({later: true})
                 }
-                let time = new Date()
-                if (time.getUTCHours() > hour || (time.getUTCHours() === hour && time.getUTCMinutes() >= min) || (time.getUTCHours() === hour && time.getUTCMinutes() === min && time.getUTCMinutes() >= sec)) {
-                    time.setUTCDate(time.getUTCDate() + 1)
-                }
-                time.setUTCHours(hour, min, sec, 0)
-                chrome.runtime.sendMessage({later: time.getTime()})
             } else {
                 chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-error').textContent})
             }
