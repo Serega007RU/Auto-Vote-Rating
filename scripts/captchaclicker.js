@@ -3,6 +3,8 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
         if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null
             && isScrolledIntoView(document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border'))
             && document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').style.display !== 'none') {
+            //Если в капче есть какая-либо ошибка, то капчу не стоит проходить
+            if (document.querySelector('.rc-anchor-error-msg-container').style.display !== 'none' && document.querySelector('.rc-anchor-error-msg-container').textContent.length > 0) return
             document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').click()
             clearInterval(timer1)
         }
