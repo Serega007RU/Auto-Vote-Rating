@@ -611,8 +611,12 @@ async function newWindow(project) {
             chrome.windows.update(window.id, {focused: false})
         }
 
-        const url = allProjects[project.rating]('voteURL', project)
-        
+        let url = allProjects[project.rating]('voteURL', project)
+
+        if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP') && currentVK['password' + project.rating]) {
+            url = allProjects[project.rating]('pageURL', project)
+        }
+
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url, active: false}, function(tab_) {
                 if (chrome.runtime.lastError) {
