@@ -207,7 +207,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             lastSuccessVote: null,
             lastAttemptVote: null
         }
-        await other.add(todayStats, 'todayStats')
+        await other.put(todayStats, 'todayStats')
     }
 
     if (!generalStats) {
@@ -223,6 +223,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             lastAttemptVote: null,
             added: Date.now()
         }
-        await other.add(generalStats, 'generalStats')
+        await other.put(generalStats, 'generalStats')
     }
 }
