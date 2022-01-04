@@ -966,7 +966,7 @@ async function endVote(request, sender, project) {
     let sendMessage
     if (request.successfully || request.later) {
         let time = new Date()
-        if (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null) && !(project.lastDayMonth && new Date(time.getFullYear(),time.getMonth() + 1,0).getDate() !== new Date().getDate())) {
+        if (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null) && !(project.lastDayMonth && new Date(time.getFullYear(), time.getMonth(), time.getDay() + 1).getMonth() !== new Date().getMonth())) {
             if (project.timeoutHour != null) {
                 if (project.timeoutMinute == null) project.timeoutMinute = 0
                 if (project.timeoutSecond == null) project.timeoutSecond = 0
