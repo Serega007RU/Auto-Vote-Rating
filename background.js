@@ -141,7 +141,7 @@ async function checkOpen(project) {
                     currentProxy.notWorking = chrome.i18n.getMessage('timeout')
                     await updateValue('proxies', currentProxy)
                     //ToDo <Serega007> голосование не корректно перезапускается, нужно break loop поиска проектов в checkVote() также check нужен в false иначе голосование зависнет то запуска другого следующего голосования
-                    await stopVote()
+                    stopVote()
                     return
                 }
             }
