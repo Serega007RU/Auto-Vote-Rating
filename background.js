@@ -996,7 +996,7 @@ async function endVote(request, sender, project) {
                 hour = 21
             } else if (project.rating === 'MCRate') {
                 hour = 22
-            } else if (project.rating === 'MinecraftServerList' || project.rating === 'ServerList101') {
+            } else if (project.rating === 'MinecraftServerList' || project.rating === 'ServerList101' || project.rating === 'MinecraftServerListNet' || project.rating === 'MinecraftServerEu') {
                 hour = 23
             } else if (project.rating === 'PlanetMinecraft' || project.rating === 'ListForge' || project.rating === 'MinecraftList') {
                 hour = 5
