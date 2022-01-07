@@ -3956,6 +3956,7 @@ function generateDataList() {
         const option = document.createElement('option')
         option.setAttribute('name', 'ListForge')
         option.value = el.value
+        option.textContent = 'ListForge'
         datalist.append(option)
     }
     //MineServers
@@ -3964,6 +3965,7 @@ function generateDataList() {
         const option = document.createElement('option')
         option.setAttribute('name', 'MineServers')
         option.value = el.value
+        option.textContent = 'MineServers'
         datalist.append(option)
     }
     // document.querySelector('option[name="ListForge"]').textContent = 'or Minecraft-MP.com'

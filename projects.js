@@ -880,6 +880,21 @@ const allProjects = {
                 return doc.querySelector('#core_middle_column div.panel-body') != null && doc.querySelector('#core_middle_column div.panel-body').textContent.includes('serveur est introuvable')
         }
     },
+    MCServidores: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://mcservidores.com/servidor/' + project.id
+            case 'projectName':
+                return doc.querySelector('#panel h1').textContent.trim()
+            case 'exampleURL':
+                return ['https://mcservidores.com/servidor/', '122', '']
+            case 'URL':
+                return 'MCServidores.com'
+            case 'oneProject':
+                return 1
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
