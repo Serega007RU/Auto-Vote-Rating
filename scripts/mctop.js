@@ -35,15 +35,29 @@ async function vote(first) {
                 // }, 1000)
                 const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value
                 try {
-                    await fetch('https://mctop.su/accounts/login/', {
+                    const response = await fetch('https://mctop.su/accounts/login/', {
                         'headers': {
                             'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
                         },
                         'body': 'csrfmiddlewaretoken=' + csrftoken + '&login=' + vkontakte.id + vkontakte.numberId + '&password=' + vkontakte.passwordMcTOP,
                         'method': 'POST'
                     })
+                    response.html = await response.text()
+                    response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+                    if (response.doc.querySelector('.errorlist') != null) {
+                        chrome.runtime.sendMessage({message: response.doc.querySelector('.errorlist').textContent})
+                    } else {
+                        chrome.runtime.sendMessage({message: 'Неизвестная ошибка авторизации по passwordMcTOP'})
+                    }
+                    return
                 } catch (e) {
-
+                    //Если мы получили ошибку
+                    //Mixed Content: The page at 'https://topcraft.ru/servers/id/' was loaded over HTTPS, but requested an insecure resource 'http://topcraft.ru/account/projects/'. This request has been blocked; the content must be served over HTTPS.
+                    //то значит всё норм
+                    if (e.message !== 'Failed to fetch') {
+                        throwError(e)
+                        return
+                    }
                 }
                 document.location.reload()
                 return
