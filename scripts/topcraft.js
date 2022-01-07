@@ -23,7 +23,7 @@ async function vote(first) {
         //Авторизованы ли мы в аккаунте?
         if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
             const timerLogin = setInterval(() => {
-                if (document.querySelector('a.modalVkLogin') != null) {
+                if (document.querySelector('#loginModal').classList.contains('in')) {
                     document.querySelector('a.modalVkLogin').click()
                     clearInterval(timerLogin)
                 } else {
@@ -41,7 +41,13 @@ async function vote(first) {
                     document.location.replace(url.toString())
                 }
             } else {
-                document.querySelector('button.openVoteModal').click()
+                const timerVote = setInterval(() => {
+                    if (document.querySelector('#voteModal').classList.contains('in')) {
+                        clearInterval(timerVote)
+                    } else {
+                        document.querySelector('button.openVoteModal').click()
+                    }
+                }, 1000)
             }
         }
         if (first) return
