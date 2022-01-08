@@ -133,7 +133,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         return
     }
 
-    if (oldVersion <= 1 || oldVersion <= 3) {
+    if (oldVersion <= 1 || oldVersion <= 3 || oldVersion % 10 !== 0) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
         if (oldVersion === 1) settings.timeout = 1000
@@ -162,12 +162,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         proxies.createIndex('ip, port', ['ip', 'port'])
         const borealis = db.createObjectStore('borealis', {autoIncrement: true})
         borealis.createIndex('nick', 'nick')
-
-        if (typeof createNotif !== 'undefined') {
-            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        } else {
-            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        }
     }
 
     if (oldVersion <= 2 || oldVersion <= 20) {
