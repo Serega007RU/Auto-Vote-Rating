@@ -23,12 +23,28 @@ async function initializeConfig(background, version) {
         window.onerror = (errorMsg, url, lineNumber) => {
             const time = new Date().toLocaleString().replace(',', '')
             const log = '[' + time + ' ERROR]: ' + errorMsg + ' at ' + url + ':' + lineNumber
-            dbLogs.add('logs', log).catch(e => console._error(e))
+            try {
+                dbLogs.add('logs', log).catch(e => {
+                    if (console._error) console._error(e)
+                    else console.error(e)
+                })
+            } catch (e) {
+                if (console._error) console._error(e)
+                else console.error(e)
+            }
         }
         window.onunhandledrejection = event => {
             const time = new Date().toLocaleString().replace(',', '')
             const log = '[' + time + ' ERROR]: ' + event.reason.stack
-            dbLogs.add('logs', log).catch(e => console._error(e))
+            try {
+                dbLogs.add('logs', log).catch(e => {
+                    if (console._error) console._error(e)
+                    else console.error(e)
+                })
+            } catch (e) {
+                if (console._error) console._error(e)
+                else console.error(e)
+            }
         }
     }
     // noinspection JSUnusedGlobalSymbols
