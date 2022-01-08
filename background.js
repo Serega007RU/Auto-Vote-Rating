@@ -7,6 +7,9 @@ var fetchProjects = new Map()
 //Текущие проекты за которые сейчас голосует расширение
 // noinspection ES6ConvertVarToLetConst
 var queueProjects = new Set()
+//Айди группы вкладок в которой щас открыты вкладки расширения
+// noinspection ES6ConvertVarToLetConst
+var groupId
 
 //Есть ли доступ в интернет?
 let online = true
@@ -249,6 +252,21 @@ async function newWindow(project) {
         })
         if (tab == null) return
         openedProjects.set(tab.id, project)
+        if (groupId) {
+            await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, (/*details*/) => {
+                if (chrome.runtime.lastError && chrome.runtime.lastError.message.includes('No group with id')) {
+                    groupId = null
+                }
+                resolve()
+            }))
+            //Дважды группируем? А чо? Костылим что бы цвет группы был голубым. :D
+            if (groupId) await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, resolve))
+        }
+        if (!groupId) {
+            await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, resolve))
+            //Дважды группируем? А чо? Костылим что бы цвет группы был голубым. :D
+            groupId = await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, resolve))
+        }
     }
 }
 
