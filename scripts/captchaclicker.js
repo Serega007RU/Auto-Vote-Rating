@@ -27,7 +27,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
                 document.location.reload()
             } else {
                 // https://i.imgur.com/WJ3ce9s.png
-                if (!document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Время проверки истекло. Установите флажок и повторите попытку') && !document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Verification expired. Check the checkbox again')) {
+                if (!document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Время проверки истекло. Установите флажок и повторите попытку') && !document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Verification expired. Check the checkbox again') && !document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Verification challenge expired. Check the checkbox again')) {
                     chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-anchor-error-msg-container').textContent})
                     clearInterval(timer2)
                 }
