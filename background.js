@@ -225,6 +225,8 @@ async function checkOpen(project) {
                     continue
                 }
                 found = true
+                currentVK = vkontakte
+                console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
 
                 //Удаляет все существующие куки ВК
                 let cookies = await new Promise(resolve=>{
@@ -236,8 +238,6 @@ async function checkOpen(project) {
                     if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                     await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
                 }
-
-                console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
 
                 //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
                 for (let i = 0; i < vkontakte.cookies.length; i++) {
@@ -267,7 +267,6 @@ async function checkOpen(project) {
                     })
                 }
 
-                currentVK = vkontakte
                 break
             }
             //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк
@@ -452,7 +451,11 @@ async function checkOpen(project) {
             }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
-    } else if (settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
+    } else if (currentVK == null && settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
+        const vkontakte = await db.get('vks', 1)
+        currentVK = vkontakte
+        console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
+
         //Удаляет все существующие куки ВК
         let cookies = await new Promise(resolve=>{
             chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
@@ -463,10 +466,6 @@ async function checkOpen(project) {
             if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
             await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
         }
-
-        const vkontakte = await db.get('vks', 1)
-
-        console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
 
         //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
         for (let i = 0; i < vkontakte.cookies.length; i++) {
@@ -486,7 +485,6 @@ async function checkOpen(project) {
             })
         }
 
-        currentVK = vkontakte
     }
 
     let retryCoolDown
