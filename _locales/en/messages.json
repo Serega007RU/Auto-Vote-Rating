@@ -1193,9 +1193,6 @@
   "dowloading": {
     "message": "Downloading "
   },
-  "update7": {
-    "message": "If you have installed Chrome or Windows antivirus, you may notice a lags after the update, this is normal, antivirus software checks the downloaded files"
-  },
   "update8": {
     "message": "The extension has been updated successfully, restart the extension for the changes to take effect"
   },
@@ -1397,5 +1394,11 @@
   },
   "translated": {
     "message": "Translated into English: kadeler#4809"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "canceled": {
+    "message": "Cancelled by the user"
   }
 }

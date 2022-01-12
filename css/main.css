@@ -227,8 +227,19 @@ nav .logo img {
 	height: 300px;
 }
 
-#modals .modal#updateVersion {
-	height: 230px;
+#modals .modal#progressModal {
+	height: 240px;
+}
+#modals .modal#progressModal .countProgress {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+}
+#modals .modal#progressModal .events {
+    /* display: grid; */
+    /* grid-template-columns: repeat(1, 1fr); */
+    /* grid-gap: 20px; */
 }
 
 #modals .modal#ChangeLog {
@@ -402,11 +413,11 @@ ul {
 
 #modals .modal .content .message {
 	overflow-y: auto;
-    font-size: 15px;
-    color: #fff;
-    /*text-align: center;*/
-    padding: 5px;
-    margin: 20px auto;
+	font-size: 15px;
+	color: #fff;
+	/*text-align: center;*/
+	padding: 5px;
+	/* margin: 20px auto; */
 	max-height: 240px;
 }
 
@@ -415,7 +426,7 @@ ul {
 	margin-top: 5px;
 }
 
-#modals .modal#updateVersion .content .message {
+#modals .modal#progressModal .content .message {
 	height: 105px;
 }
 
@@ -465,15 +476,19 @@ ul {
 #modals .modal .content .events {
     bottom: 25px;
     display: flex;
-    justify-content: space-around
+    justify-content: space-around;
+    margin: 5px auto;
 }
 
 #modals .modal#addFastProject .content {
 	color: #fff;
 }
 
-#modals .modal#updateVersion .content .events progress {
+#modals .modal#progressModal .content .progress progress {
 	margin: auto 0;
+    height: 25px;
+    /*noinspection CssInvalidPropertyValue*/
+    width: -webkit-fill-available;
 }
 
 @media(max-width: 450px) {

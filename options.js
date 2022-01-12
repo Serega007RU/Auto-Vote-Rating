@@ -95,36 +95,36 @@ async function update(version) {
         chrome.tabs.create({url: 'https://avr-extension.ml/versions/auto_vote_rating-' + version + '-an+fx.xpi'})
         return
     }
-    document.querySelector('#updateVersion .content .message').parentNode.replaceChild(document.querySelector('#updateVersion .content .message').cloneNode(false), document.querySelector('#updateVersion .content .message'))
-    document.querySelector('#updateVersion .content .events').parentNode.replaceChild(document.querySelector('#updateVersion .content .events').cloneNode(false), document.querySelector('#updateVersion .content .events'))
-    const message = document.querySelector('#updateVersion > div.content > .message')
-    const events = document.querySelector('#updateVersion > div.content > .events')
-    const progress = document.createElement('progress')
-    events.append(progress)
+
+    resetModalProgress(true)
+
+    const message = document.querySelector('#progressModal > div.content > .message')
+    const events = document.querySelector('#progressModal > div.content > .events')
     try {
         createNotif(chrome.i18n.getMessage('update1'), 'hint', 1000)
         //Спрашиваем у пользователя папку где установлено расширение и получаем её
         const dirHandle = await window.showDirectoryPicker()
-        if (!document.getElementById('updateVersion').className.includes('active')) toggleModal('updateVersion')
+        if (!document.getElementById('progressModal').className.includes('active')) toggleModal('progressModal')
         //Проверяем на соответствие манифеста
-//      message.append(chrome.i18n.getMessage('update2'))
-//      message.append(document.createElement('br'))
-//      message.scrollTop = message.scrollHeight
-//      let manifestHandle
-//      try {
-//           manifestHandle = await dirHandle.getFileHandle('manifest.json')
-//      } catch (e) {
-//          if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
-//              throw Error(chrome.i18n.getMessage('update3', 'Not found manifest'))
-//          } else {
-//              throw e
-//          }
-//      }
-//      const manifestFile = await manifestHandle.getFile()
-//      const manifest = await manifestFile.text()
-//      if (manifest != JSON.stringify(chrome.runtime.getManifest())) {
-//          throw Error(chrome.i18n.getMessage('update3', 'Invalid manifest'))
-//      }
+        // message.append(chrome.i18n.getMessage('update2'))
+        // message.append(document.createElement('br'))
+        // message.scrollTop = message.scrollHeight
+        // let manifestHandle
+        // try {
+        //     manifestHandle = await dirHandle.getFileHandle('manifest.json')
+        // } catch (e) {
+        //     if (e.message.includes('could not be found')) {//Если пользователь указал не ту папку
+        //         throw Error(chrome.i18n.getMessage('update3', 'Not found manifest'))
+        //     } else {
+        //         throw e
+        //     }
+        // }
+        // const manifestFile = await manifestHandle.getFile()
+        // const manifest = await manifestFile.text()
+        // if (manifest != JSON.stringify(chrome.runtime.getManifest())) {
+        //     throw Error(chrome.i18n.getMessage('update3', 'Invalid manifest'))
+        // }
+
         //Также ещё проверим временным файлом в случае если у пользователя дубликат папки расширения. Засовываем в эту папку файл AVRtemp для проверки что пользователь указал дейсвительно правильную папку
         await dirHandle.getFileHandle('AVRtemp', {create: true})
         //Проверяем дейсвительно ли это та папка?
@@ -162,8 +162,7 @@ async function update(version) {
         message.scrollTop = message.scrollHeight
         let response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/tree?recursive=true&per_page=100&ref=multivote')
         let json = await response.json()
-        progress.value = -1
-        progress.max = Number(response.headers.get('x-total'))
+        updateProgress(0, Number(response.headers.get('x-total')))
         const pages = Number(response.headers.get('x-total-pages')) + 1
         for (let i = 1; i < pages; i++) {
             if (i > 1) {
@@ -171,7 +170,7 @@ async function update(version) {
                 json = await response.json()
             }
             for (const file of json) {
-                progress.value = progress.value + 1
+                updateProgress()
                 if (file.type === 'blob') {
                     message.append(chrome.i18n.getMessage('dowloading') + file.path)
                     message.append(document.createElement('br'))
@@ -211,20 +210,18 @@ async function update(version) {
             // pipeTo() closes the destination pipe by default, no need to close it.
         }
 
-        message.append(createMessage(chrome.i18n.getMessage('update7'), 'warn'))
-        message.append(document.createElement('br'))
         message.append(createMessage(chrome.i18n.getMessage('update8'), 'success'))
         message.append(document.createElement('br'))
         message.scrollTop = message.scrollHeight
         const buttonReload = document.createElement('button')
         buttonReload.classList.add('btn')
         buttonReload.textContent = chrome.i18n.getMessage('reloadExtension')
-        document.querySelector('#updateVersion > div.content > .events').append(buttonReload)
+        document.querySelector('#progressModal > div.content > .events').append(buttonReload)
         buttonReload.addEventListener('click', () => {
             chrome.runtime.reload()
         })
     } catch (e) {
-        if (document.getElementById('updateVersion').className.includes('active')) {
+        if (document.getElementById('progressModal').className.includes('active')) {
             message.append(createMessage(e, 'error'))
             message.append(document.createElement('br'))
             message.append(chrome.i18n.getMessage('tryManuallyUpdate'))
@@ -240,7 +237,7 @@ async function update(version) {
             createNotif(e, 'error')
         }
         message.scrollTop = message.scrollHeight
-        if (!progress.value) progress.value = 0
+        if (!document.querySelector('#progressModal .progress progress').value) document.querySelector('#progressModal .progress progress').value = 0
         const buttonRetry = document.createElement('button')
         buttonRetry.classList.add('btn')
         buttonRetry.textContent = chrome.i18n.getMessage('retry')
@@ -4058,6 +4055,32 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     activeModal.style.transform = 'scale(1.1)'
     setTimeout(()=> activeModal.removeAttribute('style'), 100)
 })
+
+function updateProgress(min, max) {
+    const progress = document.querySelector('#progressModal .progress progress')
+    if (max != null) progress.max = max
+    if (min == null) min = progress.value + 1
+    progress.value = min
+    const countProgress = document.querySelector('.countProgress')
+    const text = countProgress.textContent.split('/')
+    text[0] = min
+    if (max != null) text[1] = max
+    countProgress.textContent = text[0] + '/' + text[1]
+    if (min === 0 && max === 0) progress.removeAttribute('value')
+}
+
+function resetModalProgress(withoutCancel) {
+    updateProgress(0, 0)
+    document.querySelector('#progressModal .content .message').parentNode.replaceChild(document.querySelector('#progressModal .content .message').cloneNode(false), document.querySelector('#progressModal .content .message'))
+    document.querySelector('#progressModal .content .events').parentNode.replaceChild(document.querySelector('#progressModal .content .events').cloneNode(false), document.querySelector('#progressModal .content .events'))
+    if (!withoutCancel) {
+        const cancel = document.createElement('button')
+        cancel.classList.add('btn')
+        cancel.classList.add('redBtn')
+        cancel.textContent = chrome.i18n.getMessage('cancel')
+        document.querySelector('#progressModal > div.content > .events').append(cancel)
+    }
+}
 
 //notifications
 let fastNotif = false

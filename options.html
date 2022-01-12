@@ -1809,14 +1809,20 @@
                 </div>
             </div>
             <!-- Обновление версии программы -->
-            <div class="modal" id="updateVersion">
+            <div class="modal" id="progressModal">
                 <div class="head">
                     <h3 data-resource="updating"></h3>
                     <div class="close"></div>
                 </div>
                 <div class="content">
+                    <div class="progress">
+                        <div class="countProgress">0/0</div>
+                        <progress></progress>
+                    </div>
                     <div class="message"></div>
-                    <div class="events"></div>
+                    <div class="events">
+                        <button class="btn redBtn" data-resource="cancel"></button>
+                    </div>
                 </div>
             </div>
             <!-- Если в облаке уже есть сохранённые настройки -->
