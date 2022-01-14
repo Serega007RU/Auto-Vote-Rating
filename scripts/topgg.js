@@ -98,6 +98,16 @@ async function vote(first) {
             const timer2 = setInterval(()=>{
                 const vote = findElement('button', ['vote'])
                 if (!vote.disabled) {
+                    for (let i = 0; i < 20; i++) {
+                        triggerMouseEvent(document, 'mousedown')
+                        triggerMouseEvent(document, 'mousemove')
+                    }
+                    function triggerMouseEvent(node, eventType) {
+                        const clickEvent = document.createEvent('MouseEvents')
+                        clickEvent.initEvent(eventType, true, true)
+                        node.dispatchEvent(clickEvent)
+                    }
+
                     vote.click()
                     clearInterval(timer2)
                 }
