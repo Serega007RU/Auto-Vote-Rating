@@ -159,7 +159,7 @@ const allProjects = {
                 return 'https://' + project.game + '/server/' + project.id + '/vote/'
             case 'projectName':
                 let text = doc.querySelector('head > title').textContent
-                return text.replace(text.substring(8, text.length), '')
+                return text.replace('Vote for ', '')
             case 'exampleURL':
                 return ['https://minecraft-mp.com/server/', '81821', '/vote/']
             case 'URL':

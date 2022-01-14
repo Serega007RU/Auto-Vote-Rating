@@ -25,7 +25,7 @@ async function vote(first) {
         }
 
         if (document.querySelector('div.alert.alert-danger') != null) {
-            if (document.querySelector('div.alert.alert-danger').textContent.includes('already voted')) {
+            if (document.querySelector('div.alert.alert-danger').textContent.includes('already voted') || document.querySelector('div.alert.alert-danger').textContent.includes('have reached your daily vote limit')) {
                 chrome.runtime.sendMessage({later: true})
                 return
             }
