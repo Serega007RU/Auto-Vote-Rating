@@ -437,7 +437,7 @@ async function checkOpen(project) {
 
         //Очистка куки
         let url = '.' + extractHostname(allProjects[project.rating]('pageURL', project))
-        if (url) {
+        if (url && project.rating !== 'IonMc') {
             let cookies = await new Promise(resolve=>{
                 chrome.cookies.getAll({domain: url}, function(cookies) {
                     resolve(cookies)
