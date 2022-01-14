@@ -33,7 +33,9 @@ async function run() {
                     } else if ((document.querySelector('div.newmodal') != null && document.querySelector('div.newmodal').style.display !== 'none')
                         || (document.querySelector('div.login_modal.loginAuthCodeModal') != null && document.querySelector('div.login_modal.loginAuthCodeModal').style.display !== 'none')
                         || (document.querySelector('div.login_modal.loginTwoFactorCodeModal') != null && document.querySelector('div.login_modal.loginTwoFactorCodeModal').style.display !== 'none')
-                        || (document.querySelector('div.login_modal.loginIPTModal') != null && document.querySelector('div.login_modal.loginIPTModal').style.display !== 'none')) {
+                        || (document.querySelector('div.login_modal.loginIPTModal') != null && document.querySelector('div.login_modal.loginIPTModal').style.display !== 'none')
+                        || (document.querySelector('div.login_modal.loginAuthCodeModal') != null && document.querySelector('div.login_modal.loginAuthCodeModal').style.display !== 'none')
+                        || document.querySelector('#loginForm')) {
                         chrome.runtime.sendMessage({authSteam: true})
                         clearInterval(timer2)
                     }
