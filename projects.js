@@ -494,13 +494,13 @@ const allProjects = {
     MinecraftBuzz: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                return 'https://minecraft.buzz/server/' + project.id + '&tab=vote'
+                return 'https://minecraft.buzz/vote/' + project.id
             case 'pageURL':
                 return 'https://minecraft.buzz/server/' + project.id
             case 'projectName':
                 return doc.querySelector('#vote-line').previousElementSibling.textContent.trim()
             case 'exampleURL':
-                return ['https://minecraft.buzz/server/', '306', '&tab=vote']
+                return ['https://minecraft.buzz/vote/', '306', '']
             case 'URL':
                 return 'Minecraft.Buzz'
         }
