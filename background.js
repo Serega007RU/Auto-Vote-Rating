@@ -8,8 +8,9 @@ var fetchProjects = new Map()
 // noinspection ES6ConvertVarToLetConst
 var queueProjects = new Set()
 //Айди группы вкладок в которой щас открыты вкладки расширения
-// noinspection ES6ConvertVarToLetConst
-var groupId
+let groupId
+//Если этот браузер не поддерживает группировку вкладок
+let notSupportedGroupTabs = false
 
 //Есть ли доступ в интернет?
 let online = true
@@ -252,6 +253,7 @@ async function newWindow(project) {
         })
         if (tab == null) return
         openedProjects.set(tab.id, project)
+        if (notSupportedGroupTabs) return
         if (groupId) {
             await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, (/*details*/) => {
                 if (chrome.runtime.lastError && chrome.runtime.lastError.message.includes('No group with id')) {
@@ -263,7 +265,14 @@ async function newWindow(project) {
             if (groupId) await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, resolve))
         }
         if (!groupId) {
-            await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, resolve))
+            await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, () => {
+                if (chrome.runtime.lastError) {
+                    notSupportedGroupTabs = true
+                    console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', chrome.runtime.lastError.message))
+                }
+                resolve()
+            }))
+            if (notSupportedGroupTabs) return
             //Дважды группируем? А чо? Костылим что бы цвет группы был голубым. :D
             groupId = await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, resolve))
         }
