@@ -1171,6 +1171,7 @@ async function addVK(repair, imp) {
         if (repair) {
             const found = await db.getFromIndex('vks', 'id', VK.id)
             if (!VK.notWorking) delete found.notWorking
+            if (!VK.notAuth) delete found.notAuth
             for (const obj of Object.keys(found)) {//Совмещает данные со старым аккаунтом при этом перезаписывает новые данные если как такое были получены
                 if (VK[obj] == null) {
                     VK[obj] = found[obj]
