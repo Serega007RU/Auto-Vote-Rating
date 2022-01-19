@@ -1721,21 +1721,22 @@ async function endVote(request, sender, project) {
     }
 
     function removeQueue() {
-        for (const value of queueProjects) {
+        const clonedQueueProjects = new Set(queueProjects)
+        for (const value of clonedQueueProjects) {
             if (project.key === value.key) {
-                queueProjects.delete(value)
+                clonedQueueProjects.delete(value)
             }
         }
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
             if (currentVK != null || currentProxy != null) {
-                if (queueProjects.size === 0) {
+                if (clonedQueueProjects.size === 0) {
                     if (currentProxy != null) clearProxy()
                     currentVK = null
                     nextLoop = false
                 } else {
                     let countVK = 0
                     let countProxy = 0
-                    for (const value of queueProjects) {
+                    for (const value of clonedQueueProjects) {
                         if (countVK > 0 && countProxy > 0) break
                         if (value.useMultiVote !== false) {
                             if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || (value.rating === 'MinecraftRating' && value.game === 'projects') || (value.rating === 'MisterLauncher' && value.game === 'projects') || value.rating === 'MonitoringMinecraft') {
@@ -1760,12 +1761,12 @@ async function endVote(request, sender, project) {
         }
         if (settings.useMultiVote && project.useMultiVote === false) {
             if (currentVK != null) {
-                if (queueProjects.size === 0) {
+                if (clonedQueueProjects.size === 0) {
                     currentVK = null
                     nextLoop = false
                 } else {
                     let countVK = 0
-                    for (const value of queueProjects) {
+                    for (const value of clonedQueueProjects) {
                         if (countVK > 0) break
                         if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || (value.rating === 'MinecraftRating' && value.game === 'projects') || (value.rating === 'MisterLauncher' && value.game === 'projects') || value.rating === 'MonitoringMinecraft') {
                             countVK++
@@ -1776,6 +1777,11 @@ async function endVote(request, sender, project) {
                         nextLoop = false
                     }
                 }
+            }
+        }
+        for (const value of queueProjects) {
+            if (project.key === value.key) {
+                queueProjects.delete(value)
             }
         }
         setTimeout(()=>{
