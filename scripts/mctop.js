@@ -94,7 +94,7 @@ async function vote(first) {
 
         if (vkontakte != null) {
             await new Promise(resolve => {
-                chrome.runtime.sendMessage({changeProxy: 'mctop'}, async result => {
+                chrome.runtime.sendMessage({changeProxy: 'McTOP'}, async result => {
                     if (result === 'success') {
                         await new Promise(resolve1 => setTimeout(resolve1, 3000))
                     }

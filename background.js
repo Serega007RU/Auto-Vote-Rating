@@ -378,7 +378,20 @@ async function checkOpen(project) {
                         config = {
                             mode: 'pac_script',
                             pacScript: {
-                                data: settings.proxyPacScript.replace('$ip$', proxy.ip).replace('$port$', proxy.port).replace('$scheme$', proxy.scheme.toUpperCase()).replace('$topcraft$', 'false/*topcraft*/').replace('$mctop$', 'false/*mctop*/')
+                                data: settings.proxyPacScript
+                                    .replace('$ip$', proxy.ip)
+                                    .replace('$port$', proxy.port)
+                                    .replace('$scheme$', proxy.scheme.toUpperCase())
+                                    .replaceAll(/\$rating_[^$.]+\$/g, (match) => {
+                                        match = match.replaceAll('$rating_', '')
+                                        match = match.replaceAll('$', '')
+                                        return 'false/*rating_' + match + '*/'
+                                    })
+                                    .replaceAll(/\$nick_[^$.]+\$/g, (match) => {
+                                        match = match.replaceAll('$nick_', '')
+                                        match = match.replaceAll('$', '')
+                                        return 'false/*nick_' + match + '*/'
+                                    })
                             }
                         }
                     } else {
