@@ -3633,7 +3633,7 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('ordinalWorld').required = false
         document.getElementById('time').required = false
         document.getElementById('hour').required = false
-        document.getElementById('nick').required = true
+        if (document.querySelector('#nick').offsetParent) document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
         if (document.querySelector('[data-resource="yourNick"]').textContent !== '') document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
