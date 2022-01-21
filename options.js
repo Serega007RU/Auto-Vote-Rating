@@ -1135,10 +1135,10 @@ async function addVK(repair, imp) {
                 delete VK.notWorking
             }
 
-            if (notAuth) {
+            if (text) {
                 VK.name = doc.querySelector('title').textContent
             } else {
-                VK.name = doc.querySelector('#pedit_first_name').value + ' ' + doc.querySelector('#pedit_last_name').value
+                VK.name = doc.querySelector('#pedit_first_name')?.value + ' ' + doc.querySelector('#pedit_last_name')?.value
             }
             VK.id = doc.querySelector('#l_pr > a').href.replace(/^.*\/\/[^\/]+/, '')
             VK.id = VK.id.substring(1, VK.id.length)
