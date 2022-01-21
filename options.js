@@ -1062,7 +1062,7 @@ async function addVK(repair, imp) {
         createNotif(chrome.i18n.getMessage('adding'))
         let response
         try {
-            response = await fetch('https://vk.com/')
+            response = await fetch('https://vk.com/edit')
         } catch (e) {
             if (e === 'TypeError: Failed to fetch') {
                 createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error')
@@ -1135,7 +1135,11 @@ async function addVK(repair, imp) {
                 delete VK.notWorking
             }
 
-            VK.name = doc.querySelector('.Qtp6iAIhvWY0T7Al3my1z')?.textContent
+            if (notAuth) {
+                VK.name = doc.querySelector('title').textContent
+            } else {
+                VK.name = doc.querySelector('#pedit_first_name').value + ' ' + doc.querySelector('#pedit_last_name').value
+            }
             VK.id = doc.querySelector('#l_pr > a').href.replace(/^.*\/\/[^\/]+/, '')
             VK.id = VK.id.substring(1, VK.id.length)
         } catch(e) {
