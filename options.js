@@ -2534,7 +2534,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
 		            	continue
 		            }
                     doc = new DOMParser().parseFromString(html, 'text/html')
-                    const result = doc.querySelector('div.alert.alert-block')
+                    const result = doc.querySelector('div.alert.alert-success')
                     result.querySelector('button').remove()
                     createNotif(acc.nick + ' - ' + result.textContent + ' ' + coin + ' бореалисиков', 'hint', 1000)
                 } else {
@@ -2562,7 +2562,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
 		            	continue
 		            }
                     doc = new DOMParser().parseFromString(html, 'text/html')
-                    const result = doc.querySelector('div.alert.alert-block')
+                    const result = doc.querySelector('div.alert.alert-success')
                     result.querySelector('button').remove()
                     createNotif(acc.nick + ' - ' + result.textContent + ' ' + vote + ' голосов', 'hint', 1000)
                 } else {
