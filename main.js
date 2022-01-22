@@ -172,12 +172,14 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
 }`
         await other.put(settings, 'settings')
 
-        const vks = db.createObjectStore('vks', {autoIncrement: true})
-        vks.createIndex('id', 'id')
-        const proxies = db.createObjectStore('proxies', {autoIncrement: true})
-        proxies.createIndex('ip, port', ['ip', 'port'])
-        const borealis = db.createObjectStore('borealis', {autoIncrement: true})
-        borealis.createIndex('nick', 'nick')
+        if (transaction.mode === 'versionchange') {
+            const vks = db.createObjectStore('vks', {autoIncrement: true})
+            vks.createIndex('id', 'id')
+            const proxies = db.createObjectStore('proxies', {autoIncrement: true})
+            proxies.createIndex('ip, port', ['ip', 'port'])
+            const borealis = db.createObjectStore('borealis', {autoIncrement: true})
+            borealis.createIndex('nick', 'nick')
+        }
     }
 
     if (oldVersion <= 2 || oldVersion <= 20) {
