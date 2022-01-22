@@ -267,6 +267,11 @@ async function newWindow(project) {
             if (groupId) await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, resolve))
         }
         if (!groupId) {
+            if (!chrome.tabs.group) {
+                notSupportedGroupTabs = true
+                console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', 'chrome.tabs.group is not a function'))
+                return
+            }
             await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, () => {
                 if (chrome.runtime.lastError) {
                     notSupportedGroupTabs = true

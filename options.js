@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', async()=>{
             })
         }
     }
+
+    selectedTop.dispatchEvent(new Event('input'))
 })
 
 // Restores select box and checkbox state using the preferences
@@ -449,6 +451,9 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
         }
         event.target.classList.remove('disabled')
     })
+    if (check.checked && check.parentElement.parentElement.parentElement.getAttribute('id') === 'addProject') {
+        check.dispatchEvent(new Event('change'))
+    }
 }
 
 //Слушатель кнопки "Добавить"
@@ -887,6 +892,7 @@ async function checkPermissions(projects, element) {
     })
     if (!granted) {
         if (element != null || !chrome.app) {//Костыль для FireFox, что бы запросить права нужно что бы пользователь обязатльно кликнул
+            document.querySelector('#addProject').classList.remove('disabled')
             const button = document.createElement('button')
             button.textContent = chrome.i18n.getMessage('grant')
             button.classList.add('submitBtn')

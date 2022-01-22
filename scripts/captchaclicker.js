@@ -88,7 +88,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
 
     //Проверяет прошла ли проверка hCaptcha
     const timer5 = setInterval(()=>{
-        if (document.getElementById('checkbox') != null && document.getElementById('checkbox').ariaChecked === 'true') {
+        if (document.getElementById('checkbox') != null && document.getElementById('checkbox').getAttribute('aria-checked') === 'true') {
             chrome.runtime.sendMessage('vote', function (response) {
                 if (response === 'startedVote') {
                     clearInterval(timer5)
@@ -100,7 +100,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
 
     //Если требуется ручное прохождение капчи
     const timer6 = setInterval(()=>{
-        if (document.querySelector('body[class="no-selection"]') != null && document.querySelector('body[class="no-selection"]').ariaHidden == null && document.querySelector('body[class="no-selection"]').style.display === '' && document.querySelector('head > yandex-captcha-solver') == null) {
+        if (document.querySelector('body[class="no-selection"]') != null && document.querySelector('body[class="no-selection"]').getAttribute('aria-hidden') == null && document.querySelector('body[class="no-selection"]').style.display === '' && document.querySelector('head > yandex-captcha-solver') == null) {
             chrome.runtime.sendMessage({captcha: true})
             clearInterval(timer6)
         } else if (document.querySelector('head > yandex-captcha-solver') != null && document.querySelector('div[style="text-align: right; color: rgb(218, 94, 94);"]') != null) {
