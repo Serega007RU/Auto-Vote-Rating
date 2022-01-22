@@ -20,6 +20,7 @@ let secondVoteMinecraftIpList = false
 var currentVK
 // noinspection ES6ConvertVarToLetConst
 var currentProxy
+let currentPacScriptProxy
 
 //Прерывает выполнение fetch запросов на случай ошибки в режиме MultiVote
 let controller = new AbortController()
@@ -143,7 +144,6 @@ async function checkOpen(project) {
                 if (currentProxy != null) {
                     currentProxy.notWorking = chrome.i18n.getMessage('timeout')
                     await updateValue('proxies', currentProxy)
-                    //ToDo <Serega007> голосование не корректно перезапускается, нужно break loop поиска проектов в checkVote() также check нужен в false иначе голосование зависнет то запуска другого следующего голосования
                     stopVote()
                     return
                 }
@@ -197,6 +197,10 @@ async function checkOpen(project) {
             if (currentProxy[project.rating]?.[project.id] > Date.now()) {
                 return
             }
+        }
+
+        if (currentPacScriptProxy != null && currentPacScriptProxy.includes('true/*nick_')) {
+            if (!currentPacScriptProxy.includes('true/*nick_' + project.nick + '*/')) return
         }
 
         //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
@@ -375,23 +379,28 @@ async function checkOpen(project) {
                 } else {
                     let config
                     if (settings.useProxyPacScript) {
+                        currentPacScriptProxy = settings.proxyPacScript
+                            .replace('$ip$', proxy.ip)
+                            .replace('$port$', proxy.port)
+                            .replace('$scheme$', proxy.scheme.toUpperCase())
+                            .replaceAll(/\$rating_[^$.]+\$/g, (match) => {
+                                match = match.replaceAll('$rating_', '')
+                                match = match.replaceAll('$', '')
+                                return 'false/*rating_' + match + '*/'
+                            })
+                            .replaceAll(/\$nick_[^$.]+\$/g, (match) => {
+                                match = match.replaceAll('$nick_', '')
+                                match = match.replaceAll('$', '')
+                                if (project.nick === match) {
+                                    return 'true/*nick_' + match + '*/'
+                                } else {
+                                    return 'false/*nick_' + match + '*/'
+                                }
+                            })
                         config = {
                             mode: 'pac_script',
                             pacScript: {
-                                data: settings.proxyPacScript
-                                    .replace('$ip$', proxy.ip)
-                                    .replace('$port$', proxy.port)
-                                    .replace('$scheme$', proxy.scheme.toUpperCase())
-                                    .replaceAll(/\$rating_[^$.]+\$/g, (match) => {
-                                        match = match.replaceAll('$rating_', '')
-                                        match = match.replaceAll('$', '')
-                                        return 'false/*rating_' + match + '*/'
-                                    })
-                                    .replaceAll(/\$nick_[^$.]+\$/g, (match) => {
-                                        match = match.replaceAll('$nick_', '')
-                                        match = match.replaceAll('$', '')
-                                        return 'false/*nick_' + match + '*/'
-                                    })
+                                data: currentPacScriptProxy
                             }
                         }
                     } else {
@@ -1328,20 +1337,17 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             if (settings.useProxyPacScript && currentProxy != null) {
                 Promise.all(promises).then(()=>{
                     promises.push(new Promise(resolve => {
-                        chrome.proxy.settings.get({}, function(details) {
-                            let script = details.value.pacScript.data
-                            if (script.includes('false/*' + request.changeProxy)) {
-                                console.log('Смена прокси для', request.changeProxy)
-                                script = script.replace('false/*' + request.changeProxy + '*/', 'true/*' + request.changeProxy + '*/')
-                                const config = {mode: 'pac_script', pacScript: {data: script}}
-                                chrome.proxy.settings.set({value: config, scope: 'regular'}, () => {
-                                    sendResponse('success')
-                                    resolve()
-                                })
-                            } else {
-                                sendResponse('none')
-                            }
-                        })
+                        if (currentPacScriptProxy.includes('false/*' + request.changeProxy)) {
+                            console.log('Смена прокси для', request.changeProxy)
+                            currentPacScriptProxy = currentPacScriptProxy.replace('false/*' + request.changeProxy + '*/', 'true/*' + request.changeProxy + '*/')
+                            const config = {mode: 'pac_script', pacScript: {data: currentPacScriptProxy}}
+                            chrome.proxy.settings.set({value: config, scope: 'regular'}, () => {
+                                sendResponse('success')
+                                resolve()
+                            })
+                        } else {
+                            sendResponse('none')
+                        }
                     }))
                 })
                 return true
@@ -1698,15 +1704,9 @@ async function endVote(request, sender, project) {
     if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
         if (project.rating === 'TopCraft' || project.rating === 'McTOP') {
             if (settings.useProxyPacScript && currentProxy != null) {
-                const proxyDetails = await new Promise(resolve => {
-                    chrome.proxy.settings.get({}, async function(details) {
-                        resolve(details)
-                    })
-                })
-                let script = proxyDetails.value.pacScript.data
-                if (script.includes('true/*' + project.rating.toLowerCase())) {
-                    script = script.replace('true/*' + project.rating.toLowerCase() + '*/', 'false/*' + project.rating.toLowerCase() + '*/')
-                    const config = {mode: 'pac_script', pacScript: {data: script}}
+                if (currentPacScriptProxy.includes('true/*' + project.rating.toLowerCase())) {
+                    currentPacScriptProxy = currentPacScriptProxy.replace('true/*' + project.rating.toLowerCase() + '*/', 'false/*' + project.rating.toLowerCase() + '*/')
+                    const config = {mode: 'pac_script', pacScript: {data: currentPacScriptProxy}}
                     await setProxy(config)
                 }
             }
@@ -1926,6 +1926,7 @@ async function clearProxy() {
     //     })
     // }
     currentProxy = null
+    currentPacScriptProxy = null
     // noinspection JSUnresolvedVariable
     if (typeof InstallTrigger !== 'undefined') {
         // noinspection JSUnresolvedVariable
