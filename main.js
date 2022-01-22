@@ -48,7 +48,7 @@ async function initializeConfig(background, version) {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 50, {upgrade})
+    db = await idb.openDB('avr', 60, {upgrade})
     db.onerror = (event) => dbError(event, false)
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {

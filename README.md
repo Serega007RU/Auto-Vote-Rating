@@ -58,6 +58,9 @@
 <a href="https://mineservers.com/">MineServers.com</a>  
 <a href="https://atlauncher.com/">ATLauncher.com</a>  
 <a href="https://servers-minecraft.net/">Servers-Minecraft.net</a>  
+<a href="https://www.minecraft-list.cz/">Minecraft-List.cz</a>  
+<a href="https://www.liste-serveurs-minecraft.org/">Liste-Serveurs-Minecraft.org</a>  
+<a href="https://mcservidores.com/">MCServidores.com</a>  
 </details>
 
 ### [How to install the extension (MultiVote verions)](https://gitlab.com/Serega007/auto-vote-rating/-/wikis/How-to-install-the-extension-(MultiVote-version))
