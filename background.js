@@ -204,6 +204,8 @@ async function checkOpen(project) {
             if (!currentPacScriptProxy.includes('true/*nick_' + project.nick + '*/')) return
         }
 
+        console.log(chrome.i18n.getMessage('searchAcc'))
+
         //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
         if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
             //Ищет не юзанный свободный аккаунт ВК
@@ -1993,8 +1995,12 @@ function extractHostname(url) {
     return hostname
 }
 
-async function stopVote() {
-    if (debug) console.log('Отмена всех голосований и очистка всего')
+async function stopVote(user) {
+    if (user) {
+        console.log(chrome.i18n.getMessage('voteSuspended'))
+    } else if (debug) {
+        console.log('Отмена всех голосований и очистка всего')
+    }
     await clearProxy()
     currentVK = null
     queueProjects.clear()

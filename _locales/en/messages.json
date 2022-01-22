@@ -1408,5 +1408,8 @@
   },
   "canceled": {
     "message": "Cancelled by the user"
+  },
+  "searchAcc": {
+    "message": "Search for a free proxy/account"
   }
 }
