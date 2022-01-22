@@ -1913,7 +1913,7 @@ async function clearProxy() {
         // noinspection JSUnresolvedVariable
         typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
         options[name] = []
-        options[name].push(currentProxy.ip)
+        options[name].push('https://' + currentProxy.ip)
         const types = {"cookies": true}
         await new Promise(resolve => {
             // noinspection JSCheckFunctionSignatures
