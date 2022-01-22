@@ -275,18 +275,13 @@ async function checkOpen(project) {
             }
             //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк
             if (!found) {
-//              settings.stopVote = Date.now() + 21600000
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundVK')
-//              console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
-//              if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
-//              await setValue('AVMRsettings', settings)
-//              await stopVote()
+                project
                 for (const value of queueProjects) {
                     if (project.key === value.key) {
                         queueProjects.delete(value)
                     }
                 }
-//              break2 = true
                 return
             }
         }
@@ -1911,20 +1906,20 @@ async function removeCookie(url, name) {
 async function clearProxy() {
     if (debug) console.log('Удаляю прокси')
     //Костыль сброса авторизации на прокси (специально для https://socproxy.ru/)
-    // if (currentProxy != null) {
-    //     const options = {}
-    //     let name
-    //     //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
-    //     // noinspection JSUnresolvedVariable
-    //     typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
-    //     options[name] = []
-    //     options[name].push(currentProxy.ip)
-    //     const types = {"cookies": true}
-    //     await new Promise(resolve => {
-    //         // noinspection JSCheckFunctionSignatures
-    //         chrome.browsingData.remove(options, types, resolve)
-    //     })
-    // }
+    if (currentProxy != null) {
+        const options = {}
+        let name
+        //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
+        // noinspection JSUnresolvedVariable
+        typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
+        options[name] = []
+        options[name].push(currentProxy.ip)
+        const types = {"cookies": true}
+        await new Promise(resolve => {
+            // noinspection JSCheckFunctionSignatures
+            chrome.browsingData.remove(options, types, resolve)
+        })
+    }
     currentProxy = null
     currentPacScriptProxy = null
     // noinspection JSUnresolvedVariable
