@@ -204,10 +204,13 @@ async function checkOpen(project) {
             if (!currentPacScriptProxy.includes('true/*nick_' + project.nick + '*/')) return
         }
 
-        console.log(chrome.i18n.getMessage('searchAcc'))
+        const needSearchVK = currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')
+        const needSearchProxy = currentProxy == null && (settings.useProxyOnUnProxyTop || (!(project.rating === 'MinecraftRating' && project.game === 'projects') && !(project.rating === 'MisterLauncher' && project.game === 'projects')))
+
+        if (needSearchVK || needSearchProxy) console.log(chrome.i18n.getMessage('searchAcc'))
 
         //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
-        if (currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
+        if (needSearchVK) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
             let cursor = await db.transaction('vks').store.openCursor()
@@ -291,7 +294,7 @@ async function checkOpen(project) {
             }
         }
 
-        if (currentProxy == null && (settings.useProxyOnUnProxyTop || (!(project.rating === 'MinecraftRating' && project.game === 'projects') && !(project.rating === 'MisterLauncher' && project.game === 'projects')))) {
+        if (needSearchProxy) {
             //Для FireFox эту проверку нет смысла выполнять
             // noinspection JSUnresolvedVariable
             if (typeof InstallTrigger === 'undefined') {
