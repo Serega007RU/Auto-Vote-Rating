@@ -1059,13 +1059,166 @@
                                 </div>
                                 <div class="changes timeline-content">
                                     <h4>
+                                        v6.5.0
+                                    </h4>
+                                    <small>released on 22.01.2022</small>
+                                    <div class="changes-entry">
+                                        <ul>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавлена поддержка https://servers-minecraft.net/
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавлена поддержка https://www.liste-serveurs-minecraft.org/
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавлена поддержка https://mcservidores.com/
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Экспериментально добавлена группировка вкладок для обозначения какие вкладки были открыты расширением
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Объявлено разрешение unlimitedStorage что бы IndexedDB не очищался при нехватке памяти
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                В информации о расширении добавлено кто перевёл
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
+                                                Добавлена возможность привязки никнейма к прокси (PacScript), шаблон $nick_ВашНик$
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Для https://mcserver-list.eu/ https://czech-craft.eu/ https://minecraftservery.eu/ и https://www.minecraft-list.cz/ добавлена возможность настроить сколько делать в день голосов так как на этих мониторингах голосование каждые 2 часа
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Если выдало ошибку 404, то следующая попытка голосования делается через 6 часов
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                В списке выбора сайтов теперь показывает к какой сети (главному) относится этот сайт
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-changed">Changed</span>
+                                                Редизайн модалки обновления
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление дублирования voting для владельцев проекта на TopCraft/McTop
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок с пустыми настройками
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлена ошибка null при already voted на CzechCraft
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Предусмотрена ошибка капчи на https://topminecraftservers.org/
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Кастомный таймаут теперь действительно применяется последний числом месяца а не первым числом
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлена ошибка если версия старых настроек не указана
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлен id SimpleMinecraft на MinecraftRating
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибки key already exists при обновлении версии настроек
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Если в капче есть какая-либо ошибка, то капчу не стоит проходить
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Для https://www.minecraft-serverlist.net/ и https://minecraft-server.eu/ настроен таймаут голосования в 23:00 по UTC
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Ещё один костыль на TopCraft/McTOP, ожидаем открытия модалки
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлен неверный селектор в поиске ошибок в капче
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Игнорируем ошибку капчи "Verification challenge expired. Check the checkbox again"
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлен бесконечный спам ошибок если бд логов не смогла инициализироваться или неожиданно закрылась
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок на https://minecraft.buzz/
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Для https://top.gg/ добавлена эмуляция действий пользователя что бы мы проходили проверку на робота
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Для Steam предусмотрены ещё некоторые виды требований авторизоваться
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок на https://listforge.net/
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлено зависание голосования при истечении таймаута
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлено получение имени аккаунта ВКонтакте в связи с обновлением дизайна сайта
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                На TopCraft/McTOP теперь не игнорируется правило игнорирования ошибки "Вы уже голосовали"
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Предусмотрена ошибка старых настроек из-за которой не загружались настройки MultiVote
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлено двойное применение куки ВК (двойное голосование)
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибки с отправкой бореаликов/голосов на бореалисе
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок с авторизацией ВК при импорте ВК
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок с автоматической авторизацией на рейтингах
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Предусмотрены ошибки если мы не можем достать Имя и Фамилию ВК
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок с авторизацией прокси совместно с PacScript
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлена повышенная нагрузка на ЦП при поиске свободного ВК/прокси
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-left">
+                                    <div class="timeline-icon"></div>
+                                </div>
+                                <div class="changes timeline-content">
+                                    <h4>
                                         v6.4.1
                                     </h4>
                                     <small>released on 16.12.2021</small>
                                     <div class="changes-entry">
                                         <ul>
-                                            <li><span class="label label-rounded text-light text-capitalize tag-added">Added</span>
-                                                Я жопа ленивая и мне лень писать тут что нового, идите читайте CHANGELOG.md если интересно чо нового
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибки с айди для костыля для владельцев проектов если они голосуют за свой же проект
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок с https://minecraftservery.eu/
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление бесконечного спама ошибками с капчей
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Список сайтов (https://listforge.net/) вынесен в общий список
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправлен таймаут голосования для https://czech-craft.eu/ и https://minecraftservery.eu/
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Ошибка "Истекло время ожидания" для капчи теперь игнорируется
+                                            </li>
+                                            <li><span class="label label-rounded text-light text-capitalize tag-fixed">Fixed</span>
+                                                Исправление ошибок на https://gtop100.com/
                                             </li>
                                         </ul>
                                     </div>
