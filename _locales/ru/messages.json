@@ -1353,6 +1353,14 @@
   "translated": {
     "message": "Перевёл на Русский: Serega007"
   },
+  "notSupportedGroupTabs": {
+    "message": "Кажется ваш браузер не поддерживает группировку вкладок: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
   "cancel": {
     "message": "Отмена"
   },

@@ -1395,6 +1395,14 @@
   "translated": {
     "message": "Translated into English: kadeler#4809"
   },
+  "notSupportedGroupTabs": {
+    "message": "It seems your browser doesn't support tab grouping: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
   "cancel": {
     "message": "Cancel"
   },
