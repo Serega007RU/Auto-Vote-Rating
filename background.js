@@ -1933,6 +1933,7 @@ async function clearProxy() {
     // }
     currentProxy = null
     currentPacScriptProxy = null
+    errorProxy = {ip: '', count: 0}
     // noinspection JSUnresolvedVariable
     if (typeof InstallTrigger !== 'undefined') {
         // noinspection JSUnresolvedVariable
@@ -2037,92 +2038,29 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
         if (settings.useProxyPacScript) {
             if (details.challenger.host !== currentProxy.ip) {
                 const proxy = await db.getFromIndex('proxies', 'ip, port', [details.challenger.host, details.challenger.port])
-                if (proxy && proxy.login) {
-                    console.log(chrome.i18n.getMessage('proxyAuth') + ' (PacScript)')
-                    callbackFn({
-                        authCredentials: {
-                            'username': proxy.login,
-                            'password': proxy.password
-                        }
-                    })
-                    return
+                if (proxy) {
+                    const authCredentials = await getCredentialsProxy(proxy)
+                    if (authCredentials.username && authCredentials.password) {
+                        console.log(chrome.i18n.getMessage('proxyAuth') + ' (PacScript)')
+                        callbackFn({authCredentials})
+                        return
+                    }
                 }
             }
         }
-        if (currentProxy.login) {
-            console.log(chrome.i18n.getMessage('proxyAuth'))
-            callbackFn({
-                authCredentials: {
-                    'username': currentProxy.login,
-                    'password': currentProxy.password
-                }
-            })
+        const authCredentials = await getCredentialsProxy(currentProxy)
+        if (authCredentials.username && authCredentials.password) {
+            callbackFn({authCredentials})
             return
-        } else if (currentProxy.TunnelBear) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'TunnelBear'))
-            if (tunnelBear.token != null && tunnelBear.expires > Date.now()) {
-                callbackFn({
-                    authCredentials: {
-                        'username': tunnelBear.token,
-                        'password': tunnelBear.token
-                    }
-                })
-                return
-            } else {
-                settings.stopVote = Date.now() + 21600000
-                console.error(chrome.i18n.getMessage('errorAuthProxyTB'))
-                if (!settings.disabledNotifError) {
-                    sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyTB'))
-                }
-                await db.put('other', settings, 'settings')
-                await stopVote()
-                chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('errorAuthProxyTB')})
+        } else if (authCredentials.errorTunnelBear) {
+            settings.stopVote = Date.now() + 21600000
+            console.error(chrome.i18n.getMessage('errorAuthProxyTB'))
+            if (!settings.disabledNotifError) {
+                sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyTB'))
             }
-        } else if (currentProxy.Windscribe) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'Windscribe'))
-            callbackFn({
-                authCredentials: {
-                    'username': '35jqgsi6-cmxwpa8',
-                    'password': 'fgj28zynq6'
-                }
-            })
-            return
-        } else if (currentProxy.HolaVPN) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'HolaVPN'))
-            callbackFn({
-                authCredentials: {
-                    'username': 'user-uuid-c1b9e2c1bbab1664da384d748ef3899c',
-                    'password': '6e07f7fa2eda'
-                }
-            })
-            return
-        } else if (currentProxy.ZenMate) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'ZenMate'))
-            callbackFn({
-                authCredentials: {
-                    'username': '97589925',
-                    'password': 'ef483afb122e05400f895434df1394a82d31e340'
-                }
-            })
-            return
-        } else if (currentProxy.NordVPN) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'NordVPN'))
-            callbackFn({
-                authCredentials: {
-                    'username': 'HX53u8JzxjGKbNJt9Bdf5nNG',
-                    'password': 'Nwn98baQJZ8q5GTjz59szaJ4'
-                }
-            })
-            return
-        } else if (currentProxy.SurfShark) {
-            console.log(chrome.i18n.getMessage('proxyAuthOther', 'SurfShark'))
-            callbackFn({
-                authCredentials: {
-                    'username': 'WZUGAQF4Qd6CP4qD99EnkZNG',
-                    'password': 'ZMqnjVeKPzPphEMn3uwKgtmr'
-                }
-            })
-            return
+            await db.put('other', settings, 'settings')
+            await stopVote()
+            chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('errorAuthProxyTB')})
         } else {
             currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword')
             console.error(chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword'))
@@ -2135,6 +2073,58 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
     }
     callbackFn()
 }, {urls: ['<all_urls>']}, ['asyncBlocking'])
+
+async function getCredentialsProxy(proxy) {
+    let authCredentials = {}
+    if (proxy.login) {
+        console.log(chrome.i18n.getMessage('proxyAuth'))
+        authCredentials = {
+            'username': proxy.login,
+            'password': proxy.password
+        }
+    } else if (proxy.TunnelBear) {
+        console.log(chrome.i18n.getMessage('proxyAuthOther', 'TunnelBear'))
+        if (tunnelBear.token != null && tunnelBear.expires > Date.now()) {
+            authCredentials = {
+                'username': tunnelBear.token,
+                'password': tunnelBear.token
+            }
+        } else {
+            authCredentials.errorTunnelBear = true
+        }
+    } else if (proxy.Windscribe) {
+        console.log(chrome.i18n.getMessage('proxyAuthOther', 'Windscribe'))
+        authCredentials = {
+            'username': '35jqgsi6-cmxwpa8',
+            'password': 'fgj28zynq6'
+        }
+    } else if (proxy.HolaVPN) {
+        console.log(chrome.i18n.getMessage('proxyAuthOther', 'HolaVPN'))
+        authCredentials = {
+            'username': 'user-uuid-c1b9e2c1bbab1664da384d748ef3899c',
+            'password': '6e07f7fa2eda'
+        }
+    } else if (proxy.ZenMate) {
+        console.log(chrome.i18n.getMessage('proxyAuthOther', 'ZenMate'))
+        authCredentials = {
+            'username': '97589925',
+            'password': 'ef483afb122e05400f895434df1394a82d31e340'
+        }
+    } else if (proxy.NordVPN) {
+        console.log(chrome.i18n.getMessage('proxyAuthOther', 'NordVPN'))
+        authCredentials = {
+            'username': 'HX53u8JzxjGKbNJt9Bdf5nNG',
+            'password': 'Nwn98baQJZ8q5GTjz59szaJ4'
+        }
+    } else if (proxy.SurfShark) {
+        console.log(chrome.i18n.getMessage('proxyAuthOther', 'SurfShark'))
+        authCredentials = {
+            'username': 'WZUGAQF4Qd6CP4qD99EnkZNG',
+            'password': 'ZMqnjVeKPzPphEMn3uwKgtmr'
+        }
+    }
+    return authCredentials
+}
 
 chrome.runtime.onInstalled.addListener(async function(details) {
     if (details.reason === 'install') {
