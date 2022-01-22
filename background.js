@@ -84,7 +84,7 @@ async function checkVote() {
         console.error(lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
         if (!settings.disabledNotifError) sendNotification(lastErrorNotFound, lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
         await db.put('other', settings, 'settings')
-        await stopVote()
+        await stopVote(true)
         chrome.runtime.sendMessage({stopVote: lastErrorNotFound})
     }
 
@@ -310,7 +310,7 @@ async function checkOpen(project) {
                         sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
                     }
                     await db.put('other', settings, 'settings')
-                    await stopVote()
+                    await stopVote(true)
                     chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('otherProxy')})
                     return
                 }
@@ -359,7 +359,7 @@ async function checkOpen(project) {
                     if (!response.ok) {
                         settings.stopVote = Date.now() + 21600000
                         await db.put('other', settings, 'settings')
-                        await stopVote()
+                        await stopVote(true)
                         if (response.status === 401) {
                             console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
                             chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2')})
@@ -1674,16 +1674,16 @@ async function endVote(request, sender, project) {
                 if (request.errorVoteNetwork && (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT') || request.errorVoteNetwork[0].includes('NS_ERROR_NET_ON_RESPONSE_START'))) {
                     currentProxy.notWorking = request.errorVoteNetwork[0]
                     await updateValue('proxies', currentProxy)
-                    await stopVote()
+                    await stopVote(true)
                 } else if (request.errorCaptcha) {
                     currentProxy.notWorking = request.errorCaptcha
                     await updateValue('proxies', currentProxy)
                     nextLoop = true
-//                  await stopVote()
+//                  await stopVote(true)
                 } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && request.message && request.message.includes('Григори') && request.message.includes('ваш айпи')) {
                     currentProxy.notWorking = request.message
                     await updateValue('proxies', currentProxy)
-                    await stopVote()
+                    await stopVote(true)
                 }
             }
             if (request.errorVote && request.errorVote[0] === '404') {
@@ -2003,7 +2003,7 @@ function extractHostname(url) {
     return hostname
 }
 
-async function stopVote(user) {
+async function stopVote(dontStart, user) {
     if (user) {
         console.log(chrome.i18n.getMessage('voteSuspended'))
     } else if (debug) {
@@ -2024,9 +2024,7 @@ async function stopVote(user) {
     controller.abort()
     openedProjects.clear()
     fetchProjects.clear()
-    // break1 = true
-    // break2 = true
-    checkVote()
+    if (!dontStart) checkVote()
 }
 
 //Если требуется авторизация для Прокси
@@ -2072,7 +2070,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyTB'))
             }
             await db.put('other', settings, 'settings')
-            await stopVote()
+            await stopVote(true)
             chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('errorAuthProxyTB')})
         } else {
             currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword')

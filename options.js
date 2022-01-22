@@ -310,7 +310,7 @@ async function stopVote(stop) {
         settings.stopVote = Number.POSITIVE_INFINITY
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
-        if (chrome.extension.getBackgroundPage()) await chrome.extension.getBackgroundPage().stopVote(true)
+        if (chrome.extension.getBackgroundPage()) await chrome.extension.getBackgroundPage().stopVote(true, true)
         createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
     }
     await db.put('other', settings, 'settings')
