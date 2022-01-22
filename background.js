@@ -1906,20 +1906,20 @@ async function removeCookie(url, name) {
 async function clearProxy() {
     if (debug) console.log('Удаляю прокси')
     //Костыль сброса авторизации на прокси (специально для https://socproxy.ru/)
-    if (currentProxy != null) {
-        const options = {}
-        let name
-        //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
-        // noinspection JSUnresolvedVariable
-        typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
-        options[name] = []
-        options[name].push('https://' + currentProxy.ip)
-        const types = {"cookies": true}
-        await new Promise(resolve => {
-            // noinspection JSCheckFunctionSignatures
-            chrome.browsingData.remove(options, types, resolve)
-        })
-    }
+    // if (currentProxy != null) {
+    //     const options = {}
+    //     let name
+    //     //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
+    //     // noinspection JSUnresolvedVariable
+    //     typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
+    //     options[name] = []
+    //     options[name].push('https://' + currentProxy.ip)
+    //     const types = {"cookies": true}
+    //     await new Promise(resolve => {
+    //         // noinspection JSCheckFunctionSignatures
+    //         chrome.browsingData.remove(options, types, resolve)
+    //     })
+    // }
     currentProxy = null
     currentPacScriptProxy = null
     // noinspection JSUnresolvedVariable
