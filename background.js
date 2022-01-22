@@ -277,7 +277,9 @@ async function checkOpen(project) {
             //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк
             if (!found) {
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundVK')
-                project
+                project.time = Date.now() + 900000
+                project.error = lastErrorNotFound
+                await updateValue('projects', project)
                 for (const value of queueProjects) {
                     if (project.key === value.key) {
                         queueProjects.delete(value)
@@ -435,18 +437,15 @@ async function checkOpen(project) {
 
             //Если не удалось найти хотя бы одно свободное не заюзанное прокси
             if (!found) {
-//              settings.stopVote = Date.now() + 21600000
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundProxy')
-//              console.warn(getProjectPrefix(project, true) + lastErrorNotFound)
-//              if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), lastErrorNotFound)
-//              await setValue('AVMRsettings', settings)
-//              await stopVote()
+                project.time = Date.now() + 900000
+                project.error = lastErrorNotFound
+                await updateValue('projects', project)
                 for (const value of queueProjects) {
                     if (project.key === value.key) {
                         queueProjects.delete(value)
                     }
                 }
-//              break2 = true
                 return
             }
         }
