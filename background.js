@@ -471,6 +471,20 @@ async function checkOpen(project) {
                 if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
             }
+            if (project.rating === 'XtremeTop100') {
+                const options = {}
+                let name
+                //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
+                // noinspection JSUnresolvedVariable
+                typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
+                options[name] = []
+                options[name].push('https://' + 'xtremetop100.com')
+                const types = {cookies: true, appcache: true, cache: true, cacheStorage: true, fileSystems: true, indexedDB: true, localStorage: true, serviceWorkers: true, webSQL: true}
+                await new Promise(resolve => {
+                    // noinspection JSCheckFunctionSignatures
+                    chrome.browsingData.remove(options, types, resolve)
+                })
+            }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
     } else if (currentVK == null && settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {

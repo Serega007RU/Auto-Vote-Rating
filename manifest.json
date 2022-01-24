@@ -43,7 +43,8 @@
 		"unlimitedStorage",
 		"cookies",
 		"proxy",
-		"<all_urls>"
+		"<all_urls>",
+		"browsingData"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
 	"version": "6.5.0",
