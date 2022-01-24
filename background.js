@@ -484,6 +484,14 @@ async function checkOpen(project) {
                     // noinspection JSCheckFunctionSignatures
                     chrome.browsingData.remove(options, types, resolve)
                 })
+                //Что бы chrome.benchmarking работал нужно браузер запустить такой командной: chrome.exe --enable-benchmarking --enable-net-benchmarking
+                if (chrome.benchmarking) {
+                    await chrome.benchmarking.closeConnections()
+                    await chrome.benchmarking.clearCache()
+                    await chrome.benchmarking.clearHostResolverCache()
+                    await chrome.benchmarking.clearPredictorCache()
+                }
+                if (chrome.privacy) await new Promise(resolve => chrome.privacy.network.webRTCIPHandlingPolicy.set({value: "disable_non_proxied_udp"}, resolve))
             }
         }
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
