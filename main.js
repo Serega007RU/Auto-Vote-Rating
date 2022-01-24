@@ -58,7 +58,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 50)
+            await initializeConfig(background, 60)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error.message})

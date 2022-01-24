@@ -793,7 +793,7 @@ async function addProject(project, element) {
         createNotif(array, 'success', null, element)
     }
 
-    if (project.rating === 'MinecraftIndex' || project.rating === 'MineServers') {
+    if (project.rating === 'MinecraftIndex' || project.rating === 'MineServers' || project.rating === 'XtremeTop100') {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 
@@ -1650,10 +1650,10 @@ selectedTop.addEventListener('input', function() {
         }
     }
 
-    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords' || name === 'DiscordBoats') {
+    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords' || name === 'DiscordBoats' || name === 'XtremeTop100') {
         document.getElementById('nick').required = false
         document.getElementById('nick').parentElement.style.display = 'none'
-    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats') {
+    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats' || laterChoose === 'XtremeTop100') {
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
     }

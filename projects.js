@@ -895,6 +895,19 @@ const allProjects = {
                 return 1
         }
     },
+    XtremeTop100: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://www.xtremetop100.com/in.php?site=' + project.id
+            case 'projectName':
+                return doc.querySelector('#topbanner form[method="POST"] input[type="submit"]').value.replace('Vote for ', '')
+            case 'exampleURL':
+                return ['https://www.xtremetop100.com/in.php?site=', '1132370645', '']
+            case 'URL':
+                return 'XtremeTop100.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
