@@ -1830,17 +1830,17 @@ async function endVote(request, sender, project) {
                 queueProjects.delete(value)
             }
         }
-        setTimeout(()=>{
+        // setTimeout(()=>{
             checkVote()
-        }, settings.timeout)
+        // }, settings.timeout)
     }
-    if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
-        removeQueue()
-    } else {
+    // if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
+    //     removeQueue()
+    // } else {
         setTimeout(()=>{
             removeQueue()
         }, settings.timeout)
-    }
+    // }
 }
 
 //Отправитель уведомлений
