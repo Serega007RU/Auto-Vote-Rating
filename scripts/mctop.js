@@ -62,6 +62,7 @@ async function vote(first) {
     }
 }
 
+let fixTimer
 const timer = setInterval(()=>{
     try {
         //Ищет надпись в которой написано что вы проголосовали или вы уже голосовали, по этой надписи скрипт завершается
@@ -75,9 +76,24 @@ const timer = setInterval(()=>{
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
             }
             clearInterval(timer)
+            clearTimeout(fixTimer)
         }
     } catch (e) {
         throwError(e)
         clearInterval(timer)
     }
 }, 1000)
+
+//Фикс-костыль на случай если у нас ошибка в vote запросе
+const observer = new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+        if (entry.name === 'https://mctop.su/projects/vote/') {
+            fixTimer = setTimeout(()=>{
+                chrome.runtime.sendMessage({message: 'Мы получили что vote запрос прошёл но ответ от TopCraft так и не прошёл, скорее всего в vote запросе произошла ошибка, смотрите подробности в консоли в момент голосования'})
+            }, 5000)
+        }
+    }
+})
+observer.observe({
+    entryTypes: ["resource"]
+})
