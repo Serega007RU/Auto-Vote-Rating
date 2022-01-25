@@ -89,7 +89,7 @@ const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
         if (entry.name === 'https://mctop.su/projects/vote/') {
             fixTimer = setTimeout(()=>{
-                chrome.runtime.sendMessage({message: 'Мы получили что vote запрос прошёл но ответ от TopCraft так и не прошёл, скорее всего в vote запросе произошла ошибка, смотрите подробности в консоли в момент голосования'})
+                chrome.runtime.sendMessage({message: 'Мы получили что vote запрос прошёл но ответ от McTOP так и не прошёл, скорее всего в vote запросе произошла ошибка, смотрите подробности в консоли в момент голосования'})
             }, 5000)
         }
     }
