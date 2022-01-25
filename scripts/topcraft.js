@@ -96,7 +96,7 @@ async function vote(first) {
             await new Promise(resolve => {
                 chrome.runtime.sendMessage({changeProxy: 'rating_TopCraft'}, async result => {
                     if (result === 'success') {
-                        await new Promise(resolve1 => setTimeout(resolve1, 3000))
+                        await new Promise(resolve1 => setTimeout(resolve1, 1000))
                     }
                     resolve()
                 })
