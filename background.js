@@ -1741,8 +1741,8 @@ async function endVote(request, sender, project) {
     if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
         if (project.rating === 'TopCraft' || project.rating === 'McTOP') {
             if (settings.useProxyPacScript && currentProxy != null) {
-                if (currentPacScriptProxy.includes('true/*rating_' + project.rating.toLowerCase())) {
-                    currentPacScriptProxy = currentPacScriptProxy.replace('true/*rating_' + project.rating.toLowerCase() + '*/', 'false/*rating_' + project.rating.toLowerCase() + '*/')
+                if (currentPacScriptProxy.includes('true/*rating_' + project.rating)) {
+                    currentPacScriptProxy = currentPacScriptProxy.replace('true/*rating_' + project.rating + '*/', 'false/*rating_' + project.rating + '*/')
                     const config = {mode: 'pac_script', pacScript: {data: currentPacScriptProxy}}
                     await setProxy(config)
                 }
