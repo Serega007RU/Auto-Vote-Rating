@@ -1376,7 +1376,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                     promises.push(new Promise(resolve => {
                         if (currentPacScriptProxy.includes('false/*' + request.changeProxy)) {
                             console.log('Смена прокси для', request.changeProxy)
-                            currentPacScriptProxy = currentPacScriptProxy.replace('false/*' + request.changeProxy + '*/', 'true/*' + request.changeProxy + '*/')
+                            currentPacScriptProxy = currentPacScriptProxy.replace('false/*rating_' + request.changeProxy + '*/', 'true/*rating_' + request.changeProxy + '*/')
                             const config = {mode: 'pac_script', pacScript: {data: currentPacScriptProxy}}
                             chrome.proxy.settings.set({value: config, scope: 'regular'}, () => {
                                 sendResponse('success')
@@ -1741,8 +1741,8 @@ async function endVote(request, sender, project) {
     if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
         if (project.rating === 'TopCraft' || project.rating === 'McTOP') {
             if (settings.useProxyPacScript && currentProxy != null) {
-                if (currentPacScriptProxy.includes('true/*' + project.rating.toLowerCase())) {
-                    currentPacScriptProxy = currentPacScriptProxy.replace('true/*' + project.rating.toLowerCase() + '*/', 'false/*' + project.rating.toLowerCase() + '*/')
+                if (currentPacScriptProxy.includes('true/*rating_' + project.rating.toLowerCase())) {
+                    currentPacScriptProxy = currentPacScriptProxy.replace('true/*rating_' + project.rating.toLowerCase() + '*/', 'false/*rating_' + project.rating.toLowerCase() + '*/')
                     const config = {mode: 'pac_script', pacScript: {data: currentPacScriptProxy}}
                     await setProxy(config)
                 }
