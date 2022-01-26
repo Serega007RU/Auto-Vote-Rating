@@ -1374,7 +1374,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             if (settings.useProxyPacScript && currentProxy != null) {
                 Promise.all(promises).then(()=>{
                     promises.push(new Promise(resolve => {
-                        if (currentPacScriptProxy.includes('false/*' + request.changeProxy)) {
+                        if (currentPacScriptProxy.includes('false/*rating_' + request.changeProxy)) {
                             console.log('Смена прокси для', request.changeProxy)
                             currentPacScriptProxy = currentPacScriptProxy.replace('false/*rating_' + request.changeProxy + '*/', 'true/*rating_' + request.changeProxy + '*/')
                             const config = {mode: 'pac_script', pacScript: {data: currentPacScriptProxy}}
