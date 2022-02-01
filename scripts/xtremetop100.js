@@ -17,3 +17,10 @@ async function vote(first) {
         throwError(e)
     }
 }
+
+const timer = setInterval(()=>{
+    if (document.querySelector('input[name="captcha_code"]').value >= 6) {
+        clearInterval(timer)
+        document.querySelector('#topbanner form[method="POST"] input[type="submit"]').click()
+    }
+}, 1000)
