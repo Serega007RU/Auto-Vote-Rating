@@ -72,13 +72,14 @@ async function checkVote() {
 
     if (lastErrorNotFound != null) lastErrorNotFound = null
 
-    const transaction = db.transaction('projects')
+    const transaction = db.transaction(['projects', 'vks', 'proxies'])
     let cursor = await transaction.objectStore('projects').openCursor()
     while (cursor) {
         const project = cursor.value
         if (!project.time || project.time < Date.now()) {
             await checkOpen(project, transaction)
         }
+        cursor = await cursor.continue()
     }
 
     if (lastErrorNotFound != null) {
@@ -216,7 +217,7 @@ async function checkOpen(project, transaction) {
         if (needSearchVK) {
             //Ищет не юзанный свободный аккаунт ВК
             let found = false
-            let cursor = await db.transaction('vks').store.openCursor()
+            let cursor = await transaction.objectStore('vks').openCursor()
             while (cursor) {
                 const vkontakte = cursor.value
                 if (vkontakte.notWorking) {
@@ -241,43 +242,46 @@ async function checkOpen(project, transaction) {
                 currentVK = vkontakte
                 console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
 
-                //Удаляет все существующие куки ВК
-                let cookies = await new Promise(resolve=>{
-                    chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
-                        resolve(cookies)
+                promises.push(applyVKCookies())
+                async function applyVKCookies() {
+                    //Удаляет все существующие куки ВК
+                    let cookies = await new Promise(resolve=>{
+                        chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
+                            resolve(cookies)
+                        })
                     })
-                })
-                for (let i = 0; i < cookies.length; i++) {
-                    if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
-                    await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
-                }
-
-                //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
-                for (let i = 0; i < vkontakte.cookies.length; i++) {
-                    let cookie = vkontakte.cookies[i]
-                    if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
-                    //Костыль для FireFox, почему-то не воспринимает куки sameSite unspecified и storeId 0
-                    // noinspection JSUnresolvedVariable
-                    if (typeof InstallTrigger !== 'undefined') {
-                        if (cookie.sameSite === 'unspecified') {
-                            cookie.sameSite = 'no_restriction'
-                        }
-                        if (cookie.storeId === '0') {
-                            cookie.storeId = 'firefox-default'
-                        }
+                    for (let i = 0; i < cookies.length; i++) {
+                        if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+                        await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
                     }
-                    await setCookieDetails({
-                        url: 'https://' + cookie.domain + cookie.path,
-                        name: cookie.name,
-                        value: cookie.value,
-                        domain: cookie.domain,
-                        path: cookie.path,
-                        secure: cookie.secure,
-                        httpOnly: cookie.httpOnly,
-                        sameSite: cookie.sameSite,
-                        expirationDate: cookie.expirationDate,
-                        storeId: cookie.storeId
-                    })
+
+                    //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
+                    for (let i = 0; i < vkontakte.cookies.length; i++) {
+                        let cookie = vkontakte.cookies[i]
+                        if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
+                        //Костыль для FireFox, почему-то не воспринимает куки sameSite unspecified и storeId 0
+                        // noinspection JSUnresolvedVariable
+                        if (typeof InstallTrigger !== 'undefined') {
+                            if (cookie.sameSite === 'unspecified') {
+                                cookie.sameSite = 'no_restriction'
+                            }
+                            if (cookie.storeId === '0') {
+                                cookie.storeId = 'firefox-default'
+                            }
+                        }
+                        await setCookieDetails({
+                            url: 'https://' + cookie.domain + cookie.path,
+                            name: cookie.name,
+                            value: cookie.value,
+                            domain: cookie.domain,
+                            path: cookie.path,
+                            secure: cookie.secure,
+                            httpOnly: cookie.httpOnly,
+                            sameSite: cookie.sameSite,
+                            expirationDate: cookie.expirationDate,
+                            storeId: cookie.storeId
+                        })
+                    }
                 }
 
                 break
@@ -287,7 +291,7 @@ async function checkOpen(project, transaction) {
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundVK')
                 project.time = Date.now() + 900000
                 project.error = lastErrorNotFound
-                await updateValue('projects', project)
+                updateValue('projects', project)
                 for (const value of queueProjects) {
                     if (project.key === value.key) {
                         queueProjects.delete(value)
@@ -301,26 +305,22 @@ async function checkOpen(project, transaction) {
             //Для FireFox эту проверку нет смысла выполнять
             // noinspection JSUnresolvedVariable
             if (typeof InstallTrigger === 'undefined') {
-                let proxyDetails = await new Promise(resolve => {
-                    chrome.proxy.settings.get({}, async function(details) {
-                        resolve(details)
-                    })
-                })
-                if (!(proxyDetails.levelOfControl === 'controllable_by_this_extension' || proxyDetails.levelOfControl === 'controlled_by_this_extension')) {
-                    settings.stopVote = Date.now() + 21600000
-                    console.error(chrome.i18n.getMessage('otherProxy'))
-                    if (!settings.disabledNotifError) {
-                        sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
+                chrome.proxy.settings.get({}, async function(details) {
+                    if (!(details.levelOfControl === 'controllable_by_this_extension' || details.levelOfControl === 'controlled_by_this_extension')) {
+                        settings.stopVote = Date.now() + 21600000
+                        console.error(chrome.i18n.getMessage('otherProxy'))
+                        if (!settings.disabledNotifError) {
+                            sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
+                        }
+                        await db.put('other', settings, 'settings')
+                        await stopVote(true)
+                        chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('otherProxy')})
                     }
-                    await db.put('other', settings, 'settings')
-                    await stopVote(true)
-                    chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('otherProxy')})
-                    return
-                }
+                })
             }
             //Ищет не юзанный свободный прокси
             let found = false
-            let cursor = await db.transaction('proxies').store.openCursor()
+            let cursor = await transaction.objectStore('proxies').openCursor()
             while (cursor) {
                 const proxy = cursor.value
                 if (proxy.notWorking) {
@@ -332,114 +332,117 @@ async function checkOpen(project, transaction) {
                     continue
                 }
                 found = true
+                currentProxy = proxy
                 //Применяет найденный незаюзанный свободный прокси
                 console.log(chrome.i18n.getMessage('applyProxy', proxy.ip + ':' + proxy.port + ' ' + proxy.scheme))
 
-                if (proxy.TunnelBear && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
-                    console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
-                    let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
-                        'headers': {
-                            'accept': 'application/json, text/plain, */*',
-                            'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
-                            'authorization': 'Bearer undefined',
-                            'cache-control': 'no-cache',
-                            'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
-                            'pragma': 'no-cache',
-                            'sec-fetch-dest': 'empty',
-                            'sec-fetch-mode': 'cors',
-                            'sec-fetch-site': 'none',
-                            'tunnelbear-app-id': 'com.tunnelbear',
-                            'tunnelbear-app-version': '1.0',
-                            'tunnelbear-platform': 'Chrome',
-                            'tunnelbear-platform-version': 'c3.3.3'
-                        },
-                        'referrerPolicy': 'strict-origin-when-cross-origin',
-                        'body': null,
-                        'method': 'POST',
-                        'mode': 'cors',
-                        'credentials': 'include'
-                    })
-                    if (!response.ok) {
-                        settings.stopVote = Date.now() + 21600000
-                        await db.put('other', settings, 'settings')
-                        await stopVote(true)
-                        if (response.status === 401) {
-                            console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
-                            chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2')})
-                            if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
+                promises.push(applyProxy())
+                async function applyProxy() {
+                    if (proxy.TunnelBear && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
+                        console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
+                        let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
+                            'headers': {
+                                'accept': 'application/json, text/plain, */*',
+                                'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                                'authorization': 'Bearer undefined',
+                                'cache-control': 'no-cache',
+                                'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
+                                'pragma': 'no-cache',
+                                'sec-fetch-dest': 'empty',
+                                'sec-fetch-mode': 'cors',
+                                'sec-fetch-site': 'none',
+                                'tunnelbear-app-id': 'com.tunnelbear',
+                                'tunnelbear-app-version': '1.0',
+                                'tunnelbear-platform': 'Chrome',
+                                'tunnelbear-platform-version': 'c3.3.3'
+                            },
+                            'referrerPolicy': 'strict-origin-when-cross-origin',
+                            'body': null,
+                            'method': 'POST',
+                            'mode': 'cors',
+                            'credentials': 'include'
+                        })
+                        if (!response.ok) {
+                            settings.stopVote = Date.now() + 21600000
+                            await db.put('other', settings, 'settings')
+                            await stopVote(true)
+                            if (response.status === 401) {
+                                console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
+                                chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2')})
+                                if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
+                                return
+                            }
+                            chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('notConnect', response.url) + response.status})
+                            console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status)
                             return
                         }
-                        chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('notConnect', response.url) + response.status})
-                        console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status)
-                        return
+                        let json = await response.json()
+                        tunnelBear.token = 'Bearer ' + json.access_token
+                        tunnelBear.expires = Date.now() + 86400000
                     }
-                    let json = await response.json()
-                    tunnelBear.token = 'Bearer ' + json.access_token
-                    tunnelBear.expires = Date.now() + 86400000
-                }
 
-                // noinspection JSUnresolvedVariable
-                if (typeof InstallTrigger !== 'undefined') {
-                    // noinspection JSUnresolvedVariable,JSUnresolvedFunction
-                    browser.proxy.onRequest.addListener(firefoxProxyRequestHandler, {urls: ['<all_urls>']})
-                } else {
-                    let config
-                    if (settings.useProxyPacScript) {
-                        currentPacScriptProxy = settings.proxyPacScript
-                            .replace('$ip$', proxy.ip)
-                            .replace('$port$', proxy.port)
-                            .replace('$scheme$', proxy.scheme.toUpperCase())
-                            .replaceAll(/\$rating_[^$.]+\$/g, (match) => {
-                                match = match.replaceAll('$rating_', '')
-                                match = match.replaceAll('$', '')
-                                return 'false/*rating_' + match + '*/'
-                            })
-                            .replaceAll(/\$nick_[^$.]+\$/g, (match) => {
-                                match = match.replaceAll('$nick_', '')
-                                match = match.replaceAll('$', '')
-                                if (project.nick === match) {
-                                    return 'true/*nick_' + match + '*/'
-                                } else {
-                                    return 'false/*nick_' + match + '*/'
-                                }
-                            })
-                        config = {
-                            mode: 'pac_script',
-                            pacScript: {
-                                data: currentPacScriptProxy
-                            }
-                        }
+                    // noinspection JSUnresolvedVariable
+                    if (typeof InstallTrigger !== 'undefined') {
+                        // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                        browser.proxy.onRequest.addListener(firefoxProxyRequestHandler, {urls: ['<all_urls>']})
                     } else {
-                        config = {
-                            mode: 'fixed_servers',
-                            rules: {
-                                singleProxy: {
-                                    scheme: proxy.scheme,
-                                    host: proxy.ip,
-                                    port: proxy.port
-                                },
-                                bypassList: settings.proxyBlackList
+                        let config
+                        if (settings.useProxyPacScript) {
+                            currentPacScriptProxy = settings.proxyPacScript
+                                .replace('$ip$', proxy.ip)
+                                .replace('$port$', proxy.port)
+                                .replace('$scheme$', proxy.scheme.toUpperCase())
+                                .replaceAll(/\$rating_[^$.]+\$/g, (match) => {
+                                    match = match.replaceAll('$rating_', '')
+                                    match = match.replaceAll('$', '')
+                                    return 'false/*rating_' + match + '*/'
+                                })
+                                .replaceAll(/\$nick_[^$.]+\$/g, (match) => {
+                                    match = match.replaceAll('$nick_', '')
+                                    match = match.replaceAll('$', '')
+                                    if (project.nick === match) {
+                                        return 'true/*nick_' + match + '*/'
+                                    } else {
+                                        return 'false/*nick_' + match + '*/'
+                                    }
+                                })
+                            config = {
+                                mode: 'pac_script',
+                                pacScript: {
+                                    data: currentPacScriptProxy
+                                }
+                            }
+                        } else {
+                            config = {
+                                mode: 'fixed_servers',
+                                rules: {
+                                    singleProxy: {
+                                        scheme: proxy.scheme,
+                                        host: proxy.ip,
+                                        port: proxy.port
+                                    },
+                                    bypassList: settings.proxyBlackList
+                                }
                             }
                         }
+                        await setProxy(config)
                     }
-                    await setProxy(config)
-                }
 
-                currentProxy = proxy
-
-                if (settings.yandexCaptchaSolver) {
-                    let cookies = await new Promise(resolve=>{
-                        chrome.cookies.getAll({}, function(cookies) {
-                            resolve(cookies)
+                    if (settings.yandexCaptchaSolver) {
+                        let cookies = await new Promise(resolve=>{
+                            chrome.cookies.getAll({}, function(cookies) {
+                                resolve(cookies)
+                            })
                         })
-                    })
-                    if (debug) console.log('Удаляю куки Yandex')
-                    for (let i = 0; i < cookies.length; i++) {
-                        if (!cookies[i].domain.includes('.yandex.')) continue
-                        if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
-                        await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
+                        if (debug) console.log('Удаляю куки Yandex')
+                        for (let i = 0; i < cookies.length; i++) {
+                            if (!cookies[i].domain.includes('.yandex.')) continue
+                            if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+                            await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
+                        }
                     }
                 }
+
                 break
             }
 
@@ -448,7 +451,7 @@ async function checkOpen(project, transaction) {
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundProxy')
                 project.time = Date.now() + 900000
                 project.error = lastErrorNotFound
-                await updateValue('projects', project)
+                updateValue('projects', project)
                 for (const value of queueProjects) {
                     if (project.key === value.key) {
                         queueProjects.delete(value)
@@ -460,76 +463,83 @@ async function checkOpen(project, transaction) {
 
         lastErrorNotFound = null
 
-        //Очистка куки
-        let url = '.' + extractHostname(allProjects[project.rating]('pageURL', project))
-        if (url && project.rating !== 'IonMc') {
-            let cookies = await new Promise(resolve=>{
-                chrome.cookies.getAll({domain: url}, function(cookies) {
-                    resolve(cookies)
+        promises.push(clearCookies())
+        async function clearCookies() {
+            //Очистка куки
+            let url = '.' + extractHostname(allProjects[project.rating]('pageURL', project))
+            if (url && project.rating !== 'IonMc') {
+                let cookies = await new Promise(resolve=>{
+                    chrome.cookies.getAll({domain: url}, function(cookies) {
+                        resolve(cookies)
+                    })
                 })
-            })
-            if (debug) console.log('Удаляю куки ' + url)
-            for (let i = 0; i < cookies.length; i++) {
-                if (cookies[i].name === 'csrf_cookie_name' || cookies[i].name.startsWith('cf_') || cookies[i].name.startsWith('__cf')) continue
-                if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
-                await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
-            }
-            if (project.rating === 'XtremeTop100') {
-                const options = {}
-                let name
-                //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
-                // noinspection JSUnresolvedVariable
-                typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
-                options[name] = []
-                options[name].push('https://' + 'xtremetop100.com')
-                const types = {cookies: true, appcache: true, cache: true, cacheStorage: true, fileSystems: true, indexedDB: true, localStorage: true, serviceWorkers: true, webSQL: true}
-                await new Promise(resolve => {
-                    // noinspection JSCheckFunctionSignatures
-                    chrome.browsingData.remove(options, types, resolve)
-                })
-                //Что бы chrome.benchmarking работал нужно браузер запустить такой командной: chrome.exe --enable-benchmarking --enable-net-benchmarking
-                if (chrome.benchmarking) {
-                    await chrome.benchmarking.closeConnections()
-                    await chrome.benchmarking.clearCache()
-                    await chrome.benchmarking.clearHostResolverCache()
-                    await chrome.benchmarking.clearPredictorCache()
+                if (debug) console.log('Удаляю куки ' + url)
+                for (let i = 0; i < cookies.length; i++) {
+                    if (cookies[i].name === 'csrf_cookie_name' || cookies[i].name.startsWith('cf_') || cookies[i].name.startsWith('__cf')) continue
+                    if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+                    await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
                 }
-                if (chrome.privacy) await new Promise(resolve => chrome.privacy.network.webRTCIPHandlingPolicy.set({value: "disable_non_proxied_udp"}, resolve))
+                if (project.rating === 'XtremeTop100') {
+                    const options = {}
+                    let name
+                    //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
+                    // noinspection JSUnresolvedVariable
+                    typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
+                    options[name] = []
+                    options[name].push('https://' + 'xtremetop100.com')
+                    const types = {cookies: true, appcache: true, cache: true, cacheStorage: true, fileSystems: true, indexedDB: true, localStorage: true, serviceWorkers: true, webSQL: true}
+                    await new Promise(resolve => {
+                        // noinspection JSCheckFunctionSignatures
+                        chrome.browsingData.remove(options, types, resolve)
+                    })
+                    //Что бы chrome.benchmarking работал нужно браузер запустить такой командной: chrome.exe --enable-benchmarking --enable-net-benchmarking
+                    if (chrome.benchmarking) {
+                        await chrome.benchmarking.closeConnections()
+                        await chrome.benchmarking.clearCache()
+                        await chrome.benchmarking.clearHostResolverCache()
+                        await chrome.benchmarking.clearPredictorCache()
+                    }
+                    if (chrome.privacy) await new Promise(resolve => chrome.privacy.network.webRTCIPHandlingPolicy.set({value: "disable_non_proxied_udp"}, resolve))
+                }
             }
         }
+
         //Применяет первый аккаунт ВКонтакте в случае голосования проекта без MultiVote (по умолчанию первый аккаунт ВКонтакте считается основным
     } else if (currentVK == null && settings.useMultiVote && project.useMultiVote === false && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')) {
-        const vkontakte = await db.get('vks', 1)
+        const vkontakte = await transaction.objectStore('vks').get(1)
         currentVK = vkontakte
         console.log(chrome.i18n.getMessage('applyVKCookies', vkontakte.id + ' - ' + vkontakte.name))
 
-        //Удаляет все существующие куки ВК
-        let cookies = await new Promise(resolve=>{
-            chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
-                resolve(cookies)
+        promises.push(applyFirstVKCookies())
+        async function applyFirstVKCookies() {
+            //Удаляет все существующие куки ВК
+            let cookies = await new Promise(resolve=>{
+                chrome.cookies.getAll({domain: '.vk.com'}, function(cookies) {
+                    resolve(cookies)
+                })
             })
-        })
-        for (let i = 0; i < cookies.length; i++) {
-            if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
-            await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
-        }
+            for (let i = 0; i < cookies.length; i++) {
+                if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
+                await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
+            }
 
-        //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
-        for (let i = 0; i < vkontakte.cookies.length; i++) {
-            let cookie = vkontakte.cookies[i]
-            if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
-            await setCookieDetails({
-                url: 'https://' + cookie.domain + cookie.path,
-                name: cookie.name,
-                value: cookie.value,
-                domain: cookie.domain,
-                path: cookie.path,
-                secure: cookie.secure,
-                httpOnly: cookie.httpOnly,
-                sameSite: cookie.sameSite,
-                expirationDate: cookie.expirationDate,
-                storeId: cookie.storeId
-            })
+            //Применяет куки ВК найденного свободного незаюзанного аккаунта ВК
+            for (let i = 0; i < vkontakte.cookies.length; i++) {
+                let cookie = vkontakte.cookies[i]
+                if (cookie.domain.charAt(0) === '.') cookie.domain = cookie.domain.substring(1, cookie.domain.length)
+                await setCookieDetails({
+                    url: 'https://' + cookie.domain + cookie.path,
+                    name: cookie.name,
+                    value: cookie.value,
+                    domain: cookie.domain,
+                    path: cookie.path,
+                    secure: cookie.secure,
+                    httpOnly: cookie.httpOnly,
+                    sameSite: cookie.sameSite,
+                    expirationDate: cookie.expirationDate,
+                    storeId: cookie.storeId
+                })
+            }
         }
 
     }
@@ -563,7 +573,6 @@ async function checkOpen(project, transaction) {
     if (!settings.disabledNotifStart)
         sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
 
-
     if (project.rating === 'MonitoringMinecraft' && (!settings.useMultiVote || project.useMultiVote === false)) {
         promises.push(clearMonitoringMinecraftCookies())
         async function clearMonitoringMinecraftCookies() {
@@ -588,9 +597,9 @@ async function checkOpen(project, transaction) {
 }
 
 let promiseGroup
-//Открывает вкладку для голосования или начинает выполнять fetch запросы
+//Открывает вкладку для голосования или начинает выполнять fetch закросы
 async function newWindow(project) {
-    //Ожидаем очистку куки
+    //Ожидаем очистку куки, применение аккаунтов или прокси
     let result = await Promise.all(promises)
     while (result.length < promises.length) {
         result = await Promise.all(promises)
@@ -638,7 +647,7 @@ async function newWindow(project) {
     if (create) {
         chrome.alarms.create(String(project.key), {when: project.nextAttempt})
     }
-    
+
     let silentVoteMode = false
     if (project.rating === 'Custom') {
         silentVoteMode = true
@@ -1322,8 +1331,8 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
                 //FireFox
                 || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING')) {
-                    // console.warn(getProjectPrefix(project, true) + "chrome.webRequest.onErrorOccurred:", details.error, details.url)
-                    return
+                // console.warn(getProjectPrefix(project, true) + "chrome.webRequest.onErrorOccurred:", details.error, details.url)
+                return
             }
             const sender = {tab: {id: details.tabId}}
             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
@@ -1367,7 +1376,7 @@ async function _fetch(url, options, project) {
     }
 }
 
-let promises = []
+let promisesProxy = []
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (sender && openedProjects.has(sender.tab.id)) {
@@ -1398,8 +1407,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             }
         } else if (request.changeProxy) {
             if (settings.useProxyPacScript && currentProxy != null) {
-                Promise.all(promises).then(()=>{
-                    promises.push(new Promise(resolve => {
+                Promise.all(promisesProxy).then(()=>{
+                    promisesProxy.push(new Promise(resolve => {
                         if (currentPacScriptProxy.includes('false/*rating_' + request.changeProxy)) {
                             console.log('Смена прокси для', request.changeProxy)
                             currentPacScriptProxy = currentPacScriptProxy.replace('false/*rating_' + request.changeProxy + '*/', 'true/*rating_' + request.changeProxy + '*/')
@@ -1865,15 +1874,15 @@ async function endVote(request, sender, project) {
             }
         }
         // setTimeout(()=>{
-            checkVote()
+        checkVote()
         // }, settings.timeout)
     }
     // if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
     //     removeQueue()
     // } else {
-        setTimeout(()=>{
-            removeQueue()
-        }, settings.timeout)
+    setTimeout(()=>{
+        removeQueue()
+    }, settings.timeout)
     // }
 }
 
