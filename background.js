@@ -148,7 +148,7 @@ async function checkOpen(project, transaction) {
                 if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
                 if (currentProxy != null) {
                     currentProxy.notWorking = chrome.i18n.getMessage('timeout')
-                    await updateValue('proxies', currentProxy)
+                    updateValue('proxies', currentProxy)
                     stopVote()
                     return
                 }
