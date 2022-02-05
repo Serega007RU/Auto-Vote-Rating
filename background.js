@@ -177,6 +177,7 @@ async function newWindow(project) {
     while (result.length < promises.length) {
         result = await Promise.all(promises)
     }
+    promises = []
 
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
