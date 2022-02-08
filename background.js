@@ -50,12 +50,12 @@ async function checkVote() {
         return
     }
 
-    let cursor = await db.transaction('projects').store.openCursor()
+    const transaction = db.transaction('projects')
+    let cursor = await transaction.objectStore('projects').openCursor()
     while (cursor) {
         const project = cursor.value
-        const key = cursor.key
         if (!project.time || project.time < Date.now()) {
-            checkOpen(project, key)
+            await checkOpen(project, transaction)
         }
         cursor = await cursor.continue()
     }
@@ -88,7 +88,8 @@ window.addEventListener('offline', ()=> {
     online = false
 })
 
-async function checkOpen(project) {
+let promises = []
+async function checkOpen(project/*, transaction*/) {
     //Если нет подключения к интернету
     if (!settings.disabledCheckInternet) {
         if (!navigator.onLine && online) {
@@ -144,30 +145,40 @@ async function checkOpen(project) {
     if (!settings.disabledNotifStart)
         sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
 
+
     if (project.rating === 'MonitoringMinecraft') {
-        let url
-        if (project.rating === 'MonitoringMinecraft') {
-            url = '.monitoringminecraft.ru'
-        }
-        let cookies = await new Promise(resolve=>{
-            chrome.cookies.getAll({domain: url}, function(cookies) {
-                resolve(cookies)
+        promises.push(clearMonitoringMinecraftCookies())
+        async function clearMonitoringMinecraftCookies() {
+            let url
+            if (project.rating === 'MonitoringMinecraft') {
+                url = '.monitoringminecraft.ru'
+            }
+            let cookies = await new Promise(resolve=>{
+                chrome.cookies.getAll({domain: url}, function(cookies) {
+                    resolve(cookies)
+                })
             })
-        })
-        for (let i = 0; i < cookies.length; i++) {
-            if (cookies[i].domain.charAt(0) === '.') {
-                await removeCookie('https://' + cookies[i].domain.substring(1, cookies[i].domain.length) + cookies[i].path, cookies[i].name)
-            } else {
+            if (debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
+            for (let i = 0; i < cookies.length; i++) {
+                if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
             }
         }
     }
 
-    await newWindow(project)
+    newWindow(project)
 }
 
-//Открывает вкладку для голосования или начинает выполнять fetch закросы
+let promiseGroup
+//Открывает вкладку для голосования или начинает выполнять fetch запросы
 async function newWindow(project) {
+    //Ожидаем очистку куки
+    let result = await Promise.all(promises)
+    while (result.length < promises.length) {
+        result = await Promise.all(promises)
+    }
+    promises = []
+
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
         project.stats.monthSuccessVotes = 0
@@ -256,15 +267,18 @@ async function newWindow(project) {
         if (tab == null) return
         openedProjects.set(tab.id, project)
         if (notSupportedGroupTabs) return
-        if (groupId) {
-            await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, (/*details*/) => {
-                if (chrome.runtime.lastError && chrome.runtime.lastError.message.includes('No group with id')) {
-                    groupId = null
-                }
-                resolve()
-            }))
-            //Дважды группируем? А чо? Костылим что бы цвет группы был голубым. :D
-            if (groupId) await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, resolve))
+        await group()
+        async function group() {
+            if (groupId) {
+                await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, (/*details*/) => {
+                    if (chrome.runtime.lastError && chrome.runtime.lastError.message.includes('No group with id')) {
+                        groupId = null
+                    }
+                    resolve()
+                }))
+                //Дважды группируем? А чо? Костылим что бы цвет группы был голубым. :D
+                if (groupId) await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, resolve))
+            }
         }
         if (!groupId) {
             if (!chrome.tabs.group) {
@@ -272,16 +286,25 @@ async function newWindow(project) {
                 console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', 'chrome.tabs.group is not a function'))
                 return
             }
-            await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, () => {
-                if (chrome.runtime.lastError) {
-                    notSupportedGroupTabs = true
-                    console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', chrome.runtime.lastError.message))
-                }
-                resolve()
-            }))
-            if (notSupportedGroupTabs) return
-            //Дважды группируем? А чо? Костылим что бы цвет группы был голубым. :D
-            groupId = await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, resolve))
+            if (promiseGroup) {
+                await promiseGroup
+                await group()
+                return
+            }
+            promiseGroup = createGroup()
+            async function createGroup() {
+                await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, () => {
+                    if (chrome.runtime.lastError) {
+                        notSupportedGroupTabs = true
+                        console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', chrome.runtime.lastError.message))
+                    }
+                    resolve()
+                }))
+                if (notSupportedGroupTabs) return
+                //Дважды группируем? А чо? Костылим что бы цвет группы был голубым. :D
+                groupId = await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, resolve))
+                promiseGroup = null
+            }
         }
     }
 }
