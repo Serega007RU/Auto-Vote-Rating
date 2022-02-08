@@ -948,6 +948,19 @@ const allProjects = {
                 return 'Serveurs-MC.net'
         }
     },
+    ServeursMinecraftCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://serveur-minecraft.com/' + project.id
+            case 'projectName':
+                return doc.querySelector('div.title h1').textContent
+            case 'exampleURL':
+                return ['https://serveur-minecraft.com/', '2908', '']
+            case 'URL':
+                return 'Serveur-Minecraft.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
