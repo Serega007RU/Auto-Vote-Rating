@@ -921,6 +921,19 @@ const allProjects = {
                 return 'Minecraft-Server.sk'
         }
     },
+    ServeursMinecraftOrg: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://www.serveursminecraft.org/serveur/' + project.id + '/'
+            case 'projectName':
+                return doc.querySelector('div.panel-heading b').textContent
+            case 'exampleURL':
+                return ['https://www.serveursminecraft.org/serveur/', '1017', '/']
+            case 'URL':
+                return 'ServeursMinecraft.org'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
