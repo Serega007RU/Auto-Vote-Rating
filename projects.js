@@ -908,6 +908,19 @@ const allProjects = {
                 return 'XtremeTop100.com'
         }
     },
+    MinecraftServerSk: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://minecraft-server.sk/' + project.id + '/vote'
+            case 'projectName':
+                return doc.querySelector('.server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://minecraft-server.sk/', 'server-luoend.52', '/vote']
+            case 'URL':
+                return 'Minecraft-Server.sk'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
