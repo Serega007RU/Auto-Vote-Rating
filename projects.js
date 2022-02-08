@@ -934,6 +934,20 @@ const allProjects = {
                 return 'ServeursMinecraft.org'
         }
     },
+    ServeursMCNet: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://serveurs-mc.net/serveur/' + project.id + '/voter'
+            case 'pageURL':
+                return 'https://serveurs-mc.net/serveur/' + project.id
+            case 'projectName':
+                return doc.querySelector('h1.text-center').textContent
+            case 'exampleURL':
+                return ['https://serveurs-mc.net/serveur/', '82', '/voter']
+            case 'URL':
+                return 'Serveurs-MC.net'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
