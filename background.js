@@ -33,8 +33,7 @@ let tunnelBear = {}
 
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
-// let break1 = false
-// let break2 = false
+let _break = false
 let lastErrorNotFound
 
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
@@ -75,6 +74,7 @@ async function checkVote() {
     const transaction = db.transaction(['projects', 'vks', 'proxies'])
     let cursor = await transaction.objectStore('projects').openCursor()
     while (cursor) {
+        if (_break) break
         const project = cursor.value
         if (!project.time || project.time < Date.now()) {
             await checkOpen(project, transaction)
@@ -92,8 +92,7 @@ async function checkVote() {
     }
 
     check = true
-    // break1 = false
-    // break2 = false
+    _break = false
 }
 
 //Триггер на голосование когда подходит время голосования
@@ -2067,7 +2066,7 @@ async function stopVote(dontStart, user) {
     } else if (debug) {
         console.log('Отмена всех голосований и очистка всего')
     }
-    await clearProxy()
+    _break = true
     currentVK = null
     queueProjects.clear()
     for (let[key/*,value*/] of openedProjects.entries()) {
@@ -2082,6 +2081,7 @@ async function stopVote(dontStart, user) {
     controller.abort()
     openedProjects.clear()
     fetchProjects.clear()
+    await clearProxy()
     if (!dontStart) checkVote()
 }
 
