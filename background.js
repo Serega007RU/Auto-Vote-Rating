@@ -65,6 +65,7 @@ async function checkVote() {
 
     if (check) {
         check = false
+        _break = false
     } else {
         return
     }
