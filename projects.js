@@ -908,6 +908,59 @@ const allProjects = {
                 return 'XtremeTop100.com'
         }
     },
+    MinecraftServerSk: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://minecraft-server.sk/' + project.id + '/vote'
+            case 'projectName':
+                return doc.querySelector('.server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://minecraft-server.sk/', 'server-luoend.52', '/vote']
+            case 'URL':
+                return 'Minecraft-Server.sk'
+        }
+    },
+    ServeursMinecraftOrg: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://www.serveursminecraft.org/serveur/' + project.id + '/'
+            case 'projectName':
+                return doc.querySelector('div.panel-heading b').textContent
+            case 'exampleURL':
+                return ['https://www.serveursminecraft.org/serveur/', '1017', '/']
+            case 'URL':
+                return 'ServeursMinecraft.org'
+        }
+    },
+    ServeursMCNet: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://serveurs-mc.net/serveur/' + project.id + '/voter'
+            case 'pageURL':
+                return 'https://serveurs-mc.net/serveur/' + project.id
+            case 'projectName':
+                return doc.querySelector('h1.text-center').textContent
+            case 'exampleURL':
+                return ['https://serveurs-mc.net/serveur/', '82', '/voter']
+            case 'URL':
+                return 'Serveurs-MC.net'
+        }
+    },
+    ServeursMinecraftCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://serveur-minecraft.com/' + project.id
+            case 'projectName':
+                return doc.querySelector('div.title h1').textContent
+            case 'exampleURL':
+                return ['https://serveur-minecraft.com/', '2908', '']
+            case 'URL':
+                return 'Serveur-Minecraft.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
