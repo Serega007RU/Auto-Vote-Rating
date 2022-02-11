@@ -1743,6 +1743,10 @@ async function endVote(request, sender, project) {
                     await updateValue('proxies', currentProxy)
                     await stopVote(true)
                 }
+            } else if (project.rating === 'MCRate' && request.errorVote && request.errorVote[0] === '500') {
+                currentProxy.notWorking = request.message
+                await updateValue('proxies', currentProxy)
+                nextLoop = true
             }
             if (request.errorVote && request.errorVote[0] === '404') {
                 project.time = Date.now() + 21600000
