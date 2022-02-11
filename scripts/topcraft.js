@@ -35,8 +35,8 @@ async function vote(first) {
                 // }, 1000)
                 const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value
                 try {
-                    const login = vkontakte.id + vkontakte.numberId
-                    if (login.length > 30) login.substring(0, 30)
+                    let login = vkontakte.id + vkontakte.numberId
+                    if (login.length > 30) login = login.substring(0, 30)
                     const response = await fetch('https://topcraft.ru/accounts/login/', {
                         'headers': {
                             'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
