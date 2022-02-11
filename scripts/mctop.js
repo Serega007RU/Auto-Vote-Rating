@@ -35,11 +35,13 @@ async function vote(first) {
                 // }, 1000)
                 const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value
                 try {
+                    const login = vkontakte.id + vkontakte.numberId
+                    if (login.length > 30) login.substring(0, 30)
                     const response = await fetch('https://mctop.su/accounts/login/', {
                         'headers': {
                             'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
                         },
-                        'body': 'csrfmiddlewaretoken=' + csrftoken + '&login=' + vkontakte.id + vkontakte.numberId + '&password=' + vkontakte.passwordMcTOP,
+                        'body': 'csrfmiddlewaretoken=' + csrftoken + '&login=' + login + '&password=' + vkontakte.passwordMcTOP,
                         'method': 'POST'
                     })
                     response.html = await response.text()
