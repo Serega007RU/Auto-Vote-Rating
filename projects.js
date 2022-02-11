@@ -32,7 +32,7 @@ const allProjects = {
     MCRate: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                return 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=http://mcrate.su/add/rate?idp=' + project.id + '&response_type=code'
+                return 'http://mcrate.su/rate/' + project.id
             case 'pageURL':
                 return 'http://mcrate.su/project/' + project.id
             case 'projectName':
