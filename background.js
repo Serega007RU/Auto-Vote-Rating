@@ -1691,12 +1691,12 @@ async function endVote(request, sender, project) {
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
         if (currentVK != null && ((project.rating === 'TopCraft' && currentVK.passwordTopCraft) || (project.rating === 'McTOP' && currentVK.passwordMcTOP))) {
-            if (request && request.message && (request.message.includes('Имя пользователя и/или пароль не верны') || request.message.includes('бедитесь, что это значение содержит не более') || request.message.includes('password' + project.rating))) {
-                if (currentVK.id !== 'id' + currentVK.numberId) {
-                    currentVK.id = 'id' + currentVK.numberId
-                } else {
+            if (request && request.message && (request.message.includes('Имя пользователя и/или пароль не верны') /*|| request.message.includes('бедитесь, что это значение содержит не более') || request.message.includes('password' + project.rating)*/)) {
+                // if (currentVK.id !== 'id' + currentVK.numberId) {
+                //     currentVK.id = 'id' + currentVK.numberId
+                // } else {
                     delete currentVK['password' + project.rating]
-                }
+                // }
                 await updateValue('vks', currentVK)
             }
         }
