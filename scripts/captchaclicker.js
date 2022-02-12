@@ -23,11 +23,12 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
         }
 
         if (document.querySelector('.rc-anchor-error-msg-container').style.display !== 'none' && document.querySelector('.rc-anchor-error-msg-container').textContent.length > 0) {
-            if (document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Try reloading the page')) {
+            const text = document.querySelector('.rc-anchor-error-msg-container').textContent
+            if (text.includes('Try reloading the page')) {
                 document.location.reload()
             } else {
                 // https://i.imgur.com/WJ3ce9s.png
-                if (!document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Время проверки истекло') && !document.querySelector('.rc-anchor-error-msg-container').textContent.includes('Verification expired')) {
+                if (!text.includes('Время проверки истекло') && !text.includes('Verification expired') && !text.includes('La validation a expiré')) {
                     chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-anchor-error-msg-container').textContent})
                     clearInterval(timer2)
                 }
