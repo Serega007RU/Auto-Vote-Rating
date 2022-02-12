@@ -971,7 +971,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             console.warn(getProjectPrefix(project, true) + message)
             if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
             project.error = message
-            delete project.nextAttempt
+            // delete project.nextAttempt
             openedProjects.delete(sender.tab.id)
             openedProjects.set(sender.tab.id, project)
             updateValue('projects', project)
