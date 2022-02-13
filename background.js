@@ -425,6 +425,18 @@ async function checkOpen(project, transaction) {
                                 }
                             }
                         }
+                        const options = {}
+                        let name
+                        //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
+                        // noinspection JSUnresolvedVariable
+                        typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
+                        options[name] = []
+                        options[name].push('https://' + currentProxy.ip)
+                        const types = {"cookies": true}
+                        await new Promise(resolve => {
+                            // noinspection JSCheckFunctionSignatures
+                            chrome.browsingData.remove(options, types, resolve)
+                        })
                         await setProxy(config)
                     }
 
@@ -479,28 +491,26 @@ async function checkOpen(project, transaction) {
                     if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                     await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
                 }
-                if (project.rating === 'XtremeTop100') {
-                    const options = {}
-                    let name
-                    //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
-                    // noinspection JSUnresolvedVariable
-                    typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
-                    options[name] = []
-                    options[name].push('https://' + 'xtremetop100.com')
-                    const types = {cookies: true, appcache: true, cache: true, cacheStorage: true, fileSystems: true, indexedDB: true, localStorage: true, serviceWorkers: true, webSQL: true}
-                    await new Promise(resolve => {
-                        // noinspection JSCheckFunctionSignatures
-                        chrome.browsingData.remove(options, types, resolve)
-                    })
-                    //Что бы chrome.benchmarking работал нужно браузер запустить такой командной: chrome.exe --enable-benchmarking --enable-net-benchmarking
-                    if (chrome.benchmarking) {
-                        await chrome.benchmarking.closeConnections()
-                        await chrome.benchmarking.clearCache()
-                        await chrome.benchmarking.clearHostResolverCache()
-                        await chrome.benchmarking.clearPredictorCache()
-                    }
-                    if (chrome.privacy) await new Promise(resolve => chrome.privacy.network.webRTCIPHandlingPolicy.set({value: "disable_non_proxied_udp"}, resolve))
-                }
+                const options = {}
+                let name
+                //FireFox зачем-то решил это называть hostnames когда в Chrome это называется origins, как же это "удобно"
+                // noinspection JSUnresolvedVariable
+                typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
+                options[name] = []
+                options[name].push('https://' + url)
+                const types = {/*cookies: true, appcache: true, cache: true, cacheStorage: true,*/ fileSystems: true, indexedDB: true, localStorage: true, serviceWorkers: true, webSQL: true}
+                await new Promise(resolve => {
+                    // noinspection JSCheckFunctionSignatures
+                    chrome.browsingData.remove(options, types, resolve)
+                })
+                //Что бы chrome.benchmarking работал нужно браузер запустить такой командной: chrome.exe --enable-benchmarking --enable-net-benchmarking
+                // if (chrome.benchmarking) {
+                //     await chrome.benchmarking.closeConnections()
+                //     await chrome.benchmarking.clearCache()
+                //     await chrome.benchmarking.clearHostResolverCache()
+                //     await chrome.benchmarking.clearPredictorCache()
+                // }
+                // if (chrome.privacy) await new Promise(resolve => chrome.privacy.network.webRTCIPHandlingPolicy.set({value: "disable_non_proxied_udp"}, resolve))
             }
         }
 
@@ -2113,9 +2123,8 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
             if (details.challenger.host !== currentProxy.ip) {
                 const proxy = await db.getFromIndex('proxies', 'ip, port', [details.challenger.host, details.challenger.port])
                 if (proxy) {
-                    const authCredentials = await getCredentialsProxy(proxy)
+                    const authCredentials = await getCredentialsProxy(proxy, true)
                     if (authCredentials.username && authCredentials.password) {
-                        console.log(chrome.i18n.getMessage('proxyAuth') + ' (PacScript)')
                         callbackFn({authCredentials})
                         return
                     }
@@ -2148,10 +2157,10 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
     callbackFn()
 }, {urls: ['<all_urls>']}, ['asyncBlocking'])
 
-async function getCredentialsProxy(proxy) {
+async function getCredentialsProxy(proxy, pacScript) {
     let authCredentials = {}
     if (proxy.login) {
-        console.log(chrome.i18n.getMessage('proxyAuth'))
+        console.log(chrome.i18n.getMessage('proxyAuth') + pacScript ? ' (PacScript)' : '')
         authCredentials = {
             'username': proxy.login,
             'password': proxy.password
