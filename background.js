@@ -1463,7 +1463,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 })
 
 //Завершает голосование, если есть ошибка то обрабатывает её
-let endTimeOut
 async function endVote(request, sender, project) {
     if (sender && openedProjects.has(sender.tab.id)) {
         //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
@@ -1517,7 +1516,7 @@ async function endVote(request, sender, project) {
             }
         } else if (request.later && Number.isInteger(request.later)) {
             time = new Date(request.later)
-            if (project.rating === 'ServeurPrive' || project.rating === 'TopGames') {
+            if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom') {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
                     time = new Date()
@@ -1561,7 +1560,7 @@ async function endVote(request, sender, project) {
                     time.setHours(0, (project.priority ? 0 : 10), 0, 0)
                     project.countVote = 0
                 } else {
-                    if (project.rating === 'ServeurProve') {
+                    if (project.rating === 'ServeurPrive') {
                         time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30)
                     } else if (project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMinecraftCom') {
                         time.setUTCHours(time.getUTCHours() + 3)
@@ -1886,8 +1885,7 @@ async function endVote(request, sender, project) {
     // if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) /*&& (settings.useProxyOnUnProxyTop || (project.rating !== 'TopCraft' && project.rating !== 'McTOP' && project.rating !== 'MinecraftRating'))*/) {
     //     removeQueue()
     // } else {
-    clearTimeout(endTimeOut)
-    endTimeOut = setTimeout(()=>{
+    setTimeout(()=>{
         removeQueue()
     }, settings.timeout)
     // }
