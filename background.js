@@ -177,7 +177,6 @@ async function newWindow(project) {
     while (result.length < promises.length) {
         result = await Promise.all(promises)
     }
-    promises = []
 
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
@@ -995,6 +994,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 })
 
 //Завершает голосование, если есть ошибка то обрабатывает её
+let endTimeOut
 async function endVote(request, sender, project) {
     if (sender && openedProjects.has(sender.tab.id)) {
         //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
@@ -1225,9 +1225,11 @@ async function endVote(request, sender, project) {
                 queueProjects.delete(value)
             }
         }
+        promises = []
         checkVote()
     }
-    setTimeout(()=>{
+    clearTimeout(endTimeOut)
+    endTimeOut = setTimeout(()=>{
         removeQueue()
     }, settings.timeout)
 }
