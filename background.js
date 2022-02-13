@@ -994,7 +994,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 })
 
 //Завершает голосование, если есть ошибка то обрабатывает её
-let endTimeOut
 async function endVote(request, sender, project) {
     if (sender && openedProjects.has(sender.tab.id)) {
         //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
@@ -1228,8 +1227,7 @@ async function endVote(request, sender, project) {
         if (queueProjects.size === 0) promises = []
         checkVote()
     }
-    clearTimeout(endTimeOut)
-    endTimeOut = setTimeout(()=>{
+    setTimeout(()=>{
         removeQueue()
     }, settings.timeout)
 }
