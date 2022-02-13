@@ -843,7 +843,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://servers-minecraft.net/' + project.id
             case 'projectName':
-                return doc.querySelector('table.info th').textContent.trim()
+                return doc.querySelector('div.text-xl').textContent
             case 'exampleURL':
                 return ['https://servers-minecraft.net/', 'server-complex-gaming.58', '/vote']
             case 'URL':
