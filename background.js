@@ -1878,7 +1878,7 @@ async function endVote(request, sender, project) {
                 queueProjects.delete(value)
             }
         }
-        promises = []
+        if (queueProjects.size === 0) promises = []
         // setTimeout(()=>{
         checkVote()
         // }, settings.timeout)
