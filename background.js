@@ -2066,11 +2066,19 @@ function extractHostname(url) {
 
 async function stopVote(dontStart, user) {
     if (user) {
-        console.log(chrome.i18n.getMessage('voteSuspended'))
+        console.log(chrome.i18n.getMessage('voteSuspending'))
     } else if (debug) {
         console.log('Отмена всех голосований и очистка всего')
     }
     _break = true
+    if (!check) {
+        await new Promise(resolve => {
+            const timer = setInterval(()=> {
+                clearInterval(timer)
+                if (check) resolve()
+            }, 1000)
+        })
+    }
     currentVK = null
     queueProjects.clear()
     for (let[key/*,value*/] of openedProjects.entries()) {

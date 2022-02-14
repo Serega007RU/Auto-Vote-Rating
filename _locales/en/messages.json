@@ -793,11 +793,14 @@
   "stopVote": {
     "message": "On/Off"
   },
+  "voteSuspending": {
+    "message": "Остановка голосования..."
+  },
   "voteSuspended": {
     "message": "Auto-voting stopped"
   },
   "voteSuspendedDay": {
-    "message": "Voting suspended for 6 hours"
+    "message": "Auto-voting stopped for 6 hours"
   },
   "voteResumed": {
     "message": "Auto-voting resumed"

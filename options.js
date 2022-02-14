@@ -303,17 +303,19 @@ async function stopVote(stop) {
     if (settings.stopVote > Date.now() && !stop) {
         settings.stopVote = 0
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+        await db.put('other', settings, 'settings')
         chrome.extension.getBackgroundPage().checkVote()
         document.querySelector('#stopVote img').src = 'images/icons/start.svg'
         createNotif(chrome.i18n.getMessage('voteResumed'), 'success', 5000)
     }  else if (settings.stopVote < Date.now()) {
+        createNotif(chrome.i18n.getMessage('voteSuspending'))
         settings.stopVote = Number.POSITIVE_INFINITY
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+        await db.put('other', settings, 'settings')
         document.querySelector('#stopVote img').src = 'images/icons/stop.svg'
         if (chrome.extension.getBackgroundPage()) await chrome.extension.getBackgroundPage().stopVote(true, true)
         createNotif(chrome.i18n.getMessage('voteSuspended'), 'error', 5000)
     }
-    await db.put('other', settings, 'settings')
 }
 
 //Добавить проект в список проекта
