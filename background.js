@@ -502,6 +502,11 @@ async function checkOpen(project, transaction) {
                 options[name] = []
                 options[name].push('https://' + url)
                 const types = {/*cookies: true, appcache: true, cache: true, cacheStorage: true,*/ fileSystems: true, indexedDB: true, localStorage: true, serviceWorkers: true, webSQL: true}
+                if (project.rating === 'TMonitoring') {
+                    types.appcache = true
+                    types.cache = true
+                    types.cacheStorage = true
+                }
                 await new Promise(resolve => {
                     // noinspection JSCheckFunctionSignatures
                     chrome.browsingData.remove(options, types, resolve)
