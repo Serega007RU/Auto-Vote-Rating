@@ -2149,7 +2149,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
 async function getCredentialsProxy(proxy, pacScript) {
     let authCredentials = {}
     if (proxy.login) {
-        console.log(chrome.i18n.getMessage('proxyAuth') + pacScript ? ' (PacScript)' : '')
+        console.log(chrome.i18n.getMessage('proxyAuth') + (pacScript ? ' (PacScript)' : ''))
         authCredentials = {
             'username': proxy.login,
             'password': proxy.password
