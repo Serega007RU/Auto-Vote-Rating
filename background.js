@@ -1753,7 +1753,8 @@ async function endVote(request, sender, project) {
                 } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP') && request.message && request.message.includes('Григори') && request.message.includes('ваш айпи')) {
                     currentProxy.notWorking = request.message
                     await updateValue('proxies', currentProxy)
-                    await stopVote(true)
+                    nextLoop = true
+                    // await stopVote(true)
                 }
             } else if (project.rating === 'MCRate' && request.errorVote && request.errorVote[0] === '500') {
                 currentProxy.notWorking = request.message
