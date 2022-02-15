@@ -501,11 +501,13 @@ async function checkOpen(project, transaction) {
                 typeof InstallTrigger === 'undefined' ? name = 'origins' : name = 'hostnames'
                 options[name] = []
                 options[name].push('https://' + url)
+                //appcache и cache не применим с origins
                 const types = {/*cookies: true, appcache: true, cache: true, cacheStorage: true,*/ fileSystems: true, indexedDB: true, localStorage: true, serviceWorkers: true, webSQL: true}
                 if (project.rating === 'TMonitoring') {
-                    types.appcache = true
-                    types.cache = true
-                    types.cacheStorage = true
+                    await new Promise(resolve => {
+                        // noinspection JSCheckFunctionSignatures
+                        chrome.browsingData.remove({}, {cache: true}, resolve)
+                    })
                 }
                 await new Promise(resolve => {
                     // noinspection JSCheckFunctionSignatures
