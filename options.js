@@ -3099,7 +3099,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (event.target.files.length === 0) return
-        const file = event.target.files[0]
+        const [file] = event.target.files
         const data = await new Response(file).json()
 
         const projects = data.projects
@@ -3154,7 +3154,6 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
 
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
     } catch (e) {
-        console.error(e)
         createNotif(e, 'error')
     } finally {
         document.getElementById('file-upload').value = ''
@@ -4107,7 +4106,8 @@ function resetModalProgress(withoutCancel) {
 let fastNotif = false
 async function createNotif(message, type, delay, element) {
     if (!type) type = 'hint'
-    console.log('['+type+']', message)
+    if (type === 'error') console.error('['+type+']', message)
+    else console.log('['+type+']', message)
     if (element != null) {
         element.textContent = ''
         if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
