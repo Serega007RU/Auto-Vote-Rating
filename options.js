@@ -1634,7 +1634,6 @@ document.getElementById('importProxy').addEventListener('change', async (event) 
         reloadProxiesList()
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
     } catch (e) {
-        console.error(e)
         createNotif(e, 'error')
     }
     document.getElementById('importProxy').value = ''
@@ -1785,7 +1784,6 @@ document.getElementById('importWindscribe').addEventListener('click', async even
             reloadProxiesList()
         } catch (e) {
             createNotif(e, 'error')
-            console.error(e)
             event.target.classList.remove('disabled')
             return
         }
@@ -1839,7 +1837,6 @@ document.getElementById('importHolaVPN').addEventListener('click', async event =
         reloadProxiesList()
     } catch (e) {
         createNotif(e, 'error')
-        console.error(e)
         event.target.classList.remove('disabled')
         return
     }
@@ -1988,7 +1985,6 @@ document.getElementById('importSurfShark').addEventListener('click', async event
         reloadProxiesList()
     } catch (e) {
         createNotif(e, 'error')
-        console.error(e)
         event.target.classList.remove('disabled')
         return
     }
@@ -2026,7 +2022,6 @@ document.getElementById('importNordVPN').addEventListener('click', async event =
         reloadProxiesList()
     } catch (e) {
         createNotif(e, 'error')
-        console.error(e)
         event.target.classList.remove('disabled')
         return
     }
