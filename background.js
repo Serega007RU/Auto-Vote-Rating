@@ -1439,6 +1439,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                             })
                         } else {
                             sendResponse('none')
+                            resolve()
                         }
                     }))
                 })
@@ -1898,7 +1899,10 @@ async function endVote(request, sender, project) {
                 queueProjects.delete(value)
             }
         }
-        if (queueProjects.size === 0) promises = []
+        if (queueProjects.size === 0) {
+            promises = []
+            promisesProxy = []
+        }
         // setTimeout(()=>{
         checkVote()
         // }, settings.timeout)
