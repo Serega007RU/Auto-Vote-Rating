@@ -1067,7 +1067,6 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
 
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
     } catch (e) {
-        console.error(e)
         createNotif(e, 'error')
     } finally {
         document.getElementById('file-upload').value = ''
@@ -1925,7 +1924,8 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
 //notifications
 async function createNotif(message, type, delay, element) {
     if (!type) type = 'hint'
-    console.log('['+type+']', message)
+    if (type === 'error') console.error('['+type+']', message)
+    else console.log('['+type+']', message)
     if (element != null) {
         element.textContent = ''
         if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
