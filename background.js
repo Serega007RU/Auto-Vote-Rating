@@ -83,17 +83,17 @@ async function checkVote() {
         cursor = await cursor.continue()
     }
 
+    check = true
+    _break = false
+
     if (lastErrorNotFound != null) {
         settings.stopVote = Date.now() + 21600000
         console.error(lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
         if (!settings.disabledNotifError) sendNotification(lastErrorNotFound, lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
         await db.put('other', settings, 'settings')
-        await stopVote(true)
+        stopVote(true)
         chrome.runtime.sendMessage({stopVote: lastErrorNotFound})
     }
-
-    check = true
-    _break = false
 }
 
 //Триггер на голосование когда подходит время голосования
@@ -313,7 +313,7 @@ async function checkOpen(project, transaction) {
                             sendNotification(chrome.i18n.getMessage('otherProxy'), chrome.i18n.getMessage('otherProxy'))
                         }
                         await db.put('other', settings, 'settings')
-                        await stopVote(true)
+                        stopVote(true)
                         chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('otherProxy')})
                     }
                 })
@@ -365,7 +365,7 @@ async function checkOpen(project, transaction) {
                         if (!response.ok) {
                             settings.stopVote = Date.now() + 21600000
                             await db.put('other', settings, 'settings')
-                            await stopVote(true)
+                            stopVote(true)
                             if (response.status === 401) {
                                 console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
                                 chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2')})
@@ -2123,7 +2123,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxy2'))
             }
             await updateValue('proxies', currentProxy)
-            await stopVote()
+            stopVote()
             callbackFn()
             return
         }
@@ -2150,7 +2150,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyTB'))
             }
             await db.put('other', settings, 'settings')
-            await stopVote(true)
+            stopVote(true)
             chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('errorAuthProxyTB')})
         } else {
             currentProxy.notWorking = chrome.i18n.getMessage('errorAuthProxy1') + ' ' + chrome.i18n.getMessage('errorAuthProxyNoPassword')
@@ -2159,7 +2159,7 @@ chrome.webRequest.onAuthRequired.addListener(async function(details, callbackFn)
                 sendNotification(chrome.i18n.getMessage('errorAuthProxy1'), chrome.i18n.getMessage('errorAuthProxyNoPassword'))
             }
             await updateValue('proxies', currentProxy)
-            await stopVote()
+            stopVote()
         }
     }
     callbackFn()
