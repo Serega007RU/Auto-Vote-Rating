@@ -2787,8 +2787,14 @@ async function addProject(project, element) {
 
     let countNicks = 0
     if (document.getElementById('importNicks').checked) {
-        const file = document.getElementById('importNicksFile').files[0]
-        const data = await new Response(file).text()
+        let data
+        try {
+            const [file] = document.getElementById('importNicksFile').files
+            data = await file.text()
+        } catch (e) {
+            createNotif(e, 'error')
+            return
+        }
         const tx = db.transaction('projects', 'readwrite')
         for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
@@ -2803,7 +2809,9 @@ async function addProject(project, element) {
             }
         }
         reloadProjectList()
+        //Что-то тут сомнительное, возможны конфликты
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().reloadAllAlarms()
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkVote()
     } else {
         await addProjectList(project)
     }
