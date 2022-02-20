@@ -2105,7 +2105,11 @@ async function stopVote(dontStart, user) {
     openedProjects.clear()
     fetchProjects.clear()
     await clearProxy()
-    if (!dontStart) checkVote()
+    if (!dontStart) {
+        checkVote()
+    } else if (Number.isFinite(settings.stopVote) && settings.stopVote > Date.now()) {
+        chrome.alarms.create('stopVote', {when: settings.stopVote})
+    }
 }
 
 //Если требуется авторизация для Прокси
