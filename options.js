@@ -1028,7 +1028,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (event.target.files.length === 0) return
-        const file = event.target.files[0]
+        const [file] = event.target.files
         const data = await new Response(file).json()
         
         const projects = data.projects
