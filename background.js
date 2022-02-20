@@ -1763,6 +1763,10 @@ async function endVote(request, sender, project) {
                     await updateValue('proxies', currentProxy)
                     nextLoop = true
                     // await stopVote(true)
+                } else if (project.rating === 'MinecraftServerList' && request.message && request.message.includes('cannot verify your vote due to a low browser score')) {
+                    currentProxy.notWorking = request.message
+                    await updateValue('proxies', currentProxy)
+                    nextLoop = true
                 }
             } else if (project.rating === 'MCRate' && request.errorVote && request.errorVote[0] === '500') {
                 currentProxy.notWorking = request.message
