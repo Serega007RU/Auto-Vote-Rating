@@ -891,8 +891,8 @@ document.getElementById('importVK').addEventListener('change', async (event) => 
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (event.target.files.length === 0) return
-        const file = event.target.files[0]
-        const data = await new Response(file).text()
+        const [file] = event.target.files
+        const data = await file.text()
         fastNotif = true
         for (let VKString of data.split(/\n/g)) {
             VKString = VKString.replace(/(?:\r\n|\r|\n)/g, '')
@@ -913,7 +913,7 @@ document.getElementById('importSettingsVK').addEventListener('change', async (ev
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (event.target.files.length === 0) return
-        const file = event.target.files[0]
+        const [file] = event.target.files
         const data = await new Response(file).json()
         let count = 0
         const tx = db.transaction('vks', 'readwrite')
@@ -945,8 +945,8 @@ document.getElementById('importBorealis').addEventListener('change', async (even
     if (event.target.files.length === 0) return
     createNotif(chrome.i18n.getMessage('importing'))
     try {
-        const file = event.target.files[0]
-        const data = await new Response(file).text()
+        const [file] = event.target.files
+        const data = await file.text()
         fastNotif = true
         for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
@@ -973,8 +973,8 @@ document.getElementById('importRegBorealis').addEventListener('change', async (e
     if (evt.target.files.length === 0) return
     createNotif(chrome.i18n.getMessage('importing'))
     try {
-        const file = evt.target.files[0]
-        const data = await new Response(file).text()
+        const [file] = evt.target.files
+        const data = await file.text()
         fastNotif = true
         for (let nick of data.split(/\n/g)) {
             nick = nick.replace(/(?:\r\n|\r|\n)/g, '')
@@ -1596,8 +1596,8 @@ document.getElementById('importProxy').addEventListener('change', async (event) 
     createNotif(chrome.i18n.getMessage('importing'))
     try {
         if (event.target.files.length === 0) return
-        let file = event.target.files[0]
-        const data = await new Response(file).text()
+        let [file] = event.target.files
+        const data = await file.text()
         const tx = db.transaction('proxies', 'readwrite')
         for (let proxyString of data.split(/\n/g)) {
             proxyString = proxyString.replace(/(?:\r\n|\r|\n)/g, '')
