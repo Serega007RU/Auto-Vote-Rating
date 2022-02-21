@@ -1255,7 +1255,7 @@ function getProjectPrefix(project, detailed) {
 //Проверяет правильное ли у вас время
 async function checkTime() {
     try {
-        let response = await fetch('https://api.cifrazia.com/')
+        let response = await fetch('https://me-admin.cifrazia.com/')
         if (response.ok && !response.redirected) {
             // если HTTP-статус в диапазоне 200-299 и не было переадресаций
             // получаем тело ответа и сравниваем время
