@@ -17,6 +17,8 @@ let online = true
 
 let secondVoteMinecraftIpList = false
 
+let debug = false
+
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
 
@@ -141,10 +143,7 @@ async function checkOpen(project/*, transaction*/) {
         }
     }
 
-    console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
-    if (!settings.disabledNotifStart)
-        sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
-
+    if (debug) console.log(getProjectPrefix(project, true) + 'престарт')
 
     if (project.rating === 'MonitoringMinecraft') {
         promises.push(clearMonitoringMinecraftCookies())
@@ -177,6 +176,9 @@ async function newWindow(project) {
     while (result.length < promises.length) {
         result = await Promise.all(promises)
     }
+
+    console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
+    if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
 
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
