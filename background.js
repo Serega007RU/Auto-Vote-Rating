@@ -589,7 +589,7 @@ async function checkOpen(project, transaction) {
         }
     }
 
-    if (debug) console.log(getProjectPrefix(project, true) + 'престарт')
+    /*if (debug)*/ console.log(getProjectPrefix(project, true) + 'престарт')
 
     if (project.rating === 'MonitoringMinecraft') {
         promises.push(clearMonitoringMinecraftCookies())
