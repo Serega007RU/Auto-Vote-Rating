@@ -2028,7 +2028,6 @@ async function clearProxy() {
         await new Promise(resolve => chrome.proxy.settings.set({value: {mode: 'system'}, scope: 'regular'}, resolve))
         await new Promise(resolve => chrome.proxy.settings.clear({scope: 'regular'},resolve))
     }
-    promises = []
 }
 
 async function setProxy(config) {
