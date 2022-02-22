@@ -35,6 +35,7 @@ let tunnelBear = {}
 let check = true
 let _break = false
 let lastErrorNotFound
+let searchAcc = true
 
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
 let closeTabs = true
@@ -85,6 +86,7 @@ async function checkVote() {
 
     check = true
     _break = false
+    searchAcc = true
 
     if (lastErrorNotFound != null) {
         settings.stopVote = Date.now() + 21600000
@@ -211,7 +213,10 @@ async function checkOpen(project, transaction) {
         const needSearchVK = currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')
         const needSearchProxy = currentProxy == null && (settings.useProxyOnUnProxyTop || (!(project.rating === 'MinecraftRating' && project.game === 'projects') && !(project.rating === 'MisterLauncher' && project.game === 'projects')))
 
-        if (needSearchVK || needSearchProxy) console.log(chrome.i18n.getMessage('searchAcc'))
+        if ((needSearchVK || needSearchProxy) && searchAcc) {
+            console.log(chrome.i18n.getMessage('searchAcc'))
+            searchAcc = false
+        }
 
         //Если включён режим MultiVote то применяет куки ВК если на то требуется и применяет прокси (применяет только не юзанный ВК или прокси)
         if (needSearchVK) {
