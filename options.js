@@ -304,6 +304,7 @@ async function stopVote(stop) {
         settings.stopVote = 0
         if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
         await db.put('other', settings, 'settings')
+        chrome.alarms.clear('stopVote')
         chrome.extension.getBackgroundPage().checkVote()
         document.querySelector('#stopVote img').src = 'images/icons/start.svg'
         createNotif(chrome.i18n.getMessage('voteResumed'), 'success', 5000)
