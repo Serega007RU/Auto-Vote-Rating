@@ -79,7 +79,7 @@ async function checkVote() {
     while (cursor) {
         if (_break) break
         const project = cursor.value
-        if (!project.time || project.time < Date.now() && !notFoundAccs[project.rating]?.[project.id] < Date.now()) {
+        if ((!project.time || project.time < Date.now()) && !notFoundAccs[project.rating]?.[project.id] < Date.now()) {
             await checkOpen(project, transaction)
         }
         cursor = await cursor.continue()
