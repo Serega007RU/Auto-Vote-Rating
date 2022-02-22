@@ -526,6 +526,8 @@ async function addVKList(VK) {
         VK.key = await db.add('vks', VK)
         await db.put('vks', VK, VK.key)
 
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().notFoundAccs = {}
+
         const count = Number(document.querySelector('#VKButton > span').textContent)
         document.querySelector('#VKButton > span').textContent = String(count + 1)
     }
@@ -698,6 +700,8 @@ async function addProxyList(proxy) {
     if (!proxy.key) {
         proxy.key = await db.add('proxies', proxy)
         await db.put('proxies', proxy, proxy.key)
+
+        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().notFoundAccs = {}
 
         const count = Number(document.querySelector('#ProxyButton > span').textContent)
         document.querySelector('#ProxyButton > span').textContent = String(count + 1)

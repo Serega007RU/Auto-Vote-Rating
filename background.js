@@ -34,6 +34,7 @@ let tunnelBear = {}
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
 let _break = false
+let notFoundAccs = {}
 let lastErrorNotFound
 let searchAcc = true
 
@@ -78,7 +79,7 @@ async function checkVote() {
     while (cursor) {
         if (_break) break
         const project = cursor.value
-        if (!project.time || project.time < Date.now()) {
+        if (!project.time || project.time < Date.now() && !notFoundAccs[project.rating]?.[project.id] < Date.now()) {
             await checkOpen(project, transaction)
         }
         cursor = await cursor.continue()
@@ -193,7 +194,7 @@ async function checkOpen(project, transaction) {
                 if (project.rating === 'MonitoringMinecraft' && !currentVK.notAuth) _return = false
 //              if (project.rating === 'MinecraftRating' && currentVK['AuthURLMinecraftRating' + project.id] != null) _return = false
 //              if (project.rating === 'MonitoringMinecraft' && currentVK['AuthURLMonitoringMinecraft' + project.id] != null) _return = false
-                if (project.rating === 'MisterLauncher' && project.game === 'projects' && !currentVK.notAuth) _return = falsen
+                if (project.rating === 'MisterLauncher' && project.game === 'projects' && !currentVK.notAuth) _return = false
                 if (_return) return
             }
         }
@@ -294,14 +295,16 @@ async function checkOpen(project, transaction) {
             //Если не удалось найти хотя бы один свободный не заюзанный аккаунт вк
             if (!found) {
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundVK')
-                project.time = Date.now() + 900000
-                project.error = lastErrorNotFound
-                updateValue('projects', project)
+                // project.time = Date.now() + 900000
+                // project.error = lastErrorNotFound
+                // updateValue('projects', project)
                 for (const value of queueProjects) {
                     if (project.key === value.key) {
                         queueProjects.delete(value)
                     }
                 }
+                if (!notFoundAccs[project.rating]) notFoundAccs[project.rating] = {}
+                notFoundAccs[project.rating][project.id] = Date.now() + 900000
                 return
             }
         }
@@ -469,14 +472,16 @@ async function checkOpen(project, transaction) {
             //Если не удалось найти хотя бы одно свободное не заюзанное прокси
             if (!found) {
                 lastErrorNotFound = chrome.i18n.getMessage('notFoundProxy')
-                project.time = Date.now() + 900000
-                project.error = lastErrorNotFound
-                updateValue('projects', project)
+                // project.time = Date.now() + 900000
+                // project.error = lastErrorNotFound
+                // updateValue('projects', project)
                 for (const value of queueProjects) {
                     if (project.key === value.key) {
                         queueProjects.delete(value)
                     }
                 }
+                if (!notFoundAccs[project.rating]) notFoundAccs[project.rating] = {}
+                notFoundAccs[project.rating][project.id] = Date.now() + 900000
                 return
             }
         }
