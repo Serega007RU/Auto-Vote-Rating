@@ -589,11 +589,9 @@ async function checkOpen(project, transaction) {
         }
     }
 
-    console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
-    if (!settings.disabledNotifStart)
-        sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
+    if (debug) console.log(getProjectPrefix(project, true) + 'престарт')
 
-    if (project.rating === 'MonitoringMinecraft' && (!settings.useMultiVote || project.useMultiVote === false)) {
+    if (project.rating === 'MonitoringMinecraft') {
         promises.push(clearMonitoringMinecraftCookies())
         async function clearMonitoringMinecraftCookies() {
             let url
@@ -624,6 +622,9 @@ async function newWindow(project) {
     while (result.length < promises.length) {
         result = await Promise.all(promises)
     }
+
+    console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
+    if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
 
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
@@ -1943,7 +1944,7 @@ function getProjectPrefix(project, detailed) {
 //Проверяет правильное ли у вас время
 async function checkTime() {
     try {
-        let response = await fetch('https://api.cifrazia.com/')
+        let response = await fetch('https://me-admin.cifrazia.com/')
         if (response.ok && !response.redirected) {
             // если HTTP-статус в диапазоне 200-299 и не было переадресаций
             // получаем тело ответа и сравниваем время
