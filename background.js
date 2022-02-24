@@ -599,7 +599,7 @@ async function checkOpen(project, transaction) {
         }
     }
 
-    /*if (debug)*/ console.log(getProjectPrefix(project, true) + 'престарт')
+    if (debug) console.log(getProjectPrefix(project, true) + 'престарт')
 
     if (project.rating === 'MonitoringMinecraft') {
         promises.push(clearMonitoringMinecraftCookies())
@@ -1706,7 +1706,11 @@ async function endVote(request, sender, project) {
             generalStats.laterVotes++
             todayStats.laterVotes++
         }
-        console.log(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
+        if (request.successfully) {
+            console.log(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
+        } else {
+            console.warn(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
+        }
         //Если ошибка
     } else {
         let message
