@@ -286,9 +286,12 @@ async function removeProjectList(project) {
     chrome.alarms.clear(String(project.key))
     
     if (!chrome.extension.getBackgroundPage()) return
+    let nowVoting = false
     for (const value of chrome.extension.getBackgroundPage().queueProjects) {
         if (project.key === value.key) {
             chrome.extension.getBackgroundPage().queueProjects.delete(value)
+            nowVoting = true
+            break
         }
     }
     //Если эта вкладка была уже открыта, он закрывает её
@@ -296,7 +299,12 @@ async function removeProjectList(project) {
         if (project.key === value.key) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
             chrome.tabs.remove(key)
+            break
         }
+    }
+    if (nowVoting) {
+        chrome.extension.getBackgroundPage().checkVote()
+        chrome.extension.getBackgroundPage().console.log(chrome.extension.getBackgroundPage().getProjectPrefix(project, true) + chrome.i18n.getMessage('projectDeleted'))
     }
 }
 

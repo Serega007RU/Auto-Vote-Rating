@@ -938,5 +938,8 @@
         "content": "$1"
       }
     }
+  },
+  "projectDeleted": {
+    "message": "The project was deleted by the user"
   }
 }
