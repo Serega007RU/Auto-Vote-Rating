@@ -27,19 +27,7 @@ async function vote() {
 
         if (button.textContent.includes('Голосовать через ')) {
             const numbers = button.textContent.match(/\d+/g).map(Number)
-            let count = 0
-            let hour = 0
-            let min = 0
-            let sec = 0
-            for (const i in numbers) {
-                if (count === 0) {
-                    hour = numbers[i]
-                } else if (count === 1) {
-                    min = numbers[i]
-                }
-                count++
-            }
-            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+            const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
             const later = Date.now() + milliseconds
             chrome.runtime.sendMessage({later: later})
         } else {
@@ -51,14 +39,15 @@ async function vote() {
 }
 
 const timer = setInterval(()=>{
-    if (document.querySelector('div.MsgBox') != null) {
+    const msg = document.querySelector('div.MsgBox')
+    if (msg != null && msg.innerText.length > 0) {
         clearInterval(timer)
-        const message = document.querySelector('div.MsgBox').innerText
+        const message = msg.innerText
         if (message.includes('уже проголосовали')) {
             chrome.runtime.sendMessage({later: true})
         } else if (message.includes('Голос принят')) {
             chrome.runtime.sendMessage({successfully: true})
-        } else if (message.length > 0) {
+        } else {
             chrome.runtime.sendMessage({message})
         }
     }
