@@ -965,7 +965,7 @@ const allProjects = {
         switch (type) {
             case 'voteURL':
             case 'pageURL':
-                return 'https://serveur-minecraft-vote.fr/serveurs/oneblock-france-farm2win.249' + project.id + '/vote'
+                return 'https://serveur-minecraft-vote.fr/serveurs/' + project.id + '/vote'
             case 'projectName':
                 return doc.querySelector('.server-name').textContent
             case 'exampleURL':
