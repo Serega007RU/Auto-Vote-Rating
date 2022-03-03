@@ -961,6 +961,19 @@ const allProjects = {
                 return 'Serveur-Minecraft.com'
         }
     },
+    ServeurMinecraftVoteFr: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://serveur-minecraft-vote.fr/serveurs/oneblock-france-farm2win.249' + project.id + '/vote'
+            case 'projectName':
+                return doc.querySelector('.server-name').textContent
+            case 'exampleURL':
+                return ['https://serveur-minecraft-vote.fr/serveurs/', 'ectalia.425', '/vote']
+            case 'URL':
+                return 'Serveur-Minecraft-Vote.fr'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
