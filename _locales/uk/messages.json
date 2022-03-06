@@ -252,6 +252,14 @@
   "addSuccess": {
     "message": "Успішно доданий"
   },
+  "addSuccessNicks": {
+    "message": "Успішно доданий $count$ ників",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
   "warnSilentVote": {
     "message": "Звертаємо вашу увагу що $top$ недоступний у режимі тихого голосування",
     "placeholders": {
@@ -562,6 +570,55 @@
   "requiresCaptcha": {
     "message": "Потрібне ручне проходження капчі"
   },
+  "multivote": {
+    "message": "MultiVote"
+  },
+  "VK": {
+    "message": "ВКонтакте"
+  },
+  "proxy": {
+    "message": "Проксі"
+  },
+  "notWork": {
+    "message": "Не працює"
+  },
+  "useMultiVote": {
+    "message": "Використовувати ВК та проксі при голосуванні (включити MultiVote)"
+  },
+  "added": {
+    "message": "Вже доданий"
+  },
+  "notAuthAcc": {
+    "message": "Ви не авторизувались у $acc$",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "type": {
+    "message": "Виберіть тип"
+  },
+  "notFoundVK": {
+    "message": "Немає вільного аккаунта ВКонтакте"
+  },
+  "notFoundProxy": {
+    "message": "Немає вільного проксі"
+  },
+  "importProxy": {
+    "message": "Імпорт"
+  },
+  "checkSchemeProxy": {
+    "message": "Визначаємо тип проксі, поточний: $scheme$",
+    "placeholders": {
+      "scheme": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorCheckSchemeProxy": {
+    "message": "Не вдалось визначити тип проксі, можливо даний проксі вмер."
+  },
   "authSteam": {
     "message": "Steam login required"
   },
@@ -570,6 +627,77 @@
   },
   "privacyPass2": {
     "message": " щоб при першому проходженні капчі получити 5 безкоштовних прохождень капч для hCaptcha"
+  },
+  "deleteAllProxies": {
+    "message": "Видалити всі проксі"
+  },
+  "deleteNotWorking": {
+    "message": "Видалити неробочі проксі"
+  },
+  "clearCookies": {
+    "message": "Видалити кукі"
+  },
+  "deletingAllProxies": {
+    "message": "Видаляю всі додані проксі..."
+  },
+  "deletedAllProxies": {
+    "message": "Всі проксі успішно видалені!"
+  },
+  "deletingNotWorkingProxies": {
+    "message": "Видалені неробочі проксі..."
+  },
+  "deletedNotWorkingProxies": {
+    "message": "Всі неробочі проксі успішно видалені!"
+  },
+  "deletingAllAcc": {
+    "message": "Видаляю всі кукі та вкладки $acc$...",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "deletedAllAcc": {
+    "message": "Всі кукі та вкладки $acc$ успішно видалені!",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "importTunnelBear": {
+    "message": "Імпорт проксі з TunnelBear"
+  },
+  "importWindscribe": {
+    "message": "Імпорт проксі з Windscribe"
+  },
+  "importHolaVPN": {
+    "message": "Імпорт проксі з HolaVPN"
+  },
+  "importZenMate": {
+    "message": "Імпорт проксі з ZenMate"
+  },
+  "importNordVPN": {
+    "message": "Імпорт проксі з NordVPN"
+  },
+  "importSurfShark": {
+    "message": "Імпорт проксі з SurfShark"
+  },
+  "importVPNStart": {
+    "message": "Починаю імпорт з $vpn$",
+    "placeholders": {
+      "vpn": {
+        "content": "$1"
+      }
+    }
+  },
+  "importVPNEnd": {
+    "message": "Імпорт з $vpn$ успішно завершений",
+    "placeholders": {
+      "vpn": {
+        "content": "$1"
+      }
+    }
   },
   "privacyPass3": {
     "message": "Або зареєструйтесь на "
@@ -604,6 +732,12 @@
   "timeout": {
     "message": "Час очікування голосування закінчився, перезапускаю голосування"
   },
+  "repeatAttemptLater": {
+    "message": "Ігноруровати помилку 'Ви вже голосували' не менше"
+  },
+  "least": {
+    "message": "раз"
+  },
   "chooseLang": {
     "message": "Виберіть мову/регіон"
   },
@@ -615,6 +749,21 @@
   },
   "idGame": {
     "message": "ID ігри"
+  },
+  "stopVote": {
+    "message": "Вкл/Викл"
+  },
+  "voteSuspending": {
+    "message": "Зупинка голосування..."
+  },
+  "voteSuspended": {
+    "message": "Авто-голосування зупинено"
+  },
+  "voteSuspendedDay": {
+    "message": "Авто-голосування зупинено на 6 годин"
+  },
+  "voteResumed": {
+    "message": "Авто-голосування відновлено"
   },
   "urlGame": {
     "message": "URL ігри"
@@ -675,6 +824,36 @@
   "chooseHour": {
     "message": "Задайте годину"
   },
+  "ip": {
+    "message": "IP"
+  },
+  "port": {
+    "message": "Порт"
+  },
+  "login": {
+    "message": "Логін"
+  },
+  "password": {
+    "message": "Пароль"
+  },
+  "ipLabel": {
+    "message": "Вкажіть адреу"
+  },
+  "portLabel": {
+    "message": "Вкажіть порт"
+  },
+  "loginLabel": {
+    "message": "Логін проксі (необов'язково)"
+  },
+  "passwordLabel": {
+    "message": "Пароль проксі (необов'язково)"
+  },
+  "typeLabel": {
+    "message": "Виберіть протокол"
+  },
+  "chooseMinute": {
+    "message": "Задайте час"
+  },
   "advSettings": {
     "message": "Додаткові параметри:"
   },
@@ -689,6 +868,23 @@
   },
   "lastDayMonth2": {
     "message": "в останній день місяця"
+  },
+  "openPopupAcc": {
+    "message": "Відкриваю вікно авторизації $acc$. Після авторизації, закрийте вікно авторизації",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "notAuthVKTop": {
+    "message": "Даний аккаунт ВКонтакте не авторизований в наступних рейтингах: "
+  },
+  "authOK": {
+    "message": "Все гаразд з авторизацією, аккаунт був доданий"
+  },
+  "notAcceptAuth": {
+    "message": "натисність щоб авторизуватися. Якщо ви не збираєтесь голосувати в перерахованих рейтингах тоді просто проігноруйте дане повідомлення"
   },
   "scheduleTime": {
     "message": "Запланувати голосування"
@@ -759,6 +955,74 @@
   "settingsSyncCopyLocalSuccess": {
     "message": "Налаштування були успішно скопійовані у локальне сховище"
   },
+  "deletingCookies": {
+    "message": "Видаляю кукі: $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "applyVKCookies": {
+    "message": "Застосовую кукі ВК: $vk$",
+    "placeholders": {
+      "vk": {
+        "content": "$1"
+      }
+    }
+  },
+  "applyProxy": {
+    "message": "Застосовую проксі: $proxy$",
+    "placeholders": {
+      "proxy": {
+        "content": "$1"
+      }
+    }
+  },
+  "proxyTBTokenExpired": {
+    "message": "Токен TunnelBear є null чи закінчився його термін дії, намагаюсь знайти новий..."
+  },
+  "proxyTBAuth1": {
+    "message": "Необхідна авторизація з TunnelBear"
+  },
+  "proxyTBAuth2": {
+    "message": "Авторизуйтесь по наступному посиланні: https://www.tunnelbear.com/account/login Голосування зупинено на 6 годин"
+  },
+  "alreadyVotedRepeat": {
+    "message": "Ви вже голосували, йдемо на повторну спробу з іншим проксі..."
+  },
+  "alreadyVotedFail": {
+    "message": "Всі спроби минули, Ви вже голосували, скоріш за все хтось з даного нікнейма вже проголосував"
+  },
+  "closeTabError": {
+    "message": "Помилка закриття вкладки"
+  },
+  "errorAuthProxy1": {
+    "message": "Помилка авторизації проксі!"
+  },
+  "errorAuthProxy2": {
+    "message": "Перевищено максимальну кілістьть спроб авторизації, скоріш за все логін чи пароль неправильні"
+  },
+  "proxyAuth": {
+    "message": "Проксі вимагає авторизацію, авторизовуюсь..."
+  },
+  "proxyAuthOther": {
+    "message": "Проксі $proxy$ вимагає авторизацию, авторизовуюсь...",
+    "placeholders": {
+      "proxy": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorAuthProxyTB": {
+    "message": "Токен TunnelBear є null або закінчився його термін дії, нічим авторизуватися в проксі! Голосування зупинено на 6 годин"
+  },
+  "errorAuthProxyNoPassword": {
+    "message": "Даний проксі вимагає авторизацію по логіну та паролю але ви його не задали в проксі"
+  },
+  "loginTB": {
+    "message": "Щоб зробити імпорт проксі з TunnelBear необхідна авторизація, "
+  },
   "errorAttemptVote": {
     "message": "Перевищено максимальну кількість спроб голосування, $error$",
     "placeholders": {
@@ -767,11 +1031,85 @@
       }
     }
   },
+  "proxyBlackList": {
+    "message": "Чорний список сайтів для проксі"
+  },
+  "proxyPacScript": {
+    "message": "PacScript проксі"
+  },
+  "proxyBLSet": {
+    "message": "Чорний список сайтів проксі оновлено"
+  },
+  "pattern": {
+    "message": "Шаблон: "
+  },
+  "otherProxy": {
+    "message": "Якесь інше розширення на VPN/proxy мішає нам, відключіть ці розширення і тоді ми зможемо керувати проксі. Голосування зупинено на 6 годин"
+  },
+  "oauthVK": {
+    "message": "Додаток $rating$ запитує доступ до вашого аккаунту.",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
   "notFast": {
     "message": "Не так швидко, дочейкайся виконання функції"
   },
+  "updateAvailbe": {
+    "message": "Доступно оновлення $version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "update": {
+    "message": "Оновити"
+  },
   "voteMode": {
     "message": "Виставити примусово режим голосування"
+  },
+  "multivoteMode": {
+    "message": "Виставити примусово режим MultiVote"
+  },
+  "enableMultiVoteMode": {
+    "message": "Режим MultiVote"
+  },
+  "enabledMultiVoteModeTooltip": {
+    "message": "Виставляє режим MultiVote окремо для доданого проекта, ігнорує залальні налаштування переключення MultiVote"
+  },
+  "withMultiVote": {
+    "message": "З MultiVote"
+  },
+  "withoutMultiVote": {
+    "message": "Без MultiVote"
+  },
+  "updated": {
+    "message": "Розширення успішно оновлено до версії $version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "useProxyOnUnProxyTop": {
+    "message": "Використовувати проксі в рейтингах де не використовується проксі (MinecraftRating и MisterLauncher)"
+  },
+  "reAddSuccess": {
+    "message": "Успішно передоданий"
+  },
+  "confirmDeleteAcc": {
+    "message": "Всі кукі та вкладки $acc$ будуть видалені, ви згодні?",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "tempNick": {
+    "message": "Тимчасовий нік"
   },
   "start": {
     "message": "Запуск розширення, v$version$",
@@ -783,6 +1121,41 @@
   },
   "suspended": {
     "message": "Розширення зупинено"
+  },
+  "updating": {
+    "message": "Оновлення розширення"
+  },
+  "reloadExtension": {
+    "message": "Перезапустити розширення"
+  },
+  "update1": {
+    "message": "Через обмеження API Chrome ми не можемо визначити в якій папці у вас встановлено розширення, вкажите в яку папку ви встановили розширення та в подальшому давайте доступ до вказанної папки"
+  },
+  "update2": {
+    "message": "Перевіряєм чи правильно ви вказали розположення папки"
+  },
+  "update3": {
+    "message": "В цій папці це розширення не встановлено, вкажите ту папку яку вказували при установці цього розширення ($error$)",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "update4": {
+    "message": "Скачуємо резервну копію налаштувань розширення на випадок якщо оновлення не вдасться"
+  },
+  "update5": {
+    "message": "Видаляємо всі файли та папки розширення для наступного оновлення"
+  },
+  "update6": {
+    "message": "Звертаємося до git за списком нових файлів"
+  },
+  "dowloading": {
+    "message": "Скачуємо "
+  },
+  "update8": {
+    "message": "Розширення успішно оновлено, перезапустіть розширення щоб зміни набули чинності"
   },
   "errordb": {
     "message": "Помилка з базою даних $db$, $error$",
@@ -815,11 +1188,91 @@
   "clearedLogs": {
     "message": "Логи успішно очищені"
   },
+  "antiBanVK": {
+    "message": "Реєструйте аккаунт на TopCraft и McTOP"
+  },
+  "antiBanVKTooltip": {
+    "message": "Ставить пароль на аккаунт на TopCraft и McTOP після авторизації ВК. Після цього при голосуванні на вказаних рейтингах авторизація проходить не через аккаунт ВК а по встановленному паролю що позволяє голосувати навіть тоді коли аккаунт ВК буде в бані. Не видаляйте аккаунт ВК з розширення якщо він буде забанений та якщо ви голосуєте на вказаних рейтингах, розширення буде продовжувати його використовувати"
+  },
+  "antiBanVKStart": {
+    "message": "Починаємо ставити пароль на $rating$",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
+  "antiBanVKEnd": {
+    "message": "Пароль $password$ успішно встановлений на $rating$",
+    "placeholders": {
+      "password": {
+        "content": "$1"
+      },
+      "rating": {
+        "content": "$2"
+      }
+    }
+  },
+  "autoAuthVKStart": {
+    "message": "Автоматично даю доступ до аккаунту $rating$",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
+  "autoAuthVK": {
+    "message": "Автоматично дозволяти доступ до аккаунту ВК рейтингам"
+  },
+  "confirmAutoAuthVK": {
+    "message": "Ви згодні передавати особисту інформацію та адресу електронної пошти від наступних доданих аккаунтів рейтингами? (TopCraft, McTOP, MCRate, MinecraftRating и MonitoringMinecraft)"
+  },
+  "tryManuallyUpdate": {
+    "message": "Якщо помилка повторюється, спробуй оновити розширення власноруч"
+  },
+  "importVKRequred": {
+    "message": "Ви не поставили галочку напротив "
+  },
+  "clearVKCookies": {
+    "message": "Очищати кукі перед авторізациєю"
+  },
+  "saveVKCredentials": {
+    "message": "Зберігати для нотатки логін та пароль від аккаунта"
+  },
+  "confirmSaveVKCredentials": {
+    "message": "Ви дійсно хочете зберігати введений логін та пароль від аккаунта? Ці дані будуть зберігатися в НЕ зашифрованому виді і можуть бути вкрадені сторонньою программою (вірусом чи трояном)"
+  },
+  "importVK": {
+    "message": "Додати по логін:пароль"
+  },
+  "importSettingsVK": {
+    "message": "Додати ВК через експортовані налаштування"
+  },
+  "importingSettingVKEnd": {
+    "message": "Додано $count$ аккаунтів ВК",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "importNicks": {
+    "message": "Імпортировати ніки"
+  },
+  "yourNicks": {
+    "message": "Ваші ніки"
+  },
+  "ChangeLog": {
+    "message": "Що нового"
+  },
   "deleteAll": {
     "message": "Видалити все"
   },
   "deleteAllRating": {
     "message": "Ви дійсно хочете видалити всі додані проекти на цей рейтинг?"
+  },
+  "importRegBorealis": {
+    "message": "Зареєструвати по логін:пароль"
   },
   "conflictSync": {
     "message": "Конфлікт налаштувань"
@@ -879,11 +1332,20 @@
   "here": {
     "message": "тут"
   },
+  "forceUpdate": {
+    "message": "Примусово оновити розширення"
+  },
+  "addBannedVK": {
+    "message": "Додавати аккаунт ВК навіть якщо він забанений"
+  },
   "notRegVK":{
     "message": "Реєстрація даного аккаунта не закінчена (не вказаний номер телефона)"
   },
   "version": {
     "message": "Версія: "
+  },
+  "useProxyPacScript": {
+    "message": "Користувач PacScript проксі"
   },
   "min": {
     "message": "Мінімум"
@@ -892,7 +1354,7 @@
     "message": "Максимум"
   },
   "translated": {
-    "message": "Перевів на Українську: k1ngm7n (Олег) & NeStell"
+    "message": "Перевів на Українську: NeStell"
   },
   "notSupportedGroupTabs": {
     "message": "Здається ваш браузер не підтримує групування вкладок: $error$",
@@ -901,6 +1363,15 @@
         "content": "$1"
       }
     }
+  },
+  "cancel": {
+    "message": "Відміна"
+  },
+  "canceled": {
+    "message": "Відміна користувачем"
+  },
+  "searchAcc": {
+    "message": "Пошук вільного проксі/аккаунта"
   },
   "projectDeleted": {
     "message": "Проект видалено Користувачем"
