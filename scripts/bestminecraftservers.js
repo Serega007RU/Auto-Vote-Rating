@@ -1,4 +1,4 @@
-async function vote(first) {
+async function vote(/*first*/) {
     try {
         if (document.querySelector('div.ui.error.message') != null) {
             if (document.querySelector('div.ui.error.message').textContent.includes('must wait until tomorrow before voting again')) {
@@ -12,8 +12,6 @@ async function vote(first) {
             chrome.runtime.sendMessage({successfully: true})
             return
         }
-
-        if (first) return
 
         const project = await getProject('BestMinecraftServers')
         document.querySelector('#main-content input[name="username"]').value = project.nick

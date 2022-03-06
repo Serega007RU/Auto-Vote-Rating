@@ -1414,5 +1414,8 @@
   },
   "searchAcc": {
     "message": "Search for a free proxy/account"
+  },
+  "projectDeleted": {
+    "message": "The project was deleted by the user"
   }
 }
