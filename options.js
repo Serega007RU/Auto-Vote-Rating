@@ -2612,6 +2612,7 @@ document.getElementById('AddNicksAccBorealis').addEventListener('click', async e
         for (let arr of array) {
             let project = {
                 rating: arr.top,
+                game: 'projects',
                 id: arr.id,
                 name: 'borealis',
                 nick: acc.nick,
