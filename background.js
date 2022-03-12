@@ -1764,7 +1764,7 @@ async function endVote(request, sender, project) {
                 currentVK[project.rating][project.id] = Number.POSITIVE_INFINITY
                 await updateValue('vks', currentVK)
             } else if (currentProxy != null && request) {
-                if (request.errorVoteNetwork && (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT') || request.errorVoteNetwork[0].includes('NS_ERROR_NET_ON_RESPONSE_START'))) {
+                if (request.errorVoteNetwork && (request.errorVoteNetwork[0].includes('PROXY') || request.errorVoteNetwork[0].includes('TUNNEL') || request.errorVoteNetwork[0].includes('TIMED_OUT') || request.errorVoteNetwork[0].includes('ERR_CONNECTION') || request.errorVoteNetwork[0].includes('NS_ERROR_NET_ON_RESPONSE_START'))) {
                     currentProxy.notWorking = request.errorVoteNetwork[0]
                     await updateValue('proxies', currentProxy)
                     await stopVote(true)
