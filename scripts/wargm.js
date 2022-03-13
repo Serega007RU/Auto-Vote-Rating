@@ -1,9 +1,6 @@
 async function vote() {
     try {
-        if (document.querySelector('div.MsgBox') != null) {
-            chrome.runtime.sendMessage({successfully: true})
-            return
-        }
+        if (document.querySelector('div.MsgBox') != null && document.querySelector('div.MsgBox').innerText.length > 0) return
 
         if (document.querySelector('div.ui.error.message') != null) {
             if (document.querySelector('div.ui.error.message').textContent.includes('must wait until tomorrow')) {
@@ -15,8 +12,8 @@ async function vote() {
         }
 
         //Если на странице есть кнопка входа через Steam то жмём её
-        if (document.querySelector('#main a[href="/steam_login"]') != null) {
-            document.querySelector('#main a[href="/steam_login"]').click()
+        if (document.querySelector('div.card-footer a[href="/steam_login"]') != null) {
+            document.querySelector('div.card-footer a[href="/steam_login"]').click()
             return
         }
 
