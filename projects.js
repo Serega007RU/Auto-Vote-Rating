@@ -974,6 +974,19 @@ const allProjects = {
                 return 'Serveur-Minecraft-Vote.fr'
         }
     },
+    MineBrowseCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://minebrowse.com/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('title').textContent.replace(' - Minebrowse Minecraft Server List', '')
+            case 'exampleURL':
+                return ['https://minebrowse.com/server/', '1638', '']
+            case 'URL':
+                return 'MineBrowse.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
