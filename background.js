@@ -513,10 +513,10 @@ async function checkOpen(project, transaction) {
                 options[name].push('https://' + url)
                 //appcache и cache не применим с origins
                 const types = {/*cookies: true, appcache: true, cache: true, cacheStorage: true,*/ fileSystems: true, indexedDB: true, localStorage: true, serviceWorkers: true, webSQL: true}
-                if (project.rating === 'TMonitoring') {
+                if (project.rating === 'TMonitoring' || currentProxy?.TunnelBear || currentProxy?.NordVPN) {
                     await new Promise(resolve => {
                         // noinspection JSCheckFunctionSignatures
-                        chrome.browsingData.remove({}, {cache: true}, resolve)
+                        chrome.browsingData.remove({since: Date.now() - 1000 * 60 * 60 * 24/*last day*/}, {cache: true}, resolve)
                     })
                 }
                 await new Promise(resolve => {
