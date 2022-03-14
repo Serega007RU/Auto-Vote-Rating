@@ -794,7 +794,7 @@
     "message": "On/Off"
   },
   "voteSuspending": {
-    "message": "Остановка голосования..."
+    "message": "Stop voting..."
   },
   "voteSuspended": {
     "message": "Auto-voting stopped"

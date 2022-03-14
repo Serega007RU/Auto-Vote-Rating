@@ -79,7 +79,7 @@ async function checkVote() {
     while (cursor) {
         if (_break) break
         const project = cursor.value
-        if ((!project.time || project.time < Date.now()) && !(notFoundAccs[project.rating]?.[project.id] > Date.now())) {
+        if ((!project.time || project.time < Date.now()) && (lastErrorNotFound == null || !(notFoundAccs[project.rating]?.[project.id] > Date.now()))) {
             await checkOpen(project, transaction)
         }
         cursor = await cursor.continue()
@@ -94,8 +94,8 @@ async function checkVote() {
         console.error(lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
         if (!settings.disabledNotifError) sendNotification(lastErrorNotFound, lastErrorNotFound + ' ' + chrome.i18n.getMessage('voteSuspendedDay'))
         await db.put('other', settings, 'settings')
-        stopVote(true)
         chrome.runtime.sendMessage({stopVote: lastErrorNotFound})
+        stopVote(true)
     }
 }
 
@@ -632,6 +632,8 @@ async function newWindow(project) {
     while (result.length < promises.length) {
         result = await Promise.all(promises)
     }
+
+    if (settings.stopVote > Date.now()) return
 
     console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
     if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
@@ -2123,6 +2125,8 @@ async function stopVote(dontStart, user) {
     openedProjects.clear()
     fetchProjects.clear()
     await clearProxy()
+    lastErrorNotFound = null
+    searchAcc = true
     if (!dontStart) {
         checkVote()
     } else if (Number.isFinite(settings.stopVote) && settings.stopVote > Date.now()) {
