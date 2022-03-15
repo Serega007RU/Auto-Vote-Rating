@@ -34,7 +34,6 @@
 		"webNavigation",
 		"alarms",
 		"unlimitedStorage",
-		"https://*.cifrazia.com/",
 		"https://*.hcaptcha.com/captcha/*",
 		"https://www.google.com/recaptcha/*",
 		"https://www.recaptcha.net/recaptcha/*"

@@ -85,7 +85,7 @@ async function initializeConfig(background, version) {
     if (!background) return
     console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 
-    if (settings && !settings.disabledCheckTime) checkTime()
+    // if (settings && !settings.disabledCheckTime) checkTime()
 
     checkVote()
 }

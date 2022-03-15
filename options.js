@@ -54,7 +54,7 @@ async function restoreOptions() {
     document.getElementById('disabledNotifError').checked = settings.disabledNotifError
     if (!settings.enabledSilentVote) document.getElementById('enabledSilentVote').value = 'disabled'
 //  if (storageArea == 'sync') document.getElementById('enableSyncStorage').checked = true
-    document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
+//     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('timeoutValue').value = settings.timeout
     if (settings.enableCustom) addCustom()
@@ -354,8 +354,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             } else {
                 settings.disabledNotifError = this.checked
             }
-        } else if (this.id === 'disabledCheckTime')
-            settings.disabledCheckTime = this.checked
+        }/* else if (this.id === 'disabledCheckTime')
+            settings.disabledCheckTime = this.checked*/
         else if (this.id === 'disabledCheckInternet')
             settings.disabledCheckInternet = this.checked
         else if (this.id === 'disableCheckProjects') {

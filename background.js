@@ -1161,44 +1161,44 @@ function getProjectPrefix(project, detailed) {
 }
 
 //Проверяет правильное ли у вас время
-async function checkTime() {
-    try {
-        let response = await fetch('https://me-admin.cifrazia.com/')
-        if (response.ok && !response.redirected) {
-            // если HTTP-статус в диапазоне 200-299 и не было переадресаций
-            // получаем тело ответа и сравниваем время
-            let json = await response.json()
-            let serverTimeUTC = Number(json.timestamp.toString().replace('.', '').substring(0, 13))
-            let timeUTC = Date.now()
-            let timeDifference = (timeUTC - serverTimeUTC)
-            if (Math.abs(timeDifference) > 300000) {
-                let text
-                let time
-                let unit
-                if (timeDifference > 0) {
-                    text = chrome.i18n.getMessage('clockHurry')
-                } else {
-                    text = chrome.i18n.getMessage('clockLagging')
-                }
-                if (timeDifference > 3600000 || timeDifference < -3600000) {
-                    time = (Math.abs(timeDifference) / 1000 / 60 / 60).toFixed(1)
-                    unit = chrome.i18n.getMessage('clockHourns')
-                } else {
-                    time = (Math.abs(timeDifference) / 1000 / 60).toFixed(1)
-                    unit = chrome.i18n.getMessage('clockMinutes')
-                }
-                let text2 = chrome.i18n.getMessage('clockInaccurate', [text, time, unit])
-                console.warn(text2)
-                if (!settings.disabledNotifWarn)
-                    sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2)
-            }
-        } else {
-            console.error(chrome.i18n.getMessage('errorClock2', String(response.status)))
-        }
-    } catch (e) {
-        console.error(chrome.i18n.getMessage('errorClock', e))
-    }
-}
+// async function checkTime() {
+//     try {
+//         let response = await fetch('https://me-admin.cifrazia.com/')
+//         if (response.ok && !response.redirected) {
+//             // если HTTP-статус в диапазоне 200-299 и не было переадресаций
+//             // получаем тело ответа и сравниваем время
+//             let json = await response.json()
+//             let serverTimeUTC = Number(json.timestamp.toString().replace('.', '').substring(0, 13))
+//             let timeUTC = Date.now()
+//             let timeDifference = (timeUTC - serverTimeUTC)
+//             if (Math.abs(timeDifference) > 300000) {
+//                 let text
+//                 let time
+//                 let unit
+//                 if (timeDifference > 0) {
+//                     text = chrome.i18n.getMessage('clockHurry')
+//                 } else {
+//                     text = chrome.i18n.getMessage('clockLagging')
+//                 }
+//                 if (timeDifference > 3600000 || timeDifference < -3600000) {
+//                     time = (Math.abs(timeDifference) / 1000 / 60 / 60).toFixed(1)
+//                     unit = chrome.i18n.getMessage('clockHourns')
+//                 } else {
+//                     time = (Math.abs(timeDifference) / 1000 / 60).toFixed(1)
+//                     unit = chrome.i18n.getMessage('clockMinutes')
+//                 }
+//                 let text2 = chrome.i18n.getMessage('clockInaccurate', [text, time, unit])
+//                 console.warn(text2)
+//                 if (!settings.disabledNotifWarn)
+//                     sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2)
+//             }
+//         } else {
+//             console.error(chrome.i18n.getMessage('errorClock2', String(response.status)))
+//         }
+//     } catch (e) {
+//         console.error(chrome.i18n.getMessage('errorClock', e))
+//     }
+// }
 
 async function removeCookie(url, name) {
     return new Promise(resolve=>{
