@@ -1001,6 +1001,20 @@ const allProjects = {
                 return 'MC-Server-List.com'
         }
     },
+    ServerLocatorCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://serverlocator.com/vote/' + project.id
+            case 'pageURL':
+                return 'https://serverlocator.com/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('.content_head h2').textContent
+            case 'exampleURL':
+                return ['https://serverlocator.com/vote/', '440', '']
+            case 'URL':
+                return 'ServerLocator.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
