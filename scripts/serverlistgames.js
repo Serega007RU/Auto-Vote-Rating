@@ -1,18 +1,14 @@
 async function vote(first) {
-    try {
-        if (document.querySelector('#alert_box') != null) {
-            analyseText(document.querySelector('#alert_box').textContent)
-            return
-        }
-
-        if (first) return
-
-        const project = await getProject('ServerListGames')
-        document.querySelector('#username').value = project.nick
-        document.querySelector('button.vote-button').click()
-    } catch (e) {
-        throwError(e)
+    if (document.querySelector('#alert_box') != null) {
+        analyseText(document.querySelector('#alert_box').textContent)
+        return
     }
+
+    if (first) return
+
+    const project = await getProject('ServerListGames')
+    document.querySelector('#username').value = project.nick
+    document.querySelector('button.vote-button').click()
 }
 
 const timer = setInterval(()=>{

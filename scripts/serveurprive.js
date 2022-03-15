@@ -1,20 +1,21 @@
 async function vote(first) {
-    try {
-        if (checkAnswer()) return
-        
-        if (first) return
+    if (checkAnswer()) return
 
-        const project = await getProject('ServeurPrive', true)
-        document.querySelector('#pseudo').value = project.nick
-        document.querySelector('#btnvote').click()
-    } catch (e) {
-        throwError(e)
-    }
+    if (first) return
+
+    const project = await getProject('ServeurPrive', true)
+    document.querySelector('#pseudo').value = project.nick
+    document.querySelector('#btnvote').click()
 }
 
 const timer = setInterval(()=>{
-    if (checkAnswer()) {
+    try {
+        if (checkAnswer()) {
+            clearInterval(timer)
+        }
+    } catch (e) {
         clearInterval(timer)
+        throwError(e)
     }
 }, 1000)
 

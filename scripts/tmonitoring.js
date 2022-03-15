@@ -1,19 +1,15 @@
 async function vote(first) {
-    try {
-        if (first) {
-            document.querySelector('span[data-target="#voteModal"]').click()
-            return
-        }
-        const project = await getProject('TMonitoring')
-        if (document.getElementById("nickname") != null) {
-            document.getElementById("nickname").value = project.nick
-        } else {
-            console.warn('[Auto Vote Rating] Нет поля ввода никнейма')
-        }
-        document.querySelector("#voteModal > div.modal-dialog > div > div.modal-footer.clearfix > div.pull-right > a").click()
-    } catch (e) {
-        throwError(e)
+    if (first) {
+        document.querySelector('span[data-target="#voteModal"]').click()
+        return
     }
+    const project = await getProject('TMonitoring')
+    if (document.getElementById("nickname") != null) {
+        document.getElementById("nickname").value = project.nick
+    } else {
+        console.warn('[Auto Vote Rating] Нет поля ввода никнейма')
+    }
+    document.querySelector("#voteModal > div.modal-dialog > div > div.modal-footer.clearfix > div.pull-right > a").click()
 }
 
 const timer = setInterval(()=>{
@@ -32,7 +28,7 @@ const timer = setInterval(()=>{
             clearInterval(timer)
         }
     } catch (e) {
-        throwError(e)
         clearInterval(timer)
+        throwError(e)
     }
 }, 1000)

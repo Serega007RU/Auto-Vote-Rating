@@ -11,38 +11,34 @@ let content = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 async function vote(first) {
     if (document.URL.includes(chrome.extension.getBackgroundPage().window.location.hostname)) return
     if (first === false) return
-    try {
-        if (document.querySelector('#Content > div.Error') != null) {
-            if (document.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
-                chrome.runtime.sendMessage({message: document.querySelector('#Content > div.Error').textContent})
-                return
-            }
-            if (document.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
-                const numbers = document.querySelector('#Content > div.Error').textContent.substring(document.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
-                const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
-                chrome.runtime.sendMessage({later: Date.now() + (86400000 - milliseconds)})
-                return
-            }
+    if (document.querySelector('#Content > div.Error') != null) {
+        if (document.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
             chrome.runtime.sendMessage({message: document.querySelector('#Content > div.Error').textContent})
             return
         }
-        if (document.querySelector('#Content > div.Good') != null && document.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
-            chrome.runtime.sendMessage({successfully: true})
+        if (document.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
+            const numbers = document.querySelector('#Content > div.Error').textContent.substring(document.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
+            const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
+            chrome.runtime.sendMessage({later: Date.now() + (86400000 - milliseconds)})
             return
         }
-        if (document.getElementById('InnerWrapper').innerText.includes('";'))
-            return
-        if (!await getRecipe(document.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src)) {
-            chrome.runtime.sendMessage({message: 'Could not find the recipe: ' + document.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src})
-            return
-        }
-        await craft(document.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
-        const project = await getProject('MinecraftIpList')
-        document.querySelector('#Content > form > input[type=text]').value = project.nick
-        document.getElementById('votebutton').click()
-    } catch (e) {
-        throwError(e)
+        chrome.runtime.sendMessage({message: document.querySelector('#Content > div.Error').textContent})
+        return
     }
+    if (document.querySelector('#Content > div.Good') != null && document.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
+        chrome.runtime.sendMessage({successfully: true})
+        return
+    }
+    if (document.getElementById('InnerWrapper').innerText.includes('";'))
+        return
+    if (!await getRecipe(document.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src)) {
+        chrome.runtime.sendMessage({message: 'Could not find the recipe: ' + document.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src})
+        return
+    }
+    await craft(document.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
+    const project = await getProject('MinecraftIpList')
+    document.querySelector('#Content > form > input[type=text]').value = project.nick
+    document.getElementById('votebutton').click()
 }
 
 // function recalculate() {

@@ -1,65 +1,61 @@
 async function vote(first) {
-    try {
-        if (document.getElementById('summary') != null) {
-            if (document.getElementById('summary').textContent.includes('Ошибка проверки CSRF')) {
-                //Костыль костыля, перезагружаем страницу в случае возникновения Ошибки проверки CSRF (данная ошибка выскакивает после прохождения проверки CloudFlare)
-                document.location.replace(document.URL)
-                return
-            } else if (document.querySelector('#summary > h1') != null && document.querySelector('#summary > p') != null) {
-                chrome.runtime.sendMessage({message: document.getElementById('summary').textContent})
-                return
-            }
-        }
-
-        if (document.querySelector('#container > h1') != null) {
-            let message = document.querySelector('#container > h1').textContent
-            if (document.querySelector('#container > h1').nextElementSibling != null) {
-                message = message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
-            }
-            chrome.runtime.sendMessage({message})
+    if (document.getElementById('summary') != null) {
+        if (document.getElementById('summary').textContent.includes('Ошибка проверки CSRF')) {
+            //Костыль костыля, перезагружаем страницу в случае возникновения Ошибки проверки CSRF (данная ошибка выскакивает после прохождения проверки CloudFlare)
+            document.location.replace(document.URL)
+            return
+        } else if (document.querySelector('#summary > h1') != null && document.querySelector('#summary > p') != null) {
+            chrome.runtime.sendMessage({message: document.getElementById('summary').textContent})
             return
         }
-        const project = await getProject('McTOP')
-        //Авторизованы ли мы в аккаунте?
-        if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
-            const timerLogin = setInterval(() => {
-                if (document.querySelector('#loginModal').classList.contains('in')) {
-                    document.querySelector('a.modalVkLogin').click()
-                    clearInterval(timerLogin)
+    }
+
+    if (document.querySelector('#container > h1') != null) {
+        let message = document.querySelector('#container > h1').textContent
+        if (document.querySelector('#container > h1').nextElementSibling != null) {
+            message = message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
+        }
+        chrome.runtime.sendMessage({message})
+        return
+    }
+    const project = await getProject('McTOP')
+    //Авторизованы ли мы в аккаунте?
+    if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
+        const timerLogin = setInterval(() => {
+            if (document.querySelector('#loginModal').classList.contains('in')) {
+                document.querySelector('a.modalVkLogin').click()
+                clearInterval(timerLogin)
+            } else {
+                document.querySelector('button[data-type=vote]').click()
+            }
+        }, 1000)
+        return
+    }
+    if (!document.querySelector('#voteModal').classList.contains('in')) {
+        if (document.querySelector('button.openVoteModal') === null) {
+            //Костыль для владельцев проектов если они голосуют за свой же проект
+            let url = new URL(document.URL)
+            if (!url.searchParams.has('voting')) {
+                url.searchParams.append('voting', project.id)
+                document.location.replace(url.toString())
+            }
+        } else {
+            const timerVote = setInterval(() => {
+                if (document.querySelector('#voteModal').classList.contains('in')) {
+                    clearInterval(timerVote)
                 } else {
-                    document.querySelector('button[data-type=vote]').click()
+                    document.querySelector('button.openVoteModal').click()
                 }
             }, 1000)
-            return
         }
-        if (!document.querySelector('#voteModal').classList.contains('in')) {
-            if (document.querySelector('button.openVoteModal') === null) {
-                //Костыль для владельцев проектов если они голосуют за свой же проект
-                let url = new URL(document.URL)
-                if (!url.searchParams.has('voting')) {
-                    url.searchParams.append('voting', project.id)
-                    document.location.replace(url.toString())
-                }
-            } else {
-                const timerVote = setInterval(() => {
-                    if (document.querySelector('#voteModal').classList.contains('in')) {
-                        clearInterval(timerVote)
-                    } else {
-                        document.querySelector('button.openVoteModal').click()
-                    }
-                }, 1000)
-            }
-        }
-        if (first) return
-
-        //Вводит никнейм
-        document.querySelector('input[name=nick]').value = project.nick
-        document.querySelector('input[name=nick]').click()
-        //Клик 'Голосовать' в окне голосования
-        document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
-    } catch (e) {
-        throwError(e)
     }
+    if (first) return
+
+    //Вводит никнейм
+    document.querySelector('input[name=nick]').value = project.nick
+    document.querySelector('input[name=nick]').click()
+    //Клик 'Голосовать' в окне голосования
+    document.querySelector('button.btn.btn-info.btn-vote.voteBtn').click()
 }
 
 let fixTimer
@@ -79,8 +75,9 @@ const timer = setInterval(()=>{
             clearTimeout(fixTimer)
         }
     } catch (e) {
-        throwError(e)
         clearInterval(timer)
+        clearTimeout(fixTimer)
+        throwError(e)
     }
 }, 1000)
 

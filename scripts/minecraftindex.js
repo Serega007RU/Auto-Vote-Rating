@@ -1,38 +1,34 @@
 async function vote(first) {
     if (first === false) return
-    try {
-        if (document.querySelector('div.alert.alert-danger.centered') != null) {
-            if (document.querySelector('div.alert.alert-danger.centered').textContent.includes("CAPTCHA")) {
-                //None
-            } else {
-                chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger.centered').textContent})
-                return
-            }
-        }
-        if (document.querySelector('div.alert.alert-error.centered') != null) {
-            if (document.querySelector('div.alert.alert-error.centered').textContent.includes('already voted')) {
-                //Из полученного текста достаёт все цифры в Array List
-                const numbers = document.querySelector('div.alert.alert-error.centered').textContent.match(/\d+/g).map(Number)
-                const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
-                chrome.runtime.sendMessage({later: Date.now() + milliseconds})
-            } else {
-                chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-error.centered').textContent})
-            }
+    if (document.querySelector('div.alert.alert-danger.centered') != null) {
+        if (document.querySelector('div.alert.alert-danger.centered').textContent.includes("CAPTCHA")) {
+            //None
+        } else {
+            chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger.centered').textContent})
             return
         }
-        if (document.querySelector('div.alert.alert-success.centered') != null) {
-            chrome.runtime.sendMessage({successfully: true})
-            return
-        }
-
-        const project = await getProject('MinecraftIndex')
-        triggerFocus(document.querySelector('#ign'))
-        document.getElementById('ign').value = project.nick
-        chrome.runtime.sendMessage({captcha: true})
-//      document.querySelector('#voteform button[type="submit"]').click()
-    } catch (e) {
-        throwError(e)
     }
+    if (document.querySelector('div.alert.alert-error.centered') != null) {
+        if (document.querySelector('div.alert.alert-error.centered').textContent.includes('already voted')) {
+            //Из полученного текста достаёт все цифры в Array List
+            const numbers = document.querySelector('div.alert.alert-error.centered').textContent.match(/\d+/g).map(Number)
+            const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
+            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+        } else {
+            chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-error.centered').textContent})
+        }
+        return
+    }
+    if (document.querySelector('div.alert.alert-success.centered') != null) {
+        chrome.runtime.sendMessage({successfully: true})
+        return
+    }
+
+    const project = await getProject('MinecraftIndex')
+    triggerFocus(document.querySelector('#ign'))
+    document.getElementById('ign').value = project.nick
+    chrome.runtime.sendMessage({captcha: true})
+    // document.querySelector('#voteform button[type="submit"]').click()
 }
 
 function triggerFocus(element) {

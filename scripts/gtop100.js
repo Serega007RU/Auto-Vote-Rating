@@ -1,13 +1,9 @@
 async function vote(first) {
-    try {
-        if (document.querySelector('#captcha-status').textContent) return
+    if (document.querySelector('#captcha-status').textContent) return
 
-        if (first) return
+    if (first) return
 
-        document.querySelector('#votebutton').click()
-    } catch (e) {
-        throwError(e)
-    }
+    document.querySelector('#votebutton').click()
 }
 
 const timer = setInterval(()=>{
@@ -30,7 +26,7 @@ const timer = setInterval(()=>{
             chrome.runtime.sendMessage({successfully: true})
         }
     } catch (e) {
-        throwError(e)
         clearInterval(timer)
+        throwError(e)
     }
 }, 100)
