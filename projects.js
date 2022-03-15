@@ -987,6 +987,20 @@ const allProjects = {
                 return 'MineBrowse.com'
         }
     },
+    MCServerListCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://mc-server-list.com/server/' + project.id +'/vote/'
+            case 'pageURL':
+                return 'https://mc-server-list.com/server/' + project.id + '/'
+            case 'projectName':
+                return doc.querySelector('h2.header').textContent
+            case 'exampleURL':
+                return ['https://mc-server-list.com/server/', '127-Armageddon+Server', '/vote/']
+            case 'URL':
+                return 'MC-Server-List.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
