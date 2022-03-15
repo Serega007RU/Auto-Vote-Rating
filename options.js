@@ -53,7 +53,6 @@ async function restoreOptions() {
     document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
     document.getElementById('disabledNotifError').checked = settings.disabledNotifError
     if (!settings.enabledSilentVote) document.getElementById('enabledSilentVote').value = 'disabled'
-//  if (storageArea == 'sync') document.getElementById('enableSyncStorage').checked = true
 //     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('timeoutValue').value = settings.timeout
@@ -414,37 +413,6 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('scheduleTime').required = false
             }
             _return = true
-//      } else if (this.id == 'enableSyncStorage') {
-//          _return = true
-//          let oldStorageArea = storageArea
-//          if (this.checked) {
-//              if (await getValue('AVMRsettings', 'sync') != null) {
-//                  toggleModal('conflictSync')
-//                  this.checked = false
-//                  event.target.classList.remove('disabled')
-//                  return
-//              }
-//              storageArea = 'sync'
-//              createNotif(chrome.i18n.getMessage('settingsSyncCopy'))
-//          } else {
-//              storageArea = 'local'
-//              createNotif(chrome.i18n.getMessage('settingsSyncCopyLocal'))
-//          }
-//          await setValue('storageArea', storageArea, 'local')
-//          for (const item of Object.keys(allProjects)) {
-//              await setValue('AVMRprojects' + item, window['projects' + item])
-//              await removeValue('AVMRprojects' + item, oldStorageArea)
-//          }
-//          await setValue('AVMRsettings', settings)
-//          await setValue('generalStats', generalStats)
-//          await removeValue('AVMRsettings', oldStorageArea)
-//          await removeValue('generalStats', oldStorageArea)
-            
-//          if (this.checked) {
-//              createNotif(chrome.i18n.getMessage('settingsSyncCopySuccess'), 'success')
-//          } else {
-//              createNotif(chrome.i18n.getMessage('settingsSyncCopyLocalSuccess'), 'success')
-//          }
         } else if (this.id === 'voteMode') {
             if (this.checked) {
                 document.getElementById('label8').removeAttribute('style')
@@ -1464,17 +1432,6 @@ document.getElementById('todayStats').addEventListener('click', async()=> {
     document.querySelector('#statsToday td[data-resource="statsLastSuccessVote"]').nextElementSibling.textContent = todayStats.lastSuccessVote ? new Date(generalStats.lastSuccessVote).toLocaleString().replace(',', '') : 'None'
     document.querySelector('#statsToday td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = todayStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
 })
-
-// document.getElementById('localStorage').addEventListener('click', async ()=>{
-//     toggleModal('conflictSync')
-//     await removeValue('AVMRsettings', 'sync')
-//     document.getElementById('enableSyncStorage').click()
-// })
-// document.getElementById('syncStorage').addEventListener('click', async ()=>{
-//     toggleModal('conflictSync')
-//     await setValue('storageArea', 'sync', 'local')
-//     document.location.reload()
-// })
 
 //Генерация поля ввода ID
 const selectedTop = document.getElementById('project')
