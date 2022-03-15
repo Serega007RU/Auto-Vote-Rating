@@ -8,25 +8,11 @@ async function vote(first) {
             if (document.querySelector('div.alert.alert-error').textContent.includes('Již si hlasoval')) {
                 if (document.querySelector('div.alert.alert-error').textContent.match(/\d+/g)) {
                     const numbers = document.querySelector('div.alert.alert-error').textContent.match(/\d+/g).map(Number)
-                    let count = 0
-                    let hour = 0
-                    let min = 0
-                    let sec = 0
-                    for (const i in numbers) {
-                        if (count === 0) {
-                            hour = numbers[i]
-                        } else if (count === 1) {
-                            min = numbers[i]
-                        } else if (count === 2) {
-                            sec = numbers[i]
-                        }
-                        count++
-                    }
                     let time = new Date()
-                    if (time.getUTCHours() > hour || (time.getUTCHours() === hour && time.getUTCMinutes() >= min) || (time.getUTCHours() === hour && time.getUTCMinutes() === min && time.getUTCMinutes() >= sec)) {
+                    if (time.getUTCHours() > numbers[0] || (time.getUTCHours() === numbers[0] && time.getUTCMinutes() >= numbers[1]) || (time.getUTCHours() === numbers[0] && time.getUTCMinutes() === numbers[1] && time.getUTCMinutes() >= numbers[2])) {
                         time.setUTCDate(time.getUTCDate() + 1)
                     }
-                    time.setUTCHours(hour, min, sec, 0)
+                    time.setUTCHours(numbers[0], numbers[1], numbers[2], 0)
                     chrome.runtime.sendMessage({later: time.getTime()})
                 } else {
                     chrome.runtime.sendMessage({later: true})

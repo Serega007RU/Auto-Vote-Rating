@@ -5,23 +5,6 @@ async function vote(first) {
             return
         }
         if (document.querySelector('div.container div.col-lg-6').textContent.includes('already voted')) {
-//          //Из полученного текста достаёт все цифры в Array List
-//          let numbers = document.querySelector('div.container div.col-lg-6 > div > p:nth-child(3)').textContent.match(/\d+/g).map(Number)
-//          let count = 0
-//          let hour = 0
-//          let min = 0
-//          let sec = 0
-//          for (var i in numbers) {
-//              if (count == 0) {
-//                  hour = numbers[i]
-//              } else if (count == 1) {
-//                  min = numbers[i]
-//              }
-//              count++
-//          }
-//          var milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-//          var later = Date.now() + milliseconds
-//          chrome.runtime.sendMessage({later: later})
             chrome.runtime.sendMessage({later: true})
             return
         }

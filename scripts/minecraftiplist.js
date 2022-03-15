@@ -19,19 +19,7 @@ async function vote(first) {
             }
             if (document.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
                 const numbers = document.querySelector('#Content > div.Error').textContent.substring(document.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
-                let count = 0
-                let hour = 0
-                let min = 0
-                let sec = 0
-                for (let i in numbers) {
-                    if (count === 0) {
-                        hour = numbers[i]
-                    } else if (count === 1) {
-                        min = numbers[i]
-                    }
-                    count++
-                }
-                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
                 chrome.runtime.sendMessage({later: Date.now() + (86400000 - milliseconds)})
                 return
             }

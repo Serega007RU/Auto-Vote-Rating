@@ -28,8 +28,7 @@ function checkAnswer() {
         } else if (document.querySelector('.alert.alert-danger').textContent.includes('Vous avez déjà voté pour ce serveur')) {
             const numbers = document.querySelector('.alert.alert-danger').textContent.match(/\d+/g).map(Number)
             const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
-            const later = Date.now() + milliseconds
-            chrome.runtime.sendMessage({later: later})
+            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         } else {
             chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-danger').textContent})
         }

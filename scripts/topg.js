@@ -18,8 +18,7 @@ async function vote(first) {
                     sec = Number(document.querySelector('.alert.alert-warning').textContent.match(/\d+ sec/g)[0].match(/\d+/g)[0])
                 }
                 const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-                const later = Date.now() + milliseconds
-                chrome.runtime.sendMessage({later: later})
+                chrome.runtime.sendMessage({later: Date.now() + milliseconds})
             } else {
                 chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-warning').textContent.trim()})
             }

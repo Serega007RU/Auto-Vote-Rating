@@ -25,8 +25,7 @@ async function vote() {
         if (button.textContent.includes('ч.')) {
             const numbers = button.textContent.match(/\d+/g).map(Number)
             const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
-            const later = Date.now() + milliseconds
-            chrome.runtime.sendMessage({later: later})
+            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         } else {
             button.click()
         }

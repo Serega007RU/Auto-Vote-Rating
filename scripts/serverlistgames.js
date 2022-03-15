@@ -27,23 +27,8 @@ function analyseText(text) {
         chrome.runtime.sendMessage({successfully: true})
     } else if (text.includes('You can vote again in') && /\d/.test(text)) {
         const numbers = text.match(/\d+/g).map(Number)
-        let count = 0
-        let hour = 0
-        let min = 0
-        let sec = 0
-        for (const i in numbers) {
-            if (count === 0) {
-                hour = numbers[i]
-            } else if (count === 1) {
-                min = numbers[i]
-            } else if (count === 1) {
-                sec = numbers[i]
-            }
-            count++
-        }
-        const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-        const later = Date.now() + milliseconds
-        chrome.runtime.sendMessage({later: later})
+        const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
+        chrome.runtime.sendMessage({later: Date.now() + milliseconds})
     } else {
         chrome.runtime.sendMessage({message: text})
     }

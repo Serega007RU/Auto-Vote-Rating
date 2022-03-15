@@ -3,21 +3,8 @@ async function vote(first) {
         if (document.querySelector('div.alert.alert-danger') != null) {
             if (document.querySelector('div.alert.alert-danger').textContent.includes('Du hast bereits')) {
                 const numbers = document.querySelector('div.alert.alert-danger').childNodes[2].textContent.match(/\d+/g).map(Number)
-                let count = 0
-                let hour = 0
-                let min = 0
-                let sec = 0
-                for (const i in numbers) {
-                    if (count === 0) {
-                        hour = numbers[i]
-                    } else if (count === 1) {
-                        min = numbers[i]
-                    }
-                    count++
-                }
-                const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-                const later = Date.now() + milliseconds
-                chrome.runtime.sendMessage({later: later})
+                const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
+                chrome.runtime.sendMessage({later: Date.now() + milliseconds})
                 return
             }
             chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
