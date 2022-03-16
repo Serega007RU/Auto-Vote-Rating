@@ -74,9 +74,10 @@
 
 ## Install the extension from zip archive
 Here is a short guide how to install an unpacked extension on Google Chrome or Chromium-based browsers
-1. Unzip the archive to any convenient location
-2. Open the "Extensions" page (`chrome://extensions/`) in the browser and turn on the "Developer mode"
+1. [Download](https://gitlab.com/Serega007/auto-vote-rating/-/archive/multivote/auto-vote-rating-multivote.zip) this repository
+2. Unzip the archive to any convenient location
+3. Open the "Extensions" page (`chrome://extensions/`) in the browser and turn on the "Developer mode"
 
 ![](https://i.imgur.com/iQ4DXVu.png)
 
-3. Click on the "Load unpacked" button and select the directory where you unpacked the archive.
+4. Click on the "Load unpacked" button and select the directory where you unpacked the archive.
