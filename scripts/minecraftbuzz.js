@@ -1,14 +1,10 @@
 async function vote(first) {
-    try {
-        if (first) return
+    if (first) return
 
-        const project = await getProject('MinecraftBuzz')
-        document.getElementById('review-check').checked = false
-        document.getElementById('username-input').value = project.nick
-        document.querySelector('#vote button[type="submit"]').click()
-    } catch (e) {
-        throwError(e)
-    }
+    const project = await getProject('MinecraftBuzz')
+    document.getElementById('review-check').checked = false
+    document.getElementById('username-input').value = project.nick
+    document.querySelector('#vote button[type="submit"]').click()
 }
 
 const timer = setInterval(()=>{
@@ -24,7 +20,7 @@ const timer = setInterval(()=>{
             clearInterval(timer)
         }
     } catch (e) {
-        throwError(e)
         clearInterval(timer)
+        throwError(e)
     }
 }, 1000)

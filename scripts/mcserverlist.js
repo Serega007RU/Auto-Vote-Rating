@@ -24,7 +24,7 @@ const timer = setInterval(()=>{
             chrome.runtime.sendMessage({successfully: true})
         }
     } catch (e) {
-        throwError(e)
         clearInterval(timer)
+        throwError(e)
     }
 }, 1000)

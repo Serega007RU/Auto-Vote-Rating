@@ -1,20 +1,21 @@
 async function vote(first) {
-    try {
-        if (checkAnswer()) return
-        
-        if (first) return
+    if (checkAnswer()) return
 
-        const project = await getProject('ServeurPrive', true)
-        document.querySelector('#pseudo').value = project.nick
-        document.querySelector('#btnvote').click()
-    } catch (e) {
-        throwError(e)
-    }
+    if (first) return
+
+    const project = await getProject('ServeurPrive', true)
+    document.querySelector('#pseudo').value = project.nick
+    document.querySelector('#btnvote').click()
 }
 
 const timer = setInterval(()=>{
-    if (checkAnswer()) {
+    try {
+        if (checkAnswer()) {
+            clearInterval(timer)
+        }
+    } catch (e) {
         clearInterval(timer)
+        throwError(e)
     }
 }, 1000)
 
@@ -28,8 +29,7 @@ function checkAnswer() {
         } else if (document.querySelector('.alert.alert-danger').textContent.includes('Vous avez déjà voté pour ce serveur')) {
             const numbers = document.querySelector('.alert.alert-danger').textContent.match(/\d+/g).map(Number)
             const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
-            const later = Date.now() + milliseconds
-            chrome.runtime.sendMessage({later: later})
+            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         } else {
             chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-danger').textContent})
         }

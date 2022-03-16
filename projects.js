@@ -974,6 +974,47 @@ const allProjects = {
                 return 'Serveur-Minecraft-Vote.fr'
         }
     },
+    MineBrowseCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://minebrowse.com/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('title').textContent.replace(' - Minebrowse Minecraft Server List', '')
+            case 'exampleURL':
+                return ['https://minebrowse.com/server/', '1638', '']
+            case 'URL':
+                return 'MineBrowse.com'
+        }
+    },
+    MCServerListCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://mc-server-list.com/server/' + project.id +'/vote/'
+            case 'pageURL':
+                return 'https://mc-server-list.com/server/' + project.id + '/'
+            case 'projectName':
+                return doc.querySelector('h2.header').textContent
+            case 'exampleURL':
+                return ['https://mc-server-list.com/server/', '127-Armageddon+Server', '/vote/']
+            case 'URL':
+                return 'MC-Server-List.com'
+        }
+    },
+    ServerLocatorCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://serverlocator.com/vote/' + project.id
+            case 'pageURL':
+                return 'https://serverlocator.com/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('.content_head h2').textContent
+            case 'exampleURL':
+                return ['https://serverlocator.com/vote/', '440', '']
+            case 'URL':
+                return 'ServerLocator.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':

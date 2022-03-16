@@ -977,26 +977,6 @@
   "notificationsDisabled": {
     "message": "Notifications are disabled or the extension doesn't have access to them! You may miss important notifications from this extension about errors or warnings!"
   },
-  "enableSyncStorage": {
-    "message": "Save extension settings in the cloud",
-    "description": "Checkbox. Cloud save extension settings"
-  },
-  "enableSyncStorageTooltip": {
-    "message": "Enabling this setting is not recommended if you have a lot of entries in the list of added projects. The cloud has limited traffic and storage space. For this to work, your browser must be logged in to the account and have synchronization enabled, otherwise settings will be saved to local storage no matter what Allows you to synchronize extension settings with multiple computers, but keeping the extension with this setting enabled on multiple computers is not recommended",
-    "description": "Tooltip. Cloud save extension settings"
-  },
-  "settingsSyncCopy": {
-    "message": "Copying settings to the cloud..."
-  },
-  "settingsSyncCopyLocal": {
-    "message": "Copying settings to local storage..."
-  },
-  "settingsSyncCopySuccess": {
-    "message": "Settings were successfully copied to the cloud"
-  },
-  "settingsSyncCopyLocalSuccess": {
-    "message": "Settings were successfully copied to local storage"
-  },
   "deletingCookies": {
     "message": "Deleting cookie: $url$",
     "placeholders": {
@@ -1315,18 +1295,6 @@
   },
   "importRegBorealis": {
     "message": "Register by login: password"
-  },
-  "conflictSync": {
-    "message": "Settings conflict"
-  },
-  "conflictSyncMessage": {
-    "message": "There are already settings in the cloud, which settings should we use?"
-  },
-  "localStorage": {
-    "message": "Local"
-  },
-  "syncStorage": {
-    "message": "Cloud"
   },
   "notGrantUrl": {
     "message": "You did not grant the extension access to rating(s), adding it is not possible"

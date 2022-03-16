@@ -780,31 +780,6 @@ async function silentVote(project) {
             if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
                 if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
-//                  let numbers = response.doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number)
-//                  let count = 0
-//                  let year = 0
-//                  let month = 0
-//                  let day = 0
-//                  let hour = 0
-//                  let min = 0
-//                  let sec = 0
-//                  for (let i in numbers) {
-//                      if (count == 0) {
-//                          hour = numbers[i]
-//                      } else if (count == 1) {
-//                          min = numbers[i]
-//                      } else if (count == 2) {
-//                          sec = numbers[i]
-//                      } else if (count == 3) {
-//                          day = numbers[i]
-//                      } else if (count == 4) {
-//                          month = numbers[i]
-//                      } else if (count == 5) {
-//                          year = numbers[i]
-//                      }
-//                      count++
-//                  }
-//                  let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000
                     endVote({later: true}, null, project)
                 } else {
                     endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
@@ -863,26 +838,6 @@ async function silentVote(project) {
                 }
 
                 if (response.doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
-//                  //Если вы уже голосовали, высчитывает сколько надо времени прождать до следующего голосования (точнее тут высчитывается во сколько вы голосовали)
-//                  //Берёт последние 30 символов
-//                  let string = response.doc.querySelector('center').textContent.substring(response.doc.querySelector('center').textContent.length - 30)
-//                  //Из полученного текста достаёт все цифры в Array List
-//                  let numbers = string.match(/\d+/g).map(Number)
-//                  let count = 0
-//                  let hour = 0
-//                  let min = 0
-//                  let sec = 0
-//                  for (let i in numbers) {
-//                      if (count == 0) {
-//                          hour = numbers[i]
-//                      } else if (count == 1) {
-//                          min = numbers[i]
-//                      }
-//                      count++
-//                  }
-//                  let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-//                  let later = Date.now() + milliseconds
-//                  endVote({later: later}, null, project)
                     endVote({later: true}, null, project)
                     return
                 } else if (response.doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
@@ -1037,19 +992,7 @@ async function silentVote(project) {
                 }
                 if (response.doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server') || response.doc.querySelector('#Content > div.Error').textContent.includes('has no votes')) {
                     let numbers = response.doc.querySelector('#Content > div.Error').textContent.substring(response.doc.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
-                    let count = 0
-                    let hour = 0
-                    let min = 0
-                    let sec = 0
-                    for (let i in numbers) {
-                        if (count === 0) {
-                            hour = numbers[i]
-                        } else if (count === 1) {
-                            min = numbers[i]
-                        }
-                        count++
-                    }
-                    let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                    let milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
                     endVote({later: Date.now() + (86400000 - milliseconds)}, null, project)
                     return
                 }
@@ -1101,19 +1044,7 @@ async function silentVote(project) {
                 }
                 if (response.doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
                     let numbers = response.doc.querySelector('#Content > div.Error').textContent.substring(response.doc.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
-                    let count = 0
-                    let hour = 0
-                    let min = 0
-                    let sec = 0
-                    for (let i in numbers) {
-                        if (count === 0) {
-                            hour = numbers[i]
-                        } else if (count === 1) {
-                            min = numbers[i]
-                        }
-                        count++
-                    }
-                    let milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+                    let milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
                     endVote({later: Date.now() + (86400000 - milliseconds)}, null, project)
                     return
                 }
@@ -1148,31 +1079,6 @@ async function silentVote(project) {
             if (!await checkResponseError(project, response, 'misterlauncher.org', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
                 if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
-//                  let numbers = response.doc.querySelector('div.alert.alert-danger').textContent.match(/\d+/g).map(Number)
-//                  let count = 0
-//                  let year = 0
-//                  let month = 0
-//                  let day = 0
-//                  let hour = 0
-//                  let min = 0
-//                  let sec = 0
-//                  for (let i in numbers) {
-//                      if (count == 0) {
-//                          hour = numbers[i]
-//                      } else if (count == 1) {
-//                          min = numbers[i]
-//                      } else if (count == 2) {
-//                          sec = numbers[i]
-//                      } else if (count == 3) {
-//                          day = numbers[i]
-//                      } else if (count == 4) {
-//                          month = numbers[i]
-//                      } else if (count == 5) {
-//                          year = numbers[i]
-//                      }
-//                      count++
-//                  }
-//                  let later = Date.UTC(year, month - 1, day, hour, min, sec, 0) - 86400000 - 10800000
                     endVote({later: true}, null, project)
                 } else {
                     endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
@@ -1523,7 +1429,7 @@ async function endVote(request, sender, project) {
 
     //Если усё успешно
     let sendMessage
-    if (request.successfully || request.later) {
+    if (request.successfully || request.later != null) {
         if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && settings.repeatAttemptLater) {
             if (request.successfully) {
                 delete project.later
@@ -1958,44 +1864,44 @@ function getProjectPrefix(project, detailed) {
 }
 
 //Проверяет правильное ли у вас время
-async function checkTime() {
-    try {
-        let response = await fetch('https://me-admin.cifrazia.com/')
-        if (response.ok && !response.redirected) {
-            // если HTTP-статус в диапазоне 200-299 и не было переадресаций
-            // получаем тело ответа и сравниваем время
-            let json = await response.json()
-            let serverTimeUTC = Number(json.timestamp.toString().replace('.', '').substring(0, 13))
-            let timeUTC = Date.now()
-            let timeDifference = (timeUTC - serverTimeUTC)
-            if (Math.abs(timeDifference) > 300000) {
-                let text
-                let time
-                let unit
-                if (timeDifference > 0) {
-                    text = chrome.i18n.getMessage('clockHurry')
-                } else {
-                    text = chrome.i18n.getMessage('clockLagging')
-                }
-                if (timeDifference > 3600000 || timeDifference < -3600000) {
-                    time = (Math.abs(timeDifference) / 1000 / 60 / 60).toFixed(1)
-                    unit = chrome.i18n.getMessage('clockHourns')
-                } else {
-                    time = (Math.abs(timeDifference) / 1000 / 60).toFixed(1)
-                    unit = chrome.i18n.getMessage('clockMinutes')
-                }
-                let text2 = chrome.i18n.getMessage('clockInaccurate', [text, time, unit])
-                console.warn(text2)
-                if (!settings.disabledNotifWarn)
-                    sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2)
-            }
-        } else {
-            console.error(chrome.i18n.getMessage('errorClock2', String(response.status)))
-        }
-    } catch (e) {
-        console.error(chrome.i18n.getMessage('errorClock', e))
-    }
-}
+// async function checkTime() {
+//     try {
+//         let response = await fetch('https://me-admin.cifrazia.com/')
+//         if (response.ok && !response.redirected) {
+//             // если HTTP-статус в диапазоне 200-299 и не было переадресаций
+//             // получаем тело ответа и сравниваем время
+//             let json = await response.json()
+//             let serverTimeUTC = Number(json.timestamp.toString().replace('.', '').substring(0, 13))
+//             let timeUTC = Date.now()
+//             let timeDifference = (timeUTC - serverTimeUTC)
+//             if (Math.abs(timeDifference) > 300000) {
+//                 let text
+//                 let time
+//                 let unit
+//                 if (timeDifference > 0) {
+//                     text = chrome.i18n.getMessage('clockHurry')
+//                 } else {
+//                     text = chrome.i18n.getMessage('clockLagging')
+//                 }
+//                 if (timeDifference > 3600000 || timeDifference < -3600000) {
+//                     time = (Math.abs(timeDifference) / 1000 / 60 / 60).toFixed(1)
+//                     unit = chrome.i18n.getMessage('clockHourns')
+//                 } else {
+//                     time = (Math.abs(timeDifference) / 1000 / 60).toFixed(1)
+//                     unit = chrome.i18n.getMessage('clockMinutes')
+//                 }
+//                 let text2 = chrome.i18n.getMessage('clockInaccurate', [text, time, unit])
+//                 console.warn(text2)
+//                 if (!settings.disabledNotifWarn)
+//                     sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2)
+//             }
+//         } else {
+//             console.error(chrome.i18n.getMessage('errorClock2', String(response.status)))
+//         }
+//     } catch (e) {
+//         console.error(chrome.i18n.getMessage('errorClock', e))
+//     }
+// }
 
 // noinspection JSUnusedGlobalSymbols
 async function setCookie(url, name, value) {

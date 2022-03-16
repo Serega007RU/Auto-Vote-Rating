@@ -238,10 +238,14 @@ async function run() {
 }
 
 async function startVote(first) {
-    const timer3 = setInterval(()=>{
+    const timer3 = setInterval(async ()=>{
         if (typeof vote === 'function') {
-            vote(first)
             clearInterval(timer3)
+            try {
+                await vote(first)
+            } catch (e) {
+                throwError(e)
+            }
         }
     }, 100)
 }
@@ -256,6 +260,10 @@ async function getProject() {
     } else {
         return proj
     }
+}
+
+function handle(func) {
+
 }
 
 function throwError(error) {

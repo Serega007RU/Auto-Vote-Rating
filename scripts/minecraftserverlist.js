@@ -6,22 +6,23 @@ if (typeof loaded2 === 'undefined') {
 }
 
 async function vote() {
-    try {
-        await new Promise(resolve => {
-            const timer = setInterval(()=>{
+    await new Promise(resolve => {
+        const timer = setInterval(()=>{
+            try {
                 //Ожидаем загрузки reCAPTCHA
                 if (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value && document.getElementById('g-recaptcha-response').value !== '') {
                     clearInterval(timer)
                     resolve()
                 }
-            }, 1000)
-        })
-        const project = await getProject('MinecraftServerList')
-        document.getElementById('ignn').value = project.nick
-        document.querySelector('#voteform > input.buttonsmall.pointer.green.size10').click()
-    } catch (e) {
-        throwError(e)
-    }
+            } catch (e) {
+                clearInterval(timer)
+                throwError(e)
+            }
+        }, 1000)
+    })
+    const project = await getProject('MinecraftServerList')
+    document.getElementById('ignn').value = project.nick
+    document.querySelector('#voteform > input.buttonsmall.pointer.green.size10').click()
 }
 
 function runVote() {
@@ -40,8 +41,8 @@ function runVote() {
                 clearInterval(timer2)
             }
         } catch (e) {
-            throwError(e)
             clearInterval(timer2)
+            throwError(e)
         }
     }, 1000)
 }
