@@ -2142,8 +2142,8 @@ async function getCredentialsProxy(proxy, pacScript) {
     } else if (proxy.SurfShark) {
         console.log(chrome.i18n.getMessage('proxyAuthOther', 'SurfShark'))
         authCredentials = {
-            'username': 'WZUGAQF4Qd6CP4qD99EnkZNG',
-            'password': 'ZMqnjVeKPzPphEMn3uwKgtmr'
+            'username': 'gzgVgHptY8NjAWwvr59WC4PU',
+            'password': 'kw25WLnVJtuCsg322GPchC8B'
         }
     }
     return authCredentials
