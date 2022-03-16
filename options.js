@@ -89,14 +89,14 @@ Version.prototype.compareTo = function(v){
 
 //Автоматизированное обновление расширения с git
 async function update(version) {
-    if (window.opr) {//Если мы на Opera
-        chrome.tabs.create({url: 'https://avr-extension.ml/versions/auto_vote_rating-' + version + '-opera.crx'})
-        return
-    }
-    if (!chrome.app) {//Если мы на FireFox
-        chrome.tabs.create({url: 'https://avr-extension.ml/versions/auto_vote_rating-' + version + '-an+fx.xpi'})
-        return
-    }
+    // if (window.opr) {//Если мы на Opera
+    //     chrome.tabs.create({url: 'https://avr-extension.ml/versions/auto_vote_rating-' + version + '-opera.crx'})
+    //     return
+    // }
+    // if (!chrome.app) {//Если мы на FireFox
+    //     chrome.tabs.create({url: 'https://avr-extension.ml/versions/auto_vote_rating-' + version + '-an+fx.xpi'})
+    //     return
+    // }
 
     resetModalProgress(true)
 
