@@ -61,6 +61,15 @@
 <a href="https://www.minecraft-list.cz/">Minecraft-List.cz</a>  
 <a href="https://www.liste-serveurs-minecraft.org/">Liste-Serveurs-Minecraft.org</a>  
 <a href="https://mcservidores.com/">MCServidores.com</a>  
+<a href="https://www.xtremetop100.com/">XtremeTop100.com</a>  
+<a href="https://minecraft-server.sk/">Minecraft-Server.sk</a>  
+<a href="https://www.serveursminecraft.org/">ServeursMinecraft.org</a>  
+<a href="https://serveurs-mc.net/">Serveurs-MC.net</a>  
+<a href="https://serveur-minecraft.com/">Serveur-Minecraft.com</a>  
+<a href="https://serveur-minecraft-vote.fr/">Serveur-Minecraft-Vote.fr</a>  
+<a href="https://minebrowse.com/">MineBrowse.com</a>  
+<a href="https://mc-server-list.com/">MC-Server-List.com</a>  
+<a href="https://serverlocator.com/">ServerLocator.com</a>  
 </details>
 
 ### Links to the extension where you can install it:
