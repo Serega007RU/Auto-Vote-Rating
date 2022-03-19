@@ -263,6 +263,10 @@ async function restoreOptions() {
     document.getElementById('timeoutValue').value = settings.timeout
     document.getElementById('useMultiVote').checked = settings.useMultiVote
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
+    if (settings.repeatAttemptLater) {
+        settings.repeatAttemptLater = false
+        db.put('other', settings, 'settings')
+    }
     document.getElementById('repeatAttemptLater').checked = settings.repeatAttemptLater
     document.getElementById('repeatLater').value = settings.repeatLater
     document.getElementById('useProxyOnUnProxyTop').checked = settings.useProxyOnUnProxyTop
