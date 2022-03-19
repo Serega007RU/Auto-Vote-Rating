@@ -1699,7 +1699,7 @@ async function endVote(request, sender, project) {
             if (request.errorVote && request.errorVote[0] === '404') {
                 project.time = Date.now() + 21600000
             }
-        } else if (request.errorVote && request.errorVote[0] === '404') {
+        }/* else */if (request.errorVote && request.errorVote[0] === '404') {
             retryCoolDown = 21600000
         } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
             retryCoolDown = 300000
@@ -1711,11 +1711,11 @@ async function endVote(request, sender, project) {
         if (project.randomize) {
             retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)
         }
-        if (!settings.useMultiVote && !project.useMultiVote) {
-            project.time = Date.now() + retryCoolDown
-        } else {
-            project.time = null
-        }
+        // if (!settings.useMultiVote && !project.useMultiVote) {
+        project.time = Date.now() + retryCoolDown
+        // } else {
+        //     project.time = null
+        // }
         project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
         if (!settings.disabledNotifError && !(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage)
