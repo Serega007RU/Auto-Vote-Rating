@@ -516,7 +516,7 @@ async function checkOpen(project, transaction) {
                 if (project.rating === 'TMonitoring' || project.rating === 'RPGParadize' || currentProxy?.TunnelBear || currentProxy?.NordVPN) {
                     await new Promise(resolve => {
                         // noinspection JSCheckFunctionSignatures
-                        chrome.browsingData.remove({since: Date.now() - 1000 * 60 * 60 * 24/*last day*/}, {cache: true}, resolve)
+                        chrome.browsingData.remove({/*since: Date.now() - 1000 * 60 * 60 * 24/*last day*/}, {cache: true}, resolve)
                     })
                 }
                 await new Promise(resolve => {
