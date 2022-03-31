@@ -48,7 +48,7 @@ async function initializeConfig(background, version) {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 60, {upgrade})
+    db = await idb.openDB('avr', 70, {upgrade})
     db.onerror = (event) => dbError(event, false)
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {
@@ -106,8 +106,11 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             enabledSilentVote: true,
             disabledCheckTime: false,
             disabledCheckInternet: false,
+            disabledOneVote: false,
+            disabledFocusedTab: false,
             enableCustom: false,
             timeout: 1000,
+            timeoutError: 900000,
             proxyBlackList: ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"],
             stopVote: 0,
             autoAuthVK: false,
@@ -249,6 +252,13 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             await cursor3.update(project)
             cursor3 = await cursor3.continue()
         }
+    }
+
+    if (oldVersion <= 5 || oldVersion <= 50) {
+        settings.timeoutError = 900000
+        settings.disabledOneVote = false
+        settings.disabledFocusedTab = false
+        await transaction.objectStore('other').put(settings, 'settings')
     }
 
     if (!todayStats) {

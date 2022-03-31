@@ -141,7 +141,7 @@ async function checkOpen(project, transaction) {
 
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
-        if (project.rating === value.rating || value.randomize && project.randomize) {
+        if (project.rating === value.rating || value.randomize && project.randomize || settings.disabledOneVote) {
             if (!value.nextAttempt) return
             if (Date.now() < value.nextAttempt) {
                 return
@@ -719,7 +719,7 @@ async function newWindow(project) {
         }
 
         let tab = await new Promise(resolve=>{
-            chrome.tabs.create({url, active: false}, function(tab_) {
+            chrome.tabs.create({url, active: settings.disabledFocusedTab}, function(tab_) {
                 if (chrome.runtime.lastError) {
                     resolve()
                     endVote({message: chrome.runtime.lastError.message}, null, project)
@@ -1701,12 +1701,9 @@ async function endVote(request, sender, project) {
             }
         }/* else */if (request.errorVote && request.errorVote[0] === '404') {
             retryCoolDown = 21600000
-        } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-            retryCoolDown = 300000
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
         } else {
-            retryCoolDown = 900000
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '15')
+            retryCoolDown = settings.timeoutError
+            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', (Math.round(settings.timeoutError / 1000 / 60 * 100) / 100).toString())
         }
         if (project.randomize) {
             retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)

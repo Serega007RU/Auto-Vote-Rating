@@ -697,6 +697,14 @@
                             <input class="checkbox" id="disabledCheckInternet" type="checkbox" name="checkbox"/>
                             <label data-resource="disabledCheckInternet" for="disabledCheckInternet"></label>
                         </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledOneVote" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledOneVote" for="disabledOneVote"></label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledFocusedTab" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledFocusedTab" for="disabledFocusedTab"></label>
+                        </div>
                         <button class="submitBtn" id="forceUpdate" data-resource="forceUpdate"></button>
                     </div>
                     <div>
@@ -715,6 +723,13 @@
                             <label data-resource="cooldown" for="timeoutValue"></label>
                             <form id="timeout">
                                 <input class="input" name="cooldown" id="timeoutValue" required type="number" min="0">
+                                <button data-resource="setCooldown" type="submit" class="justBtn"></button>
+                            </form>
+                        </div>
+                        <div class="input-block">
+                            <label data-resource="cooldownError" for="timeoutErrorValue"></label>
+                            <form id="timeoutError">
+                                <input class="input" name="cooldownError" id="timeoutErrorValue" required type="number" min="0">
                                 <button data-resource="setCooldown" type="submit" class="justBtn"></button>
                             </form>
                         </div>

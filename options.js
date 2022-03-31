@@ -260,7 +260,10 @@ async function restoreOptions() {
     if (!settings.enabledSilentVote) document.getElementById('enabledSilentVote').value = 'disabled'
 //     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
+    document.getElementById('disabledOneVote').checked = settings.disabledOneVote
+    document.getElementById('disabledFocusedTab').checked = settings.disabledFocusedTab
     document.getElementById('timeoutValue').value = settings.timeout
+    document.getElementById('timeoutErrorValue').value = settings.timeoutError
     document.getElementById('useMultiVote').checked = settings.useMultiVote
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     if (settings.repeatAttemptLater) {
@@ -2113,6 +2116,10 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledCheckTime = this.checked*/
         else if (this.id === 'disabledCheckInternet')
             settings.disabledCheckInternet = this.checked
+        else if (this.id === 'disabledOneVote')
+            settings.disabledOneVote = this.checked
+        else if (this.id === 'disabledFocusedTab')
+            settings.disabledFocusedTab = this.checked
         else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false
@@ -2395,6 +2402,22 @@ document.getElementById('timeout').addEventListener('submit', async (event)=>{
         event.target.classList.add('disabled')
     }
     settings.timeout = document.getElementById('timeoutValue').valueAsNumber
+    await db.put('other', settings, 'settings')
+    createNotif(chrome.i18n.getMessage('successSave'), 'success')
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+    event.target.classList.remove('disabled')
+})
+
+//Слушатель кнопки "Установить" на таймауте при ошибке
+document.getElementById('timeoutError').addEventListener('submit', async (event)=>{
+    event.preventDefault()
+    if (event.target.classList.contains('disabled')) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        event.target.classList.add('disabled')
+    }
+    settings.timeoutError = document.getElementById('timeoutErrorValue').valueAsNumber
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('successSave'), 'success')
     if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
