@@ -185,7 +185,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
     }
 
-    if (oldVersion <= 2 || oldVersion <= 20) {
+    if (oldVersion <= 3 || oldVersion <= 30) {
         const other = transaction.objectStore('other')
         settings = await other.get('settings')
         settings.timeout = 1000
@@ -198,7 +198,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         await other.put(settings, 'settings')
     }
 
-    if (oldVersion <= 3 || oldVersion <= 30) {
+    if (oldVersion <= 4 || oldVersion <= 40) {
         if (!transaction) transaction = db.transaction('projects', 'readwrite')
         const store = transaction.objectStore('projects')
         let cursor = await store.index('rating').openCursor('DiscordBotList')
@@ -225,7 +225,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
     }
 
-    if (oldVersion <= 4 || oldVersion <= 40) {
+    if (oldVersion <= 5 || oldVersion <= 50) {
         if (!transaction) transaction = db.transaction('projects', 'readwrite')
         const store = transaction.objectStore('projects')
         let cursor = await store.index('rating').openCursor('MCServerList')
@@ -254,7 +254,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
     }
 
-    if (oldVersion <= 5 || oldVersion <= 50) {
+    if (oldVersion <= 6 || oldVersion <= 60) {
         settings.timeoutError = 0
         settings.disabledOneVote = false
         settings.disabledFocusedTab = false
