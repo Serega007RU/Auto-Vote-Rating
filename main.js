@@ -217,6 +217,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     }
 
     if (oldVersion <= 5) {
+        settings = await transaction.objectStore('other').get('settings')
         settings.timeoutError = 900000
         settings.disabledOneVote = false
         settings.disabledFocusedTab = false
