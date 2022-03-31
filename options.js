@@ -55,6 +55,7 @@ async function restoreOptions() {
     if (!settings.enabledSilentVote) document.getElementById('enabledSilentVote').value = 'disabled'
 //     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
+    document.getElementById('disabledOneVote').checked = settings.disabledOneVote
     document.getElementById('timeoutValue').value = settings.timeout
     document.getElementById('timeoutErrorValue').value = settings.timeoutError
     if (settings.enableCustom) addCustom()
@@ -358,6 +359,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledCheckTime = this.checked*/
         else if (this.id === 'disabledCheckInternet')
             settings.disabledCheckInternet = this.checked
+        else if (this.id === 'disabledOneVote')
+            settings.disabledOneVote = this.checked
         else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false

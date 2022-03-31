@@ -1,5 +1,4 @@
 async function vote(first) {
-    document.querySelector('.sdfsdf .sdfsdf .sdf').dsasd.asdasd
     if (document.getElementById('summary') != null) {
         if (document.getElementById('summary').textContent.includes('Ошибка проверки CSRF')) {
             //Костыль костыля, перезагружаем страницу в случае возникновения Ошибки проверки CSRF (данная ошибка выскакивает после прохождения проверки CloudFlare)

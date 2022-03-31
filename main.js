@@ -115,6 +115,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             enabledSilentVote: true,
             disabledCheckTime: false,
             disabledCheckInternet: false,
+            disabledOneVote: false,
             enableCustom: false,
             timeout: 10000,
             timeoutError: 900000
@@ -216,6 +217,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
 
     if (oldVersion <= 5) {
         settings.timeoutError = 900000
+        settings.disabledOneVote = false
+        await transaction.objectStore('other').put(settings, 'settings')
     }
 
     if (!todayStats) {

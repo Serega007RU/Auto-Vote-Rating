@@ -71,6 +71,9 @@
   "disabledCheckInternet": {
     "message": "Відключити перевірку з'єднання інтернету"
   },
+  "disabledOneVote": {
+    "message": "Відключити одночасне голосування відразу на декількох сайтах"
+  },
   "disableCheckProjects": {
     "message": "Відключити перевірку"
   },
