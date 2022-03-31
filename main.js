@@ -110,7 +110,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             disabledFocusedTab: false,
             enableCustom: false,
             timeout: 1000,
-            timeoutError: 900000,
+            timeoutError: 0,
             proxyBlackList: ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"],
             stopVote: 0,
             autoAuthVK: false,
@@ -255,7 +255,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     }
 
     if (oldVersion <= 5 || oldVersion <= 50) {
-        settings.timeoutError = 900000
+        settings.timeoutError = 0
         settings.disabledOneVote = false
         settings.disabledFocusedTab = false
         await transaction.objectStore('other').put(settings, 'settings')
