@@ -1081,12 +1081,9 @@ async function endVote(request, sender, project) {
         let retryCoolDown
         if (request.errorVote && request.errorVote[0] === '404') {
             retryCoolDown = 21600000
-        } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-            retryCoolDown = 300000
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
         } else {
-            retryCoolDown = 900000
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '15')
+            retryCoolDown = settings.timeoutError
+            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', (Math.round(settings.timeoutError / 1000 / 60 * 100) / 100).toString())
         }
         if (project.randomize) {
             retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)

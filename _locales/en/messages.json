@@ -129,6 +129,9 @@
     "message": "Voting timeout in milliseconds between projects for 1 rating",
     "description": "Label. Cooldown input"
   },
+  "cooldownError": {
+    "message": "Timeout in ms in case of an error"
+  },
   "setCooldown": {
     "message": "Set",
     "description": "Button. Set cooldown"

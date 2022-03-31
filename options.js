@@ -56,6 +56,7 @@ async function restoreOptions() {
 //     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('timeoutValue').value = settings.timeout
+    document.getElementById('timeoutErrorValue').value = settings.timeoutError
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
 }
@@ -565,6 +566,22 @@ document.getElementById('timeout').addEventListener('submit', async (event)=>{
         event.target.classList.add('disabled')
     }
     settings.timeout = document.getElementById('timeoutValue').valueAsNumber
+    await db.put('other', settings, 'settings')
+    createNotif(chrome.i18n.getMessage('successSave'), 'success')
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+    event.target.classList.remove('disabled')
+})
+
+//Слушатель кнопки "Установить" на таймауте при ошибке
+document.getElementById('timeoutError').addEventListener('submit', async (event)=>{
+    event.preventDefault()
+    if (event.target.classList.contains('disabled')) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        event.target.classList.add('disabled')
+    }
+    settings.timeoutError = document.getElementById('timeoutErrorValue').valueAsNumber
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('successSave'), 'success')
     if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
