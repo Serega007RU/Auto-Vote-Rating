@@ -256,7 +256,7 @@ async function newWindow(project) {
         const url = allProjects[project.rating]('voteURL', project)
         
         let tab = await new Promise(resolve=>{
-            chrome.tabs.create({url, active: false}, function(tab_) {
+            chrome.tabs.create({url, active: settings.disabledFocusedTab}, function(tab_) {
                 if (chrome.runtime.lastError) {
                     resolve()
                     endVote({message: chrome.runtime.lastError.message}, null, project)

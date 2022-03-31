@@ -74,6 +74,9 @@
   "disabledOneVote": {
     "message": "Відключити одночасне голосування відразу на декількох сайтах"
   },
+  "disabledFocusedTab": {
+    "message": "Focused tab"
+  },
   "disableCheckProjects": {
     "message": "Відключити перевірку"
   },

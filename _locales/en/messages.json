@@ -96,6 +96,9 @@
   "disabledOneVote": {
     "message": "Disable simultaneous voting on multiple sites at once"
   },
+  "disabledFocusedTab": {
+    "message": "Focused tab"
+  },
   "disableCheckProjects": {
     "message": "Disable check-up",
     "description": "Checkbox. Disable check when adding a project"
