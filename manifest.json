@@ -14,7 +14,7 @@
 	},
 	"description": "__MSG_appDesc__",
 	"manifest_version": 2,
-	"minimum_chrome_version": "61.0",
+	"minimum_chrome_version": "85.0",
 	"name": "__MSG_appName__",
 	"options_ui": {
 		"open_in_tab": true,
