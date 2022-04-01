@@ -1054,6 +1054,28 @@ const allProjects = {
                 return 'mmovote.ru'
         }
     },
+    McMonitoringInfo: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                if (project.game === 'minecraft') {
+                    return 'https://mc-monitoring.info/server/vote/' + project.id
+                } else {
+                    return 'https://mc-monitoring.info/' + project.game + '/server/vote/' + project.id
+                }
+            case 'pageURL':
+                if (project.game === 'minecraft') {
+                    return 'https://mc-monitoring.info/server/' + project.id
+                } else {
+                    return 'https://mc-monitoring.info/' + project.game + '/server/' + project.id
+                }
+            case 'projectName':
+                return doc.querySelector('.hello h1').textContent.replace('Игровой сервер ', '')
+            case 'exampleURL':
+                return ['https://mc-monitoring.info/wow/server/vote/', '112', '']
+            case 'URL':
+                return 'mc-monitoring.info'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':

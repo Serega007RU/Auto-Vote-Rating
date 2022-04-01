@@ -547,6 +547,8 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     } else if (project.rating === 'MmoVoteRu') {
         project.game = document.getElementById('chooseGameMmoVoteRu').value.toLowerCase()
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
+    } else if (project.rating === 'McMonitoringInfo') {
+        project.game = document.getElementById('chooseGameMcMonitoringInfo').value
     }
     
     if (project.rating === 'Custom') {
@@ -1713,6 +1715,14 @@ selectedTop.addEventListener('input', function() {
     } else if (laterChoose === 'MmoVoteRu') {
         document.getElementById('urlGame5').style.display = 'none'
         document.getElementById('chooseGameMmoVoteRu').required = false
+    }
+
+    if (name === 'McMonitoringInfo') {
+        document.getElementById('urlGame6').removeAttribute('style')
+        document.getElementById('chooseGameMcMonitoringInfo').required = true
+    } else if (laterChoose === 'McMonitoringInfo') {
+        document.getElementById('urlGame6').style.display = 'none'
+        document.getElementById('chooseGameMcMonitoringInfo').required = false
     }
 
     if (name === 'BestServersCom') {
