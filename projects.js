@@ -1028,6 +1028,19 @@ const allProjects = {
                 return 'top-mmogames.ru'
         }
     },
+    MmoRpgTop: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://' + project.game +'.mmorpg.top/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('.title [itemprop="name"]').textContent
+            case 'exampleURL':
+                return ['https://wow.mmorpg.top/server/', '23', '']
+            case 'URL':
+                return 'mmorpg.top'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
