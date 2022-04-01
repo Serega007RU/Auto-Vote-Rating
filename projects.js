@@ -1041,6 +1041,19 @@ const allProjects = {
                 return 'mmorpg.top'
         }
     },
+    MmoVoteRu: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://' + project.game +'.mmovote.ru/ru/vote/' + project.id
+            case 'projectName':
+                return doc.querySelector('.content .box h2').textContent.replace('Голосование за ', '')
+            case 'exampleURL':
+                return ['https://wow.mmovote.ru/ru/vote/', '85', '']
+            case 'URL':
+                return 'mmovote.ru'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':

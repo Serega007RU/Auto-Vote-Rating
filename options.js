@@ -544,6 +544,9 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     } else if (project.rating === 'MmoRpgTop') {
         project.game = document.getElementById('chooseGameMmoRpgTop').value.toLowerCase()
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
+    } else if (project.rating === 'MmoVoteRu') {
+        project.game = document.getElementById('chooseGameMmoVoteRu').value.toLowerCase()
+        project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
     }
     
     if (project.rating === 'Custom') {
@@ -1508,6 +1511,8 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('urlGameTopG').style.display = 'none'
         document.getElementById('urlGame3').style.display = 'none'
         document.getElementById('urlGame4').style.display = 'none'
+        document.getElementById('urlGame5').style.display = 'none'
+        document.getElementById('chooseGameMmoVoteRu').required = false
         document.getElementById('chooseGameMmoRpgTop').required = false
         document.getElementById('chooseGameMineServers').required = false
         document.getElementById('chooseGamegTop100').required = false
@@ -1698,6 +1703,16 @@ selectedTop.addEventListener('input', function() {
     } else if (laterChoose === 'MmoRpgTop') {
         document.getElementById('urlGame4').style.display = 'none'
         document.getElementById('chooseGameMmoRpgTop').required = false
+    }
+
+    if (name === 'MmoVoteRu') {
+        document.getElementById('urlGame5').removeAttribute('style')
+        document.getElementById('chooseGameMmoVoteRu').required = true
+        document.getElementById('ordinalWorld').required = true
+        document.getElementById('label10').removeAttribute('style')
+    } else if (laterChoose === 'MmoVoteRu') {
+        document.getElementById('urlGame5').style.display = 'none'
+        document.getElementById('chooseGameMmoVoteRu').required = false
     }
 
     if (name === 'BestServersCom') {
