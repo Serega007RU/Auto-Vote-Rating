@@ -1015,6 +1015,19 @@ const allProjects = {
                 return 'ServerLocator.com'
         }
     },
+    TopMmoGamesRu: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://top-mmogames.ru/' + project.id
+            case 'projectName':
+                return doc.querySelector('.gamefeatures [itemprop="name"]').textContent
+            case 'exampleURL':
+                return ['https://top-mmogames.ru/', 'server-wow-amdfun', '']
+            case 'URL':
+                return 'top-mmogames.ru'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
