@@ -12,7 +12,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://topcraft.ru/servers/', '10496', '/']
             case 'URL':
-                return 'TopCraft.ru'
+                return 'topcraft.ru'
         }
     },
     McTOP: (type, project, doc) => {
@@ -26,7 +26,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://mctop.su/servers/', '5231', '/']
             case 'URL':
-                return 'McTOP.su'
+                return 'mctop.su'
         }
     },
     MCRate: (type, project, doc) => {
@@ -40,7 +40,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['http://mcrate.su/rate/', '4396', '']
             case 'URL':
-                return 'MCRate.su'
+                return 'mcrate.su'
             case 'oneProject':
                 return 1
             case 'notFound':
@@ -61,7 +61,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraftrating.ru/projects/', 'cubixworld', '/']
             case 'URL':
-                return 'MinecraftRating.ru'
+                return 'minecraftrating.ru'
         }
     },
     MonitoringMinecraft: (type, project, doc) => {
@@ -75,7 +75,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://monitoringminecraft.ru/top/', 'gg', '/vote']
             case 'URL':
-                return 'MonitoringMinecraft.ru'
+                return 'monitoringminecraft.ru'
         }
     },
     IonMc: (type, project, doc) => {
@@ -102,7 +102,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraftservers.org/vote/', '25531', '']
             case 'URL':
-                return 'MinecraftServers.org'
+                return 'minecraftservers.org'
             case 'oneProject':
                 return 1
         }
@@ -121,7 +121,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://serveur-prive.net/minecraft/', 'gommehd-net-4932', '/vote']
             case 'URL':
-                return 'Serveur-Prive.net'
+                return 'serveur-prive.net'
         }
     },
     PlanetMinecraft: (type, project, doc) => {
@@ -135,7 +135,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.planetminecraft.com/server/', 'legends-evolved', '/vote/']
             case 'URL':
-                return 'PlanetMinecraft.com'
+                return 'planetminecraft.com'
         }
     },
     TopG: (type, project, doc) => {
@@ -148,7 +148,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://topg.org/minecraft-servers/server-', '405637', '']
             case 'URL':
-                return 'TopG.org'
+                return 'topg.org'
         }
     },
     ListForge: (type, project, doc) => {
@@ -163,7 +163,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraft-mp.com/server/', '81821', '/vote/']
             case 'URL':
-                return 'ListForge.net'
+                return 'listforge.net'
             case 'notFound':
                 for (const el of doc.querySelectorAll('div.alert.alert-info')) {
                     if (el.textContent.includes('server has been removed')) {
@@ -189,7 +189,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraft-server-list.com/server/', '292028', '/vote/']
             case 'URL':
-                return 'Minecraft-Server-List.com'
+                return 'minecraft-server-list.com'
         }
     },
     ServerPact: (type, project, doc) => {
@@ -202,7 +202,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.serverpact.com/vote-', '26492123', '']
             case 'URL':
-                return 'ServerPact.com'
+                return 'serverpact.com'
             case 'oneProject':
                 return 1
             case 'notFound':
@@ -220,7 +220,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraftiplist.com/index.php?action=vote&listingID=', '2576', '']
             case 'URL':
-                return 'MinecraftIpList.com'
+                return 'minecraftiplist.com'
             case 'oneProject':
                 return 5
             case 'notFound':
@@ -238,7 +238,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://topminecraftservers.org/vote/', '9126', '']
             case 'URL':
-                return 'TopMinecraftServers.org'
+                return 'topminecraftservers.org'
         }
     },
     MinecraftServersBiz: (type, project, doc) => {
@@ -251,7 +251,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraftservers.biz/', 'servers/145999', '/']
             case 'URL':
-                return 'MinecraftServers.biz'
+                return 'minecraftservers.biz'
         }
     },
     HotMC: (type, project, doc) => {
@@ -265,7 +265,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://hotmc.ru/vote-', '199493', '']
             case 'URL':
-                return 'HotMC.ru'
+                return 'hotmc.ru'
             case 'oneProject':
                 return 1
         }
@@ -281,7 +281,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraft-server.net/vote/', 'TitanicFreak', '/']
             case 'URL':
-                return 'Minecraft-Server.net'
+                return 'minecraft-server.net'
         }
     },
     TopGames: (type, project, doc) => {
@@ -307,7 +307,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://top-serveurs.net/minecraft/', 'icesword-pvpfaction-depuis-2014-crack-on', '']
             case 'URL':
-                return 'Top-Games.net'
+                return 'top-games.net'
         }
     },
     TMonitoring: (type, project, doc) => {
@@ -320,7 +320,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://tmonitoring.com/server/', 'qoobworldru', '']
             case 'URL':
-                return 'TMonitoring.com'
+                return 'tmonitoring.com'
         }
     },
     TopGG: (type, project, doc) => {
@@ -339,7 +339,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://top.gg/bot/', '270904126974590976', '/vote']
             case 'URL':
-                return 'Top.gg'
+                return 'top.gg'
         }
     },
     DiscordBotList: (type, project, doc) => {
@@ -353,7 +353,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://discordbotlist.com/bots/', 'dank-memer', '/upvote']
             case 'URL':
-                return 'DiscordBotList.com'
+                return 'discordbotlist.com'
         }
     },
     Discords: (type, project, doc) => {
@@ -367,7 +367,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://discords.com/bots/bot/', '469610550159212554', '/vote']
             case 'URL':
-                return 'Discords.com'
+                return 'discords.com'
         }
     },
     MMoTopRU: (type, project, doc) => {
@@ -389,7 +389,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://pw.mmotop.ru/servers/', '25895', '/votes/new']
             case 'URL':
-                return 'MMoTop.ru'
+                return 'mmotop.ru'
             case 'oneProject':
                 return 1
         }
@@ -405,7 +405,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://mc-servers.com/mcvote/', '1890', '/']
             case 'URL':
-                return 'MC-Servers.com'
+                return 'mc-servers.com'
         }
     },
     MinecraftList: (type, project, doc) => {
@@ -419,7 +419,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraftlist.org/vote/', '11227', '']
             case 'URL':
-                return 'MinecraftList.org'
+                return 'minecraftlist.org'
         }
     },
     MinecraftIndex: (type, project, doc) => {
@@ -433,7 +433,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.minecraft-index.com/', '33621-extremecraft-net', '/vote']
             case 'URL':
-                return 'Minecraft-Index.com'
+                return 'minecraft-index.com'
         }
     },
     ServerList101: (type, project, doc) => {
@@ -447,7 +447,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://serverlist101.com/server/', '1547', '/vote/']
             case 'URL':
-                return 'ServerList101.com'
+                return 'serverlist101.com'
         }
     },
     MCServerList: (type, project, doc) => {
@@ -461,7 +461,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://mcserver-list.eu/hlasovat/?id=', '307', '']
             case 'URL':
-                return 'MCServer-List.eu'
+                return 'mcserver-list.eu'
         }
     },
     CraftList: (type, project, doc) => {
@@ -474,7 +474,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://craftlist.org/', 'basicland', '']
             case 'URL':
-                return 'CraftList.org'
+                return 'craftlist.org'
         }
     },
     CzechCraft: (type, project, doc) => {
@@ -488,7 +488,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://czech-craft.eu/server/', 'trenend', '/vote/']
             case 'URL':
-                return 'Czech-Craft.eu'
+                return 'czech-craft.eu'
         }
     },
     MinecraftBuzz: (type, project, doc) => {
@@ -502,7 +502,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraft.buzz/vote/', '306', '']
             case 'URL':
-                return 'Minecraft.Buzz'
+                return 'minecraft.buzz'
         }
     },
     MinecraftServery: (type, project, doc) => {
@@ -515,7 +515,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraftservery.eu/server/', '105', '']
             case 'URL':
-                return 'MinecraftServery.eu'
+                return 'minecraftservery.eu'
         }
     },
     RPGParadize: (type, project, doc) => {
@@ -528,7 +528,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.rpg-paradize.com/?page=vote&vote=', '113763', '']
             case 'URL':
-                return 'RPG-Paradize.com'
+                return 'rpg-paradize.com'
         }
     },
     MinecraftServerListNet: (type, project, doc) => {
@@ -541,7 +541,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.minecraft-serverlist.net/vote/', '51076', '']
             case 'URL':
-                return 'Minecraft-ServerList.net'
+                return 'minecraft-serverlist.net'
         }
     },
     MinecraftServerEu: (type, project, doc) => {
@@ -555,7 +555,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraft-server.eu/vote/index/', '1A73C', '']
             case 'URL':
-                return 'Minecraft-Server.eu'
+                return 'minecraft-server.eu'
         }
     },
     MinecraftKrant: (type, project, doc) => {
@@ -568,7 +568,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.minecraftkrant.nl/serverlijst/', 'torchcraft', '']
             case 'URL':
-                return 'MinecraftKrant.nl'
+                return 'minecraftkrant.nl'
         }
     },
     TrackyServer: (type, project, doc) => {
@@ -581,7 +581,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.trackyserver.com/server/', 'anubismc-486999', '']
             case 'URL':
-                return 'TrackyServer.com'
+                return 'trackyserver.com'
         }
     },
     MCListsOrg: (type, project, doc) => {
@@ -594,7 +594,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://mc-lists.org/', 'server-luxurycraft.1818', '/vote']
             case 'URL':
-                return 'MC-Lists.org'
+                return 'mc-lists.org'
         }
     },
     TopMCServersCom: (type, project, doc) => {
@@ -608,7 +608,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://topmcservers.com/server/', '17', '/vote']
             case 'URL':
-                return 'TopMCServers.com'
+                return 'topmcservers.com'
         }
     },
     BestServersCom: (type, project, doc) => {
@@ -621,7 +621,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://bestservers.com/server/', '1135', '/vote']
             case 'URL':
-                return 'BestServers.com'
+                return 'bestservers.com'
         }
     },
     CraftListNet: (type, project, doc) => {
@@ -635,7 +635,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://craft-list.net/minecraft-server/', 'Advancius-Network', '/vote']
             case 'URL':
-                return 'Craft-List.net'
+                return 'craft-list.net'
         }
     },
     MinecraftServersListOrg: (type, project, doc) => {
@@ -649,7 +649,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.minecraft-servers-list.org/index.php?a=in&u=', 'chromity', '']
             case 'URL':
-                return 'Minecraft-Servers-List.org'
+                return 'minecraft-servers-list.org'
         }
     },
     ServerListe: (type, project, doc) => {
@@ -662,7 +662,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.serverliste.net/vote/', '775', '']
             case 'URL':
-                return 'ServerListe.net'
+                return 'serverliste.net'
         }
     },
     gTop100: (type, project, doc) => {
@@ -676,7 +676,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://gtop100.com/topsites/MapleStory/sitedetails/', 'Ristonia--v224--98344', '?vote=1&pingUsername=kingcloudian']
             case 'URL':
-                return 'gTop100.com'
+                return 'gtop100.com'
         }
     },
     WARGM: (type, project, doc) => {
@@ -690,7 +690,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://wargm.ru/server/', '23394', '/votes']
             case 'URL':
-                return 'WARGM.ru'
+                return 'wargm.ru'
         }
     },
     MineStatus: (type, project, doc) => {
@@ -704,7 +704,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minestatus.net/server/vote/', 'mine.sylphmc.com', '']
             case 'URL':
-                return 'MineStatus.net'
+                return 'minestatus.net'
         }
     },
     MisterLauncher: (type, project, doc) => {
@@ -721,7 +721,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://misterlauncher.org/projects/', 'omegamc', '/']
             case 'URL':
-                return 'MisterLauncher.org'
+                return 'misterlauncher.org'
         }
     },
     MinecraftServersDe: (type, project, doc) => {
@@ -735,7 +735,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraft-servers.de/server/', 'twerion', '/vote']
             case 'URL':
-                return 'Minecraft-Servers.de'
+                return 'minecraft-servers.de'
         }
     },
     DiscordBoats: (type, project, doc) => {
@@ -749,7 +749,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://discord.boats/bot/', '557628352828014614', '/vote']
             case 'URL':
-                return 'Discord.Boats'
+                return 'discord.boats'
         }
     },
     ServerListGames: (type, project, doc) => {
@@ -763,7 +763,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://serverlist.games/vote/', '2052', '']
             case 'URL':
-                return 'ServerList.Games'
+                return 'serverlist.games'
         }
     },
     BestMinecraftServers: (type, project, doc) => {
@@ -777,7 +777,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://best-minecraft-servers.co/', 'server-hypixel-network.30', '/vote']
             case 'URL':
-                return 'Best-Minecraft-Servers.co'
+                return 'best-minecraft-servers.co'
         }
     },
     MinecraftServers100: (type, project, doc) => {
@@ -791,7 +791,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraftservers100.com/vote/', '2340', '']
             case 'URL':
-                return 'MinecraftServers100.com'
+                return 'minecraftservers100.com'
         }
     },
     MCServerListCZ: (type, project, doc) => {
@@ -805,7 +805,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://mc-serverlist.cz/', 'server-lendmark.27', '/vote']
             case 'URL':
-                return 'MC-ServerList.cz'
+                return 'mc-serverlist.cz'
         }
     },
     MineServers: (type, project, doc) => {
@@ -819,7 +819,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://mineservers.com/server/', 'jvvHdPJy', '/vote']
             case 'URL':
-                return 'MineServers.com'
+                return 'mineservers.com'
         }
     },
     ATLauncher: (type, project, doc) => {
@@ -833,7 +833,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://atlauncher.com/servers/server/', 'KineticNetworkSkyfactory4', '/vote']
             case 'URL':
-                return 'ATLauncher.com'
+                return 'atlauncher.com'
         }
     },
     ServersMinecraft: (type, project, doc) => {
@@ -847,7 +847,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://servers-minecraft.net/', 'server-complex-gaming.58', '/vote']
             case 'URL':
-                return 'Servers-Minecraft.net'
+                return 'servers-minecraft.net'
         }
     },
     MinecraftListCZ: (type, project, doc) => {
@@ -861,7 +861,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote']
             case 'URL':
-                return 'Minecraft-List.cz'
+                return 'minecraft-list.cz'
         }
     },
     ListeServeursMinecraft: (type, project, doc) => {
@@ -875,7 +875,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.liste-serveurs-minecraft.org/vote/?idc=', '202085', '']
             case 'URL':
-                return 'Liste-Serveurs-Minecraft.org'
+                return 'liste-serveurs-minecraft.org'
             case 'notFound':
                 return doc.querySelector('#core_middle_column div.panel-body') != null && doc.querySelector('#core_middle_column div.panel-body').textContent.includes('serveur est introuvable')
         }
@@ -890,7 +890,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://mcservidores.com/servidor/', '122', '']
             case 'URL':
-                return 'MCServidores.com'
+                return 'mcservidores.com'
             case 'oneProject':
                 return 1
         }
@@ -905,7 +905,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.xtremetop100.com/in.php?site=', '1132370645', '']
             case 'URL':
-                return 'XtremeTop100.com'
+                return 'xtremetop100.com'
         }
     },
     MinecraftServerSk: (type, project, doc) => {
@@ -918,7 +918,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minecraft-server.sk/', 'server-luoend.52', '/vote']
             case 'URL':
-                return 'Minecraft-Server.sk'
+                return 'minecraft-server.sk'
         }
     },
     ServeursMinecraftOrg: (type, project, doc) => {
@@ -931,7 +931,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://www.serveursminecraft.org/serveur/', '1017', '/']
             case 'URL':
-                return 'ServeursMinecraft.org'
+                return 'serveursminecraft.org'
         }
     },
     ServeursMCNet: (type, project, doc) => {
@@ -945,7 +945,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://serveurs-mc.net/serveur/', '82', '/voter']
             case 'URL':
-                return 'Serveurs-MC.net'
+                return 'serveurs-mc.net'
         }
     },
     ServeursMinecraftCom: (type, project, doc) => {
@@ -958,7 +958,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://serveur-minecraft.com/', '2908', '']
             case 'URL':
-                return 'Serveur-Minecraft.com'
+                return 'serveur-minecraft.com'
         }
     },
     ServeurMinecraftVoteFr: (type, project, doc) => {
@@ -971,7 +971,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://serveur-minecraft-vote.fr/serveurs/', 'ectalia.425', '/vote']
             case 'URL':
-                return 'Serveur-Minecraft-Vote.fr'
+                return 'serveur-minecraft-vote.fr'
         }
     },
     MineBrowseCom: (type, project, doc) => {
@@ -984,7 +984,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://minebrowse.com/server/', '1638', '']
             case 'URL':
-                return 'MineBrowse.com'
+                return 'minebrowse.com'
         }
     },
     MCServerListCom: (type, project, doc) => {
@@ -998,7 +998,7 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://mc-server-list.com/server/', '127-Armageddon+Server', '/vote/']
             case 'URL':
-                return 'MC-Server-List.com'
+                return 'mc-server-list.com'
         }
     },
     ServerLocatorCom: (type, project, doc) => {
@@ -1012,7 +1012,68 @@ const allProjects = {
             case 'exampleURL':
                 return ['https://serverlocator.com/vote/', '440', '']
             case 'URL':
-                return 'ServerLocator.com'
+                return 'serverlocator.com'
+        }
+    },
+    TopMmoGamesRu: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://top-mmogames.ru/' + project.id
+            case 'projectName':
+                return doc.querySelector('.gamefeatures [itemprop="name"]').textContent
+            case 'exampleURL':
+                return ['https://top-mmogames.ru/', 'server-wow-amdfun', '']
+            case 'URL':
+                return 'top-mmogames.ru'
+        }
+    },
+    MmoRpgTop: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://' + project.game +'.mmorpg.top/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('.title [itemprop="name"]').textContent
+            case 'exampleURL':
+                return ['https://wow.mmorpg.top/server/', '23', '']
+            case 'URL':
+                return 'mmorpg.top'
+        }
+    },
+    MmoVoteRu: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://' + project.game +'.mmovote.ru/ru/vote/' + project.id
+            case 'projectName':
+                return doc.querySelector('.content .box h2').textContent.replace('Голосование за ', '')
+            case 'exampleURL':
+                return ['https://wow.mmovote.ru/ru/vote/', '85', '']
+            case 'URL':
+                return 'mmovote.ru'
+        }
+    },
+    McMonitoringInfo: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                if (project.game === 'minecraft') {
+                    return 'https://mc-monitoring.info/server/vote/' + project.id
+                } else {
+                    return 'https://mc-monitoring.info/' + project.game + '/server/vote/' + project.id
+                }
+            case 'pageURL':
+                if (project.game === 'minecraft') {
+                    return 'https://mc-monitoring.info/server/' + project.id
+                } else {
+                    return 'https://mc-monitoring.info/' + project.game + '/server/' + project.id
+                }
+            case 'projectName':
+                return doc.querySelector('.hello h1').textContent.replace('Игровой сервер ', '')
+            case 'exampleURL':
+                return ['https://mc-monitoring.info/wow/server/vote/', '112', '']
+            case 'URL':
+                return 'mc-monitoring.info'
         }
     },
     Custom: (type, project/*, doc*/) => {

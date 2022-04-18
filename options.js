@@ -2371,6 +2371,14 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseMinecraftRating').value
     } else if (project.rating === 'MineServers') {
         project.game = document.getElementById('chooseGameMineServers').value.toLowerCase()
+    } else if (project.rating === 'MmoRpgTop') {
+        project.game = document.getElementById('chooseGameMmoRpgTop').value.toLowerCase()
+        project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
+    } else if (project.rating === 'MmoVoteRu') {
+        project.game = document.getElementById('chooseGameMmoVoteRu').value.toLowerCase()
+        project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
+    } else if (project.rating === 'McMonitoringInfo') {
+        project.game = document.getElementById('chooseGameMcMonitoringInfo').value
     }
     
     if (project.rating === 'Custom') {
@@ -3632,6 +3640,10 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('urlGame2').style.display = 'none'
         document.getElementById('urlGameTopG').style.display = 'none'
         document.getElementById('urlGame3').style.display = 'none'
+        document.getElementById('urlGame4').style.display = 'none'
+        document.getElementById('urlGame5').style.display = 'none'
+        document.getElementById('chooseGameMmoVoteRu').required = false
+        document.getElementById('chooseGameMmoRpgTop').required = false
         document.getElementById('chooseGameMineServers').required = false
         document.getElementById('chooseGamegTop100').required = false
         document.getElementById('chooseGameTopG').required = false
@@ -3817,6 +3829,34 @@ selectedTop.addEventListener('input', function() {
     } else if (laterChoose === 'gTop100') {
         document.getElementById('urlGame2').style.display = 'none'
         document.getElementById('chooseGamegTop100').required = false
+    }
+
+    if (name === 'MmoRpgTop') {
+        document.getElementById('urlGame4').removeAttribute('style')
+        document.getElementById('chooseGameMmoRpgTop').required = true
+        document.getElementById('ordinalWorld').required = true
+        document.getElementById('label10').removeAttribute('style')
+    } else if (laterChoose === 'MmoRpgTop') {
+        document.getElementById('urlGame4').style.display = 'none'
+        document.getElementById('chooseGameMmoRpgTop').required = false
+    }
+
+    if (name === 'MmoVoteRu') {
+        document.getElementById('urlGame5').removeAttribute('style')
+        document.getElementById('chooseGameMmoVoteRu').required = true
+        document.getElementById('ordinalWorld').required = true
+        document.getElementById('label10').removeAttribute('style')
+    } else if (laterChoose === 'MmoVoteRu') {
+        document.getElementById('urlGame5').style.display = 'none'
+        document.getElementById('chooseGameMmoVoteRu').required = false
+    }
+
+    if (name === 'McMonitoringInfo') {
+        document.getElementById('urlGame6').removeAttribute('style')
+        document.getElementById('chooseGameMcMonitoringInfo').required = true
+    } else if (laterChoose === 'McMonitoringInfo') {
+        document.getElementById('urlGame6').style.display = 'none'
+        document.getElementById('chooseGameMcMonitoringInfo').required = false
     }
 
     if (name === 'BestServersCom') {

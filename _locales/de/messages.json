@@ -1,0 +1,927 @@
+{
+  "appName": {
+    "message": "Auto Vote Bewertung",
+    "description": "The title of the application, displayed in the web store."
+  },
+  "appDesc": {
+    "message": "Automatische Abstimmung für Bewertungen von Projekten oder Servern (Spiele)",
+    "description": "The description of the application, displayed in the web store."
+  },
+  "addButton": {
+    "message": "hinzufügen",
+    "description": "Button. Add"
+  },
+  "help": {
+    "message": "Über",
+    "description": "Button. About"
+  },
+  "fastAdd": {
+    "message": "Schnell hinzufügen",
+    "description": "Notification. Fast add"
+  },
+  "load": {
+    "message": "Laden...",
+    "description": "Notification. Loading message"
+  },
+  "addedButton": {
+    "message": "Hinzugefügt",
+    "description": "Button. Added"
+  },
+  "optionsButton": {
+    "message": "Optionen",
+    "description": "Button. Options"
+  },
+  "addTitle": {
+    "message": "Neues Projekt hinzufügen",
+    "description": "Header. Add"
+  },
+  "yourNick": {
+    "message": "Ihr Nickname",
+    "description": "Label. Nickname"
+  },
+  "enterNick": {
+    "message": "Geben Sie Ihren Nickname ein",
+    "description": "Input. Enter your nick"
+  },
+  "enterNickOptional": {
+    "message": "Geben Sie Ihren Spitznamen ein (optional)"
+  },
+  "siteTop": {
+    "message": "Ranking [Bewertungsseite]-Seite",
+    "description": "Label. Ranking page"
+  },
+  "selectTop": {
+    "message": "Seite auswählen",
+    "description": "Input. Select page"
+  },
+  "custom": {
+    "message": "Benutzerdefiniert",
+    "description": "Input. Custom"
+  },
+  "optionsExtension": {
+    "message": "Erweiterte optionen",
+    "description": "Header. Options"
+  },
+  "settings": {
+    "message": "Einstellungen",
+    "description": "Label. Settings"
+  },
+  "disabledNotifStart": {
+    "message": "Benachrichtigungen über den Beginn der Abstimmung deaktivieren",
+    "description": "Checkbox. Voting start notifications"
+  },
+  "disabledNotifInfo": {
+    "message": "Benachrichtigungen über erfolgreiche Abstimmungen deaktivieren",
+    "description": "Checkbox. Successful notifications"
+  },
+  "disabledNotifWarn": {
+    "message": "Warnmeldungen deaktivieren",
+    "description": "Checkbox. Alert notifications"
+  },
+  "disabledNotifWarnTooltip": {
+    "message": "Zum Beispiel eine Benachrichtigung, dass Sie bereits abgestimmt haben (dies ist der Fall, wenn die Erweiterung versucht hat, für das Projekt abzustimmen, Sie selbst aber bereits abgestimmt haben))",
+    "description": "1234"
+  },
+  "disabledNotifError": {
+    "message": "Fehlerbenachrichtigungen deaktivieren",
+    "description": "Checkbox. Error notifications"
+  },
+  "disabledCheckTime": {
+    "message": "Zeitprüfung beim Start der Verlängerung deaktivieren",
+    "description": "Checkbox. Disable time checking"
+  },
+  "disabledCheckInternet": {
+    "message": "Überprüfung der Internetverbindung deaktivieren"
+  },
+  "disabledOneVote": {
+    "message": "Gleichzeitige Stimmabgabe auf mehreren Websites deaktivieren"
+  },
+  "disabledFocusedTab": {
+    "message": "Tab Fokussiert"
+  },
+  "disableCheckProjects": {
+    "message": "Check-up deaktivieren",
+    "description": "Checkbox. Disable check when adding a project"
+  },
+  "disableCheckProjectsTooltip": {
+    "message": "Diese Einstellung deaktiviert die Überprüfung beim Hinzufügen eines Projekts, die Überprüfung für MCRate (wie Sie wissen, können Sie dort nur einmal pro Tag abstimmen) und die VK-Autorisierung. Diese Einstellung wird beim Speichern der Konfiguration nicht gespeichert",
+    "description": "Tooltip. Disable check when adding a project"
+  },
+  "priority": {
+    "message": "Priorität hinzufügen",
+    "description": "Checkbox. Priority"
+  },
+  "priorityTooltip": {
+    "message": "Wenn diese Option aktiviert ist, wird das Projekt nach dem Hinzufügen eines Projekts priorisiert und steht ohne Verzögerung von 10 Minuten als erstes zur Abstimmung.",
+    "description": "Tooltip. Priority"
+  },
+  "enabledSilentVote": {
+    "message": "Abstimmungsmodus (Vote)",
+    "description": "Label. Voting mode"
+  },
+  "enabledSilentVoteTooltip": {
+    "message": "Leiser Modus (empfohlen) - Stimmen Sie für Projekte vollständig im Hintergrund ab, ohne Tabs zu öffnen. Emulationsmodus - emuliert einen echten Benutzer, öffnet einen Tab und klickt auf die Abstimmungsschaltfläche. Es ist besser, mindestens einen Tab im Browser geöffnet zu lassen, da der Browser sonst über anderen Fenstern geöffnet ist und Unannehmlichkeiten verursachen kann..",
+    "description": "Tooltip. Silent vote"
+  },
+  "enabledSilentVoteSilent": {
+    "message": "Stiller Modus",
+    "description": "Input. Mode."
+  },
+  "enabledSilentVoteNoSilent": {
+    "message": "Emulations Modus",
+    "description": "Input. Mode."
+  },
+  "cooldown": {
+    "message": "Abstimmungszeit in Millisekunden zwischen Projekten für 1 Bewertung",
+    "description": "Label. Cooldown input"
+  },
+  "cooldownError": {
+    "message": "Timeout in ms im Falle eines Fehlers"
+  },
+  "setCooldown": {
+    "message": "Set",
+    "description": "Button. Set cooldown"
+  },
+  "settingsFile": {
+    "message": "Export/Import",
+    "description": "Label. Export/Import"
+  },
+  "importSettings": {
+    "message": "Import Einstelllungen",
+    "description": "Button. Import"
+  },
+  "exportSettings": {
+    "message": "Export Einstelllungen",
+    "description": "Button. Export"
+  },
+  "exportLogs": {
+    "message": "Export logs",
+    "description": "Button. Export"
+  },
+  "addedProjects": {
+    "message": "Liste der hinzugefügten Projekte",
+    "description": "Header. Added projects"
+  },
+  "notAddedAll": {
+    "message": "Sie haben hier noch nichts hinzugefügt"
+  },
+  "notAdded": {
+    "message": "Sie haben noch keine Projekte zu dieser Abstimmungsseite hinzugefügt!",
+    "description": "Notification. You haven't added any projects"
+  },
+  "notAvailableInSilent": {
+    "message": "Diese Funktion ist im stillen Modus standardmäßig nicht verfügbar!",
+    "description": "Notification. available in silent voting mode"
+  },
+  "supportDev": {
+    "message": "Unterstützen Sie den Entwickler",
+    "description": "Link (Express gratitude)"
+  },
+  "firstInstall": {
+    "message": "Vielen Dank für die Installation der Erweiterung. Für die weitere Arbeit sollten Sie die Erweiterung zuerst konfigurieren!"
+  },
+  "firstSettings": {
+    "message": "Standardeinstellungen generieren..."
+  },
+  "firstSettingsSave": {
+    "message": "Einstellungen wurden erfolgreich als Standard eingestellt und gespeichert"
+  },
+  "settingsGen": {
+    "message": "Projekteinstellungen wurden generiert"
+  },
+  "settingsUpdate": {
+    "message": "Aktualisieren der Standardeinstellungen..."
+  },
+  "settingsUpdateEnd": {
+    "message": "Projekteinstellungen wurden aktualisiert"
+  },
+  "settingsUpdateEnd2": {
+    "message": "Einstellungen wurden erfolgreich als Standard eingestellt und gespeichert"
+  },
+  "confirmDisableErrors": {
+    "message": "Sind Sie sicher, dass Sie die Fehlerbenachrichtigungen deaktivieren möchten? Wenn bei der Abstimmung ein Problem auftritt, wird die Erweiterung alle 5 Minuten erneut versuchen abzustimmen. Wenn Sie keine Fehlermeldungen erhalten und diese nicht im Auge behalten, könnte die Erweiterung endlos versuchen, abzustimmen. Seien Sie vorsichtig damit, Sie könnten wegen Spamming-Anfragen blockiert werden."
+  },
+  "confirmDisableCheckProjects": {
+    "message": "Sind Sie sicher, dass Sie die Überprüfung beim Hinzufügen eines Projekts deaktivieren möchten? Wenn Sie beim Hinzufügen eines Projekts einen Fehler machen, kann die Abstimmung fehlschlagen"
+  },
+  "confirmPriority": {
+    "message": "Sind Sie sicher, dass Sie diesem Projekt Priorität einräumen wollen? Wenn Sie die Priorität aktivieren, kann es zu einer verspäteten Abstimmung kommen, wenn Sie keine genaue Zeit eingestellt haben. Stellen Sie die genaue Zeit ein (sekundengenau) und ändern Sie sie nicht, damit die Abstimmung korrekt abläuft."
+  },
+  "deleteButton": {
+    "message": "Löschen"
+  },
+  "nextVote": {
+    "message": "Nächste Abstimmung nach:"
+  },
+  "inPriority": {
+    "message": "In der Priorität"
+  },
+  "adding": {
+    "message": "Hinzufügen..."
+  },
+  "lets": {
+    "message": "Ja, natürlich!"
+  },
+  "alreadyAdded": {
+    "message": "Dieses Projekt ist bereits hinzugefügt"
+  },
+  "oneProjectFairTop": {
+    "message": "Sie können immer nur für ein Projekt auf FairTop abstimmen. Um für mehrere Projekte abstimmen zu können, erlauben Sie FairTop.in nicht, Cookies zu speichern, googeln Sie, wie das geht. Deaktivieren Sie dann die Überprüfung beim Hinzufügen eines Projekts in den erweiterten Einstellungen und versuchen Sie, dieses Projekt erneut hinzuzufügen. Seien Sie vorsichtig mit der Projekt-ID: Wenn Sie ein Projekt mit deaktivierter Überprüfung hinzufügen, akzeptiert die Erweiterung das Projekt auch mit einer nicht existierenden ID."
+  },
+  "oneProject": {
+    "message": "Auf $project$ kann man nur jeweils für $count$ Projekt stimmen",
+    "placeholders": {
+      "project": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      }
+    }
+  },
+  "checkHasProject": {
+    "message": "Validierung des Projektes..."
+  },
+  "notConnectInternet": {
+    "message": "Es scheint, dass Sie keine Internetverbindung haben oder die Seite nicht verfügbar ist, siehe die Details in der Konsole"
+  },
+  "notFoundProjectCode": {
+    "message": "Es gibt kein solches Projekt! HTTP-Antwort: $code$ Überprüfen Sie die Korrektheit der eingegebenen ID (und anderer Parameter, falls vorhanden)",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "notFoundProject": {
+    "message": "Es gibt kein solches Projekt! Überprüfen Sie die Korrektheit der eingegebenen ID (und ggf. anderer Parameter)"
+  },
+  "notFoundProjectRedirect": {
+    "message": "Es gab eine Weiterleitung, wahrscheinlich gibt es kein solches Projekt! Überprüfen Sie die URL: $url$ Überprüfen Sie auch die Korrektheit der eingegebenen ID (und anderer Parameter, falls vorhanden)",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "notConnectInternetVPN": {
+    "message": "Es scheint, dass Sie keine Internetverbindung haben oder die Seite nicht verfügbar ist (Sind Sie aus der Ukraine? Aktivieren Sie das VPN und lassen Sie es während der automatischen Abstimmung aktiviert), siehe die Details in der Konsole"
+  },
+  "authButton": {
+    "message": "Einloggen"
+  },
+  "authVK": {
+    "message": "Um über $project$ abzustimmen, ist eine Autorisierung über VK erforderlich",
+    "placeholders": {
+      "project": {
+        "content": "$1"
+      }
+    }
+  },
+  "notConnect": {
+    "message": "Verbindung zu $url$ fehlgeschlagen, HTTP-Antwort: $code$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      },
+      "code": {
+        "content": "$2"
+      }
+    }
+  },
+  "checkHasProjectSuccess": {
+    "message": "Projekt ist gültig"
+  },
+  "checkAuthVK": {
+    "message": "Überprüfung der VK-Autorisierung..."
+  },
+  "checkAuthVKSuccess": {
+    "message": "VK-Autorisierung abgeschlossen"
+  },
+  "addSuccess": {
+    "message": "Erfolgreich hinzugefügt"
+  },
+  "warnSilentVote": {
+    "message": "Bitte beachten Sie, dass $top$ im Modus der stillen Abstimmung nicht verfügbar ist.",
+    "placeholders": {
+      "top": {
+        "content": "$1"
+      }
+    }
+  },
+  "cooldownChanged": {
+    "message": "Sie müssen die Erweiterung neu starten, um die Änderungen zu übernehmen. Öffnen Sie nach dem Neustart erneut die Einstellungen. Neustart der Erweiterung?"
+  },
+  "storageError": {
+    "message": "Beim Lesen der Konfiguration ist ein Fehler aufgetreten: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "saving": {
+    "message": "Speichern..."
+  },
+  "storageErrorSave": {
+    "message": "Beim Speichern der Einstellungen ist ein Fehler aufgetreten: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "successSave": {
+    "message": "Einstellungen erfolgreich gespeichert"
+  },
+  "bodyFetch": {
+    "message": "Body fetch"
+  },
+  "urlFetch": {
+    "message": "URL-Abruf"
+  },
+  "delayFetch": {
+    "message": "Verzögerung in ms"
+  },
+  "name": {
+    "message": "Name"
+  },
+  "enterName": {
+    "message": "Create a name"
+  },
+  "exporting": {
+    "message": "Exportieren..."
+  },
+  "exportingEnd": {
+    "message": "Export erfolgreich abgeschlossen"
+  },
+  "importing": {
+    "message": "Einstellungen importieren..."
+  },
+  "importingEnd": {
+    "message": "Import erfolgreich abgeschlossen"
+  },
+  "disableNotifInfo": {
+    "message": "Benachrichtigungen über erfolgreiche Abstimmungen sind deaktiviert"
+  },
+  "disableNotifWarn": {
+    "message": "Warnmeldungen sind deaktiviert"
+  },
+  "disableNotifStart": {
+    "message": "Benachrichtigungen über den Beginn der Abstimmung sind deaktiviert"
+  },
+  "retry": {
+    "message": "Erneut versuchen"
+  },
+  "successFastAdd": {
+    "message": "Die Erweiterung wurde erfolgreich konfiguriert!"
+  },
+  "closeTab": {
+    "message": "Möchten Sie diesen Tab schließen?"
+  },
+  "closeTabButton": {
+    "message": "Tab schließen"
+  },
+  "projectIDTooltip": {
+    "message": " des Projekts kann z. B. über die Adressleiste der Projektseite abgerufen werden: "
+  },
+  "gameIDTooltip": {
+    "message": " des Spiels kann z. B. über die Adressleiste der Projektseite abgerufen werden: "
+  },
+  "inputProjectID": {
+    "message": "ID eingeben"
+  },
+  "inputProjectIDOrList": {
+    "message": "Geben Sie eine ID ein oder wählen Sie aus der Liste"
+  },
+  "developers": {
+    "message": "Entwickler:"
+  },
+  "developer": {
+    "message": "Entwickler:"
+  },
+  "designer": {
+    "message": "Designer:"
+  },
+  "itsFree": {
+    "message": "Die Erweiterung ist absolut kostenlos!"
+  },
+  "feedback": {
+    "message": "Wenn Sie Fragen oder Probleme haben, können Sie sich an uns wenden unter "
+  },
+  "feedback2": {
+    "message": "oder Unterstützung unter "
+  },
+  "feedback3": {
+    "message": "oder kontaktieren Sie mich unter "
+  },
+  "dmDiscord": {
+    "message": "discord"
+  },
+  "dmChromeWebStore": {
+    "message": "Chrome Web Store"
+  },
+  "email": {
+    "message": "Email"
+  },
+  "internetRestored": {
+    "message": "Internetverbindung wiederhergestellt"
+  },
+  "internetDisconected": {
+    "message": "Die Abstimmung wurde eingeleitet, aber die Internetverbindung wurde unterbrochen, ich warte darauf, dass sie wiederhergestellt wird..."
+  },
+  "startedAutoVote": {
+    "message": "Automatische Stimmabgabe starten"
+  },
+  "successAutoVote": {
+    "message": "Erfolgreiches automatisches Abstimmen"
+  },
+  "alreadyVoted": {
+    "message": "Sie haben bereits abgestimmt"
+  },
+  "errorOpenTab": {
+    "message": "Beim Öffnen des Tabs ist ein Fehler aufgetreten: "
+  },
+  "errorAuthVK": {
+    "message": "Fehler mit dem VK-Konto! $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorRedirected": {
+    "message": "Abstimmungsfehler! Es ist eine Umleitung zu einer unbekannten Seite aufgetreten: $url$ Überprüfen Sie diese URL",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorVote": {
+    "message": "Abstimmungsfehler! HTTP-Antwort: $code$ URL: $url$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      },
+      "url": {
+        "content": "$2"
+      }
+    }
+  },
+  "errorVoteNoElement": {
+    "message": "Abstimmungsfehler, es scheint ein notwendiges Element/Button zu fehlen. Melden Sie diesen Fehler an den Entwickler der Erweiterung"
+  },
+  "errorVoteNoElement2": {
+    "message": "Fehler! Es scheint, dass ein notwendiges Element (Schaltfläche oder Eingabefeld) fehlt. Hier ist, was wir wissen: $error$. Melden Sie diesen Fehler an den Entwickler der Erweiterung",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorVoteNoNick": {
+    "message": "Abstimmungsfehler! Es ist eine Umleitung zu einer unbekannten Seite aufgetreten: $url$ Überprüfen Sie diese URL",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorVoteNoNick2": {
+    "message": "Unerwarteter Fehler, das Projekt konnte nicht gefunden werden. URL: $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorVoteUnknown": {
+    "message": "Fehler bei der Abstimmung! Hier ist, das was wir wissen: "
+  },
+  "errorVoteNetwork": {
+    "message": "Fehler bei der Abstimmung! Fehlercode: $code$ URL: $url$",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      },
+      "url": {
+        "content": "$2"
+      }
+    }
+  },
+  "errorNextVote": {
+    "message": "Der nächste Abstimmungsversuch findet in $minutes$ Minuten statt",
+    "placeholders": {
+      "minutes": {
+        "content": "$1"
+      }
+    }
+  },
+  "timeStamp": {
+    "message": "wird der Zeitstempel auf"
+  },
+  "errorClock": {
+    "message": "Failed to connect to api.cifrazia.com, $error$ Wenn Sie keine genaue Zeit eingestellt haben, wird die Erweiterung nicht richtig funktionieren",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorClock2": {
+    "message": "Verbindung zu api.cifrazia.com fehlgeschlagen, HTTP-Antwort: $httpCode$. Wenn Sie keine genaue Zeit eingestellt haben, wird die Erweiterung nicht richtig funktionieren",
+    "placeholders": {
+      "httpCode": {
+        "content": "$1"
+      }
+    }
+  },
+  "clockHurry": {
+    "message": "schnell"
+  },
+  "clockLagging": {
+    "message": "langsam"
+  },
+  "clockhours": {
+    "message": "Stunden"
+  },
+  "clockMinutes": {
+    "message": "Minuten"
+  },
+  "clockInaccurate": {
+    "message": "Es scheint, dass Ihre Zeit $count$ $unit$ $inaccurate$ ist. Die Erweiterung wird nicht richtig funktionieren, bitte stellen Sie die genaue Zeit",
+    "placeholders": {
+      "inaccurate": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      },
+      "unit": {
+        "content": "$3"
+      }
+    }
+  },
+  "clockInaccurateLog": {
+    "message": "Ihre Zeit ist $text$!",
+    "placeholders": {
+      "text": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorVoteUnknown2": {
+    "message": "Unerwarteter Fehler! Keine Fehlermeldung"
+  },
+  "projectID": {
+    "message": "ID project"
+  },
+  "firstAddSettings": {
+    "message": "Zusätzliche Einstellungen werden generiert"
+  },
+  "secondBonus": {
+    "message": "Bei$project$ müssen Sie auch die Belohnung kassieren, können wir das automatisieren?",
+    "placeholders": {
+      "project": {
+        "content": "$1"
+      }
+    }
+  },
+  "redirectedSecondBonus": {
+    "message": "Es gab eine Weiterleitung zu $url$, aber es sieht so aus, als ob Sie nicht eingeloggt sind, oder es gibt ein anderes Problem. Prüfen Sie diese URL",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "dailyBonus": {
+    "message": "Täglicher Bonus"
+  },
+  "donate": {
+    "message": "https://paypal.me/serega007ru"
+  },
+  "countVote": {
+    "message": "Wie viele Stimmen pro Tag machen"
+  },
+  "warnSilentVoteTooltip": {
+    "message": "This rating will always work in emulation mode (regardless of the voting mode setting). It is set so because this top has a ReCaptcha that's impossible to bypass. We do not recommend adding more than 1 project to one voting page where ReCaptcha is active. ReCaptcha operates on the trust factor, if you pass it too often, then ReCaptcha may ask you to solve it again(select images where 'paste any object here' is shown), which this extension doesn't know how. Also if you are using a proxy or VPN then ReCaptcha's trust factor may not work"
+  },
+  "requiresCaptcha": {
+    "message": "Erfordert das manuelle Lösen des Captcha"
+  },
+  "authSteam": {
+    "message": "Erfordert Steam-Authentifizierung"
+  },
+  "privacyPass": {
+    "message": "Installieren Sie die "
+  },
+  "privacyPass2": {
+    "message": " Erweiterung, um 5 kostenlose Captcha-Pässe für hCaptcha zu erhalten"
+  },
+  "privacyPass3": {
+    "message": "Oder registrieren Sie sich auf "
+  },
+  "privacyPass4": {
+    "message": " und folgen Sie den Anweisungen. Nachdem Sie die Cookies auf hCaptcha gesetzt haben, installieren Sie eine beliebige Erweiterung, die die Cookies im Browser bearbeiten kann, zum Beispiel "
+  },
+  "privacyPass5": {
+    "message": " und verlängern Sie die Gültigkeit aller Cookies für die Domain hcaptcha.com um einige Jahre"
+  },
+  "this": {
+    "message": "diese"
+  },
+  "randomize": {
+    "message": "Zufallswahl der nächsten Abstimmung"
+  },
+  "randomizeTooltip": {
+    "message": "Innerhalb der angegebenen Grenzen wird der Zeitpunkt der nächsten Abstimmung nach dem Zufallsprinzip bestimmt. Dies ist vor allem notwendig, um es den Server-Administratoren zu erschweren, anzunehmen, dass Sie die automatische Abstimmung verwenden."
+  },
+  "inRandomize": {
+    "message": "Randomisiert"
+  },
+  "soon": {
+    "message": "Bald..."
+  },
+  "inQueue": {
+    "message": "In der Warteschlange für die Abstimmung..."
+  },
+  "now": {
+    "message": "Es findet gerade eine Abstimmung statt..."
+  },
+  "timeout": {
+    "message": "Die Wartezeit für die Abstimmung ist abgelaufen, die Abstimmung wird neu gestartet."
+  },
+  "chooseLang": {
+    "message": "Sprache/Region wählen"
+  },
+  "chooseGame": {
+    "message": "Geben Sie die Spiel-ID ein oder wählen Sie aus der Liste"
+  },
+  "chooseGameURL": {
+    "message": "Geben Sie die URL des Spiels ein oder wählen Sie aus der Liste"
+  },
+  "idGame": {
+    "message": "Spiel-ID"
+  },
+  "urlGame": {
+    "message": "Spiel-URL"
+  },
+  "stats": {
+    "message": "$project$ Statistiken",
+    "placeholders": {
+      "project": {
+        "content": "$1"
+      }
+    }
+  },
+  "stats2": {
+    "message": "Statistiken"
+  },
+  "statsSuccessVotes": {
+    "message": "Erfolgreiche Abstimmungen"
+  },
+  "statsMonthSuccessVotes": {
+    "message": "Erfolgreiche Abstimmungen für diesen Monat"
+  },
+  "statsLastMonthSuccessVotes": {
+    "message": "Erfolgreiche Abstimmungen im Vormonat"
+  },
+  "statsErrorVotes": {
+    "message": "Fehler"
+  },
+  "statsLaterVotes": {
+    "message": "'Sie haben bereits abgestimmt' Fehler"
+  },
+  "statsLastSuccessVote": {
+    "message": "Letzte erfolgreiche Abstimmung"
+  },
+  "statsLastAttemptVote": {
+    "message": "Letzter Abstimmungsversuch"
+  },
+  "statsAdded": {
+    "message": "Hinzugefügt"
+  },
+  "statsInstalled": {
+    "message": "Installiert"
+  },
+  "generalStats": {
+    "message": "Allgemeine Statistiken"
+  },
+  "todayStats": {
+    "message": "Statistik für heute"
+  },
+  "selectTime": {
+    "message": "Wählen Sie die zu verwendende Zeitüberschreitung(timeout)"
+  },
+  "timeoutMS": {
+    "message": "Timeout in ms. seit der letzten Abstimmung"
+  },
+  "timeoutHour": {
+    "message": "Nach einer bestimmten Zeit (einmal pro Tag)"
+  },
+  "chooseHour": {
+    "message": "Einstellen der Stunde"
+  },
+  "advSettings": {
+    "message": "Erweiterte Einstellung:"
+  },
+  "customTimeOut": {
+    "message": "Anpassen des Zeitpunkts der nächsten Abstimmung (timeout)"
+  },
+  "lastDayMonth": {
+    "message": "Benutzerdefiniertes Timeout nur am letzten Tag des Monats anwenden"
+  },
+  "customTimeOut2": {
+    "message": "Benutzerdefinierte Zeitüberschreitung"
+  },
+  "lastDayMonth2": {
+    "message": "am letzten Tag des Monats"
+  },
+  "scheduleTime": {
+    "message": "Planen Sie eine Abstimmung"
+  },
+  "discordLogIn": {
+    "message": "Du musst eingeloggt sein, um Discord-Bots hochzuvoten!"
+  },
+  "auth": {
+    "message": "Nur registrierte Benutzer können über diese Bewertung abstimmen. Bitte loggen Sie sich ein oder registrieren Sie sich."
+  },
+  "emptySite": {
+    "message": "Es scheint, dass diese Bewertung mit einer leeren Seite reagiert hat. Versuchen Sie, diese Seite zu besuchen und fügen Sie sie dann erneut hinzu"
+  },
+  "ordinalWorld": {
+    "message": "Weltweite Zählnummer"
+  },
+  "ordinalWorldTooltip": {
+    "message": "Die Weltnummer ist die Nummer, die bei der Abstimmung in der Liste der ausgewählten Welten steht."
+  },
+  "requiredNick": {
+    "message": "Wo ist der Nickname? Es gibt keine Steam-Autorisierungsschaltfläche, also brauche ich einen Spitznamen und der ist notwendig"
+  },
+  "alertCaptcha": {
+    "message": "Es gibt ein Captcha auf dieser Bewertungsseite, das die Erweiterung nicht lösen kann. Sie müssen es manuell lösen, die Erweiterung wird Sie darauf hinweisen."
+  },
+  "chooseTopGG": {
+    "message": "Was wählen wir?"
+  },
+  "bots": {
+    "message": "Bots"
+  },
+  "guilds": {
+    "message": "Guilds"
+  },
+  "servers": {
+    "message": "Servers"
+  },
+  "serversMinecraftRating": {
+    "message": "Servers (keine Belohnung für die Abstimmung)"
+  },
+  "projects": {
+    "message": "Projects"
+  },
+  "additionTopGG": {
+    "message": "Zusätzliche Parameter (optional)"
+  },
+  "emptyError": {
+    "message": "Leerer Fehler"
+  },
+  "notificationsDisabled": {
+    "message": "Benachrichtigungen sind deaktiviert oder die Erweiterung hat keinen Zugriff auf sie! Sie könnten wichtige Benachrichtigungen dieser Erweiterung über Fehler oder Warnungen verpassen!"
+  },
+  "errorAttemptVote": {
+    "message": "Überschreitung der maximalen Anzahl von Abstimmungsversuchen, $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "notFast": {
+    "message": "Nicht so schnell, warten Sie auf die Ausführung der Funktion"
+  },
+  "voteMode": {
+    "message": "Erzwingen der Einstellung des Abstimmungsmodus"
+  },
+  "start": {
+    "message": "Starten der Erweiterung v$version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "suspended": {
+    "message": "Erweiterung ausgesetzt"
+  },
+  "errordb": {
+    "message": "Fehler mit der Datenbank $db$ $error$",
+    "placeholders": {
+      "db": {
+        "content": "$1"
+      },
+      "error": {
+        "content": "$2"
+      }
+    }
+  },
+  "errordbTitle": {
+    "message": "Fehler mit der Datenbank $db$",
+    "placeholders": {
+      "db": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorSelectSiteRating": {
+    "message": "Die 'Bewertungsseite' ist falsch angegeben, wählen Sie die gewünschte Seite aus der Liste aus."
+  },
+  "clearLogs": {
+    "message": "Protokolle löschen"
+  },
+  "clearingLogs": {
+    "message": "Löschung der Protokolle"
+  },
+  "clearedLogs": {
+    "message": "Protokolle erfolgreich gelöscht"
+  },
+  "deleteAll": {
+    "message": "Alle löschen"
+  },
+  "deleteAllRating": {
+    "message": "Wollen Sie wirklich alle hinzugefügten Projekte in dieser Bewertung löschen?"
+  },
+  "notGrantUrl": {
+    "message": "Sie haben der Erweiterung keinen Zugriff auf die Bewertung(en) gewährt, das Hinzufügen ist nicht möglich"
+  },
+  "grantUrl": {
+    "message": "Gewährung des Zugriffs der Erweiterung auf die Bewertung(en)"
+  },
+  "grant": {
+    "message": "Grant"
+  },
+  "permissions": {
+    "message": "Berechtigungen"
+  },
+  "granted": {
+    "message": "Gewährt"
+  },
+  "notgranted": {
+    "message": "Nicht gewährt"
+  },
+  "oldSettings": {
+    "message": "Die Einstellungen der alten Version $old$ sind erkannt worden, ich aktualisiere sie auf die neue Version $new$",
+    "placeholders": {
+      "old": {
+        "content": "$1"
+      },
+      "new": {
+        "content": "$2"
+      }
+    }
+  },
+  "randomizeInput": {
+    "message": "Geben Sie die Randomisierungsgrenzen (min und max) in Millisekunden an"
+  },
+  "errorCaptcha": {
+    "message": "Fehler mit Captcha: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "passageCaptcha": {
+    "message": "Warnung! reCAPTCHA/hCaptcha arbeitet mit dieser Bewertung, wenn Sie oft aufgefordert werden, ein Captcha manuell zu passieren (wählen Sie Bilder), können Sie herausfinden, wie man dieses Problem zu lösen "
+  },
+  "here": {
+    "message": "hier"
+  },
+  "notRegVK":{
+    "message": "Die Registrierung dieses Kontos ist nicht abgeschlossen (Telefonnummer ist nicht angegeben)"
+  },
+  "version": {
+    "message": "Version: "
+  },
+  "min": {
+    "message": "Minimum"
+  },
+  "max": {
+    "message": "Maximum"
+  },
+  "translated": {
+    "message": "Übersetzt ins Deutsche: [GER]msebastian100#6704"
+  },
+  "notSupportedGroupTabs": {
+    "message": "Ihr Browser scheint die Gruppierung von Tabs nicht zu unterstützen: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "projectDeleted": {
+    "message": "Das Projekt wurde vom Benutzer gelöscht"
+  }
+}
