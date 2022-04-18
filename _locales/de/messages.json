@@ -301,6 +301,14 @@
   "addSuccess": {
     "message": "Erfolgreich hinzugefügt"
   },
+  "addSuccessNicks": {
+    "message": "Erfolgreich $count$ Nicknames hinzugefügt",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
   "warnSilentVote": {
     "message": "Bitte beachten Sie, dass $top$ im Modus der stillen Abstimmung nicht verfügbar ist.",
     "placeholders": {
@@ -611,6 +619,55 @@
   "requiresCaptcha": {
     "message": "Erfordert das manuelle Lösen des Captcha"
   },
+  "multivote": {
+    "message": "Mehrfachabstimmung"
+  },
+  "VK": {
+    "message": "VKontakte"
+  },
+  "proxy": {
+    "message": "Proxy"
+  },
+  "notWork": {
+    "message": "Funktioniert nicht"
+  },
+  "useMultiVote": {
+    "message": "VK und Proxy bei der Abstimmung verwenden (MultiVote aktivieren)"
+  },
+  "added": {
+    "message": "Bereits hinzugefügt"
+  },
+  "notAuthAcc": {
+    "message": "Sie sind nicht bei $acc$ eingeloggt",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "type": {
+    "message": "Typ auswählen"
+  },
+  "notFoundVK": {
+    "message": "Kein kostenloses VK-Konto verfügbar"
+  },
+  "notFoundProxy": {
+    "message": "Kein kostenloser Proxy verfügbar"
+  },
+  "importProxy": {
+    "message": "Importieren"
+  },
+  "checkSchemeProxy": {
+    "message": "Definieren des Proxy-Typs, aktuell: $scheme$",
+    "placeholders": {
+      "scheme": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorCheckSchemeProxy": {
+    "message": "Der Typ des Proxys kann nicht bestimmt werden, dieser Proxy ist wahrscheinlich tot."
+  },
   "authSteam": {
     "message": "Erfordert Steam-Authentifizierung"
   },
@@ -619,6 +676,77 @@
   },
   "privacyPass2": {
     "message": " Erweiterung, um 5 kostenlose Captcha-Pässe für hCaptcha zu erhalten"
+  },
+  "deleteAllProxies": {
+    "message": "Alle Proxys löschen"
+  },
+  "deleteNotWorking": {
+    "message": "Nicht funktionierende Proxys löschen"
+  },
+  "clearCookies": {
+    "message": "Cookies löschen"
+  },
+  "deletingAllProxies": {
+    "message": "Löschen aller hinzugefügten Proxys..."
+  },
+  "deletedAllProxies": {
+    "message": "Alle Proxys wurden erfolgreich gelöscht!"
+  },
+  "deletingNotWokingProxies": {
+    "message": "Löschen von nicht funktionierenden Proxys..."
+  },
+  "deletedNotWokingProxies": {
+    "message": "Alle nicht funktionierenden Proxys wurden erfolgreich gelöscht!"
+  },
+  "deletingAllAcc": {
+    "message": "Löschen von $acc$-Cookies und Tabs...",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "deletedAllAcc": {
+    "message": "Alle $acc$ Cookies und Tabs wurden erfolgreich gelöscht!",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "importTunnelBear": {
+    "message": "Proxys von TunnelBear importieren"
+  },
+  "importWindscribe": {
+    "message": "Proxys von Windscribe importieren"
+  },
+  "importHolaVPN": {
+    "message": "Proxys von HolaVPN importieren"
+  },
+  "importZenMate": {
+    "message": "Proxys aus ZenMate importieren"
+  },
+  "importNordVPN": {
+    "message": "Proxys von NordVPN importieren"
+  },
+  "importSurfShark": {
+    "message": "Proxys aus SurfShark importieren"
+  },
+  "importVPNStart": {
+    "message": "Importieren aus $vpn$",
+    "placeholders": {
+      "vpn": {
+        "content": "$1"
+      }
+    }
+  },
+  "importVPNEnd": {
+    "message": "Import von $vpn$ erfolgreich abgeschlossen",
+    "placeholders": {
+      "vpn": {
+        "content": "$1"
+      }
+    }
   },
   "privacyPass3": {
     "message": "Oder registrieren Sie sich auf "
@@ -653,6 +781,12 @@
   "timeout": {
     "message": "Die Wartezeit für die Abstimmung ist abgelaufen, die Abstimmung wird neu gestartet."
   },
+  "repeatAttemptLater": {
+    "message": "Ignorieren Sie zumindest die Fehlermeldung 'Sie haben bereits gewählt'."
+  },
+  "least": {
+    "message": "am wenigsten"
+  },
   "chooseLang": {
     "message": "Sprache/Region wählen"
   },
@@ -664,6 +798,21 @@
   },
   "idGame": {
     "message": "Spiel-ID"
+  },
+  "stopVote": {
+    "message": "an/aus"
+  },
+  "voteSuspending": {
+    "message": "Stoppe abstimmen..."
+  },
+  "voteSuspended": {
+    "message": "Automatische Stimmabgabe gestoppt"
+  },
+  "voteSuspendedDay": {
+    "message": "Automatische Stimmabgabe für 6 Stunden gestoppt"
+  },
+  "voteResumed": {
+    "message": "Automatische Stimmabgabe wieder aufgenommen"
   },
   "urlGame": {
     "message": "Spiel-URL"
@@ -724,6 +873,36 @@
   "chooseHour": {
     "message": "Einstellen der Stunde"
   },
+  "ip": {
+    "message": "IP"
+  },
+  "port": {
+    "message": "Port"
+  },
+  "login": {
+    "message": "Anmeldung"
+  },
+  "password": {
+    "message": "Passwort"
+  },
+  "ipLabel": {
+    "message": "IP eingeben"
+  },
+  "portLabel": {
+    "message": "Port eingeben"
+  },
+  "loginLabel": {
+    "message": "Proxy-Anmeldung (optional)"
+  },
+  "passwordLabel": {
+    "message": "Proxy-Passwort (optional)"
+  },
+  "typeLabel": {
+    "message": "Protokoll wählen"
+  },
+  "chooseMinute": {
+    "message": "Einstellen der Uhrzeit"
+  },
   "advSettings": {
     "message": "Erweiterte Einstellung:"
   },
@@ -738,6 +917,23 @@
   },
   "lastDayMonth2": {
     "message": "am letzten Tag des Monats"
+  },
+  "openPopupAcc": {
+    "message": "Öffnen des Autorisierungsfensters $acc$. Nach der Autorisierung schließen Sie das Autorisierungsfenster",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "notAuthVKTop": {
+    "message": "Dieses VK-Konto ist für die folgenden Bewertungen nicht zugelassen: "
+  },
+  "authOK": {
+    "message": "Auth ist OK, das Konto wurde hinzugefügt"
+  },
+  "notAcceptAuth": {
+    "message": "Klicken Sie, um sich einzuloggen. Wenn Sie nicht über die aufgelisteten Bewertungen abstimmen wollen, ignorieren Sie einfach diese Meldung"
   },
   "scheduleTime": {
     "message": "Planen Sie eine Abstimmung"
@@ -790,6 +986,74 @@
   "notificationsDisabled": {
     "message": "Benachrichtigungen sind deaktiviert oder die Erweiterung hat keinen Zugriff auf sie! Sie könnten wichtige Benachrichtigungen dieser Erweiterung über Fehler oder Warnungen verpassen!"
   },
+  "deletingCookies": {
+    "message": "Cookie löschen: $url$",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "applyVKCookies": {
+    "message": "Cookies anwenden VK: $vk$",
+    "placeholders": {
+      "vk": {
+        "content": "$1"
+      }
+    }
+  },
+  "applyProxy": {
+    "message": "Proxy anwenden: $proxy$",
+    "placeholders": {
+      "proxy": {
+        "content": "$1"
+      }
+    }
+  },
+  "proxyTBTokenExpired": {
+    "message": "Das TunnelBear-Token ist ungültig oder abgelaufen, ich versuche, ein neues zu bekommen..."
+  },
+  "proxyTBAuth1": {
+    "message": "Autorisierung mit TunnelBear ist erforderlich"
+  },
+  "proxyTBAuth2": {
+    "message": "Loggen Sie sich über den folgenden Link ein: https://www.tunnelbear.com/account/login Abstimmung für 6 Stunden ausgesetzt"
+  },
+  "alreadyVotedRepeat": {
+    "message": "Sie haben bereits abgestimmt, wir versuchen es jetzt noch einmal mit einem anderen Proxy..."
+  },
+  "alreadyVotedFail": {
+    "message": "Alle Versuche sind abgelaufen, Sie haben bereits gewählt, höchstwahrscheinlich hat jemand mit diesem Nickname bereits gewählt"
+  },
+  "closeTabError": {
+    "message": "Fehler beim Schließen des Tabs"
+  },
+  "errorAuthProxy1": {
+    "message": "Proxy-Autorisierungsfehler!"
+  },
+  "errorAuthProxy2": {
+    "message": "Die maximale Anzahl der Anmeldeversuche wurde überschritten, höchstwahrscheinlich ist der Benutzername oder das Passwort unrichtigt"
+  },
+  "proxyAuth": {
+    "message": "Der Proxy erfordert eine Autorisierung, ich melde mich an..."
+  },
+  "proxyAuthOther": {
+    "message": "Proxy $proxy$ erfordert Autorisierung, ich melde mich an...",
+    "placeholders": {
+      "proxy": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorAuthProxyTB": {
+    "message": "Das TunnelBear-Token ist ungültig oder abgelaufen, es gibt nichts, womit man sich beim Proxy anmelden könnte! Stimmabgabe für 6 Stunden ausgesetzt"
+  },
+  "errorAuthProxyNoPassword": {
+    "message": "Dieser Proxy erfordert eine Autorisierung durch Benutzername und Passwort, aber Sie haben dies nicht im Proxy eingestellt"
+  },
+  "loginTB": {
+    "message": "Um einen Proxy von TunnelBear zu importieren, ist eine Autorisierung erforderlich, "
+  },
   "errorAttemptVote": {
     "message": "Überschreitung der maximalen Anzahl von Abstimmungsversuchen, $error$",
     "placeholders": {
@@ -798,11 +1062,85 @@
       }
     }
   },
+  "proxyBlackList": {
+    "message": "Schwarze Liste von Websites für Proxys"
+  },
+  "proxyPacScript": {
+    "message": "Proxy PacScript"
+  },
+  "proxyBLSet": {
+    "message": "Schwarze Liste der Proxyseiten aktualisiert"
+  },
+  "pattern": {
+    "message": "Muster: "
+  },
+  "otherProxy": {
+    "message": "Einige andere Erweiterungen auf dem VPN/Proxy stören uns, deaktivieren Sie diese Erweiterungen und dann können wir den Proxy verwalten. Stimmabgabe für 6 Stunden ausgesetzt"
+  },
+  "oauthVK": {
+    "message": "Die $rating$-App fordert Zugang zu deinem Konto an.",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
   "notFast": {
     "message": "Nicht so schnell, warten Sie auf die Ausführung der Funktion"
   },
+  "updateAvailbe": {
+    "message": "Verfügbare $Version$ aktualisieren",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "update": {
+    "message": "Update"
+  },
   "voteMode": {
     "message": "Erzwingen der Einstellung des Abstimmungsmodus"
+  },
+  "multivoteMode": {
+    "message": "Erzwingen der Einstellung des MultiVote-Modus"
+  },
+  "enableMultiVoteMode": {
+    "message": "MultiVote Mode"
+  },
+  "enabledMultiVoteModeTooltip": {
+    "message": "Legt den MultiVote-Modus separat für das hinzugefügte Projekt fest, ignoriert die allgemeine MultiVote-Umschaltung"
+  },
+  "withMultiVote": {
+    "message": "Mit MultiVote"
+  },
+  "withoutMultiVote": {
+    "message": "Ohne MultiVote"
+  },
+  "updated": {
+    "message": "Erweiterung erfolgreich auf $version$ aktualisiert",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "useProxyOnUnProxyTop": {
+    "message": "Verwenden Sie einen Proxy für Bewertungen, bei denen kein Proxy verwendet wird (MinecraftRating und MisterLauncher)"
+  },
+  "reAddSuccess": {
+    "message": "Erfolgreich wieder eingefügt"
+  },
+  "confirmDeleteAcc": {
+    "message": "Alle Cookies und $acc$ Tabs werden gelöscht, sind Sie damit einverstanden?",
+    "placeholders": {
+      "acc": {
+        "content": "$1"
+      }
+    }
+  },
+  "tempNick": {
+    "message": "Temporärer Nickname"
   },
   "start": {
     "message": "Starten der Erweiterung v$version$",
@@ -814,6 +1152,41 @@
   },
   "suspended": {
     "message": "Erweiterung ausgesetzt"
+  },
+  "updating": {
+    "message": "Aktualisierung der Erweiterung"
+  },
+  "reloadExtension": {
+    "message": "Starten Sie die Erweiterung neu"
+  },
+  "update1": {
+    "message": "Aufgrund der Einschränkungen der Chrome-API können wir nicht feststellen, in welchem Ordner Sie die Erweiterung installiert haben, geben Sie an, in welchem Ordner Sie die Erweiterung installiert haben, und erlauben Sie dann den Zugriff auf den angegebenen Ordner"
+  },
+  "update2": {
+    "message": "Wir prüfen, ob Sie den richtigen Speicherort für den Ordner angegeben haben"
+  },
+  "update3": {
+    "message": "This extension is not installed in this folder, specify the folder that you specified when installing this extension ($error$)",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
+  },
+  "update4": {
+    "message": "Laden Sie eine Sicherungskopie der Erweiterungseinstellungen herunter, falls die Aktualisierung fehlschlägt"
+  },
+  "update5": {
+    "message": "Wir löschen alle Dateien und Ordner der Erweiterung für spätere Updates"
+  },
+  "update6": {
+    "message": "Wir nutzen git, um eine Liste der neuen Dateien zu erhalten"
+  },
+  "dowloading": {
+    "message": "Herunterladen "
+  },
+  "update8": {
+    "message": "Die Erweiterung wurde erfolgreich aktualisiert, starten Sie die Erweiterung neu, damit die Änderungen wirksam werden"
   },
   "errordb": {
     "message": "Fehler mit der Datenbank $db$ $error$",
@@ -846,11 +1219,91 @@
   "clearedLogs": {
     "message": "Protokolle erfolgreich gelöscht"
   },
+  "antiBanVK": {
+    "message": "Registrieren Sie ein Konto bei TopCraft und McTOP"
+  },
+  "antiBanVKTooltip": {
+    "message": "Legt das Passwort für das Konto auf TopCraft und McTOP nach der Anmeldung auf dem VK fest. Danach, bei der Abstimmung über die angegebenen Bewertungen, Autorisierung ist nicht durch die VK durchgeführt, sondern mit dem eingestellten Passwort, das Ihnen erlaubt, auf die angegebenen Bewertungen zu stimmen, auch wenn die VK-Konto in der Sperre ist. Löschen Sie Ihr VK-Konto nicht aus der Erweiterung, wenn es gesperrt ist, und wenn Sie über die angegebenen Bewertungen abstimmen, wird die Erweiterung es weiterhin verwenden"
+  },
+  "antiBanVKStart": {
+    "message": "Wir beginnen damit, das Passwort für $rating$ festzulegen",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
+  "antiBanVKEnd": {
+    "message": "Das Passwort $password$ wurde erfolgreich auf $rating$ gesetzt",
+    "placeholders": {
+      "password": {
+        "content": "$1"
+      },
+      "rating": {
+        "content": "$2"
+      }
+    }
+  },
+  "autoAuthVKStart": {
+    "message": "Ich erlaube automatisch den Zugriff auf das Konto $rating$",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
+  },
+  "autoAuthVK": {
+    "message": "Automatischer Zugriff auf die Bewertungen Ihres VK-Kontos"
+  },
+  "confirmAutoAuthVK": {
+    "message": "Sind Sie damit einverstanden, dass persönliche Daten und E-Mail-Adressen von später hinzugefügten Konten an Bewertungen übertragen werden? (TopCraft, McTOP, MCRate, MinecraftRating und MonitoringMinecraft)"
+  },
+  "tryManuallyUpdate": {
+    "message": "Wenn der Fehler weiterhin besteht, versuchen Sie, die Erweiterung manuell zu aktualisieren"
+  },
+  "importVKRequred": {
+    "message": "Sie haben das Kästchen daneben nicht angekreuzt "
+  },
+  "clearVKCookies": {
+    "message": "Cookies vor dem Einloggen löschen"
+  },
+  "saveVKCredentials": {
+    "message": "Speichern Sie Ihren Benutzernamen und Ihr Passwort für eine Notiz"
+  },
+  "confirmSaveVKCredentials": {
+    "message": "Wollen Sie wirklich den Benutzernamen und das Passwort, das Sie für Ihr Konto eingegeben haben, speichern? Diese Daten werden unverschlüsselt gespeichert und können von einem Drittprogramm (Virus oder Trojaner) gestohlen werden.)"
+  },
+  "importVK": {
+    "message": "Hinzufügen mit login:password"
+  },
+  "importSettingsVK": {
+    "message": "VK über exportierte Einstellungen hinzufügen"
+  },
+  "importingSettingVKEnd": {
+    "message": "$count$ der VK-Konten hinzugefügt",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "importNicks": {
+    "message": "Nicknames importieren"
+  },
+  "yourNicks": {
+    "message": "Ihre Nicknames"
+  },
+  "ChangeLog": {
+    "message": "Was ist neu?"
+  },
   "deleteAll": {
     "message": "Alle löschen"
   },
   "deleteAllRating": {
     "message": "Wollen Sie wirklich alle hinzugefügten Projekte in dieser Bewertung löschen?"
+  },
+  "importRegBorealis": {
+    "message": "Anmeldung durch Login: Passwort"
   },
   "notGrantUrl": {
     "message": "Sie haben der Erweiterung keinen Zugriff auf die Bewertung(en) gewährt, das Hinzufügen ist nicht möglich"
@@ -898,11 +1351,20 @@
   "here": {
     "message": "hier"
   },
+  "forceUpdate": {
+    "message": "Aktualisierung der Erweiterung erzwingen"
+  },
+  "addBannedVK": {
+    "message": "Ein VK-Konto hinzufügen, auch wenn es gesperrt ist"
+  },
   "notRegVK":{
     "message": "Die Registrierung dieses Kontos ist nicht abgeschlossen (Telefonnummer ist nicht angegeben)"
   },
   "version": {
     "message": "Version: "
+  },
+  "useProxyPacScript": {
+    "message": "Proxy PacScript verwenden"
   },
   "min": {
     "message": "Minimum"
@@ -920,6 +1382,15 @@
         "content": "$1"
       }
     }
+  },
+  "cancel": {
+    "message": "Abbrechen"
+  },
+  "canceled": {
+    "message": "Vom Benutzer abgebrochen"
+  },
+  "searchAcc": {
+    "message": "Suche nach einem kostenlosen Proxy/Account"
   },
   "projectDeleted": {
     "message": "Das Projekt wurde vom Benutzer gelöscht"
