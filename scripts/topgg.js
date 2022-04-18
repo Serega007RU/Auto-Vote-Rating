@@ -20,7 +20,7 @@ async function vote(first) {
         return
     }
 
-    const login = findElement('button', ['login to vote'])
+    const login = findElement('a', ['login to vote'])
     if (login != null) {
         login.click()
         return
