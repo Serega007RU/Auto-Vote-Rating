@@ -71,6 +71,12 @@
   "disabledCheckInternet": {
     "message": "Отключить проверку соединения интернета"
   },
+  "disabledOneVote": {
+    "message": "Отключить одновременное голосование сразу на нескольких сайтах"
+  },
+  "disabledFocusedTab": {
+    "message": "Focused tab"
+  },
   "disableCheckProjects": {
     "message": "Отключить проверку"
   },
@@ -96,7 +102,10 @@
     "message": "Режим эмуляции"
   },
   "cooldown": {
-    "message": "Тайм-аут голосования в мс между проектами для 1 рейтинга"
+    "message": "Таймаут голосования в мс между проектами для 1 рейтинга"
+  },
+  "cooldownError": {
+    "message": "Таймаут в мс при ошибке"
   },
   "setCooldown": {
     "message": "Установить"

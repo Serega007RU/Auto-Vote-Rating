@@ -14,7 +14,7 @@
 	},
 	"description": "__MSG_appDesc__",
 	"manifest_version": 2,
-	"minimum_chrome_version": "61.0",
+	"minimum_chrome_version": "85.0",
 	"name": "__MSG_appName__",
 	"options_ui": {
 		"open_in_tab": true,
@@ -43,7 +43,7 @@
 		"<all_urls>"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "6.6.0",
+	"version": "6.7.0",
 	"default_locale": "en",
 	"web_accessible_resources": [
 		"options.html"

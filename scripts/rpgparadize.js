@@ -4,7 +4,7 @@ function vote(first) {
         return
     }
 
-    if (document.URL.includes('top-site-Autre-10')) {
+    if (document.querySelector('b.page-spacer')) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }

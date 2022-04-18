@@ -1,8 +1,9 @@
 async function vote(first) {
     if (first === false) return
     //К чему это ожидание?
-    if (document.getElementById('infoMessage') != null) document.getElementById('infoMessage').style.display = 'none'
-    if (document.getElementById('inputFields') != null) document.getElementById('inputFields').removeAttribute('style')
+    if (document.querySelector('#infoMessage') != null) document.querySelector('#infoMessage').style.display = 'none'
+    if (document.querySelector('#inputFields') != null) document.querySelector('#inputFields').removeAttribute('style')
+    if (document.querySelector('#voteBox') != null) document.querySelector('#voteBox').removeAttribute('style')
 
     if (document.querySelector('div.alert.alert-success') != null) {
         chrome.runtime.sendMessage({successfully: true})
@@ -18,6 +19,6 @@ async function vote(first) {
     }
 
     const project = await getProject('MinecraftServerEu')
-    document.getElementById('playername').value = project.nick
-    document.getElementById('captcha').click()
+    document.querySelector('#voteBox input').value = project.nick
+    document.querySelector('#voteBox button').click()
 }

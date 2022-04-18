@@ -55,7 +55,10 @@ async function restoreOptions() {
     if (!settings.enabledSilentVote) document.getElementById('enabledSilentVote').value = 'disabled'
 //     document.getElementById('disabledCheckTime').checked = settings.disabledCheckTime
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
+    document.getElementById('disabledOneVote').checked = settings.disabledOneVote
+    document.getElementById('disabledFocusedTab').checked = settings.disabledFocusedTab
     document.getElementById('timeoutValue').value = settings.timeout
+    document.getElementById('timeoutErrorValue').value = settings.timeoutError
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
 }
@@ -357,6 +360,10 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledCheckTime = this.checked*/
         else if (this.id === 'disabledCheckInternet')
             settings.disabledCheckInternet = this.checked
+        else if (this.id === 'disabledOneVote')
+            settings.disabledOneVote = this.checked
+        else if (this.id === 'disabledFocusedTab')
+            settings.disabledFocusedTab = this.checked
         else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false
@@ -534,6 +541,14 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseMinecraftRating').value
     } else if (project.rating === 'MineServers') {
         project.game = document.getElementById('chooseGameMineServers').value.toLowerCase()
+    } else if (project.rating === 'MmoRpgTop') {
+        project.game = document.getElementById('chooseGameMmoRpgTop').value.toLowerCase()
+        project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
+    } else if (project.rating === 'MmoVoteRu') {
+        project.game = document.getElementById('chooseGameMmoVoteRu').value.toLowerCase()
+        project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
+    } else if (project.rating === 'McMonitoringInfo') {
+        project.game = document.getElementById('chooseGameMcMonitoringInfo').value
     }
     
     if (project.rating === 'Custom') {
@@ -565,6 +580,22 @@ document.getElementById('timeout').addEventListener('submit', async (event)=>{
         event.target.classList.add('disabled')
     }
     settings.timeout = document.getElementById('timeoutValue').valueAsNumber
+    await db.put('other', settings, 'settings')
+    createNotif(chrome.i18n.getMessage('successSave'), 'success')
+    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+    event.target.classList.remove('disabled')
+})
+
+//Слушатель кнопки "Установить" на таймауте при ошибке
+document.getElementById('timeoutError').addEventListener('submit', async (event)=>{
+    event.preventDefault()
+    if (event.target.classList.contains('disabled')) {
+        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
+        return
+    } else {
+        event.target.classList.add('disabled')
+    }
+    settings.timeoutError = document.getElementById('timeoutErrorValue').valueAsNumber
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('successSave'), 'success')
     if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
@@ -1481,6 +1512,10 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('urlGame2').style.display = 'none'
         document.getElementById('urlGameTopG').style.display = 'none'
         document.getElementById('urlGame3').style.display = 'none'
+        document.getElementById('urlGame4').style.display = 'none'
+        document.getElementById('urlGame5').style.display = 'none'
+        document.getElementById('chooseGameMmoVoteRu').required = false
+        document.getElementById('chooseGameMmoRpgTop').required = false
         document.getElementById('chooseGameMineServers').required = false
         document.getElementById('chooseGamegTop100').required = false
         document.getElementById('chooseGameTopG').required = false
@@ -1660,6 +1695,34 @@ selectedTop.addEventListener('input', function() {
     } else if (laterChoose === 'gTop100') {
         document.getElementById('urlGame2').style.display = 'none'
         document.getElementById('chooseGamegTop100').required = false
+    }
+
+    if (name === 'MmoRpgTop') {
+        document.getElementById('urlGame4').removeAttribute('style')
+        document.getElementById('chooseGameMmoRpgTop').required = true
+        document.getElementById('ordinalWorld').required = true
+        document.getElementById('label10').removeAttribute('style')
+    } else if (laterChoose === 'MmoRpgTop') {
+        document.getElementById('urlGame4').style.display = 'none'
+        document.getElementById('chooseGameMmoRpgTop').required = false
+    }
+
+    if (name === 'MmoVoteRu') {
+        document.getElementById('urlGame5').removeAttribute('style')
+        document.getElementById('chooseGameMmoVoteRu').required = true
+        document.getElementById('ordinalWorld').required = true
+        document.getElementById('label10').removeAttribute('style')
+    } else if (laterChoose === 'MmoVoteRu') {
+        document.getElementById('urlGame5').style.display = 'none'
+        document.getElementById('chooseGameMmoVoteRu').required = false
+    }
+
+    if (name === 'McMonitoringInfo') {
+        document.getElementById('urlGame6').removeAttribute('style')
+        document.getElementById('chooseGameMcMonitoringInfo').required = true
+    } else if (laterChoose === 'McMonitoringInfo') {
+        document.getElementById('urlGame6').style.display = 'none'
+        document.getElementById('chooseGameMcMonitoringInfo').required = false
     }
 
     if (name === 'BestServersCom') {

@@ -106,7 +106,7 @@ async function checkOpen(project/*, transaction*/) {
 
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
     for (let value of queueProjects) {
-        if (project.rating === value.rating || value.randomize && project.randomize) {
+        if (project.rating === value.rating || value.randomize && project.randomize || settings.disabledOneVote) {
             if (!value.nextAttempt) return
             if (Date.now() < value.nextAttempt) {
                 return
@@ -256,7 +256,7 @@ async function newWindow(project) {
         const url = allProjects[project.rating]('voteURL', project)
         
         let tab = await new Promise(resolve=>{
-            chrome.tabs.create({url, active: false}, function(tab_) {
+            chrome.tabs.create({url, active: settings.disabledFocusedTab}, function(tab_) {
                 if (chrome.runtime.lastError) {
                     resolve()
                     endVote({message: chrome.runtime.lastError.message}, null, project)
@@ -795,7 +795,7 @@ chrome.webRequest.onErrorOccurred.addListener(function(details) {
                 //Chrome
                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
                 //FireFox
-                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING')) {
+                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
                     // console.warn(getProjectPrefix(project, true) + details.error)
                     return
             }
@@ -1081,12 +1081,9 @@ async function endVote(request, sender, project) {
         let retryCoolDown
         if (request.errorVote && request.errorVote[0] === '404') {
             retryCoolDown = 21600000
-        } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-            retryCoolDown = 300000
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '5')
         } else {
-            retryCoolDown = 900000
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', '15')
+            retryCoolDown = settings.timeoutError
+            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', (Math.round(settings.timeoutError / 1000 / 60 * 100) / 100).toString())
         }
         if (project.randomize) {
             retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)

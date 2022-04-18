@@ -664,7 +664,8 @@ nav .logo img {
 	margin-bottom: 10px;
 }
 
-#timeout {
+#timeout,
+#timeoutError {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	grid-gap: 5px;
