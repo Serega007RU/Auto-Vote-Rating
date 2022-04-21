@@ -48,7 +48,7 @@ async function initializeConfig(background, version) {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 70, {upgrade})
+    db = await idb.openDB('avr', 80, {upgrade})
     db.onerror = (event) => dbError(event, false)
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {
@@ -254,7 +254,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
     }
 
-    if (oldVersion <= 6 || oldVersion <= 60) {
+    if (oldVersion <= 7 || oldVersion <= 70) {
         settings = await transaction.objectStore('other').get('settings')
         settings.timeoutError = 0
         settings.disabledOneVote = false
