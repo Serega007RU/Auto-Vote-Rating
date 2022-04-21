@@ -1481,13 +1481,13 @@ selectedTop.addEventListener('input', function() {
     let name
     if (document.querySelector('#projectList > option[value="' + this.value + '"]') != null) {
         name = document.querySelector('#projectList > option[value="' + this.value + '"]').getAttribute('name')
-        if (name === 'ListForge' && this.value !== 'ListForge.net') {
+        if (name === 'ListForge' && this.value !== 'listforge.net') {
             document.getElementById('chooseGameListForge').value = this.value
-            this.value = 'ListForge.net'
+            this.value = 'listforge.net'
         } else if (name === 'MineServers') {
-            if (this.value === 'MineServers.com') document.getElementById('chooseGameMineServers').value = 'mineservers.com'
+            if (this.value === 'mineservers.com') document.getElementById('chooseGameMineServers').value = 'mineservers.com'
             else document.getElementById('chooseGameMineServers').value = this.value
-            this.value = 'MineServers.com'
+            this.value = 'mineservers.com'
         }
     }
     if (name == null) {
