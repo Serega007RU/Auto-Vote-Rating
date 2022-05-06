@@ -7,7 +7,7 @@ async function vote(first) {
         chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
         return
     }
-    if (document.querySelector('div.alert.alert-succes') != null) {
+    if (document.querySelector('div.alert.alert-success') != null) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }

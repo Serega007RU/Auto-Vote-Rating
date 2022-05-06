@@ -1076,6 +1076,20 @@ const allProjects = {
                 return 'mc-monitoring.info'
         }
     },
+    McServerTimeCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://mcservertime.com/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://mcservertime.com/' + project.id
+            case 'projectName':
+                return doc.querySelector('.server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://mcservertime.com/', 'server-blastmc-asia.1399', '/vote']
+            case 'URL':
+                return 'mcservertime.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':

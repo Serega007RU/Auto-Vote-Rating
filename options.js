@@ -483,7 +483,7 @@ function generateBtnListRating(rating, count) {
 //  div.setAttribute('data-resource', 'notAdded')
 //  div.textContent = chrome.i18n.getMessage('notAdded')
 //  ul.append(div)
-    if (!(/*rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' ||*/ rating === 'MinecraftRating' || rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'MisterLauncher' || rating === 'MinecraftListCZ' || rating === 'WARGM' || rating === 'Custom')) {
+    if (!(/*rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' || rating === 'MinecraftRating' ||*/ rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'MisterLauncher' || rating === 'MinecraftListCZ' || rating === 'WARGM' || rating === 'Custom')) {
         const label = document.createElement('label')
         label.setAttribute('data-resource', 'passageCaptcha')
         label.textContent = chrome.i18n.getMessage('passageCaptcha')
@@ -2855,7 +2855,7 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (!(element != null || project.rating === 'MinecraftIndex' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MineServers' || project.rating === 'MinecraftListCZ' || project.rating === 'WARGM' || project.rating === 'Custom')) {
+    if (!(element != null || project.rating === 'MinecraftIndex' || /*(project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MineServers' || project.rating === 'MinecraftListCZ' || project.rating === 'WARGM' || project.rating === 'Custom')) {
         array.push(document.createElement('br'))
         array.push(document.createElement('br'))
         array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
