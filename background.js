@@ -119,7 +119,7 @@ async function checkOpen(project/*, transaction*/) {
     }
 
     let retryCoolDown
-    if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
+    if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -227,10 +227,10 @@ async function newWindow(project) {
     if (project.rating === 'Custom') {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
+        if (!project.emulateMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
             silentVoteMode = true
         }
-    } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' ||*/ (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
+    } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
@@ -312,25 +312,25 @@ async function newWindow(project) {
 
 async function silentVote(project) {
     try {
-        if (project.rating === 'MinecraftRating') {
-            let response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
-            if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
-            if (response.doc.querySelector('div.alert.alert-danger') != null) {
-                if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
-                    endVote({later: true}, null, project)
-                } else {
-                    endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
-                }
-            } else if (response.doc.querySelector('div.alert.alert-success') != null) {
-                if (response.doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
-                    endVote({successfully: true}, null, project)
-                } else {
-                    endVote({message: response.doc.querySelector('div.alert.alert-success').textContent}, null, project)
-                }
-            } else {
-                endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null'}, null, project)
-            }
-        } else
+        // if (project.rating === 'MinecraftRating') {
+        //     let response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
+        //     if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
+        //     if (response.doc.querySelector('div.alert.alert-danger') != null) {
+        //         if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
+        //             endVote({later: true}, null, project)
+        //         } else {
+        //             endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
+        //         }
+        //     } else if (response.doc.querySelector('div.alert.alert-success') != null) {
+        //         if (response.doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
+        //             endVote({successfully: true}, null, project)
+        //         } else {
+        //             endVote({message: response.doc.querySelector('div.alert.alert-success').textContent}, null, project)
+        //         }
+        //     } else {
+        //         endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null'}, null, project)
+        //     }
+        // } else
 
         if (project.rating === 'MonitoringMinecraft') {
             let i = 0
