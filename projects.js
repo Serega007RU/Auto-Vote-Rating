@@ -50,8 +50,6 @@ const allProjects = {
     MinecraftRating: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                if (project.game === 'projects') return 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45'
-                else return 'https://minecraftrating.ru/vote/' + project.id + '/'
             case 'pageURL':
                 if (project.game === 'projects') return 'https://minecraftrating.ru/projects/' + project.id + '/'
                 else return 'https://minecraftrating.ru/vote/' + project.id + '/'
