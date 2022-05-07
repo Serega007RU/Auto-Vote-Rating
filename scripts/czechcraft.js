@@ -7,12 +7,8 @@ async function vote(first) {
         if (document.querySelector('div.alert.alert-error').textContent.includes('Již si hlasoval')) {
             if (document.querySelector('div.alert.alert-error').textContent.match(/\d+/g)) {
                 const numbers = document.querySelector('div.alert.alert-error').textContent.match(/\d+/g).map(Number)
-                let time = new Date()
-                if (time.getUTCHours() > numbers[0] || (time.getUTCHours() === numbers[0] && time.getUTCMinutes() >= numbers[1]) || (time.getUTCHours() === numbers[0] && time.getUTCMinutes() === numbers[1] && time.getUTCMinutes() >= numbers[2])) {
-                    time.setUTCDate(time.getUTCDate() + 1)
-                }
-                time.setUTCHours(numbers[0], numbers[1], numbers[2], 0)
-                chrome.runtime.sendMessage({later: time.getTime()})
+                const date = new Date()
+                chrome.runtime.sendMessage({later: Date.UTC(date.getFullYear(), date.getMonth(), date.getDay() + 1/*Отсчёт дня начинает с нуля?*/, numbers[0] - 2/*На czech-craft время указано в часовом поясе UTC +2*/, numbers[1], numbers[2])})
             } else {
                 chrome.runtime.sendMessage({later: true})
             }

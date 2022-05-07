@@ -7,7 +7,7 @@ async function vote(first) {
         chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
         return
     }
-    if (document.querySelector('div.alert.alert-succes') != null) {
+    if (document.querySelector('div.alert.alert-success') != null) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
@@ -16,5 +16,16 @@ async function vote(first) {
 
     const project = await getProject('MinecraftServersListOrg')
     document.getElementById('mc_user').value = project.nick
-    document.getElementById('vote-btn').click()
 }
+
+const timer = setInterval(()=>{
+    try {
+        const voteBtn = document.getElementById('vote-btn')
+        if (!voteBtn.disabled) {
+            clearInterval(timer)
+            voteBtn.click()
+        }
+    } catch (e) {
+        throwError(e)
+    }
+}, 1000)

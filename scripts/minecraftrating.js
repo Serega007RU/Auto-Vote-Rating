@@ -1,19 +1,21 @@
 async function vote(first) {
     const project = await getProject('MinecraftRating')
     if (project.game === 'projects') {
-        if (first === false) return
         if (document.querySelector('div.alert.alert-danger') != null) {
             if (document.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
                 chrome.runtime.sendMessage({later: true})
             }
         } else if (document.querySelector('div.alert.alert-success') != null && document.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
             chrome.runtime.sendMessage({successfully: true})
-        } else if (document.querySelector('input[name=nick]') != null) {
+        }
+
+        if (first) {
             document.querySelector('input[name=nick]').value = project.nick
             document.querySelector('button[type=submit]').click()
-        } else {
-            setTimeout(()=>chrome.runtime.sendMessage({message: 'Ошибка, input[name=nick] является null'}), 10000)
+            return
         }
+
+        document.querySelector('#submitVote').click()
     } else {
         const timer = setInterval(()=>{
             try {

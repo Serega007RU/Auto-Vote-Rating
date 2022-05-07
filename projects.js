@@ -50,8 +50,6 @@ const allProjects = {
     MinecraftRating: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                if (project.game === 'projects') return 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45'
-                else return 'https://minecraftrating.ru/vote/' + project.id + '/'
             case 'pageURL':
                 if (project.game === 'projects') return 'https://minecraftrating.ru/projects/' + project.id + '/'
                 else return 'https://minecraftrating.ru/vote/' + project.id + '/'
@@ -1074,6 +1072,20 @@ const allProjects = {
                 return ['https://mc-monitoring.info/wow/server/vote/', '112', '']
             case 'URL':
                 return 'mc-monitoring.info'
+        }
+    },
+    McServerTimeCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://mcservertime.com/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://mcservertime.com/' + project.id
+            case 'projectName':
+                return doc.querySelector('.server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://mcservertime.com/', 'server-blastmc-asia.1399', '/vote']
+            case 'URL':
+                return 'mcservertime.com'
         }
     },
     Custom: (type, project/*, doc*/) => {
