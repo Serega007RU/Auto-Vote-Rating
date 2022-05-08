@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
     await initializeConfig()
 
     await restoreOptions()
-    
+
     if (document.URL.endsWith('?installed')) {
         window.history.replaceState(null, null, 'options.html')
         alert(chrome.i18n.getMessage('firstInstall'))
@@ -108,7 +108,7 @@ async function addProjectList(project) {
             if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkVote()
         }
     }
-    
+
     const listProject = document.getElementById(project.rating + 'List')
     if (listProject.childElementCount === 0 && listProject.parentElement.style.display === 'none') return
     const li = document.createElement('li')
@@ -128,22 +128,22 @@ async function addProjectList(project) {
             }
         }
     }
-    
+
     const div = document.createElement('div')
     div.classList.add('controlItems')
-    
+
     const img1 = document.createElement('img')
     img1.src = 'images/icons/stats.svg'
     img1.classList.add('projectStats')
     div.appendChild(img1)
-    
+
     const img2 = document.createElement('img')
     img2.src = 'images/icons/delete.svg'
     div.appendChild(img2)
-    
+
     const contDiv = document.createElement('div')
     contDiv.classList.add('message')
-    
+
     const nameProjectMes = document.createElement('div')
     nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
     contDiv.append(nameProjectMes)
@@ -152,15 +152,15 @@ async function addProjectList(project) {
     div2.classList.add('error')
     div2.textContent = project.error
     contDiv.appendChild(div2)
-    
+
     const nextVoteMes = document.createElement('div')
     nextVoteMes.classList.add('textNextVote')
     nextVoteMes.textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
     contDiv.append(nextVoteMes)
-    
+
     li.append(contDiv)
     li.append(div)
-    
+
     if (preBend) {
         listProject.prepend(li)
     } else {
@@ -286,7 +286,7 @@ async function removeProjectList(project) {
     await db.delete('projects', project.key)
 
     chrome.alarms.clear(String(project.key))
-    
+
     if (!chrome.extension.getBackgroundPage()) return
     let nowVoting = false
     for (const value of chrome.extension.getBackgroundPage().queueProjects) {
@@ -520,7 +520,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
         project.game = document.getElementById('chooseGameTopG').value
     } else if (project.rating === 'gTop100') {
         project.game = document.getElementById('chooseGamegTop100').value
-    } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ServeurMinecraftVoteFr') {
+    } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ServeurMinecraftVoteFr' || project.rating === 'ListeServeursFr') {
         project.maxCountVote = document.getElementById('countVote').valueAsNumber
         project.countVote = 0
         if (project.rating === 'TopGames') {
@@ -550,7 +550,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     } else if (project.rating === 'McMonitoringInfo') {
         project.game = document.getElementById('chooseGameMcMonitoringInfo').value
     }
-    
+
     if (project.rating === 'Custom') {
         let body
         try {
@@ -881,7 +881,7 @@ async function checkPermissions(projects, element) {
         }
         if (project.rating === 'BestServersCom') {
             // if (project.game !== 'minecraft' && project.game !== 'metine2' && project.game !== 'minecraftpe' && project.game !== 'runescape' && project.game !== 'world-of-warcraft') {
-                if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
+            if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
             // }
         }
         if (project.rating === 'ListForge') {
@@ -893,7 +893,7 @@ async function checkPermissions(projects, element) {
             if (!permissions.includes('cookies')) permissions.push('cookies')
         }
     }
-    
+
     let granted = await new Promise(resolve=>{
         chrome.permissions.contains({origins, permissions}, resolve)
     })
@@ -970,12 +970,12 @@ function extractHostname(url) {
     return hostname
 }
 const getDomainWithoutSubdomain = url => {
-  const urlParts = new URL(url).hostname.split('.')
+    const urlParts = new URL(url).hostname.split('.')
 
-  return urlParts
-    .slice(0)
-    .slice(-(urlParts.length === 4 ? 3 : 2))
-    .join('.')
+    return urlParts
+        .slice(0)
+        .slice(-(urlParts.length === 4 ? 3 : 2))
+        .join('.')
 }
 
 //Слушатель на экспорт настроек
@@ -1037,7 +1037,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         if (event.target.files.length === 0) return
         const [file] = event.target.files
         const data = await new Response(file).json()
-        
+
         const projects = data.projects
 
         if (!await checkPermissions(projects)) return
@@ -1208,7 +1208,7 @@ async function fastAdd() {
             html.append(div)
             listFastAdd.append(html)
         }
-        
+
         const projects = getUrlProjects()
         const html2 = document.createElement('div')
         html2.classList.add('fastAddEl')
@@ -1620,7 +1620,7 @@ selectedTop.addEventListener('input', function() {
             selectedTop.after(' ')
         } else if (name === 'TopGames' || name === 'ServeurPrive' || name === 'MMoTopRU') {
 //          document.getElementById('nick').required = false
-            
+
             if (name === 'MMoTopRU') {
                 document.getElementById('ordinalWorld').required = true
                 document.getElementById('label10').removeAttribute('style')
@@ -1657,14 +1657,14 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('nick').parentElement.removeAttribute('style')
     }
 
-    if (name === 'ServeurPrive' || name === 'TopGames' || name === 'MCServerList' || name === 'CzechCraft' || name === 'MinecraftServery' || name === 'MinecraftListCZ' || name === 'ListeServeursMinecraft' || name === 'ServeursMCNet' || name === 'ServeursMinecraftCom' || name === 'ServeurMinecraftVoteFr') {
+    if (name === 'ServeurPrive' || name === 'TopGames' || name === 'MCServerList' || name === 'CzechCraft' || name === 'MinecraftServery' || name === 'MinecraftListCZ' || name === 'ListeServeursMinecraft' || name === 'ServeursMCNet' || name === 'ServeursMinecraftCom' || name === 'ServeurMinecraftVoteFr' || name === 'ListeServeursFr') {
         document.getElementById('countVote').required = true
         document.getElementById('label5').removeAttribute('style')
-    } else if (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MCServerList' || laterChoose === 'CzechCraft' || laterChoose === 'MinecraftServery' || laterChoose === 'MinecraftListCZ' || laterChoose === 'ListeServeursMinecraft' || laterChoose === 'ServeursMCNet' || laterChoose === 'ServeursMinecraftCom' || laterChoose === 'ServeurMinecraftVoteFr') {
+    } else if (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MCServerList' || laterChoose === 'CzechCraft' || laterChoose === 'MinecraftServery' || laterChoose === 'MinecraftListCZ' || laterChoose === 'ListeServeursMinecraft' || laterChoose === 'ServeursMCNet' || laterChoose === 'ServeursMinecraftCom' || laterChoose === 'ServeurMinecraftVoteFr' || laterChoose === 'ListeServeursFr') {
         document.getElementById('countVote').required = false
         document.getElementById('label5').style.display = 'none'
     }
-    
+
     if (name === 'ListForge') {
         document.getElementById('nick').required = false
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')

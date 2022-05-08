@@ -1088,6 +1088,20 @@ const allProjects = {
                 return 'mcservertime.com'
         }
     },
+    ListeServeursFr: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://www.liste-serveurs.fr/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://www.liste-serveurs.fr/' + project.id
+            case 'projectName':
+                return doc.querySelector('.server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://www.liste-serveurs.fr/', 'server-pixel-prime-serveur-pixelmon.512', '/vote']
+            case 'URL':
+                return 'liste-serveurs.fr'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':

@@ -222,7 +222,7 @@ async function newWindow(project) {
     if (create) {
         chrome.alarms.create(String(project.key), {when: project.nextAttempt})
     }
-    
+
     let silentVoteMode = false
     if (project.rating === 'Custom') {
         silentVoteMode = true
@@ -254,7 +254,7 @@ async function newWindow(project) {
         }
 
         const url = allProjects[project.rating]('voteURL', project)
-        
+
         let tab = await new Promise(resolve=>{
             chrome.tabs.create({url, active: settings.disabledFocusedTab}, function(tab_) {
                 if (chrome.runtime.lastError) {
@@ -944,7 +944,7 @@ async function endVote(request, sender, project) {
             }
         } else if (request.later && Number.isInteger(request.later)) {
             time = new Date(request.later)
-            if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || request.rating === 'ServeurMinecraftVoteFr') {
+            if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || request.rating === 'ServeurMinecraftVoteFr' || request.rating === 'ListeServeursFr') {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
                     time = new Date()
@@ -981,7 +981,7 @@ async function endVote(request, sender, project) {
                 time.setUTCHours(time.getUTCHours() + 12)
             } else if (project.rating === 'MinecraftIpList' || project.rating === 'HotMC' || project.rating === 'MinecraftServerNet' || project.rating === 'TMonitoring' || project.rating === 'MCServers' || project.rating === 'CraftList' || project.rating === 'TopMCServersCom' || project.rating === 'CraftListNet' || project.rating === 'MinecraftServers100' || project.rating === 'MineStatus' || project.rating === 'MinecraftServersDe' || (project.rating === 'MinecraftRating' && project.game === 'servers') || (project.rating === 'MisterLauncher' && project.game === 'servers') || project.rating === 'ATLauncher' || project.rating === 'MCServidores' || project.rating === 'MinecraftServerSk' || project.rating === 'ServeursMinecraftOrg') {
                 time.setUTCDate(time.getUTCDate() + 1)
-            } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ServeurMinecraftVoteFr') {
+            } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ServeurMinecraftVoteFr' || project.rating === 'ListeServeursFr') {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
                     time.setDate(time.getDate() + 1)
@@ -990,7 +990,7 @@ async function endVote(request, sender, project) {
                 } else {
                     if (project.rating === 'ServeurPrive' || project.rating === 'ServeurMinecraftVoteFr') {
                         time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30)
-                    } else if (project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMinecraftCom') {
+                    } else if (project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ListeServeursFr') {
                         time.setUTCHours(time.getUTCHours() + 3)
                     } else {
                         time.setUTCHours(time.getUTCHours() + 2)
@@ -1098,7 +1098,7 @@ async function endVote(request, sender, project) {
         generalStats.errorVotes++
         todayStats.errorVotes++
     }
-    
+
     await db.put('other', generalStats, 'generalStats')
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
