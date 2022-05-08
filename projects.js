@@ -1102,6 +1102,20 @@ const allProjects = {
                 return 'liste-serveurs.fr'
         }
     },
+    ServeurMinecraftFr: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://serveur-minecraft.fr/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://serveur-minecraft.fr/' + project.id
+            case 'projectName':
+                return doc.querySelector('.server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://serveur-minecraft.fr/', 'server-oneblock-farm2win.525', '/vote']
+            case 'URL':
+                return 'serveur-minecraft.fr'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
