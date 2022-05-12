@@ -9,8 +9,10 @@ async function vote(first) {
     }
 
     const project = await getProject('MineServTop')
-    document.querySelector('.b-vote-modal__content input').value = project.nick
-    document.querySelector('.b-vote-modal__content input').dispatchEvent(new Event('input'))
+    if (document.querySelector('.b-vote-modal__content input')) {
+        document.querySelector('.b-vote-modal__content input').value = project.nick
+        document.querySelector('.b-vote-modal__content input').dispatchEvent(new Event('input'))
+    }
     document.querySelector('.b-vote-modal__content button').click()
 }
 
