@@ -1116,6 +1116,19 @@ const allProjects = {
                 return 'serveur-minecraft.fr'
         }
     },
+    MineServTop: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://mineserv.top/' + project.id
+            case 'projectName':
+                return doc.querySelector('.project-name h1').textContent
+            case 'exampleURL':
+                return ['https://mineserv.top/', 'epserv', '']
+            case 'URL':
+                return 'mineserv.top'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
