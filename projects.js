@@ -602,7 +602,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://topmcservers.com/server/' + project.id
             case 'projectName':
-                return doc.querySelector('#serverPage > h1.header').textContent
+                return doc.querySelector('#serverPage h1.header').textContent
             case 'exampleURL':
                 return ['https://topmcservers.com/server/', '17', '/vote']
             case 'URL':
