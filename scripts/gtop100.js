@@ -1,7 +1,7 @@
 async function vote(first) {
     if (document.querySelector('#captcha-status').textContent) return
 
-    if (first) return
+    if (first && document.querySelector('#myCaptcha')) return
 
     document.querySelector('#votebutton').click()
 }
