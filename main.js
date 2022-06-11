@@ -48,7 +48,7 @@ async function initializeConfig(background, version) {
         }
     }
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 80, {upgrade})
+    db = await idb.openDB('avr', 90, {upgrade})
     db.onerror = (event) => dbError(event, false)
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {
@@ -260,6 +260,18 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         settings.disabledOneVote = false
         settings.disabledFocusedTab = false
         await transaction.objectStore('other').put(settings, 'settings')
+    }
+
+    if (oldVersion <= 8 || oldVersion <= 80) {
+        if (!transaction) transaction = db.transaction('projects', 'readwrite')
+        const store = transaction.objectStore('projects')
+        let cursor = await store.index('rating').openCursor('WARGM')
+        while (cursor) {
+            const project = cursor.value
+            project.randomize = {min: 0, max: 14400000}
+            await cursor.update(project)
+            cursor = await cursor.continue()
+        }
     }
 
     if (!todayStats) {

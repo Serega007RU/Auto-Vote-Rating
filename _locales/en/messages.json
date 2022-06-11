@@ -1394,5 +1394,8 @@
   },
   "projectDeleted": {
     "message": "The project was deleted by the user"
+  },
+  "banAttention": {
+    "message": "Attention! There have been cases of blocking for auto-voting on this site, please use auto-voting on this site with caution, watch out for notifications and errors"
   }
 }
