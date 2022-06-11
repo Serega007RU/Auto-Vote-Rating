@@ -16,17 +16,19 @@ async function vote() {
         return
     }
 
-    //Зачем такие костыли
     const button = document.querySelector('div.card-footer button')
-    button.disabled = false
-    button.setAttribute('data-send', '/server/vote')
 
     if (button.textContent.includes('ч.')) {
         const numbers = button.textContent.match(/\d+/g).map(Number)
         const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
         chrome.runtime.sendMessage({later: Date.now() + milliseconds})
     } else {
-        button.click()
+        const timer2 = setInterval(() => {
+            if (!button.disabled) {
+                clearInterval(timer2)
+                button.click()
+            }
+        }, 1000)
     }
 }
 
