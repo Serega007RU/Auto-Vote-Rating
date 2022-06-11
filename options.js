@@ -2532,9 +2532,12 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
             if (bal.querySelector('font[color="red"]') != null) {
                 bal.querySelector('font[color="red"]').remove()
             }
+            let formTokens = doc.querySelectorAll('input[name="formToken"]')
             let number = bal.textContent.match(/\d+/g).map(Number)
             let coin = number[1]
             let vote = number[2]
+
+            let updateFormTokens = false
 
             if (document.getElementById('BorealisWhatToSend').value === 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value === 'Только бореалики') {
                 coins = coins + coin
@@ -2545,7 +2548,7 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
 		            	'content-type': 'application/x-www-form-urlencoded',
                         'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
                       },
-                      'body': 'username=' + nick + '&amount=' + coin + '&transferBorealics=1',
+                      'body': 'username=' + nick + '&amount=' + coin + '&transferBorealics=1&formToken=' + encodeURIComponent(formTokens[0].value),
                       'method': 'POST'
                     })
                     //Почему не UTF-8?
@@ -2559,6 +2562,8 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
                     const result = doc.querySelector('div.alert.alert-success')
                     result.querySelector('button').remove()
                     createNotif(acc.nick + ' - ' + result.textContent + ' ' + coin + ' бореалисиков', 'hint', 1000)
+
+                    updateFormTokens = true
                 } else {
                     createNotif('На ' + acc.nick + ' 0 бореаликов', 'warn', 2000)
                 }
@@ -2567,13 +2572,33 @@ document.getElementById('sendBorealis').addEventListener('submit', async (event)
             if (document.getElementById('BorealisWhatToSend').value === 'Бореалики и голоса' || document.getElementById('BorealisWhatToSend').value === 'Только голоса') {
                 votes = votes + vote
                 if (vote > 0) {
+                    if (updateFormTokens) {
+                        let response = await fetch('https://borealis.su/index.php?do=lk', {
+                            'headers': {
+                                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                                'content-type': 'application/x-www-form-urlencoded',
+                                'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                            },
+                            'method': 'POST'
+                        })
+                        //Почему не UTF-8?
+                        response = await new Response(new TextDecoder('windows-1251').decode(await response.arrayBuffer()))
+                        let html = await response.text()
+                        if (html.length < 250) {
+                            createNotif(acc.nick + ' ' + html, 'error', 3000)
+                            continue
+                        }
+                        let doc = new DOMParser().parseFromString(html, 'text/html')
+                        formTokens = doc.querySelectorAll('input[name="formToken"]')
+                    }
+
                     response = await fetch('https://borealis.su/index.php?do=lk', {
                       'headers': {
                         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
 		            	'content-type': 'application/x-www-form-urlencoded',
                         'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
                       },
-                      'body': 'username=' + nick + '&amount=' + vote + '&transferBorealics=1&isVote=1',
+                      'body': 'username=' + nick + '&amount=' + vote + '&transferBorealics=1&isVote=1&formToken=' + encodeURIComponent(formTokens[1].value),
                       'method': 'POST'
                     })
                     //Почему не UTF-8?
