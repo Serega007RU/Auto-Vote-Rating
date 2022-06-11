@@ -1652,9 +1652,21 @@ selectedTop.addEventListener('input', function() {
     if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords' || name === 'DiscordBoats' || name === 'XtremeTop100' || name === 'WARGM') {
         document.getElementById('nick').required = false
         document.getElementById('nick').parentElement.style.display = 'none'
+        document.querySelector('#banAttention').removeAttribute('style')
+        if (!document.querySelector('#randomize').checked) {
+            document.querySelector('#randomize').click()
+            document.querySelector('#randomizeMin').value = '0'
+            document.querySelector('#randomizeMax').value = '14400000'
+        }
     } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats' || laterChoose === 'XtremeTop100' || laterChoose === 'WARGM') {
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
+        document.querySelector('#banAttention').style.display = 'none'
+        if (document.querySelector('#randomize').checked) {
+            document.querySelector('#randomize').click()
+            document.querySelector('#randomizeMin').value = ''
+            document.querySelector('#randomizeMax').value = ''
+        }
     }
 
     if (name === 'ServeurPrive' || name === 'TopGames' || name === 'MCServerList' || name === 'CzechCraft' || name === 'MinecraftServery' || name === 'MinecraftListCZ' || name === 'ListeServeursMinecraft' || name === 'ServeursMCNet' || name === 'ServeursMinecraftCom' || name === 'ServeurMinecraftVoteFr' || name === 'ListeServeursFr') {

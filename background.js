@@ -119,7 +119,9 @@ async function checkOpen(project/*, transaction*/) {
     }
 
     let retryCoolDown
-    if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
+    if (project.rating === 'WARGM') {
+        retryCoolDown = 7200000
+    } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
         retryCoolDown = 300000
     } else {
         retryCoolDown = 900000
@@ -1079,7 +1081,7 @@ async function endVote(request, sender, project) {
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
-        if (request.errorVote && request.errorVote[0] === '404') {
+        if ((request.errorVote && request.errorVote[0] === '404') || (request.message && project.rating === 'WARGM')) {
             retryCoolDown = 21600000
         } else {
             retryCoolDown = settings.timeoutError
