@@ -1,14 +1,14 @@
 async function vote(first) {
-    if (document.querySelector('div.ui.success.message') != null) {
+    if (document.querySelector('div.success.message') != null) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
-    if (document.querySelector('div.alert.alert-danger') != null) {
-        if (document.querySelector('div.alert.alert-danger').textContent.includes('must wait until tomorrow')) {
+    if (document.querySelector('div.error.message') != null) {
+        if (document.querySelector('div.error.message').textContent.includes('must wait until tomorrow')) {
             chrome.runtime.sendMessage({later: true})
             return
         }
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
+        chrome.runtime.sendMessage({message: document.querySelector('div.error.message').textContent})
         return
     }
 

@@ -74,6 +74,40 @@
 <a href="https://mmorpg.top/">mmorpg.top</a>  
 <a href="https://mmovote.ru/">mmovote.ru</a>  
 <a href="https://mc-monitoring.info/">mc-monitoring.info</a>  
+<a href="https://mcservertime.com/">mcservertime.com</a>  
+<a href="https://www.liste-serveurs.fr/">liste-serveurs.fr</a>  
+<a href="https://serveur-minecraft.fr/">serveur-minecraft.fr</a>  
+<a href="https://7daystodie-servers.com/">7daystodie-servers.com</a>  
+<a href="https://ark-servers.net/">ark-servers.net</a>  
+<a href="https://arma3-servers.net/">arma3-servers.net</a>  
+<a href="https://atlas-servers.io/">atlas-servers.io</a>  
+<a href="https://conan-exiles.com/">conan-exiles.com</a>  
+<a href="https://counter-strike-servers.net/">counter-strike-servers.net</a>  
+<a href="https://cubeworld-servers.com/">cubeworld-servers.com</a>  
+<a href="https://dayz-servers.org/">dayz-servers.org</a>  
+<a href="https://ecoservers.io/">ecoservers.io</a>  
+<a href="https://empyrion-servers.com/">empyrion-servers.com</a>  
+<a href="https://gmod-servers.com/">gmod-servers.com</a>  
+<a href="https://hurtworld-servers.net/">hurtworld-servers.net</a>  
+<a href="https://hytale-servers.io/">hytale-servers.io</a>  
+<a href="https://life-is-feudal.org/">life-is-feudal.org</a>  
+<a href="https://minecraftpocket-servers.com/">minecraftpocket-servers.com</a>  
+<a href="https://minecraft-tracker.com/">minecraft-tracker.com</a>  
+<a href="https://miscreated-servers.com/">miscreated-servers.com</a>  
+<a href="https://reign-of-kings.net/">reign-of-kings.net</a>  
+<a href="https://rust-servers.net/">rust-servers.net</a>  
+<a href="https://space-engineers.com/">space-engineers.com</a>  
+<a href="https://squad-servers.com/">squad-servers.com</a>  
+<a href="https://starbound-servers.net/">starbound-servers.net</a>  
+<a href="https://tf2-servers.com/">tf2-servers.com</a>  
+<a href="https://teamspeak-servers.org/">teamspeak-servers.org</a>  
+<a href="https://terraria-servers.com/">terraria-servers.com</a>  
+<a href="https://unturned-servers.net/">unturned-servers.net</a>  
+<a href="https://wurm-unlimited.com/">wurm-unlimited.com</a>  
+<a href="https://pixelmonservers.com/">pixelmonservers.com</a>  
+<a href="https://tekkitserverlist.com/">tekkitserverlist.com</a>  
+<a href="https://technicservers.com/">technicservers.com</a>  
+<a href="https://ftbservers.com/">ftbservers.com</a>
 </details>
 
 ### Links to the extension where you can install it:

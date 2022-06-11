@@ -12,6 +12,11 @@ async function vote(first) {
         return
     }
 
+    //Костыль, reCAPTCHA загружается только после scroll, странно, да?
+    document.querySelector('#username').scrollIntoView()
+    window.scrollTo(window.scrollX, window.scrollY + 16)
+    document.dispatchEvent(new Event('scroll'))
+
     if (first) return
 
     const project = await getProject('ServersMinecraft')

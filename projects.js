@@ -602,7 +602,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://topmcservers.com/server/' + project.id
             case 'projectName':
-                return doc.querySelector('#serverPage > h1.header').textContent
+                return doc.querySelector('#serverPage h1.header').textContent
             case 'exampleURL':
                 return ['https://topmcservers.com/server/', '17', '/vote']
             case 'URL':
@@ -1086,6 +1086,47 @@ const allProjects = {
                 return ['https://mcservertime.com/', 'server-blastmc-asia.1399', '/vote']
             case 'URL':
                 return 'mcservertime.com'
+        }
+    },
+    ListeServeursFr: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://www.liste-serveurs.fr/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://www.liste-serveurs.fr/' + project.id
+            case 'projectName':
+                return doc.querySelector('.server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://www.liste-serveurs.fr/', 'server-pixel-prime-serveur-pixelmon.512', '/vote']
+            case 'URL':
+                return 'liste-serveurs.fr'
+        }
+    },
+    ServeurMinecraftFr: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://serveur-minecraft.fr/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://serveur-minecraft.fr/' + project.id
+            case 'projectName':
+                return doc.querySelector('.server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://serveur-minecraft.fr/', 'server-oneblock-farm2win.525', '/vote']
+            case 'URL':
+                return 'serveur-minecraft.fr'
+        }
+    },
+    MineServTop: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://mineserv.top/' + project.id
+            case 'projectName':
+                return doc.querySelector('.project-name h1').textContent
+            case 'exampleURL':
+                return ['https://mineserv.top/', 'epserv', '']
+            case 'URL':
+                return 'mineserv.top'
         }
     },
     Custom: (type, project/*, doc*/) => {

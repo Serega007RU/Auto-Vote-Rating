@@ -1,14 +1,14 @@
 async function vote(first) {
-    if (document.querySelector('#captcha-status').textContent) return
+    if (document.querySelector('#captcha-status') && document.querySelector('#captcha-status').textContent) return
 
-    if (first) return
+    if (first && document.querySelector('#myCaptcha')) return
 
     document.querySelector('#votebutton').click()
 }
 
 const timer = setInterval(()=>{
     try {
-        if (document.querySelector('#captcha-status').textContent) {
+        if (document.querySelector('#captcha-status') && document.querySelector('#captcha-status').textContent) {
             clearInterval(timer)
             const text = document.querySelector('#captcha-status').textContent
             if (text.includes('already voted')) {
