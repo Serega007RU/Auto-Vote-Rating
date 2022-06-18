@@ -654,11 +654,11 @@ const allProjects = {
         switch (type) {
             case 'voteURL':
             case 'pageURL':
-                return 'https://www.serverliste.net/vote/' + project.id
+                return 'https://serverliste.net/vote/' + project.id
             case 'projectName':
-                return doc.querySelector('#bar > h3').textContent.trim()
+                return doc.querySelector('.justify-content-center h3').textContent.trim()
             case 'exampleURL':
-                return ['https://www.serverliste.net/vote/', '775', '']
+                return ['https://serverliste.net/vote/', '775', '']
             case 'URL':
                 return 'serverliste.net'
         }

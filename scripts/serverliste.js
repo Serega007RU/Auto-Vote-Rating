@@ -1,20 +1,17 @@
 async function vote(first) {
-    if (document.querySelector('div.box.error') != null) {
-        if (document.querySelector('div.box.error').textContent.includes('Du hast heute schon')) {
+    const text = document.querySelector('#vote i')?.parentElement?.innerText
+    if (text != null && text.length > 0) {
+        if (text.includes('hast erfolgreich')) {
+            chrome.runtime.sendMessage({successfully: true})
+        } else if (text.includes('hast heute schon')) {
             chrome.runtime.sendMessage({later: true})
-            return
+        } else {
+            chrome.runtime.sendMessage({message: text.trim()})
         }
-        chrome.runtime.sendMessage({message: document.querySelector('div.box.error').textContent})
         return
     }
-    if (document.querySelector('div.box.success') != null) {
-        chrome.runtime.sendMessage({successfully: true})
-        return
-    }
-
-    if (first) return
 
     const project = await getProject('ServerListe')
-    document.querySelector('input[name="spieler"]').value = project.nick
-    document.querySelector('#vote_form a.button').click()
+    document.querySelector('input[name="username"]').value = project.nick
+    document.querySelector('button[data-callback="submitVoteForm"]').click()
 }
