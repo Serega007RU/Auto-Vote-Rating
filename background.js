@@ -1038,7 +1038,7 @@ async function endVote(request, sender, project) {
             project.time = project.time + Math.floor(Math.random() * (project.randomize.max - project.randomize.min) + project.randomize.min)
         } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || (project.rating === 'MinecraftRating' && project.game === 'projects')) && !project.priority && project.timeoutHour == null) {
             //Рандомизация по умолчанию (в пределах 5-10 минут) для бедного TopCraft/McTOP который легко ддосится от массового автоматического голосования
-            project.time = project.time + Math.floor(Math.random() * (600000 - -300000) + -300000)
+            project.time = project.time + Math.floor(Math.random() * (600000 - 300000) + 300000)
         }
 
         delete project.error
@@ -1134,9 +1134,13 @@ async function endVote(request, sender, project) {
         if (queueProjects.size === 0) promises = []
         checkVote()
     }
+    let timeout = settings.timeout
+    if (project.randomize || project.rating === 'WARGM') {
+        timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
+    }
     setTimeout(()=>{
         removeQueue()
-    }, settings.timeout)
+    }, timeout)
 }
 
 //Отправитель уведомлений
