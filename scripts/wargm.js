@@ -12,6 +12,7 @@ async function vote() {
 
     //Если на странице есть кнопка входа через Steam то жмём её
     if (document.querySelector('div.card-footer a[href="/steam_login"]') != null) {
+        await wait(Math.floor(Math.random() * 10000))
         document.querySelector('div.card-footer a[href="/steam_login"]').click()
         return
     }
@@ -23,13 +24,18 @@ async function vote() {
         const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
         chrome.runtime.sendMessage({later: Date.now() + milliseconds})
     } else {
-        const timer2 = setInterval(() => {
+        const timer2 = setInterval(async () => {
             if (!button.disabled) {
                 clearInterval(timer2)
+                await wait(Math.floor(Math.random() * 10000))
                 button.click()
             }
         }, 1000)
     }
+}
+
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const timer = setInterval(()=>{
