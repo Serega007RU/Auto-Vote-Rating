@@ -855,7 +855,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://www.minecraft-list.cz/server/' + project.id
             case 'projectName':
-                return doc.querySelector('.content__box__server__content__detail__firstRow__name').textContent.trim()
+                return doc.querySelector('.content__box__server__content__detail__firstRow .text-center').textContent.trim()
             case 'exampleURL':
                 return ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote']
             case 'URL':
