@@ -8,7 +8,7 @@ async function vote(first) {
             if (document.querySelector('div.alert.alert-error').textContent.match(/\d+/g)) {
                 const numbers = document.querySelector('div.alert.alert-error').textContent.match(/\d+/g).map(Number)
                 const date = new Date()
-                chrome.runtime.sendMessage({later: Date.UTC(date.getFullYear(), date.getMonth(), date.getDay() + 1/*Отсчёт дня начинает с нуля?*/, numbers[0] - 2/*На czech-craft время указано в часовом поясе UTC +2*/, numbers[1], numbers[2])})
+                chrome.runtime.sendMessage({later: Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), numbers[0] - 2/*На czech-craft время указано в часовом поясе UTC +2*/, numbers[1], numbers[2])})
             } else {
                 chrome.runtime.sendMessage({later: true})
             }
