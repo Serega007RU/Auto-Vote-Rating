@@ -654,11 +654,11 @@ const allProjects = {
         switch (type) {
             case 'voteURL':
             case 'pageURL':
-                return 'https://www.serverliste.net/vote/' + project.id
+                return 'https://serverliste.net/vote/' + project.id
             case 'projectName':
-                return doc.querySelector('#bar > h3').textContent.trim()
+                return doc.querySelector('.justify-content-center h3').textContent.trim()
             case 'exampleURL':
-                return ['https://www.serverliste.net/vote/', '775', '']
+                return ['https://serverliste.net/vote/', '775', '']
             case 'URL':
                 return 'serverliste.net'
         }
@@ -855,7 +855,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://www.minecraft-list.cz/server/' + project.id
             case 'projectName':
-                return doc.querySelector('.content__box__server__content__detail__firstRow__name').textContent.trim()
+                return doc.querySelector('.content__box__server__content__detail__firstRow .text-center').textContent.trim()
             case 'exampleURL':
                 return ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote']
             case 'URL':

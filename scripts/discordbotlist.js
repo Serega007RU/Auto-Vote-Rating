@@ -26,6 +26,15 @@ function vote(first) {
             if (!vote.disabled) {
                 clearInterval(timer1)
                 vote.click()
+
+                const timer4 = setInterval(()=>{
+                    const vote2 = findElement('button', ['upvote anyway'])
+                    console.log(vote2)
+                    if (vote2 && !vote2.disabled) {
+                        clearInterval(timer4)
+                        vote2.click()
+                    }
+                }, 1000)
             }
         } catch (e) {
             clearInterval(timer1)
@@ -92,7 +101,7 @@ function vote(first) {
 function findElement(selector, text) {
     for (const element of document.querySelectorAll(selector)) {
         for (const t of text) {
-            if (element.textContent.toLowerCase().includes(t)) {
+            if (element.textContent.toLowerCase().includes(t) || element.innerText.toLowerCase().includes(t)) {
                 return element
             }
         }

@@ -3680,6 +3680,7 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('hour').required = false
         if (document.querySelector('#nick').offsetParent) document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
+        document.querySelector('#banAttention').style.display = 'none'
         if (document.querySelector('[data-resource="yourNick"]').textContent !== '') document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         if (laterChoose && (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MMoTopRU')) {
@@ -3687,6 +3688,11 @@ selectedTop.addEventListener('input', function() {
             document.getElementById('selectLang' + laterChoose).required = false
             document.getElementById('chooseGame' + laterChoose).style.display = 'none'
             document.getElementById('chooseGame' + laterChoose).required = false
+        }
+        if (laterChoose === 'WARGM' && document.querySelector('#randomize').checked) {
+            document.querySelector('#randomize').click()
+            document.querySelector('#randomizeMin').value = ''
+            document.querySelector('#randomizeMax').value = ''
         }
         laterChoose = null
         return
@@ -3810,16 +3816,20 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('nick').parentElement.style.display = 'none'
         if (document.getElementById('importNicks').checked) document.getElementById('importNicks').click()
         document.getElementById('importNicks').disabled = true
+    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats' || laterChoose === 'XtremeTop100' || laterChoose === 'WARGM') {
+        document.getElementById('nick').required = true
+        document.getElementById('nick').parentElement.removeAttribute('style')
+        document.getElementById('importNicks').disabled = false
+    }
+
+    if (name === 'WARGM') {
         document.querySelector('#banAttention').removeAttribute('style')
         if (!document.querySelector('#randomize').checked) {
             document.querySelector('#randomize').click()
             document.querySelector('#randomizeMin').value = '0'
             document.querySelector('#randomizeMax').value = '14400000'
         }
-    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats' || laterChoose === 'XtremeTop100' || laterChoose === 'WARGM') {
-        document.getElementById('nick').required = true
-        document.getElementById('nick').parentElement.removeAttribute('style')
-        document.getElementById('importNicks').disabled = false
+    } else if (laterChoose === 'WARGM') {
         document.querySelector('#banAttention').style.display = 'none'
         if (document.querySelector('#randomize').checked) {
             document.querySelector('#randomize').click()
