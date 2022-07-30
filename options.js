@@ -1669,46 +1669,7 @@ document.getElementById('importTunnelBear').addEventListener('click', async even
     }
     createNotif(chrome.i18n.getMessage('importVPNStart', 'TunnelBear'))
     try {
-        if (token == null) {
-            let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
-                'headers': {
-                    'accept': 'application/json, text/plain, */*',
-                    'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
-                    'authorization': 'Bearer undefined',
-                    'cache-control': 'no-cache',
-                    'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
-                    'pragma': 'no-cache',
-                    'sec-fetch-dest': 'empty',
-                    'sec-fetch-mode': 'cors',
-                    'sec-fetch-site': 'none',
-                    'tunnelbear-app-id': 'com.tunnelbear',
-                    'tunnelbear-app-version': '1.0',
-                    'tunnelbear-platform': 'Chrome',
-                    'tunnelbear-platform-version': 'c3.3.3'
-                },
-                'referrerPolicy': 'strict-origin-when-cross-origin',
-                'body': null,
-                'method': 'POST',
-                'mode': 'cors',
-                'credentials': 'include'
-            })
-            if (!response.ok) {
-                if (response.status === 401) {
-                    let a = document.createElement('a')
-                    a.target = 'blank_'
-                    a.href = 'https://www.tunnelbear.com/account/login'
-                    a.textContent = chrome.i18n.getMessage('authButton')
-                    createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
-                    event.target.classList.remove('disabled')
-                    return
-                }
-                createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
-                event.target.classList.remove('disabled')
-                return
-            }
-            let json = await response.json()
-            token = 'Bearer ' + json.access_token
-        }
+        if (!await getTunnelBreakToken(event, true)) return
 
         let countries = ['AR', 'BR', 'AU', 'CA', 'DK', 'FI', 'FR', 'DE', 'IN', 'IE', 'IT', 'JP', 'MX', 'NL', 'NZ', 'NO', 'RO', 'SG', 'ES', 'SE', 'CH', 'GB', 'US']
         for (let country of countries) {
@@ -1753,6 +1714,64 @@ document.getElementById('importTunnelBear').addEventListener('click', async even
     createNotif(chrome.i18n.getMessage('importVPNEnd', 'TunnelBear'), 'success')
     event.target.classList.remove('disabled')
 })
+
+async function getTunnelBreakToken(event, first) {
+    if (token == null) {
+        let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
+            'headers': {
+                'accept': 'application/json, text/plain, */*',
+                'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+                'authorization': 'Bearer undefined',
+                'cache-control': 'no-cache',
+                'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
+                'pragma': 'no-cache',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'none',
+                'tunnelbear-app-id': 'com.tunnelbear',
+                'tunnelbear-app-version': '1.0',
+                'tunnelbear-platform': 'Chrome',
+                'tunnelbear-platform-version': 'c3.3.3'
+            },
+            'referrerPolicy': 'strict-origin-when-cross-origin',
+            'body': null,
+            'method': 'POST',
+            'mode': 'cors',
+            'credentials': 'include'
+        })
+        if (!response.ok) {
+            if (response.status === 401) {
+                if (first) {
+                    await fetch('https://prod-api-core.tunnelbear.com/core/web/api/login', {
+                        'headers': {
+                            'accept': 'application/json, text/plain, */*',
+                            'accept-language': 'ru,en;q=0.9,cs;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+                            'content-type': 'application/x-www-form-urlencoded'
+                        },
+                        'body': 'username=ermaksochi%40gmail.com&password=FnX)4wtPC-Wr2%26M&withUserDetails=true&v=web-1.0',
+                        'method': 'POST',
+                        'credentials': 'include'
+                    })
+                    return await getTunnelBreakToken(event, false)
+                } else {
+                    let a = document.createElement('a')
+                    a.target = 'blank_'
+                    a.href = 'https://www.tunnelbear.com/account/login'
+                    a.textContent = chrome.i18n.getMessage('authButton')
+                    createNotif([chrome.i18n.getMessage('loginTB'), a], 'error')
+                    event.target.classList.remove('disabled')
+                    return false;
+                }
+            }
+            createNotif(chrome.i18n.getMessage('notConnect', response.url) + response.status, 'error')
+            event.target.classList.remove('disabled')
+            return false
+        }
+        let json = await response.json()
+        token = 'Bearer ' + json.access_token
+    }
+    return true
+}
 
 //Слушатель на импорт с Windscribe
 document.getElementById('importWindscribe').addEventListener('click', async event => {

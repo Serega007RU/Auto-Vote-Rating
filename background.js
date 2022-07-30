@@ -347,46 +347,7 @@ async function checkOpen(project, transaction) {
                 promises.push(applyProxy())
                 async function applyProxy() {
                     if (proxy.TunnelBear && (tunnelBear.token == null || tunnelBear.expires < Date.now())) {
-                        console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
-                        let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
-                            'headers': {
-                                'accept': 'application/json, text/plain, */*',
-                                'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
-                                'authorization': 'Bearer undefined',
-                                'cache-control': 'no-cache',
-                                'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
-                                'pragma': 'no-cache',
-                                'sec-fetch-dest': 'empty',
-                                'sec-fetch-mode': 'cors',
-                                'sec-fetch-site': 'none',
-                                'tunnelbear-app-id': 'com.tunnelbear',
-                                'tunnelbear-app-version': '1.0',
-                                'tunnelbear-platform': 'Chrome',
-                                'tunnelbear-platform-version': 'c3.3.3'
-                            },
-                            'referrerPolicy': 'strict-origin-when-cross-origin',
-                            'body': null,
-                            'method': 'POST',
-                            'mode': 'cors',
-                            'credentials': 'include'
-                        })
-                        if (!response.ok) {
-                            settings.stopVote = Date.now() + 21600000
-                            await db.put('other', settings, 'settings')
-                            stopVote(true)
-                            if (response.status === 401) {
-                                console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
-                                chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2')})
-                                if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
-                                return
-                            }
-                            chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('notConnect', response.url) + response.status})
-                            console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status)
-                            return
-                        }
-                        let json = await response.json()
-                        tunnelBear.token = 'Bearer ' + json.access_token
-                        tunnelBear.expires = Date.now() + 86400000
+                        if (!await getTunnelBreakToken(true)) return
                     }
 
                     // noinspection JSUnresolvedVariable
@@ -2033,6 +1994,64 @@ async function stopVote(dontStart, user) {
     } else if (Number.isFinite(settings.stopVote) && settings.stopVote > Date.now()) {
         chrome.alarms.create('stopVote', {when: settings.stopVote})
     }
+}
+
+async function getTunnelBreakToken(first) {
+    console.log(chrome.i18n.getMessage('proxyTBTokenExpired'))
+    let response = await fetch('https://api.tunnelbear.com/v2/cookieToken', {
+        'headers': {
+            'accept': 'application/json, text/plain, */*',
+            'accept-language': 'ru,en-US;q=0.9,en;q=0.8',
+            'authorization': 'Bearer undefined',
+            'cache-control': 'no-cache',
+            'device': Math.floor(Math.random() * 999999999) + '-' + Math.floor(Math.random() * 99999999) + '-' + Math.floor(Math.random() * 99999) + '-' + Math.floor(Math.random() * 999999) + '-' + Math.floor(Math.random() * 99999999999999999),
+            'pragma': 'no-cache',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'none',
+            'tunnelbear-app-id': 'com.tunnelbear',
+            'tunnelbear-app-version': '1.0',
+            'tunnelbear-platform': 'Chrome',
+            'tunnelbear-platform-version': 'c3.3.3'
+        },
+        'referrerPolicy': 'strict-origin-when-cross-origin',
+        'body': null,
+        'method': 'POST',
+        'mode': 'cors',
+        'credentials': 'include'
+    })
+    if (!response.ok) {
+        settings.stopVote = Date.now() + 21600000
+        await db.put('other', settings, 'settings')
+        stopVote(true)
+        if (response.status === 401) {
+            if (first) {
+                await fetch('https://prod-api-core.tunnelbear.com/core/web/api/login', {
+                    'headers': {
+                        'accept': 'application/json, text/plain, */*',
+                        'accept-language': 'ru,en;q=0.9,cs;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+                        'content-type': 'application/x-www-form-urlencoded'
+                    },
+                    'body': 'username=ermaksochi%40gmail.com&password=FnX)4wtPC-Wr2%26M&withUserDetails=true&v=web-1.0',
+                    'method': 'POST',
+                    'credentials': 'include'
+                })
+                return await getTunnelBreakToken(false)
+            } else {
+                console.error(chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2'))
+                chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('proxyTBAuth1') + ', ' + chrome.i18n.getMessage('proxyTBAuth2')})
+                if (!settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('proxyTBAuth1'), chrome.i18n.getMessage('proxyTBAuth2'))
+                return false
+            }
+        }
+        chrome.runtime.sendMessage({stopVote: chrome.i18n.getMessage('notConnect', response.url) + response.status})
+        console.error(chrome.i18n.getMessage('notConnect', response.url) + response.status)
+        return false
+    }
+    let json = await response.json()
+    tunnelBear.token = 'Bearer ' + json.access_token
+    tunnelBear.expires = Date.now() + 86400000
+    return true
 }
 
 //Если требуется авторизация для Прокси
