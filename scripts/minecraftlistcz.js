@@ -1,4 +1,7 @@
 async function vote(first) {
+    if (document.querySelector('#challenge-form')) {
+        return
+    }
     if (document.querySelector('.alert.alert-success') != null) {
         chrome.runtime.sendMessage({successfully: true})
         return
