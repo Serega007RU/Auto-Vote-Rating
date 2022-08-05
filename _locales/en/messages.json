@@ -99,6 +99,15 @@
   "disabledFocusedTab": {
     "message": "Focused tab"
   },
+  "disabledFocusedTabTooltip": {
+    "message": "Open a tab and switch to it automatically"
+  },
+  "disabledWarnCaptcha": {
+    "message": "My captcha is solved automatically"
+  },
+  "disabledWarnCaptchaTooltip": {
+    "message": "Disables notifications and logging that the captcha needs to be passed manually"
+  },
   "disableCheckProjects": {
     "message": "Disable check-up",
     "description": "Checkbox. Disable check when adding a project"

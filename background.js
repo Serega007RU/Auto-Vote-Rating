@@ -871,6 +871,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let project = openedProjects.get(sender.tab.id)
             let message
             if (request.captcha) {
+                if (settings.disabledWarnCaptcha) return
                 message = chrome.i18n.getMessage('requiresCaptcha')
             } else if (request.auth && request.auth !== true) {
                 message = request.auth
