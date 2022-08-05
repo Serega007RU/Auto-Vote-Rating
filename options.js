@@ -264,6 +264,7 @@ async function restoreOptions() {
     document.getElementById('disabledFocusedTab').checked = settings.disabledFocusedTab
     document.getElementById('timeoutValue').value = settings.timeout
     document.getElementById('timeoutErrorValue').value = settings.timeoutError
+    document.getElementById('disabledWarnCaptcha').checked = settings.disabledWarnCaptcha
     document.getElementById('useMultiVote').checked = settings.useMultiVote
     document.getElementById('proxyBlackList').value = JSON.stringify(settings.proxyBlackList)
     if (settings.repeatAttemptLater) {
@@ -2139,6 +2140,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledOneVote = this.checked
         else if (this.id === 'disabledFocusedTab')
             settings.disabledFocusedTab = this.checked
+        else if (this.id === 'disabledWarnCaptcha')
+            settings.disabledWarnCaptcha = this.checked
         else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false

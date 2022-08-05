@@ -60,7 +60,7 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         }
     } else {
-        if (document.querySelector('#votecontainer > h2') != null && document.querySelector('#votecontainer > h2').textContent.includes('already voted')) {
+        if (document.querySelector('#votecontainer')?.nextElementSibling && document.querySelector('#votecontainer')?.nextElementSibling.textContent.includes('already voted')) {
             chrome.runtime.sendMessage({later: true})
             return
         }

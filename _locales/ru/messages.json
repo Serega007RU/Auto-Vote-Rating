@@ -77,6 +77,15 @@
   "disabledFocusedTab": {
     "message": "Focused tab"
   },
+  "disabledFocusedTabTooltip": {
+    "message": "Открывать вкладку и автоматически переключаться на неё"
+  },
+  "disabledWarnCaptcha": {
+    "message": "У меня капча решается автоматически"
+  },
+  "disabledWarnCaptchaTooltip": {
+    "message": "Отключает уведомления и логирование о том что капчу необходимо пройти вручную"
+  },
   "disableCheckProjects": {
     "message": "Отключить проверку"
   },

@@ -121,6 +121,10 @@ async function run() {
                     document.location.replace(url)
                 }
             }
+            //Если идёт проверка (новый CloudFlare?)
+            if (document.querySelector('#challenge-form')) {
+                check = false
+            }
             //Если идёт проверка CloudFlare
             if (document.getElementById('cf-content') != null) {
                 check = false
@@ -260,10 +264,6 @@ async function getProject() {
     } else {
         return proj
     }
-}
-
-function handle(func) {
-
 }
 
 function throwError(error) {

@@ -656,16 +656,16 @@ async function newWindow(project) {
     if (silentVoteMode) {
         silentVote(project)
     } else {
-        let window = await new Promise(resolve=>{
-            chrome.windows.getCurrent(function(win) {
-                if (chrome.runtime.lastError && chrome.runtime.lastError.message === 'No current window') {} else if (chrome.runtime.lastError) {
+        const windows = await new Promise(resolve=>{
+            chrome.windows.getAll(function(win) {
+                if (chrome.runtime.lastError) {
                     console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError.message)
                 }
                 resolve(win)
             })
         })
-        if (window == null) {
-            window = await new Promise(resolve=>{
+        if (windows == null || windows.length <= 0) {
+            const window = await new Promise(resolve=>{
                 chrome.windows.create({focused: false}, function(win) {
                     resolve(win)
                 })
@@ -1331,6 +1331,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let project = openedProjects.get(sender.tab.id)
             let message
             if (request.captcha) {
+                if (settings.disabledWarnCaptcha) return
                 message = chrome.i18n.getMessage('requiresCaptcha')
             } else if (request.auth && request.auth !== true) {
                 message = request.auth
