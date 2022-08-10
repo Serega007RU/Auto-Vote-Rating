@@ -1129,6 +1129,19 @@ const allProjects = {
                 return 'mineserv.top'
         }
     },
+    Top100ArenaCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://www.top100arena.com/listing/' + project.id + '/vote'
+            case 'projectName':
+                return doc.querySelector('.container.text-center h1.h2').textContent
+            case 'exampleURL':
+                return ['https://www.top100arena.com/listing/', '94246', '/vote']
+            case 'URL':
+                return 'top100arena.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':

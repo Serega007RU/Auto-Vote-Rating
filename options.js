@@ -466,7 +466,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     if (project.rating === 'Custom') {
         project.id = document.getElementById('nick').value
         project.nick = ''
-    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && project.rating !== 'XtremeTop100' && project.rating !== 'WARGM' && ((project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') ? document.getElementById('chooseMinecraftRating').value !== 'servers' : true) && document.getElementById('nick').value !== '') {
+    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && project.rating !== 'XtremeTop100' && project.rating !== 'WARGM' && project.rating !== 'Top100ArenaCom' && ((project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') ? document.getElementById('chooseMinecraftRating').value !== 'servers' : true) && document.getElementById('nick').value !== '') {
         project.nick = document.getElementById('nick').value
     } else {
         project.nick = ''
@@ -1658,10 +1658,10 @@ selectedTop.addEventListener('input', function() {
         }
     }
 
-    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords' || name === 'DiscordBoats' || name === 'XtremeTop100' || name === 'WARGM') {
+    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords' || name === 'DiscordBoats' || name === 'XtremeTop100' || name === 'WARGM' || name === 'Top100ArenaCom') {
         document.getElementById('nick').required = false
         document.getElementById('nick').parentElement.style.display = 'none'
-    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats' || laterChoose === 'XtremeTop100' || laterChoose === 'WARGM') {
+    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats' || laterChoose === 'XtremeTop100' || laterChoose === 'WARGM' || laterChoose === 'Top100ArenaCom') {
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
     }
@@ -1814,7 +1814,7 @@ selectedTop.addEventListener('input', function() {
         }
     } else if (laterChoose === 'MinecraftRating') {
         document.getElementById('chooseMinecraftRating1').style.display = 'none'
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM') {
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM' && name !== 'Top100ArenaCom') {
             document.getElementById('nick').required = true
             document.getElementById('nick').parentElement.removeAttribute('style')
         }
@@ -1831,7 +1831,7 @@ selectedTop.addEventListener('input', function() {
         }
     } else if (laterChoose === 'MisterLauncher') {
         document.getElementById('chooseMinecraftRating1').style.display = 'none'
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM') {
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM' && name !== 'Top100ArenaCom') {
             document.getElementById('nick').required = true
             document.getElementById('nick').parentElement.removeAttribute('style')
         }
