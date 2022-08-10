@@ -1141,6 +1141,20 @@ const allProjects = {
                 return 'top100arena.com'
         }
     },
+    MinecraftBestServersCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://minecraftbestservers.com/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://minecraftbestservers.com/' + project.id
+            case 'projectName':
+                return doc.querySelector('table .server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://minecraftbestservers.com/', 'server-cherry-survival.4599', '/vote']
+            case 'URL':
+                return 'minecraftbestservers.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
