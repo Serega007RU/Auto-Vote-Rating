@@ -1406,5 +1406,8 @@
   },
   "banAttention": {
     "message": "Attention! There have been cases of blocking for auto-voting on this site, please use auto-voting on this site with caution, watch out for notifications and errors"
+  },
+  "closedTab": {
+    "message": "It looks like you have closed the tab on which the extension auto-voted, the extension cannot vote with your intervention in the process"
   }
 }

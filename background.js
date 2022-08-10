@@ -1209,6 +1209,12 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     }
 })
 
+chrome.tabs.onRemoved.addListener((tabId) => {
+    const project = openedProjects.get(tabId)
+    if (!project) return
+    endVote({closedTab: true}, {tab: {id: tabId}}, project)
+})
+
 chrome.webRequest.onCompleted.addListener(function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
@@ -1369,7 +1375,7 @@ async function endVote(request, sender, project) {
     if (sender && openedProjects.has(sender.tab.id)) {
         //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         project = openedProjects.get(sender.tab.id)
-        if (closeTabs) {
+        if (closeTabs && !request.closedTab) {
             chrome.tabs.remove(sender.tab.id, function() {
                 if (chrome.runtime.lastError) {
                     console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
@@ -1663,10 +1669,14 @@ async function endVote(request, sender, project) {
             }
         }/* else */if (request.errorVote && request.errorVote[0] === '404') {
             retryCoolDown = 21600000
+        } else if (request.closedTab) {
+            retryCoolDown = 60000
         } else {
             retryCoolDown = settings.timeoutError
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', (Math.round(settings.timeoutError / 1000 / 60 * 100) / 100).toString())
         }
+
+        sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', (Math.round(retryCoolDown / 1000 / 60 * 100) / 100).toString())
+
         if (project.randomize) {
             retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)
         }
