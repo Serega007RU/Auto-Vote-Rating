@@ -1155,6 +1155,22 @@ const allProjects = {
                 return 'minecraftbestservers.com'
         }
     },
+    MCLikeCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://mclike.com/vote-' + project.id
+            case 'pageURL':
+                return 'https://mclike.com/minecraft-server-' + project.id
+            case 'projectName':
+                return doc.querySelector('div.text-server > h1').textContent.replace('Minecraft server ', '')
+            case 'exampleURL':
+                return ['https://mclike.com/vote-', '188444', '']
+            case 'URL':
+                return 'mclike.com'
+            case 'oneProject':
+                return 1
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
