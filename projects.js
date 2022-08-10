@@ -451,13 +451,12 @@ const allProjects = {
     MCServerList: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                return 'https://mcserver-list.eu/hlasovat?id=' + project.id
             case 'pageURL':
-                return 'https://api.mcserver-list.eu/server/?id=' + project.id
+                return 'https://mcserver-list.eu/hlasovat/' + project.id
             case 'projectName':
-                return JSON.parse(doc.body.innerText)[0].name
+                return doc.querySelector('.serverdetail h1').textContent
             case 'exampleURL':
-                return ['https://mcserver-list.eu/hlasovat/?id=', '307', '']
+                return ['https://mcserver-list.eu/hlasovat/', '416', '']
             case 'URL':
                 return 'mcserver-list.eu'
         }

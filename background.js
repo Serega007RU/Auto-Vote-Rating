@@ -596,17 +596,19 @@ async function silentVote(project) {
         } else
 
         if (project.rating === 'MCServerList') {
-            let response = await _fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'}, project)
+            let response = await _fetch('https://mcserver-list.eu/api/sendvote/' + project.id + '/' + project.nick, {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': null}, project)
             let json = await response.json()
             if (response.ok) {
-                if (json[0].success === "false") {
-                    if (json[0].error === 'username_voted') {
+                if (json.data.status === 'success') {
+                    endVote({successfully: true}, null, project)
+                } else if (json.data.error) {
+                    if (json.data.error.includes('username_voted')) {
                         endVote({later: true}, null, project)
                     } else {
-                        endVote({message: json[0].error}, null, project)
+                        endVote({message: json.data.error}, null, project)
                     }
                 } else {
-                    endVote({successfully: true}, null, project)
+                    endVote({message: JSON.stringify(json)}, null, project)
                 }
             } else {
                 endVote({errorVote: [String(response.status), response.url]}, null, project)
