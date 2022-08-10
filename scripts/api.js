@@ -117,10 +117,17 @@ async function run() {
                     document.location.replace(url)
                 }
             }
+
+            // Bot Verification https://gyazo.com/04797d3f1ba6b9b90c48d1dd57d305a2
+            if (document.querySelector('title')?.textContent?.includes('Bot Verification') || document.querySelector('#recaptchadiv')) {
+                check = false
+            }
+
             //Если идёт проверка (новый CloudFlare?)
             if (document.querySelector('#challenge-form')) {
                 check = false
             }
+
             //Если идёт проверка CloudFlare
             if (document.getElementById('cf-content') != null) {
                 check = false
@@ -131,6 +138,7 @@ async function run() {
                 }
                 check = false
             }
+
             //Если мы находимся на странице проверки ReCaptcha
             if (document.querySelector('body > iframe') != null && document.querySelector('body > iframe').src.startsWith('https://geo.captcha-delivery.com/captcha/')) {
                 check = false
