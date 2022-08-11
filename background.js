@@ -453,7 +453,7 @@ async function checkOpen(project, transaction) {
         async function clearCookies() {
             //Очистка куки
             let url = '.' + extractHostname(allProjects[project.rating]('pageURL', project))
-            if (url && project.rating !== 'IonMc') {
+            if (url && project.rating !== 'IonMc' && project.rating !== 'TopG') {
                 let cookies = await new Promise(resolve=>{
                     chrome.cookies.getAll({domain: url}, function(cookies) {
                         resolve(cookies)
