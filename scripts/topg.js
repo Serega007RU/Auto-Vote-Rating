@@ -1,4 +1,4 @@
-async function vote(first) {
+async function vote(/*first*/) {
     if (document.querySelector('.alert.alert-danger') != null) {
         chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-danger').textContent.trim()})
         return
@@ -27,7 +27,12 @@ async function vote(first) {
         return
     }
 
-    if (first) return
+    if (document.querySelector("#vote").innerText.toLowerCase().includes('login to vote')) {
+        chrome.runtime.sendMessage({auth: true})
+        return
+    }
+
+    // if (first) return
 
     const project = await getProject('TopG', true)
     document.getElementById('game_user').value = project.nick

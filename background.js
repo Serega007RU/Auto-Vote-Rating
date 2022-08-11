@@ -1018,17 +1018,19 @@ async function silentVote(project) {
         } else
 
         if (project.rating === 'MCServerList') {
-            let response = await _fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'}, project)
+            let response = await _fetch('https://mcserver-list.eu/api/sendvote/' + project.id + '/' + project.nick, {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': null}, project)
             let json = await response.json()
             if (response.ok) {
-                if (json[0].success === "false") {
-                    if (json[0].error === 'username_voted') {
+                if (json.data.status === 'success') {
+                    endVote({successfully: true}, null, project)
+                } else if (json.data.error) {
+                    if (json.data.error.includes('username_voted')) {
                         endVote({later: true}, null, project)
                     } else {
-                        endVote({message: json[0].error}, null, project)
+                        endVote({message: json.data.error}, null, project)
                     }
                 } else {
-                    endVote({successfully: true}, null, project)
+                    endVote({message: JSON.stringify(json)}, null, project)
                 }
             } else {
                 endVote({errorVote: [String(response.status), response.url]}, null, project)
@@ -1150,6 +1152,22 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
     if (details.frameId === 0) {
+        // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
+        if (details.url.match(/facebook.com\/*/) || details.url.match(/google.com\/*/) || details.url.match(/accounts.google.com\/*/) || details.url.match(/reddit.com\/*/) || details.url.match(/twitter.com\/*/)) {
+            return
+        }
+
+        // Если пользователь авторизовывается через эти сайты но у расширения на это нет прав, всё равно не мешаем ему, пускай сам авторизуется не смотря на то что есть автоматизация авторизации
+        if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login')) {
+            let granted = await new Promise(resolve=>{
+                chrome.permissions.contains({origins: [details.url]}, resolve)
+            })
+            if (!granted) {
+                console.warn(getProjectPrefix(project, true) + 'Not granted permissions for ' + details.url)
+                return
+            }
+        }
+
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {
@@ -1163,6 +1181,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 resolve()
             })
         })
+
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'}, function() {
                 if (chrome.runtime.lastError) {
@@ -1176,6 +1195,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 resolve()
             })
         })
+
         await new Promise(resolve => {
             let send = {sendProject: true, project}
             if (currentVK != null) send.vkontakte = currentVK
