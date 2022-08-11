@@ -27,7 +27,7 @@ async function vote(/*first*/) {
         return
     }
 
-    if (document.querySelector("#vote").textContent.toLowerCase().includes('login to vote')) {
+    if (document.querySelector("#vote").innerText.toLowerCase().includes('login to vote')) {
         chrome.runtime.sendMessage({auth: true})
         return
     }
