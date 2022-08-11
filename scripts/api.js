@@ -123,6 +123,10 @@ async function run() {
 
         //Если идёт проверка (новый CloudFlare?)
         if (document.querySelector('#challenge-form')) {
+            //Если нам требуется нажать на "Verify you are human" https://gyazo.com/56426c80a3072e5b4d565949af7da81b
+            if (document.querySelector('#cf-norobot-container input')) {
+                document.querySelector('#cf-norobot-container input').click()
+            }
             return
         }
 
