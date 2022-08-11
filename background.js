@@ -726,6 +726,17 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             return
         }
 
+        // Если пользователь авторизовывается через эти сайты но у расширения на это нет прав, всё равно не мешаем ему, пускай сам авторизуется не смотря на то что есть автоматизация авторизации
+        if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login')) {
+            let granted = await new Promise(resolve=>{
+                chrome.permissions.contains({origins: [details.url]}, resolve)
+            })
+            if (!granted) {
+                console.warn(getProjectPrefix(project, true) + 'Not granted permissions for ' + details.url)
+                return
+            }
+        }
+
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {

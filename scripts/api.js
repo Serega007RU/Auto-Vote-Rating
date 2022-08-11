@@ -42,7 +42,11 @@ async function run() {
                     clearInterval(timer2)
                 }
             }, 1000)
-        } else if (document.URL.includes('vk.com/')) {
+            return
+        }
+
+        //Если мы находися на странице авторизации ВКонтакте
+        if (document.URL.match(/vk.com\/*/)) {
             let text
             let notAuth = false
             if (document.querySelector('div.oauth_form_access')) {
@@ -67,79 +71,101 @@ async function run() {
                 text = 'null'
             }
             chrome.runtime.sendMessage({errorAuthVK: text, notAuth})
-        } else {
-            const script = document.createElement('script')
-            script.textContent = `
-            Object.defineProperty(document, 'visibilityState', {
-                get() {
-                    return 'visible'
-                }
-            })
-            Object.defineProperty(document, 'hidden', {
-                get() {
-                    return false
-                }
-            })
-            `
-            document.head.appendChild(script)
-
-            //Если мы находимся на странице проверки CloudFlare
-            if (document.querySelector('span[data-translate="complete_sec_check"]')) {
-                return
-            }
-
-            // Bot Verification https://gyazo.com/04797d3f1ba6b9b90c48d1dd57d305a2
-            if (document.querySelector('title')?.textContent?.includes('Bot Verification') || document.querySelector('#recaptchadiv')) {
-                return
-            }
-
-            //Если идёт проверка (новый CloudFlare?)
-            if (document.querySelector('#challenge-form')) {
-                return
-            }
-
-            //Если идёт проверка CloudFlare
-            if (document.getElementById('cf-content')) {
-                return
-            }
-            if (document.getElementById('cf-wrapper')) {
-                if (document.querySelector('span[data-translate="complete_sec_check"]') == null && document.querySelector('span[data-translate="managed_checking_msg"]') == null) {
-                    chrome.runtime.sendMessage({message: document.body.innerText.trim()})
-                }
-                return
-            }
-
-            //Если мы находимся на странице проверки ReCaptcha
-            if (document.querySelector('body > iframe') && document.querySelector('body > iframe').src.startsWith('https://geo.captcha-delivery.com/captcha/')) {
-                return
-            }
-
-            chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-                if (request === 'vote') {
-                    sendResponse('startedVote')
-                    startVote(false)
-                }
-            })
-
-            //Совместимость с jQuery
-            for (const script of document.querySelectorAll('script')) {
-                if (script.src.toLowerCase().includes('jquery')) {
-                    await new Promise(resolve => {
-                        const timer = setInterval(()=>{
-                            for (const entry of window.performance.getEntries()) {
-                                if (entry.name.toLowerCase().includes('jquery')) {
-                                    clearInterval(timer)
-                                    resolve()
-                                    break
-                                }
-                            }
-                        }, 1000)
-                    })
-                    break
-                }
-            }
-            startVote(true)
+            return
         }
+
+        //Если мы находися на странице авторизации Дискорд
+        if (document.URL.match(/discord.com\/*/)) {
+            if (document.URL.includes('%20guilds') || document.URL.includes('%20email') || !document.URL.includes('prompt=none')) {
+                let url = document.URL
+                //Пилюля от жадности в правах
+                url = url.replace('%20guilds.join', '')
+                url = url.replace('%20guilds', '')
+                url = url.replace('%20email', '')
+                //Заставляем авторизацию авторизоваться не беспокоя пользователя если права уже были предоставлены
+                if (!document.URL.includes('prompt=none')) url = url.concat('&prompt=none')
+                document.location.replace(url)
+            } else {
+                const timer = setTimeout(()=>{//Да это костыль, а есть вариант по лучше?
+                    chrome.runtime.sendMessage({discordLogIn: true})
+                }, 10000)
+                window.onbeforeunload = ()=> clearTimeout(timer)
+                window.onunload = ()=> clearTimeout(timer)
+            }
+            return
+        }
+
+        const script = document.createElement('script')
+        script.textContent = `
+        Object.defineProperty(document, 'visibilityState', {
+            get() {
+                return 'visible'
+            }
+        })
+        Object.defineProperty(document, 'hidden', {
+            get() {
+                return false
+            }
+        })
+        `
+        document.head.appendChild(script)
+
+        //Если мы находимся на странице проверки CloudFlare
+        if (document.querySelector('span[data-translate="complete_sec_check"]')) {
+            return
+        }
+
+        // Bot Verification https://gyazo.com/04797d3f1ba6b9b90c48d1dd57d305a2
+        if (document.querySelector('title')?.textContent?.includes('Bot Verification') || document.querySelector('#recaptchadiv')) {
+            return
+        }
+
+        //Если идёт проверка (новый CloudFlare?)
+        if (document.querySelector('#challenge-form')) {
+            return
+        }
+
+        //Если идёт проверка CloudFlare
+        if (document.getElementById('cf-content')) {
+            return
+        }
+        if (document.getElementById('cf-wrapper')) {
+            if (document.querySelector('span[data-translate="complete_sec_check"]') == null && document.querySelector('span[data-translate="managed_checking_msg"]') == null) {
+                chrome.runtime.sendMessage({message: document.body.innerText.trim()})
+            }
+            return
+        }
+
+        //Если мы находимся на странице проверки ReCaptcha
+        if (document.querySelector('body > iframe') && document.querySelector('body > iframe').src.startsWith('https://geo.captcha-delivery.com/captcha/')) {
+            return
+        }
+
+        chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+            if (request === 'vote') {
+                sendResponse('startedVote')
+                startVote(false)
+            }
+        })
+
+        //Совместимость с jQuery
+        for (const script of document.querySelectorAll('script')) {
+            if (script.src.toLowerCase().includes('jquery')) {
+                await new Promise(resolve => {
+                    const timer = setInterval(()=>{
+                        for (const entry of window.performance.getEntries()) {
+                            if (entry.name.toLowerCase().includes('jquery')) {
+                                clearInterval(timer)
+                                resolve()
+                                break
+                            }
+                        }
+                    }, 1000)
+                })
+                break
+            }
+        }
+        startVote(true)
     } catch (e) {
         throwError(e)
     }
