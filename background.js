@@ -721,6 +721,11 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
     if (details.frameId === 0) {
+        // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
+        if (details.url.match(/facebook.com\/*/) || details.url.match(/google.com\/*/) || details.url.match(/accounts.google.com\/*/) || details.url.match(/reddit.com\/*/) || details.url.match(/twitter.com\/*/)) {
+            return
+        }
+
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {
@@ -734,6 +739,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 resolve()
             })
         })
+
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'}, function() {
                 if (chrome.runtime.lastError) {
@@ -747,6 +753,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 resolve()
             })
         })
+
         await new Promise(resolve => {
             chrome.tabs.sendMessage(details.tabId, {sendProject: true, project}, function (){
                 if (chrome.runtime.lastError) {
