@@ -87,11 +87,11 @@ async function run() {
                 if (!document.URL.includes('prompt=none')) url = url.concat('&prompt=none')
                 document.location.replace(url)
             } else {
-                const timer = setTimeout(()=>{//Да это костыль, а есть вариант по лучше?
+                const timer4 = setTimeout(()=>{//Да это костыль, а есть вариант по лучше?
                     chrome.runtime.sendMessage({discordLogIn: true})
                 }, 10000)
-                window.onbeforeunload = ()=> clearTimeout(timer)
-                window.onunload = ()=> clearTimeout(timer)
+                window.onbeforeunload = ()=> clearTimeout(timer4)
+                window.onunload = ()=> clearTimeout(timer4)
             }
             return
         }
@@ -124,9 +124,12 @@ async function run() {
         //Если идёт проверка (новый CloudFlare?)
         if (document.querySelector('#challenge-form')) {
             //Если нам требуется нажать на "Verify you are human" https://gyazo.com/56426c80a3072e5b4d565949af7da81b
-            if (document.querySelector('#cf-norobot-container input')) {
-                document.querySelector('#cf-norobot-container input').click()
-            }
+            const timer5 = setInterval(()=>{
+                if (document.querySelector('#cf-norobot-container input[type="button"]')) {
+                    clearInterval(timer5)
+                    document.querySelector('#cf-norobot-container input[type="button"]').click()
+                }
+            }, 1000)
             return
         }
 
@@ -157,10 +160,10 @@ async function run() {
         for (const script of document.querySelectorAll('script')) {
             if (script.src.toLowerCase().includes('jquery')) {
                 await new Promise(resolve => {
-                    const timer = setInterval(()=>{
+                    const timer6 = setInterval(()=>{
                         for (const entry of window.performance.getEntries()) {
                             if (entry.name.toLowerCase().includes('jquery')) {
-                                clearInterval(timer)
+                                clearInterval(timer6)
                                 resolve()
                                 break
                             }
