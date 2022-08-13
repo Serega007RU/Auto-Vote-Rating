@@ -107,7 +107,11 @@
 <a href="https://pixelmonservers.com/">pixelmonservers.com</a>  
 <a href="https://tekkitserverlist.com/">tekkitserverlist.com</a>  
 <a href="https://technicservers.com/">technicservers.com</a>  
-<a href="https://ftbservers.com/">ftbservers.com</a>
+<a href="https://ftbservers.com/">ftbservers.com</a>  
+<a href="https://mineserv.top/">mineserv.top</a>  
+<a href="https://www.top100arena.com/">top100arena.com</a>  
+<a href="https://minecraftbestservers.com/">minecraftbestservers.com</a>  
+<a href="https://mclike.com/">mclike.com</a>
 </details>
 
 ### Links to the extension where you can install it:
@@ -117,7 +121,7 @@
 [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/auto-vote-rating/ecoifpgiojfhmihcfomafdcmkphafpba)
 ## Install the extension from zip archive
 Here is a short guide how to install an unpacked extension on Google Chrome or Chromium-based browsers
-1. [Download](https://gitlab.com/Serega007/auto-vote-rating/-/archive/dev/auto-vote-rating-dev.zip) this repository
+1. [Download](https://gitlab.com/Serega007/Auto-Vote-Rating/-/archive/dev/Auto-Vote-Rating-dev.zip) this repository
 2. Unzip the archive to any convenient location
 3. Open the "Extensions" page `chrome://extensions/` in the browser and turn on the "Developer mode"
 

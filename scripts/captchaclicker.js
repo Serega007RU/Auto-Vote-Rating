@@ -103,26 +103,7 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
     const timer6 = setInterval(()=>{
         if (document.querySelector('body[class="no-selection"]') != null && document.querySelector('body[class="no-selection"]').getAttribute('aria-hidden') == null && document.querySelector('body[class="no-selection"]').style.display === '' && document.querySelector('head > yandex-captcha-solver') == null) {
             clearInterval(timer6)
-            const timer7 = setTimeout(()=>{
-                chrome.runtime.sendMessage({captcha: true})
-            }, 5500)
-            //Костыль для https://greasyfork.org/ru/scripts/425854-hcaptcha-solver-automatically-solves-hcaptcha-in-browser
-            for (const entry of window.performance.getEntries()) {
-                if (entry.name.includes('mobilenet')) {
-                    clearTimeout(timer7)
-                    return
-                }
-            }
-            const observer = new PerformanceObserver((list) => {
-                for (const entry of list.getEntries()) {
-                    if (entry.name.includes('mobilenet')) {
-                        clearTimeout(timer7)
-                    }
-                }
-            })
-            observer.observe({
-                entryTypes: ['resource']
-            })
+            chrome.runtime.sendMessage({captcha: true})
         } else if (document.querySelector('head > yandex-captcha-solver') != null && document.querySelector('div[style="text-align: right; color: rgb(218, 94, 94);"]') != null) {
             chrome.runtime.sendMessage({errorCaptcha: document.querySelector('div[style="text-align: right; color: rgb(218, 94, 94);"]').textContent})
             clearInterval(timer5)

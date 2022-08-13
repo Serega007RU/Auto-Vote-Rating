@@ -2,7 +2,7 @@ async function vote(first) {
     //Если успешное авто-голосование
     if (document.querySelector('.fullscreen-flash-message-container')) {
         const message = document.querySelector('.fullscreen-flash-message-container').innerText.trim()
-        if (message.toLowerCase().includes('thank you for your vote')) {
+        if (message.toLowerCase().includes('cпасибо за голосование')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
             chrome.runtime.sendMessage({message})
@@ -11,7 +11,7 @@ async function vote(first) {
     }
 
     //Если вы уже голосовали
-    if (document.querySelector('div[class="tabs-content-without-tabs"]') != null && document.querySelector('div[class="tabs-content-without-tabs"]').innerText.includes('Вы уже голосовали')) {
+    if (document.querySelector('div[class="tabs-content-without-tabs"]') != null && document.querySelector('div[class="tabs-content-without-tabs"]').innerText.includes('have already voted recently')) {
         let leftTime = parseInt(document.querySelector('span[class="time-left"]').innerText.match(/\d/g).join(''))
         leftTime = leftTime + 1
         leftTime = leftTime * 3600000
@@ -35,7 +35,7 @@ async function vote(first) {
 
     if (first) return
 
-    const project = await getProject('HotMC')
+    const project = await getProject('MCLikeCom')
     document.querySelector('#playercollector-nickname').value = project.nick
     document.querySelector('#w0 button[type=submit]').click()
 }
