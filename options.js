@@ -59,6 +59,7 @@ async function restoreOptions() {
     document.getElementById('disabledFocusedTab').checked = settings.disabledFocusedTab
     document.getElementById('timeoutValue').value = settings.timeout
     document.getElementById('timeoutErrorValue').value = settings.timeoutError
+    document.getElementById('disabledWarnCaptcha').checked = settings.disabledWarnCaptcha
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
 }
@@ -229,7 +230,7 @@ function generateBtnListRating(rating, count) {
         const link = document.createElement('a')
         link.classList.add('link')
         link.target = 'blank_'
-        link.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+        link.href = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
         link.textContent = chrome.i18n.getMessage('here')
         link.setAttribute('data-resource', 'here')
         label.append(link)
@@ -364,6 +365,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledOneVote = this.checked
         else if (this.id === 'disabledFocusedTab')
             settings.disabledFocusedTab = this.checked
+        else if (this.id === 'disabledWarnCaptcha')
+            settings.disabledWarnCaptcha = this.checked
         else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false
@@ -463,7 +466,7 @@ document.getElementById('addProject').addEventListener('submit', async(event)=>{
     if (project.rating === 'Custom') {
         project.id = document.getElementById('nick').value
         project.nick = ''
-    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && project.rating !== 'XtremeTop100' && project.rating !== 'WARGM' && ((project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') ? document.getElementById('chooseMinecraftRating').value !== 'servers' : true) && document.getElementById('nick').value !== '') {
+    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && project.rating !== 'XtremeTop100' && project.rating !== 'WARGM' && project.rating !== 'Top100ArenaCom' && ((project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') ? document.getElementById('chooseMinecraftRating').value !== 'servers' : true) && document.getElementById('nick').value !== '') {
         project.nick = document.getElementById('nick').value
     } else {
         project.nick = ''
@@ -790,7 +793,7 @@ async function addProject(project, element) {
         const a = document.createElement('a')
         a.target = 'blank_'
         a.classList.add('link')
-        a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+        a.href = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
         a.textContent = chrome.i18n.getMessage('here')
         array.push(a)
     }
@@ -1655,10 +1658,10 @@ selectedTop.addEventListener('input', function() {
         }
     }
 
-    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords' || name === 'DiscordBoats' || name === 'XtremeTop100' || name === 'WARGM') {
+    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords' || name === 'DiscordBoats' || name === 'XtremeTop100' || name === 'WARGM' || name === 'Top100ArenaCom') {
         document.getElementById('nick').required = false
         document.getElementById('nick').parentElement.style.display = 'none'
-    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats' || laterChoose === 'XtremeTop100' || laterChoose === 'WARGM') {
+    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats' || laterChoose === 'XtremeTop100' || laterChoose === 'WARGM' || laterChoose === 'Top100ArenaCom') {
         document.getElementById('nick').required = true
         document.getElementById('nick').parentElement.removeAttribute('style')
     }
@@ -1811,7 +1814,7 @@ selectedTop.addEventListener('input', function() {
         }
     } else if (laterChoose === 'MinecraftRating') {
         document.getElementById('chooseMinecraftRating1').style.display = 'none'
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM') {
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM' && name !== 'Top100ArenaCom') {
             document.getElementById('nick').required = true
             document.getElementById('nick').parentElement.removeAttribute('style')
         }
@@ -1828,7 +1831,7 @@ selectedTop.addEventListener('input', function() {
         }
     } else if (laterChoose === 'MisterLauncher') {
         document.getElementById('chooseMinecraftRating1').style.display = 'none'
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM') {
+        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM' && name !== 'Top100ArenaCom') {
             document.getElementById('nick').required = true
             document.getElementById('nick').parentElement.removeAttribute('style')
         }

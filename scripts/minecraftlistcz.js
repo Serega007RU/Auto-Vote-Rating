@@ -1,5 +1,4 @@
 async function vote(first) {
-    if (first === false) return
     if (document.querySelector('.alert.alert-success') != null) {
         chrome.runtime.sendMessage({successfully: true})
         return
@@ -17,8 +16,10 @@ async function vote(first) {
         return
     }
 
+    if (first) return
+
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
-    document.querySelector('#flexCheckDefault').checked = true
+    document.querySelector('.vote__box__checkbox .form-check input').checked = true
     document.querySelector('div.vote__box__buttonRow__button button[type="submit"]').click()
 }

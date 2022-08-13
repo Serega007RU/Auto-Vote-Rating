@@ -1,31 +1,20 @@
 function vote(first) {
     if (first === false) return
-    if (document.URL.startsWith('https://discord.com/')) {
-        if (document.URL.includes('%20guilds') || document.URL.includes('%20email') || !document.URL.includes('prompt=none')) {
-            let url = document.URL
-            //Пилюля от жадности в правах
-            url = url.replace('%20guilds.join', '')
-            url = url.replace('%20guilds', '')
-            url = url.replace('%20email', '')
-            //Заставляем авторизацию авторизоваться не беспокоя пользователя если права уже были предоставлены
-            if (!document.URL.includes('prompt=none')) url = url.concat('&prompt=none')
-            document.location.replace(url)
-        } else {
-            const timer = setTimeout(()=>{//Да это костыль, а есть вариант по лучше?
-                chrome.runtime.sendMessage({discordLogIn: true})
-            }, 10000)
-            window.onbeforeunload = ()=> clearTimeout(timer)
-            window.onunload = ()=> clearTimeout(timer)
-        }
-        return
-    }
-
     const timer1 = setInterval(()=>{
         try {
             const vote = findElement('button', ['upvote'])
             if (!vote.disabled) {
                 clearInterval(timer1)
                 vote.click()
+
+                const timer4 = setInterval(()=>{
+                    const vote2 = findElement('button', ['upvote anyway'])
+                    console.log(vote2)
+                    if (vote2 && !vote2.disabled) {
+                        clearInterval(timer4)
+                        vote2.click()
+                    }
+                }, 1000)
             }
         } catch (e) {
             clearInterval(timer1)
@@ -92,7 +81,7 @@ function vote(first) {
 function findElement(selector, text) {
     for (const element of document.querySelectorAll(selector)) {
         for (const t of text) {
-            if (element.textContent.toLowerCase().includes(t)) {
+            if (element.textContent.toLowerCase().includes(t) || element.innerText.toLowerCase().includes(t)) {
                 return element
             }
         }

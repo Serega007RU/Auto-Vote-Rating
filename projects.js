@@ -451,13 +451,12 @@ const allProjects = {
     MCServerList: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                return 'https://mcserver-list.eu/hlasovat?id=' + project.id
             case 'pageURL':
-                return 'https://api.mcserver-list.eu/server/?id=' + project.id
+                return 'https://mcserver-list.eu/hlasovat/' + project.id
             case 'projectName':
-                return JSON.parse(doc.body.innerText)[0].name
+                return doc.querySelector('.serverdetail h1').textContent
             case 'exampleURL':
-                return ['https://mcserver-list.eu/hlasovat/?id=', '307', '']
+                return ['https://mcserver-list.eu/hlasovat/', '416', '']
             case 'URL':
                 return 'mcserver-list.eu'
         }
@@ -855,7 +854,7 @@ const allProjects = {
             case 'pageURL':
                 return 'https://www.minecraft-list.cz/server/' + project.id
             case 'projectName':
-                return doc.querySelector('.content__box__server__content__detail__firstRow__name').textContent.trim()
+                return doc.querySelector('.content__box__server__content__detail__firstRow .text-center').textContent.trim()
             case 'exampleURL':
                 return ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote']
             case 'URL':
@@ -1127,6 +1126,49 @@ const allProjects = {
                 return ['https://mineserv.top/', 'epserv', '']
             case 'URL':
                 return 'mineserv.top'
+        }
+    },
+    Top100ArenaCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://www.top100arena.com/listing/' + project.id + '/vote'
+            case 'projectName':
+                return doc.querySelector('.container.text-center h1.h2').textContent
+            case 'exampleURL':
+                return ['https://www.top100arena.com/listing/', '94246', '/vote']
+            case 'URL':
+                return 'top100arena.com'
+        }
+    },
+    MinecraftBestServersCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://minecraftbestservers.com/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://minecraftbestservers.com/' + project.id
+            case 'projectName':
+                return doc.querySelector('table .server.icon').parentElement.innerText.trim()
+            case 'exampleURL':
+                return ['https://minecraftbestservers.com/', 'server-cherry-survival.4599', '/vote']
+            case 'URL':
+                return 'minecraftbestservers.com'
+        }
+    },
+    MCLikeCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://mclike.com/vote-' + project.id
+            case 'pageURL':
+                return 'https://mclike.com/minecraft-server-' + project.id
+            case 'projectName':
+                return doc.querySelector('div.text-server > h1').textContent.replace('Minecraft server ', '')
+            case 'exampleURL':
+                return ['https://mclike.com/vote-', '188444', '']
+            case 'URL':
+                return 'mclike.com'
+            case 'oneProject':
+                return 1
         }
     },
     Custom: (type, project/*, doc*/) => {

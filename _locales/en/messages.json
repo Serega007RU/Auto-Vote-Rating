@@ -99,6 +99,15 @@
   "disabledFocusedTab": {
     "message": "Focused tab"
   },
+  "disabledFocusedTabTooltip": {
+    "message": "Open a tab and switch to it automatically"
+  },
+  "disabledWarnCaptcha": {
+    "message": "My captcha is solved automatically"
+  },
+  "disabledWarnCaptchaTooltip": {
+    "message": "Disables notifications and logging that the captcha needs to be passed manually"
+  },
   "disableCheckProjects": {
     "message": "Disable check-up",
     "description": "Checkbox. Disable check when adding a project"
@@ -741,7 +750,7 @@
     "message": "You must be logged in to upvote discord bots!"
   },
   "auth": {
-    "message": "Only registered users can vote on this rating. Please log in or register."
+    "message": "Log in to vote"
   },
   "emptySite": {
     "message": "It seems that this rating responded with an empty page, try to visit this page and then try adding again"
@@ -921,5 +930,8 @@
   },
   "banAttention": {
     "message": "Attention! There have been cases of blocking for auto-voting on this site, please use auto-voting on this site with caution, watch out for notifications and errors"
+  },
+  "closedTab": {
+    "message": "It looks like you have closed the tab on which the extension auto-voted"
   }
 }

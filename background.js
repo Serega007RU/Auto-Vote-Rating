@@ -134,13 +134,7 @@ async function checkOpen(project/*, transaction*/) {
         if (project.key === value.key) {
             openedProjects.delete(key)
             if (closeTabs) {
-                chrome.tabs.remove(key, function() {
-                    if (chrome.runtime.lastError) {
-                        console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
-                            sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                    }
-                })
+                tryCloseTab(key, project, 0)
             }
         }
     }
@@ -238,16 +232,16 @@ async function newWindow(project) {
     if (silentVoteMode) {
         silentVote(project)
     } else {
-        let window = await new Promise(resolve=>{
-            chrome.windows.getCurrent(function(win) {
-                if (chrome.runtime.lastError && chrome.runtime.lastError.message === 'No current window') {} else if (chrome.runtime.lastError) {
+        const windows = await new Promise(resolve=>{
+            chrome.windows.getAll(function(win) {
+                if (chrome.runtime.lastError) {
                     console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError.message)
                 }
                 resolve(win)
             })
         })
-        if (window == null) {
-            window = await new Promise(resolve=>{
+        if (windows == null || windows.length <= 0) {
+            const window = await new Promise(resolve=>{
                 chrome.windows.create({focused: false}, function(win) {
                     resolve(win)
                 })
@@ -596,17 +590,19 @@ async function silentVote(project) {
         } else
 
         if (project.rating === 'MCServerList') {
-            let response = await _fetch('https://api.mcserver-list.eu/vote/', {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': 'username=' + project.nick + '&id=' + project.id,'method': 'POST'}, project)
+            let response = await _fetch('https://mcserver-list.eu/api/sendvote/' + project.id + '/' + project.nick, {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': null}, project)
             let json = await response.json()
             if (response.ok) {
-                if (json[0].success === "false") {
-                    if (json[0].error === 'username_voted') {
+                if (json.data.status === 'success') {
+                    endVote({successfully: true}, null, project)
+                } else if (json.data.error) {
+                    if (json.data.error.includes('username_voted')) {
                         endVote({later: true}, null, project)
                     } else {
-                        endVote({message: json[0].error}, null, project)
+                        endVote({message: json.data.error}, null, project)
                     }
                 } else {
-                    endVote({successfully: true}, null, project)
+                    endVote({message: JSON.stringify(json)}, null, project)
                 }
             } else {
                 endVote({errorVote: [String(response.status), response.url]}, null, project)
@@ -719,6 +715,22 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     let project = openedProjects.get(details.tabId)
     if (project == null) return
     if (details.frameId === 0) {
+        // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
+        if (details.url.match(/facebook.com\/*/) || details.url.match(/google.com\/*/) || details.url.match(/accounts.google.com\/*/) || details.url.match(/reddit.com\/*/) || details.url.match(/twitter.com\/*/)) {
+            return
+        }
+
+        // Если пользователь авторизовывается через эти сайты но у расширения на это нет прав, всё равно не мешаем ему, пускай сам авторизуется не смотря на то что есть автоматизация авторизации
+        if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login')) {
+            let granted = await new Promise(resolve=>{
+                chrome.permissions.contains({origins: [details.url]}, resolve)
+            })
+            if (!granted) {
+                console.warn(getProjectPrefix(project, true) + 'Not granted permissions for ' + details.url)
+                return
+            }
+        }
+
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
                 if (chrome.runtime.lastError) {
@@ -732,6 +744,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 resolve()
             })
         })
+
         await new Promise(resolve => {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'}, function() {
                 if (chrome.runtime.lastError) {
@@ -745,6 +758,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 resolve()
             })
         })
+
         await new Promise(resolve => {
             chrome.tabs.sendMessage(details.tabId, {sendProject: true, project}, function (){
                 if (chrome.runtime.lastError) {
@@ -764,7 +778,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id') && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
                     let error = chrome.runtime.lastError.message
                     if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
-                        error += ' Try this solution: https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Problems-with-Opera'
+                        error += ' Try this solution: https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Problems-with-Opera'
                     }
                     console.error(getProjectPrefix(project, true) + error)
                     if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
@@ -774,6 +788,12 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             }
         })
     }
+})
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+    const project = openedProjects.get(tabId)
+    if (!project) return
+    endVote({closedTab: true}, {tab: {id: tabId}}, project)
 })
 
 chrome.webRequest.onCompleted.addListener(function(details) {
@@ -871,6 +891,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             let project = openedProjects.get(sender.tab.id)
             let message
             if (request.captcha) {
+                if (settings.disabledWarnCaptcha) return
                 message = chrome.i18n.getMessage('requiresCaptcha')
             } else if (request.auth && request.auth !== true) {
                 message = request.auth
@@ -903,19 +924,28 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 })
 
+function tryCloseTab(tabId, project, attempt) {
+    chrome.tabs.remove(tabId, async () => {
+        if (chrome.runtime.lastError) {
+            if (chrome.runtime.lastError.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
+                await wait(500)
+                tryCloseTab(tabId, project, ++attempt)
+                return
+            }
+            console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+            if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
+                sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+        }
+    })
+}
+
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
     if (sender && openedProjects.has(sender.tab.id)) {
         //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         project = openedProjects.get(sender.tab.id)
-        if (closeTabs) {
-            chrome.tabs.remove(sender.tab.id, function() {
-                if (chrome.runtime.lastError) {
-                    console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                    if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
-                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                }
-            })
+        if (closeTabs && !request.closedTab) {
+            tryCloseTab(sender.tab.id, project, 0)
         }
         openedProjects.delete(sender.tab.id)
     } else if (!project) return
@@ -1083,10 +1113,14 @@ async function endVote(request, sender, project) {
         let retryCoolDown
         if ((request.errorVote && request.errorVote[0] === '404') || (request.message && project.rating === 'WARGM')) {
             retryCoolDown = 21600000
+        } else if (request.closedTab) {
+            retryCoolDown = 60000
         } else {
             retryCoolDown = settings.timeoutError
-            sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', (Math.round(settings.timeoutError / 1000 / 60 * 100) / 100).toString())
         }
+
+        sendMessage = message + '. ' + chrome.i18n.getMessage('errorNextVote', (Math.round(retryCoolDown / 1000 / 60 * 100) / 100).toString())
+
         if (project.randomize) {
             retryCoolDown = retryCoolDown + Math.floor(Math.random() * 900000)
         }
