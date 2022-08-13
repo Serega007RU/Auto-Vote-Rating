@@ -549,13 +549,7 @@ async function checkOpen(project, transaction) {
         if (project.key === value.key) {
             openedProjects.delete(key)
             if (closeTabs) {
-                chrome.tabs.remove(key, function() {
-                    if (chrome.runtime.lastError) {
-                        console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
-                            sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                    }
-                })
+                tryCloseTab(key, project, 0)
             }
         }
     }
@@ -1217,7 +1211,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id') && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
                     let error = chrome.runtime.lastError.message
                     if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
-                        error += ' Try this solution: https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Problems-with-Opera'
+                        error += ' Try this solution: https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Problems-with-Opera'
                     }
                     console.error(getProjectPrefix(project, true) + error)
                     if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
@@ -1390,19 +1384,28 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 })
 
+function tryCloseTab(tabId, project, attempt) {
+    chrome.tabs.remove(tabId, async () => {
+        if (chrome.runtime.lastError) {
+            if (chrome.runtime.lastError.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
+                await wait(500)
+                tryCloseTab(tabId, project, ++attempt)
+                return
+            }
+            console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+            if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
+                sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+        }
+    })
+}
+
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
     if (sender && openedProjects.has(sender.tab.id)) {
         //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
         project = openedProjects.get(sender.tab.id)
         if (closeTabs && !request.closedTab) {
-            chrome.tabs.remove(sender.tab.id, function() {
-                if (chrome.runtime.lastError) {
-                    console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                    if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
-                        sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                }
-            })
+            tryCloseTab(sender.tab.id, project, 0)
         }
         openedProjects.delete(sender.tab.id)
     } else if (!project) return
@@ -2265,5 +2268,5 @@ console._collect = function (type, args) {
 
 /*
 Открытый репозиторий:
-https://gitlab.com/Serega007/auto-vote-minecraft-rating
+https://gitlab.com/Serega007/Auto-Vote-Rating
 */

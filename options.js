@@ -71,7 +71,6 @@ async function checkUpdateAvailable(forced) {
     } else if (document.URL.endsWith('?updated')) {
         window.history.replaceState(null, null, 'options.html')
         createNotif(chrome.i18n.getMessage('updated', chrome.runtime.getManifest().version), 'success')
-        toggleModal('ChangeLog')
     }
 }
 
@@ -229,9 +228,9 @@ async function update(version) {
             message.append(chrome.i18n.getMessage('tryManuallyUpdate'))
             message.append(' ')
             let a = document.createElement('a')
-            a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/tree/multivote'
+            a.href = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/tree/multivote'
             a.target = 'blank_'
-            a.textContent = 'https://gitlab.com/Serega007/auto-vote-rating/-/tree/multivote'
+            a.textContent = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/tree/multivote'
             a.className = 'link'
             message.append(a)
             message.append(document.createElement('br'))
@@ -492,7 +491,7 @@ function generateBtnListRating(rating, count) {
         const link = document.createElement('a')
         link.classList.add('link')
         link.target = 'blank_'
-        link.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+        link.href = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
         link.textContent = chrome.i18n.getMessage('here')
         link.setAttribute('data-resource', 'here')
         label.append(link)
@@ -2909,7 +2908,7 @@ async function addProject(project, element) {
         const a = document.createElement('a')
         a.target = 'blank_'
         a.classList.add('link')
-        a.href = 'https://gitlab.com/Serega007/auto-vote-rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+        a.href = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
         a.textContent = chrome.i18n.getMessage('here')
         array.push(a)
     }
