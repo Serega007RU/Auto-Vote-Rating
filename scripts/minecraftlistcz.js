@@ -21,10 +21,10 @@ async function vote(first) {
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
     // TODO временный код
-    if (document.querySelector('.vote__box__checkboxxx .form-check input') && document.querySelector('.vote__box__checkboxxx .form-check input').name !== 'fakerr') {
-        document.querySelector('.vote__box__checkboxxx .form-check input').checked = true
-    } else if (document.querySelector('.vote__box__checkboxx .form-check input') && document.querySelector('.vote__box__checkboxx .form-check input').name !== 'fakerr') {
-        document.querySelector('.vote__box__checkboxx .form-check input').checked = true
+    if (document.querySelector("#gdpr") && window.getComputedStyle(document.querySelector("#gdpr")).visibility === 'visible') {
+        document.querySelector("#gdpr").checked = true
+    } else {
+        chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible"})
     }
     // TODO конец
     document.querySelector('div.vote__box__buttonRow__button button[type="submit"]').click()
