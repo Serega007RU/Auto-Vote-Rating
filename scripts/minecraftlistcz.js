@@ -20,6 +20,12 @@ async function vote(first) {
 
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
-    document.querySelector('.vote__box__checkbox .form-check input').checked = true
+    // TODO временный код
+    if (document.querySelector('.vote__box__checkboxx .form-check input') && document.querySelector('.vote__box__checkboxx .form-check input').name !== 'faker') {
+        document.querySelector('.vote__box__checkboxx .form-check input').checked = true
+    } else if (document.querySelector('.vote__box__checkbox .form-check input') && document.querySelector('.vote__box__checkbox .form-check input').name !== 'faker') {
+        document.querySelector('.vote__box__checkbox .form-check input').checked = true
+    }
+    // TODO конец
     document.querySelector('div.vote__box__buttonRow__button button[type="submit"]').click()
 }
