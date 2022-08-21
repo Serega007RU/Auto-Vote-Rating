@@ -21,10 +21,11 @@ async function vote(first) {
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
     // TODO временный код
-    if (document.querySelector("#terms") && window.getComputedStyle(document.querySelector("#terms")).visibility === 'visible' && isInViewport(document.querySelector("#terms"))) {
-        document.querySelector("#terms").checked = true
+    if (window.getComputedStyle(document.querySelector("#gdpr")).visibility === 'visible' && isInViewport(document.querySelector("#gdpr"))) {
+        document.querySelector("#gdpr").checked = true
     } else {
         chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible"})
+        return
     }
     // TODO конец
     document.querySelector('div.vote__box__buttonRow__button button[type="submit"]').click()
