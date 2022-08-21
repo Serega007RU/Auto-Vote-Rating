@@ -111,7 +111,9 @@
 <a href="https://mineserv.top/">mineserv.top</a>  
 <a href="https://www.top100arena.com/">top100arena.com</a>  
 <a href="https://minecraftbestservers.com/">minecraftbestservers.com</a>  
-<a href="https://mclike.com/">mclike.com</a>
+<a href="https://mclike.com/">mclike.com</a>  
+<a href="https://pixelmon-server-list.com/">pixelmon-server-list.com</a>  
+<a href="https://www.minecraftserver.sk/">minecraftserver.sk</a>
 </details>
 
 ### Links to the extension where you can install it:
