@@ -1171,6 +1171,33 @@ const allProjects = {
                 return 1
         }
     },
+    PixelmonServerListCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://pixelmon-server-list.com/server/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://pixelmon-server-list.com/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('.page-header h1').textContent
+            case 'exampleURL':
+                return ['https://pixelmon-server-list.com/server/', '181', '/vote']
+            case 'URL':
+                return 'pixelmon-server-list.com'
+        }
+    },
+    MinecraftServerSk2: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+            case 'pageURL':
+                return 'https://www.minecraftserver.sk/server/' + project.id + '/'
+            case 'projectName':
+                return doc.querySelector('.panel-body h3').innerText.trim()
+            case 'exampleURL':
+                return ['https://www.minecraftserver.sk/server/', 'minicraft-cz-6', '/']
+            case 'URL':
+                return 'minecraftserver.sk'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
