@@ -6,7 +6,7 @@ async function vote() {
 
     if (document.querySelector('.alert-danger')?.offsetParent) {
         const message = document.querySelector('.alert-danger').innerText.trim()
-        if (message.includes('ste už zahlasovali')) {
+        if (message.includes('ste už zahlasovali') || message.includes('already voted')) {
             chrome.runtime.sendMessage({later: true})
         } else {
             chrome.runtime.sendMessage({message})
@@ -27,7 +27,7 @@ const timer = setInterval(()=>{
             clearInterval(timer)
         } else if (document.querySelector('.alert-danger')?.offsetParent) {
             const message = document.querySelector('.alert-danger').innerText.trim()
-            if (message.includes('ste už zahlasovali')) {
+            if (message.includes('ste už zahlasovali') || message.includes('already voted')) {
                 chrome.runtime.sendMessage({later: true})
             } else {
                 chrome.runtime.sendMessage({message})
