@@ -1198,6 +1198,20 @@ const allProjects = {
                 return 'minecraftserver.sk'
         }
     },
+    ServidoresdeMinecraftEs: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://servidoresdeminecraft.es/server/vote/' + project.id
+            case 'pageURL':
+                return 'https://servidoresdeminecraft.es/server/status/' + project.id
+            case 'projectName':
+                return doc.querySelector('.server-header h1').textContent
+            case 'exampleURL':
+                return ['https://servidoresdeminecraft.es/server/vote/', 'gRQ7HvE8/play.minelatino.com', '']
+            case 'URL':
+                return 'servidoresdeminecraft.es'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
