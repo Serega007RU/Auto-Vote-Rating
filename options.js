@@ -803,7 +803,7 @@ async function addProject(project, element) {
         createNotif(array, 'success', null, element)
     }
 
-    if (project.rating === 'MinecraftIndex' || project.rating === 'MineServers' || project.rating === 'XtremeTop100' || project.rating === 'ServeurMinecraftFr') {
+    if (project.rating === 'MinecraftIndex' || project.rating === 'MineServers' || project.rating === 'XtremeTop100' || project.rating === 'ServeurMinecraftFr' || project.rating === 'gTop100') {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 
