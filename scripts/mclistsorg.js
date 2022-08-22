@@ -1,4 +1,4 @@
-async function vote(first) {
+async function vote() {
     if (document.querySelector('div.ui.success.message') != null) {
         chrome.runtime.sendMessage({successfully: true})
         return
@@ -12,7 +12,8 @@ async function vote(first) {
         return
     }
 
-    if (first) return
+    // Капча была раньше
+    // if (first) return
 
     const project = await getProject('MCListOrg')
     document.querySelector('input[name="username"]').value = project.nick
