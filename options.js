@@ -2859,12 +2859,13 @@ async function addProject(project, element) {
             if (nick == null || nick === '') continue
             const project2 = Object.assign({}, project)
             project2.nick = nick
-            const found = await tx.store.index('rating, id, nick').count([project2.rating, project2.id, project2.nick])
-            if (found === 0) {
-                project2.key = await tx.store.add(project2)
-                await tx.store.put(project2, project2.key)
-                countNicks++
+            if (!document.getElementById('disableCheckProjects').checked) {
+                const found = await tx.store.index('rating, id, nick').count([project2.rating, project2.id, project2.nick])
+                if (found !== 0) continue
             }
+            project2.key = await tx.store.add(project2)
+            await tx.store.put(project2, project2.key)
+            countNicks++
         }
         reloadProjectList()
         //Что-то тут сомнительное, возможны конфликты
