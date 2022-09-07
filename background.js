@@ -772,7 +772,15 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 resolve()
             })
         })
-    } else if (details.frameId !== 0 && (details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/))) {
+    } else if (details.frameId !== 0 && (
+        details.url.match(/hcaptcha.com\/captcha\/*/)
+        || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/)
+        || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/)
+        || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/)
+        || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/)
+        || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/)
+        || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)
+        || details.url.match(/https:\/\/challenges.cloudflare.com\/*/))) {
         chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
             if (chrome.runtime.lastError) {
                 if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id') && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
