@@ -19,11 +19,12 @@ async function vote() {
         return
     }
 
-    const button = document.querySelector('div.card-footer .btn.btn-blue')
+    let button = document.querySelector('div.card-footer .btn.btn-blue:nth-child(2)')
+    if (!button) button = document.querySelector('div.card-footer .btn.btn-blue')
 
     if (!isVisible(button)) {
         await wait(Math.floor(Math.random() * 10000))
-        chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования?'})
+        chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
         return
     }
 
@@ -37,7 +38,7 @@ async function vote() {
             if (!isVisible(button)) {
                 clearInterval(timer2)
                 await wait(Math.floor(Math.random() * 10000))
-                chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
+                chrome.runtime.sendMessage({message: 'Кнопка голосования стала невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
             } else if (!button.disabled === false || button.getAttribute('disabled') == null) {
                 clearInterval(timer2)
                 await wait(Math.floor(Math.random() * 10000))
@@ -76,26 +77,30 @@ function wait(ms) {
 
 // https://stackoverflow.com/a/41698614/11235240
 function isVisible(elem) {
-    if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.');
-    const style = getComputedStyle(elem);
-    if (style.display === 'none') return false;
-    if (style.visibility !== 'visible') return false;
-    if (style.opacity < 0.1) return false;
+    if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
+    const style = getComputedStyle(elem)
+    if (style.display === 'none') return false
+    if (style.visibility !== 'visible') return false
+    if (style.opacity < 0.1) return false
+
+    if (elem.offsetHeight < 40 || elem.offsetWidth < 40) return false // 1 пиксель?
+    if (elem.textContent.length <= 3) return false // Есть текст?
+
     if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
         elem.getBoundingClientRect().width === 0) {
-        return false;
+        return false
     }
     const elemCenter   = {
         x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
         y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
     };
-    if (elemCenter.x < 0) return false;
-    if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false;
-    if (elemCenter.y < 0) return false;
-    if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return false;
-    let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y);
+    if (elemCenter.x < 0) return false
+    if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false
+    if (elemCenter.y < 0) return false
+    if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return false
+    let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
     do {
         if (pointContainer === elem) return true;
-    } while (pointContainer = pointContainer.parentNode);
-    return false;
+    } while (pointContainer = pointContainer.parentNode)
+    return false
 }
