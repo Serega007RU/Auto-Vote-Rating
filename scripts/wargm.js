@@ -21,11 +21,10 @@ async function vote() {
 
     // let button = document.querySelector('div.card-footer .btn.btn-blue:nth-child(2)')
     // if (!button) button = document.querySelector('div.card-footer .btn.btn-blue')
-    let button = document.querySelector('div.card-footer .btn.btn-blue')
+    const button = document.querySelector('div.card-footer .btn.btn-blue')
 
-    // https://cdn.discordapp.com/attachments/751367440117792828/1019229726159667200/unknown.png
     const event = new Event('mousemove')
-    document.querySelector('.general').dispatchEvent(event)
+    document.body.dispatchEvent(event)
 
     if (!isVisible(button)) {
         await wait(Math.floor(Math.random() * 10000))
@@ -42,12 +41,12 @@ async function vote() {
         const timer2 = setInterval(async () => {
             if (!isVisible(button)) {
                 clearInterval(timer2)
-                const event = new Event('mousemove')
-                document.querySelector('.general').dispatchEvent(event)
                 await wait(Math.floor(Math.random() * 10000))
                 chrome.runtime.sendMessage({message: 'Кнопка голосования стала невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
             } else if (!button.disabled === false || button.getAttribute('disabled') == null) {
                 clearInterval(timer2)
+                const event = new Event('mousemove')
+                document.body.dispatchEvent(event)
                 await wait(Math.floor(Math.random() * 10000))
                 button.click()
             }

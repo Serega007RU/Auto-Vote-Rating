@@ -108,6 +108,7 @@ async function run() {
                 return false
             }
         })
+        document.currentScript.parentNode.removeChild(document.currentScript)
         `
         document.head.appendChild(script)
 

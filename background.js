@@ -710,6 +710,25 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     return true
 }
 
+chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
+    let project = openedProjects.get(details.tabId)
+    if (project == null) return
+    if (details.frameId === 0) {
+        if (project.rating === 'WARGM') {
+            chrome.tabs.executeScript(details.tabId, {file: 'scripts/istrusted.js', runAt: 'document_end'}, function() {
+                if (chrome.runtime.lastError) {
+                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')) {
+                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
+                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
+                        project.error = chrome.runtime.lastError.message
+                        updateValue('projects', project)
+                    }
+                }
+            })
+        }
+    }
+})
+
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
 chrome.webNavigation.onCompleted.addListener(async function(details) {
     let project = openedProjects.get(details.tabId)
