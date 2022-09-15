@@ -87,6 +87,17 @@ async function initializeConfig(background, version) {
 
     // if (settings && !settings.disabledCheckTime) checkTime()
 
+    openedProjects = await db.get('other', 'openedProjects')
+    if (!openedProjects) { // noinspection JSUndeclaredVariable
+        openedProjects = new Map()
+    } else if (openedProjects.size > 0) {
+        for (const key of openedProjects.keys()) {
+            openedProjects.delete(key)
+            chrome.tabs.remove(key)
+        }
+        await db.put('other', openedProjects, 'openedProjects')
+    }
+
     checkVote()
 }
 
@@ -119,7 +130,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             disabledFocusedTab: false,
             enableCustom: false,
             timeout: 10000,
-            timeoutError: 900000
+            timeoutError: 900000,
+            disabledWarnCaptcha: false
         }
         await other.add(settings, 'settings')
         generalStats = {
@@ -141,6 +153,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
         await other.add(generalStats, 'generalStats')
         await other.add(todayStats, 'todayStats')
+        await other.add(todayStats, 'openedProjects')
         return
     }
 

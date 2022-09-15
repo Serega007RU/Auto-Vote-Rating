@@ -299,7 +299,7 @@ async function removeProjectList(project) {
     }
     //Если эта вкладка была уже открыта, он закрывает её
     for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-        if (project.key === value.key) {
+        if (project.key === value) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
             chrome.tabs.remove(key)
             break
