@@ -113,7 +113,10 @@
 <a href="https://minecraftbestservers.com/">minecraftbestservers.com</a>  
 <a href="https://mclike.com/">mclike.com</a>  
 <a href="https://pixelmon-server-list.com/">pixelmon-server-list.com</a>  
-<a href="https://www.minecraftserver.sk/">minecraftserver.sk</a>
+<a href="https://www.minecraftserver.sk/">minecraftserver.sk</a>  
+<a href="https://servidoresdeminecraft.es/">servidoresdeminecraft.es</a>  
+<a href="https://minecraftsurvivalservers.com/">minecraftsurvivalservers.com</a>  
+<a href="https://minecraft.global/">minecraft.global</a>
 </details>
 
 ### Links to the extension where you can install it:
