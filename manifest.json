@@ -47,7 +47,7 @@
 		"browsingData"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "6.8.1",
+	"version": "6.8.2",
 	"default_locale": "en",
 	"web_accessible_resources": [
 		"options.html"
