@@ -15,12 +15,14 @@ async function vote(first) {
     if (first) return
 
     const project = await getProject('MinecraftServersListOrg')
-    document.getElementById('mc_user').value = project.nick
+    const inputNick = document.querySelector('#mc_user')
+    inputNick.value = project.nick
+    inputNick.dispatchEvent(new Event('input', {bubbles:true}))
 }
 
 const timer = setInterval(()=>{
     try {
-        const voteBtn = document.getElementById('vote-btn')
+        const voteBtn = document.querySelector('#vote-btn')
         if (!voteBtn.disabled) {
             clearInterval(timer)
             voteBtn.click()

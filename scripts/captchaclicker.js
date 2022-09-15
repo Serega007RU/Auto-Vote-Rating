@@ -109,6 +109,14 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             clearInterval(timer5)
         }
     }, 1000)
+} else if (window.location.href.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+    //Если требуется ручное прохождение капчи CloudFlare
+    const timer7 = setInterval(()=>{
+        if (document.querySelector('#cf-norobot-container')) {
+            clearInterval(timer7)
+            document.querySelector('#cf-norobot-container span.mark').click()
+        }
+    }, 1000)
 }
 
 const script = document.createElement('script')
@@ -123,6 +131,7 @@ Object.defineProperty(document, 'hidden', {
         return false
     }
 })
+document.currentScript.parentNode.removeChild(document.currentScript)
 `
 document.head.appendChild(script)
 

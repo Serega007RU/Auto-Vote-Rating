@@ -18,6 +18,8 @@ const timer = setInterval(()=>{
                 chrome.runtime.sendMessage({later})
             } else if (text.includes('Thank you for voting')) {
                 chrome.runtime.sendMessage({successfully: true})
+            } else if (text.includes('please solve the') && text.includes('captcha')) {
+                chrome.runtime.sendMessage({captcha: true})
             } else {
                 chrome.runtime.sendMessage({message: text})
             }

@@ -929,7 +929,7 @@
     "message": "The project was deleted by the user"
   },
   "banAttention": {
-    "message": "Attention! There have been cases of blocking for auto-voting on this site, please use auto-voting on this site with caution, watch out for notifications and errors"
+    "message": "Attention! There have been cases of blocking for auto-voting on this site, please use auto-voting on this site with caution, watch out for notifications and errors, if you are banned, then the author of the site has made a new bypass that determines that you are auto-voting, inform the extension developer if you are banned!"
   },
   "closedTab": {
     "message": "It looks like you have closed the tab on which the extension auto-voted"
