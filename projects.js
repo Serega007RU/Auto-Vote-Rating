@@ -1228,6 +1228,20 @@ const allProjects = {
                 return 'minecraftsurvivalservers.com'
         }
     },
+    MinecraftGlobal: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://minecraft.global/server/' + project.id + '/vote'
+            case 'pageURL':
+                return 'https://minecraft.global/server/' + project.id
+            case 'projectName':
+                return doc.querySelector('h1').textContent
+            case 'exampleURL':
+                return ['https://minecraft.global/server/', '8', '/vote']
+            case 'URL':
+                return 'minecraft.global'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
