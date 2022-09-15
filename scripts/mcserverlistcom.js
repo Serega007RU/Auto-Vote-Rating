@@ -1,5 +1,5 @@
 async function vote(/*first*/) {
-    if (document.querySelector('div.ui.success.message') && document.querySelector('div.ui.success.message').textContent.includes('voted successfully')) {
+    if (document.querySelector('div.ui.success.message') && document.querySelector('div.ui.success.message').textContent.toLowerCase().includes('voted successfully')) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
@@ -7,10 +7,11 @@ async function vote(/*first*/) {
         const text = document.querySelector('div.ui.negative.message').textContent
         if (text.includes(' already voted')) {
             chrome.runtime.sendMessage({later: true})
-        } else {
+            return
+        } else if (!text.includes('Internet Explorer')) {
             chrome.runtime.sendMessage({message: text})
+            return
         }
-        return
     }
 
     const project = await getProject('MCServerListCom')
