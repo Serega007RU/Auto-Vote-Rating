@@ -773,7 +773,7 @@ async function removeProjectList(project) {
     }
     //Если эта вкладка была уже открыта, он закрывает её
     for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-        if (project.key === value.key) {
+        if (project.key === value) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
             chrome.tabs.remove(key)
             break
@@ -2919,7 +2919,7 @@ async function addProject(project, element) {
         createNotif(array, 'success', null, element)
     }
 
-    if (project.rating === 'MinecraftIndex' || project.rating === 'MineServers' || project.rating === 'XtremeTop100' || project.rating === 'ServeurMinecraftFr') {
+    if (project.rating === 'MinecraftIndex' || project.rating === 'MineServers' || project.rating === 'XtremeTop100' || project.rating === 'ServeurMinecraftFr' || project.rating === 'gTop100') {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 
@@ -3663,6 +3663,8 @@ selectedTop.addEventListener('input', function() {
             if (this.value === 'mineservers.com') document.getElementById('chooseGameMineServers').value = 'mineservers.com'
             else document.getElementById('chooseGameMineServers').value = this.value
             this.value = 'mineservers.com'
+        } else if (name === 'ServerPact') {
+            if (this.value !== 'serverpact.com') this.value = 'serverpact.com'
         }
     }
     if (name == null) {
@@ -4087,6 +4089,19 @@ function generateDataList() {
         option.textContent = 'MineServers'
         datalist.append(option)
     }
+    //ServerPact
+    const option1 = document.createElement('option')
+    option1.setAttribute('name', 'ServerPact')
+    option1.value = 'serverpact.nl'
+    datalist.append(option1)
+    const option2 = document.createElement('option')
+    option2.setAttribute('name', 'ServerPact')
+    option2.value = 'minecraftserverlijst.nl'
+    datalist.append(option2)
+    const option3 = document.createElement('option')
+    option3.setAttribute('name', 'ServerPact')
+    option3.value = 'minecraftserverlist.eu'
+    datalist.append(option3)
     // document.querySelector('option[name="ListForge"]').textContent = 'or Minecraft-MP.com'
     document.querySelector('option[name="TopGames"]').textContent = 'or Top-Serveurs.net'
     document.querySelector('option[name="Discords"]').textContent = 'or BotsForDiscord.com'

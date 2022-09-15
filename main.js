@@ -72,6 +72,17 @@ async function initializeConfig(background, version) {
 
     // if (settings && !settings.disabledCheckTime) checkTime()
 
+    openedProjects = await db.get('other', 'openedProjects')
+    if (!openedProjects) { // noinspection JSUndeclaredVariable
+        openedProjects = new Map()
+    } else if (openedProjects.size > 0) {
+        for (const key of openedProjects.keys()) {
+            openedProjects.delete(key)
+            chrome.tabs.remove(key)
+        }
+        await db.put('other', openedProjects, 'openedProjects')
+    }
+
     checkVote()
 }
 
@@ -111,6 +122,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             enableCustom: false,
             timeout: 1000,
             timeoutError: 0,
+            disabledWarnCaptcha: false,
             proxyBlackList: ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"],
             stopVote: 0,
             autoAuthVK: false,
@@ -149,6 +161,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         }
         await other.add(generalStats, 'generalStats')
         await other.add(todayStats, 'todayStats')
+        await other.add(todayStats, 'openedProjects')
         return
     }
 

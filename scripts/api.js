@@ -112,6 +112,7 @@ async function run() {
         alert = function(message) {
             window.postMessage({alert: true, message: message}, '*')
         }
+        document.currentScript.parentNode.removeChild(document.currentScript)
         `
         document.head.appendChild(script)
 

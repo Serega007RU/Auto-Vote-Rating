@@ -17,7 +17,7 @@ async function vote(first) {
     if (first) return
 
     const project = await getProject('TrackyServer')
-    document.querySelector('input[name="username"]').value = project.nick
+    document.querySelector('form.vote input[name="username"]').value = project.nick
     document.querySelector('form.vote button[type="submit"]').click()
 }
 

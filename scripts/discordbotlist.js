@@ -2,6 +2,9 @@ function vote(first) {
     if (first === false) return
     const timer1 = setInterval(()=>{
         try {
+            if (document.querySelector('.main-content').innerText.includes('ogging you in')) {
+                return
+            }
             const vote = findElement('button', ['upvote'])
             if (!vote.disabled) {
                 clearInterval(timer1)

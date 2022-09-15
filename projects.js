@@ -1198,6 +1198,36 @@ const allProjects = {
                 return 'minecraftserver.sk'
         }
     },
+    ServidoresdeMinecraftEs: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://servidoresdeminecraft.es/server/vote/' + project.id
+            case 'pageURL':
+                return 'https://servidoresdeminecraft.es/server/status/' + project.id
+            case 'projectName':
+                return doc.querySelector('.server-header h1').textContent
+            case 'exampleURL':
+                return ['https://servidoresdeminecraft.es/server/vote/', 'gRQ7HvE8/play.minelatino.com', '']
+            case 'URL':
+                return 'servidoresdeminecraft.es'
+        }
+    },
+    MinecraftSurvivalServersCom: (type, project, doc) => {
+        switch (type) {
+            case 'voteURL':
+                return 'https://minecraftsurvivalservers.com/vote/' + project.id
+            case 'pageURL':
+                return 'https://minecraftsurvivalservers.com/server/' + project.id
+            case 'projectName':
+                // Хрень какая-то, в fetch запросе отсылается не страница а предзагрузка
+                // return doc.querySelector('div.items-center > span.text-xl.font-semibold').textContent.trim()
+                return ''
+            case 'exampleURL':
+                return ['https://minecraftsurvivalservers.com/vote/', '248-rede-revo', '']
+            case 'URL':
+                return 'minecraftsurvivalservers.com'
+        }
+    },
     Custom: (type, project/*, doc*/) => {
         switch (type) {
             case 'pageURL':
