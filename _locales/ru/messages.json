@@ -86,6 +86,12 @@
   "disabledWarnCaptchaTooltip": {
     "message": "Отключает уведомления и логирование о том что капчу необходимо пройти вручную"
   },
+  "disabledDebug": {
+    "message": "Отладка"
+  },
+  "disabledDebugTooltip": {
+    "message": "Включать это только если вас об этом попросил разработчик"
+  },
   "disableCheckProjects": {
     "message": "Отключить проверку"
   },

@@ -129,7 +129,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             enableCustom: false,
             timeout: 10000,
             timeoutError: 900000,
-            disabledWarnCaptcha: false
+            disabledWarnCaptcha: false,
+            debug: false
         }
         await other.add(settings, 'settings')
         generalStats = {

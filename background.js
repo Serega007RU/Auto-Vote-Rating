@@ -17,8 +17,6 @@ let online = true
 
 let secondVoteMinecraftIpList = false
 
-let debug = false
-
 //Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
 
@@ -66,7 +64,10 @@ async function checkVote() {
 }
 
 //Триггер на голосование когда подходит время голосования
-chrome.alarms.onAlarm.addListener(checkVote)
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    if (settings.debug) console.log('chrome.alarms.onAlarm', JSON.stringify(alarm))
+    checkVote()
+})
 
 async function reloadAllAlarms() {
     await new Promise(resolve => chrome.alarms.clearAll(resolve))
@@ -140,7 +141,7 @@ async function checkOpen(project/*, transaction*/) {
         }
     }
 
-    if (debug) console.log(getProjectPrefix(project, true) + 'престарт')
+    if (settings.debug) console.log(getProjectPrefix(project, true) + 'престарт')
 
     if (project.rating === 'MonitoringMinecraft') {
         promises.push(clearMonitoringMinecraftCookies())
@@ -154,7 +155,7 @@ async function checkOpen(project/*, transaction*/) {
                     resolve(cookies)
                 })
             })
-            if (debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
+            if (settings.debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
             for (let i = 0; i < cookies.length; i++) {
                 if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
