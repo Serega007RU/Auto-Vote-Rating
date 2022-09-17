@@ -26,8 +26,6 @@ let currentPacScriptProxy
 //Прерывает выполнение fetch запросов на случай ошибки в режиме MultiVote
 let controller = new AbortController()
 
-let debug = false
-
 //Токен TunnelBear
 let tunnelBear = {}
 
@@ -100,7 +98,10 @@ async function checkVote() {
 }
 
 //Триггер на голосование когда подходит время голосования
-chrome.alarms.onAlarm.addListener(checkVote)
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    if (settings.debug) console.log('chrome.alarms.onAlarm', JSON.stringify(alarm))
+    checkVote()
+})
 
 async function reloadAllAlarms() {
     await new Promise(resolve => chrome.alarms.clearAll(resolve))
@@ -418,7 +419,7 @@ async function checkOpen(project, transaction) {
                                 resolve(cookies)
                             })
                         })
-                        if (debug) console.log('Удаляю куки Yandex')
+                        if (settings.debug) console.log('Удаляю куки Yandex')
                         for (let i = 0; i < cookies.length; i++) {
                             if (!cookies[i].domain.includes('.yandex.')) continue
                             if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
@@ -459,7 +460,7 @@ async function checkOpen(project, transaction) {
                         resolve(cookies)
                     })
                 })
-                if (debug) console.log('Удаляю куки ' + url)
+                if (settings.debug) console.log('Удаляю куки ' + url)
                 for (let i = 0; i < cookies.length; i++) {
                     if (cookies[i].name === 'csrf_cookie_name' || cookies[i].name.startsWith('cf_') || cookies[i].name.startsWith('__cf')) continue
                     if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
@@ -555,7 +556,7 @@ async function checkOpen(project, transaction) {
         }
     }
 
-    if (debug) console.log(getProjectPrefix(project, true) + 'престарт')
+    if (settings.debug) console.log(getProjectPrefix(project, true) + 'престарт')
 
     if (project.rating === 'MonitoringMinecraft') {
         promises.push(clearMonitoringMinecraftCookies())
@@ -569,7 +570,7 @@ async function checkOpen(project, transaction) {
                     resolve(cookies)
                 })
             })
-            if (debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
+            if (settings.debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
             for (let i = 0; i < cookies.length; i++) {
                 if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
                 await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
@@ -647,7 +648,7 @@ async function newWindow(project) {
     } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
         silentVoteMode = true
     }
-    if (debug) console.log('[' + project.rating + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (silentVoteMode ? ' Начинаю Fetch запрос' : ' Открываю вкладку'))
+    if (settings.debug) console.log('[' + project.rating + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (silentVoteMode ? ' Начинаю Fetch запрос' : ' Открываю вкладку'))
     if (silentVoteMode) {
         silentVote(project)
     } else {
@@ -1960,7 +1961,7 @@ async function removeCookie(url, name) {
 }
 
 async function clearProxy() {
-    if (debug) console.log('Удаляю прокси')
+    if (settings.debug) console.log('Удаляю прокси')
     currentProxy = null
     currentPacScriptProxy = null
     errorProxy = {ip: '', count: 0}
@@ -2026,7 +2027,7 @@ function extractHostname(url) {
 async function stopVote(dontStart, user) {
     if (user) {
         console.log(chrome.i18n.getMessage('voteSuspending'))
-    } else if (debug) {
+    } else if (settings.debug) {
         console.log('Отмена всех голосований и очистка всего')
     }
     _break = true
