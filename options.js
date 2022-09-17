@@ -302,6 +302,7 @@ async function removeProjectList(project) {
     for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
         if (project.key === value) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
+            db.put('other', chrome.extension.getBackgroundPage().openedProjects, 'openedProjects')
             chrome.tabs.remove(key)
             break
         }
