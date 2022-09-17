@@ -60,6 +60,7 @@ async function restoreOptions() {
     document.getElementById('timeoutValue').value = settings.timeout
     document.getElementById('timeoutErrorValue').value = settings.timeoutError
     document.getElementById('disabledWarnCaptcha').checked = settings.disabledWarnCaptcha
+    document.getElementById('disabledDebug').checked = settings.debug
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
 }
@@ -301,6 +302,7 @@ async function removeProjectList(project) {
     for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
         if (project.key === value) {
             chrome.extension.getBackgroundPage().openedProjects.delete(key)
+            db.put('other', chrome.extension.getBackgroundPage().openedProjects, 'openedProjects')
             chrome.tabs.remove(key)
             break
         }
@@ -367,6 +369,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledFocusedTab = this.checked
         else if (this.id === 'disabledWarnCaptcha')
             settings.disabledWarnCaptcha = this.checked
+        else if (this.id === 'disabledDebug')
+            settings.debug = this.checked
         else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false
