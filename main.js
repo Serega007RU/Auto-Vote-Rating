@@ -11,6 +11,9 @@ var todayStats
 let db
 //База данных логов
 let dbLogs
+//Текущие открытые вкладки расширением
+// noinspection ES6ConvertVarToLetConst
+var openedProjects = new Map()
 
 //Инициализация настроек расширения
 async function initializeConfig(background, version) {

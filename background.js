@@ -1,6 +1,3 @@
-//Текущие открытые вкладки расширением
-// noinspection ES6ConvertVarToLetConst
-var openedProjects = new Map()
 //Текущие fetch запросы
 // noinspection ES6ConvertVarToLetConst
 var fetchProjects = new Map()
