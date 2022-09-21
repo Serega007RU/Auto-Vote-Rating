@@ -21,7 +21,7 @@ async function vote() {
 
     // let button = document.querySelector('div.card-footer .btn.btn-blue:nth-child(2)')
     // if (!button) button = document.querySelector('div.card-footer .btn.btn-blue')
-    const button = document.querySelector('div.card-footer .btn.btn-blue')
+    const button = document.querySelector('.vote-page .btn.btn-blue')
 
     const event = new Event('mousemove')
     document.body.dispatchEvent(event)
