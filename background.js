@@ -714,7 +714,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
     const projectKey = openedProjects.get(details.tabId)
     if (!projectKey) return
     if (details.frameId === 0) {
-        if (details.url.match(/wargm.com\/*/)) {
+        if (details.url.match(/wargm.ru\/*/)) {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/istrusted.js', runAt: 'document_end'}, async function() {
                 if (chrome.runtime.lastError) {
                     if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')) {
