@@ -43,7 +43,7 @@ async function vote() {
                 clearInterval(timer2)
                 await wait(Math.floor(Math.random() * 10000))
                 chrome.runtime.sendMessage({message: 'Кнопка голосования стала невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
-            } else if (!button.disabled === false || button.getAttribute('disabled') == null) {
+            } else if ((button.disabled == null || button.disabled === false) && button.getAttribute('disabled') == null) {
                 clearInterval(timer2)
                 const event = new Event('mousemove')
                 document.body.dispatchEvent(event)
