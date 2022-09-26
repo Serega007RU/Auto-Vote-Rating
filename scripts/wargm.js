@@ -12,25 +12,25 @@ async function vote() {
         return
     }
 
-    //Если на странице есть кнопка входа через Steam то жмём её
-    if (document.querySelector('div.card-footer a[href="/steam_login"]') != null) {
+    //Если на странице есть кнопка входа через Steam, то жмём её
+    if (document.querySelector('a[href="/steam_login"]') != null) {
         await wait(Math.floor(Math.random() * 10000))
-        document.querySelector('div.card-footer a[href="/steam_login"]').click()
+        document.querySelector('a[href="/steam_login"]').click()
         return
     }
 
     // let button = document.querySelector('div.card-footer .btn.btn-blue:nth-child(2)')
     // if (!button) button = document.querySelector('div.card-footer .btn.btn-blue')
-    const button = document.querySelector('.vote-page .btn.btn-blue')
-
-    const event = new Event('mousemove')
-    document.body.dispatchEvent(event)
+    const button = document.querySelector('#main .btn.btn-blue')
 
     if (!isVisible(button)) {
         await wait(Math.floor(Math.random() * 10000))
         chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
         return
     }
+
+    const event = new Event('mousemove')
+    document.body.dispatchEvent(event)
 
     if (button.textContent.includes('ч.')) {
         const numbers = button.textContent.match(/\d+/g).map(Number)
