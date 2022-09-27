@@ -19,9 +19,8 @@ async function vote() {
         return
     }
 
-    // let button = document.querySelector('div.card-footer .btn.btn-blue:nth-child(2)')
-    // if (!button) button = document.querySelector('div.card-footer .btn.btn-blue')
-    const button = document.querySelector('#main .btn.btn-blue')
+    let button = document.querySelector('#main .card-body div')
+    let message = getText(button)
 
     if (!isVisible(button)) {
         await wait(Math.floor(Math.random() * 10000))
@@ -32,13 +31,15 @@ async function vote() {
     const event = new Event('mousemove')
     document.body.dispatchEvent(event)
 
-    if (button.textContent.includes('ч.')) {
-        const numbers = button.textContent.match(/\d+/g).map(Number)
+    if (message.includes('ч.')) {
+        const numbers = message.match(/\d+/g).map(Number)
         const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
         await wait(Math.floor(Math.random() * 10000))
         chrome.runtime.sendMessage({later: Date.now() + milliseconds})
     } else {
         const timer2 = setInterval(async () => {
+            button = document.querySelector('#main .card-body div')
+            // message = getText(button)
             if (!isVisible(button)) {
                 clearInterval(timer2)
                 await wait(Math.floor(Math.random() * 10000))
@@ -90,7 +91,7 @@ function isVisible(elem) {
     if (style.opacity < 0.1) return false
 
     if (elem.offsetHeight < 40 || elem.offsetWidth < 40) return false // 1 пиксель?
-    if (elem.textContent.length <= 3) return false // Есть текст?
+    if (!getText(elem)) return false // Есть текст?
 
     if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
         elem.getBoundingClientRect().width === 0) {
@@ -110,3 +111,41 @@ function isVisible(elem) {
     } while (pointContainer = pointContainer.parentNode)
     return false
 }
+
+function getText(elem) {
+    if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
+    // https://stackoverflow.com/a/60263053/11235240
+    let prop = window.getComputedStyle(elem, '::before').getPropertyValue('content')
+    if (!prop || prop === 'none' || prop === 'normal') prop = window.getComputedStyle(elem, '::after').getPropertyValue('content')
+    if (!prop || prop === 'none' || prop === 'normal') {
+        if (elem.innerText.length > 3) return elem.innerText
+        throw Error('Не найден текст кнопки (1)')
+    } else if (prop.length > 3){
+        return prop
+    } else {
+        throw Error('Не найден текст кнопки (2)')
+    }
+}
+
+// TODO не работает на ::after content: 'текст'
+// function findElement(text) {
+//     // https://stackoverflow.com/a/29289196/11235240
+//     const xPathResult = document.evaluate(xpathPrepare(text), document, null, XPathResult.ANY_TYPE, null)
+//
+//     // https://stackoverflow.com/a/47017702/11235240
+//     const nodes = []
+//     let node = xPathResult.iterateNext()
+//     while (node) {
+//         nodes.push(node)
+//         node = xPathResult.iterateNext()
+//     }
+//     return nodes
+// }
+//
+// // https://stackoverflow.com/a/8474109/11235240
+// function xpathPrepare(searchString) {
+//     const xpath = "//text()[contains(translate(., '$u', '$l'), '$s')]";
+//     return xpath.replace("$u", searchString.toUpperCase())
+//         .replace("$l", searchString.toLowerCase())
+//         .replace("$s", searchString.toLowerCase());
+// }
