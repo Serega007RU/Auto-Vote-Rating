@@ -19,7 +19,7 @@ async function vote() {
         return
     }
 
-    let button = document.querySelector('#main .card-body div')
+    let button = document.querySelector('#main .card-body').lastChild
     let message = getText(button)
 
     if (!isVisible(button)) {
@@ -38,7 +38,7 @@ async function vote() {
         chrome.runtime.sendMessage({later: Date.now() + milliseconds})
     } else {
         const timer2 = setInterval(async () => {
-            button = document.querySelector('#main .card-body div')
+            button = document.querySelector('#main .card-body').lastChild
             // message = getText(button)
             if (!isVisible(button)) {
                 clearInterval(timer2)
@@ -148,4 +148,14 @@ function getText(elem) {
 //     return xpath.replace("$u", searchString.toUpperCase())
 //         .replace("$l", searchString.toLowerCase())
 //         .replace("$s", searchString.toLowerCase());
+// }
+
+// В попытках найти элемент по тексту
+// // https://stackoverflow.com/a/68113557/11235240
+// const div = document.querySelector("#OOWYCpayNA")
+// console.log("`nodeValue` of each text node in the div:");
+// for (const child of div.childNodes) {
+//     if (child.nodeType === Node.TEXT_NODE) {
+//         console.log(child.nodeValue);
+//     }
 // }
