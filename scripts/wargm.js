@@ -19,27 +19,30 @@ async function vote() {
         return
     }
 
-    let button = document.querySelector('#main .card-body').lastChild
-    let message = getText(button)
-
-    if (!isVisible(button)) {
-        await wait(Math.floor(Math.random() * 10000))
-        chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
-        return
-    }
-
-    const event = new Event('mousemove')
-    document.body.dispatchEvent(event)
-
-    if (message.includes('ч.')) {
-        const numbers = message.match(/\d+/g).map(Number)
-        const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
-        await wait(Math.floor(Math.random() * 10000))
-        chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+    const btn = document.querySelector('#main .card-body .btn.btn-blue')
+    if (btn) {
+        if (!isVisible(btn)) {
+            await wait(Math.floor(Math.random() * 10000))
+            chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
+            return
+        }
+        const message = getText(btn)
+        if (message.includes('ч.')) {
+            const numbers = message.match(/\d+/g).map(Number)
+            const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
+            await wait(Math.floor(Math.random() * 10000))
+            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+        } else {
+            chrome.runtime.sendMessage({message: 'Что-то не так с кнопкой голосования, ' + message})
+        }
     } else {
+        const event = new Event('mousemove')
+        document.body.dispatchEvent(event)
+
         const timer2 = setInterval(async () => {
-            button = document.querySelector('#main .card-body').lastChild
-            // message = getText(button)
+            const button = findElement('голосовать')[2]
+            if (!button) return
+            // const message = getText(button)
             if (!isVisible(button)) {
                 clearInterval(timer2)
                 await wait(Math.floor(Math.random() * 10000))
@@ -112,19 +115,30 @@ function isVisible(elem) {
     return false
 }
 
+function findElement(text) {
+    const result = []
+    for (const element of document.querySelectorAll("*")) {
+        const txt = getText(element)
+        if (txt && txt.toLowerCase() === text) {
+            result.push(element)
+        }
+    }
+    return result
+}
+
 function getText(elem) {
     if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
     // https://stackoverflow.com/a/60263053/11235240
     let prop = window.getComputedStyle(elem, '::before').getPropertyValue('content')
+    let text
     if (!prop || prop === 'none' || prop === 'normal') prop = window.getComputedStyle(elem, '::after').getPropertyValue('content')
     if (!prop || prop === 'none' || prop === 'normal') {
-        if (elem.innerText.length > 3) return elem.innerText
-        throw Error('Не найден текст кнопки (1)')
-    } else if (prop.length > 3){
-        return prop
-    } else {
-        throw Error('Не найден текст кнопки (2)')
+        if (elem.innerText && elem.innerText.length > 3) text = elem.innerText
+    } else if (prop.length > 3) {
+        text = prop
     }
+    if (!text) return null
+    return text.replaceAll('"', '')
 }
 
 // TODO не работает на ::after content: 'текст'
@@ -148,14 +162,4 @@ function getText(elem) {
 //     return xpath.replace("$u", searchString.toUpperCase())
 //         .replace("$l", searchString.toLowerCase())
 //         .replace("$s", searchString.toLowerCase());
-// }
-
-// В попытках найти элемент по тексту
-// // https://stackoverflow.com/a/68113557/11235240
-// const div = document.querySelector("#OOWYCpayNA")
-// console.log("`nodeValue` of each text node in the div:");
-// for (const child of div.childNodes) {
-//     if (child.nodeType === Node.TEXT_NODE) {
-//         console.log(child.nodeValue);
-//     }
 // }
