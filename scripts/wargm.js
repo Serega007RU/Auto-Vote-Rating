@@ -40,7 +40,7 @@ async function vote() {
         document.body.dispatchEvent(event)
 
         const timer2 = setInterval(async () => {
-            const button = findElement('голоcовать')[0]
+            const button = findElement('голосовать')[4]
             if (!button) return
             // const message = getText(button)
             if (!isVisible(button)) {
