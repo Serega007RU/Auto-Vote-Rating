@@ -40,7 +40,8 @@ async function vote() {
         document.body.dispatchEvent(event)
 
         const timer2 = setInterval(async () => {
-            const button = document.querySelector('#main .card-body').lastChild
+            const button = findVoteButton()[0]
+            if (!button) return
             // const message = getText(button)
             if (!isVisible(button)) {
                 clearInterval(timer2)
@@ -93,7 +94,7 @@ function isVisible(elem) {
     if (style.opacity < 0.1) return false
 
     if (elem.offsetHeight < 40 || elem.offsetWidth < 40) return false // 1 пиксель?
-    if (!getText(elem)) return false // Есть текст?
+    // if (!getText(elem)) return false // Есть текст?
 
     if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
         elem.getBoundingClientRect().width === 0) {
@@ -112,6 +113,16 @@ function isVisible(elem) {
         if (pointContainer === elem) return true;
     } while (pointContainer = pointContainer.parentNode)
     return false
+}
+
+function findVoteButton() {
+    const elements = []
+    for (const elem of document.querySelector('#main .card-body').querySelectorAll('*')) {
+        if (isVisible(elem)) {
+            elements.push(elem)
+        }
+    }
+    return elements
 }
 
 function findElement(text) {
