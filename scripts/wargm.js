@@ -40,8 +40,7 @@ async function vote() {
         document.body.dispatchEvent(event)
 
         const timer2 = setInterval(async () => {
-            const button = findElement('голос')[0]
-            if (!button) return
+            const button = document.querySelector('#main .card-body').lastChild
             // const message = getText(button)
             if (!isVisible(button)) {
                 clearInterval(timer2)
