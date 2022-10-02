@@ -3,18 +3,18 @@ async function vote() {
 
     if (document.querySelector('div.ui.error.message') != null) {
         if (document.querySelector('div.ui.error.message').textContent.includes('must wait until tomorrow')) {
-            await wait(Math.floor(Math.random() * 10000))
+            await wait(Math.floor(Math.random() * 9000 + 1000))
             chrome.runtime.sendMessage({later: true})
             return
         }
-        await wait(Math.floor(Math.random() * 10000))
+        await wait(Math.floor(Math.random() * 9000 + 1000))
         chrome.runtime.sendMessage({message: document.querySelector('div.ui.error.message').textContent})
         return
     }
 
     //Если на странице есть кнопка входа через Steam, то жмём её
     if (document.querySelector('a[href="/steam_login"]') != null) {
-        await wait(Math.floor(Math.random() * 10000))
+        await wait(Math.floor(Math.random() * 9000 + 1000))
         document.querySelector('a[href="/steam_login"]').click()
         return
     }
@@ -22,7 +22,7 @@ async function vote() {
     const btn = document.querySelector('#main .card-body .btn.btn-blue')
     if (btn) {
         if (!isVisible(btn)) {
-            await wait(Math.floor(Math.random() * 10000))
+            await wait(Math.floor(Math.random() * 9000 + 1000))
             chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
             return
         }
@@ -30,7 +30,7 @@ async function vote() {
         if (message.includes('ч.')) {
             const numbers = message.match(/\d+/g).map(Number)
             const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
-            await wait(Math.floor(Math.random() * 10000))
+            await wait(Math.floor(Math.random() * 9000 + 1000))
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         } else {
             chrome.runtime.sendMessage({message: 'Что-то не так с кнопкой голосования, ' + message})
@@ -45,13 +45,13 @@ async function vote() {
             // const message = getText(button)
             if (!isVisible(button)) {
                 clearInterval(timer2)
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({message: 'Кнопка голосования стала невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
             } else if ((button.disabled == null || button.disabled === false) && button.getAttribute('disabled') == null) {
                 clearInterval(timer2)
                 const event = new Event('mousemove')
                 document.body.dispatchEvent(event)
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
                 button.click()
             }
         }, 1000)
@@ -65,13 +65,13 @@ const timer = setInterval(async ()=>{
             clearInterval(timer)
             const message = msg.innerText
             if (message.includes('уже проголосовали')) {
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({later: true})
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
             } else if (message.includes('Голос принят')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({message})
             }
         }
