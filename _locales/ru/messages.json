@@ -367,7 +367,7 @@
     "message": "Введите ID"
   },
   "inputProjectIDOrList": {
-    "message": "Введите ID или выберите из списка"
+    "message": "Выберите из списка ID или введите свой"
   },
   "developers": {
     "message": "Разработчики:"
