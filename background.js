@@ -20,6 +20,8 @@ let check = true
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
 let closeTabs = true
 
+let updateAvailable = false
+
 //Где храним настройки
 // let storageArea = 'local'
 
@@ -62,7 +64,7 @@ async function checkVote() {
 
 //Триггер на голосование когда подходит время голосования
 chrome.alarms.onAlarm.addListener(function (alarm) {
-    if (settings.debug) console.log('chrome.alarms.onAlarm', JSON.stringify(alarm))
+    if (settings?.debug) console.log('chrome.alarms.onAlarm', JSON.stringify(alarm))
     checkVote()
 })
 
@@ -1195,7 +1197,13 @@ async function endVote(request, sender, project) {
                 queueProjects.delete(value)
             }
         }
-        if (queueProjects.size === 0) promises = []
+        if (queueProjects.size === 0) {
+            promises = []
+            if (updateAvailable) {
+                chrome.runtime.reload()
+                return
+            }
+        }
         checkVote()
     }
     let timeout = settings.timeout
@@ -1313,6 +1321,14 @@ chrome.runtime.onInstalled.addListener(async function(details) {
     }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
 
     }*/
+})
+
+chrome.runtime.onUpdateAvailable.addListener(function() {
+    if (queueProjects.size > 0) {
+        updateAvailable = true
+    } else {
+        chrome.runtime.reload()
+    }
 })
 
 // function Version(s){
