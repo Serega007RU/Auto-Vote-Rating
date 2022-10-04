@@ -1425,7 +1425,8 @@ async function checkAuthVK(VK) {
                 createNotif(chrome.i18n.getMessage('autoAuthVKStart', key))
                 response2.html = await response2.text()
                 response2.doc = new DOMParser().parseFromString(response2.html, 'text/html')
-                const text = response2.doc.querySelector('head > script:nth-child(9)').text
+                const scripts = response2.doc.querySelectorAll('head > script')
+                const text = scripts[scripts.length - 1].text
                 const url = text.substring(text.indexOf('https://login.vk.com/?act=grant_access'), text.indexOf('"+addr'))
                 response2 = await fetch(url)
             } else {
