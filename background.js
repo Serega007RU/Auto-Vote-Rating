@@ -38,6 +38,8 @@ let closeTabs = true
 
 let nextLoop = false
 
+let updateAvailable = false
+
 //Где храним настройки
 // let storageArea = 'local'
 
@@ -96,7 +98,7 @@ async function checkVote() {
 
 //Триггер на голосование когда подходит время голосования
 chrome.alarms.onAlarm.addListener(function (alarm) {
-    if (settings.debug) console.log('chrome.alarms.onAlarm', JSON.stringify(alarm))
+    if (settings?.debug) console.log('chrome.alarms.onAlarm', JSON.stringify(alarm))
     checkVote()
 })
 
@@ -1145,7 +1147,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
     const projectKey = openedProjects.get(details.tabId)
     if (!projectKey) return
     if (details.frameId === 0) {
-        if (details.url.match(/wargm.com\/*/)) {
+        if (details.url.match(/wargm.ru\/*/)) {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/istrusted.js', runAt: 'document_end'}, async function() {
                 if (chrome.runtime.lastError) {
                     if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')) {
@@ -1851,11 +1853,15 @@ async function endVote(request, sender, project) {
         if (queueProjects.size === 0) {
             promises = []
             promisesProxy = []
+            if (updateAvailable) {
+                chrome.runtime.reload()
+                return
+            }
         }
         checkVote()
     }
     let timeout = settings.timeout
-    if (project.randomize || project.rating === 'WARGM') {
+    if (project.randomize) {
         timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
     }
     setTimeout(()=>{
@@ -2240,6 +2246,14 @@ chrome.runtime.onInstalled.addListener(async function(details) {
     }
 })
 
+chrome.runtime.onUpdateAvailable.addListener(function() {
+    if (queueProjects.size > 0) {
+        updateAvailable = true
+    } else {
+        chrome.runtime.reload()
+    }
+})
+
 function Version(s){
   this.arr = s.split('.').map(Number)
 }
@@ -2251,7 +2265,6 @@ Version.prototype.compareTo = function(v){
         if (diff) return diff>0 ? 1 : -1
     }
 }
-
 
 /* Store the original log functions. */
 console._log = console.log

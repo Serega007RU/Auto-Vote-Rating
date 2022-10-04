@@ -3,51 +3,55 @@ async function vote() {
 
     if (document.querySelector('div.ui.error.message') != null) {
         if (document.querySelector('div.ui.error.message').textContent.includes('must wait until tomorrow')) {
-            await wait(Math.floor(Math.random() * 10000))
+            await wait(Math.floor(Math.random() * 9000 + 1000))
             chrome.runtime.sendMessage({later: true})
             return
         }
-        await wait(Math.floor(Math.random() * 10000))
+        await wait(Math.floor(Math.random() * 9000 + 1000))
         chrome.runtime.sendMessage({message: document.querySelector('div.ui.error.message').textContent})
         return
     }
 
-    //Если на странице есть кнопка входа через Steam то жмём её
-    if (document.querySelector('div.card-footer a[href="/steam_login"]') != null) {
-        await wait(Math.floor(Math.random() * 10000))
-        document.querySelector('div.card-footer a[href="/steam_login"]').click()
+    //Если на странице есть кнопка входа через Steam, то жмём её
+    if (document.querySelector('a[href="/steam_login"]') != null) {
+        await wait(Math.floor(Math.random() * 9000 + 1000))
+        document.querySelector('a[href="/steam_login"]').click()
         return
     }
 
-    // let button = document.querySelector('div.card-footer .btn.btn-blue:nth-child(2)')
-    // if (!button) button = document.querySelector('div.card-footer .btn.btn-blue')
-    const button = document.querySelector('.vote-page .btn.btn-blue')
-
-    const event = new Event('mousemove')
-    document.body.dispatchEvent(event)
-
-    if (!isVisible(button)) {
-        await wait(Math.floor(Math.random() * 10000))
-        chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
-        return
-    }
-
-    if (button.textContent.includes('ч.')) {
-        const numbers = button.textContent.match(/\d+/g).map(Number)
-        const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
-        await wait(Math.floor(Math.random() * 10000))
-        chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+    const btn = document.querySelector('#main .card-body .btn.btn-blue')
+    if (btn) {
+        if (!isVisible(btn)) {
+            await wait(Math.floor(Math.random() * 9000 + 1000))
+            chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
+            return
+        }
+        const message = getText(btn)
+        if (message.includes('ч.')) {
+            const numbers = message.match(/\d+/g).map(Number)
+            const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
+            await wait(Math.floor(Math.random() * 9000 + 1000))
+            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+        } else {
+            chrome.runtime.sendMessage({message: 'Что-то не так с кнопкой голосования, ' + message})
+        }
     } else {
+        const event = new Event('mousemove')
+        document.body.dispatchEvent(event)
+
         const timer2 = setInterval(async () => {
+            const button = findVoteButton()[0]
+            if (!button) return
+            // const message = getText(button)
             if (!isVisible(button)) {
                 clearInterval(timer2)
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({message: 'Кнопка голосования стала невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
-            } else if (!button.disabled === false || button.getAttribute('disabled') == null) {
+            } else if ((button.disabled == null || button.disabled === false) && button.getAttribute('disabled') == null) {
                 clearInterval(timer2)
                 const event = new Event('mousemove')
                 document.body.dispatchEvent(event)
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
                 button.click()
             }
         }, 1000)
@@ -61,13 +65,13 @@ const timer = setInterval(async ()=>{
             clearInterval(timer)
             const message = msg.innerText
             if (message.includes('уже проголосовали')) {
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({later: true})
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
             } else if (message.includes('Голос принят')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
-                await wait(Math.floor(Math.random() * 10000))
+                await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({message})
             }
         }
@@ -90,7 +94,7 @@ function isVisible(elem) {
     if (style.opacity < 0.1) return false
 
     if (elem.offsetHeight < 40 || elem.offsetWidth < 40) return false // 1 пиксель?
-    if (elem.textContent.length <= 3) return false // Есть текст?
+    // if (!getText(elem)) return false // Есть текст?
 
     if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
         elem.getBoundingClientRect().width === 0) {
@@ -110,3 +114,62 @@ function isVisible(elem) {
     } while (pointContainer = pointContainer.parentNode)
     return false
 }
+
+function findVoteButton() {
+    const elements = []
+    for (const elem of document.querySelector('#main .card-body').querySelectorAll('*')) {
+        if (isVisible(elem)) {
+            elements.push(elem)
+        }
+    }
+    return elements
+}
+
+function findElement(text) {
+    const result = []
+    for (const element of document.querySelectorAll("*")) {
+        const txt = getText(element)
+        if (txt && txt.toLowerCase() === text) {
+            result.push(element)
+        }
+    }
+    return result
+}
+
+function getText(elem) {
+    if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
+    // https://stackoverflow.com/a/60263053/11235240
+    let prop = window.getComputedStyle(elem, '::before').getPropertyValue('content')
+    let text
+    if (!prop || prop === 'none' || prop === 'normal') prop = window.getComputedStyle(elem, '::after').getPropertyValue('content')
+    if (!prop || prop === 'none' || prop === 'normal') {
+        if (elem.innerText && elem.innerText.length > 3) text = elem.innerText
+    } else if (prop.length > 3) {
+        text = prop
+    }
+    if (!text) return null
+    return text.replaceAll('"', '')
+}
+
+// TODO не работает на ::after content: 'текст'
+// function findElement(text) {
+//     // https://stackoverflow.com/a/29289196/11235240
+//     const xPathResult = document.evaluate(xpathPrepare(text), document, null, XPathResult.ANY_TYPE, null)
+//
+//     // https://stackoverflow.com/a/47017702/11235240
+//     const nodes = []
+//     let node = xPathResult.iterateNext()
+//     while (node) {
+//         nodes.push(node)
+//         node = xPathResult.iterateNext()
+//     }
+//     return nodes
+// }
+//
+// // https://stackoverflow.com/a/8474109/11235240
+// function xpathPrepare(searchString) {
+//     const xpath = "//text()[contains(translate(., '$u', '$l'), '$s')]";
+//     return xpath.replace("$u", searchString.toUpperCase())
+//         .replace("$l", searchString.toLowerCase())
+//         .replace("$s", searchString.toLowerCase());
+// }

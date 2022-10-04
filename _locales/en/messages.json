@@ -415,7 +415,7 @@
     "message": "Enter ID"
   },
   "inputProjectIDOrList": {
-    "message": "Enter an ID or select from the list"
+    "message": "Select an ID from the list or enter your"
   },
   "developers": {
     "message": "Developers:"
