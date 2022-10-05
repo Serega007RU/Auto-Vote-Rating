@@ -352,7 +352,7 @@
     "message": "Введіть ID"
   },
   "inputProjectIDOrList": {
-    "message": "Введіть ID чи виберіть зі списку"
+    "message": "Виберіть зі списку ID або введіть свій"
   },
   "developers": {
     "message": "Розробники:"

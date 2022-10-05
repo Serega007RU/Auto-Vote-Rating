@@ -1,9 +1,9 @@
 async function vote(first) {
-    if (document.querySelector('.alert.alert-success') != null) {
+    if (document.querySelector('.alert.alert-success')) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
-    if (document.querySelector('.alert.alert-primary') != null) {
+    if (document.querySelector('.alert.alert-primary')) {
         if (document.querySelector('.alert.alert-primary').textContent.includes('si hlasoval')) {
             chrome.runtime.sendMessage({later: true})
         } else {
@@ -11,7 +11,7 @@ async function vote(first) {
         }
         return
     }
-    if (document.querySelector('.vote__box').textContent.includes('si hlasoval')) {
+    if (document.querySelector('#vote-form').textContent.includes('si hlasoval')) {
         chrome.runtime.sendMessage({later: true})
         return
     }
@@ -20,23 +20,43 @@ async function vote(first) {
 
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
-    // TODO временный код
-    if (window.getComputedStyle(document.querySelector("#gdpr")).visibility === 'visible' && isInViewport(document.querySelector("#gdpr"))) {
-        document.querySelector("#gdpr").checked = true
-    } else {
-        chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible"})
+    const gdpr = document.querySelector("#tos")
+    if (!isVisible(gdpr)) {
+        chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible. Protection from auto-voting? Inform the extension developer about this error!"})
         return
+    } else {
+        gdpr.checked = true
     }
-    // TODO конец
+
     document.querySelector('div.vote__box__buttonRow__button button[type="submit"]').click()
 }
 
-function isInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
+// https://stackoverflow.com/a/41698614/11235240
+function isVisible(elem) {
+    if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
+    const style = getComputedStyle(elem)
+    if (style.display === 'none') return false
+    if (style.visibility !== 'visible') return false
+    if (style.opacity < 0.1) return false
+
+    if (elem.offsetHeight < 16 || elem.offsetWidth < 16) return false // 1 пиксель?
+    // if (!getText(elem)) return false // Есть текст?
+
+    if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
+        elem.getBoundingClientRect().width === 0) {
+        return false
+    }
+    const elemCenter   = {
+        x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
+        y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
+    };
+    if (elemCenter.x < 0) return false
+    if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false
+    if (elemCenter.y < 0) return false
+    if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return false
+    let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
+    do {
+        if (pointContainer === elem) return true;
+    } while (pointContainer = pointContainer.parentNode)
+    return false
 }
