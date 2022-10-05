@@ -1,6 +1,3 @@
-//Текущие открытые вкладки расширением
-// noinspection ES6ConvertVarToLetConst
-var openedProjects = new Map()
 //Текущие fetch запросы
 // noinspection ES6ConvertVarToLetConst
 var fetchProjects = new Map()
@@ -22,6 +19,8 @@ let check = true
 
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
 let closeTabs = true
+
+let updateAvailable = false
 
 //Где храним настройки
 // let storageArea = 'local'
@@ -65,7 +64,7 @@ async function checkVote() {
 
 //Триггер на голосование когда подходит время голосования
 chrome.alarms.onAlarm.addListener(function (alarm) {
-    if (settings.debug) console.log('chrome.alarms.onAlarm', JSON.stringify(alarm))
+    if (settings?.debug) console.log('chrome.alarms.onAlarm', JSON.stringify(alarm))
     checkVote()
 })
 
@@ -120,7 +119,7 @@ async function checkOpen(project/*, transaction*/) {
     }
 
     let retryCoolDown
-    if (project.rating === 'WARGM') {
+    if (project.rating === 'WARGM' && project.randomize) {
         retryCoolDown = 7200000
     } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
         retryCoolDown = 300000
@@ -717,7 +716,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
     const projectKey = openedProjects.get(details.tabId)
     if (!projectKey) return
     if (details.frameId === 0) {
-        if (details.url.match(/wargm.com\/*/)) {
+        if (details.url.match(/wargm.ru\/*/)) {
             chrome.tabs.executeScript(details.tabId, {file: 'scripts/istrusted.js', runAt: 'document_end'}, async function() {
                 if (chrome.runtime.lastError) {
                     if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')) {
@@ -1144,7 +1143,7 @@ async function endVote(request, sender, project) {
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
         let retryCoolDown
-        if ((request.errorVote && request.errorVote[0] === '404') || (request.message && project.rating === 'WARGM')) {
+        if ((request.errorVote && request.errorVote[0] === '404') || (request.message && project.rating === 'WARGM' && project.randomize)) {
             retryCoolDown = 21600000
         } else if (request.closedTab) {
             retryCoolDown = 60000
@@ -1198,11 +1197,17 @@ async function endVote(request, sender, project) {
                 queueProjects.delete(value)
             }
         }
-        if (queueProjects.size === 0) promises = []
+        if (queueProjects.size === 0) {
+            promises = []
+            if (updateAvailable) {
+                chrome.runtime.reload()
+                return
+            }
+        }
         checkVote()
     }
     let timeout = settings.timeout
-    if (project.randomize || project.rating === 'WARGM') {
+    if (project.randomize) {
         timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
     }
     setTimeout(()=>{
@@ -1316,6 +1321,14 @@ chrome.runtime.onInstalled.addListener(async function(details) {
     }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
 
     }*/
+})
+
+chrome.runtime.onUpdateAvailable.addListener(function() {
+    if (queueProjects.size > 0) {
+        updateAvailable = true
+    } else {
+        chrome.runtime.reload()
+    }
 })
 
 // function Version(s){
