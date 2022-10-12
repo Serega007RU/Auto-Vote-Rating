@@ -2,7 +2,8 @@ async function vote(first) {
     if (document.querySelector('div.alert.alert-success') != null) {
         if (document.querySelector('div.alert.alert-success').textContent.includes('vote was successfully')
             || document.querySelector('div.alert.alert-success').textContent.includes('hlas byl úspěšně přijatý')
-            || document.querySelector('div.alert.alert-success').textContent.includes('hlas bol úspešne prijatý')) {
+            || document.querySelector('div.alert.alert-success').textContent.includes('hlas bol úspešne prijatý')
+            || document.querySelector('div.alert.alert-success').textContent.includes('Dein Vote wurde akzeptiert')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
             chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-success').textContent})
@@ -12,7 +13,8 @@ async function vote(first) {
     if (document.querySelector('div.alert.alert-info') != null) {
         if (document.querySelector('div.alert.alert-info').textContent.includes('next vote')
             || document.querySelector('div.alert.alert-info').textContent.includes('možný hlas za tento server můžeš odeslat')
-            || document.querySelector('div.alert.alert-info').textContent.includes('možný hlas za tento server môžeš odoslať')) {
+            || document.querySelector('div.alert.alert-info').textContent.includes('možný hlas za tento server môžeš odoslať')
+            || document.querySelector('div.alert.alert-info').textContent.includes('nächster Vote')) {
             const numbers = document.querySelector('div.alert.alert-info').textContent.match(/\d+/g).map(Number)
             chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] - 1, numbers[0], numbers[3], numbers[4], numbers[5]) + 3600000})
         } else {
@@ -21,7 +23,8 @@ async function vote(first) {
         return
     }
     if (document.querySelector('a.btn-vote').textContent.includes('possible vote')
-        || document.querySelector('a.btn-vote').textContent.includes('možný hlas')) {
+        || document.querySelector('a.btn-vote').textContent.includes('možný hlas')
+        || document.querySelector('a.btn-vote').textContent.includes('ist möglich')) {
         //Из текста достаёт все цифры в Array List
         const numbers = document.querySelector('a.btn-vote').textContent.match(/\d+/g).map(Number)
         let count = 0
