@@ -91,7 +91,7 @@ function isVisible(elem) {
     const style = getComputedStyle(elem)
     if (style.display === 'none') return false
     if (style.visibility !== 'visible') return false
-    if (style.opacity < 0.1) return false
+    if (style.opacity && style.opacity < 1) return false
 
     if (elem.offsetHeight < 40 || elem.offsetWidth < 40) return false // 1 пиксель?
     // if (!getText(elem)) return false // Есть текст?
