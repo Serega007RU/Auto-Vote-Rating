@@ -20,8 +20,8 @@ async function vote(first) {
 
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
-    const gdpr = document.querySelector(".form-check #gdpr")
-    if (!isVisible(gdpr) || gdpr.getAttribute('style')) {
+    const gdpr = document.querySelector("body > main > section > div > div.row.content > div > div > div > form > div.row > div > div.vote__box__checkboxxx > div > input[name='tos']")
+    if (!gdpr || !isVisible(gdpr) || gdpr.getAttribute('style')) {
         chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible. Protection from auto-voting? Inform the extension developer about this error!"})
         return
     } else {
