@@ -1110,7 +1110,7 @@ async function addVK(repair, imp) {
             html = await response.text()
             doc = new DOMParser().parseFromString(html, 'text/html')
         }
-        if (doc.querySelector('#login_form') != null) {
+        if (doc.querySelector('#login_form') || doc.querySelector('#index_email')) {
             createNotif(chrome.i18n.getMessage('notAuthAcc', 'VK'), 'error')
             return
         }
