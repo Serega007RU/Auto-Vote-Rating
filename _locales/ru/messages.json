@@ -1104,7 +1104,7 @@
     }
   },
   "useProxyOnUnProxyTop": {
-    "message": "Использовать прокси на рейтингах где не используется прокси (MisterLauncher)"
+    "message": "Использовать прокси на рейтингах где не используется прокси (MisterLauncher & MinecraftRating)"
   },
   "reAddSuccess": {
     "message": "Успешно передобавлен"

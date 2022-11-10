@@ -1126,7 +1126,7 @@
     }
   },
   "useProxyOnUnProxyTop": {
-    "message": "Verwenden Sie einen Proxy für Bewertungen, bei denen kein Proxy verwendet wird (MisterLauncher)"
+    "message": "Verwenden Sie einen Proxy für Bewertungen, bei denen kein Proxy verwendet wird (MisterLauncher & MinecraftRating)"
   },
   "reAddSuccess": {
     "message": "Erfolgreich wieder eingefügt"

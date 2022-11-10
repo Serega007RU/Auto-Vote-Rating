@@ -164,13 +164,13 @@ async function checkOpen(project, transaction) {
 
         if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) && !settings.useProxyOnUnProxyTop) {
             //Не позволяет голосовать безпроксиевых рейтингов с проксиевыми
-            if (/*(project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-                if (/*!(value.rating === 'MinecraftRating' && value.game === 'projects') &&*/ !(value.rating === 'MisterLauncher' && value.game === 'projects') && value.useMultiVote !== false) {
+            if ((project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
+                if (!(value.rating === 'MinecraftRating' && value.game === 'projects') && !(value.rating === 'MisterLauncher' && value.game === 'projects') && value.useMultiVote !== false) {
                     return
                 }
             }
-            if (/*(value.rating === 'MinecraftRating' && value.game === 'projects') ||*/ (value.rating === 'MisterLauncher' && value.game === 'projects')) {
-                if (/*!(project.rating === 'MinecraftRating' && project.game === 'projects') &&*/ !(project.rating === 'MisterLauncher' && project.game === 'projects') && project.useMultiVote !== false) {
+            if ((value.rating === 'MinecraftRating' && value.game === 'projects') || (value.rating === 'MisterLauncher' && value.game === 'projects')) {
+                if (!(project.rating === 'MinecraftRating' && project.game === 'projects') && !(project.rating === 'MisterLauncher' && project.game === 'projects') && project.useMultiVote !== false) {
                     //Если безпроксиевый рейтинг закончил голосование, позволяет проксиевым начать голосовать ради экономии времени
                     if (value.time < Date.now()) {
                         return
@@ -199,7 +199,7 @@ async function checkOpen(project, transaction) {
             }
         }
         if (currentProxy != null) {
-            if (!settings.useProxyOnUnProxyTop && (/*(project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
+            if (!settings.useProxyOnUnProxyTop && ((project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
                 return
             }
             if (currentProxy[project.rating]?.[project.id] > Date.now()) {
@@ -212,7 +212,7 @@ async function checkOpen(project, transaction) {
         }
 
         const needSearchVK = currentVK == null && (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft')
-        const needSearchProxy = currentProxy == null && (settings.useProxyOnUnProxyTop || (/*!(project.rating === 'MinecraftRating' && project.game === 'projects') &&*/ !(project.rating === 'MisterLauncher' && project.game === 'projects')))
+        const needSearchProxy = currentProxy == null && (settings.useProxyOnUnProxyTop || (!(project.rating === 'MinecraftRating' && project.game === 'projects') && !(project.rating === 'MisterLauncher' && project.game === 'projects')))
 
         if ((needSearchVK || needSearchProxy) && searchAcc) {
             console.log(chrome.i18n.getMessage('searchAcc'))
