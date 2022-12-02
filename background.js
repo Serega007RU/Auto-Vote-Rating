@@ -119,8 +119,8 @@ async function checkOpen(project/*, transaction*/) {
     }
 
     let retryCoolDown
-    if (project.rating === 'WARGM' && project.randomize) {
-        retryCoolDown = 7200000
+    if (project.randomize) {
+        retryCoolDown = Math.floor(Math.random() * 600000 + 1800000)
     } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
         retryCoolDown = 300000
     } else {
