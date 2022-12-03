@@ -1957,7 +1957,7 @@ document.querySelectorAll('[placeholder]').forEach(function(el) {
     el.placeholder = message
 })
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
-document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
+// document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
 
 //Модалки
 document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
