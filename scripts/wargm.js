@@ -81,10 +81,6 @@ const timer = setInterval(async ()=>{
     }
 }, 200)
 
-function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // https://stackoverflow.com/a/41698614/11235240
 function isVisible(elem) {
     if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
