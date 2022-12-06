@@ -39,8 +39,12 @@ async function vote() {
         const event = new Event('mousemove')
         document.body.dispatchEvent(event)
 
-        const timer2 = setInterval(async () => {
-            const button = findVoteButton()[0]
+        let waiting = false
+        let timer2 = setInterval(async () => {
+            if (waiting) return
+            let buttons = findVoteButton()
+            if (buttons.length === 0) return
+            let button = buttons[buttons.length - 1]
             if (!button) return
             // const message = getText(button)
             if (!isVisible(button)) {
@@ -48,10 +52,21 @@ async function vote() {
                 await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({message: 'Кнопка голосования стала невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
             } else if ((button.disabled == null || button.disabled === false) && button.getAttribute('disabled') == null) {
+                waiting = true
+                await wait(Math.floor(Math.random() * 9000 + 1000))
+                buttons = findVoteButton()
+                if (buttons.length === 0) {
+                    waiting = false
+                    return
+                }
+                button = buttons[buttons.length - 1]
+                if (!button) {
+                    waiting = false
+                    return
+                }
                 clearInterval(timer2)
                 const event = new Event('mousemove')
                 document.body.dispatchEvent(event)
-                await wait(Math.floor(Math.random() * 9000 + 1000))
                 button.click()
             }
         }, 1000)
@@ -67,8 +82,8 @@ const timer = setInterval(async ()=>{
             if (message.includes('уже проголосовали')) {
                 await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({later: true})
-                await wait(Math.floor(Math.random() * 9000 + 1000))
             } else if (message.includes('Голос принят')) {
+                await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({successfully: true})
             } else {
                 await wait(Math.floor(Math.random() * 9000 + 1000))
