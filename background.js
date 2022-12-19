@@ -832,6 +832,10 @@ chrome.webRequest.onCompleted.addListener(async function(details) {
     const projectKey = openedProjects.get(details.tabId)
     if (!projectKey) return
     const project = await db.get('projects', projectKey)
+
+    // TODO это какой-то кринж для https://www.minecraft-serverlist.net/, ошибка 500 считается как успешный запрос https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
+    if (project.rating === 'MinecraftServerListNet') return
+
     if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
         const sender = {tab: {id: details.tabId}}
         endVote({errorVote: [String(details.statusCode), details.url]}, sender, project)
