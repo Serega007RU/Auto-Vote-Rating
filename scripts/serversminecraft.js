@@ -30,6 +30,7 @@ async function vote(first) {
     if (document.querySelector('div.bg-red-100')) {
         if (document.querySelector('div.bg-red-100').textContent.toLowerCase().includes('must wait until tomorrow')) {
             chrome.runtime.sendMessage({later: true})
+            return
         }
     }
 
