@@ -23,7 +23,7 @@ async function initializeConfig(background, version) {
                 db.createObjectStore('logs', {autoIncrement: true})
             }
         })
-        window.onerror = (errorMsg, url, lineNumber) => {
+        onerror = (errorMsg, url, lineNumber) => {
             const time = new Date().toLocaleString().replace(',', '')
             const log = '[' + time + ' ERROR]: ' + errorMsg + ' at ' + url + ':' + lineNumber
             try {
@@ -36,7 +36,7 @@ async function initializeConfig(background, version) {
                 else console.error(e)
             }
         }
-        window.onunhandledrejection = event => {
+        onunhandledrejection = event => {
             const time = new Date().toLocaleString().replace(',', '')
             const log = '[' + time + ' ERROR]: ' + event.reason.stack
             try {

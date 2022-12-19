@@ -3,18 +3,10 @@
 	"short_name": "AVR",
 	"author": "Serega007",
 	"background": {
-		"scripts": [
-			"umd.js",
-			"projects.js",
-		    "main.js",
-			"background.js",
-			"scripts/minecraftiplist.js"
-		],
-		"persistent": true
+		"service_worker": "background.js"
 	},
 	"description": "__MSG_appDesc__",
-	"manifest_version": 2,
-	"minimum_chrome_version": "85.0",
+	"manifest_version": 3,
 	"name": "__MSG_appName__",
 	"options_ui": {
 		"open_in_tab": true,
@@ -34,16 +26,21 @@
 		"webNavigation",
 		"alarms",
 		"unlimitedStorage",
+		"scripting"
+	],
+	"optional_permissions": [
+		"cookies"
+	],
+	"host_permissions": [
 		"https://*.hcaptcha.com/captcha/*",
 		"https://www.google.com/recaptcha/*",
 		"https://www.recaptcha.net/recaptcha/*",
 		"https://challenges.cloudflare.com/*"
 	],
-	"optional_permissions": [
-		"cookies",
+	"optional_host_permissions": [
 		"<all_urls>"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "6.8.5",
+	"version": "7.0.0",
 	"default_locale": "en"
 }

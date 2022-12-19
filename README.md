@@ -133,3 +133,7 @@ Here is a short guide how to install an unpacked extension on Google Chrome or C
 ![](https://i.imgur.com/iQ4DXVu.png)
 
 4. Click on the "Load unpacked" button and select the directory where you unpacked the archive.
+
+
+## Используемые библиотеки
+### [IDB](https://github.com/jakearchibald/idb) версии 7.1.1

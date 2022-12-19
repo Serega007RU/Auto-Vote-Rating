@@ -1,3 +1,8 @@
+importScripts('libs/umd.js')
+importScripts('projects.js')
+importScripts('main.js')
+
+
 //Текущие fetch запросы
 // noinspection ES6ConvertVarToLetConst
 var fetchProjects = new Map()
@@ -82,11 +87,11 @@ async function reloadAllAlarms() {
     }
 }
 
-window.addEventListener('online', ()=> {
+addEventListener('online', ()=> {
     online = true
     checkVote()
 })
-window.addEventListener('offline', ()=> {
+addEventListener('offline', ()=> {
     online = false
 })
 
@@ -717,7 +722,8 @@ chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
     if (!projectKey) return
     if (details.frameId === 0) {
         if (details.url.match(/wargm.ru\/*/)) {
-            chrome.tabs.executeScript(details.tabId, {file: 'scripts/istrusted.js', runAt: 'document_end'}, async function() {
+            // TODO mv3 миграция, потеряли свойство runAt: 'document_end', подробнее https://stackoverflow.com/questions/70413148/chrome-scripting-executescript-runat-property-in-manifest-v3
+            chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/istrusted.js'], world: 'MAIN'}, async function() {
                 if (chrome.runtime.lastError) {
                     if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')) {
                         const project = await db.get('projects', projectKey)
@@ -755,23 +761,9 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         }
 
         await new Promise(resolve => {
-            chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
+            chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/' + project.rating.toLowerCase() +'.js', 'scripts/api.js']}, function() {
                 if (chrome.runtime.lastError) {
                     if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')) {
-                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                        project.error = chrome.runtime.lastError.message
-                        updateValue('projects', project)
-                    }
-                }
-                resolve()
-            })
-        })
-
-        await new Promise(resolve => {
-            chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'}, function() {
-                if (chrome.runtime.lastError) {
-                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal') && !chrome.runtime.lastError.message.includes('Missing host permission for the tab')) {
                         console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
                         if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
                         project.error = chrome.runtime.lastError.message
@@ -804,7 +796,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/)
         || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)
         || details.url.match(/https:\/\/challenges.cloudflare.com\/*/))) {
-        chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
+        chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['scripts/captchaclicker.js']}, function() {
             if (chrome.runtime.lastError) {
                 if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id') && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
                     let error = chrome.runtime.lastError.message
@@ -844,7 +836,7 @@ chrome.webRequest.onCompleted.addListener(async function(details) {
 
 chrome.webRequest.onErrorOccurred.addListener(async function(details) {
     // noinspection JSUnresolvedVariable
-    if ((details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) && fetchProjects.has(details.requestId)) {
+    if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
         let project = fetchProjects.get(details.requestId)
         endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
     } else if (openedProjects.has(details.tabId)) {
@@ -876,7 +868,7 @@ async function _fetch(url, options, project) {
     listener = (details)=>{
         //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net::ERR из fetch запроса?
         // noinspection JSUnresolvedVariable
-        if ((details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) && details.url.includes(url)) {
+        if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && details.url.includes(url)) {
             fetchProjects.set(details.requestId, project)
             removeListener()
         }
@@ -884,8 +876,6 @@ async function _fetch(url, options, project) {
     chrome.webRequest.onBeforeRequest.addListener(listener, {urls: ['<all_urls>']})
 
     if (!options) options = {}
-    //Поддержка для браузера Uran (Chrome версии 59+)
-    options.credentials = 'include'
 
     try {
         return await fetch(url, options)
