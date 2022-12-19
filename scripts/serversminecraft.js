@@ -1,9 +1,24 @@
 async function vote(first) {
-    if (document.querySelector('div.bg-green-100') != null) {
+    if (document.querySelector('.container h3') && document.querySelector('.container h3').textContent.toLowerCase().includes('submitting vote in')) {
+        return
+    }
+
+    if (document.querySelector('.ct-popup-content')) {
+        const message = document.querySelector('.ct-popup-content').innerText
+        if (message.length > 10) {
+            if (message.toLowerCase().includes('you voted') && message.toLowerCase().includes('thank you')) {
+                chrome.runtime.sendMessage({successfully: true})
+            } else {
+                chrome.runtime.sendMessage({message})
+            }
+            return
+        }
+    }
+    if (document.querySelector('div.bg-green-100')) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
-    if (document.querySelector('div.bg-blue-100') != null) {
+    if (document.querySelector('div.bg-blue-100')) {
         if (document.querySelector('div.bg-blue-100').textContent.includes('You can vote for this server again in')) {
             chrome.runtime.sendMessage({later: true})
         } else {
