@@ -88,11 +88,11 @@ async function reloadAllAlarms() {
     }
 }
 
-addEventListener('online', ()=> {
+self.addEventListener('online', ()=> {
     online = true
     checkVote()
 })
-addEventListener('offline', ()=> {
+self.addEventListener('offline', ()=> {
     online = false
 })
 
