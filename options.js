@@ -2760,7 +2760,11 @@ async function addProject(project, element) {
         } else if (response.redirected) {
             createNotif(chrome.i18n.getMessage('notFoundProjectRedirect', response.url), 'error', null, element)
             return
-        } else if (response.status === 503) {//None
+        } else if (response.status === 503) {
+            //None
+        // TODO это какой-то кринж для https://www.minecraft-serverlist.net/, ошибка 500 считается как успешный запрос https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
+        } else if (project.rating === 'MinecraftServerListNet') {
+            //None
         } else if (!response.ok) {
             createNotif(chrome.i18n.getMessage('notConnect', [project.rating, String(response.status)]), 'error', null, element)
             return
@@ -4162,7 +4166,7 @@ document.querySelectorAll('[placeholder]').forEach(function(el) {
     el.placeholder = message
 })
 document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
-document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
+// document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
 
 //Модалки
 document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {

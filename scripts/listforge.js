@@ -53,6 +53,10 @@ async function vote(first) {
             chrome.runtime.sendMessage({requiredNick: true})
             return
         }
+
+        // TODO временное решение с ожиданием загрузки капчи
+        await wait(Math.floor(Math.random() * 10000 + 5000))
+
         document.getElementById('nickname').value = project.nick
         //Кликаем проголосовать, если нет hCaptcha
         if (document.getElementById('voteBtn') != null) {
