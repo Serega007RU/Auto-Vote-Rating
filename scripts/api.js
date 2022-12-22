@@ -47,6 +47,16 @@ async function run() {
 
         //Если мы находися на странице авторизации ВКонтакте
         if (document.URL.match(/vk.com\/*/)) {
+            // TODO нужно полностью переписать тут всю логику под новую версию интерфейса ВК
+            if (document.querySelector('.vkc__AuthRoot__contentIn')) {
+                const timer = setInterval(()=>{
+                    if (document.querySelector('.vkc__AcceptPrivacyPolicy__content button[type="submit"]')) {
+                        clearInterval(timer)
+                        document.querySelector('.vkc__AcceptPrivacyPolicy__content button[type="submit"]').click()
+                    }
+                }, 1000)
+                return
+            }
             let text
             let notAuth = false
             if (document.querySelector('div.oauth_form_access')) {
@@ -70,6 +80,8 @@ async function run() {
             } else {
                 text = 'null'
             }
+            console.log({errorAuthVK: text, notAuth})
+            return
             chrome.runtime.sendMessage({errorAuthVK: text, notAuth})
             return
         }
