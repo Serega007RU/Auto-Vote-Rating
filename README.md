@@ -137,5 +137,5 @@ Here is a short guide how to install an unpacked extension on Google Chrome or C
 
 ## Используемые библиотеки
 ### [IDB](https://github.com/jakearchibald/idb) версии 7.1.1
-### [LinkedDOM](https://github.com/WebReflection/linkedom) версии 0.14.21
+### [LinkeDOM](https://github.com/WebReflection/linkedom) версии 0.14.21
 ### [Polyfill](https://github.com/regseb/castkodi/tree/mv3/src/polyfill)
