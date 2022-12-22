@@ -1,6 +1,7 @@
 importScripts('libs/umd.js')
 importScripts('projects.js')
 importScripts('main.js')
+importScripts('libs/linkedom.js')
 
 
 //Текущие fetch запросы
@@ -364,8 +365,8 @@ async function silentVote(project) {
                     await wait(5000)
                     continue
                 }
-                if (document.querySelector('form[method="POST"]') != null && document.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
-                    endVote({message: document.querySelector('form[method="POST"]').textContent.trim()}, null, project)
+                if (response.doc.querySelector('form[method="POST"]') != null && response.doc.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
+                    endVote({message: response.doc.querySelector('form[method="POST"]').textContent.trim()}, null, project)
                     return
                 }
                 if (response.doc.querySelector('input[name=player]') != null) {
