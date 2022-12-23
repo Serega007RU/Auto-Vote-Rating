@@ -116,11 +116,11 @@ async function reloadAllAlarms() {
     }
 }
 
-window.addEventListener('online', ()=> {
+self.addEventListener('online', ()=> {
     online = true
     checkVote()
 })
-window.addEventListener('offline', ()=> {
+self.addEventListener('offline', ()=> {
     online = false
 })
 
@@ -783,8 +783,8 @@ async function silentVote(project) {
                     await wait(5000)
                     continue
                 }
-                if (document.querySelector('form[method="POST"]') != null && document.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
-                    endVote({message: document.querySelector('form[method="POST"]').textContent.trim()}, null, project)
+                if (response.doc.querySelector('form[method="POST"]') != null && response.doc.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
+                    endVote({message: response.doc.querySelector('form[method="POST"]').textContent.trim()}, null, project)
                     return
                 }
                 if (response.doc.querySelector('input[name=player]') != null) {
@@ -1279,7 +1279,7 @@ chrome.webRequest.onCompleted.addListener(async function(details) {
 
 chrome.webRequest.onErrorOccurred.addListener(async function(details) {
     // noinspection JSUnresolvedVariable
-    if ((details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) && fetchProjects.has(details.requestId)) {
+    if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
         let project = fetchProjects.get(details.requestId)
         endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
     } else if (openedProjects.has(details.tabId)) {
@@ -1311,7 +1311,7 @@ async function _fetch(url, options, project) {
     listener = (details)=>{
         //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net::ERR из fetch запроса?
         // noinspection JSUnresolvedVariable
-        if ((details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) && details.url.includes(url)) {
+        if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && details.url.includes(url)) {
             fetchProjects.set(details.requestId, project)
             removeListener()
         }
