@@ -395,13 +395,13 @@ const allProjects = {
     MCServers: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
-                return 'https://mc-servers.com/mcvote/' + project.id + '/'
+                return 'https://mc-servers.com/vote/' + project.id + '/'
             case 'pageURL':
-                return 'https://mc-servers.com/details/' + project.id + '/'
+                return 'https://mc-servers.com/server/' + project.id + '/'
             case 'projectName':
                 return doc.querySelector('.main-panel h1').textContent
             case 'exampleURL':
-                return ['https://mc-servers.com/mcvote/', '1890', '/']
+                return ['https://mc-servers.com/server/', '1890', '/']
             case 'URL':
                 return 'mc-servers.com'
         }

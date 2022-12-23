@@ -4,7 +4,7 @@
 	"author": "Serega007",
 	"background": {
 		"scripts": [
-			"umd.js",
+			"libs/umd.js",
 			"projects.js",
 		    "main.js",
 			"background.js",
@@ -38,6 +38,6 @@
 		"<all_urls>"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "6.8.5",
+	"version": "6.8.6",
 	"default_locale": "en"
 }

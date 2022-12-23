@@ -82,11 +82,11 @@ async function reloadAllAlarms() {
     }
 }
 
-window.addEventListener('online', ()=> {
+self.addEventListener('online', ()=> {
     online = true
     checkVote()
 })
-window.addEventListener('offline', ()=> {
+self.addEventListener('offline', ()=> {
     online = false
 })
 
@@ -119,8 +119,8 @@ async function checkOpen(project/*, transaction*/) {
     }
 
     let retryCoolDown
-    if (project.rating === 'WARGM' && project.randomize) {
-        retryCoolDown = 7200000
+    if (project.randomize) {
+        retryCoolDown = Math.floor(Math.random() * 600000 + 1800000)
     } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
         retryCoolDown = 300000
     } else {
@@ -359,8 +359,8 @@ async function silentVote(project) {
                     await wait(5000)
                     continue
                 }
-                if (document.querySelector('form[method="POST"]') != null && document.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
-                    endVote({message: document.querySelector('form[method="POST"]').textContent.trim()}, null, project)
+                if (response.doc.querySelector('form[method="POST"]') != null && response.doc.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
+                    endVote({message: response.doc.querySelector('form[method="POST"]').textContent.trim()}, null, project)
                     return
                 }
                 if (response.doc.querySelector('input[name=player]') != null) {
@@ -832,6 +832,10 @@ chrome.webRequest.onCompleted.addListener(async function(details) {
     const projectKey = openedProjects.get(details.tabId)
     if (!projectKey) return
     const project = await db.get('projects', projectKey)
+
+    // TODO это какой-то кринж для https://www.minecraft-serverlist.net/, ошибка 500 считается как успешный запрос https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
+    if (project.rating === 'MinecraftServerListNet') return
+
     if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
         const sender = {tab: {id: details.tabId}}
         endVote({errorVote: [String(details.statusCode), details.url]}, sender, project)
@@ -840,7 +844,7 @@ chrome.webRequest.onCompleted.addListener(async function(details) {
 
 chrome.webRequest.onErrorOccurred.addListener(async function(details) {
     // noinspection JSUnresolvedVariable
-    if ((details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) && fetchProjects.has(details.requestId)) {
+    if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
         let project = fetchProjects.get(details.requestId)
         endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
     } else if (openedProjects.has(details.tabId)) {
@@ -872,7 +876,7 @@ async function _fetch(url, options, project) {
     listener = (details)=>{
         //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net::ERR из fetch запроса?
         // noinspection JSUnresolvedVariable
-        if ((details.initiator && details.initiator.includes(window.location.hostname) || (details.originUrl && details.originUrl.includes(window.location.hostname))) && details.url.includes(url)) {
+        if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && details.url.includes(url)) {
             fetchProjects.set(details.requestId, project)
             removeListener()
         }
