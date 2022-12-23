@@ -4,7 +4,7 @@
 	"author": "Serega007",
 	"background": {
 		"scripts": [
-			"umd.js",
+			"libs/umd.js",
 			"projects.js",
 		    "main.js",
 			"background.js",
