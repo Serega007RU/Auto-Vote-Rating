@@ -12,10 +12,10 @@ async function vote(first) {
     }
 
     if (first) {
-        document.getElementById('vote-modal').previousElementSibling.click()
+        document.querySelector('.columns .column button.button').click()
         return
     }
     let project = await getProject('MinecraftServery')
-    document.querySelector('#vote-modal form input[name="nickname"]').value = project.nick
-    document.querySelector('#vote-modal form button[type="submit"]').click()
+    document.querySelector('.modal form input[name="nickname"]').value = project.nick
+    document.querySelector('.modal form button[type="submit"]').click()
 }
