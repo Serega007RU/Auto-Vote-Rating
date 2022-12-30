@@ -14,6 +14,12 @@ let dbLogs
 //Текущие открытые вкладки расширением
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()
+//Текущие проекты за которые сейчас голосует расширение
+// noinspection ES6ConvertVarToLetConst
+var queueProjects = new Set()
+//Полностью ли запущено расширение?
+// noinspection ES6ConvertVarToLetConst
+var initialized = false
 
 //Инициализация настроек расширения
 async function initializeConfig(background, version) {
@@ -26,7 +32,7 @@ async function initializeConfig(background, version) {
     }
     // noinspection JSUnusedGlobalSymbols
     try {
-        db = await idb.openDB('avr', version ? version : 10, {upgrade})
+        db = await idb.openDB('avr', version ? version : 11, {upgrade})
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
@@ -35,7 +41,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 100)
+            await initializeConfig(background, 110)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error.message})
@@ -59,12 +65,14 @@ async function initializeConfig(background, version) {
     generalStats = await db.get('other', 'generalStats')
     todayStats = await db.get('other', 'todayStats')
 
-    if (!background) return
+    if (!background) {
+        initialized = true
+        return
+    }
     console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 
-    // if (settings && !settings.disabledCheckTime) checkTime()
-
     openedProjects = await db.get('other', 'openedProjects')
+    queueProjects = await db.get('other', 'queueProjects')
     if (openedProjects.size > 0) {
         for (const key of openedProjects.keys()) {
             openedProjects.delete(key)
@@ -73,7 +81,23 @@ async function initializeConfig(background, version) {
         await db.put('other', openedProjects, 'openedProjects')
     }
 
+    initialized = true
+
+    // noinspection ES6MissingAwait
     checkVote()
+}
+
+async function waitInitialize() {
+    if (!initialized) {
+        await new Promise(resolve => {
+            const timer = setInterval(()=>{
+                if (initialized) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 100)
+        })
+    }
 }
 
 self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
@@ -128,7 +152,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             disabledNotifWarn: false,
             disabledNotifError: false,
             enabledSilentVote: true,
-            disabledCheckTime: false,
             disabledCheckInternet: false,
             disabledOneVote: false,
             disabledFocusedTab: false,
@@ -159,6 +182,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         await other.add(generalStats, 'generalStats')
         await other.add(todayStats, 'todayStats')
         await other.add(openedProjects, 'openedProjects')
+        await other.add(queueProjects, 'queueProjects')
         return
     }
 
@@ -262,6 +286,11 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion <= 9) {
         openedProjects = new Map()
         await transaction.objectStore('other').put(openedProjects, 'openedProjects')
+    }
+
+    if (oldVersion <= 10) {
+        queueProjects = new Set()
+        await transaction.objectStore('other').put(queueProjects, 'queueProjects')
     }
 
     if (!todayStats) {

@@ -14,8 +14,6 @@ async function run() {
         if (request.sendProject) {
             proj = request.project
             if (request.vkontakte) vkontakte = request.vkontakte
-        } else if (request === 'reloadCaptcha') {
-            document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
         }
     })
 
@@ -96,22 +94,6 @@ async function run() {
             return
         }
 
-        const script = document.createElement('script')
-        script.textContent = `
-        Object.defineProperty(document, 'visibilityState', {
-            get() {
-                return 'visible'
-            }
-        })
-        Object.defineProperty(document, 'hidden', {
-            get() {
-                return false
-            }
-        })
-        document.currentScript.parentNode.removeChild(document.currentScript)
-        `
-        document.head.appendChild(script)
-
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]')) {
             return
@@ -151,8 +133,7 @@ async function run() {
         }
 
         chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-            if (request === 'vote') {
-                sendResponse('startedVote')
+            if (request === 'captchaPassed') {
                 startVote(false)
             }
         })
@@ -193,7 +174,7 @@ async function run() {
 
 async function startVote(first) {
     const timer3 = setInterval(async ()=>{
-        if (typeof vote === 'function') {
+        if (typeof vote === 'function' && proj != null) {
             clearInterval(timer3)
             try {
                 await vote(first)
@@ -205,15 +186,7 @@ async function startVote(first) {
 }
 
 async function getProject() {
-    if (proj == null) {
-        return await new Promise(resolve => {
-            setInterval(()=>{
-                if (proj != null) resolve(proj)
-            }, 100)
-        })
-    } else {
-        return proj
-    }
+    return proj
 }
 
 function throwError(error) {

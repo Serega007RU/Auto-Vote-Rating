@@ -86,10 +86,6 @@
     "message": "Fehlerbenachrichtigungen deaktivieren",
     "description": "Checkbox. Error notifications"
   },
-  "disabledCheckTime": {
-    "message": "Zeitprüfung beim Start der Verlängerung deaktivieren",
-    "description": "Checkbox. Disable time checking"
-  },
   "disabledCheckInternet": {
     "message": "Überprüfung der Internetverbindung deaktivieren"
   },

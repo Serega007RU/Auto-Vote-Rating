@@ -86,10 +86,6 @@
     "message": "Disable error notifications",
     "description": "Checkbox. Error notifications"
   },
-  "disabledCheckTime": {
-    "message": "Disable time checking at extension start",
-    "description": "Checkbox. Disable time checking"
-  },
   "disabledCheckInternet": {
     "message": "Disable Internet connection verification"
   },

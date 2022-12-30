@@ -1,5 +1,15 @@
+let completedLoad = false
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.sendProject) {
+        completedLoad = true
+    }
+})
+
 if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) && document.querySelector('head > captcha-widgets') == null/*Интеграция с 2Captcha Solver*/) {
     const timer1 = setInterval(()=>{
+        if (!completedLoad) return
+
         if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null
             && isScrolledIntoView(document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border'))
             && document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border').style.display !== 'none') {
@@ -14,12 +24,14 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
     const timer2 = setInterval(()=>{
         //Если капча пройдена
         if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0)) {
-            chrome.runtime.sendMessage('vote', function (response) {
-                if (response === 'startedVote') {
-                    clearInterval(timer2)
-                }
-            })
-            // clearInterval(timer2)
+            clearInterval(timer2)
+            chrome.runtime.sendMessage('captchaPassed')
+            // TODO данный мазохизм был сделан из-за того что капча иногда загружалась раньше чем страница, теперь мы капчу проходим только после полной загрузки страницы
+            // chrome.runtime.sendMessage('vote', function (response) {
+            //     if (response === 'startedVote') {
+            //         clearInterval(timer2)
+            //     }
+            // })
         }
 
         if (document.querySelector('.rc-anchor-error-msg-container').style.display !== 'none' && document.querySelector('.rc-anchor-error-msg-container').textContent.length > 0) {
@@ -35,19 +47,13 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
             }
         }
     }, 1000)
-
-    window.onmessage = function(e) {
-        if (e.data === 'reloadCaptcha') {
-            if (!(document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0))) {
-                document.location.reload()
-            }
-        }
-    }
 } else if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) && document.querySelector('head > yandex-captcha-solver') == null) {
     //Интеграция с расширением Buster: Captcha Solver for Humans
     let count = 0
     let repeat = 2
     const timer7 = setInterval(() => {
+        if (!completedLoad) return
+
         if (document.getElementById('solver-button') != null && !document.getElementById('solver-button').className.includes('working') && !document.getElementById('recaptcha-verify-button').disabled) {
             if (document.querySelector('.rc-audiochallenge-error-message') != null && document.querySelector('.rc-audiochallenge-error-message').style.display !== 'none' && document.querySelector('.rc-audiochallenge-error-message').textContent > 0) {
                 repeat = 3
@@ -79,6 +85,8 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
     chrome.runtime.sendMessage({errorCaptcha: document.body.innerText.trim(), restartVote: true})
 } else if (window.location.href.match(/.hcaptcha.com\/captcha.v\d\//)) {
     const timer4 = setInterval(()=>{
+        if (!completedLoad) return
+
         if (document.getElementById('checkbox') != null
             && isScrolledIntoView(document.getElementById('checkbox'))
             && document.getElementById('checkbox').style.display !== 'none') {
@@ -90,12 +98,14 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
     //Проверяет прошла ли проверка hCaptcha
     const timer5 = setInterval(()=>{
         if (document.getElementById('checkbox') != null && document.getElementById('checkbox').getAttribute('aria-checked') === 'true') {
-            chrome.runtime.sendMessage('vote', function (response) {
-                if (response === 'startedVote') {
-                    clearInterval(timer5)
-                }
-            })
-            // clearInterval(timer5)
+            clearInterval(timer5)
+            chrome.runtime.sendMessage('captchaPassed')
+            // TODO данный мазохизм был сделан из-за того что капча иногда загружалась раньше чем страница, теперь мы капчу проходим только после полной загрузки страницы
+            // chrome.runtime.sendMessage('vote', function (response) {
+            //     if (response === 'startedVote') {
+            //         clearInterval(timer5)
+            //     }
+            // })
         }
     }, 1000)
 
@@ -118,22 +128,6 @@ if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anc
         }
     }, 1000)
 }
-
-const script = document.createElement('script')
-script.textContent = `
-Object.defineProperty(document, 'visibilityState', {
-    get() {
-        return 'visible'
-    }
-})
-Object.defineProperty(document, 'hidden', {
-    get() {
-        return false
-    }
-})
-document.currentScript.parentNode.removeChild(document.currentScript)
-`
-document.head.appendChild(script)
 
 function isScrolledIntoView(el) {
     const rect = el.getBoundingClientRect()

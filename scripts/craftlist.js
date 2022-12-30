@@ -55,7 +55,7 @@ async function vote(first) {
     const milliseconds = (hours * 60 * 60 * 1000)
     if (project.timeout == null || project.timeout !== milliseconds) {
         project.timeout = milliseconds
-        chrome.runtime.sendMessage({changeProject: true, project})
+        chrome.runtime.sendMessage({changeProject: project})
     }
     document.querySelector('input[name="nickName"]').value = project.nick
     document.querySelector('button.btn.btn-vote').click()

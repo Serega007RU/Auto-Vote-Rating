@@ -26,7 +26,8 @@
 		"webNavigation",
 		"alarms",
 		"unlimitedStorage",
-		"scripting"
+		"scripting",
+		"tabGroups"
 	],
 	"optional_permissions": [
 		"cookies"

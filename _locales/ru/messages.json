@@ -65,9 +65,6 @@
   "disabledNotifError": {
     "message": "Отключить уведомления об ошибках"
   },
-  "disabledCheckTime": {
-    "message": "Отключить проверку времени при старте расширения"
-  },
   "disabledCheckInternet": {
     "message": "Отключить проверку соединения интернета"
   },

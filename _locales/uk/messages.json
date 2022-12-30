@@ -65,9 +65,6 @@
   "disabledNotifError": {
     "message": "Відключити сповіщення помилок"
   },
-  "disabledCheckTime": {
-    "message": "Відключити перевірку часу на старті розширення"
-  },
   "disabledCheckInternet": {
     "message": "Відключити перевірку з'єднання інтернету"
   },

@@ -1,5 +1,6 @@
 //Где храним настройки
 // let storageArea = 'local'
+// noinspection ES6MissingAwait
 
 const authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -91,23 +92,19 @@ async function addProjectList(project) {
 
         if (project.time != null && project.time > Date.now()) {
             let create = true
-            await new Promise(resolve => {
-                chrome.alarms.getAll(function(alarms) {
-                    for (const alarm of alarms) {
-                        if (alarm.scheduledTime === project.time) {
-                            create = false
-                            resolve()
-                            break
-                        }
-                    }
-                    resolve()
-                })
-            })
+            const alarms = chrome.alarms.getAll()
+            for (const alarm of alarms) {
+                // noinspection JSUnresolvedVariable
+                if (alarm.scheduledTime === project.time) {
+                    create = false
+                    break
+                }
+            }
             if (create) {
                 chrome.alarms.create(String(project.key), {when: project.time})
             }
         } else {
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().checkVote()
+            chrome.runtime.sendMessage('checkVote')
         }
     }
 
@@ -119,8 +116,8 @@ async function addProjectList(project) {
     let text = chrome.i18n.getMessage('soon')
     if (!(project.time == null || project.time === '') && Date.now() < project.time) {
         text = new Date(project.time).toLocaleString().replace(',', '')
-    } else if (chrome.extension.getBackgroundPage()) {
-        for (const value of chrome.extension.getBackgroundPage().queueProjects) {
+    } else {
+        for (const value of queueProjects) {
             if (project.rating === value.rating) {
                 text = chrome.i18n.getMessage('inQueue')
                 if (project.key === value.key) {
@@ -168,7 +165,7 @@ async function addProjectList(project) {
     } else {
         listProject.append(li)
     }
-    //Слушатель кнопки Удалить на проект
+    //Слушатель кнопки "Удалить" на проект
     img2.addEventListener('click', async event => {
         if (event.target.classList.contains('disabled')) {
             createNotif(chrome.i18n.getMessage('notFast'), 'warn')
@@ -249,6 +246,7 @@ function generateBtnListRating(rating, count) {
             while (cursor) {
                 await cursor.delete()
                 chrome.alarms.clear(String(cursor.primaryKey))
+                // noinspection JSVoidFunctionReturnValueUsed
                 cursor = await cursor.continue()
             }
             document.getElementById(rating + 'Tab').remove()
@@ -289,28 +287,7 @@ async function removeProjectList(project) {
 
     chrome.alarms.clear(String(project.key))
 
-    if (!chrome.extension.getBackgroundPage()) return
-    let nowVoting = false
-    for (const value of chrome.extension.getBackgroundPage().queueProjects) {
-        if (project.key === value.key) {
-            chrome.extension.getBackgroundPage().queueProjects.delete(value)
-            nowVoting = true
-            break
-        }
-    }
-    //Если эта вкладка была уже открыта, он закрывает её
-    for (const[key,value] of chrome.extension.getBackgroundPage().openedProjects.entries()) {
-        if (project.key === value) {
-            chrome.extension.getBackgroundPage().openedProjects.delete(key)
-            db.put('other', chrome.extension.getBackgroundPage().openedProjects, 'openedProjects')
-            chrome.tabs.remove(key)
-            break
-        }
-    }
-    if (nowVoting) {
-        chrome.extension.getBackgroundPage().checkVote()
-        chrome.extension.getBackgroundPage().console.log(chrome.extension.getBackgroundPage().getProjectPrefix(project, true) + chrome.i18n.getMessage('projectDeleted'))
-    }
+    chrome.runtime.sendMessage({projectDeleted: project})
 }
 
 //Перезагрузка списка проектов
@@ -437,7 +414,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
         }
         if (!_return) {
             await db.put('other', settings, 'settings')
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+            chrome.runtime.sendMessage('reloadSettings')
         }
         event.target.classList.remove('disabled')
     })
@@ -589,7 +566,7 @@ document.getElementById('timeout').addEventListener('submit', async (event)=>{
     settings.timeout = document.getElementById('timeoutValue').valueAsNumber
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('successSave'), 'success')
-    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+    chrome.runtime.sendMessage('reloadSettings')
     event.target.classList.remove('disabled')
 })
 
@@ -605,7 +582,7 @@ document.getElementById('timeoutError').addEventListener('submit', async (event)
     settings.timeoutError = document.getElementById('timeoutErrorValue').valueAsNumber
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('successSave'), 'success')
-    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+    chrome.runtime.sendMessage('reloadSettings')
     event.target.classList.remove('disabled')
 })
 
@@ -627,6 +604,7 @@ async function addProject(project, element) {
         secondBonusButton.className = 'secondBonus'
     }
 
+    // noinspection JSUnresolvedFunction
     if (!document.getElementById('disableCheckProjects').checked) {
         let found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
         if (found > 0) {
@@ -909,7 +887,7 @@ async function checkPermissions(projects, element) {
         chrome.permissions.contains({origins, permissions}, resolve)
     })
     if (!granted) {
-        if (element != null || !chrome.app) {//Костыль для FireFox, что бы запросить права нужно что бы пользователь обязатльно кликнул
+        if (element != null || !chrome.app) {//Костыль для FireFox, что бы запросить права нужно, что бы пользователь обязатльно кликнул
             document.querySelector('#addProject').classList.remove('disabled')
             const button = document.createElement('button')
             button.textContent = chrome.i18n.getMessage('grant')
@@ -1073,13 +1051,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
 
         await upgrade(db, data.version, db.version, tx)
 
-        if (chrome.extension.getBackgroundPage()) {
-            chrome.extension.getBackgroundPage().settings = settings
-            chrome.extension.getBackgroundPage().generalStats = generalStats
-            chrome.extension.getBackgroundPage().todayStats = todayStats
-            chrome.extension.getBackgroundPage().reloadAllAlarms()
-            chrome.extension.getBackgroundPage().checkVote()
-        }
+        chrome.runtime.sendMessage('reloadAllSettings')
 
         await restoreOptions()
 
@@ -1102,7 +1074,7 @@ modeVote.addEventListener('change', async event => {
     }
     settings.enabledSilentVote = modeVote.value === 'enabled'
     await db.put('other', settings, 'settings')
-    if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+    chrome.runtime.sendMessage('reloadSettings')
     event.target.classList.remove('disabled')
 })
 
@@ -1160,7 +1132,7 @@ function getUrlVars() {
     return vars
 }
 
-//Если страница настроек была открыта сторонним проектом то расширение переходит к быстрому добавлению проектов
+//Если страница настроек была открыта сторонним проектом то, расширение переходит к быстрому добавлению проектов
 async function fastAdd() {
     if (window.location.href.includes('addFastProject')) {
         toggleModal('addFastProject')
@@ -1171,9 +1143,8 @@ async function fastAdd() {
 
         if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] === 'true') {
             settings.disabledNotifInfo = true
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             await db.put('other', settings, 'settings')
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+            chrome.runtime.sendMessage('reloadSettings')
             document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1188,9 +1159,8 @@ async function fastAdd() {
         }
         if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] === 'true') {
             settings.disabledNotifWarn = true
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             await db.put('other', settings, 'settings')
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+            chrome.runtime.sendMessage('reloadSettings')
             document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1205,9 +1175,8 @@ async function fastAdd() {
         }
         if (vars['disableNotifStart'] != null && vars['disableNotifStart'] === 'true') {
             settings.disabledNotifStart = true
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
             await db.put('other', settings, 'settings')
-            if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+            chrome.runtime.sendMessage('reloadSettings')
             document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
@@ -1304,7 +1273,7 @@ async function addCustom() {
     if (!settings.enableCustom) {
         settings.enableCustom = true
         await db.put('other', settings, 'settings')
-        if (chrome.extension.getBackgroundPage()) chrome.extension.getBackgroundPage().settings = settings
+        chrome.runtime.sendMessage('reloadSettings')
     }
 }
 
@@ -1396,11 +1365,13 @@ async function listSelect(event, tabs) {
         div.setAttribute('data-resource', 'load')
         div.textContent = chrome.i18n.getMessage('load')
         list.append(div)
+        queueProjects = await db.get('other', 'queueProjects')
         let cursor = await db.transaction('projects').store.index('rating').openCursor(tabs)
         while (cursor) {
             if (!cursor.value.key) cursor.value.key = cursor.key
             const project = cursor.value
             addProjectList(project)
+            // noinspection JSVoidFunctionReturnValueUsed
             cursor = await cursor.continue()
         }
         div.remove()
@@ -1923,7 +1894,7 @@ function generateDataList() {
     document.querySelector('option[name="Custom"]').disabled = true
 }
 
-chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
+chrome.runtime.onMessage.addListener(async function(request/*, sender, sendResponse*/) {
     if (request.updateValue) {
         if (request.updateValue === 'projects') {
             const el = document.getElementById('projects' + request.value.key)
@@ -1931,8 +1902,9 @@ chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/)
                 let text = chrome.i18n.getMessage('soon')
                 if (!(request.value.time == null || request.value.time === '') && Date.now() < request.value.time) {
                     text = new Date(request.value.time).toLocaleString().replace(',', '')
-                } else if (chrome.extension.getBackgroundPage()) {
-                    for (const value of chrome.extension.getBackgroundPage().queueProjects) {
+                } else  {
+                    queueProjects = await db.get('other', 'queueProjects')
+                    for (const value of queueProjects) {
                         if (request.value.rating === value.rating) {
                             text = chrome.i18n.getMessage('inQueue')
                             if (request.value.key === value.key) {
