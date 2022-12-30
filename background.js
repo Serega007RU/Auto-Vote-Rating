@@ -91,10 +91,8 @@ self.addEventListener('online', ()=> {
 let promises = []
 async function checkOpen(project/*, transaction*/) {
     //Если нет подключения к интернету
-    if (!settings.disabledCheckInternet) {
-        if (!navigator.onLine) {
-            return
-        }
+    if (!settings.disabledCheckInternet && !navigator.onLine) {
+        return
     }
 
     //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован, но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
@@ -872,7 +870,13 @@ chrome.runtime.onMessage.addListener(async function(request, sender/*, sendRespo
         }
         return
     } else if (request === 'captchaPassed') {
-        chrome.tabs.sendMessage(sender.tab.id, 'captchaPassed')
+        try {
+            await chrome.tabs.sendMessage(sender.tab.id, 'captchaPassed')
+        } catch (error) {
+            if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+                console.error(error)
+            }
+        }
         return
     }
 
@@ -1239,7 +1243,13 @@ async function updateValue(objStore, value) {
     const found = await db.count(objStore, value.key)
     if (found) {
         await db.put(objStore, value, value.key)
-        chrome.runtime.sendMessage({updateValue: objStore, value})
+        try {
+            await chrome.runtime.sendMessage({updateValue: objStore, value})
+        } catch (error) {
+            if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+                console.error(error)
+            }
+        }
     } else {
         console.warn('The ' + objStore + ' could not be found, it may have been deleted', JSON.stringify(value))
     }
