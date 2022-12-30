@@ -131,6 +131,11 @@ async function addProjectList(project) {
     const div = document.createElement('div')
     div.classList.add('controlItems')
 
+    const img0 = document.createElement('img')
+    img0.src = 'images/icons/repair.svg'
+    img0.classList.add('projectStats')
+    div.appendChild(img0)
+
     const img1 = document.createElement('img')
     img1.src = 'images/icons/stats.svg'
     img1.classList.add('projectStats')
@@ -175,6 +180,13 @@ async function addProjectList(project) {
         }
         await removeProjectList(project)
         event.target.classList.remove('disabled')
+    })
+    img0.addEventListener('click', async () => {
+        project = await db.get('projects', project.key)
+        project.time = null
+        await db.put('projects', project, project.key)
+        chrome.runtime.sendMessage('checkVote')
+        updateValue({updateValue: 'projects', value: project})
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', () => updateModalStats(project, true))
@@ -1894,7 +1906,9 @@ function generateDataList() {
     document.querySelector('option[name="Custom"]').disabled = true
 }
 
-chrome.runtime.onMessage.addListener(async function(request/*, sender, sendResponse*/) {
+chrome.runtime.onMessage.addListener(updateValue)
+
+async function updateValue(request) {
     if (request.updateValue) {
         if (request.updateValue === 'projects') {
             const el = document.getElementById('projects' + request.value.key)
@@ -1920,7 +1934,7 @@ chrome.runtime.onMessage.addListener(async function(request/*, sender, sendRespo
             }
         }
     }
-})
+}
 
 //Локализация
 const elements = document.querySelectorAll('[data-resource]')

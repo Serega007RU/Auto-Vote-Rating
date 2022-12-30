@@ -391,6 +391,7 @@ nav .logo img {
 	border-radius: 5px;
 }
 
+.projectsBlock .contentBlock .listcontent li img[src="images/icons/repair.svg"],
 .projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
 	margin-right: 10px;
 }
@@ -423,6 +424,7 @@ nav .logo img {
 	opacity: 1;
 }
 
+.projectsBlock .contentBlock .listcontent li img[src="images/icons/repair.svg"]:hover,
 .projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
 	background: #1a7bee;
 }
