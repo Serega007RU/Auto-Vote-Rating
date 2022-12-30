@@ -202,10 +202,15 @@ async function addProjectList(project) {
     })
     img0.addEventListener('click', async () => {
         project = await db.get('projects', project.key)
+        if (project.time == null || project.time === '' || Date.now() > project.time) {
+            createNotif(await updateValue({updateValue: 'projects', value: project}), 'warn')
+            return
+        }
         project.time = null
         await db.put('projects', project, project.key)
         chrome.runtime.sendMessage('checkVote')
         updateValue({updateValue: 'projects', value: project})
+        createNotif(chrome.i18n.getMessage('repaired'), 'success')
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', () => updateModalStats(project, true))
@@ -1935,7 +1940,7 @@ async function updateValue(request) {
                 let text = chrome.i18n.getMessage('soon')
                 if (!(request.value.time == null || request.value.time === '') && Date.now() < request.value.time) {
                     text = new Date(request.value.time).toLocaleString().replace(',', '')
-                } else  {
+                } else {
                     queueProjects = await db.get('other', 'queueProjects')
                     for (const value of queueProjects) {
                         if (request.value.rating === value.rating) {
@@ -1950,6 +1955,7 @@ async function updateValue(request) {
                 el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
                 el.querySelector('.error').textContent = request.value.error
                 updateModalStats(request.value)
+                return text
             }
         }
     }

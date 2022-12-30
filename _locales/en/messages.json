@@ -938,5 +938,8 @@
   },
   "repair": {
     "message": "Restart voting"
+  },
+  "repaired": {
+    "message": "The vote has been sent for restart"
   }
 }
