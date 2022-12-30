@@ -2,7 +2,7 @@ async function vote(first) {
     //Если успешное авто-голосование
     if (document.querySelector('.fullscreen-flash-message-container')) {
         const message = document.querySelector('.fullscreen-flash-message-container').innerText.trim()
-        if (message.toLowerCase().includes('thank you for your vote' || message.toLowerCase().includes('спасибо за голосование'))) {
+        if (message.toLowerCase().includes('thank you for your vote') || message.toLowerCase().includes('спасибо за голосование')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
             chrome.runtime.sendMessage({message})

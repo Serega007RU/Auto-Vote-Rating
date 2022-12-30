@@ -135,7 +135,8 @@ Here is a short guide how to install an unpacked extension on Google Chrome or C
 4. Click on the "Load unpacked" button and select the directory where you unpacked the archive.
 
 
-## Используемые библиотеки
+## Libraries used
 ### [IDB](https://github.com/jakearchibald/idb) версии 7.1.1
 ### [LinkeDOM](https://github.com/WebReflection/linkedom) версии 0.14.21
 ### [Polyfill](https://github.com/regseb/castkodi/tree/mv3/src/polyfill)
+### [eval5](https://github.com/bplok20010/eval5) (also [chrome-inject-eval](https://github.com/GrinZero/chrome-inject-eval))

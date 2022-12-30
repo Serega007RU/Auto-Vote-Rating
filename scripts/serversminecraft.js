@@ -19,12 +19,19 @@ async function vote(first) {
         return
     }
     if (document.querySelector('div.bg-blue-100')) {
-        if (document.querySelector('div.bg-blue-100').textContent.includes('You can vote for this server again in')) {
+        if (document.querySelector('div.bg-blue-100').textContent.toLowerCase().includes('you can vote for this server again in')) {
             chrome.runtime.sendMessage({later: true})
         } else {
             chrome.runtime.sendMessage({message: document.querySelector('div.bg-blue-100').textContent.trim()})
         }
         return
+    }
+
+    if (document.querySelector('div.bg-red-100')) {
+        if (document.querySelector('div.bg-red-100').textContent.toLowerCase().includes('must wait until tomorrow')) {
+            chrome.runtime.sendMessage({later: true})
+            return
+        }
     }
 
     //Костыль, reCAPTCHA загружается только после scroll, странно, да?
