@@ -92,7 +92,7 @@ async function addProjectList(project) {
 
         if (project.time != null && project.time > Date.now()) {
             let create = true
-            const alarms = chrome.alarms.getAll()
+            const alarms = await chrome.alarms.getAll()
             for (const alarm of alarms) {
                 // noinspection JSUnresolvedVariable
                 if (alarm.scheduledTime === project.time) {
