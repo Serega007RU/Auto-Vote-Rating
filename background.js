@@ -654,18 +654,50 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
 }
 
 chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
+    if (details.url === 'about:blank') return
     await waitInitialize()
     const projectKey = openedProjects.get(details.tabId)
     if (!projectKey) return
-    const files = ['scripts/main/visible.js']
+    const files = []
     if (details.frameId === 0) {
+        // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
+        if (details.url.match(/facebook.com\/*/) || details.url.match(/google.com\/*/) || details.url.match(/accounts.google.com\/*/) || details.url.match(/reddit.com\/*/) || details.url.match(/twitter.com\/*/)) {
+            return
+        }
+        // Если пользователь авторизовывается через эти сайты, но у расширения на это нет прав, всё равно не мешаем ему, пускай сам авторизуется не смотря, на то что есть автоматизация авторизации
+        if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login')) {
+            // noinspection JSUnresolvedFunction
+            let granted = await chrome.permissions.contains({origins: [details.url]})
+            if (!granted) {
+                return
+            }
+        }
+
+        files.push('scripts/main/visible.js')
         if (details.url.match(/wargm.ru\/*/)) {
             files.push('scripts/main/istrusted.js')
         }
+    } else if (details.url.match(/hcaptcha.com\/captcha\/*/)
+            || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/)
+            || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/)
+            || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/)
+            || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/)
+            || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/)
+            || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)
+            || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+        files.push('scripts/main/visible.js')
     }
+
+    if (files.length === 0) return
+
     try {
-        // noinspection JSCheckFunctionSignatures
-        await chrome.scripting.executeScript({target: {tabId: details.tabId}, files, world: 'MAIN', injectImmediately: true})
+        if (details.frameId === 0) {
+            // noinspection JSCheckFunctionSignatures
+            await chrome.scripting.executeScript({target: {tabId: details.tabId}, files, world: 'MAIN', injectImmediately: true})
+        } else {
+            // noinspection JSCheckFunctionSignatures
+            await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files, world: 'MAIN', injectImmediately: true})
+        }
     } catch (error) {
         if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal')) {
             const project = await db.get('projects', projectKey)
