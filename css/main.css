@@ -391,9 +391,10 @@ nav .logo img {
 	border-radius: 5px;
 }
 
-.projectsBlock .contentBlock .listcontent li img[src="images/icons/repair.svg"],
-.projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"] {
+.projectStats {
 	margin-right: 10px;
+	position: relative;
+	display: inline-block;
 }
 
 .projectsBlock .contentBlock .listcontent li .controlItems {
@@ -409,7 +410,7 @@ nav .logo img {
     justify-content: space-around;
 }
 
-.projectsBlock .contentBlock .listcontent li .controlItems img {
+.projectStats img {
 	width: 30px;
 	display: block;
 	padding: 10px;
@@ -424,12 +425,11 @@ nav .logo img {
 	opacity: 1;
 }
 
-.projectsBlock .contentBlock .listcontent li img[src="images/icons/repair.svg"]:hover,
-.projectsBlock .contentBlock .listcontent li img[src="images/icons/stats.svg"]:hover {
+.projectStats img:hover {
 	background: #1a7bee;
 }
 
-.projectsBlock .contentBlock .listcontent li img[src="images/icons/delete.svg"]:hover {
+.projectStats img[src="images/icons/delete.svg"]:hover {
 	background: #da5e5e;
 }
 
@@ -557,7 +557,7 @@ nav .logo img {
         width: 100%;
     }
 
-    .projectsBlock .contentBlock .listcontent li .controlItems img {
+    .projectStats img {
     	padding: 5px;
     }
 }
@@ -761,6 +761,7 @@ nav .logo img {
     top: -3px;
 }
 
+.projectStats .tooltiptext,
 .tooltip1 .tooltip1text,
 .tooltip2 .tooltip2text  {
  	visibility: hidden;
@@ -777,7 +778,17 @@ nav .logo img {
  	opacity: 0;
  	transition: opacity 0.3s;
  	font-size: initial !important;
- }
+}
+
+.projectStats .tooltiptext {
+	width: 150px;
+	padding: 10px;
+	margin-left: -60px;
+}
+
+.projectStats .tooltiptext {
+	bottom: 125%;
+}
 
 .tooltip1 .tooltip1text {
 	bottom: 145%;
@@ -787,6 +798,7 @@ nav .logo img {
 	top: 155%;
 }
 
+.projectStats .tooltiptext::after,
 .tooltip1 .tooltip1text::after,
 .tooltip2 .tooltip2text::after {
  	content: "";
@@ -797,6 +809,7 @@ nav .logo img {
  	border-style: solid;
  }
  
+.projectStats .tooltiptext::after,
 .tooltip1 .tooltip1text::after {
 	top: 100%;
 	border-color: #000 transparent transparent transparent;
@@ -807,6 +820,7 @@ nav .logo img {
 	border-color: transparent transparent #000 transparent;
 }
 
+.projectStats:hover .tooltiptext,
 .tooltip1:hover .tooltip1text,
 .tooltip2:hover .tooltip2text {
 	visibility: visible;

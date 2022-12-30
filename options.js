@@ -131,18 +131,37 @@ async function addProjectList(project) {
     const div = document.createElement('div')
     div.classList.add('controlItems')
 
-    const img0 = document.createElement('img')
-    img0.src = 'images/icons/repair.svg'
+    const img0 = document.createElement('div')
+    const img0svg = document.createElement('img')
+    const img0text = document.createElement('span')
+    img0text.classList.add('tooltiptext')
+    img0text.textContent = chrome.i18n.getMessage('repair')
     img0.classList.add('projectStats')
+    img0svg.src = 'images/icons/repair.svg'
+    img0.appendChild(img0svg)
+    img0.appendChild(img0text)
     div.appendChild(img0)
 
-    const img1 = document.createElement('img')
-    img1.src = 'images/icons/stats.svg'
+    const img1 = document.createElement('div')
+    const img1svg = document.createElement('img')
+    const img1text = document.createElement('span')
+    img1text.classList.add('tooltiptext')
+    img1text.textContent = chrome.i18n.getMessage('stats2')
     img1.classList.add('projectStats')
+    img1svg.src = 'images/icons/stats.svg'
+    img1.appendChild(img1svg)
+    img1.appendChild(img1text)
     div.appendChild(img1)
 
-    const img2 = document.createElement('img')
-    img2.src = 'images/icons/delete.svg'
+    const img2 = document.createElement('div')
+    const img2svg = document.createElement('img')
+    const img2text = document.createElement('span')
+    img2text.classList.add('tooltiptext')
+    img2text.textContent = chrome.i18n.getMessage('deleteButton')
+    img2.classList.add('projectStats')
+    img2svg.src = 'images/icons/delete.svg'
+    img2.appendChild(img2svg)
+    img2.appendChild(img2text)
     div.appendChild(img2)
 
     const contDiv = document.createElement('div')

@@ -935,5 +935,8 @@
   },
   "closedTab": {
     "message": "It looks like you have closed the tab on which the extension auto-voted"
+  },
+  "repair": {
+    "message": "Restart voting"
   }
 }

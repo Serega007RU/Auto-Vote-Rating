@@ -4,6 +4,7 @@ importScripts('libs/idb.umd.js')
 importScripts('projects.js')
 importScripts('main.js')
 importScripts('libs/linkedom.js')
+importScripts('libs/evalCore.umd.js')
 
 //Текущие fetch запросы
 // noinspection ES6ConvertVarToLetConst
