@@ -3,6 +3,7 @@
 importScripts('libs/idb.umd.js')
 importScripts('projects.js')
 importScripts('main.js')
+// TODO отложенный importScripts пока не работают, подробнее https://bugs.chromium.org/p/chromium/issues/detail?id=1198822
 importScripts('libs/linkedom.js')
 importScripts('libs/evalCore.umd.js')
 
@@ -926,6 +927,7 @@ chrome.runtime.onMessage.addListener(async function(request, sender/*, sendRespo
                 // noinspection JSCheckFunctionSignatures
                 if (!isNaN(key)) { // noinspection JSCheckFunctionSignatures
                     chrome.tabs.remove(key)
+                        .catch(error => {if (error.message !== 'No tab with id.') console.warn(error)})
                 }
                 break
             }
