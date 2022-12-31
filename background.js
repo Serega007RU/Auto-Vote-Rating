@@ -95,14 +95,16 @@ async function checkOpen(project, transaction) {
     for (const[tab,projectKey] of openedProjects.entries()) {
         // noinspection JSCheckFunctionSignatures
         const value = await transaction.objectStore('projects').get(projectKey)
-        if (!value.nextAttempt || (value.timeoutQueue && Date.now() > value.timeoutQueue)) {
+        if (value.timeoutQueue && Date.now() > value.timeoutQueue) {
             if (value.timeoutQueue) {
                 delete value.timeoutQueue
                 updateValue('projects', value)
             }
-            openedProjects.delete(tab)
-            db.put('other', openedProjects, 'openedProjects')
-            continue
+            if (!value.nextAttempt || Date.now() > value.nextAttempt) {
+                openedProjects.delete(tab)
+                db.put('other', openedProjects, 'openedProjects')
+                continue
+            }
         }
         if (project.rating === value.rating || (value.randomize && project.randomize) || settings.disabledOneVote) {
             if (Date.now() < value.nextAttempt) {
@@ -776,6 +778,20 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 console.error(getProjectPrefix(project, true) + error)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
                 project.error = error
+                updateValue('projects', project)
+            }
+        }
+
+        // Если вкладка уже загружена, повторно туда высылаем sendProject который обозначает что мы готовы к голосованию
+        const tab = await chrome.tabs.get(details.tabId)
+        if (tab.status !== 'complete') return
+        try {
+            await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
+        } catch (error) {
+            if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+                console.error(getProjectPrefix(project, true) + error.message)
+                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
+                project.error = error.message
                 updateValue('projects', project)
             }
         }
