@@ -125,35 +125,6 @@ async function waitInitialize() {
     }
 }
 
-self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
-    if (!dbLogs) return
-    const time = new Date().toLocaleString().replace(',', '')
-    const log = '[' + time + ' ERROR]: ' + errorMsg + ' at ' + url + ':' + lineNumber
-    try {
-        dbLogs.add('logs', log).catch(e => {
-            if (console._error) console._error(e)
-            else console.error(e)
-        })
-    } catch (e) {
-        if (console._error) console._error(e)
-        else console.error(e)
-    }
-})
-self.addEventListener('onunhandledrejection', (event) => {
-    if (!dbLogs) return
-    const time = new Date().toLocaleString().replace(',', '')
-    const log = '[' + time + ' ERROR]: ' + event.reason.stack
-    try {
-        dbLogs.add('logs', log).catch(e => {
-            if (console._error) console._error(e)
-            else console.error(e)
-        })
-    } catch (e) {
-        if (console._error) console._error(e)
-        else console.error(e)
-    }
-})
-
 async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion == null) oldVersion = 1
 

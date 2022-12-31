@@ -24,9 +24,6 @@ let closeTabs = true
 
 let updateAvailable = false
 
-//Где храним настройки
-// let storageArea = 'local'
-
 //Инициализация настроек расширения
 // noinspection JSIgnoredPromiseFromCall
 initializeConfig(true)
