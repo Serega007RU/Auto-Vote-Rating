@@ -89,25 +89,41 @@ self.addEventListener('online', ()=> {
 })
 
 let promises = []
-async function checkOpen(project/*, transaction*/) {
+async function checkOpen(project, transaction) {
     //Если нет подключения к интернету
     if (!settings.disabledCheckInternet && !navigator.onLine) {
         return
     }
 
-    //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован, но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
-    for (let value of queueProjects) {
-        if (project.rating === value.rating || value.randomize && project.randomize || settings.disabledOneVote) {
-            if (!value.nextAttempt) return
+    for (const[tab,projectKey] of openedProjects.entries()) {
+        // noinspection JSCheckFunctionSignatures
+        const value = await transaction.objectStore('projects').get(projectKey)
+        if (!value.nextAttempt || (value.timeoutQueue && Date.now() > value.timeoutQueue)) {
+            if (value.timeoutQueue) {
+                delete value.timeoutQueue
+                updateValue('projects', value)
+            }
+            openedProjects.delete(tab)
+            db.put('other', openedProjects, 'openedProjects')
+            continue
+        }
+        if (project.rating === value.rating || (value.randomize && project.randomize) || settings.disabledOneVote) {
             if (Date.now() < value.nextAttempt) {
                 return
-            } else {
-                queueProjects.delete(value)
-                console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
-                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
+            } else if (project.key === projectKey) {
+                console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('timeout'))
+                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('timeout'))
+                openedProjects.delete(tab)
+                db.put('other', openedProjects, 'openedProjects')
+                // noinspection JSCheckFunctionSignatures
+                if (closeTabs && !isNaN(tab)) {
+                    tryCloseTab(tab, project, 0)
+                }
+                break
             }
         }
     }
+
 
     let retryCoolDown
     if (project.randomize) {
@@ -118,18 +134,8 @@ async function checkOpen(project/*, transaction*/) {
         retryCoolDown = 900000
     }
     project.nextAttempt = Date.now() + retryCoolDown
-    queueProjects.add(project)
 
-    //Если эта вкладка была уже открыта, он закрывает её
-    for (const[key,value] of openedProjects.entries()) {
-        if (project.key === value) {
-            openedProjects.delete(key)
-            if (closeTabs) {
-                tryCloseTab(key, project, 0)
-            }
-        }
-    }
-    db.put('other', queueProjects, 'queueProjects')
+    openedProjects.set('background_' + project.key, project.key)
     db.put('other', openedProjects, 'openedProjects')
 
     if (settings.debug) console.log(getProjectPrefix(project, true) + 'пред запуск')
@@ -213,6 +219,8 @@ async function newWindow(project) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
+        openedProjects.set('background_' + project.key, project.key)
+        db.put('other', openedProjects, 'openedProjects')
         silentVote(project)
     } else {
         const windows = await chrome.windows.getAll()
@@ -227,6 +235,7 @@ async function newWindow(project) {
         let tab = await chrome.tabs.create({url, active: settings.disabledFocusedTab})
             .catch(error => endVote({message: error}, null, project))
         if (tab == null) return
+        openedProjects.delete('background_' + project.key)
         openedProjects.set(tab.id, project.key)
         db.put('other', openedProjects, 'openedProjects')
 
@@ -888,7 +897,6 @@ chrome.runtime.onMessage.addListener(async function(request, sender/*, sendRespo
         generalStats = await db.get('other', 'generalStats')
         todayStats = await db.get('other', 'todayStats')
         openedProjects = await db.get('other', 'openedProjects')
-        queueProjects = await db.get('other', 'queueProjects')
         reloadAllAlarms()
         checkVote()
         return
@@ -897,24 +905,19 @@ chrome.runtime.onMessage.addListener(async function(request, sender/*, sendRespo
         return
     } else if (request.projectDeleted) {
         let nowVoting = false
-        for (const value of queueProjects) {
-            if (request.projectDeleted.key === value.key) {
-                queueProjects.delete(value)
-                db.put('other', queueProjects, 'queueProjects')
-                nowVoting = true
-                break
-            }
-        }
         //Если эта вкладка была уже открыта, он закрывает её
         for (const[key,value] of openedProjects.entries()) {
             if (request.projectDeleted.key === value) {
+                nowVoting = true
                 openedProjects.delete(key)
-                db.put('other', openedProjects, 'openedProjects')
                 // noinspection JSCheckFunctionSignatures
-                chrome.tabs.remove(key)
+                if (!isNaN(key)) { // noinspection JSCheckFunctionSignatures
+                    chrome.tabs.remove(key)
+                }
                 break
             }
         }
+        db.put('other', openedProjects, 'openedProjects')
         if (nowVoting) {
             checkVote()
             console.log(getProjectPrefix(request.projectDeleted, true) + chrome.i18n.getMessage('projectDeleted'))
@@ -963,8 +966,8 @@ async function tryCloseTab(tabId, project, attempt) {
     try {
         await chrome.tabs.remove(tabId)
     } catch (error) {
-        await wait(500)
         if (error.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
+            await wait(500)
             tryCloseTab(tabId, project, ++attempt)
             return
         }
@@ -1171,6 +1174,12 @@ async function endVote(request, sender, project) {
         todayStats.errorVotes++
     }
 
+    let timeout = settings.timeout
+    if (project.randomize) {
+        timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
+    }
+    project.timeoutQueue = timeout
+
     await db.put('other', generalStats, 'generalStats')
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
@@ -1191,28 +1200,32 @@ async function endVote(request, sender, project) {
     }
 
     function removeQueue() {
-        for (const value of queueProjects) {
-            if (project.key === value.key) {
-                queueProjects.delete(value)
+        for (const [tab,projectKey] of openedProjects) {
+            if (project.key === projectKey) {
+                openedProjects.delete(tab)
             }
         }
-        if (queueProjects.size === 0) {
+        if (openedProjects.size === 0) {
             promises = []
             if (updateAvailable) {
                 chrome.runtime.reload()
                 return
             }
         }
-        db.put('other', queueProjects, 'queueProjects')
+        delete project.timeoutQueue
+        updateValue('projects', project)
+        db.put('other', openedProjects, 'openedProjects')
         checkVote()
     }
-    let timeout = settings.timeout
-    if (project.randomize) {
-        timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
-    }
+
     setTimeout(()=>{
         removeQueue()
     }, timeout)
+
+    // TODO мы не можем быть уверены что setTimeout в Service Worker 100% отработает, поэтому мы на всякий случай создаём chrome.alarm
+    let alarmTimeout = timeout
+    if (alarmTimeout < 60000) alarmTimeout = 60000
+    chrome.alarms.create('checkVote', {when: Date.now() + alarmTimeout})
 }
 
 //Отправитель уведомлений
@@ -1278,8 +1291,6 @@ chrome.runtime.onInstalled.addListener(async function(details) {
         chrome.tabs.create({url: 'options.html?installed'})
     } else if (details.reason === 'update') {
         await waitInitialize()
-        queueProjects = new Set()
-        await db.put('other', queueProjects, 'queueProjects')
         checkVote()
     }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
 
@@ -1288,7 +1299,7 @@ chrome.runtime.onInstalled.addListener(async function(details) {
 
 chrome.runtime.onUpdateAvailable.addListener(async function() {
     await waitInitialize()
-    if (queueProjects.size > 0) {
+    if (openedProjects.size > 0) {
         updateAvailable = true
     } else {
         chrome.runtime.reload()

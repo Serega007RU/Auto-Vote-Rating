@@ -14,9 +14,6 @@ let dbLogs
 //Текущие открытые вкладки расширением
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()
-//Текущие проекты за которые сейчас голосует расширение
-// noinspection ES6ConvertVarToLetConst
-var queueProjects = new Set()
 //Полностью ли запущено расширение?
 // noinspection ES6ConvertVarToLetConst
 var initialized = false
@@ -61,7 +58,7 @@ async function initializeConfig(background, version) {
     }
     // noinspection JSUnusedGlobalSymbols
     try {
-        db = await idb.openDB('avr', version ? version : 11, {upgrade})
+        db = await idb.openDB('avr', version ? version : 10, {upgrade})
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
@@ -101,7 +98,6 @@ async function initializeConfig(background, version) {
     console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 
     openedProjects = await db.get('other', 'openedProjects')
-    queueProjects = await db.get('other', 'queueProjects')
     if (openedProjects.size > 0) {
         for (const key of openedProjects.keys()) {
             openedProjects.delete(key)
@@ -211,7 +207,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         await other.add(generalStats, 'generalStats')
         await other.add(todayStats, 'todayStats')
         await other.add(openedProjects, 'openedProjects')
-        await other.add(queueProjects, 'queueProjects')
         return
     }
 
@@ -315,11 +310,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion <= 9) {
         openedProjects = new Map()
         await transaction.objectStore('other').put(openedProjects, 'openedProjects')
-    }
-
-    if (oldVersion <= 10) {
-        queueProjects = new Set()
-        await transaction.objectStore('other').put(queueProjects, 'queueProjects')
     }
 
     if (!todayStats) {

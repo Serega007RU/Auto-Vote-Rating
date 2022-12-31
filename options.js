@@ -117,10 +117,11 @@ async function addProjectList(project) {
     if (!(project.time == null || project.time === '') && Date.now() < project.time) {
         text = new Date(project.time).toLocaleString().replace(',', '')
     } else {
-        for (const value of queueProjects) {
+        for (const [tab,projectKey] of openedProjects) {
+            const value = await db.get('projects', projectKey)
             if (project.rating === value.rating) {
                 text = chrome.i18n.getMessage('inQueue')
-                if (project.key === value.key) {
+                if (project.key === projectKey) {
                     text = chrome.i18n.getMessage('now')
                     break
                 }
@@ -1401,7 +1402,7 @@ async function listSelect(event, tabs) {
         div.setAttribute('data-resource', 'load')
         div.textContent = chrome.i18n.getMessage('load')
         list.append(div)
-        queueProjects = await db.get('other', 'queueProjects')
+        openedProjects = await db.get('other', 'openedProjects')
         let cursor = await db.transaction('projects').store.index('rating').openCursor(tabs)
         while (cursor) {
             if (!cursor.value.key) cursor.value.key = cursor.key
@@ -1941,11 +1942,12 @@ async function updateValue(request) {
                 if (!(request.value.time == null || request.value.time === '') && Date.now() < request.value.time) {
                     text = new Date(request.value.time).toLocaleString().replace(',', '')
                 } else {
-                    queueProjects = await db.get('other', 'queueProjects')
-                    for (const value of queueProjects) {
+                    openedProjects = await db.get('other', 'openedProjects')
+                    for (const [tab,projectKey] of openedProjects) {
+                        const value = await db.get('projects', projectKey)
                         if (request.value.rating === value.rating) {
                             text = chrome.i18n.getMessage('inQueue')
-                            if (request.value.key === value.key) {
+                            if (request.value.key === projectKey) {
                                 text = chrome.i18n.getMessage('now')
                                 break
                             }
