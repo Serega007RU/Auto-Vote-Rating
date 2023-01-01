@@ -920,11 +920,11 @@ async function checkPermissions(projects, element) {
         }
     }
 
-    let granted = await new Promise(resolve=>{
-        chrome.permissions.contains({origins, permissions}, resolve)
-    })
+    // noinspection JSUnresolvedFunction
+    let granted = await chrome.permissions.contains({origins, permissions})
     if (!granted) {
-        if (element != null || !chrome.app) {//Костыль для FireFox, что бы запросить права нужно, что бы пользователь обязатльно кликнул
+        // noinspection JSUnresolvedVariable
+        if (element != null || typeof InstallTrigger !== 'undefined') {//Костыль для FireFox, что бы запросить права нужно, что бы пользователь обязатльно кликнул
             document.querySelector('#addProject').classList.remove('disabled')
             const button = document.createElement('button')
             button.textContent = chrome.i18n.getMessage('grant')
@@ -932,9 +932,8 @@ async function checkPermissions(projects, element) {
             createNotif([chrome.i18n.getMessage('grantUrl'), button], null, null, element)
             granted = await new Promise(resolve=>{
                 button.addEventListener('click', async ()=>{
-                    granted = await new Promise(resolve=>{
-                        chrome.permissions.request({origins, permissions}, resolve)
-                    })
+                    // noinspection JSVoidFunctionReturnValueUsed
+                    granted = await chrome.permissions.request({origins, permissions})
                     if (element == null) removeNotif(button.parentElement.parentElement)
                     if (!granted) {
                         createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
@@ -947,9 +946,8 @@ async function checkPermissions(projects, element) {
             })
             return granted
         } else {
-            granted = await new Promise(resolve=>{
-                chrome.permissions.request({origins, permissions}, resolve)
-            })
+            // noinspection JSVoidFunctionReturnValueUsed
+            granted = await chrome.permissions.request({origins, permissions})
             if (!granted) {
                 createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
                 return false
@@ -1325,11 +1323,8 @@ async function openPopup(url, onClose) {
         //FireFox зачем-то решил это называть allowScriptsToClose когда в Chrome это называется setSelfAsOpener, как же это "удобно"
         close = 'allowScriptsToClose'
     }
-    const tabID = await new Promise(resolve=>{
-        chrome.windows.create({type: 'popup', url, [close]: true, top, left, width, height}, function (details) {
-            resolve(details.tabs[0].id)
-        })
-    })
+    const tab = await chrome.windows.create({type: 'popup', url, [close]: true, top, left, width, height})
+    const tabID = tab.tabs[0].id
     if (onClose) {
         function onRemoved(tabId/*, removeInfo*/) {
             if (tabID === tabId) {

@@ -9,7 +9,7 @@ importScripts('libs/evalCore.umd.js')
 
 //Текущие fetch запросы
 // noinspection ES6ConvertVarToLetConst
-var fetchProjects = new Map()
+// var fetchProjects = new Map()
 //ID группы вкладок в которой сейчас открыты вкладки расширения
 let groupId
 //Если этот браузер не поддерживает группировку вкладок
@@ -282,13 +282,13 @@ async function silentVote(project) {
             let i = 0
             while (i <= 3) {
                 i++
-                let response = await _fetch('https://monitoringminecraft.ru/top/' + project.id + '/vote', {
+                let response = await fetch('https://monitoringminecraft.ru/top/' + project.id + '/vote', {
                     'headers': {
                         'content-type': 'application/x-www-form-urlencoded'
                     },
                     'body': 'player=' + project.nick + '',
                     'method': 'POST'
-                }, project)
+                })
                 if (!await checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
                 if (response.status === 503) {
                     if (i >= 3) {
@@ -334,7 +334,7 @@ async function silentVote(project) {
         } else
 
         if (project.rating === 'ServerPact') {
-            let response = await _fetch('https://www.serverpact.com/vote-' + project.id, {
+            let response = await fetch('https://www.serverpact.com/vote-' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -351,7 +351,7 @@ async function silentVote(project) {
                 'method': 'GET',
                 'mode': 'cors',
                 'credentials': 'include'
-            }, project)
+            })
             if (!await checkResponseError(project, response, 'serverpact.com')) return
             function generatePass(nb) {
                 let chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@'
@@ -363,7 +363,7 @@ async function silentVote(project) {
                 return pass
             }
             let captchaPass = generatePass(32)
-            let captcha = await _fetch('https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php', {
+            let captcha = await fetch('https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php', {
                 'headers': {
                     'accept': 'application/json, text/javascript, */*; q=0.01',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -380,14 +380,14 @@ async function silentVote(project) {
                 'method': 'POST',
                 'mode': 'cors',
                 'credentials': 'include'
-            }, project)
+            })
             let json = captcha.json()
             if (json.error) {
                 endVote({message: 'Error in captcha'}, null, project)
                 return
             }
 
-            response = await _fetch('https://www.serverpact.com/vote-' + project.id, {
+            response = await fetch('https://www.serverpact.com/vote-' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,en-US;q=0.8',
@@ -405,7 +405,7 @@ async function silentVote(project) {
                 'method': 'POST',
                 'mode': 'cors',
                 'credentials': 'include'
-            }, project)
+            })
             if (!await checkResponseError(project, response, 'serverpact.com')) return
             if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
                 endVote({successfully: true}, null, project)
@@ -419,7 +419,7 @@ async function silentVote(project) {
         } else
 
         if (project.rating === 'MinecraftIpList') {
-            let response = await _fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
+            let response = await fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -436,7 +436,7 @@ async function silentVote(project) {
                 'method': 'GET',
                 'mode': 'cors',
                 'credentials': 'include'
-            }, project)
+            })
             if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
 
             if (response.doc.querySelector('#InnerWrapper > script:nth-child(10)') != null && response.doc.querySelector('table[class="CraftingTarget"]') == null) {
@@ -445,7 +445,7 @@ async function silentVote(project) {
                     endVote('Error time zone', null, project)
                     return
                 }
-                await _fetch('https://minecraftiplist.com/timezone.php?timezone=Europe/Moscow', {
+                await fetch('https://minecraftiplist.com/timezone.php?timezone=Europe/Moscow', {
                     'headers': {
                         'accept': '*/*',
                         'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -461,7 +461,7 @@ async function silentVote(project) {
                     'method': 'GET',
                     'mode': 'cors',
                     'credentials': 'include'
-                }, project)
+                })
                 secondVoteMinecraftIpList = true
                 silentVote(project)
                 return
@@ -499,7 +499,7 @@ async function silentVote(project) {
                 code2 += content[i] << ((i - 6) * 5)
             }
 
-            response = await _fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
+            response = await fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
                 'headers': {
                     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
                     'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
@@ -517,7 +517,7 @@ async function silentVote(project) {
                 'method': 'POST',
                 'mode': 'cors',
                 'credentials': 'include'
-            }, project)
+            })
             if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
 
             if (response.doc.querySelector('#Content > div.Error') != null) {
@@ -540,7 +540,7 @@ async function silentVote(project) {
         } else
 
         if (project.rating === 'MCServerList') {
-            let response = await _fetch('https://mcserver-list.eu/api/sendvote/' + project.id + '/' + project.nick, {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': null}, project)
+            let response = await fetch('https://mcserver-list.eu/api/sendvote/' + project.id + '/' + project.nick, {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': null})
             let json = await response.json()
             if (response.ok) {
                 if (json.data.status === 'success') {
@@ -560,7 +560,7 @@ async function silentVote(project) {
         } else
 
         if (project.rating === 'MisterLauncher') {
-            let response = await _fetch('https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code', null, project)
+            let response = await fetch('https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code')
             if (!await checkResponseError(project, response, 'misterlauncher.org', null, true)) return
             if (response.doc.querySelector('div.alert.alert-danger') != null) {
                 if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
@@ -580,7 +580,7 @@ async function silentVote(project) {
         } else
 
         if (project.rating === 'Custom') {
-            let response = await _fetch(project.responseURL, {...project.body}, project)
+            let response = await fetch(project.responseURL, {...project.body})
             await response.text()
             if (response.ok) {
                 endVote({successfully: true}, null, project)
@@ -590,17 +590,17 @@ async function silentVote(project) {
         }
     } catch (e) {
         if (e.message === 'Failed to fetch' || e.message === 'NetworkError when attempting to fetch resource.') {
-            let found = false
-            for (const p of fetchProjects.values()) {
-                if (p.key === project.key) {
-                    found = true
-                    break
-                }
-            }
-            if (!found) {
+            // let found = false
+            // for (const p of fetchProjects.values()) {
+            //     if (p.key === project.key) {
+            //         found = true
+            //         break
+            //     }
+            // }
+            // if (!found) {
                 // endVote({notConnectInternet: true}, null, project)
                 endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
-            }
+            // }
         } else {
             endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
         }
@@ -659,6 +659,25 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     return true
 }
+
+chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
+    await waitInitialize()
+    if (openedProjects.has(details.tabId)) {
+        if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
+            const project = await db.get('projects', openedProjects.get(details.tabId))
+            if (
+                //Chrome
+                details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
+                //FireFox
+                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
+                // console.warn(getProjectPrefix(project, true) + details.error)
+                return
+            }
+            const sender = {tab: {id: details.tabId}}
+            endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
+        }
+    }
+})
 
 chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
     if (details.url === 'about:blank') return
@@ -807,73 +826,74 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
     endVote({closedTab: true}, {tab: {id: tabId}}, project)
 })
 
-chrome.webRequest.onCompleted.addListener(async function(details) {
-    await waitInitialize()
-    const projectKey = openedProjects.get(details.tabId)
-    if (!projectKey) return
-    const project = await db.get('projects', projectKey)
-
-    // TODO это какой-то кринж для https://www.minecraft-serverlist.net/, ошибка 500 считается как успешный запрос https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
-    if (project.rating === 'MinecraftServerListNet') return
-
-    if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
-        const sender = {tab: {id: details.tabId}}
-        endVote({errorVote: [String(details.statusCode), details.url]}, sender, project)
-    }
-}, {urls: ['<all_urls>']})
-
-chrome.webRequest.onErrorOccurred.addListener(async function(details) {
-    await waitInitialize()
-    // noinspection JSUnresolvedVariable
-    if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
-        let project = fetchProjects.get(details.requestId)
-        endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
-    } else if (openedProjects.has(details.tabId)) {
-        if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
-            const project = await db.get('projects', openedProjects.get(details.tabId))
-            if (
-                //Chrome
-                details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
-                //FireFox
-                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
-                    // console.warn(getProjectPrefix(project, true) + details.error)
-                    return
-            }
-            const sender = {tab: {id: details.tabId}}
-            endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
-        }
-    }
-}, {urls: ['<all_urls>']})
-
-async function _fetch(url, options, project) {
-    let listener
-    const removeListener = ()=>{
-        if (listener) {
-            chrome.webRequest.onBeforeRequest.removeListener(listener)
-            listener = null
-        }
-    }
-
-    listener = (details)=>{
-        //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net::ERR из fetch запроса?
-        // noinspection JSUnresolvedVariable
-        if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && details.url.includes(url)) {
-            fetchProjects.set(details.requestId, project)
-            removeListener()
-        }
-    }
-    chrome.webRequest.onBeforeRequest.addListener(listener, {urls: ['<all_urls>']})
-
-    if (!options) options = {}
-
-    try {
-        return await fetch(url, options)
-    } catch(e) {
-        throw e
-    } finally {
-        removeListener()
-    }
-}
+// TODO к сожалению в manifest v3 не возможно узнать status code страницы, не знаю как это ещё сделать
+// chrome.webRequest.onCompleted.addListener(async function(details) {
+//     await waitInitialize()
+//     const projectKey = openedProjects.get(details.tabId)
+//     if (!projectKey) return
+//     const project = await db.get('projects', projectKey)
+//
+//     // TODO это какой-то кринж для https://www.minecraft-serverlist.net/, ошибка 500 считается как успешный запрос https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
+//     if (project.rating === 'MinecraftServerListNet') return
+//
+//     if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
+//         const sender = {tab: {id: details.tabId}}
+//         endVote({errorVote: [String(details.statusCode), details.url]}, sender, project)
+//     }
+// }, {urls: ['<all_urls>']})
+//
+// chrome.webRequest.onErrorOccurred.addListener(async function(details) {
+//     await waitInitialize()
+//     // noinspection JSUnresolvedVariable
+//     if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
+//         let project = fetchProjects.get(details.requestId)
+//         endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
+//     } else if (openedProjects.has(details.tabId)) {
+//         if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
+//             const project = await db.get('projects', openedProjects.get(details.tabId))
+//             if (
+//                 //Chrome
+//                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
+//                 //FireFox
+//                 || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
+//                     // console.warn(getProjectPrefix(project, true) + details.error)
+//                     return
+//             }
+//             const sender = {tab: {id: details.tabId}}
+//             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
+//         }
+//     }
+// }, {urls: ['<all_urls>']})
+//
+// async function _fetch(url, options, project) {
+//     let listener
+//     const removeListener = ()=>{
+//         if (listener) {
+//             chrome.webRequest.onBeforeRequest.removeListener(listener)
+//             listener = null
+//         }
+//     }
+//
+//     listener = (details)=>{
+//         //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net::ERR из fetch запроса?
+//         // noinspection JSUnresolvedVariable
+//         if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && details.url.includes(url)) {
+//             fetchProjects.set(details.requestId, project)
+//             removeListener()
+//         }
+//     }
+//     chrome.webRequest.onBeforeRequest.addListener(listener, {urls: ['<all_urls>']})
+//
+//     if (!options) options = {}
+//
+//     try {
+//         return await fetch(url, options)
+//     } catch(e) {
+//         throw e
+//     } finally {
+//         removeListener()
+//     }
+// }
 
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(async function(request, sender/*, sendResponse*/) {
@@ -1004,11 +1024,11 @@ async function endVote(request, sender, project) {
         db.put('other', openedProjects, 'openedProjects')
     } else if (!project) return
 
-    for (const[key,value] of fetchProjects.entries()) {
-        if (value.key === project.key) {
-            fetchProjects.delete(key)
-        }
-    }
+    // for (const[key,value] of fetchProjects.entries()) {
+    //     if (value.key === project.key) {
+    //         fetchProjects.delete(key)
+    //     }
+    // }
 
     delete project.nextAttempt
 
