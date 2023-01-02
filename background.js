@@ -442,7 +442,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
             await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files, world: 'MAIN', injectImmediately: true})
         }
     } catch (error) {
-        if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal')) {
+        if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
             const project = await db.get('projects', projectKey)
             console.error(getProjectPrefix(project, true) + error.message)
             if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
@@ -525,7 +525,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
         } catch (error) {
-            if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+            if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
                 console.error(getProjectPrefix(project, true) + error.message)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
                 project.error = error.message
@@ -569,7 +569,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             if (tab.status !== 'complete') return
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
         } catch (error) {
-            if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+            if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
                 error = error.message
                 if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
                     error += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
