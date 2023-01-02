@@ -269,7 +269,7 @@ function generateBtnListRating(rating, count) {
         const link = document.createElement('a')
         link.classList.add('link')
         link.target = 'blank_'
-        link.href = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+        link.href = 'https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
         link.textContent = chrome.i18n.getMessage('here')
         link.setAttribute('data-resource', 'here')
         label.append(link)
@@ -832,7 +832,7 @@ async function addProject(project, element) {
         const a = document.createElement('a')
         a.target = 'blank_'
         a.classList.add('link')
-        a.href = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+        a.href = 'https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
         a.textContent = chrome.i18n.getMessage('here')
         array.push(a)
     }

@@ -516,7 +516,7 @@ nav .logo img {
 	}
 
 	#versionLabel {
-		display: none;
+		display: none !important;
 	}
 
     .container {
@@ -655,6 +655,12 @@ nav .logo img {
 
 .link:hover {
 	color: #3674d2 !important;
+}
+
+#versionLabel {
+	color: #8677ff !important;
+	display: flex;
+	justify-content: center;
 }
 
 #donate {

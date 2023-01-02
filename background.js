@@ -572,7 +572,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
                 error = error.message
                 if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
-                    error += ' Try this solution: https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Problems-with-Opera'
+                    error += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
                 }
                 console.error(getProjectPrefix(project, true) + error)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
@@ -1147,5 +1147,5 @@ console._collect = function (type, args) {
 
 /*
 Открытый репозиторий:
-https://gitlab.com/Serega007/Auto-Vote-Rating
+https://github.com/Serega007RU/Auto-Vote-Rating/
 */
