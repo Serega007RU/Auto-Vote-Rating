@@ -75,6 +75,8 @@ var allProjects = {
                 return ['https://monitoringminecraft.ru/top/', 'gg', '/vote']
             case 'URL':
                 return 'monitoringminecraft.ru'
+            case 'silentVote':
+                return true
         }
     },
     IonMc: (type, project, doc) => {
@@ -206,6 +208,8 @@ var allProjects = {
                 return 1
             case 'notFound':
                 return doc.querySelector('div.container > div.row > div > center') != null && doc.querySelector('div.container > div.row > div > center').textContent.includes('This server does not exist')
+            case 'silentVote':
+                return true
         }
     },
     MinecraftIpList: (type, project, doc) => {
@@ -224,6 +228,8 @@ var allProjects = {
                 return 5
             case 'notFound':
                 return doc.querySelector('#addr > span:nth-child(3)') == null
+            case 'silentVote':
+                return true
         }
     },
     TopMinecraftServers: (type, project, doc) => {
@@ -460,6 +466,8 @@ var allProjects = {
                 return ['https://mcserver-list.eu/hlasovat/', '416', '']
             case 'URL':
                 return 'mcserver-list.eu'
+            case 'silentVote':
+                return true
         }
     },
     CraftList: (type, project, doc) => {
@@ -725,6 +733,8 @@ var allProjects = {
                 return ['https://misterlauncher.org/projects/', 'omegamc', '/']
             case 'URL':
                 return 'misterlauncher.org'
+            case 'silentVote':
+                return project.game === 'projects'
         }
     },
     MinecraftServersDe: (type, project, doc) => {
@@ -1258,6 +1268,8 @@ var allProjects = {
                 return ['', '', '']
             case 'URL':
                 return 'Custom'
+            case 'silentVote':
+                return true
         }
     }
 }
