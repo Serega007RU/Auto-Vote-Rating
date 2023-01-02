@@ -1,6 +1,6 @@
 //Список рейтингов
-// noinspection JSUnusedGlobalSymbols
-const allProjects = {
+// noinspection JSUnusedGlobalSymbols,ES6ConvertVarToLetConst
+var allProjects = {
     TopCraft: (type, project, doc) => {
         switch (type) {
             case 'voteURL':
@@ -539,6 +539,9 @@ const allProjects = {
                 return ['https://www.minecraft-serverlist.net/vote/', '51076', '']
             case 'URL':
                 return 'minecraft-serverlist.net'
+            // TODO перестал почему-то выдавать ошибку, подробнее https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
+            // case 'ignoreErrors':
+            //     return true
         }
     },
     MinecraftServerEu: (type, project, doc) => {

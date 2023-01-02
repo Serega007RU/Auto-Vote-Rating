@@ -694,8 +694,8 @@ async function addProject(project, element) {
             return
         } else if (response.status === 503) {
             //None
-        // TODO это какой-то кринж для https://www.minecraft-serverlist.net/, ошибка 500 считается как успешный запрос https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
-        } else if (project.rating === 'MinecraftServerListNet') {
+        // Иногда некоторые проекты намеренно выдаёт ошибку в status code, нам ничего не остаётся кроме как игнорировать все ошибки, подробнее https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
+        } else if (allProjects[project.rating]('ignoreErrors')) {
             //None
         } else if (!response.ok) {
             createNotif(chrome.i18n.getMessage('notConnect', [project.rating, String(response.status)]), 'error', null, element)
