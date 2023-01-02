@@ -2,6 +2,9 @@
 // let storageArea = 'local'
 // noinspection ES6MissingAwait
 
+// noinspection JSUnresolvedVariable,JSUnresolvedFunction,ES6ConvertVarToLetConst
+var evil = evalCore.getEvalInstance(self)
+
 const authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
     ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
@@ -62,6 +65,7 @@ async function restoreOptions() {
     document.getElementById('timeoutErrorValue').value = settings.timeoutError
     document.getElementById('disabledWarnCaptcha').checked = settings.disabledWarnCaptcha
     document.getElementById('disabledDebug').checked = settings.debug
+    document.getElementById('disabledUseRemoteCode').checked = settings.disabledUseRemoteCode
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
 }
@@ -385,6 +389,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledWarnCaptcha = this.checked
         else if (this.id === 'disabledDebug')
             settings.debug = this.checked
+        else if (this.id === 'disabledUseRemoteCode')
+            settings.disabledUseRemoteCode = this.checked
         else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false
@@ -643,6 +649,16 @@ async function addProject(project, element) {
 
     // noinspection JSUnresolvedFunction
     if (!document.getElementById('disableCheckProjects').checked) {
+        if (!settings.disabledUseRemoteCode) {
+            try {
+                const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
+                const projects = await response.text()
+                evil(projects)
+            } catch (error) {
+                createNotif('Ошибка при получении удалённого кода, использую вместо этого локальный код' + error.message, 'warn')
+            }
+        }
+
         let found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
         if (found > 0) {
             const message = chrome.i18n.getMessage('alreadyAdded')

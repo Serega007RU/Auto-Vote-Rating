@@ -941,5 +941,11 @@
   },
   "repaired": {
     "message": "The vote has been sent for restart"
+  },
+  "disabledUseRemoteCode": {
+    "message": "Disable the use of remote code"
+  },
+  "disabledUseRemoteCodeTooltip": {
+    "message": "Some site owners are very actively struggling with this extension and trying to break it as much as possible. The extension now uses the remote code, which allows you not to update the extension and at the same time the code will always be up-to-date. If you disable the use of remote code, then you may encounter errors, we do not recommend that you do this. This option is more intended for the developer to debug local code."
   }
 }

@@ -27,6 +27,9 @@ let closeTabs = true
 
 let updateAvailable = false
 
+// noinspection JSUnresolvedVariable,JSUnresolvedFunction,ES6ConvertVarToLetConst
+var evil = evalCore.getEvalInstance(self)
+
 //Инициализация настроек расширения
 // noinspection JSIgnoredPromiseFromCall
 initializeConfig(true)
@@ -208,6 +211,16 @@ async function newWindow(project) {
     }
     if (create) {
         chrome.alarms.create(String(project.key), {when: project.nextAttempt})
+    }
+
+    if (!settings.disabledUseRemoteCode) {
+        try {
+            const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
+            const projects = await response.text()
+            evil(projects)
+        } catch (error) {
+            console.error(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
+        }
     }
 
     let silentVoteMode = false
@@ -461,19 +474,53 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             }
         }
 
-        try {
-            await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
-
-            if (allProjects[project.rating]('needWorld')) {
-                await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + project.rating.toLowerCase() +'_world.js']})
+        let eval = true
+        let textApi, textScript, textWorld
+        if (!settings.disabledUseRemoteCode) {
+            try {
+                const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/api.js')
+                textApi = await responseApi.text()
+                const responseScript = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '.js')
+                textScript = await responseScript.text()
+                if (allProjects[project.rating]('needWorld')) {
+                    const responseWorld = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_world.js')
+                    textWorld = await responseWorld.text()
+                }
+            } catch (error) {
+                console.error(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
+                eval = false
             }
+        } else {
+            eval = false
+        }
+
+        try {
             if (allProjects[project.rating]('needPrompt')) {
-                const func = function(nick) {
+                const funcPrompt = function(nick) {
                     prompt = function() {
                         return nick
                     }
                 }
-                await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func, args: [project.nick]})
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func: funcPrompt, args: [project.nick]})
+            }
+
+            if (eval) {
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
+                await chrome.tabs.sendMessage(details.tabId, {textEval: true, textApi, textScript})
+                if (allProjects[project.rating]('needWorld')) {
+                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['libs/evalCore.umd.js']})
+                    const funcWorld = function(text) {
+                        // noinspection JSUnresolvedFunction,JSUnresolvedVariable
+                        const evil = evalCore.getEvalInstance(window)
+                        evil(text)
+                    }
+                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func: funcWorld, args: [textWorld]})
+                }
+            } else {
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
+                if (allProjects[project.rating]('needWorld')) {
+                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + project.rating.toLowerCase() +'_world.js']})
+                }
             }
 
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
@@ -494,10 +541,35 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/)
         || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)
         || details.url.match(/https:\/\/challenges.cloudflare.com\/*/))) {
+
+        // let eval = true
+        // let textCaptcha
+        // if (!settings.disabledUseRemoteCode) {
+        //     try {
+        //         const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/captchaclicker.js')
+        //         textCaptcha = await responseApi.text()
+        //     } catch (error) {
+        //         console.error(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
+        //         eval = false
+        //     }
+        // } else {
+        //     eval = false
+        // }
+
         try {
-            await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['scripts/main/captchaclicker.js']})
+            // if (eval) {
+            //     await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
+            //     await chrome.tabs.sendMessage(details.tabId, {textEval: true, textCaptcha})
+            // } else {
+                await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['scripts/main/captchaclicker.js']})
+            // }
+
+            // Если вкладка уже загружена, повторно туда высылаем sendProject который обозначает что мы готовы к голосованию
+            const tab = await chrome.tabs.get(details.tabId)
+            if (tab.status !== 'complete') return
+            await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
         } catch (error) {
-            if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
+            if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
                 error = error.message
                 if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
                     error += ' Try this solution: https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Problems-with-Opera'
@@ -505,20 +577,6 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 console.error(getProjectPrefix(project, true) + error)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
                 project.error = error
-                updateValue('projects', project)
-            }
-        }
-
-        // Если вкладка уже загружена, повторно туда высылаем sendProject который обозначает что мы готовы к голосованию
-        const tab = await chrome.tabs.get(details.tabId)
-        if (tab.status !== 'complete') return
-        try {
-            await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
-        } catch (error) {
-            if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
-                console.error(getProjectPrefix(project, true) + error.message)
-                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
-                project.error = error.message
                 updateValue('projects', project)
             }
         }
