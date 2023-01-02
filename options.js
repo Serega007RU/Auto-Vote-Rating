@@ -2,8 +2,7 @@
 // let storageArea = 'local'
 // noinspection ES6MissingAwait
 
-// noinspection JSUnresolvedVariable,JSUnresolvedFunction,ES6ConvertVarToLetConst
-var evil = evalCore.getEvalInstance(self)
+let evil
 
 const authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
@@ -650,6 +649,9 @@ async function addProject(project, element) {
     // noinspection JSUnresolvedFunction
     if (!document.getElementById('disableCheckProjects').checked) {
         if (!settings.disabledUseRemoteCode) {
+            if (!evil) { // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                evil = evalCore.getEvalInstance(self)
+            }
             try {
                 const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
                 const projects = await response.text()
