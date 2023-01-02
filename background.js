@@ -700,7 +700,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
         }
 
         files.push('scripts/main/visible.js')
-        if (details.url.match(/wargm.ru\/*/)) {
+        if (projectByURL(details.url)?.('needIsTrusted')) {
             files.push('scripts/main/istrusted.js')
         }
     } else if (details.url.match(/hcaptcha.com\/captcha\/*/)
@@ -759,19 +759,22 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
         try {
             await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
-        } catch (error) {
-            if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal')) {
-                console.error(getProjectPrefix(project, true) + error.message)
-                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
-                project.error = error.message
-                updateValue('projects', project)
-            }
-        }
 
-        try {
+            if (allProjects[project.rating]('needWorld')) {
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + project.rating.toLowerCase() +'_world.js']})
+            }
+            if (allProjects[project.rating]('needPrompt')) {
+                const func = function(nick) {
+                    prompt = function() {
+                        return nick
+                    }
+                }
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func, args: [project.nick]})
+            }
+
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
         } catch (error) {
-            if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+            if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
                 console.error(getProjectPrefix(project, true) + error.message)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
                 project.error = error.message
@@ -1303,29 +1306,12 @@ async function updateValue(objStore, value) {
     }
 }
 
-function extractHostname(url) {
-    let hostname
-    //find & remove protocol (http, ftp, etc.) and get hostname
-
-    if (url.indexOf('//') > -1) {
-        hostname = url.split('/')[2]
-    } else {
-        hostname = url.split('/')[0]
-    }
-
-    //find & remove port number
-    hostname = hostname.split(':')[0]
-    //find & remove '?'
-    hostname = hostname.split('?')[0]
-
-    return hostname
-}
-
 chrome.runtime.onInstalled.addListener(async function(details) {
+    await waitInitialize()
+    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
     if (details.reason === 'install') {
         chrome.tabs.create({url: 'options.html?installed'})
     } else if (details.reason === 'update') {
-        await waitInitialize()
         checkVote()
     }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
 

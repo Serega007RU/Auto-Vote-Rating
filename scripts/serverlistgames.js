@@ -8,24 +8,13 @@ async function vote(first) {
 
     const project = await getProject('ServerListGames')
 
-    const script = document.createElement('script')
-    script.textContent = `
-        const textInputRef = document.querySelector('#username')
-        const valueSetter = Object.getOwnPropertyDescriptor(textInputRef, 'value').set;
-        const prototype = Object.getPrototypeOf(textInputRef);
-        const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
-        if (valueSetter && valueSetter !== prototypeValueSetter) {
-            prototypeValueSetter.call(textInputRef, "` + project.nick + `");
-        } else {
-            valueSetter.call(textInputRef, "` + project.nick + `");
-        }
-        textInputRef.dispatchEvent(new Event('input', { bubbles: true }));
-        document.querySelector('button.vote-button').click()
-        `
-    document.head.appendChild(script)
-    // document.querySelector('#username').value = project.nick
+    const textInputRef = document.querySelector('#username')
+    const prototype = Object.getPrototypeOf(textInputRef)
+    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set
+    prototypeValueSetter.call(textInputRef, project.nick)
+    textInputRef.dispatchEvent(new Event('input', { bubbles: true }))
 
-    // document.querySelector('button.vote-button').click()
+    document.querySelector('button.vote-button').click()
 }
 
 const timer = setInterval(()=>{

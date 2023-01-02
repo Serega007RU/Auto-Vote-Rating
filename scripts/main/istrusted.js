@@ -15,4 +15,3 @@ Element.prototype.addEventListener = function () {
     }
     return this._addEventListener(...args)
 }
-document.currentScript.parentNode.removeChild(document.currentScript)

@@ -1,5 +1,6 @@
 //Список рейтингов
-// noinspection JSUnusedGlobalSymbols,ES6ConvertVarToLetConst
+// noinspection JSUnusedGlobalSymbols,ES6ConvertVarToLetConst,SpellCheckingInspection
+
 var allProjects = {
     TopCraft: (type, project, doc) => {
         switch (type) {
@@ -86,7 +87,7 @@ var allProjects = {
             case 'exampleURL':
                 return ['https://ionmc.top/projects/', '80', '/vote']
             case 'URL':
-                return 'IonMc.top'
+                return 'ionmc.top'
         }
     },
     MinecraftServersOrg: (type, project, doc) => {
@@ -691,6 +692,8 @@ var allProjects = {
                 return ['https://wargm.ru/server/', '23394', '/votes']
             case 'URL':
                 return 'wargm.ru'
+            case 'needIsTrusted':
+                return true
         }
     },
     MineStatus: (type, project, doc) => {
@@ -1026,6 +1029,8 @@ var allProjects = {
                 return ['https://top-mmogames.ru/', 'server-wow-amdfun', '']
             case 'URL':
                 return 'top-mmogames.ru'
+            case 'needPrompt':
+                return true
         }
     },
     MmoRpgTop: (type, project, doc) => {
@@ -1255,4 +1260,122 @@ var allProjects = {
                 return 'Custom'
         }
     }
+}
+
+function projectByURL(url) {
+    url = getDomainWithoutSubdomain(url)
+    switch (url) {
+        case 'topcraft.ru': return allProjects['TopCraft']
+        case 'mctop.su': return allProjects['McTOP']
+        case 'mcrate.su': return allProjects['MCRate']
+        case 'minecraftrating.ru': return allProjects['MinecraftRating']
+        case 'monitoringminecraft.ru': return allProjects['MonitoringMinecraft']
+        case 'ionmc.top': return allProjects['IonMc']
+        case 'minecraftservers.org': return allProjects['MinecraftServersOrg']
+        case 'serveur-prive.net': return allProjects['ServeurPrive']
+        case 'planetminecraft.com': return allProjects['PlanetMinecraft']
+        case 'topg.org': return allProjects['TopG']
+        case 'listforge.net': return allProjects['ListForge']
+        case 'minecraft-server-list.com': return allProjects['MinecraftServerList']
+        case 'serverpact.com': return allProjects['ServerPact']
+        case 'minecraftiplist.com': return allProjects['MinecraftIpList']
+        case 'topminecraftservers.org': return allProjects['TopMinecraftServers']
+        case 'minecraftservers.biz': return allProjects['MinecraftServersBiz']
+        case 'hotmc.ru': return allProjects['HotMC']
+        case 'minecraft-server.net': return allProjects['MinecraftServerNet']
+        case 'top-games.net': return allProjects['TopGames']
+        case 'tmonitoring.com': return allProjects['TMonitoring']
+        case 'top.gg': return allProjects['TopGG']
+        case 'discordbotlist.com': return allProjects['DiscordBotList']
+        case 'discords.com': return allProjects['Discords']
+        case 'mmotop.ru': return allProjects['MMoTopRU']
+        case 'mc-servers.com': return allProjects['MCServers']
+        case 'minecraftlist.org': return allProjects['MinecraftList']
+        case 'minecraft-index.com': return allProjects['MinecraftIndex']
+        case 'serverlist101.com': return allProjects['ServerList101']
+        case 'mcserver-list.eu': return allProjects['MCServerList']
+        case 'craftlist.org': return allProjects['CraftList']
+        case 'czech-craft.eu': return allProjects['CzechCraft']
+        case 'minecraft.buzz': return allProjects['MinecraftBuzz']
+        case 'minecraftservery.eu': return allProjects['MinecraftServery']
+        case 'rpg-paradize.com': return allProjects['RPGParadize']
+        case 'minecraft-serverlist.net': return allProjects['MinecraftServerListNet']
+        case 'minecraft-server.eu': return allProjects['MinecraftServerEu']
+        case 'minecraftkrant.nl': return allProjects['MinecraftKrant']
+        case 'trackyserver.com': return allProjects['TrackyServer']
+        case 'mc-lists.org': return allProjects['MCListsOrg']
+        case 'topmcservers.com': return allProjects['TopMCServersCom']
+        case 'bestservers.com': return allProjects['BestServersCom']
+        case 'craft-list.net': return allProjects['CraftListNet']
+        case 'minecraft-servers-list.org': return allProjects['MinecraftServersListOrg']
+        case 'serverliste.net': return allProjects['ServerListe']
+        case 'gtop100.com': return allProjects['gTop100']
+        case 'wargm.ru': return allProjects['WARGM']
+        case 'minestatus.net': return allProjects['MineStatus']
+        case 'misterlauncher.org': return allProjects['MisterLauncher']
+        case 'minecraft-servers.de': return allProjects['MinecraftServersDe']
+        case 'discord.boats': return allProjects['DiscordBoats']
+        case 'serverlist.games': return allProjects['ServerListGames']
+        case 'best-minecraft-servers.co': return allProjects['BestMinecraftServers']
+        case 'minecraftservers100.com': return allProjects['MinecraftServers100']
+        case 'mc-serverlist.cz': return allProjects['MCServerListCZ']
+        case 'mineservers.com': return allProjects['MineServers']
+        case 'atlauncher.com': return allProjects['ATLauncher']
+        case 'servers-minecraft.net': return allProjects['ServersMinecraft']
+        case 'minecraft-list.cz': return allProjects['MinecraftListCZ']
+        case 'liste-serveurs-minecraft.org': return allProjects['ListeServeursMinecraft']
+        case 'mcservidores.com': return allProjects['MCServidores']
+        case 'xtremetop100.com': return allProjects['XtremeTop100']
+        case 'minecraft-server.sk': return allProjects['MinecraftServerSk']
+        case 'serveursminecraft.org': return allProjects['ServeursMinecraftOrg']
+        case 'serveurs-mc.net': return allProjects['ServeursMCNet']
+        case 'serveur-minecraft.com': return allProjects['ServeursMinecraftCom']
+        case 'serveur-minecraft-vote.fr': return allProjects['ServeurMinecraftVoteFr']
+        case 'minebrowse.com': return allProjects['MineBrowseCom']
+        case 'mc-server-list.com': return allProjects['MCServerListCom']
+        case 'serverlocator.com': return allProjects['ServerLocatorCom']
+        case 'top-mmogames.ru': return allProjects['TopMmoGamesRu']
+        case 'mmorpg.top': return allProjects['MmoRpgTop']
+        case 'mmovote.ru': return allProjects['MmoVoteRu']
+        case 'mc-monitoring.info': return allProjects['McMonitoringInfo']
+        case 'mcservertime.com': return allProjects['McServerTimeCom']
+        case 'liste-serveurs.fr': return allProjects['ListeServeursFr']
+        case 'serveur-minecraft.fr': return allProjects['ServeurMinecraftFr']
+        case 'mineserv.top': return allProjects['MineServTop']
+        case 'top100arena.com': return allProjects['Top100ArenaCom']
+        case 'minecraftbestservers.com': return allProjects['MinecraftBestServersCom']
+        case 'mclike.com': return allProjects['MCLikeCom']
+        case 'pixelmon-server-list.com': return allProjects['PixelmonServerListCom']
+        case 'minecraftserver.sk': return allProjects['MinecraftServerSk2']
+        case 'servidoresdeminecraft.es': return allProjects['ServidoresdeMinecraftEs']
+        case 'minecraftsurvivalservers.com': return allProjects['MinecraftSurvivalServersCom']
+        case 'minecraft.global': return allProjects['MinecraftGlobal']
+    }
+}
+
+const getDomainWithoutSubdomain = url => {
+    const urlParts = new URL(url).hostname.split('.')
+
+    return urlParts
+        .slice(0)
+        .slice(-(urlParts.length === 4 ? 3 : 2))
+        .join('.')
+}
+
+function extractHostname(url) {
+    let hostname
+    //find & remove protocol (http, ftp, etc.) and get hostname
+
+    if (url.indexOf('//') > -1) {
+        hostname = url.split('/')[2]
+    } else {
+        hostname = url.split('/')[0]
+    }
+
+    //find & remove port number
+    hostname = hostname.split(':')[0]
+    //find & remove '?'
+    hostname = hostname.split('?')[0]
+
+    return hostname
 }

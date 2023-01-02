@@ -973,35 +973,6 @@ function createMessage(text, level) {
     return span
 }
 
-function extractHostname(url) {
-    let hostname
-    //find & remove protocol (http, ftp, etc.) and get hostname
-
-    if (url.indexOf('//') > -1) {
-        hostname = url.split('/')[2]
-    } else {
-        hostname = url.split('/')[0]
-    }
-
-    //find & remove port number
-    hostname = hostname.split(':')[0]
-    //find & remove "?"
-    hostname = hostname.split('?')[0]
-
-    hostname = hostname.replace(/\r?\n/g, '')
-//  hostname = hostname.replace(/\s+/g, '')
-
-    return hostname
-}
-const getDomainWithoutSubdomain = url => {
-    const urlParts = new URL(url).hostname.split('.')
-
-    return urlParts
-        .slice(0)
-        .slice(-(urlParts.length === 4 ? 3 : 2))
-        .join('.')
-}
-
 //Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exporting'))

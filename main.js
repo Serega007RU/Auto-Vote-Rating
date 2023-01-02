@@ -95,7 +95,6 @@ async function initializeConfig(background, version) {
         initialized = true
         return
     }
-    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 
     openedProjects = await db.get('other', 'openedProjects')
     if (openedProjects.size > 0) {
