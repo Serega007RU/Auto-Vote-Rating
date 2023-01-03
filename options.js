@@ -120,11 +120,10 @@ async function addProjectList(project) {
     if (!(project.time == null || project.time === '') && Date.now() < project.time) {
         text = new Date(project.time).toLocaleString().replace(',', '')
     } else {
-        for (const [tab,projectKey] of openedProjects) {
-            const value = await db.get('projects', projectKey)
+        for (const value of openedProjects.values()) {
             if (project.rating === value.rating) {
                 text = chrome.i18n.getMessage('inQueue')
-                if (project.key === projectKey) {
+                if (project.key === value.key) {
                     text = chrome.i18n.getMessage('now')
                     break
                 }
@@ -308,6 +307,18 @@ function generateBtnListRating(rating, count) {
 async function removeProjectList(project) {
     const li = document.getElementById('projects' + project.key)
     if (li != null) {
+        try {
+            // noinspection JSVoidFunctionReturnValueUsed
+            const message = await chrome.runtime.sendMessage({projectDeleted: project})
+            // noinspection JSIncompatibleTypesComparison
+            if (message === 'reject') {
+                createNotif(chrome.i18n.getMessage('rejectDelete'), 'error')
+                return
+            }
+        } catch (error) {
+            createNotif(error.message, 'error')
+        }
+
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
         if (count <= 0) {
             document.getElementById(project.rating + 'Tab').remove()
@@ -319,15 +330,7 @@ async function removeProjectList(project) {
             li.remove()
             document.querySelector('#' + project.rating + 'Button > span').textContent = String(count)
         }
-    } else {
-        return
     }
-
-    await db.delete('projects', project.key)
-
-    chrome.alarms.clear(String(project.key))
-
-    chrome.runtime.sendMessage({projectDeleted: project})
 }
 
 //Перезагрузка списка проектов
@@ -1927,11 +1930,10 @@ async function updateValue(request) {
                     text = new Date(request.value.time).toLocaleString().replace(',', '')
                 } else {
                     openedProjects = await db.get('other', 'openedProjects')
-                    for (const [tab,projectKey] of openedProjects) {
-                        const value = await db.get('projects', projectKey)
+                    for (const value of openedProjects.values()) {
                         if (request.value.rating === value.rating) {
                             text = chrome.i18n.getMessage('inQueue')
-                            if (request.value.key === projectKey) {
+                            if (request.value.key === value.key) {
                                 text = chrome.i18n.getMessage('now')
                                 break
                             }

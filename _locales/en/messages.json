@@ -657,7 +657,7 @@
     "message": "There is a vote going on right now..."
   },
   "timeout": {
-    "message": "Vote expecting time has expired, restarting the vote"
+    "message": "Vote expecting time has expired"
   },
   "chooseLang": {
     "message": "Choose language/region"
@@ -947,5 +947,8 @@
   },
   "disabledUseRemoteCodeTooltip": {
     "message": "Some site owners are very actively struggling with this extension and trying to break it as much as possible. The extension now uses the remote code, which allows you not to update the extension and at the same time the code will always be up-to-date. If you disable the use of remote code, then you may encounter errors, we do not recommend that you do this. This option is more intended for the developer to debug local code."
+  },
+  "rejectDelete": {
+    "message": "Cannot be deleted while the voting is running, restart the extension if the voting is stuck"
   }
 }

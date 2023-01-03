@@ -101,7 +101,7 @@ async function initializeConfig(background, version) {
         for (const key of openedProjects.keys()) {
             openedProjects.delete(key)
             if (!isNaN(key)) chrome.tabs.remove(key)
-                .catch(error => {if (error.message !== 'No tab with id.') console.warn(error)})
+                .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
         }
         await db.put('other', openedProjects, 'openedProjects')
     }

@@ -647,7 +647,7 @@
     "message": "Es findet gerade eine Abstimmung statt..."
   },
   "timeout": {
-    "message": "Die Wartezeit für die Abstimmung ist abgelaufen, die Abstimmung wird neu gestartet."
+    "message": "Die Wartezeit für die Abstimmung ist abgelaufen."
   },
   "chooseLang": {
     "message": "Sprache/Region wählen"

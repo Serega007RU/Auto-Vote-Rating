@@ -92,37 +92,29 @@ self.addEventListener('online', ()=> {
 })
 
 let promises = []
-async function checkOpen(project, transaction) {
+async function checkOpen(project/*, transaction*/) {
     //Если нет подключения к интернету
     if (!settings.disabledCheckInternet && !navigator.onLine) {
         return
     }
 
-    for (const[tab,projectKey] of openedProjects.entries()) {
-        // noinspection JSCheckFunctionSignatures
-        const value = await transaction.objectStore('projects').get(projectKey)
+    for (const[tab,value] of openedProjects) {
         if (value.timeoutQueue && Date.now() > value.timeoutQueue) {
-            if (value.timeoutQueue) {
-                delete value.timeoutQueue
-                updateValue('projects', value)
-            }
-            if (!value.nextAttempt || Date.now() > value.nextAttempt) {
-                openedProjects.delete(tab)
-                db.put('other', openedProjects, 'openedProjects')
-                continue
-            }
+            openedProjects.delete(tab)
+            db.put('other', openedProjects, 'openedProjects')
+            continue
         }
         if (project.rating === value.rating || (value.randomize && project.randomize) || settings.disabledOneVote) {
             if (Date.now() < value.nextAttempt) {
                 return
-            } else if (project.key === projectKey) {
-                console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('timeout'))
-                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('timeout'))
+            } else {
+                console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
+                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
                 openedProjects.delete(tab)
                 db.put('other', openedProjects, 'openedProjects')
                 // noinspection JSCheckFunctionSignatures
                 if (closeTabs && !isNaN(tab)) {
-                    tryCloseTab(tab, project, 0)
+                    tryCloseTab(tab, value, 0)
                 }
                 break
             }
@@ -139,8 +131,9 @@ async function checkOpen(project, transaction) {
         retryCoolDown = 900000
     }
     project.nextAttempt = Date.now() + retryCoolDown
+    delete project.timeoutQueue
 
-    openedProjects.set('background_' + project.key, project.key)
+    openedProjects.set('start_' + project.key, project)
     db.put('other', openedProjects, 'openedProjects')
 
     if (settings.debug) console.log(getProjectPrefix(project, true) + 'пред запуск')
@@ -164,6 +157,7 @@ async function checkOpen(project, transaction) {
     newWindow(project)
 }
 
+let promiseGroup
 //Открывает вкладку для голосования или начинает выполнять fetch запросы
 async function newWindow(project) {
     //Ожидаем очистку куки
@@ -234,7 +228,12 @@ async function newWindow(project) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
-        openedProjects.set('background_' + project.key, project.key)
+        for (const [tab,value] of openedProjects) {
+            if (project.key === value.key) {
+                openedProjects.delete(tab)
+            }
+        }
+        openedProjects.set('background_' + project.key, project)
         db.put('other', openedProjects, 'openedProjects')
         silentVote(project)
     } else {
@@ -250,43 +249,66 @@ async function newWindow(project) {
         let tab = await chrome.tabs.create({url, active: settings.disabledFocusedTab})
             .catch(error => endVote({message: error}, null, project))
         if (tab == null) return
-        openedProjects.delete('background_' + project.key)
-        openedProjects.set(tab.id, project.key)
+        for (const [tab,value] of openedProjects) {
+            if (project.key === value.key) {
+                openedProjects.delete(tab)
+            }
+        }
+        openedProjects.set(tab.id, project)
         db.put('other', openedProjects, 'openedProjects')
 
         if (notSupportedGroupTabs) return
-        if (!groupId) {
-            let groups
-            try {
-                groups = await chrome.tabGroups.query({title: 'Auto Vote Rating'})
-            } catch (error) {
-                notSupportedGroupTabs = true
-                console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', error.message))
-                return
-            }
-            if (groups.length > 0) {
-                groupId = groups[0]
-                await chrome.tabs.group({groupId, tabIds: tab.id})
-            } else {
+        await group()
+        async function group() {
+            if (groupId) {
                 try {
-                    groupId = await chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id})
-                    await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
+                    await chrome.tabs.group({groupId, tabIds: tab.id})
                 } catch (error) {
-                    notSupportedGroupTabs = true
-                    console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', error.message))
+                    if (error.message.includes('No tab with id')) return
+                    if (error.message.includes('No group with id')) {
+                        groupId = await chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id})
+                        await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
+                    } else {
+                        console.warn(error)
+                    }
                 }
             }
-        } else {
-             try {
-                 await chrome.tabs.group({groupId, tabIds: tab.id})
-             } catch (error) {
-                 if (error.message.includes('No group with id')) {
-                     groupId = await chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id})
-                     await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
-                 } else {
-                     console.warn(error.message)
-                 }
-             }
+        }
+        if (!groupId) {
+            if (promiseGroup) {
+                await promiseGroup
+                await group()
+                return
+            }
+            promiseGroup = createGroup()
+            async function createGroup() {
+                let groups
+                try {
+                    groups = await chrome.tabGroups.query({title: 'Auto Vote Rating'})
+                } catch (error) {
+                    notSupportedGroupTabs = true
+                    console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', error))
+                    promiseGroup = null
+                    return
+                }
+                if (groups.length > 0) {
+                    groupId = groups[0]
+                    await group()
+                } else {
+                    try {
+                        groupId = await chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id})
+                        await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
+                    } catch (error) {
+                        if (error.message.includes('No tab with id')) {
+                            promiseGroup = null
+                            return
+                        }
+                        notSupportedGroupTabs = true
+                        console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', error))
+                    }
+                }
+                promiseGroup = null
+            }
         }
     }
 }
@@ -381,7 +403,7 @@ chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
     await waitInitialize()
     if (openedProjects.has(details.tabId)) {
         if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
-            const project = await db.get('projects', openedProjects.get(details.tabId))
+            const project = await db.get('projects', openedProjects.get(details.tabId).key)
             if (
                 //Chrome
                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
@@ -399,8 +421,8 @@ chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
 chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
     if (details.url === 'about:blank') return
     await waitInitialize()
-    const projectKey = openedProjects.get(details.tabId)
-    if (!projectKey) return
+    let project = openedProjects.get(details.tabId)
+    if (!project) return
     const files = []
     if (details.frameId === 0) {
         // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
@@ -443,8 +465,8 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
         }
     } catch (error) {
         if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
-            const project = await db.get('projects', projectKey)
-            console.error(getProjectPrefix(project, true) + error.message)
+            project = await db.get('projects', project.key)
+            console.error(getProjectPrefix(project, true) + error)
             if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
             project.error = error.message
             updateValue('projects', project)
@@ -455,9 +477,8 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
 chrome.webNavigation.onCompleted.addListener(async function(details) {
     await waitInitialize()
-    const projectKey = openedProjects.get(details.tabId)
-    if (!projectKey) return
-    const project = await db.get('projects', projectKey)
+    let project = openedProjects.get(details.tabId)
+    if (!project) return
     if (details.frameId === 0) {
         // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
         if (details.url.match(/facebook.com\/*/) || details.url.match(/google.com\/*/) || details.url.match(/accounts.google.com\/*/) || details.url.match(/reddit.com\/*/) || details.url.match(/twitter.com\/*/)) {
@@ -526,7 +547,8 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
         } catch (error) {
             if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
-                console.error(getProjectPrefix(project, true) + error.message)
+                project = await db.get('projects', project.key)
+                console.error(getProjectPrefix(project, true) + error)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
                 project.error = error.message
                 updateValue('projects', project)
@@ -570,6 +592,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
         } catch (error) {
             if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
+                project = await db.get('projects', project.key)
                 error = error.message
                 if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
                     error += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
@@ -585,18 +608,18 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
 chrome.tabs.onRemoved.addListener(async function(tabId) {
     await waitInitialize()
-    const projectKey = openedProjects.get(tabId)
-    if (!projectKey) return
-    const project = await db.get('projects', projectKey)
+    let project = openedProjects.get(tabId)
+    if (!project) return
+    project = await db.get('projects', project.key)
     endVote({closedTab: true}, {tab: {id: tabId}}, project)
 })
 
 // TODO к сожалению в manifest v3 не возможно узнать status code страницы, не знаю как это ещё сделать
 // chrome.webRequest.onCompleted.addListener(async function(details) {
 //     await waitInitialize()
-//     const projectKey = openedProjects.get(details.tabId)
-//     if (!projectKey) return
-//     const project = await db.get('projects', projectKey)
+//     let project = openedProjects.get(details.tabId)
+//     if (!project) return
+//     project = await db.get('projects', project.key)
 //
 //     // TODO это какой-то кринж для https://www.minecraft-serverlist.net/, ошибка 500 считается как успешный запрос https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
 //     if (project.rating === 'MinecraftServerListNet') return
@@ -615,7 +638,7 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
 //         endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
 //     } else if (openedProjects.has(details.tabId)) {
 //         if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
-//             const project = await db.get('projects', openedProjects.get(details.tabId))
+//             const project = await db.get('projects', openedProjects.get(details.tabId).key)
 //             if (
 //                 //Chrome
 //                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
@@ -661,7 +684,15 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
 // }
 
 //Слушатель сообщений и ошибок
-chrome.runtime.onMessage.addListener(async function(request, sender/*, sendResponse*/) {
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    // noinspection JSIgnoredPromiseFromCall
+    onRuntimeMessage(request, sender, sendResponse)
+    if (request.projectDeleted) {
+        return true
+    }
+})
+
+async function onRuntimeMessage(request, sender, sendResponse) {
     if (request === 'reloadCaptcha') {
         // noinspection JSVoidFunctionReturnValueUsed,JSCheckFunctionSignatures
         const frames = await chrome.webNavigation.getAllFrames({tabId: sender.tab.id})
@@ -688,6 +719,8 @@ chrome.runtime.onMessage.addListener(async function(request, sender/*, sendRespo
         return
     }
 
+    await waitInitialize()
+
     if (request === 'checkVote') {
         checkVote()
         return
@@ -705,23 +738,30 @@ chrome.runtime.onMessage.addListener(async function(request, sender/*, sendRespo
     } else if (request.projectDeleted) {
         let nowVoting = false
         //Если эта вкладка была уже открыта, он закрывает её
-        for (const[key,value] of openedProjects.entries()) {
-            if (request.projectDeleted.key === value) {
+        for (const[key,value] of openedProjects) {
+            if (request.projectDeleted.key === value.key) {
+                if (key === 'start_' + request.projectDeleted.key) {
+                    sendResponse('reject')
+                    return
+                }
                 nowVoting = true
                 openedProjects.delete(key)
                 // noinspection JSCheckFunctionSignatures
                 if (!isNaN(key)) { // noinspection JSCheckFunctionSignatures
                     chrome.tabs.remove(key)
-                        .catch(error => {if (error.message !== 'No tab with id.') console.warn(error)})
+                        .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
                 }
                 break
             }
         }
-        db.put('other', openedProjects, 'openedProjects')
+        await db.put('other', openedProjects, 'openedProjects')
+        await db.delete('projects', request.projectDeleted.key)
+        chrome.alarms.clear(String(request.projectDeleted.key))
         if (nowVoting) {
             checkVote()
             console.log(getProjectPrefix(request.projectDeleted, true) + chrome.i18n.getMessage('projectDeleted'))
         }
+        sendResponse('success')
         return
     }
 
@@ -730,12 +770,11 @@ chrome.runtime.onMessage.addListener(async function(request, sender/*, sendRespo
         return
     }
 
-    await waitInitialize()
     if (!openedProjects.has(sender.tab.id)) {
         console.warn('Пришёл нераспознанный chrome.runtime.message, что это?' + JSON.stringify(request))
         return
     }
-    const project = await db.get('projects', openedProjects.get(sender.tab.id))
+    const project = await db.get('projects', openedProjects.get(sender.tab.id).key)
     if (request.captcha || request.authSteam || request.discordLogIn || request.auth) {//Если требует ручное прохождение капчи
         let message
         if (request.captcha) {
@@ -760,7 +799,7 @@ chrome.runtime.onMessage.addListener(async function(request, sender/*, sendRespo
     } else {
         endVote(request, sender, project)
     }
-})
+}
 
 async function tryCloseTab(tabId, project, attempt) {
     try {
@@ -771,31 +810,32 @@ async function tryCloseTab(tabId, project, attempt) {
             tryCloseTab(tabId, project, ++attempt)
             return
         }
-        console.warn(getProjectPrefix(project, true) + error.message)
-        if (!settings.disabledNotifError && error.message !== 'No tab with id.')
+        if (!settings.disabledNotifError && !error.message.includes('No tab with id')) {
+            console.warn(getProjectPrefix(project, true) + error)
             sendNotification(getProjectPrefix(project, false), error.message)
+        }
     }
 }
 
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
     if (sender && openedProjects.has(sender.tab.id)) {
-        //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
-        project = await db.get('projects', openedProjects.get(sender.tab.id))
+        openedProjects.delete(sender.tab.id)
+        openedProjects.set('queue_' + project.key, project)
+        db.put('other', openedProjects, 'openedProjects')
         if (closeTabs && !request.closedTab) {
             tryCloseTab(sender.tab.id, project, 0)
         }
-        openedProjects.delete(sender.tab.id)
-        db.put('other', openedProjects, 'openedProjects')
     } else if (!project) return
 
-    // for (const[key,value] of fetchProjects.entries()) {
+    // for (const[key,value] of fetchProjects) {
     //     if (value.key === project.key) {
     //         fetchProjects.delete(key)
     //     }
     // }
 
     delete project.nextAttempt
+    delete project.timeoutQueue
 
     //Если усё успешно
     let sendMessage
@@ -1000,8 +1040,8 @@ async function endVote(request, sender, project) {
     }
 
     function removeQueue() {
-        for (const [tab,projectKey] of openedProjects) {
-            if (project.key === projectKey) {
+        for (const [tab,value] of openedProjects) {
+            if (project.key === value.key) {
                 openedProjects.delete(tab)
             }
         }
