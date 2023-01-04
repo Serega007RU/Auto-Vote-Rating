@@ -65,6 +65,7 @@ async function restoreOptions() {
     document.getElementById('disabledWarnCaptcha').checked = settings.disabledWarnCaptcha
     document.getElementById('disabledDebug').checked = settings.debug
     document.getElementById('disabledUseRemoteCode').checked = settings.disabledUseRemoteCode
+    document.getElementById('disabledSendErrorSentry').checked = settings.disabledSendErrorSentry
     if (settings.enableCustom) addCustom()
     await reloadProjectList()
 }
@@ -393,6 +394,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.debug = this.checked
         else if (this.id === 'disabledUseRemoteCode')
             settings.disabledUseRemoteCode = this.checked
+        else if (this.id === 'disabledSendErrorSentry')
+            settings.disabledSendErrorSentry = this.checked
         else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false
@@ -944,36 +947,46 @@ async function checkPermissions(projects, element) {
     // noinspection JSUnresolvedFunction
     let granted = await chrome.permissions.contains({origins, permissions})
     if (!granted) {
-        // noinspection JSUnresolvedVariable
-        if (element != null || typeof InstallTrigger !== 'undefined') {//Костыль для FireFox, что бы запросить права нужно, что бы пользователь обязатльно кликнул
-            document.querySelector('#addProject').classList.remove('disabled')
-            const button = document.createElement('button')
-            button.textContent = chrome.i18n.getMessage('grant')
-            button.classList.add('submitBtn')
-            createNotif([chrome.i18n.getMessage('grantUrl'), button], null, null, element)
-            granted = await new Promise(resolve=>{
-                button.addEventListener('click', async ()=>{
-                    // noinspection JSVoidFunctionReturnValueUsed
-                    granted = await chrome.permissions.request({origins, permissions})
-                    if (element == null) removeNotif(button.parentElement.parentElement)
-                    if (!granted) {
-                        createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
-                        resolve(false)
-                    } else {
-                        if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', null, element)
-                        resolve(true)
-                    }
-                })
-            })
-            return granted
-        } else {
-            // noinspection JSVoidFunctionReturnValueUsed
-            granted = await chrome.permissions.request({origins, permissions})
-            if (!granted) {
-                createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
-                return false
+        if (element != null) {
+            try {
+                // noinspection JSVoidFunctionReturnValueUsed
+                granted = await chrome.permissions.request({origins, permissions})
+                if (!granted) {
+                    createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
+                    return false
+                }
+            } catch (error) {
+                if (!error.message.includes('This function must be called during a user gesture')) {
+                    createNotif(error.message, 'error', null, element)
+                    return false
+                }
             }
         }
+        document.querySelector('#addProject').classList.remove('disabled')
+        const button = document.createElement('button')
+        button.textContent = chrome.i18n.getMessage('grant')
+        button.classList.add('submitBtn')
+        createNotif([chrome.i18n.getMessage('grantUrl'), button], null, null, element)
+        granted = await new Promise(resolve=>{
+            button.addEventListener('click', async ()=>{
+                try {
+                    // noinspection JSVoidFunctionReturnValueUsed
+                    granted = await chrome.permissions.request({origins, permissions})
+                } catch (error) {
+                    createNotif(error.message, 'error', null, element)
+                    resolve(false)
+                }
+                if (element == null) removeNotif(button.parentElement.parentElement)
+                if (!granted) {
+                    createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
+                    resolve(false)
+                } else {
+                    if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', null, element)
+                    resolve(true)
+                }
+            })
+        })
+        return granted
     }
     if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', null, element)
     return true

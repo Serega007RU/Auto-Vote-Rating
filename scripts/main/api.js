@@ -36,7 +36,7 @@ async function run() {
                         clearInterval(timer2)
                     }
                 } catch (e) {
-                    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+                    chrome.runtime.sendMessage({errorVoteNoElement: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
                     clearInterval(timer2)
                 }
             }, 1000)
@@ -203,16 +203,18 @@ async function getProject() {
 
 function throwError(error) {
     let message
-    if (error.message === 'errorVoteNoNick2') {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-        return
-    } else if (error.stack) {
-        message = error.stack
+    if (error.stack) {
+        // noinspection JSUnresolvedVariable
+        if (self.evalCore) {
+            message = error.toString()
+        } else {
+            message = error.stack
+        }
     } else {
         message = error
     }
 
-    chrome.runtime.sendMessage({errorVoteNoElement2: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
+    chrome.runtime.sendMessage({errorVoteNoElement: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
 }
 
 function wait(ms) {

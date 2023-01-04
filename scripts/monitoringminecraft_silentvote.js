@@ -49,7 +49,7 @@ async function silentVoteMonitoringMinecraft(project) {
             endVote({successfully: true}, null, project)
             return
         } else {
-            endVote({errorVoteNoElement: true}, null, project)
+            endVote({message: response.doc.querySelector('center').textContent}, null, project)
             return
         }
     }

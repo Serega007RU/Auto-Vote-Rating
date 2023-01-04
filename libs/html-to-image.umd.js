@@ -323,7 +323,7 @@ async function resourceToDataURL(resourceUrl, contentType, options) {
       msg = typeof error === 'string' ? error : error.message;
     }
     if (msg) {
-      console.warn(msg);
+      // console.warn(msg);
     }
   }
   cache[cacheKey] = dataURL;
@@ -557,13 +557,13 @@ async function getCSSRules(styleSheets, options) {
               try {
                 sheet.insertRule(rule, rule.startsWith('@import') ? importIndex += 1 : sheet.cssRules.length);
               } catch (error) {
-                console.error('Error inserting rule from remote css', {
-                  rule,
-                  error
-                });
+                // console.error('Error inserting rule from remote css', {
+                //   rule,
+                //   error
+                // });
               }
             })).catch(e => {
-              console.error('Error loading remote css', e.toString());
+              // console.error('Error loading remote css', e.toString());
             });
             deferreds.push(deferred);
           }
@@ -574,10 +574,10 @@ async function getCSSRules(styleSheets, options) {
           deferreds.push(fetchCSS(sheet.href).then(metadata => embedFonts(metadata, options)).then(cssText => parseCSS(cssText).forEach(rule => {
             inline.insertRule(rule, sheet.cssRules.length);
           })).catch(err => {
-            console.error('Error loading remote stylesheet', err.toString());
+            // console.error('Error loading remote stylesheet', err.toString());
           }));
         }
-        console.error('Error inlining remote css file', e.toString());
+        // console.error('Error inlining remote css file', e.toString());
       }
     }
   });
@@ -590,7 +590,7 @@ async function getCSSRules(styleSheets, options) {
             ret.push(item);
           });
         } catch (e) {
-          console.error(`Error while reading CSS rules from ${sheet.href}`, e.toString());
+          // console.error(`Error while reading CSS rules from ${sheet.href}`, e.toString());
         }
       }
     });

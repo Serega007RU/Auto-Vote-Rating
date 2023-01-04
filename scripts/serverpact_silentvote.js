@@ -81,6 +81,6 @@ async function silentVoteServerPact(project) {
     } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null) {
         endVote({message: response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.substring(0, response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.indexOf('\n'))}, null, project)
     } else {
-        endVote({errorVoteUnknown2: true}, null, project)
+        endVote({emptyError: true}, null, project)
     }
 }

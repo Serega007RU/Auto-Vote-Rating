@@ -466,34 +466,12 @@
     }
   },
   "errorVoteNoElement": {
-    "message": "Abstimmungsfehler, es scheint ein notwendiges Element/Button zu fehlen. Melden Sie diesen Fehler an den Entwickler der Erweiterung"
-  },
-  "errorVoteNoElement2": {
     "message": "Fehler! Es scheint, dass ein notwendiges Element (Schaltfläche oder Eingabefeld) fehlt. Hier ist, was wir wissen: $error$. Melden Sie diesen Fehler an den Entwickler der Erweiterung",
     "placeholders": {
       "error": {
         "content": "$1"
       }
     }
-  },
-  "errorVoteNoNick": {
-    "message": "Abstimmungsfehler! Es ist eine Umleitung zu einer unbekannten Seite aufgetreten: $url$ Überprüfen Sie diese URL",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorVoteNoNick2": {
-    "message": "Unerwarteter Fehler, das Projekt konnte nicht gefunden werden. URL: $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorVoteUnknown": {
-    "message": "Fehler bei der Abstimmung! Hier ist, das was wir wissen: "
   },
   "errorVoteNetwork": {
     "message": "Fehler bei der Abstimmung! Fehlercode: $code$ URL: $url$",
@@ -566,9 +544,6 @@
         "content": "$1"
       }
     }
-  },
-  "errorVoteUnknown2": {
-    "message": "Unerwarteter Fehler! Keine Fehlermeldung"
   },
   "projectID": {
     "message": "ID project"

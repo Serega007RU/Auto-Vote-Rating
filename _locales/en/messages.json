@@ -476,34 +476,12 @@
     }
   },
   "errorVoteNoElement": {
-    "message": "Voting error, it seems some necessary element/button is missing. Report this error to the extension developer"
-  },
-  "errorVoteNoElement2": {
     "message": "Error! It seems that some necessary element (button or input field) is missing. Here's what we know: $error$. Report this error to the extension developer",
     "placeholders": {
       "error": {
         "content": "$1"
       }
     }
-  },
-  "errorVoteNoNick": {
-    "message": "Voting error! Redirection to the unknown page occurred: $url$ Check this URL",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorVoteNoNick2": {
-    "message": "Unexpected error, could not find the project. URL: $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorVoteUnknown": {
-    "message": "Error when voting! Here's what we know: "
   },
   "errorVoteNetwork": {
     "message": "Error when voting! Error code: $code$ URL: $url$",
@@ -576,9 +554,6 @@
         "content": "$1"
       }
     }
-  },
-  "errorVoteUnknown2": {
-    "message": "Unexpected error! No error message"
   },
   "projectID": {
     "message": "ID project"
@@ -950,5 +925,11 @@
   },
   "rejectDelete": {
     "message": "Cannot be deleted while the voting is running, restart the extension if the voting is stuck"
+  },
+  "disabledSendErrorSentry": {
+    "message": "Disable sending error reports to the extension developer"
+  },
+  "disabledSendErrorSentryTooltip": {
+    "message": "About some errors, the extension sends an error report to the extension developer via the service Sentry.io , this report includes details of the error, a screenshot of the site (in the form of png and html) and also details of your settings (this is your nickname, on which site you vote and with which settings). You can disable this"
   }
 }

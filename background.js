@@ -307,7 +307,7 @@ async function newWindow(project) {
                     return
                 }
                 if (groups.length > 0) {
-                    groupId = groups[0]
+                    groupId = groups[0].id
                     await group()
                 } else {
                     try {
@@ -368,7 +368,7 @@ async function silentVote(project) {
 
         await self['silentVote' + project.rating](project)
     } catch (e) {
-        if (e.message === 'Failed to fetch' || e.message === 'NetworkError when attempting to fetch resource.') {
+        if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError when attempting to fetch resource')) {
             // let found = false
             // for (const p of fetchProjects.values()) {
             //     if (p.key === project.key) {
@@ -377,11 +377,21 @@ async function silentVote(project) {
             //     }
             // }
             // if (!found) {
-                // endVote({notConnectInternet: true}, null, project)
-                endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
+                endVote({notConnectInternet: true}, null, project)
+                // endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
             // }
         } else {
-            endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
+            let message
+            if (e.stack) {
+                if (!settings.disabledUseRemoteCode) {
+                    message = e.toString()
+                } else {
+                    message = e.stack
+                }
+            } else {
+                message = e
+            }
+            endVote({errorVoteNoElement: message}, null, project)
         }
     }
 }
@@ -859,6 +869,12 @@ async function tryCloseTab(tabId, project, attempt) {
 
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
+    if (!settings.disabledSendErrorSentry) {
+        if (request.message != null || request.errorVoteNoElement || request.emptyError) {
+            await reportError(request, sender, project)
+        }
+    }
+
     if (sender && openedProjects.has(sender.tab.id)) {
         openedProjects.delete(sender.tab.id)
         openedProjects.set('queue_' + project.key, project)
@@ -1106,6 +1122,158 @@ async function endVote(request, sender, project) {
     let alarmTimeout = timeout
     if (alarmTimeout < 60000) alarmTimeout = 60000
     chrome.alarms.create('checkVote', {when: Date.now() + alarmTimeout})
+}
+
+
+async function reportError(request, sender, project) {
+    let tabDetails
+    if (sender && openedProjects.has(sender.tab.id)) {
+        try {
+            await chrome.scripting.executeScript({target: {tabId: sender.tab.id}, files: ['libs/html-to-image.umd.js', 'scripts/main/report.js']})
+            tabDetails = await chrome.tabs.sendMessage(sender.tab.id, {generateReport: true})
+            if (!tabDetails.screenshotError) tabDetails.screenshot = new Uint8Array(await convertBase64ToBlob(tabDetails.screenshot).arrayBuffer())
+        } catch (error) {
+            if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
+                console.warn(getProjectPrefix(project, true) + error)
+            }
+        }
+    }
+
+    sendReport(request, tabDetails, project)
+}
+
+async function sendReport(request, tabDetails, project) {
+    let titleError = project.rating + ' '
+    let detailsError
+    if (request.message != null) {
+        if (request.message.length > 0) {
+            titleError = titleError + request.message
+        } else {
+            titleError = titleError + 'Empty error'
+        }
+    } else if (request.errorVoteNoElement) {
+        titleError = titleError + 'No element'
+        detailsError = request.errorVoteNoElement
+    } else if (request.emptyError) {
+        titleError = titleError + 'Empty error'
+    }
+
+    const eventId = uuidv4()
+    const date = new Date()
+    const message1 = {}
+    message1.event_id = eventId
+    message1.sent_at = date.toISOString()
+    const message2 = {type: 'event'}
+    const message3 = {}
+    message3.message = titleError
+    message3.level = 'error'
+    message3.event_id = uuidv4()
+    message3.platform = 'javascript'
+    message3.timestamp = date.getTime() / 1000
+    message3.environment = 'Auto-Vote-Rating@' + chrome.runtime.getManifest().version
+    message3.extra = {}
+    if (detailsError) message3.extra.detailsError = detailsError
+    message3.extra.project = project
+    message3.request = {url: 'chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd/background.js', headers: {'User-Agent': self.navigator.userAgent}}
+    let body = JSON.stringify(message1) + '\n' + JSON.stringify(message2) + '\n' + JSON.stringify(message3)
+
+    // Да тут полный кринж, работа с байтами крайне убога, но мы работаем с тем чем имеем
+    if (tabDetails) {
+        let documentArrayHead
+        let documentArrayBody
+        let documentArray
+
+        let screenshotArrayHead
+        let screenshotArrayBody
+        let screenshotArray
+
+        let enc = new TextEncoder()
+
+        const attachmentHTML = {}
+        documentArrayBody = enc.encode(tabDetails.html)
+        attachmentHTML.type = 'attachment'
+        attachmentHTML.length = documentArrayBody.length
+        attachmentHTML.filename = 'document.html'
+        documentArrayHead = enc.encode('\n' + JSON.stringify(attachmentHTML) + '\n')
+        documentArray = new Uint8Array(documentArrayHead.length + documentArrayBody.length)
+        documentArray.set(documentArrayHead)
+        documentArray.set(documentArrayBody, documentArrayHead.length)
+
+        let newBody = enc.encode(body)
+        let newBody2 = new Uint8Array(newBody.length + documentArray.length)
+        newBody2.set(newBody)
+        newBody2.set(documentArray, newBody.length)
+
+        const attachmentScreenshot = {}
+        screenshotArrayBody = tabDetails.screenshotError ? enc.encode(tabDetails.screenshotError) : tabDetails.screenshot
+        attachmentScreenshot.type = 'attachment'
+        attachmentScreenshot.length = screenshotArrayBody.length
+        attachmentScreenshot.filename = tabDetails.screenshotError ? 'screenshot.txt' : 'screenshot.png'
+        screenshotArrayHead = enc.encode('\n' + JSON.stringify(attachmentScreenshot) + '\n')
+        screenshotArray = new Uint8Array(screenshotArrayHead.length + screenshotArrayBody.length)
+        screenshotArray.set(screenshotArrayHead)
+        screenshotArray.set(screenshotArrayBody, screenshotArrayHead.length)
+
+        let newBody3 = new Uint8Array(newBody2.length + screenshotArray.length)
+        newBody3.set(newBody2)
+        newBody3.set(screenshotArray, newBody2.length)
+        body = newBody3
+    }
+
+    const options = {body}
+    options.method = 'POST'
+    try {
+        const response = await fetch("https://o1160467.ingest.sentry.io/api/6244963/envelope/?sentry_key=a9f5f15340e847fa9f8af7120188faf3", options)
+        const json = await response.json()
+        if (!response.ok) {
+            console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', json)
+        }
+    } catch (error) {
+        console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error)
+    }
+}
+
+function uuidv4() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
+// Sentry.addGlobalEventProcessor((event, hint) => {
+//     if (tabDetails) {
+//         hint.attachments = [{filename: "screenshot.png", data: tabDetails.screenshot}, {filename: "document.html", data: tabDetails.html}]
+//         tabDetails = null
+//     }
+//     return event
+// })
+// Sentry.init({
+//     dsn: "https://a9f5f15340e847fa9f8af7120188faf3@o1160467.ingest.sentry.io/6244963",
+//     release: "Auto-Vote-Rating@" + chrome.runtime.getManifest().version,
+//     tracesSampleRate: 0.0
+// })
+// Sentry.configureScope(scope => {
+//     scope.setExtra('battery', 0.7);
+// });
+function convertBase64ToBlob(base64Image) {
+    // Split into two parts
+    const parts = base64Image.split(';base64,');
+
+    // Hold the content type
+    const imageType = parts[0].split(':')[1];
+
+    // Decode Base64 string
+    const decodedData = self.atob(parts[1]);
+
+    // Create UNIT8ARRAY of size same as row data length
+    const uInt8Array = new Uint8Array(decodedData.length);
+
+    // Insert all character code into uInt8Array
+    for (let i = 0; i < decodedData.length; ++i) {
+        uInt8Array[i] = decodedData.charCodeAt(i);
+    }
+
+    // Return BLOB image after conversion
+    return new Blob([uInt8Array], { type: imageType });
 }
 
 //Отправитель уведомлений

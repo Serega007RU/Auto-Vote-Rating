@@ -156,7 +156,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             timeoutError: 900000,
             disabledWarnCaptcha: false,
             debug: false,
-            disabledUseRemoteCode: false
+            disabledUseRemoteCode: false,
+            disabledSendErrorSentry: false
         }
         await other.add(settings, 'settings')
         generalStats = {
