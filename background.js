@@ -5,9 +5,11 @@ importScripts('projects.js')
 importScripts('main.js')
 
 // TODO отложенный importScripts пока не работают, подробнее https://bugs.chromium.org/p/chromium/issues/detail?id=1198822
-importScripts('libs/linkedom.js')
-importScripts('libs/evalCore.umd.js')
-importScripts('scripts/mcserverlist_silentvote.js', 'scripts/minecraftiplist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
+self.addEventListener('install', () => {
+    importScripts('libs/linkedom.js')
+    importScripts('libs/evalCore.umd.js')
+    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/minecraftiplist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
+})
 
 //Текущие fetch запросы
 // noinspection ES6ConvertVarToLetConst
@@ -21,14 +23,14 @@ let secondVoteMinecraftIpList = false
 
 //Нужно ли сейчас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
+let doubleCheck = false
 
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
 let closeTabs = true
 
 let updateAvailable = false
 
-// noinspection JSUnresolvedVariable,JSUnresolvedFunction,ES6ConvertVarToLetConst
-var evil = evalCore.getEvalInstance(self)
+let evil
 
 //Инициализация настроек расширения
 // noinspection JSIgnoredPromiseFromCall
@@ -47,6 +49,7 @@ async function checkVote() {
     if (check) {
         check = false
     } else {
+        doubleCheck = true
         return
     }
 
@@ -62,6 +65,10 @@ async function checkVote() {
     }
 
     check = true
+    if (doubleCheck) {
+        doubleCheck = false
+        checkVote()
+    }
 }
 
 //Триггер на голосование когда подходит время голосования
@@ -211,6 +218,14 @@ async function newWindow(project) {
         try {
             const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
             const projects = await response.text()
+            if (!evil) {
+                // noinspection JSUnresolvedVariable
+                if (!self.evalCore) {
+                    importScripts('libs/evalCore.umd.js')
+                }
+                // noinspection JSUnresolvedFunction,JSUnresolvedVariable
+                evil = evalCore.getEvalInstance(self)
+            }
             evil(projects)
         } catch (error) {
             console.error(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
@@ -314,6 +329,9 @@ async function newWindow(project) {
 }
 
 async function silentVote(project) {
+    if (!self.DOMParser) {
+        importScripts('libs/linkedom.js')
+    }
     try {
         if (project.rating === 'Custom') {
             let response = await fetch(project.responseURL, {...project.body})
@@ -324,6 +342,28 @@ async function silentVote(project) {
                 endVote({errorVote: [String(response.status), response.url]}, null, project)
             }
             return
+        }
+
+        if (!settings.disabledUseRemoteCode) {
+            try {
+                const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_silentvote.js')
+                const textScript = await response.text()
+                if (!evil) {
+                    // noinspection JSUnresolvedVariable
+                    if (!self.evalCore) {
+                        importScripts('libs/evalCore.umd.js')
+                    }
+                    // noinspection JSUnresolvedFunction,JSUnresolvedVariable
+                    evil = evalCore.getEvalInstance(self)
+                }
+                evil(textScript)
+            } catch (error) {
+                console.error(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
+            }
+        }
+
+        if (!self['silentVote' + project.rating]) {
+            importScripts('scripts/' + project.rating.toLowerCase() + '_silentvote.js')
         }
 
         await self['silentVote' + project.rating](project)
