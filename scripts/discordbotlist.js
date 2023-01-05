@@ -5,6 +5,13 @@ function vote(first) {
             if (document.querySelector('.main-content').innerText.includes('ogging you in')) {
                 return
             }
+
+            const login = findElement('a', ['log in'])
+            if (login) {
+                login.click()
+                return
+            }
+
             const vote = findElement('button', ['upvote'])
             if (!vote.disabled) {
                 clearInterval(timer1)
@@ -83,10 +90,8 @@ function vote(first) {
 
 function findElement(selector, text) {
     for (const element of document.querySelectorAll(selector)) {
-        for (const t of text) {
-            if (element.textContent.toLowerCase().includes(t) || element.innerText.toLowerCase().includes(t)) {
-                return element
-            }
+        if (element.textContent.toLowerCase().includes(text) || element.innerText.toLowerCase().includes(text)) {
+            return element
         }
     }
 }
