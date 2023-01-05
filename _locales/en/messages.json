@@ -931,5 +931,28 @@
   },
   "disabledSendErrorSentryTooltip": {
     "message": "About some errors, the extension sends an error report to the extension developer via the service Sentry.io , this report includes details of the error, a screenshot of the site (in the form of png and html) and also details of your settings (this is your nickname, on which site you vote and with which settings). You can disable this"
+  },
+  "expertMode": {
+    "message": "I am an advanced user"
+  },
+  "expertModeTooltip": {
+    "message": "You will be given the ability to access the advanced settings, this function is intended for users who are well versed in computers and its subtle technical nuances."
+  },
+  "link": {
+    "message": "Link to the rating"
+  },
+  "linkPlaceholder": {
+    "message": "Insert a link to the rating here"
+  },
+  "errorLink": {
+    "message": "$url$ is not supported by the extension. Please note that here you need to specify a link to monitoring (rating) and not to the project site itself (server). You can also try manual addition mode",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "switchModeAdd": {
+    "message": "Switch the add mode to manual"
   }
 }

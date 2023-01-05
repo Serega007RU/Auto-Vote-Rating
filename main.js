@@ -157,7 +157,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             disabledWarnCaptcha: false,
             debug: false,
             disabledUseRemoteCode: false,
-            disabledSendErrorSentry: false
+            disabledSendErrorSentry: false,
+            expertMode: false
         }
         await other.add(settings, 'settings')
         generalStats = {

@@ -236,10 +236,10 @@ async function newWindow(project) {
     if (project.rating === 'Custom') {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && allProjects[project.rating]('silentVote', project)) {
+        if (!project.emulateMode && allProjects[project.rating].silentVote?.(project)) {
             silentVoteMode = true
         }
-    } else if (project.silentMode && allProjects[project.rating]('silentVote', project)) {
+    } else if (project.silentMode && allProjects[project.rating].silentVote?.(project)) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
@@ -259,7 +259,7 @@ async function newWindow(project) {
             await chrome.windows.update(window.id, {focused: false})
         }
 
-        const url = allProjects[project.rating]('voteURL', project)
+        const url = allProjects[project.rating].voteURL(project)
 
         let tab = await chrome.tabs.create({url, active: settings.disabledFocusedTab})
             .catch(error => endVote({message: error}, null, project))
@@ -489,7 +489,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
         }
 
         files.push('scripts/main/visible.js')
-        if (projectByURL(details.url)?.('needIsTrusted')) {
+        if (allProjects[projectByURL(details.url)]?.needIsTrusted?.()) {
             files.push('scripts/main/istrusted.js')
         }
     } else if (details.url.match(/hcaptcha.com\/captcha\/*/)
@@ -553,7 +553,8 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 textApi = await responseApi.text()
                 const responseScript = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '.js')
                 textScript = await responseScript.text()
-                if (allProjects[project.rating]('needWorld')) {
+                // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                if (allProjects[project.rating].needWorld?.()) {
                     const responseWorld = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_world.js')
                     textWorld = await responseWorld.text()
                 }
@@ -566,7 +567,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         }
 
         try {
-            if (allProjects[project.rating]('needPrompt')) {
+            if (allProjects[project.rating].needPrompt?.()) {
                 const funcPrompt = function(nick) {
                     prompt = function() {
                         return nick
@@ -578,7 +579,8 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             if (eval) {
                 await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
                 await chrome.tabs.sendMessage(details.tabId, {textEval: true, textApi, textScript})
-                if (allProjects[project.rating]('needWorld')) {
+                // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                if (allProjects[project.rating].needWorld?.()) {
                     await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['libs/evalCore.umd.js']})
                     const funcWorld = function(text) {
                         // noinspection JSUnresolvedFunction,JSUnresolvedVariable
@@ -589,7 +591,8 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 }
             } else {
                 await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
-                if (allProjects[project.rating]('needWorld')) {
+                // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                if (allProjects[project.rating].needWorld?.()) {
                     await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + project.rating.toLowerCase() +'_world.js']})
                 }
             }
@@ -1290,9 +1293,9 @@ function sendNotification(title, message) {
 
 function getProjectPrefix(project, detailed) {
     if (detailed) {
-        return '[' + allProjects[project.rating]('URL', project) + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + ' '
+        return '[' + allProjects[project.rating].URL() + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + ' '
     } else {
-        return '[' + allProjects[project.rating]('URL', project) + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' ' : '') + (project.name != null ? '– ' + project.name : '– ' + project.id)
+        return '[' + allProjects[project.rating].URL() + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' ' : '') + (project.name != null ? '– ' + project.name : '– ' + project.id)
     }
 }
 

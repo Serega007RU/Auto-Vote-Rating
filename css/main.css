@@ -488,10 +488,11 @@ nav .logo img {
 	font-size: 16px;
 }
 
-#addProject {
+#addProject,
+#addProjectExpert {
 	margin-top: 20px;
+	grid-template-columns: auto 490px auto;
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
 	grid-gap: 20px;
 }
 
@@ -536,7 +537,8 @@ nav .logo img {
     }
 
     .userSettings,
-    #addProject {
+	#addProject,
+    #addProjectExpert {
     	grid-template-columns: none;
     }
 
@@ -598,6 +600,13 @@ nav .logo img {
 
 [data-resource="notAdded"], [data-resource="load"] {
 	font-size: 14px;
+	display: block;
+	text-align: center;
+	margin: 10px 0;
+}
+
+#load, #load [data-resource="load"] {
+	font-size: 24px;
 	display: block;
 	text-align: center;
 	margin: 10px 0;
