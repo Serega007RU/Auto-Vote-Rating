@@ -35,6 +35,13 @@ var allProjects = {
         exampleURL: () => ['https://minecraftrating.ru/projects/', 'cubixworld', '/'],
         URL: () => 'minecraftrating.ru',
         parseURL: (url) => ({game: url.pathname.split('/')[1] === 'projects' ? 'projects': 'servers', id: url.pathname.split('/')[2]}),
+        exampleURLGame: () => ['https://minecraftrating.ru/', 'projects', '/mcskill/'],
+        defaultGame: () => 'projects',
+        gameList: () => new Map([
+            ['projects', 'Проекты'],
+            ['servers', 'Сервера (нет награды за голосование)']
+        ]),
+        notRequiredNick: (project) => project?.game === 'servers'
     },
     MonitoringMinecraft: {
         voteURL: (project) => 'https://monitoringminecraft.ru/top/' + project.id + '/vote',
@@ -81,7 +88,26 @@ var allProjects = {
                 project.id = paths[2]
             }
             return project
-        }
+        },
+        limitedCountVote: () => true,
+        exampleURLGame: () => ['https://serveur-prive.net/', 'minecraft', '/gommehd-net-4932'],
+        defaultGame: () => 'minecraft',
+        gameList: () => new Map([
+            ['ark', 'ARK'],
+            ['ark-survival-evolved', 'Ark : Survival Evolved'],
+            ['discord', 'Discord'],
+            ['garrys-mod', "Garry's Mod"],
+            ['grand-theft-auto', 'Grand Theft Auto V'],
+            ['hytale', 'Hytale'],
+            ['minecraft', 'Minecraft'],
+            ['minecraft-bedrock', 'Minecraft Bedrock'],
+            ['rust', 'Rust']
+        ]),
+        defaultLand: () => 'fr',
+        langList: () => new Map([
+            ['en', 'English'],
+            ['fr', 'Français']
+        ])
     },
     PlanetMinecraft: {
         voteURL: (project) => 'https://www.planetminecraft.com/server/' + project.id + '/vote/',
@@ -97,7 +123,15 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.sheader').textContent,
         exampleURL: () => ['https://topg.org/minecraft-servers/server-', '405637', ''],
         URL: () => 'topg.org',
-        parseURL: (url) => ({ game: url.pathname.split('/')[1], id: url.pathname.split('/')[2].replace('server-', '')})
+        parseURL: (url) => ({ game: url.pathname.split('/')[1], id: url.pathname.split('/')[2].replace('server-', '')}),
+        exampleURLGame: () => ['https://topg.org/', 'minecraft-servers', '/server-405637'],
+        gameList: () => new Map([
+            ['minecraft-servers', 'Minecraft'],
+            ['cs-servers', 'Counter Strike: 1.6'],
+            ['mu-private-servers', 'Mu Online'],
+            ['wow-private-servers', 'World of Warcraft'],
+            ['runescape-private-servers', 'Runescape']
+        ])
     },
     ListForge: {
         voteURL: (project) => 'https://' + project.game + '/server/' + project.id + '/vote/' + (project.addition != null ? project.addition : ''),
@@ -132,7 +166,40 @@ var allProjects = {
                     return el.textContent.trim()
                 }
             }
-        }
+        },
+        exampleURLGame: () => ['https://', 'minecraft-mp.com', '/server/207380/vote/'],
+        gameList: () => new Map([
+            ['7daystodie-servers.com', '7 Days To Die'],
+            ['ark-servers.net', 'ARK : Survival Evolved'],
+            ['arma3-servers.net', 'Arma3'],
+            ['atlas-servers.io', 'Atlas'],
+            ['conan-exiles.com', 'Conan Exiles'],
+            ['counter-strike-servers.net', 'Counter Strike : Global Offensive'],
+            ['cubeworld-servers.com', 'Cube World'],
+            ['dayz-servers.org', 'DayZ'],
+            ['ecoservers.io', 'ECO'],
+            ['empyrion-servers.com', 'Empyrion'],
+            ['gmod-servers.com', "Garry's Mod"],
+            ['hurtworld-servers.net', 'Hurtworld'],
+            ['hytale-servers.io', 'Hytale'],
+            ['life-is-feudal.org', 'Life is Feudal'],
+            ['minecraft-mp.com', 'Minecraft'],
+            ['minecraftpocket-servers.com', 'Minecraft Pocket'],
+            ['minecraft-tracker.com', 'Minecraft Tracker'],
+            ['miscreated-servers.com', 'Miscreated'],
+            ['reign-of-kings.net', 'Reign of Kings'],
+            ['rust-servers.net', 'Rust'],
+            ['space-engineers.com', 'Space Engineers'],
+            ['squad-servers.com', 'Squad'],
+            ['starbound-servers.net', 'Starbound'],
+            ['tf2-servers.com', 'Team Fortress 2'],
+            ['teamspeak-servers.org', 'Teamspeak'],
+            ['terraria-servers.com', 'Terraria'],
+            ['unturned-servers.net', 'Unturned'],
+            ['wurm-unlimited.com', 'Wurm Unlimited']
+        ]),
+        optionalNick: () => true,
+        additionExampleURL: () => ['https://minecraft-mp.com/server/41366/vote/', '?alternate_captcha=1', '']
     },
     MinecraftServerList: {
         voteURL: (project) => 'https://minecraft-server-list.com/server/' + project.id + '/vote/',
@@ -248,7 +315,33 @@ var allProjects = {
             project.game = paths[1]
             project.id = paths[2]
             return project
-        }
+        },
+        limitedCountVote: () => true,
+        exampleURLGame: () => ['https://top-serveurs.net/', 'minecraft', '/hailcraft'],
+        defaultGame: () => 'minecraft',
+        gameList: () => new Map([
+            ['ark', 'ARK'],
+            ['dayz', 'Dayz'],
+            ['discord', 'Discord'],
+            ['garrys-mod', "Garry's mod"],
+            ['gta', 'GTA 5'],
+            ['hytale', 'Hytale'],
+            ['l4d2', 'Left 4 Dead 2'],
+            ['minecraft', 'Minecraft'],
+            ['rdr', 'Red Dead Redemption 2'],
+            ['roblox', 'Roblox'],
+            ['rust', 'Rust'],
+            ['terraria', 'Terraria']
+        ]),
+        defaultLand: () => 'fr',
+        langList: () => new Map([
+            ['de', 'Deutsch'],
+            ['en', 'English'],
+            ['es', 'Español'],
+            ['fr', 'Français'],
+            ['pt', 'Português'],
+            ['ru', 'Русский']
+        ])
     },
     TMonitoring: {
         voteURL: (project) => 'https://tmonitoring.com/server/' + project.id + '/',
@@ -281,7 +374,15 @@ var allProjects = {
                 project.addition = ''
             }
             return project
-        }
+        },
+        exampleURLGame: () => ['https://top.gg/', 'bot', '/270904126974590976/vote'],
+        defaultGame: () => 'bot',
+        gameList: () => new Map([
+            ['bot', 'Bots'],
+            ['servers', 'Guilds']
+        ]),
+        notRequiredNick: () => true,
+        additionExampleURL: () => ['https://top.gg/bot/617037497574359050/vote', '?currency=DOGE', '']
     },
     DiscordBotList: {
         voteURL: (project) => 'https://discordbotlist.com/' + project.game + '/' + project.id + '/upvote',
@@ -289,7 +390,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('h1.bot-name').textContent.trim(),
         exampleURL: () => ['https://discordbotlist.com/bots/', 'dank-memer', '/upvote'],
         URL: () => 'discordbotlist.com',
-        parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
+        notRequiredNick: () => true
     },
     Discords: {
         voteURL: (project) => 'https://discords.com/' + project.game + '/' + project.id + (project.game === 'servers' ? '/upvote' : '/vote'),
@@ -297,7 +399,8 @@ var allProjects = {
         projectName: (doc, project) => project.game === 'servers' ? doc.querySelector('.servernameh1').textContent : doc.querySelector('.bot-title-bp h2').textContent,
         exampleURL: () => ['https://discords.com/bots/bot/', '469610550159212554', '/vote'],
         URL: () => 'discords.com',
-        parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
+        notRequiredNick: () => true
     },
     MMoTopRU: {
         voteURL: (project) => {
@@ -330,7 +433,24 @@ var allProjects = {
             }
             return project
         },
-        oneProject: () => 1
+        oneProject: () => 1,
+        ordinalWorld: () => true,
+        exampleURLGame: () => ['https://', 'pw', '.mmotop.ru/servers/25895/votes/new'],
+        gameList: () => new Map([
+            ['aion', 'Aion'],
+            ['mu', 'Global FIU Online'],
+            ['jd', 'Jade Dynasty'],
+            ['la2', 'Lineage 2'],
+            ['all', 'Online Games (All)'],
+            ['pw', 'Perfect World'],
+            ['rf', 'RF Online'],
+            ['wow', 'World War Craft']
+        ]),
+        defaultLand: () => 'ru',
+        langList: () => new Map([
+            ['en', 'English'],
+            ['ru', 'Русский']
+        ])
     },
     MCServers: {
         voteURL: (project) => 'https://mc-servers.com/vote/' + project.id + '/',
@@ -371,7 +491,8 @@ var allProjects = {
         exampleURL: () => ['https://mcserver-list.eu/hlasovat/', '416', ''],
         URL: () => 'mcserver-list.eu',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        silentVote: () => true
+        silentVote: () => true,
+        limitedCountVote: () => true
     },
     CraftList: {
         voteURL: (project) => 'https://craftlist.org/' + project.id,
@@ -387,7 +508,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('a.server-name').textContent,
         exampleURL: () => ['https://czech-craft.eu/server/', 'trenend', '/vote/'],
         URL: () => 'czech-craft.eu',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        limitedCountVote: () => true
     },
     MinecraftBuzz: {
         voteURL: (project) => 'https://minecraft.buzz/vote/' + project.id,
@@ -403,7 +525,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.container div.box h1.title').textContent,
         exampleURL: () => ['https://minecraftservery.eu/server/', '105', ''],
         URL: () => 'minecraftservery.eu',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        limitedCountVote: () => true
     },
     RPGParadize: {
         voteURL: (project) => 'https://www.rpg-paradize.com/?page=vote&vote=' + project.id,
@@ -477,7 +600,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('th.server').textContent.trim(),
         exampleURL: () => ['https://bestservers.com/server/', '1135', '/vote'],
         URL: () => 'bestservers.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        optionalNick: () => true
     },
     CraftListNet: {
         voteURL: (project) => 'https://craft-list.net/minecraft-server/' + project.id + '/vote',
@@ -524,7 +648,72 @@ var allProjects = {
             project.game = paths[2]
             project.id = paths[4]
             return project
-        }
+        },
+        exampleURLGame: () => ['https://gtop100.com/topsites/', 'MapleStory', '/sitedetails/Ristonia--v224--98344?vote=1&pingUsername=kingcloudian'],
+        gameList: () => new Map([
+            ['4Story', '4Story'],
+            ['ACE-Online', 'ACE Online'],
+            ['ARK-Survival-Evolved', 'ARK Survival Evolved'],
+            ['Agario', 'Agario'],
+            ['Aion-Online', 'Aion Online'],
+            ['Allods-Online', 'Allods Online'],
+            ['Battle-of-the-Immortals', 'Battle of the Immortals'],
+            ['Black-Desert-Online', 'Black Desert Online'],
+            ['Cabal-Online', 'Cabal Online'],
+            ['Conquer-Online', 'Conquer Online'],
+            ['Counter-Strike', 'Counter Strike'],
+            ['Dekaron', 'Dekaron'],
+            ['Dragon-Nest', 'Dragon Nest'],
+            ['Dragonica-Online', 'Dragonica Online'],
+            ['dungeon-fighter-online-private-servers', 'Dungeon Fighter Online'],
+            ['Ether-Saga-Odyssey', 'Ether Saga Odyssey'],
+            ['Flyff', 'Flyff'],
+            ['Forsaken-World', 'Forsaken World'],
+            ['Free-Online-Games', 'Free Online Games'],
+            ['Grand-Chase', 'Grand Chase'],
+            ['Habbo-Hotel', 'Habbo Hotel'],
+            ['Helbreath', 'Helbreath'],
+            ['Iris-Online', 'Iris Online'],
+            ['Jade-Dynasty', 'Jade Dynasty'],
+            ['Knight-Online', 'Knight Online'],
+            ['Last-Chaos', 'Last Chaos'],
+            ['Latale', 'Latale'],
+            ['Legend-Of-Mir', 'Legend Of Mir'],
+            ['Legends-of-Aria', 'Legends of Aria'],
+            ['life-is-feudal-servers', 'Life is feudal'],
+            ['Lineage-2', 'Lineage 2'],
+            ['Luna-Online', 'Luna Online'],
+            ['MMORPG-And-MPOG', 'MMORPG And MPOG'],
+            ['MapleStory', 'MapleStory'],
+            ['Metin2', 'Metin2'],
+            ['Minecraft-Servers', 'Minecraft'],
+            ['Mu-Online', 'Mu Online'],
+            ['Ogame', 'Ogame'],
+            ['Perfect-World', 'Perfect World'],
+            ['Priston-Tale', 'Priston Tale'],
+            ['RF-Online', 'RF Online'],
+            ['Ragnarok-Online', 'Ragnarok Online'],
+            ['RaiderZ-Online', 'RaiderZ Online'],
+            ['Ran-Online', 'Ran Online'],
+            ['Rappelz', 'Rappelz'],
+            ['Rohan', 'Rohan'],
+            ['Rose-Online', 'Rose Online'],
+            ['Runes-of-Magic', 'Runes of Magic'],
+            ['Runescape-private-server-top-100-list', 'Runescape'],
+            ['Rust', 'Rust'],
+            ['Rusty-Hearts', 'Rusty Hearts'],
+            ['Seal-Online', 'Seal Online'],
+            ['Shaiya', 'Shaiya'],
+            ['Silkroad-Online', 'Silkroad Online'],
+            ['Swordsman', 'Swordsman'],
+            ['Tales-Of-Pirates', 'Tales Of Pirates'],
+            ['Tera', 'Tera'],
+            ['Terraria', 'Terraria'],
+            ['Travian', 'Travian'],
+            ['Ultima-Online', 'Ultima Online'],
+            ['War-of-the-Immortals', 'War of the Immortals'],
+            ['World-of-Warcraft', 'World of Warcraft']
+        ])
     },
     WARGM: {
         voteURL: (project) => 'https://wargm.ru/server/' + project.id + '/votes',
@@ -533,7 +722,9 @@ var allProjects = {
         exampleURL: () => ['https://wargm.ru/server/', '23394', '/votes'],
         URL: () => 'wargm.ru',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        needIsTrusted: () => true
+        needIsTrusted: () => true,
+        notRequiredNick: () => true,
+        banAttention: () => true
     },
     MineStatus: {
         voteURL: (project) => 'https://minestatus.net/server/vote/' + project.id,
@@ -558,8 +749,9 @@ var allProjects = {
         },
         exampleURL: () => ['https://misterlauncher.org/projects/', 'omegamc', '/'],
         URL: () => 'misterlauncher.org',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        silentVote: (project) => project.game === 'projects'
+        parseURL: (url) => ({game: url.pathname.split('/')[1] === 'projects' ? 'projects': 'servers', id: url.pathname.split('/')[2]}),
+        silentVote: (project) => project.game === 'projects',
+        notRequiredNick: (project) => project?.game === 'servers'
     },
     MinecraftServersDe: {
         voteURL: (project) => 'https://minecraft-servers.de/server/' + project.id + '/vote',
@@ -575,7 +767,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.container h3 > span').textContent,
         exampleURL: () => ['https://discord.boats/bot/', '557628352828014614', '/vote'],
         URL: () => 'discord.boats',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        notRequiredNick: () => true
     },
     ServerListGames: {
         voteURL: (project) => 'https://serverlist.games/vote/' + project.id,
@@ -615,7 +808,16 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('#title h1').textContent,
         exampleURL: () => ['https://mineservers.com/server/', 'jvvHdPJy', '/vote'],
         URL: () => 'mineservers.com',
-        parseURL: (url) => ({game: url.hostname, id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({game: url.hostname, id: url.pathname.split('/')[2]}),
+        exampleURLGame: () => ['https://', 'mineservers.com', '/server/2zQ6UmWN/vote'],
+        defaultGame: () => 'mineservers.com',
+        gameList: () => new Map([
+            ['mineservers.com', ''],
+            ['pixelmonservers.com', ''],
+            ['tekkitserverlist.com', ''],
+            ['technicservers.com', ''],
+            ['ftbservers.com', '']
+        ])
     },
     ATLauncher: {
         voteURL: (project) => 'https://atlauncher.com/servers/server/' + project.id + '/vote',
@@ -639,7 +841,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.content__box__server__content__detail__firstRow .text-center').textContent.trim(),
         exampleURL: () => ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote'],
         URL: () => 'minecraft-list.cz',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        limitedCountVote: () => true
     },
     ListeServeursMinecraft: {
         voteURL: (project) => 'https://www.liste-serveurs-minecraft.org/vote/?idc=' + project.id,
@@ -662,7 +865,8 @@ var allProjects = {
             }
             return project
         },
-        notFound: (doc) => doc.querySelector('#core_middle_column div.panel-body') != null && doc.querySelector('#core_middle_column div.panel-body').textContent.includes('serveur est introuvable')
+        notFound: (doc) => doc.querySelector('#core_middle_column div.panel-body') != null && doc.querySelector('#core_middle_column div.panel-body').textContent.includes('serveur est introuvable'),
+        limitedCountVote: () => true
     },
     MCServidores: {
         voteURL: (project) => 'https://mcservidores.com/servidor/' + project.id,
@@ -687,7 +891,8 @@ var allProjects = {
                 project.id = url.pathname.split('/')[1].replace('sitedetails-', '')
             }
             return project
-        }
+        },
+        notRequiredNick: () => true
     },
     MinecraftServerSk: {
         voteURL: (project) => 'https://minecraft-server.sk/' + project.id + '/vote',
@@ -711,7 +916,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('h1.text-center').textContent,
         exampleURL: () => ['https://serveurs-mc.net/serveur/', '82', '/voter'],
         URL: () => 'serveurs-mc.net',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        limitedCountVote: () => true
     },
     ServeursMinecraftCom: {
         voteURL: (project) => 'https://serveur-minecraft.com/' + project.id,
@@ -719,7 +925,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.title h1').textContent,
         exampleURL: () => ['https://serveur-minecraft.com/', '2908', ''],
         URL: () => 'serveur-minecraft.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]})
+        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        limitedCountVote: () => true
     },
     ServeurMinecraftVoteFr: {
         voteURL: (project) => 'https://serveur-minecraft-vote.fr/serveurs/' + project.id + '/vote',
@@ -727,7 +934,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.server-name').textContent,
         exampleURL: () => ['https://serveur-minecraft-vote.fr/serveurs/', 'ectalia.425', '/vote'],
         URL: () => 'serveur-minecraft-vote.fr',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        limitedCountVote: () => true
     },
     MineBrowseCom: {
         voteURL: (project) => 'https://minebrowse.com/server/' + project.id,
@@ -768,7 +976,21 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.title [itemprop="name"]').textContent,
         exampleURL: () => ['https://wow.mmorpg.top/server/', '23', ''],
         URL: () => 'mmorpg.top',
-        parseURL: (url) => ({game: url.hostname.split('.')[0], id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({game: url.hostname.split('.')[0], id: url.pathname.split('/')[2]}),
+        ordinalWorld: () => true,
+        exampleURLGame: () => ['https://', 'wow', '.mmorpg.top/server/23'],
+        gameList: () => new Map([
+            ['l2', 'Lineage 2'],
+            ['wow', 'World of Warcraft'],
+            ['aion', 'Aion'],
+            ['mu', 'MU Online'],
+            ['jd', 'Jade Dynasty'],
+            ['pw', 'Perfect World'],
+            ['rf', 'RF Online'],
+            ['so', 'Silkroad Online'],
+            ['co', 'Conquer Online'],
+            ['og', 'Other games']
+        ])
     },
     MmoVoteRu: {
         voteURL: (project) => 'https://' + project.game +'.mmovote.ru/ru/vote/' + project.id,
@@ -776,7 +998,20 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.content .box h2').textContent.replace('Голосование за ', ''),
         exampleURL: () => ['https://wow.mmovote.ru/ru/vote/', '85', ''],
         URL: () => 'mmovote.ru',
-        parseURL: (url) => ({game: url.hostname.split('.')[0], id: url.pathname.split('/')[3]})
+        parseURL: (url) => ({game: url.hostname.split('.')[0], id: url.pathname.split('/')[3]}),
+        ordinalWorld: () => true,
+        exampleURLGame: () => ['https://', 'wow', '.mmovote.ru/ru/vote/85'],
+        gameList: () => new Map([
+            ['wow', 'World of Warcraft'],
+            ['l2', 'Lineage 2'],
+            ['aion', 'Aion'],
+            ['mu', 'MU Online'],
+            ['rf', 'RF Online'],
+            ['jade', 'Jade Dynasty'],
+            ['games', 'Online Games'],
+            ['pw', 'Perfect World'],
+            ['minecraft', 'Minecraft']
+        ])
     },
     McMonitoringInfo: {
         voteURL: (project) => {
@@ -815,7 +1050,14 @@ var allProjects = {
                 project.game = paths[1]
             }
             return project
-        }
+        },
+        exampleURLGame: () => ['https://mc-monitoring.info/', 'wow', '/server/vote/112'],
+        gameList: () => new Map([
+            ['wow', 'World of Warcraft'],
+            ['l2', 'Lineage 2'],
+            ['gta', 'GTA'],
+            ['minecraft', 'Minecraft']
+        ])
     },
     McServerTimeCom: {
         voteURL: (project) => 'https://mcservertime.com/' + project.id + '/vote',
@@ -831,7 +1073,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.server.icon').parentElement.innerText.trim(),
         exampleURL: () => ['https://www.liste-serveurs.fr/', 'server-pixel-prime-serveur-pixelmon.512', '/vote'],
         URL: () => 'liste-serveurs.fr',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]})
+        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        limitedCountVote: () => true
     },
     ServeurMinecraftFr: {
         voteURL: (project) => 'https://serveur-minecraft.fr/' + project.id + '/vote',
@@ -855,7 +1098,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.container.text-center h1.h2').textContent,
         exampleURL: () => ['https://www.top100arena.com/listing/', '94246', '/vote'],
         URL: () => 'top100arena.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        notRequiredNick: () => true
     },
     MinecraftBestServersCom: {
         voteURL: (project) => 'https://minecraftbestservers.com/' + project.id + '/vote',
@@ -935,128 +1179,128 @@ var allProjects = {
     }
 }
 
-function projectByURL(url) {
-    url = getDomainWithoutSubdomain(url)
-    switch (url) {
-        case 'topcraft.ru': return 'TopCraft'
-        case 'mctop.su': return 'McTOP'
-        case 'mcrate.su': return 'MCRate'
-        case 'minecraftrating.ru': return 'MinecraftRating'
-        case 'monitoringminecraft.ru': return 'MonitoringMinecraft'
-        case 'ionmc.top': return 'IonMc'
-        case 'minecraftservers.org': return 'MinecraftServersOrg'
-        case 'serveur-prive.net': return 'ServeurPrive'
-        case 'planetminecraft.com': return 'PlanetMinecraft'
-        case 'topg.org': return 'TopG'
-        case 'listforge.net': return 'ListForge'
-        case 'ark-servers.net': return 'ListForge'
-        case 'arma3-servers.net': return 'ListForge'
-        case 'atlas-servers.io': return 'ListForge'
-        case 'conan-exiles.com': return 'ListForge'
-        case 'counter-strike-servers.net': return 'ListForge'
-        case 'cubeworld-servers.com': return 'ListForge'
-        case 'dayz-servers.org': return 'ListForge'
-        case 'ecoservers.io': return 'ListForge'
-        case 'empyrion-servers.com': return 'ListForge'
-        case 'gmod-servers.com': return 'ListForge'
-        case 'hurtworld-servers.net': return 'ListForge'
-        case 'hytale-servers.io': return 'ListForge'
-        case 'life-is-feudal.org': return 'ListForge'
-        case 'minecraft-mp.com': return 'ListForge'
-        case 'minecraftpocket-servers.com': return 'ListForge'
-        case 'minecraft-tracker.com': return 'ListForge'
-        case 'miscreated-servers.com': return 'ListForge'
-        case 'reign-of-kings.net': return 'ListForge'
-        case 'rust-servers.net': return 'ListForge'
-        case 'space-engineers.com': return 'ListForge'
-        case 'squad-servers.com': return 'ListForge'
-        case 'starbound-servers.net': return 'ListForge'
-        case 'tf2-servers.com': return 'ListForge'
-        case 'teamspeak-servers.org': return 'ListForge'
-        case 'terraria-servers.com': return 'ListForge'
-        case 'unturned-servers.net': return 'ListForge'
-        case 'wurm-unlimited.com': return 'ListForge'
-        case 'minecraft-server-list.com': return 'MinecraftServerList'
-        case 'serverpact.com': return 'ServerPact'
-        case 'minecraftiplist.com': return 'MinecraftIpList'
-        case 'topminecraftservers.org': return 'TopMinecraftServers'
-        case 'minecraftservers.biz': return 'MinecraftServersBiz'
-        case 'hotmc.ru': return 'HotMC'
-        case 'minecraft-server.net': return 'MinecraftServerNet'
-        case 'top-games.net': return 'TopGames'
-        case 'top-serveurs.net': return 'TopGames'
-        case 'tmonitoring.com': return 'TMonitoring'
-        case 'top.gg': return 'TopGG'
-        case 'discordbotlist.com': return 'DiscordBotList'
-        case 'discords.com': return 'Discords'
-        case 'mmotop.ru': return 'MMoTopRU'
-        case 'mc-servers.com': return 'MCServers'
-        case 'minecraftlist.org': return 'MinecraftList'
-        case 'minecraft-index.com': return 'MinecraftIndex'
-        case 'serverlist101.com': return 'ServerList101'
-        case 'mcserver-list.eu': return 'MCServerList'
-        case 'craftlist.org': return 'CraftList'
-        case 'czech-craft.eu': return 'CzechCraft'
-        case 'minecraft.buzz': return 'MinecraftBuzz'
-        case 'minecraftservery.eu': return 'MinecraftServery'
-        case 'rpg-paradize.com': return 'RPGParadize'
-        case 'minecraft-serverlist.net': return 'MinecraftServerListNet'
-        case 'minecraft-server.eu': return 'MinecraftServerEu'
-        case 'minecraftkrant.nl': return 'MinecraftKrant'
-        case 'trackyserver.com': return 'TrackyServer'
-        case 'mc-lists.org': return 'MCListsOrg'
-        case 'topmcservers.com': return 'TopMCServersCom'
-        case 'bestservers.com': return 'BestServersCom'
-        case 'craft-list.net': return 'CraftListNet'
-        case 'minecraft-servers-list.org': return 'MinecraftServersListOrg'
-        case 'serverliste.net': return 'ServerListe'
-        case 'gtop100.com': return 'gTop100'
-        case 'wargm.ru': return 'WARGM'
-        case 'minestatus.net': return 'MineStatus'
-        case 'misterlauncher.org': return 'MisterLauncher'
-        case 'minecraft-servers.de': return 'MinecraftServersDe'
-        case 'discord.boats': return 'DiscordBoats'
-        case 'serverlist.games': return 'ServerListGames'
-        case 'best-minecraft-servers.co': return 'BestMinecraftServers'
-        case 'minecraftservers100.com': return 'MinecraftServers100'
-        case 'mc-serverlist.cz': return 'MCServerListCZ'
-        case 'mineservers.com': return 'MineServers'
-        case 'pixelmonservers.com': return 'MineServers'
-        case 'tekkitserverlist.com': return 'MineServers'
-        case 'technicservers.com': return 'MineServers'
-        case 'ftbservers.com': return 'MineServers'
-        case 'atlauncher.com': return 'ATLauncher'
-        case 'servers-minecraft.net': return 'ServersMinecraft'
-        case 'minecraft-list.cz': return 'MinecraftListCZ'
-        case 'liste-serveurs-minecraft.org': return 'ListeServeursMinecraft'
-        case 'mcservidores.com': return 'MCServidores'
-        case 'xtremetop100.com': return 'XtremeTop100'
-        case 'minecraft-server.sk': return 'MinecraftServerSk'
-        case 'serveursminecraft.org': return 'ServeursMinecraftOrg'
-        case 'serveurs-mc.net': return 'ServeursMCNet'
-        case 'serveur-minecraft.com': return 'ServeursMinecraftCom'
-        case 'serveur-minecraft-vote.fr': return 'ServeurMinecraftVoteFr'
-        case 'minebrowse.com': return 'MineBrowseCom'
-        case 'mc-server-list.com': return 'MCServerListCom'
-        case 'serverlocator.com': return 'ServerLocatorCom'
-        case 'top-mmogames.ru': return 'TopMmoGamesRu'
-        case 'mmorpg.top': return 'MmoRpgTop'
-        case 'mmovote.ru': return 'MmoVoteRu'
-        case 'mc-monitoring.info': return 'McMonitoringInfo'
-        case 'mcservertime.com': return 'McServerTimeCom'
-        case 'liste-serveurs.fr': return 'ListeServeursFr'
-        case 'serveur-minecraft.fr': return 'ServeurMinecraftFr'
-        case 'mineserv.top': return 'MineServTop'
-        case 'top100arena.com': return 'Top100ArenaCom'
-        case 'minecraftbestservers.com': return 'MinecraftBestServersCom'
-        case 'mclike.com': return 'MCLikeCom'
-        case 'pixelmon-server-list.com': return 'PixelmonServerListCom'
-        case 'minecraftserver.sk': return 'MinecraftServerSk2'
-        case 'servidoresdeminecraft.es': return 'ServidoresdeMinecraftEs'
-        case 'minecraftsurvivalservers.com': return 'MinecraftSurvivalServersCom'
-        case 'minecraft.global': return 'MinecraftGlobal'
-    }
-}
+var projectByURL = new Map([
+    ['topcraft.ru', 'TopCraft'],
+    ['mctop.su', 'McTOP'],
+    ['mcrate.su', 'MCRate'],
+    ['minecraftrating.ru', 'MinecraftRating'],
+    ['monitoringminecraft.ru', 'MonitoringMinecraft'],
+    ['ionmc.top', 'IonMc'],
+    ['minecraftservers.org', 'MinecraftServersOrg'],
+    ['serveur-prive.net', 'ServeurPrive'],
+    ['planetminecraft.com', 'PlanetMinecraft'],
+    ['topg.org', 'TopG'],
+    ['listforge.net', 'ListForge'],
+    ['ark-servers.net', 'ListForge'],
+    ['arma3-servers.net', 'ListForge'],
+    ['atlas-servers.io', 'ListForge'],
+    ['conan-exiles.com', 'ListForge'],
+    ['counter-strike-servers.net', 'ListForge'],
+    ['cubeworld-servers.com', 'ListForge'],
+    ['dayz-servers.org', 'ListForge'],
+    ['ecoservers.io', 'ListForge'],
+    ['empyrion-servers.com', 'ListForge'],
+    ['gmod-servers.com', 'ListForge'],
+    ['hurtworld-servers.net', 'ListForge'],
+    ['hytale-servers.io', 'ListForge'],
+    ['life-is-feudal.org', 'ListForge'],
+    ['minecraft-mp.com', 'ListForge'],
+    ['minecraftpocket-servers.com', 'ListForge'],
+    ['minecraft-tracker.com', 'ListForge'],
+    ['miscreated-servers.com', 'ListForge'],
+    ['reign-of-kings.net', 'ListForge'],
+    ['rust-servers.net', 'ListForge'],
+    ['space-engineers.com', 'ListForge'],
+    ['squad-servers.com', 'ListForge'],
+    ['starbound-servers.net', 'ListForge'],
+    ['tf2-servers.com', 'ListForge'],
+    ['teamspeak-servers.org', 'ListForge'],
+    ['terraria-servers.com', 'ListForge'],
+    ['unturned-servers.net', 'ListForge'],
+    ['wurm-unlimited.com', 'ListForge'],
+    ['minecraft-server-list.com', 'MinecraftServerList'],
+    ['serverpact.com', 'ServerPact'],
+    ['serverpact.nl', 'ServerPact'],
+    ['minecraftserverlijst.nl', 'ServerPact'],
+    ['minecraftserverlist.eu', 'ServerPact'],
+    ['minecraftiplist.com', 'MinecraftIpList'],
+    ['topminecraftservers.org', 'TopMinecraftServers'],
+    ['minecraftservers.biz', 'MinecraftServersBiz'],
+    ['hotmc.ru', 'HotMC'],
+    ['minecraft-server.net', 'MinecraftServerNet'],
+    ['top-games.net', 'TopGames'],
+    ['top-serveurs.net', 'TopGames'],
+    ['tmonitoring.com', 'TMonitoring'],
+    ['top.gg', 'TopGG'],
+    ['discordbotlist.com', 'DiscordBotList'],
+    ['discords.com', 'Discords'],
+    ['mmotop.ru', 'MMoTopRU'],
+    ['mc-servers.com', 'MCServers'],
+    ['minecraftlist.org', 'MinecraftList'],
+    ['minecraft-index.com', 'MinecraftIndex'],
+    ['serverlist101.com', 'ServerList101'],
+    ['mcserver-list.eu', 'MCServerList'],
+    ['craftlist.org', 'CraftList'],
+    ['czech-craft.eu', 'CzechCraft'],
+    ['minecraft.buzz', 'MinecraftBuzz'],
+    ['minecraftservery.eu', 'MinecraftServery'],
+    ['rpg-paradize.com', 'RPGParadize'],
+    ['minecraft-serverlist.net', 'MinecraftServerListNet'],
+    ['minecraft-server.eu', 'MinecraftServerEu'],
+    ['minecraftkrant.nl', 'MinecraftKrant'],
+    ['trackyserver.com', 'TrackyServer'],
+    ['mc-lists.org', 'MCListsOrg'],
+    ['topmcservers.com', 'TopMCServersCom'],
+    ['bestservers.com', 'BestServersCom'],
+    ['craft-list.net', 'CraftListNet'],
+    ['minecraft-servers-list.org', 'MinecraftServersListOrg'],
+    ['serverliste.net', 'ServerListe'],
+    ['gtop100.com', 'gTop100'],
+    ['wargm.ru', 'WARGM'],
+    ['minestatus.net', 'MineStatus'],
+    ['misterlauncher.org', 'MisterLauncher'],
+    ['minecraft-servers.de', 'MinecraftServersDe'],
+    ['discord.boats', 'DiscordBoats'],
+    ['serverlist.games', 'ServerListGames'],
+    ['best-minecraft-servers.co', 'BestMinecraftServers'],
+    ['minecraftservers100.com', 'MinecraftServers100'],
+    ['mc-serverlist.cz', 'MCServerListCZ'],
+    ['mineservers.com', 'MineServers'],
+    ['pixelmonservers.com', 'MineServers'],
+    ['tekkitserverlist.com', 'MineServers'],
+    ['technicservers.com', 'MineServers'],
+    ['ftbservers.com', 'MineServers'],
+    ['atlauncher.com', 'ATLauncher'],
+    ['servers-minecraft.net', 'ServersMinecraft'],
+    ['minecraft-list.cz', 'MinecraftListCZ'],
+    ['liste-serveurs-minecraft.org', 'ListeServeursMinecraft'],
+    ['mcservidores.com', 'MCServidores'],
+    ['xtremetop100.com', 'XtremeTop100'],
+    ['minecraft-server.sk', 'MinecraftServerSk'],
+    ['serveursminecraft.org', 'ServeursMinecraftOrg'],
+    ['serveurs-mc.net', 'ServeursMCNet'],
+    ['serveur-minecraft.com', 'ServeursMinecraftCom'],
+    ['serveur-minecraft-vote.fr', 'ServeurMinecraftVoteFr'],
+    ['minebrowse.com', 'MineBrowseCom'],
+    ['mc-server-list.com', 'MCServerListCom'],
+    ['serverlocator.com', 'ServerLocatorCom'],
+    ['top-mmogames.ru', 'TopMmoGamesRu'],
+    ['mmorpg.top', 'MmoRpgTop'],
+    ['mmovote.ru', 'MmoVoteRu'],
+    ['mc-monitoring.info', 'McMonitoringInfo'],
+    ['mcservertime.com', 'McServerTimeCom'],
+    ['liste-serveurs.fr', 'ListeServeursFr'],
+    ['serveur-minecraft.fr', 'ServeurMinecraftFr'],
+    ['mineserv.top', 'MineServTop'],
+    ['top100arena.com', 'Top100ArenaCom'],
+    ['minecraftbestservers.com', 'MinecraftBestServersCom'],
+    ['mclike.com', 'MCLikeCom'],
+    ['pixelmon-server-list.com', 'PixelmonServerListCom'],
+    ['minecraftserver.sk', 'MinecraftServerSk2'],
+    ['servidoresdeminecraft.es', 'ServidoresdeMinecraftEs'],
+    ['minecraftsurvivalservers.com', 'MinecraftSurvivalServersCom'],
+    ['minecraft.global', 'MinecraftGlobal']
+])
 
 const getDomainWithoutSubdomain = url => {
     const urlParts = new URL(url).hostname.split('.')

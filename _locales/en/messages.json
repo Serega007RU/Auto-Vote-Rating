@@ -402,9 +402,6 @@
   "inputProjectID": {
     "message": "Enter ID"
   },
-  "inputProjectIDOrList": {
-    "message": "Select an ID from the list or enter your"
-  },
   "developers": {
     "message": "Developers:"
   },
@@ -744,25 +741,7 @@
   "alertCaptcha": {
     "message": "There is a captcha on this rating page that the extension cannot pass, you will need to manually pass it, the extension will notify you about this."
   },
-  "chooseTopGG": {
-    "message": "What do we vote for?"
-  },
-  "bots": {
-    "message": "Bots"
-  },
-  "guilds": {
-    "message": "Guilds"
-  },
-  "servers": {
-    "message": "Servers"
-  },
-  "serversMinecraftRating": {
-    "message": "Servers (no reward for voting)"
-  },
-  "projects": {
-    "message": "Projects"
-  },
-  "additionTopGG": {
+  "additionURL": {
     "message": "Additional parameters (optional)"
   },
   "emptyError": {
@@ -778,9 +757,6 @@
         "content": "$1"
       }
     }
-  },
-  "notFast": {
-    "message": "Not so fast, wait for the function to run"
   },
   "voteMode": {
     "message": "Force the voting mode to be set"
@@ -908,6 +884,9 @@
   "banAttention": {
     "message": "Attention! There have been cases of blocking for auto-voting on this site, please use auto-voting on this site with caution, watch out for notifications and errors, if you are banned, then the author of the site has made a new bypass that determines that you are auto-voting, inform the extension developer if you are banned!"
   },
+  "rewardAttention": {
+    "message": "Attention! With the parameters you specified, you will not receive a reward for voting! What's the point of voting if you don't get anything for it?"
+  },
   "closedTab": {
     "message": "It looks like you have closed the tab on which the extension auto-voted"
   },
@@ -945,14 +924,28 @@
     "message": "Insert a link to the rating here"
   },
   "errorLink": {
-    "message": "$url$ is not supported by the extension. Please note that here you need to specify a link to monitoring (rating) and not to the project site itself (server). You can also try manual addition mode",
+    "message": "$url$ is not supported by the extension. Please note that here you need to specify a link to monitoring (rating) and not to the project site itself (server). You can also try manual addition mode (switch on the bottom right)",
     "placeholders": {
       "url": {
         "content": "$1"
       }
     }
   },
-  "switchModeAdd": {
-    "message": "Switch the add mode to manual"
+  "switchAddMode": {
+    "message": "Manual mode"
+  },
+  "storageUsed": {
+    "message": "Storage used: $value$ $unit$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      },
+      "unit": {
+        "content": "$2"
+      }
+    }
+  },
+  "edit": {
+    "message": "Edit"
   }
 }

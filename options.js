@@ -85,18 +85,20 @@ async function restoreOptions() {
     if (settings.enableCustom) addCustom()
     if (settings.expertMode) {
         document.getElementById('addTab').setAttribute('data-tab', 'appendExpert')
-        document.getElementById('appendExpert').style.display = 'block'
+        if (document.getElementById('addTab').classList.contains('active')) document.getElementById('appendExpert').style.display = 'block'
         document.getElementById("enabledSilentVote").parentElement.removeAttribute('style')
         document.getElementById("timeout").parentElement.removeAttribute('style')
         document.getElementById("timeoutError").parentElement.removeAttribute('style')
         document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
         document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
         document.getElementById("disabledDebug").parentElement.removeAttribute('style')
-        document.getElementById('addProjectExpert').style.gridTemplateColumns = 'repeat(2, 1fr)'
+        document.getElementById('addProjectExpert').classList.add('addProjectExpert')
+        document.getElementById('addProjectExpert').classList.remove('addProjectExpertManual')
         document.getElementById('advSettingsAdd').removeAttribute('style')
         document.getElementById('emptyDiv').remove()
+        document.querySelector('label[for="switchAddMode_2"]').style.display = 'none'
     } else {
-        document.getElementById('append').style.display = 'block'
+        if (document.getElementById('addTab').classList.contains('active')) document.getElementById('append').style.display = 'block'
     }
     await reloadProjectList()
 }
@@ -121,6 +123,7 @@ async function addProjectList(project) {
             project.key = await db.put('projects', project)
             await db.put('projects', project, project.key)
         }
+        usageSpace()
 
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent)
         document.querySelector('#' + project.rating + 'Button > span').textContent = String(count + 1)
@@ -165,6 +168,17 @@ async function addProjectList(project) {
 
     const div = document.createElement('div')
     div.classList.add('controlItems')
+
+    const img3 = document.createElement('div')
+    const img3svg = document.createElement('img')
+    const img3text = document.createElement('span')
+    img3text.classList.add('tooltiptext')
+    img3text.textContent = chrome.i18n.getMessage('edit')
+    img3.classList.add('projectStats')
+    img3svg.src = 'images/icons/edit.svg'
+    img3.appendChild(img3svg)
+    img3.appendChild(img3text)
+    div.appendChild(img3)
 
     const img0 = document.createElement('div')
     const img0svg = document.createElement('img')
@@ -226,14 +240,9 @@ async function addProjectList(project) {
     }
     //Слушатель кнопки "Удалить" на проект
     img2.addEventListener('click', async event => {
-        if (event.target.classList.contains('disabled')) {
-            createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-            return
-        } else {
-            event.target.classList.add('disabled')
-        }
+        event.target.disabled = true
         await removeProjectList(project)
-        event.target.classList.remove('disabled')
+        event.target.disabled = false
     })
     img0.addEventListener('click', async () => {
         project = await db.get('projects', project.key)
@@ -350,6 +359,7 @@ async function removeProjectList(project) {
         } catch (error) {
             createNotif(error.message, 'error')
         }
+        usageSpace()
 
         const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
         if (count <= 0) {
@@ -389,12 +399,7 @@ async function reloadProjectList() {
 //Слушатель дополнительных настроек
 for (const check of document.querySelectorAll('input[name=checkbox]')) {
     check.addEventListener('change', async function (event) {
-        if (event.target.classList.contains('disabled')) {
-            createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-            return
-        } else {
-            event.target.classList.add('disabled')
-        }
+        event.target.disabled = true
         let _return = false
         if (this.id === 'disabledNotifStart')
             settings.disabledNotifStart = this.checked
@@ -435,9 +440,11 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
                 document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
                 document.getElementById("disabledDebug").parentElement.removeAttribute('style')
-                document.getElementById('addProjectExpert').style.gridTemplateColumns = 'repeat(2, 1fr)'
+                document.getElementById('addProjectExpert').classList.add('addProjectExpert')
+                document.getElementById('addProjectExpert').classList.remove('addProjectExpertManual')
                 document.getElementById('advSettingsAdd').removeAttribute('style')
                 document.getElementById('emptyDiv').remove()
+                document.querySelector('label[for="switchAddMode_2"]').style.display = 'none'
             } else {
                 document.getElementById('addTab').setAttribute('data-tab', 'append')
                 document.getElementById("enabledSilentVote").parentElement.style.display = 'none'
@@ -446,11 +453,13 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById("disabledOneVote").parentElement.style.display = 'none'
                 document.getElementById("disabledFocusedTab").parentElement.style.display = 'none'
                 document.getElementById("disabledDebug").parentElement.style.display = 'none'
-                document.getElementById('addProjectExpert').removeAttribute('style')
+                document.getElementById('addProjectExpert').classList.add('addProjectExpertManual')
+                document.getElementById('addProjectExpert').classList.remove('addProjectExpert')
                 document.getElementById('advSettingsAdd').style.display = 'none'
                 const div = document.createElement('div')
                 div.id = 'emptyDiv'
                 document.getElementById('addProjectExpert').prepend(div)
+                document.querySelector('label[for="switchAddMode_2"]').removeAttribute('style')
             }
         } else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
@@ -465,24 +474,24 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
         } else if (this.id === 'customTimeOut') {
             if (this.checked) {
                 document.getElementById('lastDayMonth').disabled = false
-                document.getElementById('label6').removeAttribute('style')
+                document.getElementById('selectTime').parentElement.removeAttribute('style')
                 if (document.getElementById('selectTime').value === 'ms') {
-                    document.getElementById('label3').removeAttribute('style')
+                    document.getElementById('time').parentElement.removeAttribute('style')
                     document.getElementById('time').required = true
-                    document.getElementById('label7').style.display = 'none'
+                    document.getElementById('hour').parentElement.style.display = 'none'
                     document.getElementById('hour').required = false
                 } else {
-                    document.getElementById('label7').removeAttribute('style')
+                    document.getElementById('hour').parentElement.removeAttribute('style')
                     document.getElementById('hour').required = true
-                    document.getElementById('label3').style.display = 'none'
+                    document.getElementById('time').parentElement.style.display = 'none'
                     document.getElementById('time').required = false
                 }
             } else {
                 document.getElementById('lastDayMonth').disabled = true
-                document.getElementById('label6').style.display = 'none'
-                document.getElementById('label3').style.display = 'none'
+                document.getElementById('selectTime').parentElement.style.display = 'none'
+                document.getElementById('time').parentElement.style.display = 'none'
                 document.getElementById('time').required = false
-                document.getElementById('label7').style.display = 'none'
+                document.getElementById('hour').parentElement.style.display = 'none'
                 document.getElementById('hour').required = false
             }
             _return = true
@@ -490,37 +499,38 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             _return = true
         } else if (this.id === 'randomize') {
             if (this.checked) {
-                document.getElementById('label11').removeAttribute('style')
+                document.getElementById('randomizeMin').parentElement.removeAttribute('style')
                 document.getElementById('randomizeMin').required = true
                 document.getElementById('randomizeMax').required = true
             } else {
-                document.getElementById('label11').style.display = 'none'
+                document.getElementById('randomizeMin').parentElement.style.display = 'none'
                 document.getElementById('randomizeMin').required = false
                 document.getElementById('randomizeMax').required = false
             }
             _return = true
         } else if (this.id === 'scheduleTimeCheckbox') {
             if (this.checked) {
-                document.getElementById('label9').removeAttribute('style')
+                document.getElementById('scheduleTime').parentElement.removeAttribute('style')
                 document.getElementById('scheduleTime').required = true
             } else {
-                document.getElementById('label9').style.display = 'none'
+                document.getElementById('scheduleTime').parentElement.style.display = 'none'
                 document.getElementById('scheduleTime').required = false
             }
             _return = true
         } else if (this.id === 'voteMode') {
             if (this.checked) {
-                document.getElementById('label8').removeAttribute('style')
+                document.getElementById('voteModeSelect').parentElement.removeAttribute('style')
             } else {
-                document.getElementById('label8').style.display = 'none'
+                document.getElementById('voteModeSelect').parentElement.style.display = 'none'
             }
             _return = true
         }
         if (!_return) {
             await db.put('other', settings, 'settings')
             chrome.runtime.sendMessage('reloadSettings')
+            usageSpace()
         }
-        event.target.classList.remove('disabled')
+        event.target.disabled = false
     })
     if (check.checked && check.parentElement.parentElement.parentElement.getAttribute('id') === 'addProjectExpert') {
         check.dispatchEvent(new Event('change'))
@@ -530,34 +540,21 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
 //Слушатель кнопки "Добавить"
 document.getElementById('append').addEventListener('submit', async(event)=>{
     event.preventDefault()
-    if (event.target.classList.contains('disabled')) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        event.target.classList.add('disabled')
-    }
-    let rating, project
+    event.submitter.disabled = true
+    let rating, project, domain
     let url = document.getElementById('link').value
     try {
-        rating = projectByURL(url)
+        domain = getDomainWithoutSubdomain(url)
+        rating = projectByURL.get(domain)
         if (!rating) {
-            const domain = getDomainWithoutSubdomain(url)
-            const button = document.createElement('button')
-            button.textContent = chrome.i18n.getMessage('switchModeAdd')
-            button.classList.add('submitBtn', 'switchModeAdd')
-            createNotif([chrome.i18n.getMessage('errorLink', domain), button], 'error')
-            button.addEventListener('click', ()=>{
-                removeNotif(button.parentElement.parentElement)
-                document.getElementById('append').style.display = 'none'
-                document.getElementById('appendExpert').style.display = 'block'
-            })
-            event.target.classList.remove('disabled')
+            createNotif(chrome.i18n.getMessage('errorLink', domain), 'error')
+            event.submitter.disabled = false
             return
         }
         project = allProjects[rating].parseURL(new URL(url))
     } catch (error) {
         createNotif(error.message, 'error')
-        event.target.classList.remove('disabled')
+        event.submitter.disabled = false
         return
     }
     project.rating = rating
@@ -584,18 +581,37 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
     }
     await addProject(project)
-    event.target.classList.remove('disabled')
+    event.submitter.disabled = false
 })
+
+//
+let modeBtns = document.querySelectorAll('.switchAddMode')
+modeBtns.forEach((btn)=> {
+    btn.addEventListener('change', async ()=> {
+        modeBtns.forEach((el)=> el.checked = btn.checked)
+        await wait(200)
+        if (btn.checked) {
+            document.getElementById('append').style.display = 'none'
+            document.getElementById('appendExpert').style.display = 'block'
+            document.getElementById('addProjectExpert').classList.remove('addProjectExpert')
+            document.getElementById('addProjectExpert').classList.add('addProjectExpertManual')
+        } else {
+            document.getElementById('append').style.display = 'block'
+            document.getElementById('appendExpert').style.display = 'none'
+            document.getElementById('addProjectExpert').classList.remove('addProjectExpertManual')
+            document.getElementById('addProjectExpert').classList.add('addProjectExpert')
+        }
+    })
+})
+
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 //Слушатель кнопки "Добавить" в режиме эксперта
 document.getElementById('appendExpert').addEventListener('submit', async(event)=>{
     event.preventDefault()
-    if (event.target.classList.contains('disabled')) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        event.target.classList.add('disabled')
-    }
+    event.submitter.disabled = true
     const project = {}
     let name
     if (document.querySelector('#projectList > option[value="' + this.project.value + '"]') != null) {
@@ -603,7 +619,7 @@ document.getElementById('appendExpert').addEventListener('submit', async(event)=
     }
     if (name == null) {
         createNotif(chrome.i18n.getMessage('errorSelectSiteRating'), 'error')
-        event.target.classList.remove('disabled')
+        event.submitter.disabled = false
         return
     }
     project.rating = name
@@ -705,7 +721,7 @@ document.getElementById('appendExpert').addEventListener('submit', async(event)=
             body = JSON.parse(document.getElementById('customBody').value)
         } catch (e) {
             createNotif(e, 'error')
-            event.target.classList.remove('disabled')
+            event.submitter.disabled = false
             return
         }
 //      project.id = body
@@ -715,39 +731,29 @@ document.getElementById('appendExpert').addEventListener('submit', async(event)=
     } else {
         await addProject(project, null)
     }
-    event.target.classList.remove('disabled')
+    event.submitter.disabled = false
 })
 
 //Слушатель кнопки "Установить" на таймауте
 document.getElementById('timeout').addEventListener('submit', async (event)=>{
     event.preventDefault()
-    if (event.target.classList.contains('disabled')) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        event.target.classList.add('disabled')
-    }
+    event.submitter.disabled = true
     settings.timeout = document.getElementById('timeoutValue').valueAsNumber
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('successSave'), 'success')
     chrome.runtime.sendMessage('reloadSettings')
-    event.target.classList.remove('disabled')
+    event.submitter.disabled = false
 })
 
 //Слушатель кнопки "Установить" на таймауте при ошибке
 document.getElementById('timeoutError').addEventListener('submit', async (event)=>{
     event.preventDefault()
-    if (event.target.classList.contains('disabled')) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        event.target.classList.add('disabled')
-    }
+    event.submitter.disabled = true
     settings.timeoutError = document.getElementById('timeoutErrorValue').valueAsNumber
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('successSave'), 'success')
     chrome.runtime.sendMessage('reloadSettings')
-    event.target.classList.remove('disabled')
+    event.submitter.disabled = false
 })
 
 async function addProject(project, element) {
@@ -886,14 +892,9 @@ async function addProject(project, element) {
                         openPopup(url2, ()=> document.location.reload(true))
                     } else {
                         openPopup(url2, async () => {
-                            if (event.target.classList.contains('disabled')) {
-                                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-                                return
-                            } else {
-                                event.target.classList.add('disabled')
-                            }
+                            event.target.disabled = true
                             await addProject(project, element)
-                            event.target.classList.remove('disabled')
+                            event.target.disabled = false
                         })
                     }
                 })
@@ -982,12 +983,7 @@ function addProjectsBonus(project, element) {
 //      })
 /*  } else */if (project.id === 'victorycraft' || project.id === "8179" || project.id === "4729") {
         document.getElementById('secondBonusVictoryCraft').addEventListener('click', async event => {
-            if (event.target.classList.contains('disabled')) {
-                createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-                return
-            } else {
-                event.target.classList.add('disabled')
-            }
+            event.target.disabled = true
             let vict = {
                 rating: 'Custom',
                 nick: '',
@@ -1012,7 +1008,7 @@ function addProjectsBonus(project, element) {
             }
             await addProject(vict, element)
             //await addProject('Custom', 'VictoryCraft Голосуйте минимум в 2х рейтингах в день', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://victorycraft.ru/?do=cabinet&loc=vote","referrerPolicy":"no-referrer-when-downgrade","body":"receive_month_bonus_posted=1&reward_id=1&token=%7Btoken%7D","method":"POST","mode":"cors"}', {ms: 604800000}, 'https://victorycraft.ru/?do=cabinet&loc=vote', null, priorityOption, null)
-            event.target.classList.remove('disabled')
+            event.target.disabled = false
         })
     }
 }
@@ -1068,8 +1064,8 @@ async function checkPermissions(projects, element) {
                 }
             }
         }
-        document.querySelector('#addProject').classList.remove('disabled')
-        document.querySelector('#addProjectExpert').classList.remove('disabled')
+        document.getElementById('submitAddProject').disabled = false
+        document.getElementById('submitAddProjectExpert').disabled = false
         const button = document.createElement('button')
         button.textContent = chrome.i18n.getMessage('grant')
         button.classList.add('submitBtn')
@@ -1159,10 +1155,33 @@ document.getElementById('logs-download').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('exportingEnd'), 'success')
 })
 
+//Сколько использовано места на логи
+// noinspection JSIgnoredPromiseFromCall
+usageSpace()
+async function usageSpace() {
+    const quota = await navigator.storage.estimate()
+    // Код рассчитывающий использованное место позаимствовано из uBlock Origin https://github.com/gorhill/uBlock/blob/feaa338678ab64e334d33d5b5fb06749877454e7/src/js/settings.js#L118
+    let v, unit
+    v = quota.usage
+    if ( v < 1e3 ) {
+        unit = 'genericBytes'
+    } else if ( v < 1e6 ) {
+        v /= 1e3
+        unit = 'KB'
+    } else if ( v < 1e9 ) {
+        v /= 1e6
+        unit = 'MB'
+    } else {
+        v /= 1e9
+        unit = 'GB'
+    }
+    document.getElementById('storageUsed').textContent = chrome.i18n.getMessage('storageUsed', [v.toFixed(1), unit])
+}
 //Очистка логов
 document.getElementById('logs-clear').addEventListener('click', async ()=>{
     createNotif(chrome.i18n.getMessage('clearingLogs'))
     await dbLogs.clear('logs')
+    usageSpace()
     createNotif(chrome.i18n.getMessage('clearedLogs'), 'success')
 })
 
@@ -1213,16 +1232,11 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
 //Слушатель переключателя режима голосования
 let modeVote = document.getElementById('enabledSilentVote')
 modeVote.addEventListener('change', async event => {
-    if (event.target.classList.contains('disabled')) {
-        createNotif(chrome.i18n.getMessage('notFast'), 'warn')
-        return
-    } else {
-        event.target.classList.add('disabled')
-    }
+    event.target.disabled = true
     settings.enabledSilentVote = modeVote.value === 'enabled'
     await db.put('other', settings, 'settings')
     chrome.runtime.sendMessage('reloadSettings')
-    event.target.classList.remove('disabled')
+    event.target.disabled = false
 })
 
 //Достаёт все проекты указанные в URL
@@ -1576,489 +1590,261 @@ document.getElementById('todayStats').addEventListener('click', async()=> {
     document.querySelector('#statsToday td[data-resource="statsLastAttemptVote"]').nextElementSibling.textContent = todayStats.lastAttemptVote ? new Date(generalStats.lastAttemptVote).toLocaleString().replace(',', '') : 'None'
 })
 
+let laterChoose = false
 document.getElementById('link').addEventListener('input', function() {
-    document.getElementById('nick').parentElement.style.display = 'none'
-    document.getElementById('nick').required = false
-    document.getElementById('countVote').parentElement.style.display = 'none'
-    document.getElementById('countVote').required = false
-    document.getElementById('ordinalWorld').parentElement.style.display = 'none'
-    document.getElementById('ordinalWorld').required = false
-    document.getElementById('banAttention').style.display = 'none'
-    let rating, project
+    if (laterChoose) {
+        document.getElementById('nick').parentElement.style.display = 'none'
+        document.getElementById('nick').required = false
+        document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
+        document.getElementById('countVote').parentElement.style.display = 'none'
+        document.getElementById('countVote').required = false
+        document.getElementById('ordinalWorld').parentElement.style.display = 'none'
+        document.getElementById('ordinalWorld').required = false
+        document.getElementById('banAttention').style.display = 'none'
+        document.getElementById('rewardAttention').style.display = 'none'
+        laterChoose = false
+    }
+
+    let rating, project, funcRating
     try {
-        rating = projectByURL(this.value)
+        rating = projectByURL.get(getDomainWithoutSubdomain(this.value))
         if (!rating) return
-        project = allProjects[rating].parseURL(new URL(this.value))
+        funcRating = allProjects[rating]
+        project = funcRating.parseURL(new URL(this.value))
     } catch (error) {
         return
     }
+    laterChoose = true
+
     project.rating = rating
-    if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && project.rating !== 'XtremeTop100' && project.rating !== 'WARGM' && project.rating !== 'Top100ArenaCom' && ((project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') ? project.game !== 'servers' : true)) {
+    if (!funcRating.notRequiredNick?.(project)) {
         document.getElementById('nick').parentElement.removeAttribute('style')
         document.getElementById('nick').required = true
+        if (funcRating.optionalNick?.()) {
+            document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
+        }
     }
-    if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ServeurMinecraftVoteFr' || project.rating === 'ListeServeursFr') {
+    if (funcRating.limitedCountVote?.()) {
         document.getElementById('countVote').parentElement.removeAttribute('style')
         document.getElementById('countVote').required = true
     }
-    if (project.rating === 'MMoTopRU' || project.rating === 'MmoRpgTop' || project.rating === 'MmoVoteRu') {
+    if (funcRating.ordinalWorld?.()) {
         document.getElementById('ordinalWorld').parentElement.removeAttribute('style')
         document.getElementById('ordinalWorld').required = true
     }
-    if (project.rating === 'WARGM') {
+    if (funcRating.banAttention?.()) {
         document.getElementById('banAttention').removeAttribute('style')
+    }
+    if (project.rating === 'MinecraftRating' && project.game === 'servers') {
+        document.getElementById('rewardAttention').removeAttribute('style')
     }
 })
 
 //Генерация поля ввода ID
 const selectedTop = document.getElementById('project')
 
-let laterChoose
+let laterChooseExpert = false
 selectedTop.addEventListener('input', function() {
-    document.getElementById('id').value = ''
-    let name
-    if (document.querySelector('#projectList > option[value="' + this.value + '"]') != null) {
-        name = document.querySelector('#projectList > option[value="' + this.value + '"]').getAttribute('name')
-        if (name === 'ListForge' && this.value !== 'listforge.net') {
-            document.getElementById('chooseGameListForge').value = this.value
-            this.value = 'listforge.net'
-        } else if (name === 'MineServers') {
-            if (this.value === 'mineservers.com') document.getElementById('chooseGameMineServers').value = 'mineservers.com'
-            else document.getElementById('chooseGameMineServers').value = this.value
-            this.value = 'mineservers.com'
-        } else if (name === 'ServerPact') {
-            if (this.value !== 'serverpact.com') this.value = 'serverpact.com'
-        }
-    }
-    if (name == null) {
-        if (laterChoose == null) return
-        // this.value = ''
-        document.getElementById('idSelector').style.display = 'none'
-        document.getElementById('label1').style.display = 'none'
-        document.getElementById('label2').style.display = 'none'
-        document.getElementById('label3').style.display = 'none'
-        document.getElementById('label4').style.display = 'none'
-        document.getElementById('label5').style.display = 'none'
-        document.getElementById('label6').style.display = 'none'
-        document.getElementById('label7').style.display = 'none'
-        document.getElementById('label8').style.display = 'none'
-        document.getElementById('label9').style.display = 'none'
-        document.getElementById('label10').style.display = 'none'
-        document.getElementById('idGame').style.display = 'none'
-        document.getElementById('chooseMinecraftRating1').style.display = 'none'
-        document.getElementById('chooseTopGG1').style.display = 'none'
-        document.getElementById('additionTopGG1').style.display = 'none'
-        document.getElementById('urlGame').style.display = 'none'
-        document.getElementById('urlGame2').style.display = 'none'
-        document.getElementById('urlGameTopG').style.display = 'none'
-        document.getElementById('urlGame3').style.display = 'none'
-        document.getElementById('urlGame4').style.display = 'none'
-        document.getElementById('urlGame5').style.display = 'none'
-        document.getElementById('chooseGameMmoVoteRu').required = false
-        document.getElementById('chooseGameMmoRpgTop').required = false
-        document.getElementById('chooseGameMineServers').required = false
-        document.getElementById('chooseGamegTop100').required = false
-        document.getElementById('chooseGameTopG').required = false
-        document.getElementById('chooseGameListForge').required = false
-        document.getElementById('countVoteExpert').required = false
-        document.getElementById('id').required = false
-        document.getElementById('ordinalWorldExpert').required = false
-        document.getElementById('time').required = false
-        document.getElementById('hour').required = false
-        document.getElementById('nickExpert').required = false
+    if (laterChooseExpert) {
+        document.getElementById('id').value = ''
+        document.getElementById('id').parentElement.style.display = 'none'
+        document.getElementById('id').name = 'name'
+        document.getElementById('id').required = true
+        document.getElementById('projectIDTooltip1').textContent = ''
+        document.getElementById('projectIDTooltip2').textContent = ''
+        document.getElementById('projectIDTooltip3').textContent = ''
+        document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
         document.getElementById('nickExpert').parentElement.style.display = 'none'
-        document.querySelector('#banAttention').style.display = 'none'
-        if (document.querySelector('[data-resource="yourNick"]').textContent !== '') document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
+        document.getElementById('nickExpert').required = false
         document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterNick')
-        if (laterChoose && (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MMoTopRU')) {
-            document.getElementById('selectLang' + laterChoose).style.display = 'none'
-            document.getElementById('selectLang' + laterChoose).required = false
-            document.getElementById('chooseGame' + laterChoose).style.display = 'none'
-            document.getElementById('chooseGame' + laterChoose).required = false
-        }
-        if (laterChoose === 'WARGM' && document.querySelector('#randomize').checked) {
-            document.querySelector('#randomize').click()
-            document.querySelector('#randomizeMin').value = ''
-            document.querySelector('#randomizeMax').value = ''
-        }
-        laterChoose = null
+        document.getElementById('chooseGame').parentElement.style.display = 'none'
+        document.getElementById('chooseGame').value = ''
+        document.getElementById('chooseGame').name = 'chooseGame'
+        document.getElementById('urlGameTooltip1').textContent = ''
+        document.getElementById('urlGameTooltip2').textContent = ''
+        document.getElementById('urlGameTooltip3').textContent = ''
+        document.getElementById('gameList').replaceChildren()
+        document.getElementById('chooseLang').parentElement.style.display = 'none'
+        document.getElementById('chooseLang').value = ''
+        document.getElementById('chooseLang').name = 'chooseLang'
+        document.getElementById('langList').replaceChildren()
+        document.getElementById('countVoteExpert').parentElement.style.display = 'none'
+        document.getElementById('countVoteExpert').required = false
+        document.getElementById('ordinalWorldExpert').parentElement.style.display = 'none'
+        document.getElementById('ordinalWorldExpert').required = false
+        document.getElementById('banAttentionExpert').style.display = 'none'
+        document.getElementById('rewardAttentionExpert').style.display = 'none'
+        document.getElementById('additionURL').parentElement.style.display = 'none'
+        document.getElementById('additionURL').name = 'additionURL'
+        document.getElementById('additionURLTooltip1').textContent = ''
+        document.getElementById('additionURLTooltip2').textContent = ''
+        document.getElementById('additionURLTooltip3').textContent = ''
+        document.getElementById('customTimeOut').disabled = false
+        document.getElementById('lastDayMonth').disabled = false
+        document.getElementById('voteMode').disabled = false
+        if (!document.getElementById('customTimeOut').checked) document.getElementById('selectTime').parentElement.style.display = 'none'
+        document.getElementById('customBody').parentElement.style.display = 'none'
+        document.getElementById('responseURL').parentElement.style.display = 'none'
+        laterChooseExpert = false
+    }
+
+    if (this.value === 'Custom') {
+        laterChooseExpert = true
+        document.getElementById('customTimeOut').disabled = true
+        document.getElementById('customTimeOut').checked = false
+        document.getElementById('lastDayMonth').disabled = true
+        document.getElementById('lastDayMonth').checked = false
+        document.getElementById('voteMode').disabled = true
+        document.getElementById('voteMode').checked = false
+        document.getElementById('nickExpert').parentElement.removeAttribute('style')
+        document.getElementById('nickExpert').required = true
+        document.getElementById('id').required = false
+
+        document.getElementById('selectTime').parentElement.removeAttribute('style')
+        document.getElementById('customBody').parentElement.removeAttribute('style')
+        document.getElementById('responseURL').parentElement.removeAttribute('style')
+
+        document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('name')
+        document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterName')
         return
     }
-    document.getElementById('idSelector').removeAttribute('style')
 
-    if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM' && name !== 'Top100ArenaCom') {
+    let rating = projectByURL.get(this.value)
+
+    if (!rating) return
+    laterChooseExpert = true
+
+    let funcRating = allProjects[rating]
+
+    document.getElementById('id').parentElement.removeAttribute('style')
+    document.getElementById('projectIDTooltip1').textContent = funcRating.exampleURL()[0]
+    document.getElementById('projectIDTooltip2').textContent = funcRating.exampleURL()[1]
+    document.getElementById('projectIDTooltip3').textContent = funcRating.exampleURL()[2]
+    document.getElementById('id').name = 'id' + rating
+
+    if (!funcRating.notRequiredNick?.()) {
         document.getElementById('nickExpert').parentElement.removeAttribute('style')
         document.getElementById('nickExpert').required = true
+        if (funcRating.optionalNick?.()) {
+            document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterNickOptional')
+        }
     }
 
-    if (document.getElementById(name + 'IDList') != null) {
-        document.getElementById('id').setAttribute('list', name + 'IDList')
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectIDOrList')
-    } else {
-        document.getElementById('id').removeAttribute('list')
-        document.getElementById('id').placeholder = chrome.i18n.getMessage('inputProjectID')
+    if (this.value !== funcRating.URL()) {
+        if (funcRating.exampleURLGame && !funcRating.defaultGame) document.getElementById('chooseGame').value = this.value
+        this.value = funcRating.URL()
     }
-
-    document.getElementById('id').required = true
-
-    const exampleURL = allProjects[name].exampleURL()
-    document.getElementById('projectIDTooltip1').textContent = exampleURL[0]
-    document.getElementById('projectIDTooltip2').textContent = exampleURL[1]
-    document.getElementById('projectIDTooltip3').textContent = exampleURL[2]
-
-    if (name === 'Custom' || name === 'ServeurPrive' || name === 'TopGames' || name === 'MMoTopRU' || laterChoose === 'Custom' || laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MMoTopRU') {
-        document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
-        document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterNick')
-
-        idSelector.removeAttribute('style')
-
-        document.getElementById('label1').style.display = 'none'
-        document.getElementById('label2').style.display = 'none'
-        document.getElementById('label4').style.display = 'none'
-        document.getElementById('label5').style.display = 'none'
-        document.getElementById('label10').style.display = 'none'
-        document.getElementById('countVoteExpert').required = false
-        document.getElementById('ordinalWorldExpert').required = false
-        if (laterChoose && (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MMoTopRU')) {
-            document.getElementById('selectLang' + laterChoose).style.display = 'none'
-            document.getElementById('selectLang' + laterChoose).required = false
-            document.getElementById('chooseGame' + laterChoose).style.display = 'none'
-            document.getElementById('chooseGame' + laterChoose).required = false
-        }
-        document.getElementById('idGame').style.display = 'none'
-        document.getElementById('customTimeOut').disabled = false
-        document.getElementById('voteMode').disabled = false
-        if (!document.getElementById('customTimeOut').checked) {
-            document.getElementById('label6').style.display = 'none'
-            document.getElementById('label3').style.display = 'none'
-            document.getElementById('time').required = false
-            document.getElementById('label7').style.display = 'none'
-            document.getElementById('hour').required = false
-        }
-
-        if (name === 'Custom') {
-            document.getElementById('customTimeOut').disabled = true
-            document.getElementById('customTimeOut').checked = false
-            document.getElementById('lastDayMonth').disabled = true
-            document.getElementById('lastDayMonth').checked = false
-            document.getElementById('voteMode').disabled = true
-            document.getElementById('voteMode').checked = false
-
-            idSelector.setAttribute('style', 'height: 0px;')
-            idSelector.style.display = 'none'
-
-            document.getElementById('id').required = false
-
-            document.getElementById('label6').removeAttribute('style')
-            document.getElementById('label1').removeAttribute('style')
-            document.getElementById('label2').removeAttribute('style')
-            if (document.getElementById('selectTime').value === 'ms') {
-                document.getElementById('label3').removeAttribute('style')
-                document.getElementById('time').required = true
-                document.getElementById('label7').style.display = 'none'
-                document.getElementById('hour').required = false
-            } else {
-                document.getElementById('label7').removeAttribute('style')
-                document.getElementById('hour').required = true
-                document.getElementById('label3').style.display = 'none'
-                document.getElementById('time').required = false
-            }
-
-            document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('name')
-            document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterName')
-//          document.getElementById('nickExpert').required = true
-
-            selectedTop.after(' ')
-        } else if (name === 'TopGames' || name === 'ServeurPrive' || name === 'MMoTopRU') {
-//          document.getElementById('nickExpert').required = false
-
-            if (name === 'MMoTopRU') {
-                document.getElementById('ordinalWorldExpert').required = true
-                document.getElementById('label10').removeAttribute('style')
-            }
-
-            document.getElementById('selectLang' + name).removeAttribute('style')
-            document.getElementById('selectLang' + name).required = true
-            document.getElementById('chooseGame' + name).removeAttribute('style')
-            document.getElementById('chooseGame' + name).required = true
-
-            document.getElementById('label4').removeAttribute('style')
-            document.getElementById('idGame').removeAttribute('style')
-            if (name === 'ServeurPrive') {
-                document.getElementById('gameIDTooltip1').textContent = 'https://serveur-prive.net/'
-                document.getElementById('gameIDTooltip2').textContent = 'minecraft'
-                document.getElementById('gameIDTooltip3').textContent = '/gommehd-net-4932'
-            } else if (name === 'TopGames') {
-                document.getElementById('gameIDTooltip1').textContent = 'https://top-serveurs.net/'
-                document.getElementById('gameIDTooltip2').textContent = 'minecraft'
-                document.getElementById('gameIDTooltip3').textContent = '/hailcraft'
-            } else if (name === 'MMoTopRU') {
-                document.getElementById('gameIDTooltip1').textContent = 'https://'
-                document.getElementById('gameIDTooltip2').textContent = 'pw'
-                document.getElementById('gameIDTooltip3').textContent = '.mmotop.ru/servers/25895/votes/new'
+    if (funcRating.exampleURLGame) {
+        document.getElementById('chooseGame').parentElement.removeAttribute('style')
+        document.getElementById('chooseGame').name = 'chooseGame' + rating
+        if (funcRating.defaultGame) document.getElementById('chooseGame').value = funcRating.defaultGame()
+        document.getElementById('urlGameTooltip1').textContent = funcRating.exampleURLGame()[0]
+        document.getElementById('urlGameTooltip2').textContent = funcRating.exampleURLGame()[1]
+        document.getElementById('urlGameTooltip3').textContent = funcRating.exampleURLGame()[2]
+        if (funcRating.gameList) {
+            const gameList = document.getElementById('gameList')
+            for (const [value, name] of funcRating.gameList()) {
+                const option = document.createElement('option')
+                option.value = value
+                option.textContent = name
+                gameList.append(option)
             }
         }
     }
 
-    if (name === 'TopGG' || name === 'DiscordBotList' || name === 'Discords' || name === 'DiscordBoats' || name === 'XtremeTop100' || name === 'WARGM' || name === 'Top100ArenaCom') {
-        document.getElementById('nickExpert').required = false
-        document.getElementById('nickExpert').parentElement.style.display = 'none'
-    } else if (laterChoose === 'TopGG' || laterChoose === 'DiscordBotList' || laterChoose === 'Discords' || laterChoose === 'DiscordBoats' || laterChoose === 'XtremeTop100' || laterChoose === 'WARGM' || laterChoose === 'Top100ArenaCom') {
-        document.getElementById('nickExpert').required = true
-        document.getElementById('nickExpert').parentElement.removeAttribute('style')
-    }
-
-    if (name === 'WARGM') {
-        document.querySelector('#banAttentionExpert').removeAttribute('style')
-        if (!document.querySelector('#randomize').checked) {
-            document.querySelector('#randomize').click()
-            document.querySelector('#randomizeMin').value = '0'
-            document.querySelector('#randomizeMax').value = '14400000'
-        }
-    } else if (laterChoose === 'WARGM') {
-        document.querySelector('#banAttentionExpert').style.display = 'none'
-        if (document.querySelector('#randomize').checked) {
-            document.querySelector('#randomize').click()
-            document.querySelector('#randomizeMin').value = ''
-            document.querySelector('#randomizeMax').value = ''
+    if (funcRating.langList) {
+        document.getElementById('chooseLang').parentElement.removeAttribute('style')
+        document.getElementById('chooseLang').name = 'chooseLang' + rating
+        if (funcRating.defaultLand) document.getElementById('chooseLang').value = funcRating.defaultLand()
+        const langList = document.getElementById('langList')
+        for (const [value, name] of funcRating.langList()) {
+            const option = document.createElement('option')
+            option.value = value
+            option.textContent = name
+            langList.append(option)
         }
     }
 
-    if (name === 'ServeurPrive' || name === 'TopGames' || name === 'MCServerList' || name === 'CzechCraft' || name === 'MinecraftServery' || name === 'MinecraftListCZ' || name === 'ListeServeursMinecraft' || name === 'ServeursMCNet' || name === 'ServeursMinecraftCom' || name === 'ServeurMinecraftVoteFr' || name === 'ListeServeursFr') {
+    if (funcRating.limitedCountVote?.()) {
+        document.getElementById('countVoteExpert').parentElement.removeAttribute('style')
         document.getElementById('countVoteExpert').required = true
-        document.getElementById('label5').removeAttribute('style')
-    } else if (laterChoose === 'ServeurPrive' || laterChoose === 'TopGames' || laterChoose === 'MCServerList' || laterChoose === 'CzechCraft' || laterChoose === 'MinecraftServery' || laterChoose === 'MinecraftListCZ' || laterChoose === 'ListeServeursMinecraft' || laterChoose === 'ServeursMCNet' || laterChoose === 'ServeursMinecraftCom' || laterChoose === 'ServeurMinecraftVoteFr' || laterChoose === 'ListeServeursFr') {
-        document.getElementById('countVoteExpert').required = false
-        document.getElementById('label5').style.display = 'none'
     }
 
-    if (name === 'ListForge') {
-        document.getElementById('nickExpert').required = false
-        document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterNickOptional')
-        document.getElementById('urlGame').removeAttribute('style')
-        document.getElementById('chooseGameListForge').required = true
-        document.getElementById('additionTopGG1').removeAttribute('style')
-        document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://minecraft-mp.com/server/288761/vote/'
-        document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(2)").textContent = '?alternate_captcha=1'
-    } else if (laterChoose === 'ListForge') {
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats') document.getElementById('nickExpert').required = true
-        if (name !== 'Custom') document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterNick')
-        document.getElementById('urlGame').style.display = 'none'
-        document.getElementById('chooseGameListForge').required = false
-        if (name !== 'TopGG') document.getElementById('additionTopGG1').style.display = 'none'
-    }
-
-    if (name === 'MineServers') {
-        document.getElementById('urlGame3').removeAttribute('style')
-        document.getElementById('chooseGameMineServers').required = true
-    } else if (laterChoose === 'MineServers') {
-        document.getElementById('urlGame3').style.display = 'none'
-        document.getElementById('chooseGameMineServers').required = false
-    }
-
-    if (name === 'gTop100') {
-        document.getElementById('urlGame2').removeAttribute('style')
-        document.getElementById('chooseGamegTop100').required = true
-    } else if (laterChoose === 'gTop100') {
-        document.getElementById('urlGame2').style.display = 'none'
-        document.getElementById('chooseGamegTop100').required = false
-    }
-
-    if (name === 'MmoRpgTop') {
-        document.getElementById('urlGame4').removeAttribute('style')
-        document.getElementById('chooseGameMmoRpgTop').required = true
+    if (funcRating.ordinalWorld?.()) {
+        document.getElementById('ordinalWorldExpert').parentElement.removeAttribute('style')
         document.getElementById('ordinalWorldExpert').required = true
-        document.getElementById('label10').removeAttribute('style')
-    } else if (laterChoose === 'MmoRpgTop') {
-        document.getElementById('urlGame4').style.display = 'none'
-        document.getElementById('chooseGameMmoRpgTop').required = false
     }
 
-    if (name === 'MmoVoteRu') {
-        document.getElementById('urlGame5').removeAttribute('style')
-        document.getElementById('chooseGameMmoVoteRu').required = true
-        document.getElementById('ordinalWorldExpert').required = true
-        document.getElementById('label10').removeAttribute('style')
-    } else if (laterChoose === 'MmoVoteRu') {
-        document.getElementById('urlGame5').style.display = 'none'
-        document.getElementById('chooseGameMmoVoteRu').required = false
-    }
-
-    if (name === 'McMonitoringInfo') {
-        document.getElementById('urlGame6').removeAttribute('style')
-        document.getElementById('chooseGameMcMonitoringInfo').required = true
-    } else if (laterChoose === 'McMonitoringInfo') {
-        document.getElementById('urlGame6').style.display = 'none'
-        document.getElementById('chooseGameMcMonitoringInfo').required = false
-    }
-
-    if (name === 'BestServersCom') {
-        document.getElementById('nickExpert').required = false
-        document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterNickOptional')
-    } else if (laterChoose === 'BestServersCom') {
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'BestServersCom') document.getElementById('nickExpert').required = true
-        if (name !== 'Custom') document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterNick')
-    }
-
-    if (name === 'TopG') {
-        document.getElementById('urlGameTopG').removeAttribute('style')
-        document.getElementById('chooseGameTopG').required = true
-    } else if (laterChoose === 'TopG') {
-        document.getElementById('urlGameTopG').style.display = 'none'
-        document.getElementById('chooseGameTopG').required = false
-    }
-
-    if (name === 'TopGG') {
-        document.getElementById('chooseTopGG1').removeAttribute('style')
-        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://top.gg/'
-        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bot'
-        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/270904126974590976/vote'
-        document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bot'
-        document.querySelector('#chooseTopGG > option[data-resource="guilds"]').value = 'servers'
-        document.getElementById('additionTopGG1').removeAttribute('style')
-        document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://top.gg/bot/617037497574359050/vote'
-        document.querySelector("#additionTopGG1 > label > span > span > span:nth-child(2)").textContent = '?currency=DOGE'
-    } else if (laterChoose === 'TopGG') {
-        document.getElementById('chooseTopGG1').style.display = 'none'
-        if (name !== 'ListForge') document.getElementById('additionTopGG1').style.display = 'none'
-    }
-
-    if (name === 'Discords') {
-        document.getElementById('chooseTopGG1').removeAttribute('style')
-        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://discords.com/'
-        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bots/bot'
-        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/469610550159212554/vote'
-        document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bots/bot'
-        document.querySelector('#chooseTopGG > option[data-resource="guilds"]').value = 'servers'
-    } else if (laterChoose === 'Discords') {
-        document.getElementById('chooseTopGG1').style.display = 'none'
-    }
-
-    if (name === 'DiscordBotList') {
-        document.getElementById('chooseTopGG1').removeAttribute('style')
-        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(1)").textContent = 'https://discordbotlist.com/'
-        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(2)").textContent = 'bots'
-        document.querySelector("#chooseTopGG1 > label > span > span > span:nth-child(3)").textContent = '/dank-memer/upvote'
-        document.querySelector('#chooseTopGG > option[data-resource="bots"]').value = 'bots'
-        document.querySelector('#chooseTopGG > option[data-resource="guilds"]').value = 'servers'
-    } else if (laterChoose === 'Discords') {
-        document.getElementById('chooseTopGG1').style.display = 'none'
-    }
-
-    if (name === 'MinecraftRating') {
-        document.getElementById('chooseMinecraftRating1').removeAttribute('style')
-        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(1)").textContent = 'https://minecraftrating.ru/'
-        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(2)").textContent = 'projects'
-        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(3)").textContent = '/mcskill/'
-        if (document.getElementById('chooseMinecraftRating').value === 'servers') {
-            document.getElementById('nickExpert').required = false
-            document.getElementById('nickExpert').parentElement.style.display = 'none'
-        }
-    } else if (laterChoose === 'MinecraftRating') {
-        document.getElementById('chooseMinecraftRating1').style.display = 'none'
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM' && name !== 'Top100ArenaCom') {
-            document.getElementById('nickExpert').required = true
-            document.getElementById('nickExpert').parentElement.removeAttribute('style')
+    if (funcRating.banAttention?.()) {
+        document.getElementById('banAttentionExpert').removeAttribute('style')
+        if (!document.getElementById('randomize').checked) {
+            document.getElementById('randomize').click()
+            document.getElementById('randomizeMin').value = '0'
+            document.getElementById('randomizeMax').value = '14400000'
         }
     }
 
-    if (name === 'MisterLauncher') {
-        document.getElementById('chooseMinecraftRating1').removeAttribute('style')
-        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(1)").textContent = 'https://misterlauncher.org/'
-        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(2)").textContent = 'projects'
-        document.querySelector("#chooseMinecraftRating1 > label > span > span > span:nth-child(3)").textContent = '/omegamc/'
-        if (document.getElementById('chooseMinecraftRating').value === 'servers') {
-            document.getElementById('nickExpert').required = false
-            document.getElementById('nickExpert').parentElement.style.display = 'none'
-        }
-    } else if (laterChoose === 'MisterLauncher') {
-        document.getElementById('chooseMinecraftRating1').style.display = 'none'
-        if (name !== 'TopGG' && name !== 'DiscordBotList' && name !== 'Discords' && name !== 'DiscordBoats' && name !== 'XtremeTop100' && name !== 'WARGM' && name !== 'Top100ArenaCom') {
-            document.getElementById('nickExpert').required = true
-            document.getElementById('nickExpert').parentElement.removeAttribute('style')
-        }
+    if (funcRating.additionExampleURL) {
+        document.getElementById('additionURL').parentElement.removeAttribute('style')
+        document.getElementById('additionURL').name = 'additionURL' + rating
+        document.getElementById('additionURLTooltip1').textContent = funcRating.additionExampleURL()[0]
+        document.getElementById('additionURLTooltip2').textContent = funcRating.additionExampleURL()[1]
+        document.getElementById('additionURLTooltip3').textContent = funcRating.additionExampleURL()[2]
     }
-
-    laterChoose = name
 })
 selectedTop.dispatchEvent(new Event('change'))
 
 //Слушатель на выбор типа timeout для Custom
 document.getElementById('selectTime').addEventListener('change', function() {
     if (this.value === 'ms') {
-        document.getElementById('label3').removeAttribute('style')
+        document.getElementById('time').parentElement.removeAttribute('style')
         document.getElementById('time').required = true
-        document.getElementById('label7').style.display = 'none'
+        document.getElementById('hour').parentElement.style.display = 'none'
         document.getElementById('hour').required = false
     } else {
-        document.getElementById('label7').removeAttribute('style')
+        document.getElementById('hour').parentElement.removeAttribute('style')
         document.getElementById('hour').required = true
-        document.getElementById('label3').style.display = 'none'
+        document.getElementById('time').parentElement.style.display = 'none'
         document.getElementById('time').required = false
     }
 })
 
-document.getElementById('chooseMinecraftRating').addEventListener('change', function () {
-    if (this.value === 'servers') {
-        document.getElementById('nickExpert').required = false
-        document.getElementById('nickExpert').parentElement.style.display = 'none'
-    } else {
-        document.getElementById('nickExpert').required = true
-        document.getElementById('nickExpert').parentElement.removeAttribute('style')
+document.getElementById('chooseGame').addEventListener('change', function () {
+    if (this.name === 'chooseGameMinecraftRating') {
+        if (this.value === 'servers') {
+            document.getElementById('nickExpert').required = false
+            document.getElementById('nickExpert').parentElement.style.display = 'none'
+            document.getElementById('rewardAttentionExpert').removeAttribute('style')
+        } else {
+            document.getElementById('nickExpert').required = true
+            document.getElementById('nickExpert').parentElement.removeAttribute('style')
+            document.getElementById('rewardAttentionExpert').style.display = 'none'
+        }
     }
 })
 
 generateDataList()
 function generateDataList() {
     const datalist = document.getElementById('projectList')
-    for (const item of Object.keys(allProjects)) {
-        const url = allProjects[item].URL()
+    for (const [url, rating] of projectByURL) {
         const option = document.createElement('option')
-        option.setAttribute('name', item)
+        option.setAttribute('name', rating)
         option.value = url
         datalist.append(option)
     }
-    //ListForge
-    for (const el of document.querySelector('#gameListListForge').children) {
-        const option = document.createElement('option')
-        option.setAttribute('name', 'ListForge')
-        option.value = el.value
-        option.textContent = 'ListForge'
-        datalist.append(option)
-    }
-    //MineServers
-    for (const el of document.querySelector('#gameListMineServers').children) {
-        if (el.value === 'mineservers.com') continue
-        const option = document.createElement('option')
-        option.setAttribute('name', 'MineServers')
-        option.value = el.value
-        option.textContent = 'MineServers'
-        datalist.append(option)
-    }
-    //ServerPact
-    const option1 = document.createElement('option')
-    option1.setAttribute('name', 'ServerPact')
-    option1.value = 'serverpact.nl'
-    datalist.append(option1)
-    const option2 = document.createElement('option')
-    option2.setAttribute('name', 'ServerPact')
-    option2.value = 'minecraftserverlijst.nl'
-    datalist.append(option2)
-    const option3 = document.createElement('option')
-    option3.setAttribute('name', 'ServerPact')
-    option3.value = 'minecraftserverlist.eu'
-    datalist.append(option3)
-    // document.querySelector('option[name="ListForge"]').textContent = 'or Minecraft-MP.com'
-    document.querySelector('option[name="TopGames"]').textContent = 'or Top-Serveurs.net'
-    document.querySelector('option[name="Discords"]').textContent = 'or BotsForDiscord.com'
-    document.querySelector('option[name="Custom"]').textContent = chrome.i18n.getMessage('Custom')
-    document.querySelector('option[name="Custom"]').disabled = true
+    const option = document.createElement('option')
+    option.setAttribute('name', 'Custom')
+    option.value = 'Custom'
+    option.textContent = chrome.i18n.getMessage('Custom')
+    option.disabled = true
+    datalist.append(option)
 }
 
 chrome.runtime.onMessage.addListener(updateValue)
 
 async function updateValue(request) {
     if (request.updateValue) {
+        usageSpace()
         if (request.updateValue === 'projects') {
             const el = document.getElementById('projects' + request.value.key)
             if (el != null) {

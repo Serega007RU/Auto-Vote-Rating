@@ -351,6 +351,14 @@ nav .logo img {
     #modals .modal {
         width: calc(100% - 30px);
     }
+
+    #submitAddProject {
+    	margin-bottom: 20px;
+    }
+
+    #submitAddProjectExpert {
+    	margin-bottom: 40px;
+    }
 }
 
 /* Тело */
@@ -488,12 +496,24 @@ nav .logo img {
 	font-size: 16px;
 }
 
+#addProject {
+	grid-template-columns: auto 490px auto;
+}
+
 #addProject,
 #addProjectExpert {
+	position: relative;
 	margin-top: 20px;
-	grid-template-columns: auto 490px auto;
 	display: grid;
 	grid-gap: 20px;
+}
+
+.addProjectExpertManual {
+	grid-template-columns: auto 490px auto;
+}
+
+.addProjectExpert {
+	grid-template-columns: repeat(2, 1fr)
 }
 
 .userSettings {
@@ -844,14 +864,12 @@ nav .logo img {
 
 .social {
 	display: block;
-	margin: auto;
-	border: none !important;
-	outline: none !important; 
-	padding: 10px;
-	background: #1a7bee;
-	border-radius: 50%;
-	opacity: .8;
-	transition: .2s;
+    margin: auto;
+    outline: none !important;
+    padding: 10px;
+    border-radius: 50%;
+    opacity: .8;
+    transition: .2s;
 }
 
 .social:hover {
@@ -859,8 +877,8 @@ nav .logo img {
 }
 
 .social img {
-	width: 50px;
-	height: 50px;
+	width: 60px;
+	height: 60px;
 }
 
 @media(max-width: 750px) {
@@ -888,6 +906,54 @@ nav .logo img {
 	.tooltip2 {
 		display: none;
 	}
+}
+
+.switchAddMode {
+	display: none;
+	position: absolute; 
+    visibility: hidden !important;
+}
+
+.switchAddMode + label {
+	cursor: pointer;
+    padding-right: 45px;
+    position: absolute;
+    display: block;
+    font-size: 15px;
+    bottom: 3px;
+    right: 0;
+}
+
+.switchAddMode + label:before,
+.switchAddMode + label:after {
+	content: '';
+	position: absolute;
+	bottom: -3px;
+	margin-top: -7.5px;
+	box-sizing: border-box;
+}
+
+.switchAddMode + label:before {
+	width: 36px;
+	height: 21px;
+	right: 0px;
+	background: #fff;
+	border: 1px solid #e4e3e1;
+	border-radius: 15px;
+}
+
+.switchAddMode + label:after {
+	width: 21px;
+	height: 21px;
+	right: 15px;
+	background: #BDBDBD;
+	border-radius: 50%;
+	transition: all 200ms ease-out;
+}
+
+.switchAddMode:checked + label:after {
+	right: 0px;
+	background: #1a7bee;
 }
 
 .checkbox {
@@ -981,6 +1047,20 @@ input.checkbox:disabled + label {
 .input {
 	height: 35px;
 	width: calc(100% - 20px);
+}
+
+input[type="text"]:-webkit-autofill,
+input[type="number"]:-webkit-autofill,
+input[type="text"]:-internal-autofill-previewed,
+input[type="number"]:-internal-autofill-previewed {
+	background-color: #2a2a2f !important;
+	color: #696969 !important;
+	-webkit-box-shadow: 0 0 0 30px #2a2a2f inset !important;
+	-webkit-text-fill-color: #696969 !important;
+}
+
+button:disabled {
+	opacity: .5 !important;
 }
 
 .select {
@@ -1232,7 +1312,10 @@ input.checkbox:disabled + label {
 	margin-bottom: 15px !important;
 }
 
-#banAttention {
+#rewardAttention,
+#rewardAttentionExpert,
+#banAttention,
+#banAttentionExpert {
 	margin-top: 15px;
 	color: #f1af4c;
 }

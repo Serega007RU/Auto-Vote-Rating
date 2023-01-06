@@ -228,7 +228,7 @@ async function newWindow(project) {
             }
             evil(projects)
         } catch (error) {
-            console.error(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
+            console.warn(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода projects.js, использую вместо этого локальный код', error)
         }
     }
 
@@ -358,7 +358,7 @@ async function silentVote(project) {
                 }
                 evil(textScript)
             } catch (error) {
-                console.error(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
+                console.warn(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода scripts/' + project.rating.toLowerCase() + '_silentvote.js, использую вместо этого локальный код', error)
             }
         }
 
@@ -489,7 +489,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
         }
 
         files.push('scripts/main/visible.js')
-        if (allProjects[projectByURL(details.url)]?.needIsTrusted?.()) {
+        if (allProjects[projectByURL.get(getDomainWithoutSubdomain(details.url))]?.needIsTrusted?.()) {
             files.push('scripts/main/istrusted.js')
         }
     } else if (details.url.match(/hcaptcha.com\/captcha\/*/)
@@ -516,7 +516,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
     } catch (error) {
         if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
             project = await db.get('projects', project.key)
-            console.error(getProjectPrefix(project, true) + error)
+            console.error(getProjectPrefix(project, true), error)
             if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
             project.error = error.message
             updateValue('projects', project)
@@ -559,7 +559,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                     textWorld = await responseWorld.text()
                 }
             } catch (error) {
-                console.error(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
+                console.warn(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
                 eval = false
             }
         } else {
@@ -601,7 +601,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         } catch (error) {
             if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
                 project = await db.get('projects', project.key)
-                console.error(getProjectPrefix(project, true) + error)
+                console.error(getProjectPrefix(project, true), error)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
                 project.error = error.message
                 updateValue('projects', project)
@@ -624,7 +624,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         //         const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/captchaclicker.js')
         //         textCaptcha = await responseApi.text()
         //     } catch (error) {
-        //         console.error(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error)
+        //         console.warn(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода scripts/main/captchaclicker.js, использую вместо этого локальный код', error)
         //         eval = false
         //     }
         // } else {
@@ -650,7 +650,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
                     error += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
                 }
-                console.error(getProjectPrefix(project, true) + error)
+                console.error(getProjectPrefix(project, true), error)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
                 project.error = error
                 updateValue('projects', project)
@@ -766,7 +766,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
             await chrome.tabs.sendMessage(sender.tab.id, 'captchaPassed')
         } catch (error) {
             if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
-                console.error(error)
+                console.warn(error)
             }
         }
         return
@@ -874,7 +874,11 @@ async function tryCloseTab(tabId, project, attempt) {
 async function endVote(request, sender, project) {
     if (!settings.disabledSendErrorSentry) {
         if (request.message != null || request.errorVoteNoElement || request.emptyError) {
-            await reportError(request, sender, project)
+            try {
+                await reportError(request, sender, project)
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true) + 'Ошибка отправки отчёта об ошибке', error)
+            }
         }
     }
 
@@ -1129,6 +1133,9 @@ async function endVote(request, sender, project) {
 
 
 async function reportError(request, sender, project) {
+    const reported = await db.get('other', 'sentryReported')
+    if (reported?.[project.rating] > Date.now()) return
+
     let tabDetails
     if (sender && openedProjects.has(sender.tab.id)) {
         try {
@@ -1137,15 +1144,15 @@ async function reportError(request, sender, project) {
             if (!tabDetails.screenshotError) tabDetails.screenshot = new Uint8Array(await convertBase64ToBlob(tabDetails.screenshot).arrayBuffer())
         } catch (error) {
             if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
-                console.warn(getProjectPrefix(project, true) + error)
+                console.warn(getProjectPrefix(project, true) + 'Ошибка получении скриншота вкладки для отправки отчёта об ошибке', error)
             }
         }
     }
 
-    sendReport(request, tabDetails, project)
+    sendReport(request, tabDetails, project, reported)
 }
 
-async function sendReport(request, tabDetails, project) {
+async function sendReport(request, tabDetails, project, reported) {
     let titleError = project.rating + ' '
     let detailsError
     if (request.message != null) {
@@ -1233,6 +1240,10 @@ async function sendReport(request, tabDetails, project) {
         }
     } catch (error) {
         console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error)
+    } finally {
+        if (!reported) reported = {}
+        reported[project.rating] = Date.now() + 86400000
+        await db.put('other', reported, 'sentryReported')
     }
 }
 

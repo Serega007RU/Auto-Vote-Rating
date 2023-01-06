@@ -387,9 +387,6 @@
   "inputProjectID": {
     "message": "ID eingeben"
   },
-  "inputProjectIDOrList": {
-    "message": "Wählen Sie eine ID aus der Liste aus oder geben Sie Ihre ID ein"
-  },
   "developers": {
     "message": "Entwickler:"
   },
@@ -734,25 +731,7 @@
   "alertCaptcha": {
     "message": "Es gibt ein Captcha auf dieser Bewertungsseite, das die Erweiterung nicht lösen kann. Sie müssen es manuell lösen, die Erweiterung wird Sie darauf hinweisen."
   },
-  "chooseTopGG": {
-    "message": "Was wählen wir?"
-  },
-  "bots": {
-    "message": "Bots"
-  },
-  "guilds": {
-    "message": "Guilds"
-  },
-  "servers": {
-    "message": "Servers"
-  },
-  "serversMinecraftRating": {
-    "message": "Servers (keine Belohnung für die Abstimmung)"
-  },
-  "projects": {
-    "message": "Projects"
-  },
-  "additionTopGG": {
+  "additionURL": {
     "message": "Zusätzliche Parameter (optional)"
   },
   "emptyError": {
@@ -768,9 +747,6 @@
         "content": "$1"
       }
     }
-  },
-  "notFast": {
-    "message": "Nicht so schnell, warten Sie auf die Ausführung der Funktion"
   },
   "voteMode": {
     "message": "Erzwingen der Einstellung des Abstimmungsmodus"

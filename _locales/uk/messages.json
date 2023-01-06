@@ -348,9 +348,6 @@
   "inputProjectID": {
     "message": "Введіть ID"
   },
-  "inputProjectIDOrList": {
-    "message": "Виберіть зі списку ID або введіть свій"
-  },
   "developers": {
     "message": "Розробники:"
   },
@@ -695,25 +692,7 @@
   "alertCaptcha": {
     "message": "В даному рейтингу є капча яку розширення не може пройти, вам буде потрібно власноруч її проходити, розширення буде вас сповіщати об сповіщеннях про необхідність пройти капчу."
   },
-  "chooseTopGG": {
-    "message": "За що голосуємо?"
-  },
-  "bots": {
-    "message": "Боти"
-  },
-  "guilds": {
-    "message": "Сервери"
-  },
-  "servers": {
-    "message": "Сервери"
-  },
-  "serversMinecraftRating": {
-    "message": "Сервери (немає нагороди за голосування)"
-  },
-  "projects": {
-    "message": "Проекти"
-  },
-  "additionTopGG": {
+  "additionURL": {
     "message": "Додаткові параметри (необов'язково)"
   },
   "emptyError": {
@@ -729,9 +708,6 @@
         "content": "$1"
       }
     }
-  },
-  "notFast": {
-    "message": "Не так швидко, дочейкайся виконання функції"
   },
   "voteMode": {
     "message": "Виставити примусово режим голосування"
