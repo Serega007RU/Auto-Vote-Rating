@@ -376,6 +376,9 @@
   "feedback3": {
     "message": "или ко мне на "
   },
+  "feedback4": {
+    "message": "или в issues bug tracker на"
+  },
   "dmDiscord": {
     "message": "дискорд"
   },

@@ -415,6 +415,9 @@
   "feedback3": {
     "message": "or contact me on "
   },
+  "feedback4": {
+    "message": "or issues bug tracker on"
+  },
   "dmDiscord": {
     "message": "discord"
   },
