@@ -124,6 +124,9 @@
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/auto-vote-rating/)   
 [Opera Addons](https://addons.opera.com/ru/extensions/details/auto-vote-minecraft-rating/)   
 [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/auto-vote-rating/ecoifpgiojfhmihcfomafdcmkphafpba)
+
+### Support via Discord: https://discord.com/invite/GyvMtbU
+
 ## Install the extension from zip archive
 Here is a short guide how to install an unpacked extension on Google Chrome or Chromium-based browsers
 1. [Download](https://github.com/Serega007RU/Auto-Vote-Rating/archive/refs/heads/mv3.zip) this repository
