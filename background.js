@@ -5,10 +5,13 @@ importScripts('projects.js')
 importScripts('main.js')
 
 // TODO отложенный importScripts пока не работают, подробнее https://bugs.chromium.org/p/chromium/issues/detail?id=1198822
-self.addEventListener('install', () => {
+self.addEventListener('install', async () => {
     importScripts('libs/linkedom.js')
     importScripts('libs/evalCore.umd.js')
     importScripts('scripts/mcserverlist_silentvote.js', 'scripts/minecraftiplist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
+
+    await waitInitialize()
+    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 })
 
 //Текущие fetch запросы
@@ -31,6 +34,7 @@ let closeTabs = true
 let updateAvailable = false
 
 let evil
+let evilProjects
 
 //Инициализация настроек расширения
 // noinspection JSIgnoredPromiseFromCall
@@ -161,6 +165,28 @@ async function checkOpen(project/*, transaction*/) {
         }
     }
 
+    if (!settings.disabledUseRemoteCode && evilProjects < Date.now()) {
+        evilProjects = Date.now() + 300000
+        promises.push(fetchProjects())
+        async function fetchProjects() {
+            try {
+                const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
+                const projects = await response.text()
+                if (!evil) {
+                    // noinspection JSUnresolvedVariable
+                    if (!self.evalCore) {
+                        importScripts('libs/evalCore.umd.js')
+                    }
+                    // noinspection JSUnresolvedFunction,JSUnresolvedVariable
+                    evil = evalCore.getEvalInstance(self)
+                }
+                evil(projects)
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода projects.js, использую вместо этого локальный код', error)
+            }
+        }
+    }
+
     newWindow(project)
 }
 
@@ -212,24 +238,6 @@ async function newWindow(project) {
     }
     if (create) {
         chrome.alarms.create(String(project.key), {when: project.nextAttempt})
-    }
-
-    if (!settings.disabledUseRemoteCode) {
-        try {
-            const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
-            const projects = await response.text()
-            if (!evil) {
-                // noinspection JSUnresolvedVariable
-                if (!self.evalCore) {
-                    importScripts('libs/evalCore.umd.js')
-                }
-                // noinspection JSUnresolvedFunction,JSUnresolvedVariable
-                evil = evalCore.getEvalInstance(self)
-            }
-            evil(projects)
-        } catch (error) {
-            console.warn(getProjectPrefix(project, true) + 'Ошибка при получении удалённого кода projects.js, использую вместо этого локальный код', error)
-        }
     }
 
     let silentVoteMode = false
@@ -302,7 +310,7 @@ async function newWindow(project) {
                     groups = await chrome.tabGroups.query({title: 'Auto Vote Rating'})
                 } catch (error) {
                     notSupportedGroupTabs = true
-                    console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', error))
+                    console.warn(chrome.i18n.getMessage('notSupportedGroupTabs'), error)
                     promiseGroup = null
                     return
                 }
@@ -319,7 +327,7 @@ async function newWindow(project) {
                             return
                         }
                         notSupportedGroupTabs = true
-                        console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', error))
+                        console.warn(chrome.i18n.getMessage('notSupportedGroupTabs'), error)
                     }
                 }
                 promiseGroup = null
@@ -554,7 +562,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 const responseScript = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '.js')
                 textScript = await responseScript.text()
                 // noinspection JSUnresolvedVariable,JSUnresolvedFunction
-                if (allProjects[project.rating].needWorld?.()) {
+                if (allProjects[project.rating]?.needWorld?.()) {
                     const responseWorld = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_world.js')
                     textWorld = await responseWorld.text()
                 }
@@ -567,7 +575,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         }
 
         try {
-            if (allProjects[project.rating].needPrompt?.()) {
+            if (allProjects[project.rating]?.needPrompt?.()) {
                 const funcPrompt = function(nick) {
                     prompt = function() {
                         return nick
@@ -580,7 +588,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
                 await chrome.tabs.sendMessage(details.tabId, {textEval: true, textApi, textScript})
                 // noinspection JSUnresolvedVariable,JSUnresolvedFunction
-                if (allProjects[project.rating].needWorld?.()) {
+                if (allProjects[project.rating]?.needWorld?.()) {
                     await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['libs/evalCore.umd.js']})
                     const funcWorld = function(text) {
                         // noinspection JSUnresolvedFunction,JSUnresolvedVariable
@@ -592,7 +600,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             } else {
                 await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
                 // noinspection JSUnresolvedVariable,JSUnresolvedFunction
-                if (allProjects[project.rating].needWorld?.()) {
+                if (allProjects[project.rating]?.needWorld?.()) {
                     await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + project.rating.toLowerCase() +'_world.js']})
                 }
             }
@@ -740,7 +748,7 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // noinspection JSIgnoredPromiseFromCall
     onRuntimeMessage(request, sender, sendResponse)
-    if (request.projectDeleted) {
+    if (request.projectDeleted || request.projectRestart) {
         return true
     }
 })
@@ -804,16 +812,52 @@ async function onRuntimeMessage(request, sender, sendResponse) {
                     chrome.tabs.remove(key)
                         .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
                 }
+                await db.put('other', openedProjects, 'openedProjects')
                 break
             }
         }
-        await db.put('other', openedProjects, 'openedProjects')
         await db.delete('projects', request.projectDeleted.key)
-        chrome.alarms.clear(String(request.projectDeleted.key))
+        await chrome.alarms.clear(String(request.projectDeleted.key))
         if (nowVoting) {
             checkVote()
             console.log(getProjectPrefix(request.projectDeleted, true) + chrome.i18n.getMessage('projectDeleted'))
         }
+        sendResponse('success')
+        return
+    } else if (request.projectRestart) {
+        let inQueue = false
+        for (const[key,value] of openedProjects) {
+            if (settings.disabledOneVote) {
+                sendResponse('inQueue')
+                return
+            }
+            if (request.projectRestart.key === value.key) {
+                if (request.confirmed) {
+                    openedProjects.delete(key)
+                    // noinspection JSCheckFunctionSignatures
+                    if (!isNaN(key)) { // noinspection JSCheckFunctionSignatures
+                        chrome.tabs.remove(key)
+                            .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
+                    }
+                    await db.put('other', openedProjects, 'openedProjects')
+                    break
+                } else {
+                    sendResponse('needConfirm')
+                    return
+                }
+            } else if (request.projectRestart.rating === value.rating) {
+                inQueue = true
+            }
+        }
+        if (inQueue) {
+            sendResponse('inQueue')
+            return
+        }
+        await chrome.alarms.clear(String(request.projectRestart.key))
+        request.projectRestart.time = null
+        await db.put('projects', request.projectRestart, request.projectRestart.key)
+        console.log(getProjectPrefix(request.projectRestart, true) + chrome.i18n.getMessage('projectRestarted'))
+        checkVote()
         sendResponse('success')
         return
     }
@@ -1304,9 +1348,9 @@ function sendNotification(title, message) {
 
 function getProjectPrefix(project, detailed) {
     if (detailed) {
-        return '[' + allProjects[project.rating].URL() + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + ' '
+        return '[' + allProjects[project.rating]?.URL() + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + ' '
     } else {
-        return '[' + allProjects[project.rating].URL() + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' ' : '') + (project.name != null ? '– ' + project.name : '– ' + project.id)
+        return '[' + allProjects[project.rating]?.URL() + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' ' : '') + (project.name != null ? '– ' + project.name : '– ' + project.id)
     }
 }
 
@@ -1332,7 +1376,6 @@ async function updateValue(objStore, value) {
 
 chrome.runtime.onInstalled.addListener(async function(details) {
     await waitInitialize()
-    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
     if (details.reason === 'install') {
         chrome.tabs.create({url: 'options.html?installed'})
     } else if (details.reason === 'update') {

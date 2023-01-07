@@ -353,10 +353,6 @@ nav .logo img {
     }
 
     #submitAddProject {
-    	margin-bottom: 20px;
-    }
-
-    #submitAddProjectExpert {
     	margin-bottom: 40px;
     }
 }
@@ -497,11 +493,6 @@ nav .logo img {
 }
 
 #addProject {
-	grid-template-columns: auto 490px auto;
-}
-
-#addProject,
-#addProjectExpert {
 	position: relative;
 	margin-top: 20px;
 	display: grid;
@@ -557,8 +548,7 @@ nav .logo img {
     }
 
     .userSettings,
-	#addProject,
-    #addProjectExpert {
+	#addProject {
     	grid-template-columns: none;
     }
 
@@ -595,7 +585,8 @@ nav .logo img {
 	font-size: 14px;
 }
 
-[data-resource="notAddedAll"] {
+[data-resource="notAddedAll"],
+#addedLoading {
     text-align: center;
     margin-top: 20px;
 }
@@ -618,7 +609,7 @@ nav .logo img {
 	margin: auto 0;
 }
 
-[data-resource="notAdded"], [data-resource="load"] {
+[data-resource="notAdded"] {
 	font-size: 14px;
 	display: block;
 	text-align: center;
@@ -732,6 +723,19 @@ nav .logo img {
 .submitBtn:hover {
 	cursor: pointer;
 	opacity: 1;
+}
+
+#submitCancelProject {
+	background: #2a2a2f;
+}
+
+.editSubtitle {
+	text-align: center;
+	margin-top: 8px;
+}
+
+.editProjectButtons {
+	display: flex;
 }
 
 .selectsite,
@@ -974,7 +978,8 @@ nav .logo img {
 	user-select: none;
 }
 
-input.checkbox:disabled + label {
+input.checkbox:disabled + label,
+input.switchAddMode:disabled + label {
 	opacity: .5;
 }
 
@@ -1050,11 +1055,7 @@ input.checkbox:disabled + label {
 }
 
 input[type="text"]:-webkit-autofill,
-input[type="number"]:-webkit-autofill,
-input[type="text"]:-internal-autofill-previewed,
-input[type="number"]:-internal-autofill-previewed {
-	background-color: #2a2a2f !important;
-	color: #696969 !important;
+input[type="number"]:-webkit-autofill {
 	-webkit-box-shadow: 0 0 0 30px #2a2a2f inset !important;
 	-webkit-text-fill-color: #696969 !important;
 }
@@ -1313,9 +1314,8 @@ button:disabled {
 }
 
 #rewardAttention,
-#rewardAttentionExpert,
 #banAttention,
-#banAttentionExpert {
+#operaAttention {
 	margin-top: 15px;
 	color: #f1af4c;
 }

@@ -39,25 +39,77 @@
             </div>
         </nav>
         <div class="container">
-            
             <!-- Добавить -->
             <div id="append" class="tabcontent" style="display: none;">
                 <h4 data-resource="addTitle"></h4>
+                <div class="editSubtitle" style="display: none;"></div>
                 <hr color="#5A5A5C">
-                <form id="addProject">
-                    <input type="checkbox" name="switchAddMode" id="switchAddMode_1" class="switchAddMode">
-                    <label for="switchAddMode_1" data-resource="switchAddMode"></label>
-                    <div></div>
+                <form id="addProject" class="addProject addProjectExpertManual">
+                    <input type="checkbox" name="switchAddMode" id="switchAddMode" class="switchAddMode">
+                    <label for="switchAddMode" data-resource="switchAddMode"></label>
+                    <div id="emptyDiv"></div>
                     <div>
                         <!--Cсылка-->
                         <div class="input-block">
                             <label data-resource="link" for="link"></label>
-                            <input class="input" name="link" id="link" required placeholder="linkPlaceholder" type="text">
+                            <input class="input" name="link" id="link" required placeholder="linkPlaceholder" type="text" spellcheck="false">
+                        </div>
+                        <!--Выбор сайта-->
+                        <div style="display: none;" class="input-block">
+                            <label data-resource="siteTop" for="rating"></label>
+                            <input class="input" name="project" type="text" id="rating" placeholder="selectTop" list="ratingList" spellcheck="false">
+                            <datalist id="ratingList"></datalist>
                         </div>
                         <!--Никнейм-->
-                        <div class="input-block" style="display: none;">
+                        <div class="input-block" style="display: none">
                             <label data-resource="yourNick" for="nick"></label>
-                            <input class="input" name="nick" id="nick" placeholder="enterNick" type="text">
+                            <input class="input" name="nick" id="nick" placeholder="enterNick" type="text" spellcheck="false">
+                        </div>
+                        <!--ID проекта-->
+                        <div style="display: none;" class="input-block">
+                            <label for="id" data-resource="projectID">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span style="color:#d32f2f;">ID</span>
+                                        <span data-resource="projectIDTooltip"></span>
+                                        <br>
+                                        <span id="projectIDTooltip1"></span><span id="projectIDTooltip2" style="color:#d32f2f;"></span><span id="projectIDTooltip3"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input class="input" name="id" id="id" placeholder="inputProjectID" spellcheck="false">
+                        </div>
+                        <!--Дополнительные параметры URL-->
+                        <div style="display: none;" class="input-block">
+                            <label data-resource="additionURL" for="additionURL">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span id="additionURLTooltip1"></span><span id="additionURLTooltip2" style="color:#d32f2f;"></span><span id="additionURLTooltip3"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input id="additionURL" name="additionURL" placeholder="additionURL" type="text" class="input" spellcheck="false"/>
+                        </div>
+                        <!--Выбор игры-->
+                        <div style="display: none;" class="input-block">
+                            <label data-resource="urlGame" for="chooseGame">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span style="color:red;">URL</span>
+                                        <span data-resource="gameIDTooltip"></span>
+                                        <br>
+                                        <span id="urlGameTooltip1"></span><span id="urlGameTooltip2" style="color:#d32f2f;"></span><span id="urlGameTooltip3"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input class="input" name="chooseGame" type="text" id="chooseGame" placeholder="chooseGameURL" list="gameList" spellcheck="false">
+                            <datalist id="gameList"></datalist>
+                        </div>
+                        <!--Выбор языка-->
+                        <div style="display: none;" class="input-block">
+                            <label data-resource="chooseLang" for="chooseLang"></label>
+                            <input class="input" name="chooseLang" type="text" id="chooseLang" placeholder="chooseLang" list="langList" spellcheck="false">
+                            <datalist id="langList"></datalist>
                         </div>
                         <!--Максимальное кол-во голосов в день-->
                         <div style="display: none;" class="input-block">
@@ -74,98 +126,6 @@
                                 </span>
                             </label>
                             <input id="ordinalWorld" name="ordinalWorld" type="number" min="1" max="16" placeholder="ordinalWorld" class="input">
-                        </div>
-
-                        <button class="submitBtn" data-resource="addButton" id="submitAddProject" type="submit"></button>
-
-                        <div data-resource="banAttention" id="banAttention" style="display: none"></div>
-                        <div data-resource="rewardAttention" id="rewardAttention" style="display: none"></div>
-                    </div>
-                    <div></div>
-                </form>
-            </div>
-            <!-- Добавить (для опытных пользователей) -->
-            <div id="appendExpert" class="tabcontent" style="display: none;">
-                <h4 data-resource="addTitle"></h4>
-                <hr color="#5A5A5C">
-                <form id="addProjectExpert" class="addProjectExpert">
-                    <input type="checkbox" name="switchAddMode" id="switchAddMode_2" class="switchAddMode">
-                    <label for="switchAddMode_2" data-resource="switchAddMode"></label>
-                    <div id="emptyDiv"></div>
-                    <div>
-                        <!--Выбор сайта-->
-                        <div class="input-block">
-                            <label data-resource="siteTop" for="project"></label>
-                            <input class="input" name="project" type="text" id="project" placeholder="selectTop" list="projectList" required>
-                            <datalist id="projectList"></datalist>
-                        </div>
-                        <!--Никнейм-->
-                        <div class="input-block" style="display: none">
-                            <label data-resource="yourNick" for="nickExpert"></label>
-                            <input class="input" name="nick" id="nickExpert" placeholder="enterNick" type="text">
-                        </div>
-                        <!--ID проекта-->
-                        <div style="display: none;" class="input-block">
-                            <label for="id" data-resource="projectID">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:#d32f2f;">ID</span>
-                                        <span data-resource="projectIDTooltip"></span>
-                                        <br>
-                                        <span id="projectIDTooltip1"></span><span id="projectIDTooltip2" style="color:#d32f2f;"></span><span id="projectIDTooltip3"></span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input class="input" name="id" id="id" placeholder="inputProjectID" required>
-                        </div>
-                        <!--Дополнительные параметры URL-->
-                        <div style="display: none;" class="input-block">
-                            <label data-resource="additionURL" for="additionURL">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span id="additionURLTooltip1"></span><span id="additionURLTooltip2" style="color:#d32f2f;"></span><span id="additionURLTooltip3"></span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input id="additionURL" name="additionURL" placeholder="additionURL" type="text" class="input"/>
-                        </div>
-                        <!--Выбор игры-->
-                        <div style="display: none;" class="input-block">
-                            <label data-resource="urlGame">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:red;">URL</span>
-                                        <span data-resource="gameIDTooltip"></span>
-                                        <br>
-                                        <span id="urlGameTooltip1"></span><span id="urlGameTooltip2" style="color:#d32f2f;"></span><span id="urlGameTooltip3"></span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGame" placeholder="chooseGameURL" list="gameList">
-                            <datalist id="gameList"></datalist>
-                        </div>
-                        <!--Выбор языка-->
-                        <div style="display: none;" class="input-block">
-                            <label data-resource="chooseLang">
-                            </label>
-                            <input class="input" name="chooseLang" type="text" id="chooseLang" placeholder="chooseLang" list="langList">
-                            <datalist id="langList"></datalist>
-                        </div>
-                        <!--Максимальное кол-во голосов в день-->
-                        <div style="display: none;" class="input-block">
-                            <label for="countVoteExpert" data-resource="countVote"></label>
-                            <input id="countVoteExpert" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="input" value="5">
-                        </div>
-                        <!--Выбор порядкового номера мира-->
-                        <div style="display: none;" class="input-block" id="label10">
-                            <label for="ordinalWorldExpert" data-resource="ordinalWorld">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span data-resource="ordinalWorldTooltip"></span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input id="ordinalWorldExpert" name="ordinalWorld" type="number" min="1" max="16" placeholder="ordinalWorld" class="input">
                         </div>
 
                         <!--Выбор типа таймаута-->
@@ -200,12 +160,12 @@
                         <!--URL запроса-->
                         <div style="display: none;" class="input-block">
                             <label for="responseURL" data-resource="urlFetch"></label>
-                            <input id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="input"/>
+                            <input id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="input" spellcheck="false"/>
                         </div>
                         <!--Тело запроса-->
                         <div style="display: none;" class="input-block">
                             <label for="customBody" data-resource="bodyFetch"></label>
-                            <textarea id="customBody" name="customBody" placeholder="bodyFetch" class="textarea"></textarea>
+                            <textarea id="customBody" name="customBody" placeholder="bodyFetch" class="textarea" spellcheck="false"></textarea>
                         </div>
                         <!--Выбор режима голосования (тихий или эмуляция)-->
                         <div style="display: none;" class="input-block">
@@ -220,10 +180,20 @@
                             </select>
                         </div>
 
-                        <button class="submitBtn" data-resource="addButton" id="submitAddProjectExpert" type="submit"></button>
+                        <button class="submitBtn" data-resource="addButton" id="submitAddProject" type="submit"></button>
 
-                        <div data-resource="banAttention" id="banAttentionExpert" style="display: none"></div>
-                        <div data-resource="rewardAttention" id="rewardAttentionExpert" style="display: none"></div>
+                        <div class="editProjectButtons" style="display: none;">
+                            <button class="submitBtn" data-resource="save" id="submitEditProject" type="submit"></button>
+                            <button class="submitBtn" data-resource="cancel" id="submitCancelProject" type="button"></button>
+                        </div>
+
+                        <div data-resource="banAttention" id="banAttention" style="display: none"></div>
+                        <div data-resource="rewardAttention" id="rewardAttention" style="display: none"></div>
+                        <div data-resource="operaAttention" id="operaAttention" style="display: none">
+                            <br>
+                            <br>
+                            <a class="link" href="https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera">Problems with Opera</a>
+                        </div>
                     </div>
                     <div id="advSettingsAdd" style="display: none">
                         <div class="label-block">
@@ -418,7 +388,8 @@
             <div id="added" class="tabcontent" style="display: none;">
                 <h4 data-resource="addedProjects"></h4>
                 <hr color="#5A5A5C">
-                <p data-resource="notAddedAll"></p>
+                <p id="addedLoading" data-resource="load"></p>
+                <p id="notAddedAll" data-resource="notAddedAll" style="display: none;"></p>
                 <div class="projectsBlock">
                     <div class="buttonBlock"></div>
                     <div class="contentBlock"></div>
@@ -584,8 +555,9 @@
             </div>
         </div>
         <script src="libs/idb.umd.js"></script>
-        <script async src="libs/evalCore.umd.js"></script>
         <script src="projects.js"></script>
         <script src="main.js"></script>
         <script src="options.js"></script>
+        <script async src="libs/evalCore.umd.js"></script>
     </body>
+</html>

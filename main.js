@@ -17,9 +17,13 @@ var openedProjects = new Map()
 //Полностью ли запущено расширение?
 // noinspection ES6ConvertVarToLetConst
 var initialized = false
+let background = false
 
 self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
     if (!dbLogs) return
+    if (!background) { // noinspection JSIgnoredPromiseFromCall
+        createNotif(errorMsg + ' at ' + url + ':' + lineNumber, 'error')
+    }
     const time = new Date().toLocaleString().replace(',', '')
     const log = '[' + time + ' ERROR]: ' + errorMsg + ' at ' + url + ':' + lineNumber
     try {
@@ -34,6 +38,9 @@ self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
 })
 self.addEventListener('onunhandledrejection', (event) => {
     if (!dbLogs) return
+    if (!background) { // noinspection JSIgnoredPromiseFromCall
+        createNotif(event.reason.stack, 'error')
+    }
     const time = new Date().toLocaleString().replace(',', '')
     const log = '[' + time + ' ERROR]: ' + event.reason.stack
     try {
@@ -49,6 +56,7 @@ self.addEventListener('onunhandledrejection', (event) => {
 
 //Инициализация настроек расширения
 async function initializeConfig(background, version) {
+    this.background = background
     if (!dbLogs) {
         dbLogs = await idb.openDB('logs', 1, {
             upgrade(db/*, oldVersion, newVersion, transaction*/) {
@@ -129,11 +137,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion == null) oldVersion = 1
 
     if (oldVersion !== newVersion) {
-        if (typeof createNotif !== 'undefined') {
-            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        } else {
-            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        }
+        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
     }
 
     if (oldVersion === 0) {

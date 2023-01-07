@@ -297,14 +297,6 @@
   "addSuccess": {
     "message": "Erfolgreich hinzugefügt"
   },
-  "warnSilentVote": {
-    "message": "Bitte beachten Sie, dass $top$ im Modus der stillen Abstimmung nicht verfügbar ist.",
-    "placeholders": {
-      "top": {
-        "content": "$1"
-      }
-    }
-  },
   "cooldownChanged": {
     "message": "Sie müssen die Erweiterung neu starten, um die Änderungen zu übernehmen. Öffnen Sie nach dem Neustart erneut die Einstellungen. Neustart der Erweiterung?"
   },
@@ -572,9 +564,6 @@
   },
   "countVote": {
     "message": "Wie viele Stimmen pro Tag machen"
-  },
-  "warnSilentVoteTooltip": {
-    "message": "This rating will always work in emulation mode (regardless of the voting mode setting). It is set so because this top has a ReCaptcha that's impossible to bypass. We do not recommend adding more than 1 project to one voting page where ReCaptcha is active. ReCaptcha operates on the trust factor, if you pass it too often, then ReCaptcha may ask you to solve it again(select images where 'paste any object here' is shown), which this extension doesn't know how. Also if you are using a proxy or VPN then ReCaptcha's trust factor may not work"
   },
   "requiresCaptcha": {
     "message": "Erfordert das manuelle Lösen des Captcha"
@@ -861,12 +850,7 @@
     "message": "Übersetzt ins Deutsche: [GER]msebastian100#6704"
   },
   "notSupportedGroupTabs": {
-    "message": "Ihr Browser scheint die Gruppierung von Tabs nicht zu unterstützen: $error$",
-    "placeholders": {
-      "error": {
-        "content": "$1"
-      }
-    }
+    "message": "Ihr Browser scheint die Gruppierung von Tabs nicht zu unterstützen"
   },
   "projectDeleted": {
     "message": "Das Projekt wurde vom Benutzer gelöscht"

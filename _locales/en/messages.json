@@ -312,14 +312,6 @@
   "addSuccess": {
     "message": "Successfully added"
   },
-  "warnSilentVote": {
-    "message": "Please note that $top$ is not available in silent voting mode",
-    "placeholders": {
-      "top": {
-        "content": "$1"
-      }
-    }
-  },
   "cooldownChanged": {
     "message": "You must restart the extension to apply changes. After restarting, open settings again. Restart the extension?"
   },
@@ -582,9 +574,6 @@
   },
   "countVote": {
     "message": "How many votes make per day"
-  },
-  "warnSilentVoteTooltip": {
-    "message": "This rating will always work in emulation mode (regardless of the voting mode setting). It is set so because this top has a ReCaptcha that's impossible to bypass. We do not recommend adding more than 1 project to one voting page where ReCaptcha is active. ReCaptcha operates on the trust factor, if you pass it too often, then ReCaptcha may ask you to solve it again(select images where 'paste any object here' is shown), which this extension doesn't know how. Also if you are using a proxy or VPN then ReCaptcha's trust factor may not work"
   },
   "requiresCaptcha": {
     "message": "Requires manually solving the captcha"
@@ -871,12 +860,7 @@
     "message": "Translated into English: kadeler#4809"
   },
   "notSupportedGroupTabs": {
-    "message": "It seems your browser doesn't support tab grouping: $error$",
-    "placeholders": {
-      "error": {
-        "content": "$1"
-      }
-    }
+    "message": "It seems your browser doesn't support tab grouping"
   },
   "projectDeleted": {
     "message": "The project was deleted by the user"
@@ -890,10 +874,10 @@
   "closedTab": {
     "message": "It looks like you have closed the tab on which the extension auto-voted"
   },
-  "repair": {
+  "restart": {
     "message": "Restart voting"
   },
-  "repaired": {
+  "restarted": {
     "message": "The vote has been sent for restart"
   },
   "disabledUseRemoteCode": {
@@ -947,5 +931,26 @@
   },
   "edit": {
     "message": "Edit"
+  },
+  "confirmRestart": {
+    "message": "This project is voting right now, do you want to restart voting anyway?"
+  },
+  "projectRestarted": {
+    "message": "Voting restarted by the user"
+  },
+  "restartInQueue": {
+    "message": "This project is in the voting queue, restart is not possible."
+  },
+  "save": {
+    "message": "Save"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "editTitle": {
+    "message": "Editing an existing project"
+  },
+  "operaAttention": {
+    "message": "Attention! We found that you are using the Opera browser, with this browser there is a problem accessing Google captcha. Please follow the instructions below to give the extension access to Google captcha"
   }
 }

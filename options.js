@@ -4,6 +4,8 @@
 
 let evil
 
+let editingProject
+
 const authVKUrls = new Map([
     ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
     ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
@@ -22,10 +24,7 @@ svgSuccess.src = 'images/icons/success.svg'
 document.addEventListener('DOMContentLoaded', async()=>{
     await initializeConfig()
 
-    document.getElementById('addTab').classList.add('active')
-    document.getElementById('load').style.display = 'none'
-
-    await restoreOptions()
+    await restoreOptions(true)
 
     if (document.URL.endsWith('?installed')) {
         window.history.replaceState(null, null, 'options.html')
@@ -46,8 +45,14 @@ document.addEventListener('DOMContentLoaded', async()=>{
         }
     }
 
-    selectedTop.dispatchEvent(new Event('input'))
+    document.getElementById('rating').dispatchEvent(new Event('input'))
+    document.getElementById('link').dispatchEvent(new Event('input'))
 
+    fastAdd()
+})
+
+window.addEventListener('load', async () => {
+    await waitInitialize()
     if (!settings.disabledUseRemoteCode) {
         if (!evil) { // noinspection JSUnresolvedVariable,JSUnresolvedFunction
             evil = evalCore.getEvalInstance(self)
@@ -60,12 +65,13 @@ document.addEventListener('DOMContentLoaded', async()=>{
             createNotif('Ошибка при получении удалённого кода, использую вместо этого локальный код' + error.message, 'warn')
         }
     }
-
-    fastAdd()
+    await reloadProjectList()
+    document.getElementById('addedLoading').style.display = 'none'
+    document.getElementById('notAddedAll').removeAttribute('style')
 })
 
 // Restores select box and checkbox state using the preferences
-async function restoreOptions() {
+async function restoreOptions(first) {
     //Считывает настройки расширение и выдаёт их в html
     document.getElementById('disabledNotifStart').checked = settings.disabledNotifStart
     document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
@@ -84,23 +90,25 @@ async function restoreOptions() {
     document.getElementById('expertMode').checked = settings.expertMode
     if (settings.enableCustom) addCustom()
     if (settings.expertMode) {
-        document.getElementById('addTab').setAttribute('data-tab', 'appendExpert')
-        if (document.getElementById('addTab').classList.contains('active')) document.getElementById('appendExpert').style.display = 'block'
         document.getElementById("enabledSilentVote").parentElement.removeAttribute('style')
         document.getElementById("timeout").parentElement.removeAttribute('style')
         document.getElementById("timeoutError").parentElement.removeAttribute('style')
         document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
         document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
         document.getElementById("disabledDebug").parentElement.removeAttribute('style')
-        document.getElementById('addProjectExpert').classList.add('addProjectExpert')
-        document.getElementById('addProjectExpert').classList.remove('addProjectExpertManual')
+        document.getElementById('addProject').classList.add('addProjectExpert')
+        document.getElementById('addProject').classList.remove('addProjectExpertManual')
         document.getElementById('advSettingsAdd').removeAttribute('style')
         document.getElementById('emptyDiv').remove()
-        document.querySelector('label[for="switchAddMode_2"]').style.display = 'none'
     } else {
         if (document.getElementById('addTab').classList.contains('active')) document.getElementById('append').style.display = 'block'
     }
-    await reloadProjectList()
+    if (first) {
+        document.getElementById('addTab').classList.add('active')
+        document.getElementById('load').style.display = 'none'
+        document.getElementById('append').removeAttribute('style')
+    }
+    if (!first) await reloadProjectList()
 }
 
 //Добавить проект в список проекта
@@ -169,24 +177,27 @@ async function addProjectList(project) {
     const div = document.createElement('div')
     div.classList.add('controlItems')
 
-    const img3 = document.createElement('div')
-    const img3svg = document.createElement('img')
-    const img3text = document.createElement('span')
-    img3text.classList.add('tooltiptext')
-    img3text.textContent = chrome.i18n.getMessage('edit')
-    img3.classList.add('projectStats')
-    img3svg.src = 'images/icons/edit.svg'
-    img3.appendChild(img3svg)
-    img3.appendChild(img3text)
-    div.appendChild(img3)
+    let img3
+    if (settings.expertMode) {
+        img3 = document.createElement('div')
+        const img3svg = document.createElement('img')
+        const img3text = document.createElement('span')
+        img3text.classList.add('tooltiptext')
+        img3text.textContent = chrome.i18n.getMessage('edit')
+        img3.classList.add('projectStats')
+        img3svg.src = 'images/icons/edit.svg'
+        img3.appendChild(img3svg)
+        img3.appendChild(img3text)
+        div.appendChild(img3)
+    }
 
     const img0 = document.createElement('div')
     const img0svg = document.createElement('img')
     const img0text = document.createElement('span')
     img0text.classList.add('tooltiptext')
-    img0text.textContent = chrome.i18n.getMessage('repair')
+    img0text.textContent = chrome.i18n.getMessage('restart')
     img0.classList.add('projectStats')
-    img0svg.src = 'images/icons/repair.svg'
+    img0svg.src = 'images/icons/restart.svg'
     img0.appendChild(img0svg)
     img0.appendChild(img0text)
     div.appendChild(img0)
@@ -239,25 +250,146 @@ async function addProjectList(project) {
         listProject.append(li)
     }
     //Слушатель кнопки "Удалить" на проект
-    img2.addEventListener('click', async event => {
-        event.target.disabled = true
+    img2.addEventListener('click', async () => {
         await removeProjectList(project)
-        event.target.disabled = false
     })
+    //Слушатель кнопка "Перезапустить голосование" на проект
     img0.addEventListener('click', async () => {
         project = await db.get('projects', project.key)
-        if (project.time == null || project.time === '' || Date.now() > project.time) {
-            createNotif(await updateValue({updateValue: 'projects', value: project}), 'warn')
+        try {
+            // noinspection JSVoidFunctionReturnValueUsed
+            let message = await chrome.runtime.sendMessage({projectRestart: project})
+            // noinspection JSIncompatibleTypesComparison
+            if (message === 'needConfirm') {
+                if (confirm(chrome.i18n.getMessage('confirmRestart'))) {
+                    try {
+                        // noinspection JSVoidFunctionReturnValueUsed
+                        message = await chrome.runtime.sendMessage({projectRestart: project, confirmed: true})
+                        // noinspection JSIncompatibleTypesComparison
+                        if (message === 'inQueue') {
+                            createNotif(chrome.i18n.getMessage('restartInQueue'), 'error')
+                            return
+                        }
+                    } catch (error) {
+                        createNotif(error.message, 'error')
+                        return
+                    }
+                } else {
+                    return
+                }
+            } else { // noinspection JSIncompatibleTypesComparison
+                if (message === 'inQueue') {
+                    createNotif(chrome.i18n.getMessage('restartInQueue'), 'error')
+                    return
+                }
+            }
+        } catch (error) {
+            createNotif(error.message, 'error')
             return
         }
-        project.time = null
-        await db.put('projects', project, project.key)
-        chrome.runtime.sendMessage('checkVote')
-        updateValue({updateValue: 'projects', value: project})
-        createNotif(chrome.i18n.getMessage('repaired'), 'success')
+        createNotif(chrome.i18n.getMessage('restarted'), 'success')
     })
     //Слушатель кнопки Статистики и вывод её в модалку
     img1.addEventListener('click', () => updateModalStats(project, true))
+    //Слушатель кнопки "Редактировать"
+    if (settings.expertMode) {
+        img3.addEventListener('click', () => {
+            editingProject = project
+            document.querySelector('#addTab div').textContent = chrome.i18n.getMessage('edit')
+            document.querySelector('#addTab img').src = 'images/icons/edit.svg'
+            document.getElementById('addTab').click()
+            if (!document.getElementById('switchAddMode').checked) {
+                document.getElementById('switchAddMode').click()
+            }
+            document.getElementById('switchAddMode').disabled = true
+
+            const funcRating = allProjects[project.rating]
+            document.getElementById('rating').value = funcRating.URL()
+            if (project.rating === 'Custom') {
+                document.getElementById('nick').value = project.id
+            } else {
+                document.getElementById('id').value = project.id
+            }
+            if (funcRating.exampleURLGame) {
+                document.getElementById('chooseGame').value = project.game
+            }
+            if (funcRating.langList) {
+                document.getElementById('chooseLang').value = project.lang
+            }
+            if (funcRating.additionExampleURL) {
+                document.getElementById('additionURL').value = project.addition
+            }
+            if (project.rating !== 'Custom' && !funcRating.notRequiredNick?.(project)) {
+                document.getElementById('nick').value = project.nick
+            }
+            if (funcRating.limitedCountVote?.()) {
+                document.getElementById('countVote').value = project.maxCountVote
+            }
+            if (funcRating.ordinalWorld?.()) {
+                document.getElementById('ordinalWorld').value = project.ordinalWorld
+            }
+
+            if (project.time > Date.now()) {
+                document.getElementById('scheduleTimeCheckbox').checked = true
+                document.getElementById('scheduleTimeCheckbox').dispatchEvent(new Event('change'))
+                // TODO сомнительный код, я не знаю как ещё вынести обратно в input Date без смещений во времени из-за часового пояса
+                // https://stackoverflow.com/a/61082536/11235240
+                const time = new Date(project.time)
+                time.setMinutes(time.getMinutes() - time.getTimezoneOffset())
+                document.getElementById('scheduleTime').value = time.toISOString().slice(0,23)
+            }
+            if (document.getElementById('customTimeOut').checked || project.rating === 'Custom') {
+                if (project.timeout) {
+                    document.getElementById('selectTime').value = 'ms'
+                    document.getElementById('time').valueAsNumber = project.timeout
+                } else {
+                    document.getElementById('selectTime').value = 'hour'
+                    // TODO сомнительный код, я не знаю как ещё вынести обратно в input Date без смещений во времени из-за часового пояса
+                    // https://stackoverflow.com/a/61082536/11235240
+                    const hours = new Date(1980, 0, 1, project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
+                    hours.setMinutes(hours.getMinutes() - hours.getTimezoneOffset())
+                    document.getElementById('hour').value = hours.toISOString().slice(11,23)
+                }
+                document.getElementById('selectTime').dispatchEvent(new Event('change'))
+            }
+            if (project.lastDayMonth) {
+                document.getElementById('lastDayMonth').checked = true
+                document.getElementById('lastDayMonth').dispatchEvent(new Event('change'))
+            }
+            if (project.rating !== 'Custom' && (project.silentMode || project.emulateMode)) {
+                if (project.silentMode) {
+                    document.getElementById('voteModeSelect').value = 'silentMode'
+                } else {
+                    document.getElementById('voteModeSelect').value = 'emulateMode'
+                }
+                document.getElementById('voteMode').checked = true
+                document.getElementById('voteMode').dispatchEvent(new Event('change'))
+            }
+            if (project.priority) {
+                document.getElementById('priority').checked
+                document.getElementById('priority').dispatchEvent(new Event('change'))
+            }
+            if (project.randomize) {
+                document.getElementById('randomizeMin').value = project.randomize.min
+                document.getElementById('randomizeMax').value = project.randomize.max
+                document.getElementById('randomize').checked
+                document.getElementById('randomize').dispatchEvent(new Event('change'))
+            }
+
+            if (project.rating === 'Custom') {
+                document.getElementById('customBody').value = JSON.stringify(project.body, null, '\t')
+                document.getElementById('responseURL').value = project.responseURL
+            }
+            document.getElementById('rating').dispatchEvent(new Event('input'))
+
+            document.getElementById('submitAddProject').style.display = 'none'
+            document.getElementById('submitEditProject').parentElement.removeAttribute('style')
+            document.querySelector('[data-resource="addTitle"]').textContent = chrome.i18n.getMessage('editTitle')
+            document.querySelector('.editSubtitle').removeAttribute('style')
+            document.querySelector('.editSubtitle').id = 'edit' + project.key
+            document.querySelector('.editSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
+        })
+    }
     updateModalStats(project)
 }
 
@@ -300,7 +432,7 @@ function generateBtnListRating(rating, count) {
 //  div.setAttribute('data-resource', 'notAdded')
 //  div.textContent = chrome.i18n.getMessage('notAdded')
 //  ul.append(div)
-    if (!(/*rating === 'TopCraft' || rating === 'McTOP' || rating === 'MCRate' || rating === 'MinecraftRating' ||*/ rating === 'MonitoringMinecraft' || rating === 'ServerPact' || rating === 'MinecraftIpList' || rating === 'MCServerList' || rating === 'MisterLauncher' || rating === 'MinecraftListCZ' || rating === 'WARGM' || rating === 'Custom')) {
+    if (!(allProjects[rating].notRequiredCaptcha?.())) {
         const label = document.createElement('label')
         label.setAttribute('data-resource', 'passageCaptcha')
         label.textContent = chrome.i18n.getMessage('passageCaptcha')
@@ -332,7 +464,7 @@ function generateBtnListRating(rating, count) {
             document.getElementById(rating + 'Tab').remove()
             document.getElementById(rating + 'Button').remove()
             if (document.querySelector('.buttonBlock').childElementCount <= 0) {
-                document.querySelector('p[data-resource="notAddedAll"]').textContent = chrome.i18n.getMessage('notAddedAll')
+                document.getElementById('notAddedAll').textContent = chrome.i18n.getMessage('notAddedAll')
             }
         }
     })
@@ -340,7 +472,7 @@ function generateBtnListRating(rating, count) {
     document.querySelector('div.projectsBlock > div.contentBlock').append(ul)
 
     if (document.querySelector('.buttonBlock').childElementCount > 0) {
-        document.querySelector('p[data-resource="notAddedAll"]').textContent = ''
+        document.getElementById('notAddedAll').textContent = ''
     }
 }
 
@@ -366,7 +498,7 @@ async function removeProjectList(project) {
             document.getElementById(project.rating + 'Tab').remove()
             document.getElementById(project.rating + 'Button').remove()
             if (document.querySelector('.buttonBlock').childElementCount <= 0) {
-                document.querySelector('p[data-resource="notAddedAll"]').textContent = chrome.i18n.getMessage('notAddedAll')
+                document.getElementById('notAddedAll').textContent = chrome.i18n.getMessage('notAddedAll')
             }
         } else {
             li.remove()
@@ -433,34 +565,31 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
         else if (this.id === 'expertMode') {
             settings.expertMode = this.checked
             if (this.checked) {
-                document.getElementById('addTab').setAttribute('data-tab', 'appendExpert')
                 document.getElementById("enabledSilentVote").parentElement.removeAttribute('style')
                 document.getElementById("timeout").parentElement.removeAttribute('style')
                 document.getElementById("timeoutError").parentElement.removeAttribute('style')
                 document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
                 document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
                 document.getElementById("disabledDebug").parentElement.removeAttribute('style')
-                document.getElementById('addProjectExpert').classList.add('addProjectExpert')
-                document.getElementById('addProjectExpert').classList.remove('addProjectExpertManual')
+                document.getElementById('addProject').classList.add('addProjectExpert')
+                document.getElementById('addProject').classList.remove('addProjectExpertManual')
                 document.getElementById('advSettingsAdd').removeAttribute('style')
                 document.getElementById('emptyDiv').remove()
-                document.querySelector('label[for="switchAddMode_2"]').style.display = 'none'
             } else {
-                document.getElementById('addTab').setAttribute('data-tab', 'append')
                 document.getElementById("enabledSilentVote").parentElement.style.display = 'none'
                 document.getElementById("timeout").parentElement.style.display = 'none'
                 document.getElementById("timeoutError").parentElement.style.display = 'none'
                 document.getElementById("disabledOneVote").parentElement.style.display = 'none'
                 document.getElementById("disabledFocusedTab").parentElement.style.display = 'none'
                 document.getElementById("disabledDebug").parentElement.style.display = 'none'
-                document.getElementById('addProjectExpert').classList.add('addProjectExpertManual')
-                document.getElementById('addProjectExpert').classList.remove('addProjectExpert')
+                document.getElementById('addProject').classList.add('addProjectExpertManual')
+                document.getElementById('addProject').classList.remove('addProjectExpert')
                 document.getElementById('advSettingsAdd').style.display = 'none'
                 const div = document.createElement('div')
                 div.id = 'emptyDiv'
-                document.getElementById('addProjectExpert').prepend(div)
-                document.querySelector('label[for="switchAddMode_2"]').removeAttribute('style')
+                document.getElementById('addProject').prepend(div)
             }
+            reloadProjectList()
         } else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false
@@ -532,187 +661,188 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
         }
         event.target.disabled = false
     })
-    if (check.checked && check.parentElement.parentElement.parentElement.getAttribute('id') === 'addProjectExpert') {
+    if (check.checked && check.parentElement.parentElement.parentElement.getAttribute('id') === 'addProject') {
         check.dispatchEvent(new Event('change'))
     }
+}
+
+//Слушатель на переключение ручного режима в добавлении
+document.getElementById('switchAddMode').addEventListener('change', (event)=>{
+    document.getElementById('link').value = ''
+    document.getElementById('link').dispatchEvent(new Event('input'))
+    document.getElementById('rating').value = ''
+    document.getElementById('rating').dispatchEvent(new Event('input'))
+    if (event.target.checked) {
+        document.getElementById('rating').parentElement.removeAttribute('style')
+        document.getElementById('rating').required = true
+        document.getElementById('link').parentElement.style.display = 'none'
+        document.getElementById('link').required = false
+        document.getElementById('id').required = true
+    } else {
+        document.getElementById('rating').parentElement.style.display = 'none'
+        document.getElementById('rating').required = false
+        document.getElementById('link').parentElement.removeAttribute('style')
+        document.getElementById('link').required = true
+        document.getElementById('id').required = false
+    }
+})
+
+document.getElementById('submitCancelProject').addEventListener('click', () => resetEdit(editingProject))
+
+async function resetEdit(project) {
+    editingProject = null
+    document.getElementById('lastDayMonth').checked = false
+    document.getElementById('lastDayMonth').dispatchEvent(new Event('change'))
+    document.getElementById('customTimeOut').checked = false
+    document.getElementById('customTimeOut').dispatchEvent(new Event('change'))
+    document.getElementById('scheduleTimeCheckbox').checked = false
+    document.getElementById('scheduleTimeCheckbox').dispatchEvent(new Event('change'))
+    document.getElementById('priority').checked = false
+    document.getElementById('priority').dispatchEvent(new Event('change'))
+    document.getElementById('randomize').checked = false
+    document.getElementById('randomize').dispatchEvent(new Event('change'))
+    document.getElementById('voteMode').checked = false
+    document.getElementById('voteMode').dispatchEvent(new Event('change'))
+    document.getElementById('rating').value = ''
+    document.getElementById('rating').dispatchEvent(new Event('input'))
+    document.querySelector('#addTab img').src = 'images/icons/addBtn.svg'
+    document.querySelector('#addTab div').textContent = chrome.i18n.getMessage('addButton')
+    document.querySelector('[data-resource="addTitle"]').textContent = chrome.i18n.getMessage('addTitle')
+    document.querySelector('.editSubtitle').removeAttribute('id')
+    document.querySelector('.editSubtitle').textContent = ''
+    document.querySelector('.editSubtitle').style.display = 'none'
+    document.getElementById('submitAddProject').removeAttribute('style')
+    document.getElementById('submitEditProject').parentElement.style.display = 'none'
+    document.getElementById('switchAddMode').disabled = false
+    document.getElementById('switchAddMode').click()
+
+    document.getElementById('addedTab').click()
+    document.getElementById(project.rating + 'Button').click()
+    document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})
+    highlight(document.getElementById('projects' + project.key))
 }
 
 //Слушатель кнопки "Добавить"
 document.getElementById('append').addEventListener('submit', async(event)=>{
     event.preventDefault()
     event.submitter.disabled = true
-    let rating, project, domain
-    let url = document.getElementById('link').value
-    try {
-        domain = getDomainWithoutSubdomain(url)
-        rating = projectByURL.get(domain)
-        if (!rating) {
-            createNotif(chrome.i18n.getMessage('errorLink', domain), 'error')
+    let rating, domain, funcRating
+    let project
+    if (event.submitter.id === 'submitEditProject') {
+        project = editingProject
+    }
+    if (!document.getElementById('switchAddMode').checked) {
+        const url = document.getElementById('link').value
+        try {
+            domain = getDomainWithoutSubdomain(url)
+            rating = projectByURL.get(domain)
+            if (!rating) {
+                createNotif(chrome.i18n.getMessage('errorLink', domain), 'error')
+                event.submitter.disabled = false
+                return
+            }
+            funcRating = allProjects[rating]
+            project = funcRating.parseURL(new URL(url))
+            project.rating = rating
+        } catch (error) {
+            createNotif(error.message, 'error')
             event.submitter.disabled = false
             return
         }
-        project = allProjects[rating].parseURL(new URL(url))
-    } catch (error) {
-        createNotif(error.message, 'error')
-        event.submitter.disabled = false
-        return
+    } else {
+        domain = document.getElementById('rating').value
+        rating = projectByURL.get(domain)
+        if (!rating) {
+            createNotif(chrome.i18n.getMessage('errorSelectSiteRating'), 'error')
+            event.submitter.disabled = false
+            return
+        }
+        project.rating = rating
+        funcRating = allProjects[rating]
+
+        if (project.rating === 'Custom') {
+            project.id = document.getElementById('nick').value
+        } else {
+            project.id = document.getElementById('id').value
+        }
+
+        if (funcRating.exampleURLGame) {
+            project.game = document.getElementById('chooseGame').value
+        }
+
+        if (funcRating.langList) {
+            project.lang = document.getElementById('chooseLang').value
+        }
+
+        if (funcRating.additionExampleURL) {
+            project.addition = document.getElementById('additionURL').value
+        }
     }
-    project.rating = rating
-    project.stats = {
-        successVotes: 0,
-        monthSuccessVotes: 0,
-        lastMonthSuccessVotes: 0,
-        errorVotes: 0,
-        laterVotes: 0,
-        lastSuccessVote: null,
-        lastAttemptVote: null,
-        added: Date.now()
-    }
-    if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && project.rating !== 'XtremeTop100' && project.rating !== 'WARGM' && project.rating !== 'Top100ArenaCom' && ((project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') ? project.game !== 'servers' : true)) {
+
+    if (project.rating !== 'Custom' && !funcRating.notRequiredNick?.(project)) {
         project.nick = document.getElementById('nick').value
     } else {
         project.nick = ''
     }
-    if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ServeurMinecraftVoteFr' || project.rating === 'ListeServeursFr') {
+
+    if (funcRating.limitedCountVote?.()) {
         project.maxCountVote = document.getElementById('countVote').valueAsNumber
         project.countVote = 0
     }
-    if (project.rating === 'MMoTopRU' || project.rating === 'MmoRpgTop' || project.rating === 'MmoVoteRu') {
+
+    if (funcRating.ordinalWorld?.()) {
         project.ordinalWorld = document.getElementById('ordinalWorld').valueAsNumber
     }
-    await addProject(project)
-    event.submitter.disabled = false
-})
 
-//
-let modeBtns = document.querySelectorAll('.switchAddMode')
-modeBtns.forEach((btn)=> {
-    btn.addEventListener('change', async ()=> {
-        modeBtns.forEach((el)=> el.checked = btn.checked)
-        await wait(200)
-        if (btn.checked) {
-            document.getElementById('append').style.display = 'none'
-            document.getElementById('appendExpert').style.display = 'block'
-            document.getElementById('addProjectExpert').classList.remove('addProjectExpert')
-            document.getElementById('addProjectExpert').classList.add('addProjectExpertManual')
+    if (event.submitter.id !== 'submitEditProject') {
+        project.stats = {
+            successVotes: 0,
+            monthSuccessVotes: 0,
+            lastMonthSuccessVotes: 0,
+            errorVotes: 0,
+            laterVotes: 0,
+            lastSuccessVote: null,
+            lastAttemptVote: null,
+            added: Date.now()
+        }
+    }
+
+    if (settings.expertMode || project.rating === 'Custom') {
+        if (document.getElementById('scheduleTimeCheckbox').checked && document.getElementById('scheduleTime').value !== '') {
+            project.time = new Date(document.getElementById('scheduleTime').value).getTime()
         } else {
-            document.getElementById('append').style.display = 'block'
-            document.getElementById('appendExpert').style.display = 'none'
-            document.getElementById('addProjectExpert').classList.remove('addProjectExpertManual')
-            document.getElementById('addProjectExpert').classList.add('addProjectExpert')
+            project.time = null
         }
-    })
-})
-
-function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-//Слушатель кнопки "Добавить" в режиме эксперта
-document.getElementById('appendExpert').addEventListener('submit', async(event)=>{
-    event.preventDefault()
-    event.submitter.disabled = true
-    const project = {}
-    let name
-    if (document.querySelector('#projectList > option[value="' + this.project.value + '"]') != null) {
-        name = document.querySelector('#projectList > option[value="' + this.project.value + '"]').getAttribute('name')
-    }
-    if (name == null) {
-        createNotif(chrome.i18n.getMessage('errorSelectSiteRating'), 'error')
-        event.submitter.disabled = false
-        return
-    }
-    project.rating = name
-    project.id = document.getElementById('id').value
-    if (project.rating === 'Custom') {
-        project.id = document.getElementById('nickExpert').value
-        project.nick = ''
-    } else if (project.rating !== 'TopGG' && project.rating !== 'DiscordBotList' && project.rating !== 'Discords' && project.rating !== 'DiscordBoats' && project.rating !== 'XtremeTop100' && project.rating !== 'WARGM' && project.rating !== 'Top100ArenaCom' && ((project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') ? document.getElementById('chooseMinecraftRating').value !== 'servers' : true) && document.getElementById('nick').value !== '') {
-        project.nick = document.getElementById('nickExpert').value
-    } else {
-        project.nick = ''
-    }
-    project.stats = {
-        successVotes: 0,
-        monthSuccessVotes: 0,
-        lastMonthSuccessVotes: 0,
-        errorVotes: 0,
-        laterVotes: 0,
-        lastSuccessVote: null,
-        lastAttemptVote: null,
-        added: Date.now()
-    }
-    if (document.getElementById('scheduleTimeCheckbox').checked && document.getElementById('scheduleTime').value !== '') {
-        project.time = new Date(document.getElementById('scheduleTime').value).getTime()
-    } else {
-        project.time = null
-    }
-    if (document.getElementById('customTimeOut').checked || project.rating === 'Custom') {
-        if (document.getElementById('selectTime').value === 'ms') {
-            project.timeout = document.getElementById('time').valueAsNumber
-        } else {
-            project.timeoutHour = Number(document.getElementById('hour').value.split(':')[0])
-            if (Number.isNaN(project.timeoutHour)) project.timeoutHour = 0
-            project.timeoutMinute = Number(document.getElementById('hour').value.split(':')[1])
-            if (Number.isNaN(project.timeoutMinute)) project.timeoutMinute = 0
-            project.timeoutSecond = Number(document.getElementById('hour').value.split(':')[2])
-            if (Number.isNaN(project.timeoutSecond)) project.timeoutSecond = 0
-            project.timeoutMS = Number(document.getElementById('hour').value.split('.')[1])
-            if (Number.isNaN(project.timeoutMS)) project.timeoutMS = 0
+        if (document.getElementById('customTimeOut').checked || project.rating === 'Custom') {
+            if (document.getElementById('selectTime').value === 'ms') {
+                project.timeout = document.getElementById('time').valueAsNumber
+            } else {
+                project.timeoutHour = Number(document.getElementById('hour').value.split(':')[0])
+                if (Number.isNaN(project.timeoutHour)) project.timeoutHour = 0
+                project.timeoutMinute = Number(document.getElementById('hour').value.split(':')[1])
+                if (Number.isNaN(project.timeoutMinute)) project.timeoutMinute = 0
+                project.timeoutSecond = Number(document.getElementById('hour').value.split(':')[2])
+                if (Number.isNaN(project.timeoutSecond)) project.timeoutSecond = 0
+                project.timeoutMS = Number(document.getElementById('hour').value.split('.')[1])
+                if (Number.isNaN(project.timeoutMS)) project.timeoutMS = 0
+            }
         }
-    }
-    if (document.getElementById('lastDayMonth').checked) {
-        project.lastDayMonth = true
-    }
-    if (project.rating !== 'Custom' && document.getElementById('voteMode').checked) {
-        if (document.getElementById('voteModeSelect').value === 'silentMode') {
-            project.silentMode = true
-        } else if (document.getElementById('voteModeSelect').value === 'emulateMode') {
-            project.emulateMode = true
+        if (document.getElementById('lastDayMonth').checked) {
+            project.lastDayMonth = true
         }
-    }
-    if (document.getElementById('priority').checked) {
-        project.priority = true
-    }
-    if (document.getElementById('randomize').checked) {
-        project.randomize = {min: document.getElementById('randomizeMin').valueAsNumber, max: document.getElementById('randomizeMax').valueAsNumber}
-    }
-    if (project.rating === 'ListForge') {
-        project.game = document.getElementById('chooseGameListForge').value.toLowerCase()
-        project.addition = document.getElementById('additionTopGG').value
-    } else if (project.rating === 'TopG') {
-        project.game = document.getElementById('chooseGameTopG').value
-    } else if (project.rating === 'gTop100') {
-        project.game = document.getElementById('chooseGamegTop100').value
-    } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ServeurMinecraftVoteFr' || project.rating === 'ListeServeursFr') {
-        project.maxCountVote = document.getElementById('countVoteExpert').valueAsNumber
-        project.countVote = 0
-        if (project.rating === 'TopGames') {
-            project.game = document.getElementById('chooseGameTopGames').value
-            project.lang = document.getElementById('selectLangTopGames').value
-        } else if (project.rating === 'ServeurPrive') {
-            project.game = document.getElementById('chooseGameServeurPrive').value
-            project.lang = document.getElementById('selectLangServeurPrive').value
+        if (project.rating !== 'Custom' && document.getElementById('voteMode').checked) {
+            if (document.getElementById('voteModeSelect').value === 'silentMode') {
+                project.silentMode = true
+            } else if (document.getElementById('voteModeSelect').value === 'emulateMode') {
+                project.emulateMode = true
+            }
         }
-    } else if (project.rating === 'MMoTopRU') {
-        project.game = document.getElementById('chooseGameMMoTopRU').value
-        project.lang = document.getElementById('selectLangMMoTopRU').value
-        project.ordinalWorld = document.getElementById('ordinalWorldExpert').valueAsNumber
-    } else if (project.rating === 'TopGG' || project.rating === 'Discords' || project.rating === 'DiscordBotList') {
-        project.game = document.getElementById('chooseTopGG').value
-        if (project.rating === 'TopGG') project.addition = document.getElementById('additionTopGG').value
-    } else if (project.rating === 'MinecraftRating' || project.rating === 'MisterLauncher') {
-        project.game = document.getElementById('chooseMinecraftRating').value
-    } else if (project.rating === 'MineServers') {
-        project.game = document.getElementById('chooseGameMineServers').value.toLowerCase()
-    } else if (project.rating === 'MmoRpgTop') {
-        project.game = document.getElementById('chooseGameMmoRpgTop').value.toLowerCase()
-        project.ordinalWorld = document.getElementById('ordinalWorldExpert').valueAsNumber
-    } else if (project.rating === 'MmoVoteRu') {
-        project.game = document.getElementById('chooseGameMmoVoteRu').value.toLowerCase()
-        project.ordinalWorld = document.getElementById('ordinalWorldExpert').valueAsNumber
-    } else if (project.rating === 'McMonitoringInfo') {
-        project.game = document.getElementById('chooseGameMcMonitoringInfo').value
+        if (document.getElementById('priority').checked) {
+            project.priority = true
+        }
+        if (document.getElementById('randomize').checked) {
+            project.randomize = {min: document.getElementById('randomizeMin').valueAsNumber, max: document.getElementById('randomizeMax').valueAsNumber}
+        }
     }
 
     if (project.rating === 'Custom') {
@@ -727,10 +857,16 @@ document.getElementById('appendExpert').addEventListener('submit', async(event)=
 //      project.id = body
         project.body = body
         project.responseURL = document.getElementById('responseURL').value
-        await addProject(project, null)
-    } else {
-        await addProject(project, null)
     }
+
+    if (event.submitter.id === 'submitEditProject') {
+        await db.put('projects', project, project.key)
+        await updateValue({updateValue: 'projects', value: project})
+        resetEdit(project)
+    } else {
+        await addProject(project)
+    }
+
     event.submitter.disabled = false
 })
 
@@ -907,38 +1043,22 @@ async function addProject(project, element) {
         }
     }
 
-//  let random = false
-//  if (projectURL.toLowerCase().includes('pandamium')) {
-//      project.randomize = true
-//      random = true
-//  }
-
     await addProjectList(project)
 
-    /*f (random) {
-        updateStatusAdd('<div style="color:#4CAF50;">' + chrome.i18n.getMessage('addSuccess') + ' ' + projectURL + '</div> <div align="center" style="color:#da5e5e;">' + chrome.i18n.getMessage('warnSilentVote', project.rating) + '</div> <span class="tooltip2"><span class="tooltip2text">' + chrome.i18n.getMessage('warnSilentVoteTooltip') + '</span></span><br><div align="center"> Auto-voting is not allowed on this server, a randomizer for the time of the next vote is enabled in order to avoid punishment.</div>', true, element)
-    } else*/
+    // noinspection JSUnresolvedVariable
+    if (!settings.operaAttention && navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' && !(allProjects[project.rating].notRequiredCaptcha?.(project) || allProjects[project.rating].alertManualCaptcha?.())) {
+        settings.operaAttention = true
+        db.put('other', settings, 'settings')
+    }
+
     const array = []
     array.push(chrome.i18n.getMessage('addSuccess') + ' ' + project.name)
-//  if ((project.rating == 'PlanetMinecraft' || project.rating == 'TopG' || project.rating == 'MinecraftServerList' || project.rating == 'IonMc' || project.rating == 'MinecraftServersOrg' || project.rating == 'ServeurPrive' || project.rating == 'TopMinecraftServers' || project.rating == 'MinecraftServersBiz' || project.rating == 'HotMC' || project.rating == 'MinecraftServerNet' || project.rating == 'TopGames' || project.rating == 'TMonitoring' || project.rating == 'TopGG' || project.rating == 'DiscordBotList' || project.rating == 'MMoTopRU' || project.rating == 'MCServers' || project.rating == 'MinecraftList' || project.rating == 'MinecraftIndex' || project.rating == 'ServerList101') && settings.enabledSilentVote && !element) {
-//      const messageWSV = chrome.i18n.getMessage('warnSilentVote', project.rating)
-//      const span = document.createElement('span')
-//      span.className = 'tooltip2'
-//      span.style = 'color: white;'
-//      const span2 = document.createElement('span')
-//      span2.className = 'tooltip2text'
-//      span2.textContent = chrome.i18n.getMessage('warnSilentVoteTooltip')
-//      span.appendChild(span2)
-//      messageWSV.appendChild(span)
-//      array.push(document.createElement('br'))
-//      array.push(messageWSV)
-//  }
     if (secondBonusText) {
         array.push(document.createElement('br'))
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (!(element != null || project.rating === 'MinecraftIndex' || /*(project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MineServers' || project.rating === 'MinecraftListCZ' || project.rating === 'WARGM' || project.rating === 'Custom')) {
+    if (!(element != null || allProjects[project.rating].notRequiredCaptcha?.(project) || allProjects[project.rating].alertManualCaptcha?.())) {
         array.push(document.createElement('br'))
         array.push(document.createElement('br'))
         array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
@@ -955,7 +1075,7 @@ async function addProject(project, element) {
         createNotif(array, 'success', null, element)
     }
 
-    if (project.rating === 'MinecraftIndex' || project.rating === 'MineServers' || project.rating === 'XtremeTop100' || project.rating === 'ServeurMinecraftFr' || project.rating === 'gTop100') {
+    if (allProjects[project.rating].alertManualCaptcha?.()) {
         alert(chrome.i18n.getMessage('alertCaptcha'))
     }
 
@@ -1020,27 +1140,15 @@ async function checkPermissions(projects, element) {
         const url = allProjects[project.rating].pageURL(project)
         const domain = getDomainWithoutSubdomain(url)
         if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
-        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-            if (!origins.includes('*://*.vk.com/*')) origins.push('*://*.vk.com/*')
-        }
-        if (project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'Discords' || project.rating === 'DiscordBoats') {
-            if (!origins.includes('https://discord.com/oauth2/*')) origins.push('https://discord.com/oauth2/*')
-        }
-        if (project.rating === 'WARGM') {
-            if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
-        }
-        if (project.rating === 'BestServersCom') {
-            // if (project.game !== 'minecraft' && project.game !== 'metine2' && project.game !== 'minecraftpe' && project.game !== 'runescape' && project.game !== 'world-of-warcraft') {
-            if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
-            // }
-        }
-        if (project.rating === 'ListForge') {
-            if (project.game !== 'cubeworld-servers.com' && project.game !== 'hytale-servers.io' && project.game !== 'minecraft-mp.com' && project.game !== 'minecraftpocket-servers.com' && project.game !== 'terraria-servers.com' && project.game !== 'valheim-servers.io') {
-                if (!origins.includes('*://*.steamcommunity.com/*')) origins.push('*://*.steamcommunity.com/*')
+        if (allProjects[project.rating].needAdditionalOrigins) {
+            for (const origin of allProjects[project.rating].needAdditionalOrigins(project)) {
+                if (!origins.includes(origin)) origins.push(origin)
             }
         }
-        if (project.rating === 'MonitoringMinecraft') {
-            if (!permissions.includes('cookies')) permissions.push('cookies')
+        if (allProjects[project.rating].needAdditionalPermissions) {
+            for (const permission of allProjects[project.rating].needAdditionalPermissions(project)) {
+                if (!permissions.includes(permission)) permissions.push(permission)
+            }
         }
     }
 
@@ -1058,14 +1166,13 @@ async function checkPermissions(projects, element) {
                     return true
                 }
             } catch (error) {
-                if (!error.message.includes('This function must be called during a user gesture')) {
+                if (!error.message.includes('must be called during a user gesture') && !error.message.includes('may only be called from a user input handler')) {
                     createNotif(error.message, 'error', null, element)
                     return false
                 }
             }
         }
         document.getElementById('submitAddProject').disabled = false
-        document.getElementById('submitAddProjectExpert').disabled = false
         const button = document.createElement('button')
         button.textContent = chrome.i18n.getMessage('grant')
         button.classList.add('submitBtn')
@@ -1602,6 +1709,7 @@ document.getElementById('link').addEventListener('input', function() {
         document.getElementById('ordinalWorld').required = false
         document.getElementById('banAttention').style.display = 'none'
         document.getElementById('rewardAttention').style.display = 'none'
+        document.getElementById('operaAttention').style.display = 'none'
         laterChoose = false
     }
 
@@ -1632,20 +1740,21 @@ document.getElementById('link').addEventListener('input', function() {
         document.getElementById('ordinalWorld').parentElement.removeAttribute('style')
         document.getElementById('ordinalWorld').required = true
     }
-    if (funcRating.banAttention?.()) {
+    if (funcRating.banAttention?.(project)) {
         document.getElementById('banAttention').removeAttribute('style')
     }
     if (project.rating === 'MinecraftRating' && project.game === 'servers') {
         document.getElementById('rewardAttention').removeAttribute('style')
     }
+    // noinspection JSUnresolvedVariable
+    if (!settings.operaAttention && navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' && !(funcRating.notRequiredCaptcha?.(project) || funcRating.alertManualCaptcha?.())) {
+        document.getElementById('operaAttention').removeAttribute('style')
+    }
 })
 
-//Генерация поля ввода ID
-const selectedTop = document.getElementById('project')
-
-let laterChooseExpert = false
-selectedTop.addEventListener('input', function() {
-    if (laterChooseExpert) {
+let laterChooseManual = false
+document.getElementById('rating').addEventListener('input', function() {
+    if (laterChooseManual) {
         document.getElementById('id').value = ''
         document.getElementById('id').parentElement.style.display = 'none'
         document.getElementById('id').name = 'name'
@@ -1654,9 +1763,9 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('projectIDTooltip2').textContent = ''
         document.getElementById('projectIDTooltip3').textContent = ''
         document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('yourNick')
-        document.getElementById('nickExpert').parentElement.style.display = 'none'
-        document.getElementById('nickExpert').required = false
-        document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterNick')
+        document.getElementById('nick').parentElement.style.display = 'none'
+        document.getElementById('nick').required = false
+        document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('chooseGame').parentElement.style.display = 'none'
         document.getElementById('chooseGame').value = ''
         document.getElementById('chooseGame').name = 'chooseGame'
@@ -1668,12 +1777,13 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('chooseLang').value = ''
         document.getElementById('chooseLang').name = 'chooseLang'
         document.getElementById('langList').replaceChildren()
-        document.getElementById('countVoteExpert').parentElement.style.display = 'none'
-        document.getElementById('countVoteExpert').required = false
-        document.getElementById('ordinalWorldExpert').parentElement.style.display = 'none'
-        document.getElementById('ordinalWorldExpert').required = false
-        document.getElementById('banAttentionExpert').style.display = 'none'
-        document.getElementById('rewardAttentionExpert').style.display = 'none'
+        document.getElementById('countVote').parentElement.style.display = 'none'
+        document.getElementById('countVote').required = false
+        document.getElementById('ordinalWorld').parentElement.style.display = 'none'
+        document.getElementById('ordinalWorld').required = false
+        document.getElementById('banAttention').style.display = 'none'
+        document.getElementById('rewardAttention').style.display = 'none'
+        document.getElementById('operaAttention').style.display = 'none'
         document.getElementById('additionURL').parentElement.style.display = 'none'
         document.getElementById('additionURL').name = 'additionURL'
         document.getElementById('additionURLTooltip1').textContent = ''
@@ -1685,19 +1795,19 @@ selectedTop.addEventListener('input', function() {
         if (!document.getElementById('customTimeOut').checked) document.getElementById('selectTime').parentElement.style.display = 'none'
         document.getElementById('customBody').parentElement.style.display = 'none'
         document.getElementById('responseURL').parentElement.style.display = 'none'
-        laterChooseExpert = false
+        laterChooseManual = false
     }
 
     if (this.value === 'Custom') {
-        laterChooseExpert = true
+        laterChooseManual = true
         document.getElementById('customTimeOut').disabled = true
         document.getElementById('customTimeOut').checked = false
         document.getElementById('lastDayMonth').disabled = true
         document.getElementById('lastDayMonth').checked = false
         document.getElementById('voteMode').disabled = true
         document.getElementById('voteMode').checked = false
-        document.getElementById('nickExpert').parentElement.removeAttribute('style')
-        document.getElementById('nickExpert').required = true
+        document.getElementById('nick').parentElement.removeAttribute('style')
+        document.getElementById('nick').required = true
         document.getElementById('id').required = false
 
         document.getElementById('selectTime').parentElement.removeAttribute('style')
@@ -1705,14 +1815,14 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('responseURL').parentElement.removeAttribute('style')
 
         document.querySelector('[data-resource="yourNick"]').textContent = chrome.i18n.getMessage('name')
-        document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterName')
+        document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterName')
         return
     }
 
     let rating = projectByURL.get(this.value)
 
     if (!rating) return
-    laterChooseExpert = true
+    laterChooseManual = true
 
     let funcRating = allProjects[rating]
 
@@ -1723,10 +1833,10 @@ selectedTop.addEventListener('input', function() {
     document.getElementById('id').name = 'id' + rating
 
     if (!funcRating.notRequiredNick?.()) {
-        document.getElementById('nickExpert').parentElement.removeAttribute('style')
-        document.getElementById('nickExpert').required = true
+        document.getElementById('nick').parentElement.removeAttribute('style')
+        document.getElementById('nick').required = true
         if (funcRating.optionalNick?.()) {
-            document.getElementById('nickExpert').placeholder = chrome.i18n.getMessage('enterNickOptional')
+            document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNickOptional')
         }
     }
 
@@ -1766,22 +1876,27 @@ selectedTop.addEventListener('input', function() {
     }
 
     if (funcRating.limitedCountVote?.()) {
-        document.getElementById('countVoteExpert').parentElement.removeAttribute('style')
-        document.getElementById('countVoteExpert').required = true
+        document.getElementById('countVote').parentElement.removeAttribute('style')
+        document.getElementById('countVote').required = true
     }
 
     if (funcRating.ordinalWorld?.()) {
-        document.getElementById('ordinalWorldExpert').parentElement.removeAttribute('style')
-        document.getElementById('ordinalWorldExpert').required = true
+        document.getElementById('ordinalWorld').parentElement.removeAttribute('style')
+        document.getElementById('ordinalWorld').required = true
     }
 
     if (funcRating.banAttention?.()) {
-        document.getElementById('banAttentionExpert').removeAttribute('style')
+        document.getElementById('banAttention').removeAttribute('style')
         if (!document.getElementById('randomize').checked) {
             document.getElementById('randomize').click()
             document.getElementById('randomizeMin').value = '0'
             document.getElementById('randomizeMax').value = '14400000'
         }
+    }
+
+    // noinspection JSUnresolvedVariable
+    if (!settings.operaAttention && navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' && !(funcRating.notRequiredCaptcha?.(project) || funcRating.alertManualCaptcha?.())) {
+        document.getElementById('operaAttention').removeAttribute('style')
     }
 
     if (funcRating.additionExampleURL) {
@@ -1792,7 +1907,6 @@ selectedTop.addEventListener('input', function() {
         document.getElementById('additionURLTooltip3').textContent = funcRating.additionExampleURL()[2]
     }
 })
-selectedTop.dispatchEvent(new Event('change'))
 
 //Слушатель на выбор типа timeout для Custom
 document.getElementById('selectTime').addEventListener('change', function() {
@@ -1812,20 +1926,20 @@ document.getElementById('selectTime').addEventListener('change', function() {
 document.getElementById('chooseGame').addEventListener('change', function () {
     if (this.name === 'chooseGameMinecraftRating') {
         if (this.value === 'servers') {
-            document.getElementById('nickExpert').required = false
-            document.getElementById('nickExpert').parentElement.style.display = 'none'
-            document.getElementById('rewardAttentionExpert').removeAttribute('style')
+            document.getElementById('nick').required = false
+            document.getElementById('nick').parentElement.style.display = 'none'
+            document.getElementById('rewardAttention').removeAttribute('style')
         } else {
-            document.getElementById('nickExpert').required = true
-            document.getElementById('nickExpert').parentElement.removeAttribute('style')
-            document.getElementById('rewardAttentionExpert').style.display = 'none'
+            document.getElementById('nick').required = true
+            document.getElementById('nick').parentElement.removeAttribute('style')
+            document.getElementById('rewardAttention').style.display = 'none'
         }
     }
 })
 
 generateDataList()
 function generateDataList() {
-    const datalist = document.getElementById('projectList')
+    const datalist = document.getElementById('ratingList')
     for (const [url, rating] of projectByURL) {
         const option = document.createElement('option')
         option.setAttribute('name', rating)
@@ -1863,6 +1977,7 @@ async function updateValue(request) {
                         }
                     }
                 }
+                el.querySelector('div > div').textContent = (request.value.nick != null && request.value.nick !== '' ? request.value.nick + ' – ' : '') + (request.value.game != null ? request.value.game + ' – ' : '') + request.value.id + (request.value.name != null ? ' – ' + request.value.name : '') + (!request.value.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!request.value.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (request.value.rating !== 'Custom' && (request.value.timeout != null || request.value.timeoutHour != null) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (request.value.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (request.value.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (request.value.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
                 el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
                 el.querySelector('.error').textContent = request.value.error
                 updateModalStats(request.value)
@@ -1882,7 +1997,7 @@ document.querySelectorAll('[placeholder]').forEach(function(el) {
     if (!message || message === '') return
     el.placeholder = message
 })
-document.getElementById('nickExpert').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
+document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
 // document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
 
 //Модалки
@@ -1918,6 +2033,21 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     activeModal.style.transform = 'scale(1.1)'
     setTimeout(()=> activeModal.removeAttribute('style'), 100)
 })
+
+function highlight(element) {
+    let defaultBG = element.style.backgroundColor
+    let defaultTransition = element.style.transition
+
+    element.style.transition = "background 1s"
+    element.style.backgroundColor = "#a0a11e"
+
+    setTimeout(function() {
+        element.style.backgroundColor = defaultBG;
+        setTimeout(function() {
+            element.style.transition = defaultTransition;
+        }, 1000)
+    }, 1000)
+}
 
 //notifications
 async function createNotif(message, type, delay, element) {
