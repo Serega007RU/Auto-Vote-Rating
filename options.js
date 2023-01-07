@@ -294,6 +294,7 @@ async function addProjectList(project) {
     //Слушатель кнопки "Редактировать"
     if (settings.expertMode) {
         img3.addEventListener('click', () => {
+            resetEdit()
             editingProject = project
             document.querySelector('#addTab div').textContent = chrome.i18n.getMessage('edit')
             document.querySelector('#addTab img').src = 'images/icons/edit.svg'
@@ -302,6 +303,7 @@ async function addProjectList(project) {
                 document.getElementById('switchAddMode').click()
             }
             document.getElementById('switchAddMode').disabled = true
+            document.getElementById('rating').disabled = true
 
             const funcRating = allProjects[project.rating]
             document.getElementById('rating').value = funcRating.URL()
@@ -338,7 +340,7 @@ async function addProjectList(project) {
                 time.setMinutes(time.getMinutes() - time.getTimezoneOffset())
                 document.getElementById('scheduleTime').value = time.toISOString().slice(0,23)
             }
-            if (document.getElementById('customTimeOut').checked || project.rating === 'Custom') {
+            if (project.timeout || project.timeoutHour || project.rating === 'Custom') {
                 if (project.timeout) {
                     document.getElementById('selectTime').value = 'ms'
                     document.getElementById('time').valueAsNumber = project.timeout
@@ -366,13 +368,13 @@ async function addProjectList(project) {
                 document.getElementById('voteMode').dispatchEvent(new Event('change'))
             }
             if (project.priority) {
-                document.getElementById('priority').checked
+                document.getElementById('priority').checked = true
                 document.getElementById('priority').dispatchEvent(new Event('change'))
             }
             if (project.randomize) {
                 document.getElementById('randomizeMin').value = project.randomize.min
                 document.getElementById('randomizeMax').value = project.randomize.max
-                document.getElementById('randomize').checked
+                document.getElementById('randomize').checked = true
                 document.getElementById('randomize').dispatchEvent(new Event('change'))
             }
 
@@ -715,11 +717,14 @@ async function resetEdit(project) {
     document.getElementById('submitEditProject').parentElement.style.display = 'none'
     document.getElementById('switchAddMode').disabled = false
     document.getElementById('switchAddMode').click()
+    document.getElementById('rating').disabled = false
 
-    document.getElementById('addedTab').click()
-    document.getElementById(project.rating + 'Button').click()
-    document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})
-    highlight(document.getElementById('projects' + project.key))
+    if (project) {
+        document.getElementById('addedTab').click()
+        document.getElementById(project.rating + 'Button').click()
+        document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})
+        highlight(document.getElementById('projects' + project.key))
+    }
 }
 
 //Слушатель кнопки "Добавить"
@@ -826,9 +831,17 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
                 project.timeoutMS = Number(document.getElementById('hour').value.split('.')[1])
                 if (Number.isNaN(project.timeoutMS)) project.timeoutMS = 0
             }
+        } else {
+            delete project.timeout
+            delete project.timeoutHour
+            delete project.timeoutMinute
+            delete project.timeoutSecond
+            delete project.timeoutMS
         }
         if (document.getElementById('lastDayMonth').checked) {
             project.lastDayMonth = true
+        } else {
+            delete project.lastDayMonth
         }
         if (project.rating !== 'Custom' && document.getElementById('voteMode').checked) {
             if (document.getElementById('voteModeSelect').value === 'silentMode') {
@@ -836,12 +849,19 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
             } else if (document.getElementById('voteModeSelect').value === 'emulateMode') {
                 project.emulateMode = true
             }
+        } else {
+            delete project.silentMode
+            delete project.emulateMode
         }
         if (document.getElementById('priority').checked) {
             project.priority = true
+        } else {
+            delete project.priority
         }
         if (document.getElementById('randomize').checked) {
             project.randomize = {min: document.getElementById('randomizeMin').valueAsNumber, max: document.getElementById('randomizeMax').valueAsNumber}
+        } else {
+            delete project.randomize
         }
     }
 
