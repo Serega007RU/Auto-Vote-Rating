@@ -3,17 +3,18 @@ async function vote(first) {
         chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
         return
     }
-    if (document.querySelector('div.alert.alert-error') != null) {
-        if (document.querySelector('div.alert.alert-error').textContent.includes('Již si hlasoval')) {
-            if (document.querySelector('div.alert.alert-error').textContent.match(/\d+/g)) {
-                const numbers = document.querySelector('div.alert.alert-error').textContent.match(/\d+/g).map(Number)
+    if (document.querySelector('div.alert.alert-error')) {
+        const message = document.querySelector('div.alert.alert-error').parentElement.textContent
+        if (message.includes('Již si hlasoval')) {
+            if (message.match(/\d+/g)) {
+                const numbers = message.match(/\d+/g).map(Number)
                 const date = new Date()
                 chrome.runtime.sendMessage({later: Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), numbers[0] - 2/*На czech-craft время указано в часовом поясе UTC +2*/, numbers[1], numbers[2])})
             } else {
                 chrome.runtime.sendMessage({later: true})
             }
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-error').textContent})
+            chrome.runtime.sendMessage({message})
         }
         return
     }
