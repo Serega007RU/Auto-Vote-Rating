@@ -1146,12 +1146,18 @@ async function endVote(request, sender, project) {
         }
     }
 
-    function removeQueue() {
+    async function removeQueue() {
         for (const [tab,value] of openedProjects) {
             if (project.key === value.key) {
                 openedProjects.delete(tab)
             }
         }
+        project = await db.get('projects', project.key)
+        if (project) {
+            delete project.timeoutQueue
+            updateValue('projects', project)
+        }
+        db.put('other', openedProjects, 'openedProjects')
         if (openedProjects.size === 0) {
             promises = []
             if (updateAvailable) {
@@ -1159,9 +1165,6 @@ async function endVote(request, sender, project) {
                 return
             }
         }
-        delete project.timeoutQueue
-        updateValue('projects', project)
-        db.put('other', openedProjects, 'openedProjects')
         checkVote()
     }
 

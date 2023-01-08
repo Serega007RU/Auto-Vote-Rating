@@ -17,13 +17,13 @@ var openedProjects = new Map()
 //Полностью ли запущено расширение?
 // noinspection ES6ConvertVarToLetConst
 var initialized = false
-let background = false
 
-self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
-    if (!dbLogs) return
-    if (!background) { // noinspection JSIgnoredPromiseFromCall
-        createNotif(errorMsg + ' at ' + url + ':' + lineNumber, 'error')
+self.addEventListener('error', (errorMsg, url, lineNumber) => {
+    if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
+        createNotif(errorMsg + ' at ' + url + ':' + lineNumber, 'error', null, null, true)
+        document.querySelectorAll('button[disabled]').forEach((el) => el.disabled = false)
     }
+    if (!dbLogs) return
     const time = new Date().toLocaleString().replace(',', '')
     const log = '[' + time + ' ERROR]: ' + errorMsg + ' at ' + url + ':' + lineNumber
     try {
@@ -36,11 +36,12 @@ self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
         else console.error(e)
     }
 })
-self.addEventListener('onunhandledrejection', (event) => {
-    if (!dbLogs) return
-    if (!background) { // noinspection JSIgnoredPromiseFromCall
-        createNotif(event.reason.stack, 'error')
+self.addEventListener('unhandledrejection', (event) => {
+    if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
+        createNotif(event.reason.stack, 'error', null, null, true)
+        document.querySelectorAll('button[disabled]').forEach((el) => el.disabled = false)
     }
+    if (!dbLogs) return
     const time = new Date().toLocaleString().replace(',', '')
     const log = '[' + time + ' ERROR]: ' + event.reason.stack
     try {
@@ -56,7 +57,6 @@ self.addEventListener('onunhandledrejection', (event) => {
 
 //Инициализация настроек расширения
 async function initializeConfig(background, version) {
-    this.background = background
     if (!dbLogs) {
         dbLogs = await idb.openDB('logs', 1, {
             upgrade(db/*, oldVersion, newVersion, transaction*/) {
@@ -75,7 +75,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 110)
+            await initializeConfig(background, 100)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error.message})

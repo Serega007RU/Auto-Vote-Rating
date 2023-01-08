@@ -21,6 +21,154 @@ svgFail.src = 'images/icons/error.svg'
 const svgSuccess = document.createElement('img')
 svgSuccess.src = 'images/icons/success.svg'
 
+//Локализация
+const elements = document.querySelectorAll('[data-resource]')
+elements.forEach(function(el) {
+    el.prepend(chrome.i18n.getMessage(el.getAttribute('data-resource')))
+})
+document.querySelectorAll('[placeholder]').forEach(function(el) {
+    const message = chrome.i18n.getMessage(el.placeholder)
+    if (!message || message === '') return
+    el.placeholder = message
+})
+document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
+// document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
+document.querySelector('#load div').textContent = chrome.i18n.getMessage('load')
+
+//notifications
+async function createNotif(message, type, delay, element, dontLog) {
+    if (!type) type = 'hint'
+    if (!dontLog) {
+        if (type === 'error') console.error('['+type+']', message)
+        else if (type === 'warn') console.warn('['+type+']', message)
+        else console.log('['+type+']', message)
+    }
+    if (element != null) {
+        element.textContent = ''
+        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
+            for (const m of message) element.append(m)
+        } else {
+            element.textContent = message
+        }
+        element.className = type
+        if (type === 'success') {
+            element.parentElement.parentElement.parentElement.firstElementChild.src = 'images/icons/success.svg'
+        }
+        return
+    }
+    const notif = document.createElement('div')
+    notif.classList.add('notif', 'show', type)
+    if (!delay) {
+        if (type === 'error') delay = 30000
+        else delay = 5000
+    }
+
+    if (type !== 'hint') {
+        let imgBlock = document.createElement('img')
+        imgBlock.src = 'images/notif/'+type+'.png'
+        notif.append(imgBlock)
+        let progressBlock = document.createElement('div')
+        progressBlock.classList.add('progress')
+        let progressBar = document.createElement('div')
+        progressBar.style.animation = 'notif-progress '+delay/1000+'s linear'
+        progressBlock.append(progressBar)
+        notif.append(progressBlock)
+    }
+
+    let mesBlock = document.createElement('div')
+    if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
+        for (const m of message) mesBlock.append(m)
+    } else {
+        mesBlock.append(message)
+    }
+    notif.append(mesBlock)
+    notif.style.visibility = 'hidden'
+    document.getElementById('notifBlock2').append(notif)
+
+    let allNotifH
+    function calcAllNotifH() {
+        allNotifH = 10
+        document.querySelectorAll('#notifBlock > .notif').forEach((el)=> {
+            allNotifH = allNotifH + el.clientHeight + 10
+        })
+        document.querySelectorAll('#notifBlock2 > .notif').forEach((el)=> {
+            allNotifH = allNotifH + el.clientHeight + 10
+        })
+    }
+    calcAllNotifH()
+
+    notif.remove()
+    notif.removeAttribute('style')
+
+    while (window.innerHeight < allNotifH) {
+        await new Promise(resolve=>{
+            function listener(event) {
+                if (event.animationName === 'notif-hide') {
+                    document.getElementById('notifBlock').removeEventListener('animationend', listener)
+                    resolve()
+                }
+            }
+            document.getElementById('notifBlock').addEventListener('animationend', listener)
+        })
+        calcAllNotifH()
+    }
+
+    document.getElementById('notifBlock').append(notif)
+
+    let timer
+    if (type !== 'hint') timer = new Timer(()=> removeNotif(notif), delay)
+
+    if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
+        setTimeout(()=> removeNotif(notif.previousElementSibling), delay >= 3000 ? 3000 : delay)
+    }
+
+    notif.addEventListener('click', (e)=> {
+        if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
+            if (e.detail === 2) removeNotif(notif)
+        } else {
+            removeNotif(notif)
+        }
+    })
+
+    notif.addEventListener('mouseover', ()=> {
+        if (!notif.classList.contains('hint')) {
+            timer.pause()
+            notif.querySelector('.progress div').style.animationPlayState = 'paused'
+        }
+    })
+
+    notif.addEventListener('mouseout', ()=> {
+        if (!notif.classList.contains('hint')) {
+            timer.resume()
+            notif.querySelector('.progress div').style.animationPlayState = 'running'
+        }
+    })
+}
+function removeNotif(elem) {
+    if (!elem) return
+    elem.classList.remove('show')
+    elem.classList.add('hide')
+    setTimeout(()=> elem.classList.add('hidden'), 500)
+    setTimeout(()=> elem.remove(), 1000)
+}
+
+let Timer = function(callback, delay) {
+    let timerId, start, remaining = delay
+
+    this.pause = function() {
+        window.clearTimeout(timerId)
+        remaining -= Date.now() - start
+    }
+
+    this.resume = function() {
+        start = Date.now()
+        window.clearTimeout(timerId)
+        timerId = window.setTimeout(callback, remaining)
+    }
+
+    this.resume()
+}
+
 document.addEventListener('DOMContentLoaded', async()=>{
     await initializeConfig()
 
@@ -66,6 +214,8 @@ window.addEventListener('load', async () => {
         }
     }
     await reloadProjectList()
+    generateDataList()
+    if (settings.enableCustom) addCustom()
     document.getElementById('addedLoading').style.display = 'none'
     document.getElementById('notAddedAll').removeAttribute('style')
 })
@@ -88,7 +238,6 @@ async function restoreOptions(first) {
     document.getElementById('disabledUseRemoteCode').checked = settings.disabledUseRemoteCode
     document.getElementById('disabledSendErrorSentry').checked = settings.disabledSendErrorSentry
     document.getElementById('expertMode').checked = settings.expertMode
-    if (settings.enableCustom) addCustom()
     if (settings.expertMode) {
         document.getElementById("enabledSilentVote").parentElement.removeAttribute('style')
         document.getElementById("timeout").parentElement.removeAttribute('style')
@@ -293,103 +442,9 @@ async function addProjectList(project) {
     img1.addEventListener('click', () => updateModalStats(project, true))
     //Слушатель кнопки "Редактировать"
     if (settings.expertMode) {
-        img3.addEventListener('click', () => {
-            resetEdit()
-            editingProject = project
-            document.querySelector('#addTab div').textContent = chrome.i18n.getMessage('edit')
-            document.querySelector('#addTab img').src = 'images/icons/edit.svg'
-            document.getElementById('addTab').click()
-            if (!document.getElementById('switchAddMode').checked) {
-                document.getElementById('switchAddMode').click()
-            }
-            document.getElementById('switchAddMode').disabled = true
-            document.getElementById('rating').disabled = true
-
-            const funcRating = allProjects[project.rating]
-            document.getElementById('rating').value = funcRating.URL()
-            if (project.rating === 'Custom') {
-                document.getElementById('nick').value = project.id
-            } else {
-                document.getElementById('id').value = project.id
-            }
-            if (funcRating.exampleURLGame) {
-                document.getElementById('chooseGame').value = project.game
-            }
-            if (funcRating.langList) {
-                document.getElementById('chooseLang').value = project.lang
-            }
-            if (funcRating.additionExampleURL) {
-                document.getElementById('additionURL').value = project.addition
-            }
-            if (project.rating !== 'Custom' && !funcRating.notRequiredNick?.(project)) {
-                document.getElementById('nick').value = project.nick
-            }
-            if (funcRating.limitedCountVote?.()) {
-                document.getElementById('countVote').value = project.maxCountVote
-            }
-            if (funcRating.ordinalWorld?.()) {
-                document.getElementById('ordinalWorld').value = project.ordinalWorld
-            }
-
-            if (project.time > Date.now()) {
-                document.getElementById('scheduleTimeCheckbox').checked = true
-                document.getElementById('scheduleTimeCheckbox').dispatchEvent(new Event('change'))
-                // TODO сомнительный код, я не знаю как ещё вынести обратно в input Date без смещений во времени из-за часового пояса
-                // https://stackoverflow.com/a/61082536/11235240
-                const time = new Date(project.time)
-                time.setMinutes(time.getMinutes() - time.getTimezoneOffset())
-                document.getElementById('scheduleTime').value = time.toISOString().slice(0,23)
-            }
-            if (project.timeout || project.timeoutHour || project.rating === 'Custom') {
-                if (project.timeout) {
-                    document.getElementById('selectTime').value = 'ms'
-                    document.getElementById('time').valueAsNumber = project.timeout
-                } else {
-                    document.getElementById('selectTime').value = 'hour'
-                    // TODO сомнительный код, я не знаю как ещё вынести обратно в input Date без смещений во времени из-за часового пояса
-                    // https://stackoverflow.com/a/61082536/11235240
-                    const hours = new Date(1980, 0, 1, project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
-                    hours.setMinutes(hours.getMinutes() - hours.getTimezoneOffset())
-                    document.getElementById('hour').value = hours.toISOString().slice(11,23)
-                }
-                document.getElementById('selectTime').dispatchEvent(new Event('change'))
-            }
-            if (project.lastDayMonth) {
-                document.getElementById('lastDayMonth').checked = true
-                document.getElementById('lastDayMonth').dispatchEvent(new Event('change'))
-            }
-            if (project.rating !== 'Custom' && (project.silentMode || project.emulateMode)) {
-                if (project.silentMode) {
-                    document.getElementById('voteModeSelect').value = 'silentMode'
-                } else {
-                    document.getElementById('voteModeSelect').value = 'emulateMode'
-                }
-                document.getElementById('voteMode').checked = true
-                document.getElementById('voteMode').dispatchEvent(new Event('change'))
-            }
-            if (project.priority) {
-                document.getElementById('priority').checked = true
-                document.getElementById('priority').dispatchEvent(new Event('change'))
-            }
-            if (project.randomize) {
-                document.getElementById('randomizeMin').value = project.randomize.min
-                document.getElementById('randomizeMax').value = project.randomize.max
-                document.getElementById('randomize').checked = true
-                document.getElementById('randomize').dispatchEvent(new Event('change'))
-            }
-
-            if (project.rating === 'Custom') {
-                document.getElementById('customBody').value = JSON.stringify(project.body, null, '\t')
-                document.getElementById('responseURL').value = project.responseURL
-            }
-            document.getElementById('rating').dispatchEvent(new Event('input'))
-
-            document.getElementById('submitAddProject').style.display = 'none'
-            document.getElementById('submitEditProject').parentElement.removeAttribute('style')
-            document.querySelector('[data-resource="addTitle"]').textContent = chrome.i18n.getMessage('editTitle')
-            document.querySelector('.editSubtitle').removeAttribute('style')
-            document.querySelector('.editSubtitle').id = 'edit' + project.key
-            document.querySelector('.editSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
+        img3.addEventListener('click', async () => {
+            project = await db.get('projects', project.key)
+            editProject(project, true)
         })
     }
     updateModalStats(project)
@@ -691,7 +746,7 @@ document.getElementById('switchAddMode').addEventListener('change', (event)=>{
 
 document.getElementById('submitCancelProject').addEventListener('click', () => resetEdit(editingProject))
 
-async function resetEdit(project) {
+function resetEdit(project) {
     editingProject = null
     document.getElementById('lastDayMonth').checked = false
     document.getElementById('lastDayMonth').dispatchEvent(new Event('change'))
@@ -725,6 +780,105 @@ async function resetEdit(project) {
         document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})
         highlight(document.getElementById('projects' + project.key))
     }
+}
+
+function editProject(project, switchToEdit) {
+    resetEdit()
+    editingProject = project
+    document.querySelector('#addTab div').textContent = chrome.i18n.getMessage('edit')
+    document.querySelector('#addTab img').src = 'images/icons/edit.svg'
+    if (switchToEdit) document.getElementById('addTab').click()
+    if (!document.getElementById('switchAddMode').checked) {
+        document.getElementById('switchAddMode').click()
+    }
+    document.getElementById('switchAddMode').disabled = true
+    document.getElementById('rating').disabled = true
+
+    const funcRating = allProjects[project.rating]
+    document.getElementById('rating').value = funcRating.URL()
+    if (project.rating === 'Custom') {
+        document.getElementById('nick').value = project.id
+    } else {
+        document.getElementById('id').value = project.id
+    }
+    if (funcRating.exampleURLGame) {
+        document.getElementById('chooseGame').value = project.game
+    }
+    if (funcRating.langList) {
+        document.getElementById('chooseLang').value = project.lang
+    }
+    if (funcRating.additionExampleURL) {
+        document.getElementById('additionURL').value = project.addition
+    }
+    if (project.rating !== 'Custom' && !funcRating.notRequiredNick?.(project)) {
+        document.getElementById('nick').value = project.nick
+    }
+    if (funcRating.limitedCountVote?.()) {
+        document.getElementById('countVote').value = project.maxCountVote
+    }
+    if (funcRating.ordinalWorld?.()) {
+        document.getElementById('ordinalWorld').value = project.ordinalWorld
+    }
+
+    if (project.time > Date.now()) {
+        document.getElementById('scheduleTimeCheckbox').checked = true
+        document.getElementById('scheduleTimeCheckbox').dispatchEvent(new Event('change'))
+        // TODO сомнительный код, я не знаю как ещё вынести обратно в input Date без смещений во времени из-за часового пояса
+        // https://stackoverflow.com/a/61082536/11235240
+        const time = new Date(project.time)
+        time.setMinutes(time.getMinutes() - time.getTimezoneOffset())
+        document.getElementById('scheduleTime').value = time.toISOString().slice(0,23)
+    }
+    if (project.timeout || project.timeoutHour || project.rating === 'Custom') {
+        if (project.timeout) {
+            document.getElementById('selectTime').value = 'ms'
+            document.getElementById('time').valueAsNumber = project.timeout
+        } else {
+            document.getElementById('selectTime').value = 'hour'
+            // TODO сомнительный код, я не знаю как ещё вынести обратно в input Date без смещений во времени из-за часового пояса
+            // https://stackoverflow.com/a/61082536/11235240
+            const hours = new Date(1980, 0, 1, project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
+            hours.setMinutes(hours.getMinutes() - hours.getTimezoneOffset())
+            document.getElementById('hour').value = hours.toISOString().slice(11,23)
+        }
+        document.getElementById('selectTime').dispatchEvent(new Event('change'))
+    }
+    if (project.lastDayMonth) {
+        document.getElementById('lastDayMonth').checked = true
+        document.getElementById('lastDayMonth').dispatchEvent(new Event('change'))
+    }
+    if (project.rating !== 'Custom' && (project.silentMode || project.emulateMode)) {
+        if (project.silentMode) {
+            document.getElementById('voteModeSelect').value = 'silentMode'
+        } else {
+            document.getElementById('voteModeSelect').value = 'emulateMode'
+        }
+        document.getElementById('voteMode').checked = true
+        document.getElementById('voteMode').dispatchEvent(new Event('change'))
+    }
+    if (project.priority) {
+        document.getElementById('priority').checked = true
+        document.getElementById('priority').dispatchEvent(new Event('change'))
+    }
+    if (project.randomize) {
+        document.getElementById('randomizeMin').value = project.randomize.min
+        document.getElementById('randomizeMax').value = project.randomize.max
+        document.getElementById('randomize').checked = true
+        document.getElementById('randomize').dispatchEvent(new Event('change'))
+    }
+
+    if (project.rating === 'Custom') {
+        document.getElementById('customBody').value = JSON.stringify(project.body, null, '\t')
+        document.getElementById('responseURL').value = project.responseURL
+    }
+    document.getElementById('rating').dispatchEvent(new Event('input'))
+
+    document.getElementById('submitAddProject').style.display = 'none'
+    document.getElementById('submitEditProject').parentElement.removeAttribute('style')
+    document.querySelector('[data-resource="addTitle"]').textContent = chrome.i18n.getMessage('editTitle')
+    document.querySelector('.editSubtitle').removeAttribute('style')
+    document.querySelector('.editSubtitle').id = 'edit' + project.key
+    document.querySelector('.editSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
 }
 
 //Слушатель кнопки "Добавить"
@@ -881,8 +1035,9 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
 
     if (event.submitter.id === 'submitEditProject') {
         await db.put('projects', project, project.key)
-        await updateValue({updateValue: 'projects', value: project})
         resetEdit(project)
+        await updateValue({updateValue: 'projects', value: project})
+        if (project.time < Date.now()) chrome.runtime.sendMessage('checkVote')
     } else {
         await addProject(project)
     }
@@ -930,8 +1085,8 @@ async function addProject(project, element) {
         secondBonusButton.className = 'secondBonus'
     }
 
-    // noinspection JSUnresolvedFunction
     if (!document.getElementById('disableCheckProjects').checked) {
+        // noinspection JSUnresolvedFunction
         let found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
         if (found > 0) {
             const message = chrome.i18n.getMessage('alreadyAdded')
@@ -1957,7 +2112,6 @@ document.getElementById('chooseGame').addEventListener('change', function () {
     }
 })
 
-generateDataList()
 function generateDataList() {
     const datalist = document.getElementById('ratingList')
     for (const [url, rating] of projectByURL) {
@@ -1981,7 +2135,7 @@ async function updateValue(request) {
         usageSpace()
         if (request.updateValue === 'projects') {
             const el = document.getElementById('projects' + request.value.key)
-            if (el != null) {
+            if (el) {
                 let text = chrome.i18n.getMessage('soon')
                 if (!(request.value.time == null || request.value.time === '') && Date.now() < request.value.time) {
                     text = new Date(request.value.time).toLocaleString().replace(',', '')
@@ -2001,24 +2155,14 @@ async function updateValue(request) {
                 el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
                 el.querySelector('.error').textContent = request.value.error
                 updateModalStats(request.value)
-                return text
+            }
+            const el2 = document.getElementById('edit' + request.value.key)
+            if (el2) {
+                editProject(request.value)
             }
         }
     }
 }
-
-//Локализация
-const elements = document.querySelectorAll('[data-resource]')
-elements.forEach(function(el) {
-    el.prepend(chrome.i18n.getMessage(el.getAttribute('data-resource')))
-})
-document.querySelectorAll('[placeholder]').forEach(function(el) {
-    const message = chrome.i18n.getMessage(el.placeholder)
-    if (!message || message === '') return
-    el.placeholder = message
-})
-document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessage('enterNick'))
-// document.getElementById('donate').setAttribute('href', chrome.i18n.getMessage('donate'))
 
 //Модалки
 document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
@@ -2067,135 +2211,4 @@ function highlight(element) {
             element.style.transition = defaultTransition;
         }, 1000)
     }, 1000)
-}
-
-//notifications
-async function createNotif(message, type, delay, element) {
-    if (!type) type = 'hint'
-    if (type === 'error') console.error('['+type+']', message)
-    else console.log('['+type+']', message)
-    if (element != null) {
-        element.textContent = ''
-        if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-            for (const m of message) element.append(m)
-        } else {
-            element.textContent = message
-        }
-        element.className = type
-        if (type === 'success') {
-            element.parentElement.parentElement.parentElement.firstElementChild.src = 'images/icons/success.svg'
-        }
-        return
-    }
-    const notif = document.createElement('div')
-    notif.classList.add('notif', 'show', type)
-    if (!delay) {
-        if (type === 'error') delay = 30000
-        else delay = 5000
-    }
-
-    if (type !== 'hint') {
-        let imgBlock = document.createElement('img')
-        imgBlock.src = 'images/notif/'+type+'.png'
-        notif.append(imgBlock)
-        let progressBlock = document.createElement('div')
-        progressBlock.classList.add('progress')
-        let progressBar = document.createElement('div')
-        progressBar.style.animation = 'notif-progress '+delay/1000+'s linear'
-        progressBlock.append(progressBar)
-        notif.append(progressBlock)
-    }
-
-    let mesBlock = document.createElement('div')
-    if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-        for (const m of message) mesBlock.append(m)
-    } else {
-        mesBlock.append(message)
-    }
-    notif.append(mesBlock)
-    notif.style.visibility = 'hidden'
-    document.getElementById('notifBlock2').append(notif)
-
-    let allNotifH
-    function calcAllNotifH() {
-        allNotifH = 10
-        document.querySelectorAll('#notifBlock > .notif').forEach((el)=> {
-            allNotifH = allNotifH + el.clientHeight + 10
-        })
-        document.querySelectorAll('#notifBlock2 > .notif').forEach((el)=> {
-            allNotifH = allNotifH + el.clientHeight + 10
-        })
-    }
-    calcAllNotifH()
-
-    notif.remove()
-    notif.removeAttribute('style')
-
-    while (window.innerHeight < allNotifH) {
-        await new Promise(resolve=>{
-            function listener(event) {
-                if (event.animationName === 'notif-hide') {
-                    document.getElementById('notifBlock').removeEventListener('animationend', listener)
-                    resolve()
-                }
-            }
-            document.getElementById('notifBlock').addEventListener('animationend', listener)
-        })
-        calcAllNotifH()
-    }
-
-    document.getElementById('notifBlock').append(notif)
-
-    let timer
-    if (type !== 'hint') timer = new Timer(()=> removeNotif(notif), delay)
-
-    if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
-        setTimeout(()=> removeNotif(notif.previousElementSibling), delay >= 3000 ? 3000 : delay)
-    }
-
-    notif.addEventListener('click', (e)=> {
-        if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
-            if (e.detail === 2) removeNotif(notif)
-        } else {
-            removeNotif(notif)
-        }
-    })
-
-    notif.addEventListener('mouseover', ()=> {
-        if (!notif.classList.contains('hint')) {
-            timer.pause()
-            notif.querySelector('.progress div').style.animationPlayState = 'paused'
-        }
-    })
-
-    notif.addEventListener('mouseout', ()=> {
-        if (!notif.classList.contains('hint')) {
-            timer.resume()
-            notif.querySelector('.progress div').style.animationPlayState = 'running'
-        }
-    })
-}
-function removeNotif(elem) {
-    if (!elem) return
-    elem.classList.remove('show')
-    elem.classList.add('hide')
-    setTimeout(()=> elem.classList.add('hidden'), 500)
-    setTimeout(()=> elem.remove(), 1000)
-}
-
-let Timer = function(callback, delay) {
-    let timerId, start, remaining = delay
-
-    this.pause = function() {
-        window.clearTimeout(timerId)
-        remaining -= Date.now() - start
-    }
-
-    this.resume = function() {
-        start = Date.now()
-        window.clearTimeout(timerId)
-        timerId = window.setTimeout(callback, remaining)
-    }
-
-    this.resume()
 }
