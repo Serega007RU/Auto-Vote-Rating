@@ -4,10 +4,13 @@ async function vote(first) {
         return
     }
     if (document.querySelector('.alert.alert-primary')) {
-        if (document.querySelector('.alert.alert-primary').textContent.includes('si hlasoval')) {
+        const message = document.querySelector('.alert.alert-primary').textContent
+        if (message.includes('reCaptcha')) {
+            // None
+        } else if (message.includes('si hlasoval')) {
             chrome.runtime.sendMessage({later: true})
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-primary').textContent.trim()})
+            chrome.runtime.sendMessage({message: message.trim()})
         }
         return
     }
