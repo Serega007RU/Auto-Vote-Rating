@@ -131,7 +131,8 @@ Here is a short guide how to install an unpacked extension on Google Chrome or C
 
 
 ## Libraries used
-### [IDB](https://github.com/jakearchibald/idb) version 7.1.1
+### [IDB](https://github.com/jakearchibald/idb)
+### [JSZip](https://github.com/Stuk/jszip)
 [//]: # (### [LinkeDOM]&#40;https://github.com/WebReflection/linkedom&#41; version 0.14.21)
 [//]: # (### [Polyfill]&#40;https://github.com/regseb/castkodi/tree/mv3/src/polyfill&#41;)
 [//]: # (### [eval5]&#40;https://github.com/bplok20010/eval5&#41; &#40;also [chrome-inject-eval]&#40;https://github.com/GrinZero/chrome-inject-eval&#41;&#41;)

@@ -1179,12 +1179,6 @@
   "update5": {
     "message": "Wir löschen alle Dateien und Ordner der Erweiterung für spätere Updates"
   },
-  "update6": {
-    "message": "Wir nutzen git, um eine Liste der neuen Dateien zu erhalten"
-  },
-  "dowloading": {
-    "message": "Herunterladen "
-  },
   "update8": {
     "message": "Die Erweiterung wurde erfolgreich aktualisiert, starten Sie die Erweiterung neu, damit die Änderungen wirksam werden"
   },

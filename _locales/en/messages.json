@@ -1195,10 +1195,10 @@
     "message": "We delete all files and folders of the extension for subsequent updates"
   },
   "update6": {
-    "message": "We turn to git for a list of new files"
+    "message": "We turn to git for the archive"
   },
-  "dowloading": {
-    "message": "Downloading "
+  "unpacking": {
+    "message": "Unpacking "
   },
   "update8": {
     "message": "The extension has been updated successfully, restart the extension for the changes to take effect"

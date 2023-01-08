@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
 })
 
 async function checkUpdateAvailable(forced) {
-    const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/files/manifest.json/raw?ref=multivote')
+    const response = await fetch('https://raw.githubusercontent.com/Serega007RU/Auto-Vote-Rating/multivote/manifest.json')
     const json = await response.json()
     if (forced || new Version(chrome.runtime.getManifest().version).compareTo(new Version(json.version)) === -1) {
         const button = document.createElement('button')
@@ -157,37 +157,40 @@ async function update(version) {
             await dirHandle.removeEntry(entry.name, {recursive: true})
         }
 
-        //Обращаемся к git где все у нас файлы перечислены
+        //Обращаемся к git за архивом
         message.append(chrome.i18n.getMessage('update6'))
         message.append(document.createElement('br'))
         message.scrollTop = message.scrollHeight
-        let response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/tree?recursive=true&per_page=100&ref=multivote')
-        let json = await response.json()
-        updateProgress(0, Number(response.headers.get('x-total')))
-        const pages = Number(response.headers.get('x-total-pages')) + 1
-        for (let i = 1; i < pages; i++) {
-            if (i > 1) {
-                response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/tree?recursive=true&per_page=100&ref=multivote&page=' + i)
-                json = await response.json()
+        let response = await fetch('https://github.com/Serega007RU/Auto-Vote-Rating/archive/refs/heads/multivote.zip')
+        let zip = await JSZip.loadAsync(response.arrayBuffer())
+        updateProgress(0, Object.keys(zip.files).length)
+        const promises = new Map()
+        const maxThreads = 4
+        for (const file of Object.keys(zip.files)) {
+            if (promises.size >= maxThreads) {
+                await Promise.any(promises.values())
             }
-            for (const file of json) {
-                updateProgress()
-                if (file.type === 'blob') {
-                    message.append(chrome.i18n.getMessage('dowloading') + file.path)
-                    message.append(document.createElement('br'))
-                    message.scrollTop = message.scrollHeight
-                    file.url = 'https://gitlab.com/api/v4/projects/19831620/repository/files/' + file.path.replaceAll('/', '%2F') + '/raw?ref=multivote'
-                    await createFile(dirHandle, file.path.split('/'), file)
-                }
+            updateProgress()
+            const zipEntry = zip.file(file)
+            if (zipEntry && !zipEntry.dir) {
+                const name = file.replace('Auto-Vote-Rating-multivote/', '')
+                message.append(chrome.i18n.getMessage('unpacking') + name)
+                message.append(document.createElement('br'))
+                message.scrollTop = message.scrollHeight
+                const promise = createFile(dirHandle, name.split('/'), zipEntry, name).then(() => promises.delete(name))
+                promises.set(name, promise)
             }
         }
 
         //Создаёт поддиректории если их не существует и создаёт файл в нужной дирректории
-        async function createFile(rootDirEntry, folders, file) {
+        async function createFile(rootDirEntry, folders, zipEntry, name) {
+            if (promises.size >= maxThreads) {
+                await Promise.any(promises.values())
+            }
             if (folders.length === 1) {
                 //Создаём файл
-                const newFileHandle = await rootDirEntry.getFileHandle(file.name, {create: true})
-                await writeURLToFile(newFileHandle, file.url)
+                const newFileHandle = await rootDirEntry.getFileHandle(folders[0], {create: true})
+                await writeZipEntryToFile(newFileHandle, zipEntry)
                 return
             }
             //Фильтруем './' и '/'
@@ -196,20 +199,23 @@ async function update(version) {
             }
             const dirEntry = await rootDirEntry.getDirectoryHandle(folders[0], {create: true})
             if (folders.length) {//Если есть ещё поддиректории
-                createFile(dirEntry, folders.slice(1), file)
+                const promise = createFile(dirEntry, folders.slice(1), zipEntry, name).then(() => promises.delete(name))
+                promises.set(name, promise)
             }
         }
 
         //Записывает в указанный файл содержимое из указанного URL
-        async function writeURLToFile(fileHandle, url) {
+        async function writeZipEntryToFile(fileHandle, zipEntry) {
             // Create a FileSystemWritableFileStream to write to.
             const writable = await fileHandle.createWritable()
             // Make an HTTP request for the contents.
-            const response = await fetch(url)
+            const blob = await zipEntry.async('blob')
             // Stream the response into the file.
-            await response.body.pipeTo(writable)
+            await blob.stream().pipeTo(writable)
             // pipeTo() closes the destination pipe by default, no need to close it.
         }
+
+        await Promise.all(promises.values())
 
         message.append(createMessage(chrome.i18n.getMessage('update8'), 'success'))
         message.append(document.createElement('br'))
@@ -228,9 +234,9 @@ async function update(version) {
             message.append(chrome.i18n.getMessage('tryManuallyUpdate'))
             message.append(' ')
             let a = document.createElement('a')
-            a.href = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/tree/multivote'
+            a.href = 'https://github.com/Serega007RU/Auto-Vote-Rating/tree/multivote'
             a.target = 'blank_'
-            a.textContent = 'https://gitlab.com/Serega007/Auto-Vote-Rating/-/tree/multivote'
+            a.textContent = 'https://github.com/Serega007RU/Auto-Vote-Rating/tree/multivote'
             a.className = 'link'
             message.append(a)
             message.append(document.createElement('br'))
@@ -3190,14 +3196,20 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
             }
             await tx.objectStore('projects').add(project, project.key)
         }
-        for (const vk of vks) {
-            await tx.objectStore('vks').add(vk, vk.key)
+        if (vks) {
+            for (const vk of vks) {
+                await tx.objectStore('vks').add(vk, vk.key)
+            }
         }
-        for (const proxy of proxies) {
-            await tx.objectStore('proxies').add(proxy, proxy.key)
+        if (proxies) {
+            for (const proxy of proxies) {
+                await tx.objectStore('proxies').add(proxy, proxy.key)
+            }
         }
-        for (const accborealis of borealis) {
-            await tx.objectStore('borealis').add(accborealis, accborealis.key)
+        if (borealis) {
+            for (const accborealis of borealis) {
+                await tx.objectStore('borealis').add(accborealis, accborealis.key)
+            }
         }
         data.settings.stopVote = Number.POSITIVE_INFINITY
         await tx.objectStore('other').put(data.settings, 'settings')
@@ -3244,7 +3256,7 @@ modeVote.addEventListener('change', async event => {
 })
 
 document.getElementById('forceUpdate').addEventListener('click', async () => {
-    const response = await fetch('https://gitlab.com/api/v4/projects/19831620/repository/files/manifest.json/raw?ref=multivote')
+    const response = await fetch('https://raw.githubusercontent.com/Serega007RU/Auto-Vote-Rating/multivote/manifest.json')
     const json = await response.json()
     checkUpdateAvailable(json.version)
 })
