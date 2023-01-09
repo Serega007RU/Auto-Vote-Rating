@@ -14,8 +14,15 @@ let dbLogs
 //Текущие открытые вкладки расширением
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()
+//Полностью ли запущено расширение?
+// noinspection ES6ConvertVarToLetConst
+var initialized = false
 
-self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
+self.addEventListener('error', (errorMsg, url, lineNumber) => {
+    if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
+        createNotif(errorMsg + ' at ' + url + ':' + lineNumber, 'error', null, null, true)
+        document.querySelectorAll('button[disabled]').forEach((el) => el.disabled = false)
+    }
     if (!dbLogs) return
     const time = new Date().toLocaleString().replace(',', '')
     const log = '[' + time + ' ERROR]: ' + errorMsg + ' at ' + url + ':' + lineNumber
@@ -29,7 +36,11 @@ self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
         else console.error(e)
     }
 })
-self.addEventListener('onunhandledrejection', (event) => {
+self.addEventListener('unhandledrejection', (event) => {
+    if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
+        createNotif(event.reason.stack, 'error', null, null, true)
+        document.querySelectorAll('button[disabled]').forEach((el) => el.disabled = false)
+    }
     if (!dbLogs) return
     const time = new Date().toLocaleString().replace(',', '')
     const log = '[' + time + ' ERROR]: ' + event.reason.stack
@@ -88,32 +99,45 @@ async function initializeConfig(background, version) {
     generalStats = await db.get('other', 'generalStats')
     todayStats = await db.get('other', 'todayStats')
 
-    if (!background) return
-    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
-
-    // if (settings && !settings.disabledCheckTime) checkTime()
+    if (!background) {
+        initialized = true
+        return
+    }
 
     openedProjects = await db.get('other', 'openedProjects')
     if (openedProjects.size > 0) {
         for (const key of openedProjects.keys()) {
             openedProjects.delete(key)
-            chrome.tabs.remove(key)
+            if (!isNaN(key)) chrome.tabs.remove(key)
+                .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
         }
         await db.put('other', openedProjects, 'openedProjects')
     }
 
+    initialized = true
+
+    // noinspection ES6MissingAwait
     checkVote()
+}
+
+async function waitInitialize() {
+    if (!initialized) {
+        await new Promise(resolve => {
+            const timer = setInterval(()=>{
+                if (initialized) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 100)
+        })
+    }
 }
 
 async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion == null) oldVersion = 1
 
     if (oldVersion !== newVersion) {
-        if (typeof createNotif !== 'undefined') {
-            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        } else {
-            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
-        }
+        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
     }
 
     if (oldVersion === 0) {
@@ -128,7 +152,6 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             disabledNotifWarn: false,
             disabledNotifError: false,
             enabledSilentVote: true,
-            disabledCheckTime: false,
             disabledCheckInternet: false,
             disabledOneVote: false,
             disabledFocusedTab: false,
@@ -136,7 +159,10 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             timeout: 10000,
             timeoutError: 900000,
             disabledWarnCaptcha: false,
-            debug: false
+            debug: false,
+            disabledUseRemoteCode: false,
+            disabledSendErrorSentry: false,
+            expertMode: false
         }
         await other.add(settings, 'settings')
         generalStats = {

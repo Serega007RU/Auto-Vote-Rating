@@ -16,6 +16,6 @@ async function vote(first) {
     } else if (document.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
         chrome.runtime.sendMessage({successfully: true})
     } else {
-        chrome.runtime.sendMessage({errorVoteNoElement: true})
+        chrome.runtime.sendMessage({message: document.querySelector('center').textContent})
     }
 }

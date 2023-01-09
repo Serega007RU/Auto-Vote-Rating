@@ -5,25 +5,10 @@ async function vote(first) {
         return
     }
 
-    if (first) await inject()
-
     const vote = document.querySelector('.likedislike .like')
     //Зачем нам открывать в новой вкладке?
     vote.removeAttribute('target')
     document.querySelector('.likedislike .like').click()
-}
-
-//Костыли что бы отправить никнейм в prompt иначе вся работа JavaScript будет остановлена
-async function inject() {
-    const project = await getProject('TopMmoGamesRu')
-    const script = document.createElement('script')
-    script.textContent = `
-        prompt = function() {
-            return '` + project.nick + `'
-        }
-        `
-    document.head.appendChild(script)
-    //ToDo большие сомнения что оно будет успевать подставлять ник но мы надеемся на лучшее
 }
 
 const timer = setInterval(()=>{

@@ -86,10 +86,6 @@
     "message": "Disable error notifications",
     "description": "Checkbox. Error notifications"
   },
-  "disabledCheckTime": {
-    "message": "Disable time checking at extension start",
-    "description": "Checkbox. Disable time checking"
-  },
   "disabledCheckInternet": {
     "message": "Disable Internet connection verification"
   },
@@ -316,14 +312,6 @@
   "addSuccess": {
     "message": "Successfully added"
   },
-  "warnSilentVote": {
-    "message": "Please note that $top$ is not available in silent voting mode",
-    "placeholders": {
-      "top": {
-        "content": "$1"
-      }
-    }
-  },
   "cooldownChanged": {
     "message": "You must restart the extension to apply changes. After restarting, open settings again. Restart the extension?"
   },
@@ -406,9 +394,6 @@
   "inputProjectID": {
     "message": "Enter ID"
   },
-  "inputProjectIDOrList": {
-    "message": "Select an ID from the list or enter your"
-  },
   "developers": {
     "message": "Developers:"
   },
@@ -429,6 +414,9 @@
   },
   "feedback3": {
     "message": "or contact me on "
+  },
+  "feedback4": {
+    "message": "or issues bug tracker on"
   },
   "dmDiscord": {
     "message": "discord"
@@ -480,34 +468,12 @@
     }
   },
   "errorVoteNoElement": {
-    "message": "Voting error, it seems some necessary element/button is missing. Report this error to the extension developer"
-  },
-  "errorVoteNoElement2": {
     "message": "Error! It seems that some necessary element (button or input field) is missing. Here's what we know: $error$. Report this error to the extension developer",
     "placeholders": {
       "error": {
         "content": "$1"
       }
     }
-  },
-  "errorVoteNoNick": {
-    "message": "Voting error! Redirection to the unknown page occurred: $url$ Check this URL",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorVoteNoNick2": {
-    "message": "Unexpected error, could not find the project. URL: $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorVoteUnknown": {
-    "message": "Error when voting! Here's what we know: "
   },
   "errorVoteNetwork": {
     "message": "Error when voting! Error code: $code$ URL: $url$",
@@ -581,9 +547,6 @@
       }
     }
   },
-  "errorVoteUnknown2": {
-    "message": "Unexpected error! No error message"
-  },
   "projectID": {
     "message": "ID project"
   },
@@ -614,9 +577,6 @@
   },
   "countVote": {
     "message": "How many votes make per day"
-  },
-  "warnSilentVoteTooltip": {
-    "message": "This rating will always work in emulation mode (regardless of the voting mode setting). It is set so because this top has a ReCaptcha that's impossible to bypass. We do not recommend adding more than 1 project to one voting page where ReCaptcha is active. ReCaptcha operates on the trust factor, if you pass it too often, then ReCaptcha may ask you to solve it again(select images where 'paste any object here' is shown), which this extension doesn't know how. Also if you are using a proxy or VPN then ReCaptcha's trust factor may not work"
   },
   "requiresCaptcha": {
     "message": "Requires manually solving the captcha"
@@ -661,7 +621,7 @@
     "message": "There is a vote going on right now..."
   },
   "timeout": {
-    "message": "Vote expecting time has expired, restarting the vote"
+    "message": "Vote expecting time has expired"
   },
   "chooseLang": {
     "message": "Choose language/region"
@@ -773,25 +733,7 @@
   "alertCaptcha": {
     "message": "There is a captcha on this rating page that the extension cannot pass, you will need to manually pass it, the extension will notify you about this."
   },
-  "chooseTopGG": {
-    "message": "What do we vote for?"
-  },
-  "bots": {
-    "message": "Bots"
-  },
-  "guilds": {
-    "message": "Guilds"
-  },
-  "servers": {
-    "message": "Servers"
-  },
-  "serversMinecraftRating": {
-    "message": "Servers (no reward for voting)"
-  },
-  "projects": {
-    "message": "Projects"
-  },
-  "additionTopGG": {
+  "additionURL": {
     "message": "Additional parameters (optional)"
   },
   "emptyError": {
@@ -807,9 +749,6 @@
         "content": "$1"
       }
     }
-  },
-  "notFast": {
-    "message": "Not so fast, wait for the function to run"
   },
   "voteMode": {
     "message": "Force the voting mode to be set"
@@ -924,12 +863,7 @@
     "message": "Translated into English: kadeler#4809"
   },
   "notSupportedGroupTabs": {
-    "message": "It seems your browser doesn't support tab grouping: $error$",
-    "placeholders": {
-      "error": {
-        "content": "$1"
-      }
-    }
+    "message": "It seems your browser doesn't support tab grouping"
   },
   "projectDeleted": {
     "message": "The project was deleted by the user"
@@ -937,7 +871,89 @@
   "banAttention": {
     "message": "Attention! There have been cases of blocking for auto-voting on this site, please use auto-voting on this site with caution, watch out for notifications and errors, if you are banned, then the author of the site has made a new bypass that determines that you are auto-voting, inform the extension developer if you are banned!"
   },
+  "rewardAttention": {
+    "message": "Attention! With the parameters you specified, you will not receive a reward for voting! What's the point of voting if you don't get anything for it?"
+  },
   "closedTab": {
     "message": "It looks like you have closed the tab on which the extension auto-voted"
+  },
+  "restart": {
+    "message": "Restart voting"
+  },
+  "restarted": {
+    "message": "The vote has been sent for restart"
+  },
+  "disabledUseRemoteCode": {
+    "message": "Disable the use of remote code"
+  },
+  "disabledUseRemoteCodeTooltip": {
+    "message": "Some site owners are very actively struggling with this extension and trying to break it as much as possible. The extension now uses the remote code, which allows you not to update the extension and at the same time the code will always be up-to-date. If you disable the use of remote code, then you may encounter errors, we do not recommend that you do this. This option is more intended for the developer to debug local code."
+  },
+  "rejectDelete": {
+    "message": "Cannot be deleted while the voting is running, restart the extension if the voting is stuck"
+  },
+  "disabledSendErrorSentry": {
+    "message": "Disable sending error reports to the extension developer"
+  },
+  "disabledSendErrorSentryTooltip": {
+    "message": "About some errors, the extension sends an error report to the extension developer via the service Sentry.io , this report includes details of the error, a screenshot of the site (in the form of png and html) and also details of your settings (this is your nickname, on which site you vote and with which settings). You can disable this"
+  },
+  "expertMode": {
+    "message": "I am an advanced user"
+  },
+  "expertModeTooltip": {
+    "message": "You will be given the ability to access the advanced settings, this function is intended for users who are well versed in computers and its subtle technical nuances."
+  },
+  "link": {
+    "message": "Link to the rating"
+  },
+  "linkPlaceholder": {
+    "message": "Insert a link to the rating here"
+  },
+  "errorLink": {
+    "message": "$url$ is not supported by the extension. Please note that here you need to specify a link to monitoring (rating) and not to the project site itself (server). You can also try manual addition mode (switch on the bottom right)",
+    "placeholders": {
+      "url": {
+        "content": "$1"
+      }
+    }
+  },
+  "switchAddMode": {
+    "message": "Manual mode"
+  },
+  "storageUsed": {
+    "message": "Storage used: $value$ $unit$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      },
+      "unit": {
+        "content": "$2"
+      }
+    }
+  },
+  "edit": {
+    "message": "Edit"
+  },
+  "confirmRestart": {
+    "message": "This project is voting right now, do you want to restart voting anyway?"
+  },
+  "projectRestarted": {
+    "message": "Voting restarted by the user"
+  },
+  "restartInQueue": {
+    "message": "This project is in the voting queue, restart is not possible."
+  },
+  "save": {
+    "message": "Save"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "editTitle": {
+    "message": "Editing an existing project"
+  },
+  "operaAttention": {
+    "message": "Attention! We found that you are using the Opera browser, with this browser there is a problem accessing Google captcha. Please follow the instructions below to give the extension access to Google captcha"
   }
 }

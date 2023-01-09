@@ -4,10 +4,13 @@ async function vote(first) {
         return
     }
     if (document.querySelector('.alert.alert-primary')) {
-        if (document.querySelector('.alert.alert-primary').textContent.includes('si hlasoval')) {
+        const message = document.querySelector('.alert.alert-primary').textContent
+        if (message.includes('reCaptcha')) {
+            // None
+        } else if (message.includes('si hlasoval')) {
             chrome.runtime.sendMessage({later: true})
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-primary').textContent.trim()})
+            chrome.runtime.sendMessage({message: message.trim()})
         }
         return
     }
@@ -20,7 +23,7 @@ async function vote(first) {
 
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
-    const gdpr = document.querySelector("#vote-form > div.row > div.col-lg-7 > div.vote__box__checkboxxx > div:nth-child(1) > input")
+    const gdpr = document.querySelector("div > form > div.row > div.col-lg-7 > div.vote__box__checkbox > div:nth-child(1) > input")
     if (!gdpr || !isVisible(gdpr) || gdpr.getAttribute('style')) {
         chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible. Protection from auto-voting? Inform the extension developer about this error!"})
         return

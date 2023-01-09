@@ -14,8 +14,6 @@ async function run() {
         if (request.sendProject) {
             proj = request.project
             if (request.vkontakte) vkontakte = request.vkontakte
-        } else if (request === 'reloadCaptcha') {
-            document.querySelector('iframe[title="reCAPTCHA"]').contentWindow.postMessage('reloadCaptcha', '*')
         }
     })
 
@@ -38,7 +36,7 @@ async function run() {
                         clearInterval(timer2)
                     }
                 } catch (e) {
-                    chrome.runtime.sendMessage({errorVoteNoElement2: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
+                    chrome.runtime.sendMessage({errorVoteNoElement: e.stack + (document.body.textContent.trim().length < 500 ? ' ' + document.body.textContent.trim() : '')})
                     clearInterval(timer2)
                 }
             }, 1000)
@@ -108,22 +106,6 @@ async function run() {
             return
         }
 
-        const script = document.createElement('script')
-        script.textContent = `
-        Object.defineProperty(document, 'visibilityState', {
-            get() {
-                return 'visible'
-            }
-        })
-        Object.defineProperty(document, 'hidden', {
-            get() {
-                return false
-            }
-        })
-        document.currentScript.parentNode.removeChild(document.currentScript)
-        `
-        document.head.appendChild(script)
-
         //Если мы находимся на странице проверки CloudFlare
         if (document.querySelector('span[data-translate="complete_sec_check"]')) {
             return
@@ -163,8 +145,7 @@ async function run() {
         }
 
         chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-            if (request === 'vote') {
-                sendResponse('startedVote')
+            if (request === 'captchaPassed') {
                 startVote(false)
             }
         })
@@ -205,7 +186,7 @@ async function run() {
 
 async function startVote(first) {
     const timer3 = setInterval(async ()=>{
-        if (typeof vote === 'function') {
+        if (typeof vote === 'function' && proj != null) {
             clearInterval(timer3)
             try {
                 await vote(first)
@@ -217,29 +198,23 @@ async function startVote(first) {
 }
 
 async function getProject() {
-    if (proj == null) {
-        return await new Promise(resolve => {
-            setInterval(()=>{
-                if (proj != null) resolve(proj)
-            }, 100)
-        })
-    } else {
-        return proj
-    }
+    return proj
 }
 
 function throwError(error) {
     let message
-    if (error.message === 'errorVoteNoNick2') {
-        chrome.runtime.sendMessage({errorVoteNoNick2: document.URL})
-        return
-    } else if (error.stack) {
-        message = error.stack
+    if (error.stack) {
+        // noinspection JSUnresolvedVariable
+        if (self.evalCore) {
+            message = error.toString()
+        } else {
+            message = error.stack
+        }
     } else {
         message = error
     }
 
-    chrome.runtime.sendMessage({errorVoteNoElement2: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
+    chrome.runtime.sendMessage({errorVoteNoElement: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
 }
 
 function wait(ms) {

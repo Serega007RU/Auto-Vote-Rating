@@ -1,12 +1,16 @@
 async function vote(first) {
     //MMoTopRU, что за костыли?
     if (document.querySelector('body > div') == null && document.querySelectorAll('body > script[type="text/javascript"]').length === 1) {
-//          chrome.runtime.sendMessage({emptySite: true})
+        // chrome.runtime.sendMessage({emptySite: true})
         return
     }
 
-    if (document.querySelector('a[href="/users/sign_in"]') != null) {
-        chrome.runtime.sendMessage({auth: document.querySelector('a[href="/users/sign_in"]').parentElement.innerText})
+    if (document.body.innerText.trim().length < 150 && document.body.innerText.trim().includes('Loading...')) {
+        return
+    }
+
+    if (document.querySelector('a[href="https://mmotop.ru/users/sign_in"]') || document.querySelector('a[href="/users/sign_in"]') || document.querySelector('form[action="/users/sign_in"]')) {
+        chrome.runtime.sendMessage({auth: true})
         return
     }
 

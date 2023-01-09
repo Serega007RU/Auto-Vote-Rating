@@ -20,7 +20,7 @@ async function vote(first) {
         }
         if (!project.name) {
             project.name = document.querySelector('.card-body h1').textContent
-            chrome.runtime.sendMessage({changeProject: true, project})
+            chrome.runtime.sendMessage({changeProject: project})
         }
         if (button.textContent === 'Upvote') {
             button.click()

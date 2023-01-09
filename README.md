@@ -124,9 +124,12 @@
 [Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/auto-vote-rating/)   
 [Opera Addons](https://addons.opera.com/ru/extensions/details/auto-vote-minecraft-rating/)   
 [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/auto-vote-rating/ecoifpgiojfhmihcfomafdcmkphafpba)
+
+### Support via Discord: https://discord.com/invite/GyvMtbU
+
 ## Install the extension from zip archive
 Here is a short guide how to install an unpacked extension on Google Chrome or Chromium-based browsers
-1. [Download](https://gitlab.com/Serega007/Auto-Vote-Rating/-/archive/master/Auto-Vote-Rating-master.zip) this repository
+1. [Download](https://github.com/Serega007RU/Auto-Vote-Rating/archive/refs/heads/master.zip) this repository
 2. Unzip the archive to any convenient location
 3. Open the "Extensions" page `chrome://extensions/` in the browser and turn on the "Developer mode"
 
@@ -136,7 +139,7 @@ Here is a short guide how to install an unpacked extension on Google Chrome or C
 
 
 ## Libraries used
-### [IDB](https://github.com/jakearchibald/idb) version 7.1.1
-[//]: # (### [LinkeDOM]&#40;https://github.com/WebReflection/linkedom&#41; version 0.14.21)
-[//]: # (### [Polyfill]&#40;https://github.com/regseb/castkodi/tree/mv3/src/polyfill&#41;)
-[//]: # (### [eval5]&#40;https://github.com/bplok20010/eval5&#41; &#40;also [chrome-inject-eval]&#40;https://github.com/GrinZero/chrome-inject-eval&#41;&#41;)
+### [IDB](https://github.com/jakearchibald/idb)
+### [LinkeDOM](https://github.com/WebReflection/linkedom) (also [Polyfill](https://github.com/regseb/castkodi/tree/mv3/src/polyfill))
+### [eval5](https://github.com/bplok20010/eval5) & [babel](https://github.com/babel/babel) (also [chrome-inject-eval](https://github.com/GrinZero/chrome-inject-eval))
+### [html-to-image](https://github.com/bubkoo/html-to-image)

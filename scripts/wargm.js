@@ -41,33 +41,38 @@ async function vote() {
 
         let waiting = false
         let timer2 = setInterval(async () => {
-            if (waiting) return
-            let buttons = findVoteButton()
-            if (buttons.length === 0) return
-            let button = buttons[buttons.length - 1]
-            if (!button) return
-            // const message = getText(button)
-            if (!isVisible(button)) {
-                clearInterval(timer2)
-                await wait(Math.floor(Math.random() * 9000 + 1000))
-                chrome.runtime.sendMessage({message: 'Кнопка голосования стала невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
-            } else if ((button.disabled == null || button.disabled === false) && button.getAttribute('disabled') == null) {
-                waiting = true
-                await wait(Math.floor(Math.random() * 9000 + 1000))
-                buttons = findVoteButton()
-                if (buttons.length === 0) {
-                    waiting = false
-                    return
+            try {
+                if (waiting) return
+                let buttons = findVoteButton()
+                if (buttons.length === 0) return
+                let button = buttons[buttons.length - 1]
+                if (!button) return
+                // const message = getText(button)
+                if (!isVisible(button)) {
+                    clearInterval(timer2)
+                    await wait(Math.floor(Math.random() * 9000 + 1000))
+                    chrome.runtime.sendMessage({message: 'Кнопка голосования стала невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
+                } else if ((button.disabled == null || button.disabled === false) && button.getAttribute('disabled') == null) {
+                    waiting = true
+                    await wait(Math.floor(Math.random() * 9000 + 1000))
+                    buttons = findVoteButton()
+                    if (buttons.length === 0) {
+                        waiting = false
+                        return
+                    }
+                    button = buttons[buttons.length - 1]
+                    if (!button) {
+                        waiting = false
+                        return
+                    }
+                    clearInterval(timer2)
+                    const event = new Event('mousemove')
+                    document.body.dispatchEvent(event)
+                    button.click()
                 }
-                button = buttons[buttons.length - 1]
-                if (!button) {
-                    waiting = false
-                    return
-                }
+            } catch (e) {
                 clearInterval(timer2)
-                const event = new Event('mousemove')
-                document.body.dispatchEvent(event)
-                button.click()
+                throwError(e)
             }
         }, 1000)
     }
