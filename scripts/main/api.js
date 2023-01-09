@@ -136,7 +136,7 @@ async function run() {
             if (document.querySelector('span[data-translate="complete_sec_check"]') == null && document.querySelector('span[data-translate="managed_checking_msg"]') == null) {
                 const request = {}
                 if (document.querySelector('#cf-error-details h1')) {
-                    request.message = document.querySelector('#cf-error-details h1').textContent
+                    request.message = document.querySelector('#cf-error-details h1').textContent.trim()
                 } else {
                     request.message = document.body.innerText.trim()
                 }
