@@ -55,7 +55,12 @@ async function vote(first) {
                         countAlreadyVoted = countAlreadyVoted + 1
                     }
                 } else {
-                    chrome.runtime.sendMessage({message: result.parentElement.textContent})
+                    const request = {}
+                    request.message = result.parentElement.textContent
+                    if (request.message.includes('Something went wrong while trying to vote')) {
+                        request.ignoreReport = true
+                    }
+                    chrome.runtime.sendMessage(request)
                     clearInterval(timer1)
                 }
             }
