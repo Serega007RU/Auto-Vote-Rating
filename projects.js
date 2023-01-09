@@ -773,7 +773,13 @@ var allProjects = {
         },
         exampleURL: () => ['https://misterlauncher.org/projects/', 'omegamc', '/'],
         URL: () => 'misterlauncher.org',
-        parseURL: (url) => ({game: url.pathname.split('/')[1] === 'projects' ? 'projects': 'servers', id: url.pathname.split('/')[2]}),
+        parseURL: (url) => ({game: url.pathname.split('/')[1] === 'projects' ? 'projects' : 'servers', id: url.pathname.split('/')[2]}),
+        exampleURLGame: () => ['https://misterlauncher.org/', 'projects', '/omegamc/'],
+        defaultGame: () => 'projects',
+        gameList: () => new Map([
+            ['projects', 'Проекты'],
+            ['servers', 'Сервера (нет награды за голосование)']
+        ]),
         silentVote: (project) => project.game === 'projects',
         notRequiredNick: (project) => project?.game === 'servers',
         notRequiredCaptcha: (project) => project?.game === 'projects',

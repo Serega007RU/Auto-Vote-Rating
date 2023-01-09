@@ -1,9 +1,9 @@
-let first = true
+let first_ = true
 async function vote(first) {
     if (first) {
-        if (this.first && document.querySelector('.project-head__vote > button')) {
+        if (first_ && document.querySelector('.project-head__vote > button')) {
             document.querySelector('.project-head__vote > button').click()
-            this.first = false
+            first_ = false
         }
         return
     }
@@ -31,9 +31,9 @@ const timer = setInterval(()=>{
         } else if (document.querySelector('.b-vote-modal__content_auth')) {
             document.querySelector('.b-vote-modal__content button').click()
             clearInterval(timer)
-        } else if (first && document.querySelector('.project-head__vote > button')) {
+        } else if (first_ && document.querySelector('.project-head__vote > button')) {
             document.querySelector('.project-head__vote > button').click()
-            first = false
+            first_ = false
         }
     } catch (e) {
         clearInterval(timer)

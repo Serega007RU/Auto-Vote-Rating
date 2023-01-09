@@ -1,4 +1,8 @@
 async function vote(first) {
+    if (document.body.innerHTML.length === 0) {
+        chrome.runtime.sendMessage({emptyError: true, ignoreReport: true})
+        return
+    }
     if (document.querySelector('.alert.alert-success')) {
         chrome.runtime.sendMessage({successfully: true})
         return

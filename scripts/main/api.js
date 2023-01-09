@@ -134,7 +134,14 @@ async function run() {
         }
         if (document.getElementById('cf-wrapper')) {
             if (document.querySelector('span[data-translate="complete_sec_check"]') == null && document.querySelector('span[data-translate="managed_checking_msg"]') == null) {
-                chrome.runtime.sendMessage({message: document.body.innerText.trim()})
+                const request = {}
+                if (document.querySelector('#cf-error-details h1')) {
+                    request.message = document.querySelector('#cf-error-details h1').textContent
+                } else {
+                    request.message = document.body.innerText.trim()
+                }
+                request.ignoreReport = true
+                chrome.runtime.sendMessage(request)
             }
             return
         }
@@ -214,7 +221,16 @@ function throwError(error) {
         message = error
     }
 
-    chrome.runtime.sendMessage({errorVoteNoElement: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
+    const request = {}
+    request.errorVoteNoElement = message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')
+    if (request.errorVoteNoElement.includes('500') && request.errorVoteNoElement.includes('Internal Server Error')) {
+        request.ignoreReport = true
+    }
+    if (document.location.pathname === '/' && document.location.search === '') {
+        request.ignoreReport = true
+    }
+
+    chrome.runtime.sendMessage(request)
 }
 
 function wait(ms) {

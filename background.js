@@ -22,8 +22,6 @@ let groupId
 //Если этот браузер не поддерживает группировку вкладок
 let notSupportedGroupTabs = false
 
-let secondVoteMinecraftIpList = false
-
 //Нужно ли сейчас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
 let doubleCheck = false
@@ -917,7 +915,7 @@ async function tryCloseTab(tabId, project, attempt) {
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
     if (!settings.disabledSendErrorSentry) {
-        if (request.message != null || request.errorVoteNoElement || request.emptyError) {
+        if (!request.ignoreReport && (request.message != null || request.errorVoteNoElement || request.emptyError)) {
             try {
                 await reportError(request, sender, project)
             } catch (error) {
@@ -1196,10 +1194,10 @@ async function reportError(request, sender, project) {
         }
     }
 
-    sendReport(request, tabDetails, project, reported)
+    sendReport(request, sender, tabDetails, project, reported)
 }
 
-async function sendReport(request, tabDetails, project, reported) {
+async function sendReport(request, sender, tabDetails, project, reported) {
     let titleError = project.rating + ' '
     let detailsError
     if (request.message != null) {
@@ -1231,7 +1229,13 @@ async function sendReport(request, tabDetails, project, reported) {
     message3.extra = {}
     if (detailsError) message3.extra.detailsError = detailsError
     message3.extra.project = project
-    message3.request = {url: 'chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd/background.js', headers: {'User-Agent': self.navigator.userAgent}}
+    message3.extra.settings = settings
+    message3.request = {headers: {'User-Agent': self.navigator.userAgent}}
+    if (sender?.url) {
+        message3.request.url = sender.url
+    } else {
+        message3.request.url = 'chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd/background.js'
+    }
     let body = JSON.stringify(message1) + '\n' + JSON.stringify(message2) + '\n' + JSON.stringify(message3)
 
     // Да тут полный кринж, работа с байтами крайне убога, но мы работаем с тем чем имеем

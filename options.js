@@ -886,7 +886,7 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
     event.preventDefault()
     event.submitter.disabled = true
     let rating, domain, funcRating
-    let project
+    let project = {}
     if (event.submitter.id === 'submitEditProject') {
         project = editingProject
     }

@@ -9,12 +9,13 @@ async function vote(first) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
-    if (document.querySelector('div.alert.alert-danger') != null) {
-        if (document.querySelector('div.alert.alert-danger').textContent.includes('already voted')) {
+    if (document.querySelector('div.alert.alert-danger')) {
+        const message = document.querySelector('div.alert.alert-danger').textContent
+        if (message.includes('already voted') || message.includes('kannst für diesen Server heute nicht mehr voten')) {
             chrome.runtime.sendMessage({later: true})
             return
         }
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
+        chrome.runtime.sendMessage({message})
         return
     }
 

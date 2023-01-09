@@ -23,13 +23,27 @@ async function vote(first) {
         }
     }
 
-    if (document.querySelector('div.alert.alert-danger') != null) {
-        if (document.querySelector('div.alert.alert-danger').textContent.includes('already voted') || document.querySelector('div.alert.alert-danger').textContent.includes('have reached your daily vote limit')) {
+    if (document.querySelector('div.alert.alert-danger')) {
+        const message = document.querySelector('div.alert.alert-danger').textContent.trim()
+        if (message.includes('already voted') || message.includes('have reached your daily vote limit')) {
             chrome.runtime.sendMessage({later: true})
             return
         }
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent.trim()})
+        if (message.includes('Captcha data missing')) {
+            chrome.runtime.sendMessage({captcha: true})
+            return
+        }
+        chrome.runtime.sendMessage({message})
         return
+    }
+
+    if (document.querySelector('.container h1')?.textContent?.includes('Error')) {
+        const request = {}
+        request.message = document.querySelector('.container h1').textContent + ' ' + document.querySelector('.container p').textContent
+        if (request.message.includes('page you were looking for cannot be found') || request.message.includes('page you were looking does not exist anymore')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
     }
 
     //Если на странице есть hCaptcha то мы ждём её решения
@@ -53,9 +67,6 @@ async function vote(first) {
             chrome.runtime.sendMessage({requiredNick: true})
             return
         }
-
-        // TODO временное решение с ожиданием загрузки капчи
-        await wait(Math.floor(Math.random() * 10000 + 5000))
 
         document.getElementById('nickname').value = project.nick
         //Кликаем проголосовать, если нет hCaptcha

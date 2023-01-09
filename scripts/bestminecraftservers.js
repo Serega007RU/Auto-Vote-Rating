@@ -1,4 +1,17 @@
 async function vote(/*first*/) {
+    if (document.body.innerHTML.length === 0) {
+        chrome.runtime.sendMessage({emptyError: true, ignoreReport: true})
+        return
+    }
+    if (document.querySelector('.ui.segments')) {
+        const request = {}
+        request.message = document.querySelector('.ui.segments').textContent.trim()
+        if (request.message.includes('Page Not Found')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
+        return
+    }
     if (document.querySelector('div.ui.error.message') != null) {
         if (document.querySelector('div.ui.error.message').textContent.includes('must wait until tomorrow before voting again')) {
             chrome.runtime.sendMessage({later: true})
