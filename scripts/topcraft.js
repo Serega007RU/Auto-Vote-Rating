@@ -11,11 +11,14 @@ async function vote(first) {
     }
 
     if (document.querySelector('#container > h1') != null) {
-        let message = document.querySelector('#container > h1').textContent
+        let request = {message: document.querySelector('#container > h1').textContent}
         if (document.querySelector('#container > h1').nextElementSibling != null) {
-            message = message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
+            request.message = request.message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
         }
-        chrome.runtime.sendMessage({message})
+        if (request.message.includes('ошибка во время авторизации через социальную сеть')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage({request})
         return
     }
     const project = await getProject('TopCraft')
@@ -68,6 +71,8 @@ const timer = setInterval(()=>{
                 chrome.runtime.sendMessage({later: true})
             } else if (textContent.includes('за ваш голос') || textContent.includes('спасибо за голос') ||  textContent.includes('голос принят') || textContent.includes('голос засчитан') || textContent.includes('успех') || textContent.includes('успешн')) {
                 chrome.runtime.sendMessage({successfully: true})
+            } else if (textContent.includes('некорректный ник') || textContent.includes('ваш айпи попал в базу данных спамеров')) {
+                chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent, ignoreReport: true})
             } else {
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
             }
@@ -85,7 +90,7 @@ const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
         if (entry.name === 'https://topcraft.ru/projects/vote/') {
             fixTimer = setTimeout(()=>{
-                chrome.runtime.sendMessage({message: 'Мы получили что vote запрос прошёл но ответ от TopCraft так и не поступил, скорее всего в vote запросе произошла ошибка, смотрите подробности в консоли в момент голосования'})
+                chrome.runtime.sendMessage({message: 'Мы получили что vote запрос прошёл но ответ от TopCraft так и не поступил, скорее всего в vote запросе произошла ошибка, смотрите подробности в консоли в момент голосования', ignoreReport: true})
             }, 5000)
         }
     }
