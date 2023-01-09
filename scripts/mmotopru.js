@@ -9,6 +9,11 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('form[name="form"] input[name="captcha"]')) {
+        chrome.runtime.sendMessage({captcha: true})
+        return
+    }
+
     if (document.querySelector('a[href="https://mmotop.ru/users/sign_in"]') || document.querySelector('a[href="/users/sign_in"]') || document.querySelector('form[action="/users/sign_in"]')) {
         chrome.runtime.sendMessage({auth: true})
         return
