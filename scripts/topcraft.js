@@ -73,6 +73,8 @@ const timer = setInterval(()=>{
                 chrome.runtime.sendMessage({successfully: true})
             } else if (textContent.includes('некорректный ник') || textContent.includes('ваш айпи попал в базу данных спамеров')) {
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent, ignoreReport: true})
+            } else if (textContent.includes('поставьте галочку в капче')) {
+                return
             } else {
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
             }
