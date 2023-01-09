@@ -872,12 +872,11 @@ var allProjects = {
     MinecraftListCZ: {
         voteURL: (project) => 'https://www.minecraft-list.cz/server/' + project.id + '/vote',
         pageURL: (project) => 'https://www.minecraft-list.cz/server/' + project.id,
-        projectName: (doc) => doc.querySelector('.content__box__server__content__detail__firstRow .text-center').textContent.trim(),
+        projectName: (doc) => doc.querySelector('.card-body .text-center').textContent.trim(),
         exampleURL: () => ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote'],
         URL: () => 'minecraft-list.cz',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        limitedCountVote: () => true,
-        notRequiredCaptcha: () => true
+        limitedCountVote: () => true
     },
     ListeServeursMinecraft: {
         voteURL: (project) => 'https://www.liste-serveurs-minecraft.org/vote/?idc=' + project.id,
