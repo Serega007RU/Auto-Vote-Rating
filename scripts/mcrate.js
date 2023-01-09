@@ -1,6 +1,11 @@
 async function vote(first) {
-    if (document.querySelector('div[class="error"]') != null) {
-        chrome.runtime.sendMessage({message: document.querySelector('div[class="error"]').textContent})
+    if (document.querySelector('div[class="error"]')) {
+        const request = {}
+        request.message = document.querySelector('div[class="error"]').textContent
+        if (request.message.includes('аккаунт заблокирован')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
         return
     }
     if (document.querySelector('div[class=report]') != null) {
