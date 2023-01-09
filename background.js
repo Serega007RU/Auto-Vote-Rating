@@ -917,7 +917,7 @@ async function tryCloseTab(tabId, project, attempt) {
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
     if (!settings.disabledSendErrorSentry) {
-        if (request.message != null || request.errorVoteNoElement || request.emptyError) {
+        if (!request.ignoreReport && (request.message != null || request.errorVoteNoElement || request.emptyError)) {
             try {
                 await reportError(request, sender, project)
             } catch (error) {
