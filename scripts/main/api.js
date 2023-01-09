@@ -221,7 +221,13 @@ function throwError(error) {
         message = error
     }
 
-    chrome.runtime.sendMessage({errorVoteNoElement: message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')})
+    const request = {}
+    request.errorVoteNoElement = message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')
+    if (request.errorVoteNoElement.includes('500') && request.errorVoteNoElement.includes('Internal Server Error')) {
+        request.ignoreReport = true
+    }
+
+    chrome.runtime.sendMessage(request)
 }
 
 function wait(ms) {
