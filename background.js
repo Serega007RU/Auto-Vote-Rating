@@ -22,8 +22,6 @@ let groupId
 //Если этот браузер не поддерживает группировку вкладок
 let notSupportedGroupTabs = false
 
-let secondVoteMinecraftIpList = false
-
 //Нужно ли сейчас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
 let doubleCheck = false

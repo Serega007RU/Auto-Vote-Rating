@@ -9,6 +9,7 @@ const toDataURL = url=>fetch(url).then(response=>response.blob()).then(blob=>new
 }))
 let currentRecept = {}
 let content = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+let secondVoteMinecraftIpList = false
 
 async function silentVoteMinecraftIpList(project) {
     let response = await fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
