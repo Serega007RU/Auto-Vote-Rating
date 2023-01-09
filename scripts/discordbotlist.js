@@ -34,10 +34,10 @@ function vote(first) {
 
     const timer2 = setInterval(()=>{
         try {
-            const result = findElement('h1', ['thank you for voting'])
-            if (result != null) {
+            const result = findElement('h1', ['thank you for voting', 'one more thing...'])
+            if (result) {
                 clearInterval(timer2)
-                if (result.textContent.toLowerCase().includes('thank you for voting')) {
+                if (result.textContent.toLowerCase().includes('thank you for voting') || (result.parentElement.textContent.toLowerCase().includes('one more thing...') && result.parentElement.textContent.toLowerCase().includes('how would you rate your experience using'))) {
                     chrome.runtime.sendMessage({successfully: true})
                 }
                 return
@@ -90,8 +90,10 @@ function vote(first) {
 
 function findElement(selector, text) {
     for (const element of document.querySelectorAll(selector)) {
-        if (element.textContent.toLowerCase().includes(text) || element.innerText.toLowerCase().includes(text)) {
-            return element
+        for (const t of text) {
+            if (element.textContent.toLowerCase().includes(t) || element.innerText.toLowerCase().includes(t)) {
+                return element
+            }
         }
     }
 }
