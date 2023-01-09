@@ -23,12 +23,17 @@ async function vote(first) {
         }
     }
 
-    if (document.querySelector('div.alert.alert-danger') != null) {
-        if (document.querySelector('div.alert.alert-danger').textContent.includes('already voted') || document.querySelector('div.alert.alert-danger').textContent.includes('have reached your daily vote limit')) {
+    if (document.querySelector('div.alert.alert-danger')) {
+        const message = document.querySelector('div.alert.alert-danger').textContent.trim()
+        if (message.includes('already voted') || message.includes('have reached your daily vote limit')) {
             chrome.runtime.sendMessage({later: true})
             return
         }
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent.trim()})
+        if (message.includes('Captcha data missing')) {
+            chrome.runtime.sendMessage({captcha: true})
+            return
+        }
+        chrome.runtime.sendMessage({message})
         return
     }
 
@@ -53,9 +58,6 @@ async function vote(first) {
             chrome.runtime.sendMessage({requiredNick: true})
             return
         }
-
-        // TODO временное решение с ожиданием загрузки капчи
-        await wait(Math.floor(Math.random() * 10000 + 5000))
 
         document.getElementById('nickname').value = project.nick
         //Кликаем проголосовать, если нет hCaptcha
