@@ -29,14 +29,19 @@ function runVote() {
     const timer2 = setInterval(()=>{
         try {
             if (document.querySelector('#voteerror > font') != null) {
-                if (document.querySelector('#voteerror > font').textContent.includes('Vote Registered')) {
+                const request = {}
+                request.message = document.querySelector('#voteerror > font').textContent
+                if (message.includes('Vote Registered')) {
                     chrome.runtime.sendMessage({successfully: true})
-                } else if (document.querySelector('#voteerror > font').textContent.includes('already voted')) {
+                } else if (message.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
-                } else if (document.querySelector('#voteerror > font').textContent.includes('Please Wait')) {
+                } else if (message.includes('Please Wait')) {
                     return
                 } else {
-                    chrome.runtime.sendMessage({message: document.querySelector('#voteerror > font').textContent})
+                    if (message.includes('not a valid playername')) {
+                        request.ignoreReport = true
+                    }
+                    chrome.runtime.sendMessage(request)
                 }
                 clearInterval(timer2)
             }
