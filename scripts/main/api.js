@@ -226,6 +226,9 @@ function throwError(error) {
     if (request.errorVoteNoElement.includes('500') && request.errorVoteNoElement.includes('Internal Server Error')) {
         request.ignoreReport = true
     }
+    if (document.location.pathname === '/' && document.location.search === '') {
+        request.ignoreReport = true
+    }
 
     chrome.runtime.sendMessage(request)
 }
