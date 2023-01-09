@@ -27,7 +27,7 @@ self.addEventListener('error', (errorMsg, url, lineNumber) => {
     const time = new Date().toLocaleString().replace(',', '')
     const log = '[' + time + ' ERROR]: ' + errorMsg + ' at ' + url + ':' + lineNumber
     try {
-        dbLogs.add('logs', log).catch(e => {
+        dbLogs.put('logs', log).catch(e => {
             if (console._error) console._error(e)
             else console.error(e)
         })
@@ -45,7 +45,7 @@ self.addEventListener('unhandledrejection', (event) => {
     const time = new Date().toLocaleString().replace(',', '')
     const log = '[' + time + ' ERROR]: ' + event.reason.stack
     try {
-        dbLogs.add('logs', log).catch(e => {
+        dbLogs.put('logs', log).catch(e => {
             if (console._error) console._error(e)
             else console.error(e)
         })
@@ -71,28 +71,28 @@ async function initializeConfig(background, version) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
             if (version) {
-                dbError({target: {source: {name: 'avr'}}, error: error.message})
+                dbError({target: {source: {name: 'avr'}}, error: error})
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
             await initializeConfig(background, 100)
             return
         }
-        dbError({target: {source: {name: 'avr'}}, error: error.message})
+        dbError({target: {source: {name: 'avr'}}, error: error})
         return
     }
     db.onerror = (event) => dbError(event, false)
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {
         if (background) {
-            if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error)
+            if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error.message)
             if (logs) {
-                console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
+                console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error.message]))
             } else {
-                console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
+                console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error.message]))
             }
         } else {
-            createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
+            createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error.message]), 'error')
         }
     }
     settings = await db.get('other', 'settings')
