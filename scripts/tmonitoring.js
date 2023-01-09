@@ -1,4 +1,8 @@
 async function vote(first) {
+    if (document.querySelector('#content')?.textContent.includes('Страница которую Вы запрашиваете не существует!')) {
+        chrome.runtime.sendMessage({message: document.querySelector('#content').textContent, ignoreReport: true})
+        return
+    }
     if (first) {
         document.querySelector('span[data-target="#voteModal"]').click()
         return
