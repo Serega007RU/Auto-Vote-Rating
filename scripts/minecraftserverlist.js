@@ -31,14 +31,14 @@ function runVote() {
             if (document.querySelector('#voteerror > font') != null) {
                 const request = {}
                 request.message = document.querySelector('#voteerror > font').textContent
-                if (message.includes('Vote Registered')) {
+                if (request.message.includes('Vote Registered')) {
                     chrome.runtime.sendMessage({successfully: true})
-                } else if (message.includes('already voted')) {
+                } else if (request.message.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
-                } else if (message.includes('Please Wait')) {
+                } else if (request.message.includes('Please Wait')) {
                     return
                 } else {
-                    if (message.includes('not a valid playername')) {
+                    if (request.message.includes('not a valid playername')) {
                         request.ignoreReport = true
                     }
                     chrome.runtime.sendMessage(request)
