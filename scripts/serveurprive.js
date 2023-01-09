@@ -20,18 +20,19 @@ const timer = setInterval(()=>{
 }, 1000)
 
 function checkAnswer() {
-    //Ессли есть ошибка
-    if (document.querySelector('.alert.alert-danger') != null) {
+    //Если есть ошибка
+    if (document.querySelector('.alert.alert-danger')) {
+        const message = document.querySelector('.alert.alert-danger').textContent
         //Если не удалось пройти капчу
-        if (document.querySelector('.alert.alert-danger').textContent.includes('captcha')) {
-            chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-danger').textContent})
+        if (message.includes('captcha')) {
+            return false
             //Если вы уже голосовали
-        } else if (document.querySelector('.alert.alert-danger').textContent.includes('Vous avez déjà voté pour ce serveur')) {
+        } else if (message.includes('Vous avez déjà voté pour ce serveur')) {
             const numbers = document.querySelector('.alert.alert-danger').textContent.match(/\d+/g).map(Number)
             const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-danger').textContent})
+            chrome.runtime.sendMessage({message})
         }
         return true
     }
