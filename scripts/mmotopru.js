@@ -27,6 +27,12 @@ async function vote(first) {
         return
     }
 
+    // Если мы вдруг попустили уведомление, то пытаемся снова войти в меню голосования
+    if (document.querySelector('.header-2 a.btn.btn-danger')) {
+        document.querySelector('.header-2 a.btn.btn-danger').click()
+        return
+    }
+
     //Делаем форму голосования видимой
     document.querySelector('div.vote-fields').removeAttribute('style')
 
