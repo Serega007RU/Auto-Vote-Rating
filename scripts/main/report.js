@@ -7,8 +7,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 async function generateReport(request, sender, sendResponse) {
     const filter = (node) => {
-        if (node && node.tagName) {
-            return !node.tagName.toLowerCase().includes('img') && !node.tagName.toLowerCase().includes('video');
+        if (node && node.nodeName) {
+            const nodeName = node.nodeName.toLowerCase()
+            return !nodeName.includes('img') && !nodeName.includes('video') && nodeName !== '#comment'
         }
         return true
     }
