@@ -134,7 +134,14 @@ async function run() {
         }
         if (document.getElementById('cf-wrapper')) {
             if (document.querySelector('span[data-translate="complete_sec_check"]') == null && document.querySelector('span[data-translate="managed_checking_msg"]') == null) {
-                chrome.runtime.sendMessage({message: document.body.innerText.trim()})
+                const request = {}
+                if (document.querySelector('#cf-error-details h1')) {
+                    request.message = document.querySelector('#cf-error-details h1').textContent
+                } else {
+                    request.message = document.body.innerText.trim()
+                }
+                request.ignoreReport = true
+                chrome.runtime.sendMessage(request)
             }
             return
         }
