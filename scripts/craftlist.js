@@ -1,32 +1,36 @@
 async function vote(first) {
-    if (document.querySelector('div.alert.alert-success') != null) {
-        if (document.querySelector('div.alert.alert-success').textContent.includes('vote was successfully')
-            || document.querySelector('div.alert.alert-success').textContent.includes('hlas byl úspěšně přijatý')
-            || document.querySelector('div.alert.alert-success').textContent.includes('hlas bol úspešne prijatý')
-            || document.querySelector('div.alert.alert-success').textContent.includes('Dein Vote wurde akzeptiert')) {
+    if (document.querySelector('div.alert.alert-success')) {
+        const message = document.querySelector('div.alert.alert-success').textContent
+        if (message.includes('vote was successfully')
+            || message.includes('hlas byl úspěšně přijatý')
+            || message.includes('hlas bol úspešne prijatý')
+            || message.includes('Dein Vote wurde akzeptiert')
+            || message.includes('Tvůj hlas byl úspěšne přijatý')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-success').textContent})
+            chrome.runtime.sendMessage({message})
         }
         return
     }
-    if (document.querySelector('div.alert.alert-info') != null) {
-        if (document.querySelector('div.alert.alert-info').textContent.includes('next vote')
-            || document.querySelector('div.alert.alert-info').textContent.includes('možný hlas za tento server můžeš odeslat')
-            || document.querySelector('div.alert.alert-info').textContent.includes('možný hlas za tento server môžeš odoslať')
-            || document.querySelector('div.alert.alert-info').textContent.includes('nächster Vote')) {
-            const numbers = document.querySelector('div.alert.alert-info').textContent.match(/\d+/g).map(Number)
+    if (document.querySelector('div.alert.alert-info')) {
+        const message = document.querySelector('div.alert.alert-info').textContent
+        if (message.includes('next vote')
+            || message.includes('možný hlas za tento server můžeš odeslat')
+            || message.includes('možný hlas za tento server môžeš odoslať')
+            || message.includes('nächster Vote')) {
+            const numbers = message.match(/\d+/g).map(Number)
             chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] - 1, numbers[0], numbers[3], numbers[4], numbers[5]) + 3600000})
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-info').textContent})
+            chrome.runtime.sendMessage({message})
         }
         return
     }
-    if (document.querySelector('a.btn-vote').textContent.includes('possible vote')
-        || document.querySelector('a.btn-vote').textContent.includes('možný hlas')
-        || document.querySelector('a.btn-vote').textContent.includes('ist möglich')) {
+    const btnText = document.querySelector('a.btn-vote').textContent
+    if (btnText.includes('possible vote')
+        || btnText.includes('možný hlas')
+        || btnText.includes('ist möglich')) {
         //Из текста достаёт все цифры в Array List
-        const numbers = document.querySelector('a.btn-vote').textContent.match(/\d+/g).map(Number)
+        const numbers = btnText.match(/\d+/g).map(Number)
         let count = 0
         let hour = 0
         let min = 0
