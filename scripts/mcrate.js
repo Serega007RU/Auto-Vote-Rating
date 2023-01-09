@@ -2,7 +2,7 @@ async function vote(first) {
     if (document.querySelector('div[class="error"]')) {
         const request = {}
         request.message = document.querySelector('div[class="error"]').textContent
-        if (request.message.includes('аккаунт заблокирован')) {
+        if (request.message.includes('аккаунт заблокирован') || request.message.includes('Неправильный токен ВК')) {
             request.ignoreReport = true
         }
         chrome.runtime.sendMessage(request)
