@@ -1,6 +1,8 @@
 async function vote(first) {
     if (document.querySelector('.alert.alert-danger') != null) {
-        chrome.runtime.sendMessage({message: document.querySelector('.alert.alert-danger').textContent.trim()})
+        const message = document.querySelector('.alert.alert-danger').textContent.trim()
+        if (message.includes('verification required')) return
+        chrome.runtime.sendMessage({message})
         return
     } else if (document.querySelector('.alert.alert-warning') != null) {
         const message = document.querySelector('.alert.alert-warning').textContent
