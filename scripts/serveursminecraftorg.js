@@ -4,14 +4,15 @@ async function vote(first) {
         return
     }
     if (document.querySelector('div.alert-danger') != null) {
-        if (document.querySelector('div.alert-danger').textContent.includes('Vous devez attendre')) {
+        const message = document.querySelector('div.alert-danger').textContent.trim()
+        if (message.includes('Vous devez attendre')) {
             // const numbers = document.querySelector('div.error.message').textContent.match(/\d+/g).map(Number)
             // chrome.runtime.sendMessage({later: new Date(numbers[0][1]...)})
             chrome.runtime.sendMessage({later: true})
-        } else if (document.querySelector('div.alert-danger').textContent.includes('Répondre au captcha est obligatoire')) {
-            //None
+        } else if (message.includes('Répondre au captcha est obligatoire') || message.includes('Le captcha est invalide')) {
+            // None
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.alert-danger').textContent.trim()})
+            chrome.runtime.sendMessage({message})
         }
         return
     }
