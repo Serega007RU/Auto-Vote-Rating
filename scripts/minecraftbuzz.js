@@ -17,7 +17,7 @@ const timer = setInterval(()=>{
             } else if (request.message.includes('already voted')) {
                 chrome.runtime.sendMessage({later: true})
             } else {
-                if (request.message.includes('proxy')) {
+                if (request.message.includes('proxy') || request.message.includes('Captcha')) {
                     request.ignoreReport = true
                 }
                 chrome.runtime.sendMessage(request)
