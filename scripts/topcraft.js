@@ -71,7 +71,7 @@ const timer = setInterval(()=>{
                 chrome.runtime.sendMessage({later: true})
             } else if (textContent.includes('за ваш голос') || textContent.includes('спасибо за голос') ||  textContent.includes('голос принят') || textContent.includes('голос засчитан') || textContent.includes('успех') || textContent.includes('успешн')) {
                 chrome.runtime.sendMessage({successfully: true})
-            } else if (textContent.includes('некорректный ник') || textContent.includes('ваш айпи попал в базу данных спамеров') || (textContent.includes('код ошибки') && textContent.includes('обновить страницу')) || textContent.includes('ошибка авторизации через социальную сеть')) {
+            } else if (textContent.includes('некорректный ник') || textContent.includes('ваш айпи находится в базе данных спамеров') || textContent.includes('ваш айпи попал в базу данных спамеров') || (textContent.includes('код ошибки') && textContent.includes('обновить страницу')) || textContent.includes('ошибка авторизации через социальную сеть')) {
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent, ignoreReport: true})
             } else if (textContent.includes('поставьте галочку в капче')) {
                 return
