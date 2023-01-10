@@ -236,10 +236,10 @@ var allProjects = {
         notRequiredCaptcha: () => true
     },
     MinecraftIpList: {
-        voteURL: (project) => 'https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id,
-        pageURL: (project) => 'https://minecraftiplist.com/server/-' + project.id,
+        voteURL: (project) => 'https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id,
+        pageURL: (project) => 'https://www.minecraftiplist.com/server/-' + project.id,
         projectName: (doc) => doc.querySelector('h2.motdservername').textContent,
-        exampleURL: () => ['https://minecraftiplist.com/index.php?action=vote&listingID=', '2576', ''],
+        exampleURL: () => ['https://www.minecraftiplist.com/index.php?action=vote&listingID=', '2576', ''],
         URL: () => 'minecraftiplist.com',
         parseURL: (url) => {
             const project = {}
@@ -250,11 +250,7 @@ var allProjects = {
                 project.id = url.searchParams.get('listingID')
             }
             return project
-        },
-        oneProject: () => 5,
-        notFound: (doc) => doc.querySelector('#addr > span:nth-child(3)') == null,
-        silentVote: () => true,
-        notRequiredCaptcha: () => true
+        }
     },
     TopMinecraftServers: {
         voteURL: (project) => 'https://topminecraftservers.org/vote/' + project.id,

@@ -8,7 +8,7 @@ importScripts('main.js')
 self.addEventListener('install', async () => {
     importScripts('libs/linkedom.js')
     importScripts('libs/evalCore.umd.js')
-    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/minecraftiplist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
+    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
 
     await waitInitialize()
     console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
