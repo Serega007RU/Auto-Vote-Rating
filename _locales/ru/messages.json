@@ -404,7 +404,12 @@
     "message": "Вы уже голосовали"
   },
   "errorOpenTab": {
-    "message": "Ошибка при открытии вкладки: "
+    "message": "Ошибка при открытии вкладки: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   },
   "errorAuthVK": {
     "message": "Ошибка авторизации ВК! $error$",

@@ -259,7 +259,7 @@ async function newWindow(project) {
         silentVote(project)
     } else {
         const windows = await chrome.windows.getAll()
-            .catch(error => console.error(chrome.i18n.getMessage('errorOpenTab') + error))
+            .catch(error => console.warn(chrome.i18n.getMessage('errorOpenTab', error.message)))
         if (windows == null || windows.length <= 0) {
             const window = await chrome.windows.create({focused: false})
             await chrome.windows.update(window.id, {focused: false})
@@ -267,8 +267,7 @@ async function newWindow(project) {
 
         const url = allProjects[project.rating].voteURL(project)
 
-        let tab = await chrome.tabs.create({url, active: settings.disabledFocusedTab})
-            .catch(error => endVote({message: error}, null, project))
+        let tab = await tryOpenTab({url, active: settings.disabledFocusedTab}, project, 0)
         if (tab == null) return
         for (const [tab,value] of openedProjects) {
             if (project.key === value.key) {
@@ -896,18 +895,31 @@ async function onRuntimeMessage(request, sender, sendResponse) {
     }
 }
 
+async function tryOpenTab(request, project, attempt) {
+    try {
+        return await chrome.tabs.create(request)
+    } catch (error) {
+        if (error.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
+            await wait(500)
+            return await tryOpenTab(request, project, ++attempt)
+        }
+        endVote({errorOpenTab: error.message}, null, project)
+        return null
+    }
+}
+
 async function tryCloseTab(tabId, project, attempt) {
     try {
         await chrome.tabs.remove(tabId)
     } catch (error) {
         if (error.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
             await wait(500)
-            tryCloseTab(tabId, project, ++attempt)
+            await tryCloseTab(tabId, project, ++attempt)
             return
         }
-        if (!settings.disabledNotifError && !error.message.includes('No tab with id')) {
+        if (!error.message.includes('No tab with id')) {
             console.warn(getProjectPrefix(project, true) + error)
-            sendNotification(getProjectPrefix(project, false), error.message)
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
         }
     }
 }
@@ -1201,8 +1213,10 @@ async function sendReport(request, sender, tabDetails, project, reported) {
     let titleError = project.rating + ' '
     let detailsError
     if (request.message != null) {
-        if (request.message.length > 0) {
+        if (typeof request.message === 'string' && request.message.length > 0) {
             titleError = titleError + request.message
+        } else if (typeof request.message === 'object') {
+            titleError = titleError + JSON.stringify(request.message)
         } else {
             titleError = titleError + 'Empty error'
         }
