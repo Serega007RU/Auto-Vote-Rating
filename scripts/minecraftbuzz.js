@@ -9,13 +9,18 @@ async function vote(first) {
 
 const timer = setInterval(()=>{
     try {
-        if (document.getElementById('message') != null) {
-            if (document.getElementById('message').textContent.includes('Thank you for voting')) {
+        if (document.getElementById('message')) {
+            const request = {}
+            request.message = document.getElementById('message').textContent.trim()
+            if (request.message.includes('Thank you for voting')) {
                 chrome.runtime.sendMessage({successfully: true})
-            } else if (document.getElementById('message').textContent.includes('already voted')) {
+            } else if (request.message.includes('already voted')) {
                 chrome.runtime.sendMessage({later: true})
             } else {
-                chrome.runtime.sendMessage({message: document.getElementById('message').textContent.trim()})
+                if (request.message.includes('proxy')) {
+                    request.ignoreReport = true
+                }
+                chrome.runtime.sendMessage(request)
             }
             clearInterval(timer)
         }
