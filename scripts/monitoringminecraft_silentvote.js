@@ -42,14 +42,19 @@ async function silentVoteMonitoringMinecraft(project) {
             continue
         }
 
-        if (response.doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
+        const request = {}
+        request.message = response.doc.querySelector('center').textContent
+        if (request.message.includes('Вы уже голосовали сегодня')) {
             endVote({later: true}, null, project)
             return
-        } else if (response.doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
+        } else if (request.message.includes('Вы успешно проголосовали!')) {
             endVote({successfully: true}, null, project)
             return
         } else {
-            endVote({message: response.doc.querySelector('center').textContent}, null, project)
+            if (request.message.includes('Ошибка подключения VK')) {
+                request.ignoreReport = true
+            }
+            endVote(request, null, project)
             return
         }
     }
