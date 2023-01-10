@@ -26,6 +26,7 @@ async function vote() {
 }
 
 function runVote() {
+    let alreadySent = false
     const timer2 = setInterval(()=>{
         try {
             if (document.querySelector('#voteerror > font') != null) {
@@ -37,8 +38,12 @@ function runVote() {
                     chrome.runtime.sendMessage({later: true})
                 } else if (request.message.includes('Please Wait')) {
                     return
+                } else if (request.message.includes('cannot verify your vote due to a low browser score')) {
+                    if (alreadySent) return
+                    chrome.runtime.sendMessage({captcha: true})
+                    alreadySent = true
                 } else {
-                    if (request.message.includes('not a valid playername')) {
+                    if (request.message.includes('not a valid playername') || request.message.includes('could not connect to Votifier')) {
                         request.ignoreReport = true
                     }
                     chrome.runtime.sendMessage(request)
