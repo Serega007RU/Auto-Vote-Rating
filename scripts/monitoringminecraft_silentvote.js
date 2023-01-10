@@ -14,7 +14,7 @@ async function silentVoteMonitoringMinecraft(project) {
         if (!await checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
         if (response.status === 503) {
             if (i >= 3) {
-                endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + String(response.status))}, null, project)
+                endVote({errorAttemptVote: 'response code: ' + String(response.status)}, null, project)
                 return
             }
             await wait(5000)
@@ -23,19 +23,19 @@ async function silentVoteMonitoringMinecraft(project) {
 
         if (response.doc.querySelector('body') != null && response.doc.querySelector('body').textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
             if (i >= 3) {
-                endVote({message: chrome.i18n.getMessage('errorAttemptVote') + response.doc.querySelector('body').textContent}, null, project)
+                endVote({message: chrome.i18n.getMessage('errorAttemptVote') + response.doc.querySelector('body').textContent, html: response.doc.body.outerHTML}, null, project)
                 return
             }
             await wait(5000)
             continue
         }
         if (response.doc.querySelector('form[method="POST"]') != null && response.doc.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
-            endVote({message: response.doc.querySelector('form[method="POST"]').textContent.trim()}, null, project)
+            endVote({message: response.doc.querySelector('form[method="POST"]').textContent.trim(), html: response.doc.body.outerHTML}, null, project)
             return
         }
         if (response.doc.querySelector('input[name=player]') != null) {
             if (i >= 3) {
-                endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(response.doc.querySelector('input[name=player]')))}, null, project)
+                endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(response.doc.querySelector('input[name=player]'))), html: response.doc.body.outerHTML}, null, project)
                 return
             }
             await wait(5000)
@@ -54,6 +54,7 @@ async function silentVoteMonitoringMinecraft(project) {
             if (request.message.includes('Ошибка подключения VK')) {
                 request.ignoreReport = true
             }
+            request.html = response.doc.body.outerHTML
             endVote(request, null, project)
             return
         }

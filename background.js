@@ -34,6 +34,8 @@ let updateAvailable = false
 let evil
 let evilProjects
 
+let silentResponseBody = {}
+
 //Инициализация настроек расширения
 // noinspection JSIgnoredPromiseFromCall
 initializeConfig(true)
@@ -396,8 +398,15 @@ async function silentVote(project) {
             } else {
                 message = e
             }
-            endVote({errorVoteNoElement: message}, null, project)
+            const request = {}
+            request.errorVoteNoElement = message
+            if (silentResponseBody[project.rating]) {
+                request.html = silentResponseBody[project.rating].body.outerHTML
+            }
+            endVote(request, null, project)
         }
+    } finally {
+        delete silentResponseBody[project.rating]
     }
 }
 
@@ -411,6 +420,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     response.html = await response.text()
     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+    silentResponseBody[project.rating] = response.doc
     if (vk && host.includes('vk.com')) {
         //Узнаём причину почему мы зависли на авторизации ВК
         let text
@@ -1252,6 +1262,10 @@ async function sendReport(request, sender, tabDetails, project, reported) {
     }
     let body = JSON.stringify(message1) + '\n' + JSON.stringify(message2) + '\n' + JSON.stringify(message3)
 
+    if (!tabDetails && request.html) {
+        tabDetails = {html: request.html}
+    }
+
     // Да тут полный кринж, работа с байтами крайне убога, но мы работаем с тем чем имеем
     if (tabDetails) {
         let documentArrayHead
@@ -1279,20 +1293,24 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         newBody2.set(newBody)
         newBody2.set(documentArray, newBody.length)
 
-        const attachmentScreenshot = {}
-        screenshotArrayBody = tabDetails.screenshotError ? enc.encode(tabDetails.screenshotError) : tabDetails.screenshot
-        attachmentScreenshot.type = 'attachment'
-        attachmentScreenshot.length = screenshotArrayBody.length
-        attachmentScreenshot.filename = tabDetails.screenshotError ? 'screenshot.txt' : 'screenshot.png'
-        screenshotArrayHead = enc.encode('\n' + JSON.stringify(attachmentScreenshot) + '\n')
-        screenshotArray = new Uint8Array(screenshotArrayHead.length + screenshotArrayBody.length)
-        screenshotArray.set(screenshotArrayHead)
-        screenshotArray.set(screenshotArrayBody, screenshotArrayHead.length)
+        if (tabDetails.screenshot || tabDetails.screenshotError) {
+            const attachmentScreenshot = {}
+            screenshotArrayBody = tabDetails.screenshotError ? enc.encode(tabDetails.screenshotError) : tabDetails.screenshot
+            attachmentScreenshot.type = 'attachment'
+            attachmentScreenshot.length = screenshotArrayBody.length
+            attachmentScreenshot.filename = tabDetails.screenshotError ? 'screenshot.txt' : 'screenshot.png'
+            screenshotArrayHead = enc.encode('\n' + JSON.stringify(attachmentScreenshot) + '\n')
+            screenshotArray = new Uint8Array(screenshotArrayHead.length + screenshotArrayBody.length)
+            screenshotArray.set(screenshotArrayHead)
+            screenshotArray.set(screenshotArrayBody, screenshotArrayHead.length)
 
-        let newBody3 = new Uint8Array(newBody2.length + screenshotArray.length)
-        newBody3.set(newBody2)
-        newBody3.set(screenshotArray, newBody2.length)
-        body = newBody3
+            let newBody3 = new Uint8Array(newBody2.length + screenshotArray.length)
+            newBody3.set(newBody2)
+            newBody3.set(screenshotArray, newBody2.length)
+            body = newBody3
+        } else {
+            body = newBody2
+        }
     }
 
     const options = {body}

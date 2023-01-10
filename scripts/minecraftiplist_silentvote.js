@@ -35,7 +35,7 @@ async function silentVoteMinecraftIpList(project) {
     if (response.doc.querySelector('#InnerWrapper > script:nth-child(10)') != null && response.doc.querySelector('table[class="CraftingTarget"]') == null) {
         if (secondVoteMinecraftIpList) {
             secondVoteMinecraftIpList = false
-            endVote('Error time zone', null, project)
+            endVote({message: 'Error time zone', html: response.doc.body.outerHTML}, null, project)
             return
         }
         await fetch('https://minecraftiplist.com/timezone.php?timezone=Europe/Moscow', {
@@ -63,7 +63,7 @@ async function silentVoteMinecraftIpList(project) {
 
     if (response.doc.querySelector('#Content > div.Error') != null) {
         if (response.doc.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
-            endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
+            endVote({message: response.doc.querySelector('#Content > div.Error').textContent, html: response.doc.body.outerHTML}, null, project)
             return
         }
         if (response.doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server') || response.doc.querySelector('#Content > div.Error').textContent.includes('has no votes')) {
@@ -72,12 +72,12 @@ async function silentVoteMinecraftIpList(project) {
             endVote({later: Date.now() + (86400000 - milliseconds)}, null, project)
             return
         }
-        endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
+        endVote({message: response.doc.querySelector('#Content > div.Error').textContent, html: response.doc.body.outerHTML}, null, project)
         return
     }
 
     if (!await getRecipe(response.doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace(/^.*\/\/[^\/]+/, 'https://minecraftiplist.com'))) {
-        endVote({message: 'Couldnt find the recipe: ' + response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace(/^.*\/\/[^\/]+/, 'https://minecraftiplist.com')}, null, project)
+        endVote({message: 'Couldnt find the recipe: ' + response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace(/^.*\/\/[^\/]+/, 'https://minecraftiplist.com'), html: response.doc.body.outerHTML}, null, project)
         return
     }
     await craft(response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
@@ -115,7 +115,7 @@ async function silentVoteMinecraftIpList(project) {
 
     if (response.doc.querySelector('#Content > div.Error') != null) {
         if (response.doc.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
-            endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
+            endVote({message: response.doc.querySelector('#Content > div.Error').textContent, html: response.doc.body.outerHTML}, null, project)
             return
         }
         if (response.doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
@@ -124,7 +124,7 @@ async function silentVoteMinecraftIpList(project) {
             endVote({later: Date.now() + (86400000 - milliseconds)}, null, project)
             return
         }
-        endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
+        endVote({message: response.doc.querySelector('#Content > div.Error').textContent, html: response.doc.body.outerHTML}, null, project)
         return
     }
     if (response.doc.querySelector('#Content > div.Good') != null && response.doc.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
