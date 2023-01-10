@@ -8,15 +8,19 @@ async function vote(first) {
         return
     }
     if (document.querySelector('.alert.alert-primary')) {
-        const message = document.querySelector('.alert.alert-primary').textContent
-        if (message.includes('reCaptcha')) {
-            // None
-        } else if (message.includes('si hlasoval')) {
+        const request = {}
+        request.message = document.querySelector('.alert.alert-primary').textContent.trim()
+        if (request.message.includes('reCaptcha')) {
+            return
+        } else if (request.message.includes('si hlasoval')) {
             chrome.runtime.sendMessage({later: true})
+            return
         } else {
-            chrome.runtime.sendMessage({message: message.trim()})
+            if (!request.message.includes('server u nás nemá nakonfigurované hlasování')) {
+                chrome.runtime.sendMessage(request)
+                return
+            }
         }
-        return
     }
     if (document.querySelector('#vote-form').textContent.includes('si hlasoval')) {
         chrome.runtime.sendMessage({later: true})
