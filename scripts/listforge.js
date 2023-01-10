@@ -29,7 +29,7 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: true})
             return
         }
-        if (message.includes('Captcha data missing')) {
+        if (message.includes('Captcha')) {
             chrome.runtime.sendMessage({captcha: true})
             return
         }
