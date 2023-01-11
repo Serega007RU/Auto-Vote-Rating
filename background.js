@@ -10,7 +10,24 @@ self.addEventListener('install', async () => {
     importScripts('libs/evalCore.umd.js')
     importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
 
-    await waitInitialize()
+    // noinspection JSUndeclaredVariable
+    initialized2 = false
+
+    await waitInitialize1()
+
+    openedProjects = await db.get('other', 'openedProjects')
+    if (openedProjects.size > 0) {
+        for (const key of openedProjects.keys()) {
+            openedProjects.delete(key)
+            if (!isNaN(key)) chrome.tabs.remove(key)
+                .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
+        }
+        await db.put('other', openedProjects, 'openedProjects')
+    }
+
+    // noinspection JSUndeclaredVariable
+    initialized2 = true
+
     console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 })
 
@@ -43,7 +60,7 @@ initializeConfig(true)
 //Проверка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
 
-    if (!settings || !initialized) return
+    await waitInitialize()
 
     //Если нет интернета, то не голосуем
     if (!settings.disabledCheckInternet && !navigator.onLine) {
@@ -936,24 +953,33 @@ async function tryCloseTab(tabId, project, attempt) {
 
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
-    if (!settings.disabledSendErrorSentry) {
-        if (!request.ignoreReport && (request.message != null || request.errorVoteNoElement || request.emptyError)) {
-            try {
-                await reportError(request, sender, project)
-            } catch (error) {
-                console.warn(getProjectPrefix(project, true) + 'Ошибка отправки отчёта об ошибке', error)
+    for (const [tab,value] of openedProjects) {
+        if (project.key === value.key) {
+            if (isNaN(tab) && !tab.startsWith('background_')) {
+                return
+            } else {
+                openedProjects.delete(tab)
+                openedProjects.set('queue_' + project.key, project)
             }
+            break
         }
     }
 
-    if (sender && openedProjects.has(sender.tab.id)) {
-        openedProjects.delete(sender.tab.id)
-        openedProjects.set('queue_' + project.key, project)
-        db.put('other', openedProjects, 'openedProjects')
-        if (closeTabs && !request.closedTab) {
+    if (!settings.disabledSendErrorSentry && !request.ignoreReport && (request.message != null || request.errorVoteNoElement || request.emptyError)) {
+        try {
+            await reportError(request, sender, project)
+        } catch (error) {
+            console.warn(getProjectPrefix(project, true) + 'Ошибка отправки отчёта об ошибке', error)
+        } finally {
+            if (closeTabs && !request.closedTab) {
+                tryCloseTab(sender.tab.id, project, 0)
+            }
+        }
+    } else {
+        if (sender && closeTabs && !request.closedTab) {
             tryCloseTab(sender.tab.id, project, 0)
         }
-    } else if (!project) return
+    }
 
     // for (const[key,value] of fetchProjects) {
     //     if (value.key === project.key) {
@@ -1204,7 +1230,7 @@ async function reportError(request, sender, project) {
     if (reported?.[project.rating] > Date.now()) return
 
     let tabDetails
-    if (sender && openedProjects.has(sender.tab.id)) {
+    if (sender) {
         try {
             await chrome.scripting.executeScript({target: {tabId: sender.tab.id}, files: ['libs/html-to-image.umd.js', 'scripts/main/report.js']})
             tabDetails = await chrome.tabs.sendMessage(sender.tab.id, {generateReport: true})
@@ -1215,6 +1241,8 @@ async function reportError(request, sender, project) {
             }
         }
     }
+
+    if (!tabDetails || !request.html) return
 
     sendReport(request, sender, tabDetails, project, reported)
 }

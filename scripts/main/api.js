@@ -1,22 +1,21 @@
 //Фикс-костыль двойной загрузки (для Rocket Loader)
-if (typeof loaded === 'undefined') {
-    // noinspection ES6ConvertVarToLetConst
-    var proj
-    // noinspection ES6ConvertVarToLetConst
-    var vkontakte
-    // noinspection ES6ConvertVarToLetConst
-    var loaded = true
+if (!window.loaded) {
+    window.loaded = true
+    // noinspection JSIgnoredPromiseFromCall
     run()
 }
 
-async function run() {
-    chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
-        if (request.sendProject) {
-            proj = request.project
-            if (request.vkontakte) vkontakte = request.vkontakte
-        }
-    })
+chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
+    if (request.sendProject) {
+        window.proj = request.project
+        if (request.vkontakte) window.vkontakte = request.vkontakte
+    } else if (request === 'captchaPassed') {
+        // noinspection JSIgnoredPromiseFromCall
+        startVote(false)
+    }
+})
 
+async function run() {
     try {
         //Если мы находимся на странице авторизации Steam
         if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
@@ -78,8 +77,6 @@ async function run() {
             } else {
                 text = 'null'
             }
-            console.log({errorAuthVK: text, notAuth})
-            return
             chrome.runtime.sendMessage({errorAuthVK: text, notAuth})
             return
         }
@@ -151,12 +148,6 @@ async function run() {
             return
         }
 
-        chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-            if (request === 'captchaPassed') {
-                startVote(false)
-            }
-        })
-
         //Совместимость с jQuery
         for (const script of document.querySelectorAll('script')) {
             if (script.src.toLowerCase().includes('jquery')) {
@@ -193,7 +184,7 @@ async function run() {
 
 async function startVote(first) {
     const timer3 = setInterval(async ()=>{
-        if (typeof vote === 'function' && proj != null) {
+        if (typeof vote === 'function' && window.proj != null) {
             clearInterval(timer3)
             try {
                 await vote(first)
@@ -205,7 +196,7 @@ async function startVote(first) {
 }
 
 async function getProject() {
-    return proj
+    return window.proj
 }
 
 function throwError(error) {

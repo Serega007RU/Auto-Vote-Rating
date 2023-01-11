@@ -15,8 +15,8 @@ let dbLogs
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()
 //Полностью ли запущено расширение?
-// noinspection ES6ConvertVarToLetConst
-var initialized = false
+let initialized = false
+let initialized2 = true
 
 self.addEventListener('error', (errorMsg, url, lineNumber) => {
     if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
@@ -101,17 +101,8 @@ async function initializeConfig(background, version) {
 
     if (!background) {
         initialized = true
+        initialized2 = true
         return
-    }
-
-    openedProjects = await db.get('other', 'openedProjects')
-    if (openedProjects.size > 0) {
-        for (const key of openedProjects.keys()) {
-            openedProjects.delete(key)
-            if (!isNaN(key)) chrome.tabs.remove(key)
-                .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
-        }
-        await db.put('other', openedProjects, 'openedProjects')
     }
 
     initialized = true
@@ -121,6 +112,19 @@ async function initializeConfig(background, version) {
 }
 
 async function waitInitialize() {
+    if (!initialized || !initialized2) {
+        await new Promise(resolve => {
+            const timer = setInterval(()=>{
+                if (initialized && initialized2) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 100)
+        })
+    }
+}
+
+async function waitInitialize1() {
     if (!initialized) {
         await new Promise(resolve => {
             const timer = setInterval(()=>{
