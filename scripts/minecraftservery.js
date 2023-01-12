@@ -9,7 +9,7 @@ async function vote(first) {
             return
         } else {
             const message = document.querySelector('.notification').textContent.trim()
-            if (message.toLowerCase().includes('captcha')) {
+            if (message.toLowerCase().includes('captcha') || message.toLowerCase().includes('že nejste robot')) {
                 if (first) chrome.runtime.sendMessage({captcha: true})
                 return
             } else {
