@@ -70,7 +70,7 @@ const timer = setInterval(()=>{
                 chrome.runtime.sendMessage({successfully: true})
             } else if (textContent.includes('некорректный ник') || textContent.includes('ваш айпи находится в базе данных спамеров') || textContent.includes('ваш айпи попал в базу данных спамеров') || (textContent.includes('код ошибки') && textContent.includes('обновить страницу')) || textContent.includes('ошибка авторизации через социальную сеть')) {
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent, ignoreReport: true})
-            } else if (textContent.includes('поставьте галочку в капче')) {
+            } else if (textContent.includes('поставьте галочку в капче') || textContent.includes('обязательное поле')) {
                 return
             } else {
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
