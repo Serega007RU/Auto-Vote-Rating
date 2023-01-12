@@ -23,18 +23,19 @@ async function vote(first) {
         }
     }
 
-    if (document.querySelector('div.alert.alert-danger')) {
-        const message = document.querySelector('div.alert.alert-danger').textContent.trim()
+    for (const el of document.querySelectorAll('div.alert.alert-danger')) {
+        if (el.querySelector('center > strong')) continue
+        const message = el.textContent.trim()
         if (message.includes('already voted') || message.includes('have reached your daily vote limit')) {
             chrome.runtime.sendMessage({later: true})
             return
         }
-        if (message.includes('Captcha')) {
-            chrome.runtime.sendMessage({captcha: true})
+        if (message.toLowerCase().includes('captcha')) {
+            if (first) chrome.runtime.sendMessage({captcha: true})
+        } else {
+            chrome.runtime.sendMessage({message})
             return
         }
-        chrome.runtime.sendMessage({message})
-        return
     }
 
     if (document.querySelector('.container h1')?.textContent?.includes('Error')) {
@@ -54,7 +55,7 @@ async function vote(first) {
     }
 
     //Если на странице есть hCaptcha то мы ждём её решения
-    if (document.querySelector('div.h-captcha') != null && first) {
+    if ((document.querySelector('div.h-captcha') || document.querySelector('.cf-turnstile')) && first) {
         return
     }
 
