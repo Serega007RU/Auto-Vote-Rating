@@ -143,6 +143,14 @@ async function run() {
             return
         }
 
+        if (document.querySelector('body > center > h1') && document.querySelector('body > center:nth-child(3)')?.textContent.includes('cloudflare')) {
+            const request = {}
+            request.message = document.body.innerText
+            request.ignoreReport = true
+            chrome.runtime.sendMessage(request)
+            return
+        }
+
         //Если мы находимся на странице проверки ReCaptcha
         if (document.querySelector('body > iframe') && document.querySelector('body > iframe').src.startsWith('https://geo.captcha-delivery.com/captcha/')) {
             return
@@ -214,9 +222,6 @@ function throwError(error) {
 
     const request = {}
     request.errorVoteNoElement = message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')
-    if (request.errorVoteNoElement.includes('500') && request.errorVoteNoElement.includes('Internal Server Error')) {
-        request.ignoreReport = true
-    }
     if (document.location.pathname === '/' && document.location.search === '') {
         request.ignoreReport = true
     }
