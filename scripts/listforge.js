@@ -1,13 +1,13 @@
 async function vote(first) {
     //Пилюля от жадности
-    if (document.getElementById('adblock-notice') != null) document.getElementById('adblock-notice').remove()
-    if (document.getElementById('adsense-notice') != null) document.getElementById('adsense-notice').remove()
-    if (document.getElementById('vote-loading-block') != null) document.getElementById('vote-loading-block').remove()
-    if (document.getElementById('blocked-notice') != null) document.getElementById('blocked-notice').remove()
-    if (document.getElementById('privacysettings-notice') != null) document.getElementById('privacysettings-notice').remove()
-    if (document.getElementById('vote-form-block') != null) document.getElementById('vote-form-block').removeAttribute('style')
-    if (document.getElementById('vote-button-block') != null) document.getElementById('vote-button-block').removeAttribute('style')
-    if (document.querySelector('a[href="/servers/premium/"]') != null) document.querySelector('a[href="/servers/premium/"]').remove()
+    document.getElementById('adblock-notice')?.remove()
+    document.getElementById('adsense-notice')?.remove()
+    document.getElementById('vote-loading-block')?.remove()
+    document.getElementById('blocked-notice')?.remove()
+    document.getElementById('privacysettings-notice')?.remove()
+    document.getElementById('vote-form-block')?.removeAttribute('style')
+    document.getElementById('vote-button-block')?.removeAttribute('style')
+    document.querySelector('a[href="/servers/premium/"]')?.remove()
 
     for (const el of document.querySelectorAll('div.alert.alert-info')) {
         if (el.textContent.includes('server has been removed')) {
@@ -44,6 +44,13 @@ async function vote(first) {
             request.ignoreReport = true
         }
         chrome.runtime.sendMessage(request)
+    }
+
+    if (document.location.pathname.split('/')[1] === 'country') {
+        const request = {}
+        request.errorVoteNoElement = 'Redirected to server list'
+        request.ignoreReport = true
+        return
     }
 
     //Если на странице есть hCaptcha то мы ждём её решения
