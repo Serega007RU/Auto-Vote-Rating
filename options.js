@@ -174,11 +174,6 @@ document.addEventListener('DOMContentLoaded', async()=>{
 
     await restoreOptions(true)
 
-    if (document.URL.endsWith('?installed')) {
-        window.history.replaceState(null, null, 'options.html')
-        alert(chrome.i18n.getMessage('firstInstall'))
-    }
-
     document.querySelector('div[data-resource="version"]').textContent+= chrome.runtime.getManifest().version
 
     //Для FireFox почему-то не доступно это API
@@ -218,6 +213,7 @@ window.addEventListener('load', async () => {
     if (settings.enableCustom) addCustom()
     document.getElementById('addedLoading').style.display = 'none'
     document.getElementById('notAddedAll').removeAttribute('style')
+    initialized3 = true
 })
 
 // Restores select box and checkbox state using the preferences
@@ -1036,7 +1032,7 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
     if (event.submitter.id === 'submitEditProject') {
         await db.put('projects', project, project.key)
         resetEdit(project)
-        await updateValue({updateValue: 'projects', value: project})
+        await onMessage({updateValue: 'projects', value: project})
         if (project.time < Date.now()) chrome.runtime.sendMessage('checkVote')
     } else {
         await addProject(project)
@@ -2128,9 +2124,9 @@ function generateDataList() {
     datalist.append(option)
 }
 
-chrome.runtime.onMessage.addListener(updateValue)
+chrome.runtime.onMessage.addListener(onMessage)
 
-async function updateValue(request) {
+async function onMessage(request) {
     if (request.updateValue) {
         usageSpace()
         if (request.updateValue === 'projects') {
@@ -2161,6 +2157,17 @@ async function updateValue(request) {
                 editProject(request.value)
             }
         }
+    } else if (request.installed) {
+        alert(chrome.i18n.getMessage('firstInstall'))
+    } else if (request.openProject) {
+        await waitInitialize()
+        document.getElementById('addedTab').click()
+        await waitInitialize3()
+        const project = await db.get('projects', request.openProject)
+        await listSelect({currentTarget: document.querySelector('#' + project.rating + 'Button')}, project.rating)
+        document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})
+        highlight(document.getElementById('projects' + project.key))
+        window.history.replaceState(null, null, 'options.html')
     }
 }
 

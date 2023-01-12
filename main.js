@@ -17,6 +17,7 @@ var openedProjects = new Map()
 //Полностью ли запущено расширение?
 let initialized = false
 let initialized2 = true
+let initialized3 = false
 
 self.addEventListener('error', (errorMsg, url, lineNumber) => {
     if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
@@ -129,6 +130,19 @@ async function waitInitialize1() {
         await new Promise(resolve => {
             const timer = setInterval(()=>{
                 if (initialized) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 100)
+        })
+    }
+}
+
+async function waitInitialize3() {
+    if (!initialized3) {
+        await new Promise(resolve => {
+            const timer = setInterval(()=>{
+                if (initialized3) {
                     clearInterval(timer)
                     resolve()
                 }

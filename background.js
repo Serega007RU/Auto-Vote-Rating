@@ -549,7 +549,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
         if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
             project = await db.get('projects', project.key)
             console.error(getProjectPrefix(project, true), error)
-            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
             project.error = error.message
             updateValue('projects', project)
         }
@@ -634,7 +634,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
                 project = await db.get('projects', project.key)
                 console.error(getProjectPrefix(project, true), error)
-                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
+                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
                 project.error = error.message
                 updateValue('projects', project)
             }
@@ -683,7 +683,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                     error += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
                 }
                 console.error(getProjectPrefix(project, true), error)
-                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
+                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
                 project.error = error
                 updateValue('projects', project)
             }
@@ -907,14 +907,14 @@ async function onRuntimeMessage(request, sender, sendResponse) {
             message = chrome.i18n.getMessage(Object.keys(request)[0])
         }
         console.warn(getProjectPrefix(project, true) + message)
-        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
+        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
         project.error = message
         // delete project.nextAttempt
         updateValue('projects', project)
     } else if (request.errorCaptcha && !request.restartVote) {
         const message = chrome.i18n.getMessage('errorCaptcha', request.errorCaptcha)
         console.warn(getProjectPrefix(project, true) + message)
-        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
+        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
         project.error = message
         updateValue('projects', project)
     } else {
@@ -946,7 +946,7 @@ async function tryCloseTab(tabId, project, attempt) {
         }
         if (!error.message.includes('No tab with id')) {
             console.warn(getProjectPrefix(project, true) + error)
-            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
         }
     }
 }
@@ -1107,7 +1107,7 @@ async function endVote(request, sender, project) {
 
         if (request.successfully) {
             sendMessage = chrome.i18n.getMessage('successAutoVote')
-            if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
             project.stats.successVotes++
             project.stats.monthSuccessVotes++
@@ -1121,7 +1121,7 @@ async function endVote(request, sender, project) {
         } else {
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
 //          if (typeof request.later == 'string') sendMessage = sendMessage + ' ' + request.later
-            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
             project.stats.laterVotes++
 
@@ -1159,7 +1159,7 @@ async function endVote(request, sender, project) {
         project.time = Date.now() + retryCoolDown
         project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage)
+        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
         project.stats.errorVotes++
 
@@ -1402,7 +1402,7 @@ function convertBase64ToBlob(base64Image) {
 }
 
 //Отправитель уведомлений
-function sendNotification(title, message) {
+function sendNotification(title, message, notificationId) {
     if (!message) message = ''
     let notification = {
         type: 'basic',
@@ -1410,8 +1410,44 @@ function sendNotification(title, message) {
         title: title,
         message: message
     }
-    chrome.notifications.create('', notification, function() {})
+    if (!notificationId) notificationId = ''
+    chrome.notifications.create(notificationId, notification, function() {})
 }
+chrome.notifications.onClicked.addListener(async function (notificationId) {
+    if (notificationId.startsWith('openTab_')) {
+        try {
+            const tabId = Number(notificationId.replace('openTab_', ''))
+            if (!tabId) return
+            const tab = await chrome.tabs.update(tabId, {active: true})
+            if (!tab) return
+            await chrome.windows.update(tab.windowId, {focused: true})
+        } catch (error) {
+            if (!error.message.includes('No tab with id')) {
+                console.warn('Ошибка при фокусировке на вкладку', error)
+            }
+        }
+    } else if (notificationId.startsWith('openProject_')) {
+        try {
+            const projectKey = Number(notificationId.replace('openProject_', ''))
+            const found = await db.count('projects', projectKey)
+            if (!found) return
+            await chrome.runtime.openOptionsPage()
+            // Дикий костыль на ожидание загрузки вкладки, мы не можем адекватно передать в настройки нужные данные, поэтому придётся так костылять
+            const tab = await chrome.tabs.query({active: true, lastFocusedWindow: true})
+            if (!tab.length) return
+            if (tab[0].status !== 'complete') {
+                for (let i = 0; i < 9; i++) {
+                    await wait(250)
+                    const t = await chrome.tabs.get(tab[0].id)
+                    if (t.status === 'complete') break
+                }
+            }
+            await chrome.runtime.sendMessage({openProject: projectKey})
+        } catch (error) {
+            console.warn('Ошибка открытия настроек с определённым проектом', error)
+        }
+    }
+})
 
 function getProjectPrefix(project, detailed) {
     if (detailed) {
@@ -1444,7 +1480,8 @@ async function updateValue(objStore, value) {
 chrome.runtime.onInstalled.addListener(async function(details) {
     await waitInitialize()
     if (details.reason === 'install') {
-        chrome.tabs.create({url: 'options.html?installed'})
+        await chrome.runtime.openOptionsPage()
+        chrome.runtime.sendMessage({installed: true})
     } else if (details.reason === 'update') {
         checkVote()
     }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
