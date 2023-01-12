@@ -43,7 +43,7 @@ async function vote(first) {
     const timer2 = setInterval(() => {
         try {
             const vote = findElement('button', ['vote'])
-            if (!vote.disabled) {
+            if (!vote?.disabled) {
                 for (let i = 0; i < 20; i++) {
                     triggerMouseEvent(document, 'mousedown')
                     triggerMouseEvent(document, 'mousemove')
