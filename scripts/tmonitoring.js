@@ -18,14 +18,18 @@ async function vote(first) {
 
 const timer = setInterval(()=>{
     try {
-        if (document.querySelector('div[class="message error"]') != null) {
-            clearInterval(timer)
-            if (document.querySelector('div[class="message error"]').textContent.includes('уже голосовали')) {
+        if (document.querySelector('div[class="message error"]')) {
+            const message = document.querySelector('div[class="message error"]').textContent
+            if (message.includes('уже голосовали')) {
                 const numbers = document.querySelector('div[class="message error"]').textContent.match(/\d+/g).map(Number)
                 const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
                 chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+                clearInterval(timer)
             } else {
-                chrome.runtime.sendMessage({message: document.querySelector('div[class="message error"]').textContent})
+                if (!message.includes('капча')) {
+                    chrome.runtime.sendMessage({message})
+                    clearInterval(timer)
+                }
             }
         } else if (document.querySelector('div[class="message success"]') != null) {
             chrome.runtime.sendMessage({successfully: true})
