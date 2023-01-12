@@ -236,10 +236,10 @@ var allProjects = {
         notRequiredCaptcha: () => true
     },
     MinecraftIpList: {
-        voteURL: (project) => 'https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id,
-        pageURL: (project) => 'https://minecraftiplist.com/server/-' + project.id,
+        voteURL: (project) => 'https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id,
+        pageURL: (project) => 'https://www.minecraftiplist.com/server/-' + project.id,
         projectName: (doc) => doc.querySelector('h2.motdservername').textContent,
-        exampleURL: () => ['https://minecraftiplist.com/index.php?action=vote&listingID=', '2576', ''],
+        exampleURL: () => ['https://www.minecraftiplist.com/index.php?action=vote&listingID=', '2576', ''],
         URL: () => 'minecraftiplist.com',
         parseURL: (url) => {
             const project = {}
@@ -250,11 +250,7 @@ var allProjects = {
                 project.id = url.searchParams.get('listingID')
             }
             return project
-        },
-        oneProject: () => 5,
-        notFound: (doc) => doc.querySelector('#addr > span:nth-child(3)') == null,
-        silentVote: () => true,
-        notRequiredCaptcha: () => true
+        }
     },
     TopMinecraftServers: {
         voteURL: (project) => 'https://topminecraftservers.org/vote/' + project.id,
@@ -872,12 +868,11 @@ var allProjects = {
     MinecraftListCZ: {
         voteURL: (project) => 'https://www.minecraft-list.cz/server/' + project.id + '/vote',
         pageURL: (project) => 'https://www.minecraft-list.cz/server/' + project.id,
-        projectName: (doc) => doc.querySelector('.content__box__server__content__detail__firstRow .text-center').textContent.trim(),
+        projectName: (doc) => doc.querySelector('.card-body .text-center').textContent.trim(),
         exampleURL: () => ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote'],
         URL: () => 'minecraft-list.cz',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        limitedCountVote: () => true,
-        notRequiredCaptcha: () => true
+        limitedCountVote: () => true
     },
     ListeServeursMinecraft: {
         voteURL: (project) => 'https://www.liste-serveurs-minecraft.org/vote/?idc=' + project.id,

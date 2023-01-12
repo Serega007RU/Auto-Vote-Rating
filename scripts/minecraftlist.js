@@ -1,14 +1,20 @@
 async function vote(first) {
-    if (document.querySelector('p.notification.errormsg') != null) {
-        if (document.querySelector('p.notification.errormsg').textContent.includes('You can vote after')) {
+    if (document.querySelector('p.notification.errormsg')) {
+        const message = document.querySelector('p.notification.errormsg').textContent
+        if (message.includes('You can vote after')) {
             //Из полученного текста достаёт все цифры в Array List
-            const numbers = document.querySelector('p.notification.errormsg').textContent.match(/\d+/g).map(Number)
+            const numbers = message.match(/\d+/g).map(Number)
             const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+            return
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('p.notification.errormsg').textContent})
+            if (message.toLowerCase().includes('captcha')) {
+                if (first) chrome.runtime.sendMessage({captcha: true})
+            } else {
+                chrome.runtime.sendMessage({message})
+                return
+            }
         }
-        return
     }
     if (document.querySelector('p.notification.successmsg') != null) {
         chrome.runtime.sendMessage({successfully: true})

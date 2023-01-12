@@ -50,7 +50,7 @@ async function silentVoteServerPact(project) {
     })
     let json = captcha.json()
     if (json.error) {
-        endVote({message: 'Error in captcha'}, null, project)
+        endVote({message: 'Error in captcha', html: JSON.stringify(json)}, null, project)
         return
     }
 
@@ -79,8 +79,8 @@ async function silentVoteServerPact(project) {
     } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null && (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('You can only vote once') || response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('already voted'))) {
         endVote({later: Date.now() + 43200000}, null, project)
     } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null) {
-        endVote({message: response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.substring(0, response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.indexOf('\n'))}, null, project)
+        endVote({message: response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.substring(0, response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.indexOf('\n')), html: response.doc.body.outerHTML}, null, project)
     } else {
-        endVote({emptyError: true}, null, project)
+        endVote({emptyError: true, html: response.doc.body.outerHTML}, null, project)
     }
 }

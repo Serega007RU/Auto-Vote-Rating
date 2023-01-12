@@ -1,5 +1,9 @@
 async function vote(first) {
     const project = await getProject('MinecraftRating')
+    if (document.querySelector('.container .text-center')?.textContent.includes('Страница не найдена')) {
+        chrome.runtime.sendMessage({message: document.querySelector('.container .text-center').textContent, ignoreReport: true})
+        return
+    }
     if (project.game === 'projects') {
         if (document.querySelector('div.alert.alert-danger') != null) {
             if (document.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {

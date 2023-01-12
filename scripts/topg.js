@@ -31,6 +31,23 @@ async function vote(first) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
+    if (document.body.outerHTML.length < 200 && document.body.outerHTML.includes('must have cookies enabled in your browser')) {
+        const request = {}
+        request.errorVoteNoElement = document.body.innerText.trim()
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
+    const project = await getProject('TopG')
+
+    if (document.location.pathname.split('/')[1] === project.game && !document.location.pathname.split('/')[2]) {
+        const request = {}
+        request.errorVoteNoElement = 'Redirected to server list'
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return
+    }
 
     if (document.querySelector("#vote").innerText.toLowerCase().includes('login to vote') || document.querySelector("#vote").innerText.toLowerCase().includes('connect with a social network to vote')) {
         chrome.runtime.sendMessage({auth: true})
@@ -39,7 +56,7 @@ async function vote(first) {
 
     if (document.querySelector('#vote .h-captcha') && first) return
 
-    const project = await getProject('TopG', true)
+
     document.getElementById('game_user').value = project.nick
     document.querySelector('#vote button[type="submit"]').click()
 }

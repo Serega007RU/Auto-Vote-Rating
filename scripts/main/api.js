@@ -1,22 +1,21 @@
 //Фикс-костыль двойной загрузки (для Rocket Loader)
-if (typeof loaded === 'undefined') {
-    // noinspection ES6ConvertVarToLetConst
-    var proj
-    // noinspection ES6ConvertVarToLetConst
-    var vkontakte
-    // noinspection ES6ConvertVarToLetConst
-    var loaded = true
+if (!window.loaded) {
+    window.loaded = true
+    // noinspection JSIgnoredPromiseFromCall
     run()
 }
 
-async function run() {
-    chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
-        if (request.sendProject) {
-            proj = request.project
-            if (request.vkontakte) vkontakte = request.vkontakte
-        }
-    })
+chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
+    if (request.sendProject) {
+        window.proj = request.project
+        if (request.vkontakte) window.vkontakte = request.vkontakte
+    } else if (request === 'captchaPassed') {
+        // noinspection JSIgnoredPromiseFromCall
+        startVote(false)
+    }
+})
 
+async function run() {
     try {
         //Если мы находимся на странице авторизации Steam
         if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
@@ -24,7 +23,7 @@ async function run() {
             const timer2 = setInterval(()=>{
                 try {
                     if (document.getElementById('error_display').style.display !== 'none') {
-                        chrome.runtime.sendMessage({message: document.getElementById('error_display').textContent})
+                        chrome.runtime.sendMessage({authSteam: true})
                         clearInterval(timer2)
                     } else if ((document.querySelector('div.newmodal') && document.querySelector('div.newmodal').style.display !== 'none')
                         || (document.querySelector('div.login_modal.loginAuthCodeModal') && document.querySelector('div.login_modal.loginAuthCodeModal').style.display !== 'none')
@@ -78,8 +77,6 @@ async function run() {
             } else {
                 text = 'null'
             }
-            console.log({errorAuthVK: text, notAuth})
-            return
             chrome.runtime.sendMessage({errorAuthVK: text, notAuth})
             return
         }
@@ -136,7 +133,7 @@ async function run() {
             if (document.querySelector('span[data-translate="complete_sec_check"]') == null && document.querySelector('span[data-translate="managed_checking_msg"]') == null) {
                 const request = {}
                 if (document.querySelector('#cf-error-details h1')) {
-                    request.message = document.querySelector('#cf-error-details h1').textContent
+                    request.message = document.querySelector('#cf-error-details h1').textContent.trim()
                 } else {
                     request.message = document.body.innerText.trim()
                 }
@@ -146,16 +143,18 @@ async function run() {
             return
         }
 
+        if (document.querySelector('body > center > h1') && document.querySelector('body > center:nth-child(3)')?.textContent.includes('cloudflare')) {
+            const request = {}
+            request.message = document.body.innerText
+            request.ignoreReport = true
+            chrome.runtime.sendMessage(request)
+            return
+        }
+
         //Если мы находимся на странице проверки ReCaptcha
         if (document.querySelector('body > iframe') && document.querySelector('body > iframe').src.startsWith('https://geo.captcha-delivery.com/captcha/')) {
             return
         }
-
-        chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-            if (request === 'captchaPassed') {
-                startVote(false)
-            }
-        })
 
         //Совместимость с jQuery
         for (const script of document.querySelectorAll('script')) {
@@ -193,7 +192,7 @@ async function run() {
 
 async function startVote(first) {
     const timer3 = setInterval(async ()=>{
-        if (typeof vote === 'function' && proj != null) {
+        if (typeof vote === 'function' && window.proj != null) {
             clearInterval(timer3)
             try {
                 await vote(first)
@@ -205,7 +204,7 @@ async function startVote(first) {
 }
 
 async function getProject() {
-    return proj
+    return window.proj
 }
 
 function throwError(error) {
@@ -223,9 +222,6 @@ function throwError(error) {
 
     const request = {}
     request.errorVoteNoElement = message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')
-    if (request.errorVoteNoElement.includes('500') && request.errorVoteNoElement.includes('Internal Server Error')) {
-        request.ignoreReport = true
-    }
     if (document.location.pathname === '/' && document.location.search === '') {
         request.ignoreReport = true
     }

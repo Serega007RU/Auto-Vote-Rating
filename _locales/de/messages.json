@@ -425,7 +425,12 @@
     "message": "Sie haben bereits abgestimmt"
   },
   "errorOpenTab": {
-    "message": "Beim Öffnen des Tabs ist ein Fehler aufgetreten: "
+    "message": "Beim Öffnen des Tabs ist ein Fehler aufgetreten: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   },
   "errorAuthVK": {
     "message": "Fehler mit dem VK-Konto! $error$",

@@ -8,14 +8,27 @@ async function vote(first) {
         return
     }
     if (document.querySelector('.alert.alert-primary')) {
-        const message = document.querySelector('.alert.alert-primary').textContent
-        if (message.includes('reCaptcha')) {
-            // None
-        } else if (message.includes('si hlasoval')) {
+        const request = {}
+        request.message = document.querySelector('.alert.alert-primary').textContent.trim()
+        if (request.message.includes('reCaptcha')) {
+            return
+        } else if (request.message.includes('si hlasoval')) {
             chrome.runtime.sendMessage({later: true})
+            return
         } else {
-            chrome.runtime.sendMessage({message: message.trim()})
+            if (!request.message.includes('server u nás nemá nakonfigurované hlasování')) {
+                chrome.runtime.sendMessage(request)
+                return
+            }
         }
+    }
+    if (document.querySelector('div.content.content-full h1')) {
+        const request = {}
+        request.message = document.querySelector('div.content.content-full h1').textContent.trim() + ' ' + document.querySelector('div.content.content-full h2').textContent.trim()
+        if (request.message.includes('ale tato stránka nebyla nalezena')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
         return
     }
     if (document.querySelector('#vote-form').textContent.includes('si hlasoval')) {
@@ -59,7 +72,8 @@ function isVisible(elem) {
     };
     if (elemCenter.x < 0) return false
     if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false
-    if (elemCenter.y < 0) return false
+    // TODO если элемент вне видимости страницы то это плохо
+    if (elemCenter.y < 0) return true
     if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return false
     let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
     do {

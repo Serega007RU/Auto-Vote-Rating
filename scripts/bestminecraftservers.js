@@ -12,11 +12,16 @@ async function vote(/*first*/) {
         chrome.runtime.sendMessage(request)
         return
     }
-    if (document.querySelector('div.ui.error.message') != null) {
-        if (document.querySelector('div.ui.error.message').textContent.includes('must wait until tomorrow before voting again')) {
+    if (document.querySelector('div.ui.error.message')) {
+        const request = {}
+        request.message = document.querySelector('div.ui.error.message').textContent.trim()
+        if (request.message.includes('must wait until tomorrow before voting again')) {
             chrome.runtime.sendMessage({later: true})
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.ui.error.message').textContent.trim()})
+            if (request.message.includes('Vote limit has been exceed')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
         }
         return
     }

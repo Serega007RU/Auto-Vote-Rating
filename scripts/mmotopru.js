@@ -9,6 +9,11 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('form[name="form"] input[name="captcha"]')) {
+        chrome.runtime.sendMessage({captcha: true})
+        return
+    }
+
     if (document.querySelector('a[href="https://mmotop.ru/users/sign_in"]') || document.querySelector('a[href="/users/sign_in"]') || document.querySelector('form[action="/users/sign_in"]')) {
         chrome.runtime.sendMessage({auth: true})
         return
@@ -24,6 +29,12 @@ async function vote(first) {
         } else {
             chrome.runtime.sendMessage({message: document.querySelector('body > div.ui-pnotify').textContent})
         }
+        return
+    }
+
+    // Если мы вдруг попустили уведомление, то пытаемся снова войти в меню голосования
+    if (document.querySelector('.header-2 a.btn.btn-danger')) {
+        document.querySelector('.header-2 a.btn.btn-danger').click()
         return
     }
 

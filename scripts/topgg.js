@@ -7,31 +7,6 @@ async function vote(first) {
         return
     }
 
-    await wait(Math.floor(Math.random() * 9000 + 1000))
-
-    const timer2 = setInterval(() => {
-        try {
-            const vote = findElement('button', ['vote'])
-            if (!vote.disabled) {
-                for (let i = 0; i < 20; i++) {
-                    triggerMouseEvent(document, 'mousedown')
-                    triggerMouseEvent(document, 'mousemove')
-                }
-                function triggerMouseEvent(node, eventType) {
-                    const clickEvent = document.createEvent('MouseEvents')
-                    clickEvent.initEvent(eventType, true, true)
-                    node.dispatchEvent(clickEvent)
-                }
-
-                vote.click()
-                clearInterval(timer2)
-            }
-        } catch (e) {
-            clearInterval(timer2)
-            throwError(e)
-        }
-    })
-
     let countAlreadyVoted = 0
     const timer1 = setInterval(() => {
         try {
@@ -40,15 +15,8 @@ async function vote(first) {
                 if (result.textContent.toLowerCase().includes('thanks for voting')) {
                     chrome.runtime.sendMessage({successfully: true})
                     clearInterval(timer1)
-                } else if (result.parentElement.textContent.toLowerCase().includes('already voted')) {
-                    if (countAlreadyVoted > 60) {
-                        chrome.runtime.sendMessage({later: true})
-                        clearInterval(timer1)
-                    } else {
-                        countAlreadyVoted = countAlreadyVoted + 1
-                    }
                 } else if (result.textContent.toLowerCase().includes('already voted')) {
-                    if (countAlreadyVoted > 60) {
+                    if (countAlreadyVoted > 30) {
                         chrome.runtime.sendMessage({later: true})
                         clearInterval(timer1)
                     } else {
@@ -69,6 +37,31 @@ async function vote(first) {
             throwError(e)
         }
     }, 1000)
+
+    await wait(Math.floor(Math.random() * 9000 + 1000))
+
+    const timer2 = setInterval(() => {
+        try {
+            const vote = findElement('button', ['vote'])
+            if (!vote?.disabled) {
+                for (let i = 0; i < 20; i++) {
+                    triggerMouseEvent(document, 'mousedown')
+                    triggerMouseEvent(document, 'mousemove')
+                }
+                function triggerMouseEvent(node, eventType) {
+                    const clickEvent = document.createEvent('MouseEvents')
+                    clickEvent.initEvent(eventType, true, true)
+                    node.dispatchEvent(clickEvent)
+                }
+
+                vote.click()
+                clearInterval(timer2)
+            }
+        } catch (e) {
+            clearInterval(timer2)
+            throwError(e)
+        }
+    })
 }
 
 function findElement(selector, text) {

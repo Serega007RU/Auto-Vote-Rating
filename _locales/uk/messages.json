@@ -386,7 +386,12 @@
     "message": "Ви вже голосували"
   },
   "errorOpenTab": {
-    "message": "Помилка при відритті вкладки: "
+    "message": "Помилка при відритті вкладки: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   },
   "errorAuthVK": {
     "message": "Помилка авторизації ВК! $error$",

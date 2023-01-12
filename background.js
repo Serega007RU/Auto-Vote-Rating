@@ -8,9 +8,26 @@ importScripts('main.js')
 self.addEventListener('install', async () => {
     importScripts('libs/linkedom.js')
     importScripts('libs/evalCore.umd.js')
-    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/minecraftiplist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
+    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
 
-    await waitInitialize()
+    // noinspection JSUndeclaredVariable
+    initialized2 = false
+
+    await waitInitialize1()
+
+    openedProjects = await db.get('other', 'openedProjects')
+    if (openedProjects.size > 0) {
+        for (const key of openedProjects.keys()) {
+            openedProjects.delete(key)
+            if (!isNaN(key)) chrome.tabs.remove(key)
+                .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
+        }
+        await db.put('other', openedProjects, 'openedProjects')
+    }
+
+    // noinspection JSUndeclaredVariable
+    initialized2 = true
+
     console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 })
 
@@ -34,6 +51,8 @@ let updateAvailable = false
 let evil
 let evilProjects
 
+let silentResponseBody = {}
+
 //Инициализация настроек расширения
 // noinspection JSIgnoredPromiseFromCall
 initializeConfig(true)
@@ -41,7 +60,7 @@ initializeConfig(true)
 //Проверка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
 
-    if (!settings || !initialized) return
+    await waitInitialize()
 
     //Если нет интернета, то не голосуем
     if (!settings.disabledCheckInternet && !navigator.onLine) {
@@ -259,7 +278,7 @@ async function newWindow(project) {
         silentVote(project)
     } else {
         const windows = await chrome.windows.getAll()
-            .catch(error => console.error(chrome.i18n.getMessage('errorOpenTab') + error))
+            .catch(error => console.warn(chrome.i18n.getMessage('errorOpenTab', error.message)))
         if (windows == null || windows.length <= 0) {
             const window = await chrome.windows.create({focused: false})
             await chrome.windows.update(window.id, {focused: false})
@@ -267,8 +286,7 @@ async function newWindow(project) {
 
         const url = allProjects[project.rating].voteURL(project)
 
-        let tab = await chrome.tabs.create({url, active: settings.disabledFocusedTab})
-            .catch(error => endVote({message: error}, null, project))
+        let tab = await tryOpenTab({url, active: settings.disabledFocusedTab}, project, 0)
         if (tab == null) return
         for (const [tab,value] of openedProjects) {
             if (project.key === value.key) {
@@ -397,8 +415,15 @@ async function silentVote(project) {
             } else {
                 message = e
             }
-            endVote({errorVoteNoElement: message}, null, project)
+            const request = {}
+            request.errorVoteNoElement = message
+            if (silentResponseBody[project.rating]) {
+                request.html = silentResponseBody[project.rating].body.outerHTML
+            }
+            endVote(request, null, project)
         }
+    } finally {
+        delete silentResponseBody[project.rating]
     }
 }
 
@@ -412,6 +437,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     response.html = await response.text()
     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+    silentResponseBody[project.rating] = response.doc
     if (vk && host.includes('vk.com')) {
         //Узнаём причину почему мы зависли на авторизации ВК
         let text
@@ -523,7 +549,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
         if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
             project = await db.get('projects', project.key)
             console.error(getProjectPrefix(project, true), error)
-            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
             project.error = error.message
             updateValue('projects', project)
         }
@@ -608,7 +634,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
                 project = await db.get('projects', project.key)
                 console.error(getProjectPrefix(project, true), error)
-                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
+                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
                 project.error = error.message
                 updateValue('projects', project)
             }
@@ -657,7 +683,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                     error += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
                 }
                 console.error(getProjectPrefix(project, true), error)
-                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message)
+                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
                 project.error = error
                 updateValue('projects', project)
             }
@@ -881,18 +907,31 @@ async function onRuntimeMessage(request, sender, sendResponse) {
             message = chrome.i18n.getMessage(Object.keys(request)[0])
         }
         console.warn(getProjectPrefix(project, true) + message)
-        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
+        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
         project.error = message
         // delete project.nextAttempt
         updateValue('projects', project)
     } else if (request.errorCaptcha && !request.restartVote) {
         const message = chrome.i18n.getMessage('errorCaptcha', request.errorCaptcha)
         console.warn(getProjectPrefix(project, true) + message)
-        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
+        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
         project.error = message
         updateValue('projects', project)
     } else {
         endVote(request, sender, project)
+    }
+}
+
+async function tryOpenTab(request, project, attempt) {
+    try {
+        return await chrome.tabs.create(request)
+    } catch (error) {
+        if (error.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
+            await wait(500)
+            return await tryOpenTab(request, project, ++attempt)
+        }
+        endVote({errorOpenTab: error.message}, null, project)
+        return null
     }
 }
 
@@ -902,36 +941,45 @@ async function tryCloseTab(tabId, project, attempt) {
     } catch (error) {
         if (error.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
             await wait(500)
-            tryCloseTab(tabId, project, ++attempt)
+            await tryCloseTab(tabId, project, ++attempt)
             return
         }
-        if (!settings.disabledNotifError && !error.message.includes('No tab with id')) {
+        if (!error.message.includes('No tab with id')) {
             console.warn(getProjectPrefix(project, true) + error)
-            sendNotification(getProjectPrefix(project, false), error.message)
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
         }
     }
 }
 
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
-    if (!settings.disabledSendErrorSentry) {
-        if (!request.ignoreReport && (request.message != null || request.errorVoteNoElement || request.emptyError)) {
-            try {
-                await reportError(request, sender, project)
-            } catch (error) {
-                console.warn(getProjectPrefix(project, true) + 'Ошибка отправки отчёта об ошибке', error)
+    for (const [tab,value] of openedProjects) {
+        if (project.key === value.key) {
+            if (isNaN(tab) && !tab.startsWith('background_')) {
+                return
+            } else {
+                openedProjects.delete(tab)
+                openedProjects.set('queue_' + project.key, project)
             }
+            break
         }
     }
 
-    if (sender && openedProjects.has(sender.tab.id)) {
-        openedProjects.delete(sender.tab.id)
-        openedProjects.set('queue_' + project.key, project)
-        db.put('other', openedProjects, 'openedProjects')
-        if (closeTabs && !request.closedTab) {
+    if (!settings.disabledSendErrorSentry && !request.ignoreReport && (request.message != null || request.errorVoteNoElement || request.emptyError)) {
+        try {
+            await reportError(request, sender, project)
+        } catch (error) {
+            console.warn(getProjectPrefix(project, true) + 'Ошибка отправки отчёта об ошибке', error)
+        } finally {
+            if (closeTabs && !request.closedTab) {
+                tryCloseTab(sender.tab.id, project, 0)
+            }
+        }
+    } else {
+        if (sender && closeTabs && !request.closedTab) {
             tryCloseTab(sender.tab.id, project, 0)
         }
-    } else if (!project) return
+    }
 
     // for (const[key,value] of fetchProjects) {
     //     if (value.key === project.key) {
@@ -1059,7 +1107,7 @@ async function endVote(request, sender, project) {
 
         if (request.successfully) {
             sendMessage = chrome.i18n.getMessage('successAutoVote')
-            if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
             project.stats.successVotes++
             project.stats.monthSuccessVotes++
@@ -1073,7 +1121,7 @@ async function endVote(request, sender, project) {
         } else {
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
 //          if (typeof request.later == 'string') sendMessage = sendMessage + ' ' + request.later
-            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
             project.stats.laterVotes++
 
@@ -1111,7 +1159,7 @@ async function endVote(request, sender, project) {
         project.time = Date.now() + retryCoolDown
         project.error = message
         console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage)
+        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
         project.stats.errorVotes++
 
@@ -1182,7 +1230,7 @@ async function reportError(request, sender, project) {
     if (reported?.[project.rating] > Date.now()) return
 
     let tabDetails
-    if (sender && openedProjects.has(sender.tab.id)) {
+    if (sender) {
         try {
             await chrome.scripting.executeScript({target: {tabId: sender.tab.id}, files: ['libs/html-to-image.umd.js', 'scripts/main/report.js']})
             tabDetails = await chrome.tabs.sendMessage(sender.tab.id, {generateReport: true})
@@ -1194,6 +1242,8 @@ async function reportError(request, sender, project) {
         }
     }
 
+    if (!tabDetails || !request.html) return
+
     sendReport(request, sender, tabDetails, project, reported)
 }
 
@@ -1201,8 +1251,10 @@ async function sendReport(request, sender, tabDetails, project, reported) {
     let titleError = project.rating + ' '
     let detailsError
     if (request.message != null) {
-        if (request.message.length > 0) {
+        if (typeof request.message === 'string' && request.message.length > 0) {
             titleError = titleError + request.message
+        } else if (typeof request.message === 'object') {
+            titleError = titleError + JSON.stringify(request.message)
         } else {
             titleError = titleError + 'Empty error'
         }
@@ -1238,6 +1290,10 @@ async function sendReport(request, sender, tabDetails, project, reported) {
     }
     let body = JSON.stringify(message1) + '\n' + JSON.stringify(message2) + '\n' + JSON.stringify(message3)
 
+    if (!tabDetails && request.html) {
+        tabDetails = {html: request.html}
+    }
+
     // Да тут полный кринж, работа с байтами крайне убога, но мы работаем с тем чем имеем
     if (tabDetails) {
         let documentArrayHead
@@ -1265,20 +1321,24 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         newBody2.set(newBody)
         newBody2.set(documentArray, newBody.length)
 
-        const attachmentScreenshot = {}
-        screenshotArrayBody = tabDetails.screenshotError ? enc.encode(tabDetails.screenshotError) : tabDetails.screenshot
-        attachmentScreenshot.type = 'attachment'
-        attachmentScreenshot.length = screenshotArrayBody.length
-        attachmentScreenshot.filename = tabDetails.screenshotError ? 'screenshot.txt' : 'screenshot.png'
-        screenshotArrayHead = enc.encode('\n' + JSON.stringify(attachmentScreenshot) + '\n')
-        screenshotArray = new Uint8Array(screenshotArrayHead.length + screenshotArrayBody.length)
-        screenshotArray.set(screenshotArrayHead)
-        screenshotArray.set(screenshotArrayBody, screenshotArrayHead.length)
+        if (tabDetails.screenshot || tabDetails.screenshotError) {
+            const attachmentScreenshot = {}
+            screenshotArrayBody = tabDetails.screenshotError ? enc.encode(tabDetails.screenshotError) : tabDetails.screenshot
+            attachmentScreenshot.type = 'attachment'
+            attachmentScreenshot.length = screenshotArrayBody.length
+            attachmentScreenshot.filename = tabDetails.screenshotError ? 'screenshot.txt' : 'screenshot.png'
+            screenshotArrayHead = enc.encode('\n' + JSON.stringify(attachmentScreenshot) + '\n')
+            screenshotArray = new Uint8Array(screenshotArrayHead.length + screenshotArrayBody.length)
+            screenshotArray.set(screenshotArrayHead)
+            screenshotArray.set(screenshotArrayBody, screenshotArrayHead.length)
 
-        let newBody3 = new Uint8Array(newBody2.length + screenshotArray.length)
-        newBody3.set(newBody2)
-        newBody3.set(screenshotArray, newBody2.length)
-        body = newBody3
+            let newBody3 = new Uint8Array(newBody2.length + screenshotArray.length)
+            newBody3.set(newBody2)
+            newBody3.set(screenshotArray, newBody2.length)
+            body = newBody3
+        } else {
+            body = newBody2
+        }
     }
 
     const options = {body}
@@ -1342,7 +1402,7 @@ function convertBase64ToBlob(base64Image) {
 }
 
 //Отправитель уведомлений
-function sendNotification(title, message) {
+function sendNotification(title, message, notificationId) {
     if (!message) message = ''
     let notification = {
         type: 'basic',
@@ -1350,8 +1410,44 @@ function sendNotification(title, message) {
         title: title,
         message: message
     }
-    chrome.notifications.create('', notification, function() {})
+    if (!notificationId) notificationId = ''
+    chrome.notifications.create(notificationId, notification, function() {})
 }
+chrome.notifications.onClicked.addListener(async function (notificationId) {
+    if (notificationId.startsWith('openTab_')) {
+        try {
+            const tabId = Number(notificationId.replace('openTab_', ''))
+            if (!tabId) return
+            const tab = await chrome.tabs.update(tabId, {active: true})
+            if (!tab) return
+            await chrome.windows.update(tab.windowId, {focused: true})
+        } catch (error) {
+            if (!error.message.includes('No tab with id')) {
+                console.warn('Ошибка при фокусировке на вкладку', error)
+            }
+        }
+    } else if (notificationId.startsWith('openProject_')) {
+        try {
+            const projectKey = Number(notificationId.replace('openProject_', ''))
+            const found = await db.count('projects', projectKey)
+            if (!found) return
+            await chrome.runtime.openOptionsPage()
+            // Дикий костыль на ожидание загрузки вкладки, мы не можем адекватно передать в настройки нужные данные, поэтому придётся так костылять
+            const tab = await chrome.tabs.query({active: true, lastFocusedWindow: true})
+            if (!tab.length) return
+            if (tab[0].status !== 'complete') {
+                for (let i = 0; i < 9; i++) {
+                    await wait(250)
+                    const t = await chrome.tabs.get(tab[0].id)
+                    if (t.status === 'complete') break
+                }
+            }
+            await chrome.runtime.sendMessage({openProject: projectKey})
+        } catch (error) {
+            console.warn('Ошибка открытия настроек с определённым проектом', error)
+        }
+    }
+})
 
 function getProjectPrefix(project, detailed) {
     if (detailed) {
@@ -1384,7 +1480,8 @@ async function updateValue(objStore, value) {
 chrome.runtime.onInstalled.addListener(async function(details) {
     await waitInitialize()
     if (details.reason === 'install') {
-        chrome.tabs.create({url: 'options.html?installed'})
+        await chrome.runtime.openOptionsPage()
+        chrome.runtime.sendMessage({installed: true})
     } else if (details.reason === 'update') {
         checkVote()
     }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {

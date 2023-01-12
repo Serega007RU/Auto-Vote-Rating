@@ -1,5 +1,5 @@
 async function vote(first) {
-    const message = document.querySelector('#1231alert').textContent.trim()
+    const message = document.querySelector('#alert').textContent.trim()
     if (message.length > 0) {
         if (message.includes('Thanks for voting')) {
             chrome.runtime.sendMessage({successfully: true})
