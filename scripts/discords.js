@@ -40,7 +40,7 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         }
     } else {
-        if (document.querySelector('#votecontainer')?.nextElementSibling && document.querySelector('#votecontainer')?.nextElementSibling.textContent.includes('already voted')) {
+        if (document.querySelector('#votecontainer')?.nextElementSibling.textContent.includes('already voted')) {
             chrome.runtime.sendMessage({later: true})
             return
         }
@@ -48,6 +48,9 @@ async function vote(first) {
         if (document.getElementById('errorsubtitle') != null) {
             if (document.getElementById('errorsubtitle').textContent.toLowerCase().includes('successfully')) {
                 chrome.runtime.sendMessage({successfully: true})
+                return
+            } else if (document.getElementById('errorsubtitle').textContent.toLowerCase().includes('already voted')) {
+                chrome.runtime.sendMessage({later: true})
                 return
             }
             chrome.runtime.sendMessage({message: document.getElementById('errorsubtitle').textContent.trim()})
