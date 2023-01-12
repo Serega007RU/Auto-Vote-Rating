@@ -23,7 +23,7 @@ async function run() {
             const timer2 = setInterval(()=>{
                 try {
                     if (document.getElementById('error_display').style.display !== 'none') {
-                        chrome.runtime.sendMessage({message: document.getElementById('error_display').textContent})
+                        chrome.runtime.sendMessage({authSteam: true})
                         clearInterval(timer2)
                     } else if ((document.querySelector('div.newmodal') && document.querySelector('div.newmodal').style.display !== 'none')
                         || (document.querySelector('div.login_modal.loginAuthCodeModal') && document.querySelector('div.login_modal.loginAuthCodeModal').style.display !== 'none')
