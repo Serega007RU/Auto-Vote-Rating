@@ -960,5 +960,13 @@
   },
   "operaAttention": {
     "message": "Attention! We found that you are using the Opera browser, with this browser there is a problem accessing Google captcha. Please follow the instructions below to give the extension access to Google captcha"
+  },
+  "errorLinkParam": {
+    "message": "According to the link you provided, we could not get the $param$ parameter, most likely you did not provide a complete link. You can also try manual mode (bottom right switch)",
+    "placeholders": {
+      "param": {
+        "content": "$1"
+      }
+    }
   }
 }
