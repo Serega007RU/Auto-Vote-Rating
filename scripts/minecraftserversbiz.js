@@ -10,8 +10,14 @@ async function vote(first) {
             chrome.runtime.sendMessage({successfully: true})
             return
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('#cookies-message > div').textContent})
-            return
+            const request = {}
+            request.message = document.querySelector('#cookies-message > div').textContent
+            if (request.message.includes('captcha')) {
+                if (first) chrome.runtime.sendMessage({captcha: true})
+            } else {
+                chrome.runtime.sendMessage(request)
+                return
+            }
         }
     }
 
