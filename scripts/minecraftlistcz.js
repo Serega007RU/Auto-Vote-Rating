@@ -63,7 +63,8 @@ function isVisible(elem) {
     };
     if (elemCenter.x < 0) return false
     if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false
-    if (elemCenter.y < 0) return false
+    // TODO если элемент вне видимости страницы то это плохо
+    if (elemCenter.y < 0) return true
     if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return false
     let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
     do {
