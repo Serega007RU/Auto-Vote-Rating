@@ -38,7 +38,7 @@ function runVote() {
                     chrome.runtime.sendMessage({later: true})
                 } else if (request.message.includes('Please Wait')) {
                     return
-                } else if (request.message.includes('cannot verify your vote due to a low browser score')) {
+                } else if (request.message.includes('cannot verify your vote due to a low browser score') || request.message.includes('with the Anti Spam check')) {
                     if (alreadySent) return
                     chrome.runtime.sendMessage({captcha: true})
                     alreadySent = true
