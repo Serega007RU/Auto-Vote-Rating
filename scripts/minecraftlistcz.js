@@ -22,6 +22,15 @@ async function vote(first) {
             }
         }
     }
+    if (document.querySelector('div.content.content-full h1')) {
+        const request = {}
+        request.message = document.querySelector('div.content.content-full h1').textContent.trim() + ' ' + document.querySelector('div.content.content-full h2').textContent.trim()
+        if (request.message.includes('ale tato stránka nebyla nalezena')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
+        return
+    }
     if (document.querySelector('#vote-form').textContent.includes('si hlasoval')) {
         chrome.runtime.sendMessage({later: true})
         return
