@@ -1,5 +1,15 @@
 async function vote(first) {
+
     if (first === false) return
+
+    // Если мы каким-то образом попали на форум значит что-то не так
+    if (document.location.pathname.split('/')[1] === 'forum') {
+        const request = {}
+        request.errorVoteNoElement = 'Redirected to forum'
+        request.ignoreReport = true
+        return
+    }
+
     //К чему это ожидание?
     if (document.querySelector('#infoMessage') != null) document.querySelector('#infoMessage').style.display = 'none'
     if (document.querySelector('#inputFields') != null) document.querySelector('#inputFields').removeAttribute('style')
