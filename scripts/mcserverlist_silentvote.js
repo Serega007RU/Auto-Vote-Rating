@@ -10,7 +10,12 @@ async function silentVoteMCServerList(project) {
             if (json.data.error.includes('username_voted')) {
                 endVote({later: true}, null, project)
             } else {
-                endVote({message: json.data.error}, null, project)
+                const request = {}
+                request.message = json.data.error
+                if (request.message === 'server_not_found') {
+                    request.ignoreReport = true
+                }
+                endVote(request, null, project)
             }
         } else {
             endVote({message: JSON.stringify(json)}, null, project)
