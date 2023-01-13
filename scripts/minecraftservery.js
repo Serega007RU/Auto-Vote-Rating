@@ -18,6 +18,15 @@ async function vote(first) {
             }
         }
     }
+    if (document.querySelector('body > .container > h1.title')) {
+        const request = {}
+        request.message = document.querySelector('body > .container > h1.title').textContent
+        if (request.message.includes('stránka nebyla nalezena')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
+        return
+    }
 
     if (first) {
         document.querySelector('.columns .column button.button').click()
