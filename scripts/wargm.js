@@ -104,6 +104,7 @@ const timer = setInterval(async ()=>{
 // https://stackoverflow.com/a/41698614/11235240
 function isVisible(elem) {
     if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
+    elem.scrollIntoView({block: 'center'})
     const style = getComputedStyle(elem)
     if (style.display === 'none') return false
     if (style.visibility !== 'visible') return false
