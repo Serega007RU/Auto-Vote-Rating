@@ -26,6 +26,7 @@ async function vote(first) {
     for (const el of document.querySelectorAll('div.alert.alert-danger')) {
         if (el.querySelector('center > strong')) continue
         const message = el.textContent.trim()
+        if (message.includes('need to accept our Privacy Policy')) continue
         if (message.includes('already voted') || message.includes('have reached your daily vote limit')) {
             chrome.runtime.sendMessage({later: true})
             return
