@@ -325,7 +325,11 @@ var allProjects = {
                 project.lang = url.hostname.split('.')[0]
             }
             project.game = paths[1]
-            project.id = paths[2]
+            if (paths[2] === 'vote') {
+                project.id = paths[3]
+            } else {
+                project.id = paths[2]
+            }
             return project
         },
         limitedCountVote: () => true,
