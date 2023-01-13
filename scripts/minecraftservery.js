@@ -8,12 +8,16 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: Date.now() + 7200000})
             return
         } else {
-            const message = document.querySelector('.notification').textContent.trim()
-            if (message.toLowerCase().includes('captcha') || message.toLowerCase().includes('že nejste robot')) {
+            const request = {}
+            request.message = document.querySelector('.notification').textContent.trim()
+            if (request.message.toLowerCase().includes('captcha') || request.message.toLowerCase().includes('že nejste robot')) {
                 if (first) chrome.runtime.sendMessage({captcha: true})
                 return
             } else {
-                chrome.runtime.sendMessage({message})
+                if (request.message.includes('server byl označen jako neaktivní')) {
+                    request.ignoreReport = true
+                }
+                chrome.runtime.sendMessage(request)
                 return
             }
         }
