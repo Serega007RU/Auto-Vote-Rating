@@ -1,5 +1,14 @@
 async function vote(first) {
     if (first === false) return
+
+    if (document.querySelector('#error-page .wp-die-message h1')) {
+        const request = {}
+        request.message = document.querySelector('#error-page .wp-die-message h1').textContent
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     //Ожидаем загрузки Contrôle anti-bot
     if (document.querySelector('#loader_circle') != null) {
         await new Promise(resolve => {
