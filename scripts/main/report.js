@@ -16,7 +16,7 @@ async function generateReport(request, sender, sendResponse) {
             }
             if (node.attributes?.length) {
                 for (const attr of node.attributes) {
-                    if (attr?.name?.startsWith('x-')) {
+                    if (attr?.name?.startsWith('x-') || attr?.name === ';') {
                         return false
                     }
                 }

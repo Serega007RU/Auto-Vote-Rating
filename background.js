@@ -1345,6 +1345,7 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         if (!response.ok) {
             console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', json)
         }
+        console.log('An error report has been sent, details:', json)
     } catch (error) {
         console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error)
     } finally {
@@ -1360,21 +1361,6 @@ function uuidv4() {
     );
 }
 
-// Sentry.addGlobalEventProcessor((event, hint) => {
-//     if (tabDetails) {
-//         hint.attachments = [{filename: "screenshot.png", data: tabDetails.screenshot}, {filename: "document.html", data: tabDetails.html}]
-//         tabDetails = null
-//     }
-//     return event
-// })
-// Sentry.init({
-//     dsn: "https://a9f5f15340e847fa9f8af7120188faf3@o1160467.ingest.sentry.io/6244963",
-//     release: "Auto-Vote-Rating@" + chrome.runtime.getManifest().version,
-//     tracesSampleRate: 0.0
-// })
-// Sentry.configureScope(scope => {
-//     scope.setExtra('battery', 0.7);
-// });
 function convertBase64ToBlob(base64Image) {
     // Split into two parts
     const parts = base64Image.split(';base64,');
@@ -1427,23 +1413,27 @@ chrome.notifications.onClicked.addListener(async function (notificationId) {
             const projectKey = Number(notificationId.replace('openProject_', ''))
             const found = await db.count('projects', projectKey)
             if (!found) return
-            await chrome.runtime.openOptionsPage()
-            // Дикий костыль на ожидание загрузки вкладки, мы не можем адекватно передать в настройки нужные данные, поэтому придётся так костылять
-            const tab = await chrome.tabs.query({active: true, lastFocusedWindow: true})
-            if (!tab.length) return
-            if (tab[0].status !== 'complete') {
-                for (let i = 0; i < 9; i++) {
-                    await wait(250)
-                    const t = await chrome.tabs.get(tab[0].id)
-                    if (t.status === 'complete') break
-                }
-            }
+            await openOptionsPage()
             await chrome.runtime.sendMessage({openProject: projectKey})
         } catch (error) {
             console.warn('Ошибка открытия настроек с определённым проектом', error)
         }
     }
 })
+
+async function openOptionsPage() {
+    await chrome.runtime.openOptionsPage()
+    // Дикий костыль на ожидание загрузки вкладки, мы не можем адекватно передать в настройки нужные данные, поэтому придётся так костылять
+    const tab = await chrome.tabs.query({active: true, lastFocusedWindow: true})
+    if (!tab.length) return
+    if (tab[0].status !== 'complete') {
+        for (let i = 0; i < 9; i++) {
+            await wait(250)
+            const t = await chrome.tabs.get(tab[0].id)
+            if (t.status === 'complete') break
+        }
+    }
+}
 
 function getProjectPrefix(project, detailed) {
     if (detailed) {
@@ -1476,7 +1466,7 @@ async function updateValue(objStore, value) {
 chrome.runtime.onInstalled.addListener(async function(details) {
     await waitInitialize()
     if (details.reason === 'install') {
-        await chrome.runtime.openOptionsPage()
+        await openOptionsPage()
         chrome.runtime.sendMessage({installed: true})
     } else if (details.reason === 'update') {
         checkVote()
