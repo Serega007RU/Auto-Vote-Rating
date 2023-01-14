@@ -46,8 +46,6 @@ let doubleCheck = false
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
 let closeTabs = true
 
-let updateAvailable = false
-
 let evil
 let evilProjects
 
@@ -1206,10 +1204,6 @@ async function endVote(request, sender, project) {
         db.put('other', openedProjects, 'openedProjects')
         if (openedProjects.size === 0) {
             promises = []
-            if (updateAvailable) {
-                chrome.runtime.reload()
-                return
-            }
         }
         checkVote()
     }
@@ -1487,15 +1481,6 @@ chrome.runtime.onInstalled.addListener(async function(details) {
     }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
 
     }*/
-})
-
-chrome.runtime.onUpdateAvailable.addListener(async function() {
-    await waitInitialize()
-    if (openedProjects.size > 0) {
-        updateAvailable = true
-    } else {
-        chrome.runtime.reload()
-    }
 })
 
 // function Version(s){
