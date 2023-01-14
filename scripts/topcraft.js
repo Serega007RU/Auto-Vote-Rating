@@ -10,17 +10,19 @@ async function vote(first) {
         }
     }
 
-    if (document.querySelector('#container > h1') != null) {
-        let request = {message: document.querySelector('#container > h1').textContent}
-        if (document.querySelector('#container > h1').nextElementSibling != null) {
+    if (document.querySelector('#container > h1')) {
+        let request = {}
+        request.message = document.querySelector('#container > h1').textContent
+        if (document.querySelector('#container > h1').nextElementSibling) {
             request.message = request.message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
         }
-        if (request.message.includes('ошибка во время авторизации через социальную сеть')) {
+        if (request.message.toLowerCase().includes('ошибка авторизации через социальную сеть')) {
             request.ignoreReport = true
         }
-        chrome.runtime.sendMessage({request})
+        chrome.runtime.sendMessage(request)
         return
     }
+
     const project = await getProject('TopCraft')
     //Авторизованы ли мы в аккаунте?
     if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
