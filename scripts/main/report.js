@@ -10,7 +10,7 @@ async function generateReport(request, sender, sendResponse) {
         if (node) {
             if (node.nodeName) {
                 const nodeName = node.nodeName.toLowerCase()
-                if (nodeName.includes('img') || nodeName.includes('video') || nodeName === '#comment') {
+                if (nodeName === '#comment') {
                     return false
                 }
             }
@@ -27,6 +27,7 @@ async function generateReport(request, sender, sendResponse) {
     let screenshot
     let screenshotError
     try {
+        // noinspection JSUnresolvedVariable
         screenshot = await htmlToImage.toPng(document.body, {filter})
     } catch (error) {
         if (error?.target?.outerHTML) {

@@ -1228,7 +1228,7 @@ async function reportError(request, sender, project) {
     let tabDetails
     if (sender) {
         try {
-            await chrome.scripting.executeScript({target: {tabId: sender.tab.id}, files: ['libs/html-to-image.umd.js', 'scripts/main/report.js']})
+            await chrome.scripting.executeScript({target: {tabId: sender.tab.id}, files: ['libs/html-to-image.js', 'scripts/main/report.js']})
             tabDetails = await chrome.tabs.sendMessage(sender.tab.id, {generateReport: true})
             if (!tabDetails.screenshotError) tabDetails.screenshot = new Uint8Array(await convertBase64ToBlob(tabDetails.screenshot).arrayBuffer())
         } catch (error) {
