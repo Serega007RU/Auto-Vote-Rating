@@ -953,6 +953,7 @@ async function tryCloseTab(tabId, project, attempt) {
 async function endVote(request, sender, project) {
     for (const [tab,value] of openedProjects) {
         if (project.key === value.key) {
+            // noinspection JSCheckFunctionSignatures
             if (isNaN(tab) && !tab.startsWith('background_')) {
                 return
             } else {
@@ -1192,7 +1193,8 @@ async function endVote(request, sender, project) {
 
     async function removeQueue() {
         for (const [tab,value] of openedProjects) {
-            if (project.key === value.key) {
+            // noinspection JSCheckFunctionSignatures
+            if (isNaN(tab) && tab.startsWith('queue_') && project.key === value.key) {
                 openedProjects.delete(tab)
             }
         }
