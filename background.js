@@ -1238,7 +1238,7 @@ async function reportError(request, sender, project) {
         }
     }
 
-    if (!tabDetails || !request.html) return
+    if (!tabDetails && !request.html) return
 
     sendReport(request, sender, tabDetails, project, reported)
 }
