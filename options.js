@@ -899,6 +899,24 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
             funcRating = allProjects[rating]
             project = funcRating.parseURL(new URL(url))
             project.rating = rating
+
+            if (project.id == null) {
+                createNotif(chrome.i18n.getMessage('errorLinkParam', 'id'), 'error')
+                event.submitter.disabled = false
+                return
+            }
+
+            if (funcRating.exampleURLGame && project.game == null) {
+                createNotif(chrome.i18n.getMessage('errorLinkParam', 'game'), 'error')
+                event.submitter.disabled = false
+                return
+            }
+
+            if (funcRating.langList && project.lang == null) {
+                createNotif(chrome.i18n.getMessage('errorLinkParam', 'lang'), 'error')
+                event.submitter.disabled = false
+                return
+            }
         } catch (error) {
             createNotif(error.message, 'error')
             event.submitter.disabled = false

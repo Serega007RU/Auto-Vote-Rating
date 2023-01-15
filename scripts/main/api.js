@@ -143,7 +143,7 @@ async function run() {
             return
         }
 
-        if (document.querySelector('body > center > h1') && document.querySelector('body > center:nth-child(3)')?.textContent.includes('cloudflare')) {
+        if (document.querySelector('body > center > h1') && (document.querySelector('body > center:nth-child(3)')?.textContent.includes('cloudflare') || document.querySelector('body > center:nth-child(3)')?.textContent.includes('nginx'))) {
             const request = {}
             request.message = document.body.innerText
             request.ignoreReport = true

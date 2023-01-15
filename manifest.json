@@ -41,6 +41,6 @@
 		"<all_urls>"
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "7.0.3",
+	"version": "7.0.4",
 	"default_locale": "en"
 }

@@ -7,15 +7,27 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 async function generateReport(request, sender, sendResponse) {
     const filter = (node) => {
-        if (node && node.nodeName) {
-            const nodeName = node.nodeName.toLowerCase()
-            return !nodeName.includes('img') && !nodeName.includes('video') && nodeName !== '#comment'
+        if (node) {
+            if (node.nodeName) {
+                const nodeName = node.nodeName.toLowerCase()
+                if (nodeName === '#comment') {
+                    return false
+                }
+            }
+            if (node.attributes?.length) {
+                for (const attr of node.attributes) {
+                    if (attr?.name?.startsWith('x-') || attr?.name === ';') {
+                        return false
+                    }
+                }
+            }
         }
         return true
     }
     let screenshot
     let screenshotError
     try {
+        // noinspection JSUnresolvedVariable
         screenshot = await htmlToImage.toPng(document.body, {filter})
     } catch (error) {
         if (error?.target?.outerHTML) {

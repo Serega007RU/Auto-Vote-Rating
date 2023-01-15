@@ -46,8 +46,6 @@ let doubleCheck = false
 //Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
 let closeTabs = true
 
-let updateAvailable = false
-
 let evil
 let evilProjects
 
@@ -955,6 +953,7 @@ async function tryCloseTab(tabId, project, attempt) {
 async function endVote(request, sender, project) {
     for (const [tab,value] of openedProjects) {
         if (project.key === value.key) {
+            // noinspection JSCheckFunctionSignatures
             if (isNaN(tab) && !tab.startsWith('background_')) {
                 return
             } else {
@@ -1194,7 +1193,8 @@ async function endVote(request, sender, project) {
 
     async function removeQueue() {
         for (const [tab,value] of openedProjects) {
-            if (project.key === value.key) {
+            // noinspection JSCheckFunctionSignatures
+            if (isNaN(tab) && tab.startsWith('queue_') && project.key === value.key) {
                 openedProjects.delete(tab)
             }
         }
@@ -1206,10 +1206,6 @@ async function endVote(request, sender, project) {
         db.put('other', openedProjects, 'openedProjects')
         if (openedProjects.size === 0) {
             promises = []
-            if (updateAvailable) {
-                chrome.runtime.reload()
-                return
-            }
         }
         checkVote()
     }
@@ -1232,7 +1228,7 @@ async function reportError(request, sender, project) {
     let tabDetails
     if (sender) {
         try {
-            await chrome.scripting.executeScript({target: {tabId: sender.tab.id}, files: ['libs/html-to-image.umd.js', 'scripts/main/report.js']})
+            await chrome.scripting.executeScript({target: {tabId: sender.tab.id}, files: ['libs/html-to-image.js', 'scripts/main/report.js']})
             tabDetails = await chrome.tabs.sendMessage(sender.tab.id, {generateReport: true})
             if (!tabDetails.screenshotError) tabDetails.screenshot = new Uint8Array(await convertBase64ToBlob(tabDetails.screenshot).arrayBuffer())
         } catch (error) {
@@ -1242,7 +1238,7 @@ async function reportError(request, sender, project) {
         }
     }
 
-    if (!tabDetails || !request.html) return
+    if (!tabDetails && !request.html) return
 
     sendReport(request, sender, tabDetails, project, reported)
 }
@@ -1349,6 +1345,7 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         if (!response.ok) {
             console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', json)
         }
+        console.log('An error report has been sent, details:', json)
     } catch (error) {
         console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error)
     } finally {
@@ -1364,21 +1361,6 @@ function uuidv4() {
     );
 }
 
-// Sentry.addGlobalEventProcessor((event, hint) => {
-//     if (tabDetails) {
-//         hint.attachments = [{filename: "screenshot.png", data: tabDetails.screenshot}, {filename: "document.html", data: tabDetails.html}]
-//         tabDetails = null
-//     }
-//     return event
-// })
-// Sentry.init({
-//     dsn: "https://a9f5f15340e847fa9f8af7120188faf3@o1160467.ingest.sentry.io/6244963",
-//     release: "Auto-Vote-Rating@" + chrome.runtime.getManifest().version,
-//     tracesSampleRate: 0.0
-// })
-// Sentry.configureScope(scope => {
-//     scope.setExtra('battery', 0.7);
-// });
 function convertBase64ToBlob(base64Image) {
     // Split into two parts
     const parts = base64Image.split(';base64,');
@@ -1431,23 +1413,27 @@ chrome.notifications.onClicked.addListener(async function (notificationId) {
             const projectKey = Number(notificationId.replace('openProject_', ''))
             const found = await db.count('projects', projectKey)
             if (!found) return
-            await chrome.runtime.openOptionsPage()
-            // Дикий костыль на ожидание загрузки вкладки, мы не можем адекватно передать в настройки нужные данные, поэтому придётся так костылять
-            const tab = await chrome.tabs.query({active: true, lastFocusedWindow: true})
-            if (!tab.length) return
-            if (tab[0].status !== 'complete') {
-                for (let i = 0; i < 9; i++) {
-                    await wait(250)
-                    const t = await chrome.tabs.get(tab[0].id)
-                    if (t.status === 'complete') break
-                }
-            }
+            await openOptionsPage()
             await chrome.runtime.sendMessage({openProject: projectKey})
         } catch (error) {
             console.warn('Ошибка открытия настроек с определённым проектом', error)
         }
     }
 })
+
+async function openOptionsPage() {
+    await chrome.runtime.openOptionsPage()
+    // Дикий костыль на ожидание загрузки вкладки, мы не можем адекватно передать в настройки нужные данные, поэтому придётся так костылять
+    const tab = await chrome.tabs.query({active: true, lastFocusedWindow: true})
+    if (!tab.length) return
+    if (tab[0].status !== 'complete') {
+        for (let i = 0; i < 9; i++) {
+            await wait(250)
+            const t = await chrome.tabs.get(tab[0].id)
+            if (t.status === 'complete') break
+        }
+    }
+}
 
 function getProjectPrefix(project, detailed) {
     if (detailed) {
@@ -1480,22 +1466,13 @@ async function updateValue(objStore, value) {
 chrome.runtime.onInstalled.addListener(async function(details) {
     await waitInitialize()
     if (details.reason === 'install') {
-        await chrome.runtime.openOptionsPage()
+        await openOptionsPage()
         chrome.runtime.sendMessage({installed: true})
     } else if (details.reason === 'update') {
         checkVote()
     }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
 
     }*/
-})
-
-chrome.runtime.onUpdateAvailable.addListener(async function() {
-    await waitInitialize()
-    if (openedProjects.size > 0) {
-        updateAvailable = true
-    } else {
-        chrome.runtime.reload()
-    }
 })
 
 // function Version(s){

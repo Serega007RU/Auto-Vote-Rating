@@ -19,11 +19,13 @@ async function vote(first) {
         }
     }
     //Если есть ошибка
-    if (document.querySelector('div.alert.alert-danger') != null) {
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').innerText})
-        return
-    } else if (document.querySelector('div.alert.alert-danger') != null) {
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').innerText})
+    if (document.querySelector('div.alert.alert-danger')) {
+        const message = document.querySelector('div.alert.alert-danger').innerText
+        if (message.includes('cannot vote more than once at the same time')) {
+            chrome.runtime.sendMessage({later: true})
+        } else {
+            chrome.runtime.sendMessage({message})
+        }
         return
     }
 

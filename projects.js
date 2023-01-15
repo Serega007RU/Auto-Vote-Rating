@@ -325,7 +325,11 @@ var allProjects = {
                 project.lang = url.hostname.split('.')[0]
             }
             project.game = paths[1]
-            project.id = paths[2]
+            if (paths[2] === 'vote') {
+                project.id = paths[3]
+            } else {
+                project.id = paths[2]
+            }
             return project
         },
         limitedCountVote: () => true,
@@ -1225,6 +1229,7 @@ var projectByURL = new Map([
     ['planetminecraft.com', 'PlanetMinecraft'],
     ['topg.org', 'TopG'],
     ['listforge.net', 'ListForge'],
+    ['7daystodie-servers.com', 'ListForge'],
     ['ark-servers.net', 'ListForge'],
     ['arma3-servers.net', 'ListForge'],
     ['atlas-servers.io', 'ListForge'],
@@ -1251,6 +1256,8 @@ var projectByURL = new Map([
     ['teamspeak-servers.org', 'ListForge'],
     ['terraria-servers.com', 'ListForge'],
     ['unturned-servers.net', 'ListForge'],
+    ['vrising-servers.net', 'ListForge'],
+    ['valheim-servers.io', 'ListForge'],
     ['wurm-unlimited.com', 'ListForge'],
     ['minecraft-server-list.com', 'MinecraftServerList'],
     ['serverpact.com', 'ServerPact'],

@@ -1,4 +1,14 @@
 async function vote() {
+    if (document.body.textContent.trim().length < 250) {
+        const request = {}
+        request.message = document.body.textContent.trim()
+        if (request.message.includes('something went wrong')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     if (document.querySelector('div.ui.success.message') != null) {
         chrome.runtime.sendMessage({successfully: true})
         return

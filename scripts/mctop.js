@@ -10,14 +10,19 @@ async function vote(first) {
         }
     }
 
-    if (document.querySelector('#container > h1') != null) {
-        let message = document.querySelector('#container > h1').textContent
-        if (document.querySelector('#container > h1').nextElementSibling != null) {
-            message = message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
+    if (document.querySelector('#container > h1')) {
+        let request = {}
+        request.message = document.querySelector('#container > h1').textContent
+        if (document.querySelector('#container > h1').nextElementSibling) {
+            request.message = request.message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
         }
-        chrome.runtime.sendMessage({message})
+        if (request.message.toLowerCase().includes('ошибка авторизации через социальную сеть')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
         return
     }
+
     const project = await getProject('McTOP')
     //Авторизованы ли мы в аккаунте?
     if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {

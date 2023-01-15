@@ -123,6 +123,10 @@ function run() {
                 clearInterval(timer7)
                 document.querySelector('#cf-norobot-container span.mark').click()
             }
+            if (document.querySelector('#cf-stage #success')?.style.display !== 'none') {
+                clearInterval(timer7)
+                chrome.runtime.sendMessage('captchaPassed')
+            }
         }, 1000)
     }
 }
