@@ -1,9 +1,9 @@
 async function vote(first) {
     if (document.querySelector('#captcha-status') && document.querySelector('#captcha-status').textContent) return
 
-    if (first && document.querySelector('#myCaptcha')) return
-
     document.querySelector('#votebutton').click()
+
+    if (first) chrome.runtime.sendMessage({captcha: true})
 }
 
 const timer = setInterval(()=>{
