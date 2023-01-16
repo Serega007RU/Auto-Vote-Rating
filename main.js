@@ -173,6 +173,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             enabledSilentVote: true,
             disabledCheckInternet: false,
             disabledOneVote: false,
+            disabledRestartOnTimeout: false,
             disabledFocusedTab: false,
             enableCustom: false,
             timeout: 10000,

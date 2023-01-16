@@ -980,5 +980,8 @@
   },
   "timeoutVoteTooltip": {
     "message": "If the vote lasts too long, the extension will restart it after the specified time"
+  },
+  "disabledRestartOnTimeout": {
+    "message": "Disable the restart of voting if it lasts too long"
   }
 }

@@ -226,6 +226,7 @@ async function restoreOptions(first) {
     if (!settings.enabledSilentVote) document.getElementById('enabledSilentVote').value = 'disabled'
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('disabledOneVote').checked = settings.disabledOneVote
+    document.getElementById('disabledRestartOnTimeout').checked = settings.disabledRestartOnTimeout
     document.getElementById('disabledFocusedTab').checked = settings.disabledFocusedTab
     document.getElementById('timeoutValue').value = settings.timeout
     document.getElementById('timeoutErrorValue').value = settings.timeoutError
@@ -607,6 +608,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledCheckInternet = this.checked
         else if (this.id === 'disabledOneVote')
             settings.disabledOneVote = this.checked
+        else if (this.id === 'disabledRestartOnTimeout')
+            settings.disabledRestartOnTimeout = this.checked
         else if (this.id === 'disabledFocusedTab')
             settings.disabledFocusedTab = this.checked
         else if (this.id === 'disabledWarnCaptcha')

@@ -130,7 +130,7 @@ async function checkOpen(project/*, transaction*/) {
             continue
         }
         if (project.rating === value.rating || (value.randomize && project.randomize) || settings.disabledOneVote) {
-            if (Date.now() < value.nextAttempt) {
+            if (settings.disabledRestartOnTimeout || Date.now() < value.nextAttempt) {
                 return
             } else {
                 console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
@@ -147,13 +147,15 @@ async function checkOpen(project/*, transaction*/) {
     }
 
 
-    let retryCoolDown
-    if (project.randomize) {
-        retryCoolDown = Math.floor(Math.random() * 600000 + 1800000)
-    } else {
-        retryCoolDown = settings.timeoutVote
+    if (!settings.disabledRestartOnTimeout) {
+        let retryCoolDown
+        if (project.randomize) {
+            retryCoolDown = Math.floor(Math.random() * 600000 + 1800000)
+        } else {
+            retryCoolDown = settings.timeoutVote
+        }
+        project.nextAttempt = Date.now() + retryCoolDown
     }
-    project.nextAttempt = Date.now() + retryCoolDown
     delete project.timeoutQueue
 
     openedProjects.set('start_' + project.key, project)
