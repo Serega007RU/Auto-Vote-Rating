@@ -143,7 +143,7 @@
     "description": "Input. Mode."
   },
   "cooldown": {
-    "message": "Voting timeout in milliseconds between projects for 1 rating",
+    "message": "Timeout between projects for 1 rating",
     "description": "Label. Cooldown input"
   },
   "cooldownError": {
@@ -968,5 +968,17 @@
         "content": "$1"
       }
     }
+  },
+  "cooldownVote": {
+    "message": "Voting timeout in ms"
+  },
+  "timeoutTooltip": {
+    "message": "If you vote on the rating (monitoring) for several projects (servers), then at the end of the voting, the extension waits for the specified time before voting for the next project on the same rating"
+  },
+  "timeoutErrorTooltip": {
+    "message": "If a voting error occurs, the extension will wait for the specified time until the next voting attempt"
+  },
+  "timeoutVoteTooltip": {
+    "message": "If the vote lasts too long, the extension will restart it after the specified time"
   }
 }

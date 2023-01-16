@@ -98,9 +98,6 @@
   "enabledSilentVoteNoSilent": {
     "message": "Режим эмуляції"
   },
-  "cooldown": {
-    "message": "Таймаут голосування в мс між проектами для 1 рейтинга"
-  },
   "cooldownError": {
     "message": "Таймаут в мс при помилці"
   },

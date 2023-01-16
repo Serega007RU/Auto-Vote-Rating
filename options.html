@@ -337,16 +337,35 @@
                             </select>
                         </div>
                         <div class="input-block" style="display: none">
-                            <label data-resource="cooldown" for="timeoutValue"></label>
+                            <label data-resource="cooldown" for="timeoutValue">
+                                <span class="tooltip2">
+                                    <span data-resource="timeoutTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
                             <form id="timeout">
                                 <input class="input" name="cooldown" id="timeoutValue" required type="number" min="0">
                                 <button data-resource="setCooldown" type="submit" class="justBtn"></button>
                             </form>
                         </div>
                         <div class="input-block" style="display: none">
-                            <label data-resource="cooldownError" for="timeoutErrorValue"></label>
+                            <label data-resource="cooldownError" for="timeoutErrorValue">
+                                <span class="tooltip2">
+                                    <span data-resource="timeoutErrorTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
                             <form id="timeoutError">
                                 <input class="input" name="cooldownError" id="timeoutErrorValue" required type="number" min="0">
+                                <button data-resource="setCooldown" type="submit" class="justBtn"></button>
+                            </form>
+                        </div>
+                        <div class="input-block" style="display: none">
+                            <label data-resource="cooldownVote" for="timeoutVoteValue">
+                                <span class="tooltip2">
+                                    <span data-resource="timeoutVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <form id="timeoutVote">
+                                <input class="input" name="cooldownVote" id="timeoutVoteValue" required type="number" min="1000">
                                 <button data-resource="setCooldown" type="submit" class="justBtn"></button>
                             </form>
                         </div>

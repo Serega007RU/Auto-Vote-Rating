@@ -67,7 +67,7 @@ async function initializeConfig(background, version) {
     }
     // noinspection JSUnusedGlobalSymbols
     try {
-        db = await idb.openDB('avr', version ? version : 10, {upgrade})
+        db = await idb.openDB('avr', version ? version : 11, {upgrade})
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
@@ -76,7 +76,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 100)
+            await initializeConfig(background, 110)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error})
@@ -177,6 +177,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             enableCustom: false,
             timeout: 10000,
             timeoutError: 900000,
+            timeoutVote: 900000,
             disabledWarnCaptcha: false,
             debug: false,
             disabledUseRemoteCode: false,
@@ -307,6 +308,12 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion <= 9) {
         openedProjects = new Map()
         await transaction.objectStore('other').put(openedProjects, 'openedProjects')
+    }
+
+    if (oldVersion <= 10) {
+        settings = await transaction.objectStore('other').get('settings')
+        settings.timeoutVote = 900000
+        await transaction.objectStore('other').put(settings, 'settings')
     }
 
     if (!todayStats) {
