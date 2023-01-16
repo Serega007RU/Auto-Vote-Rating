@@ -99,6 +99,7 @@ async function initializeConfig(background, version) {
     settings = await db.get('other', 'settings')
     generalStats = await db.get('other', 'generalStats')
     todayStats = await db.get('other', 'todayStats')
+    openedProjects = await db.get('other', 'openedProjects')
 
     if (!background) {
         initialized = true

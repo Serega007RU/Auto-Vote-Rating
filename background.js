@@ -15,7 +15,6 @@ self.addEventListener('install', async () => {
 
     await waitInitialize1()
 
-    openedProjects = await db.get('other', 'openedProjects')
     if (openedProjects.size > 0) {
         for (const key of openedProjects.keys()) {
             openedProjects.delete(key)
@@ -959,6 +958,7 @@ async function endVote(request, sender, project) {
             } else {
                 openedProjects.delete(tab)
                 openedProjects.set('queue_' + project.key, project)
+                db.put('other', openedProjects, 'openedProjects')
             }
             break
         }
