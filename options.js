@@ -233,6 +233,7 @@ async function restoreOptions(first) {
     document.getElementById('timeoutVoteValue').value = settings.timeoutVote
     document.getElementById('disabledWarnCaptcha').checked = settings.disabledWarnCaptcha
     document.getElementById('disabledDebug').checked = settings.debug
+    document.getElementById('disabledCloseTabs').checked = settings.disabledCloseTabs
     document.getElementById('disabledUseRemoteCode').checked = settings.disabledUseRemoteCode
     document.getElementById('disabledSendErrorSentry').checked = settings.disabledSendErrorSentry
     document.getElementById('expertMode').checked = settings.expertMode
@@ -244,6 +245,7 @@ async function restoreOptions(first) {
         document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
         document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
         document.getElementById("disabledDebug").parentElement.removeAttribute('style')
+        document.getElementById("disabledCloseTabs").parentElement.removeAttribute('style')
         document.getElementById('addProject').classList.add('addProjectExpert')
         document.getElementById('addProject').classList.remove('addProjectExpertManual')
         document.getElementById('advSettingsAdd').removeAttribute('style')
@@ -616,6 +618,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledWarnCaptcha = this.checked
         else if (this.id === 'disabledDebug')
             settings.debug = this.checked
+        else if (this.id === 'disabledCloseTabs')
+            settings.disabledCloseTabs = this.checked
         else if (this.id === 'disabledUseRemoteCode')
             settings.disabledUseRemoteCode = this.checked
         else if (this.id === 'disabledSendErrorSentry')
@@ -630,6 +634,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
                 document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
                 document.getElementById("disabledDebug").parentElement.removeAttribute('style')
+                document.getElementById("disabledCloseTabs").parentElement.removeAttribute('style')
                 document.getElementById('addProject').classList.add('addProjectExpert')
                 document.getElementById('addProject').classList.remove('addProjectExpertManual')
                 document.getElementById('advSettingsAdd').removeAttribute('style')
@@ -642,6 +647,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById("disabledOneVote").parentElement.style.display = 'none'
                 document.getElementById("disabledFocusedTab").parentElement.style.display = 'none'
                 document.getElementById("disabledDebug").parentElement.style.display = 'none'
+                document.getElementById("disabledCloseTabs").parentElement.style.display = 'none'
                 document.getElementById('addProject').classList.add('addProjectExpertManual')
                 document.getElementById('addProject').classList.remove('addProjectExpert')
                 document.getElementById('advSettingsAdd').style.display = 'none'

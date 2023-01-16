@@ -16,10 +16,9 @@ self.addEventListener('install', async () => {
     await waitInitialize1()
 
     if (openedProjects.size > 0) {
-        for (const key of openedProjects.keys()) {
+        for (const [key, value] of openedProjects) {
             openedProjects.delete(key)
-            if (!isNaN(key)) chrome.tabs.remove(key)
-                .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
+            tryCloseTab(key, value, 0)
         }
         await db.put('other', openedProjects, 'openedProjects')
     }
@@ -41,9 +40,6 @@ let notSupportedGroupTabs = false
 //Нужно ли сейчас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
 let doubleCheck = false
-
-//Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
-let closeTabs = true
 
 let evil
 let evilProjects
@@ -138,9 +134,7 @@ async function checkOpen(project/*, transaction*/) {
                 openedProjects.delete(tab)
                 db.put('other', openedProjects, 'openedProjects')
                 // noinspection JSCheckFunctionSignatures
-                if (closeTabs && !isNaN(tab)) {
-                    tryCloseTab(tab, value, 0)
-                }
+                tryCloseTab(tab, value, 0)
                 break
             }
         }
@@ -828,11 +822,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
                 }
                 nowVoting = true
                 openedProjects.delete(key)
-                // noinspection JSCheckFunctionSignatures
-                if (!isNaN(key)) { // noinspection JSCheckFunctionSignatures
-                    chrome.tabs.remove(key)
-                        .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
-                }
+                tryCloseTab(key, value, 0)
                 await db.put('other', openedProjects, 'openedProjects')
                 break
             }
@@ -855,11 +845,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
             if (request.projectRestart.key === value.key) {
                 if (request.confirmed) {
                     openedProjects.delete(key)
-                    // noinspection JSCheckFunctionSignatures
-                    if (!isNaN(key)) { // noinspection JSCheckFunctionSignatures
-                        chrome.tabs.remove(key)
-                            .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
-                    }
+                    tryCloseTab(key, value, 0)
                     await db.put('other', openedProjects, 'openedProjects')
                     break
                 } else {
@@ -933,6 +919,7 @@ async function tryOpenTab(request, project, attempt) {
 }
 
 async function tryCloseTab(tabId, project, attempt) {
+    if (isNaN(tabId) || settings.disabledCloseTabs) return
     try {
         await chrome.tabs.remove(tabId)
     } catch (error) {
@@ -970,12 +957,12 @@ async function endVote(request, sender, project) {
         } catch (error) {
             console.warn(getProjectPrefix(project, true) + 'Ошибка отправки отчёта об ошибке', error)
         } finally {
-            if (closeTabs && !request.closedTab) {
+            if (!request.closedTab) {
                 tryCloseTab(sender.tab.id, project, 0)
             }
         }
     } else {
-        if (sender && closeTabs && !request.closedTab) {
+        if (sender && !request.closedTab) {
             tryCloseTab(sender.tab.id, project, 0)
         }
     }
