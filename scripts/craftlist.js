@@ -1,4 +1,13 @@
 async function vote(first) {
+    // Костыль
+    if (document.location.pathname.split('/')[1] === 'cs' && !document.location.pathname.split('/')[2]) {
+        const request = {}
+        request.errorVoteNoElement = 'Redirected to server list'
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     if (document.querySelector('div.alert.alert-success')) {
         const message = document.querySelector('div.alert.alert-success').textContent
         if (message.includes('vote was successfully')
