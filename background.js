@@ -15,12 +15,10 @@ self.addEventListener('install', async () => {
 
     await waitInitialize1()
 
-    openedProjects = await db.get('other', 'openedProjects')
     if (openedProjects.size > 0) {
-        for (const key of openedProjects.keys()) {
+        for (const [key, value] of openedProjects) {
             openedProjects.delete(key)
-            if (!isNaN(key)) chrome.tabs.remove(key)
-                .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
+            tryCloseTab(key, value, 0)
         }
         await db.put('other', openedProjects, 'openedProjects')
     }
@@ -42,9 +40,6 @@ let notSupportedGroupTabs = false
 //Нужно ли сейчас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
 let doubleCheck = false
-
-//Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
-let closeTabs = true
 
 let evil
 let evilProjects
@@ -131,7 +126,7 @@ async function checkOpen(project/*, transaction*/) {
             continue
         }
         if (project.rating === value.rating || (value.randomize && project.randomize) || settings.disabledOneVote) {
-            if (Date.now() < value.nextAttempt) {
+            if (settings.disabledRestartOnTimeout || Date.now() < value.nextAttempt) {
                 return
             } else {
                 console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
@@ -139,24 +134,22 @@ async function checkOpen(project/*, transaction*/) {
                 openedProjects.delete(tab)
                 db.put('other', openedProjects, 'openedProjects')
                 // noinspection JSCheckFunctionSignatures
-                if (closeTabs && !isNaN(tab)) {
-                    tryCloseTab(tab, value, 0)
-                }
+                tryCloseTab(tab, value, 0)
                 break
             }
         }
     }
 
 
-    let retryCoolDown
-    if (project.randomize) {
-        retryCoolDown = Math.floor(Math.random() * 600000 + 1800000)
-    } else if (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-        retryCoolDown = 300000
-    } else {
-        retryCoolDown = 900000
+    if (!settings.disabledRestartOnTimeout) {
+        let retryCoolDown
+        if (project.randomize) {
+            retryCoolDown = Math.floor(Math.random() * 600000 + 1800000)
+        } else {
+            retryCoolDown = settings.timeoutVote
+        }
+        project.nextAttempt = Date.now() + retryCoolDown
     }
-    project.nextAttempt = Date.now() + retryCoolDown
     delete project.timeoutQueue
 
     openedProjects.set('start_' + project.key, project)
@@ -829,11 +822,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
                 }
                 nowVoting = true
                 openedProjects.delete(key)
-                // noinspection JSCheckFunctionSignatures
-                if (!isNaN(key)) { // noinspection JSCheckFunctionSignatures
-                    chrome.tabs.remove(key)
-                        .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
-                }
+                tryCloseTab(key, value, 0)
                 await db.put('other', openedProjects, 'openedProjects')
                 break
             }
@@ -856,11 +845,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
             if (request.projectRestart.key === value.key) {
                 if (request.confirmed) {
                     openedProjects.delete(key)
-                    // noinspection JSCheckFunctionSignatures
-                    if (!isNaN(key)) { // noinspection JSCheckFunctionSignatures
-                        chrome.tabs.remove(key)
-                            .catch(error => {if (!error.message.includes('No tab with id')) console.warn(error)})
-                    }
+                    tryCloseTab(key, value, 0)
                     await db.put('other', openedProjects, 'openedProjects')
                     break
                 } else {
@@ -934,6 +919,7 @@ async function tryOpenTab(request, project, attempt) {
 }
 
 async function tryCloseTab(tabId, project, attempt) {
+    if (isNaN(tabId) || settings.disabledCloseTabs) return
     try {
         await chrome.tabs.remove(tabId)
     } catch (error) {
@@ -959,6 +945,7 @@ async function endVote(request, sender, project) {
             } else {
                 openedProjects.delete(tab)
                 openedProjects.set('queue_' + project.key, project)
+                db.put('other', openedProjects, 'openedProjects')
             }
             break
         }
@@ -970,12 +957,12 @@ async function endVote(request, sender, project) {
         } catch (error) {
             console.warn(getProjectPrefix(project, true) + 'Ошибка отправки отчёта об ошибке', error)
         } finally {
-            if (closeTabs && !request.closedTab) {
+            if (!request.closedTab) {
                 tryCloseTab(sender.tab.id, project, 0)
             }
         }
     } else {
-        if (sender && closeTabs && !request.closedTab) {
+        if (sender && !request.closedTab) {
             tryCloseTab(sender.tab.id, project, 0)
         }
     }

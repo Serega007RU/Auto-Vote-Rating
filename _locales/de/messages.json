@@ -127,10 +127,6 @@
     "message": "Emulations Modus",
     "description": "Input. Mode."
   },
-  "cooldown": {
-    "message": "Abstimmungszeit in Millisekunden zwischen Projekten für 1 Bewertung",
-    "description": "Label. Cooldown input"
-  },
   "cooldownError": {
     "message": "Timeout in ms im Falle eines Fehlers"
   },

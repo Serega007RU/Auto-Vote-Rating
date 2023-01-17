@@ -226,11 +226,14 @@ async function restoreOptions(first) {
     if (!settings.enabledSilentVote) document.getElementById('enabledSilentVote').value = 'disabled'
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('disabledOneVote').checked = settings.disabledOneVote
+    document.getElementById('disabledRestartOnTimeout').checked = settings.disabledRestartOnTimeout
     document.getElementById('disabledFocusedTab').checked = settings.disabledFocusedTab
     document.getElementById('timeoutValue').value = settings.timeout
     document.getElementById('timeoutErrorValue').value = settings.timeoutError
+    document.getElementById('timeoutVoteValue').value = settings.timeoutVote
     document.getElementById('disabledWarnCaptcha').checked = settings.disabledWarnCaptcha
     document.getElementById('disabledDebug').checked = settings.debug
+    document.getElementById('disabledCloseTabs').checked = settings.disabledCloseTabs
     document.getElementById('disabledUseRemoteCode').checked = settings.disabledUseRemoteCode
     document.getElementById('disabledSendErrorSentry').checked = settings.disabledSendErrorSentry
     document.getElementById('expertMode').checked = settings.expertMode
@@ -238,9 +241,11 @@ async function restoreOptions(first) {
         document.getElementById("enabledSilentVote").parentElement.removeAttribute('style')
         document.getElementById("timeout").parentElement.removeAttribute('style')
         document.getElementById("timeoutError").parentElement.removeAttribute('style')
+        document.getElementById('timeoutVote').parentElement.removeAttribute('style')
         document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
         document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
         document.getElementById("disabledDebug").parentElement.removeAttribute('style')
+        document.getElementById("disabledCloseTabs").parentElement.removeAttribute('style')
         document.getElementById('addProject').classList.add('addProjectExpert')
         document.getElementById('addProject').classList.remove('addProjectExpertManual')
         document.getElementById('advSettingsAdd').removeAttribute('style')
@@ -605,12 +610,16 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledCheckInternet = this.checked
         else if (this.id === 'disabledOneVote')
             settings.disabledOneVote = this.checked
+        else if (this.id === 'disabledRestartOnTimeout')
+            settings.disabledRestartOnTimeout = this.checked
         else if (this.id === 'disabledFocusedTab')
             settings.disabledFocusedTab = this.checked
         else if (this.id === 'disabledWarnCaptcha')
             settings.disabledWarnCaptcha = this.checked
         else if (this.id === 'disabledDebug')
             settings.debug = this.checked
+        else if (this.id === 'disabledCloseTabs')
+            settings.disabledCloseTabs = this.checked
         else if (this.id === 'disabledUseRemoteCode')
             settings.disabledUseRemoteCode = this.checked
         else if (this.id === 'disabledSendErrorSentry')
@@ -621,9 +630,11 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById("enabledSilentVote").parentElement.removeAttribute('style')
                 document.getElementById("timeout").parentElement.removeAttribute('style')
                 document.getElementById("timeoutError").parentElement.removeAttribute('style')
+                document.getElementById('timeoutVote').parentElement.removeAttribute('style')
                 document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
                 document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
                 document.getElementById("disabledDebug").parentElement.removeAttribute('style')
+                document.getElementById("disabledCloseTabs").parentElement.removeAttribute('style')
                 document.getElementById('addProject').classList.add('addProjectExpert')
                 document.getElementById('addProject').classList.remove('addProjectExpertManual')
                 document.getElementById('advSettingsAdd').removeAttribute('style')
@@ -632,9 +643,11 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById("enabledSilentVote").parentElement.style.display = 'none'
                 document.getElementById("timeout").parentElement.style.display = 'none'
                 document.getElementById("timeoutError").parentElement.style.display = 'none'
+                document.getElementById('timeoutVote').parentElement.style.display = 'none'
                 document.getElementById("disabledOneVote").parentElement.style.display = 'none'
                 document.getElementById("disabledFocusedTab").parentElement.style.display = 'none'
                 document.getElementById("disabledDebug").parentElement.style.display = 'none'
+                document.getElementById("disabledCloseTabs").parentElement.style.display = 'none'
                 document.getElementById('addProject').classList.add('addProjectExpertManual')
                 document.getElementById('addProject').classList.remove('addProjectExpert')
                 document.getElementById('advSettingsAdd').style.display = 'none'
@@ -1075,6 +1088,17 @@ document.getElementById('timeoutError').addEventListener('submit', async (event)
     event.preventDefault()
     event.submitter.disabled = true
     settings.timeoutError = document.getElementById('timeoutErrorValue').valueAsNumber
+    await db.put('other', settings, 'settings')
+    createNotif(chrome.i18n.getMessage('successSave'), 'success')
+    chrome.runtime.sendMessage('reloadSettings')
+    event.submitter.disabled = false
+})
+
+//Слушатель кнопки "Установить" на таймауте при голосовании
+document.getElementById('timeoutVote').addEventListener('submit', async (event)=>{
+    event.preventDefault()
+    event.submitter.disabled = true
+    settings.timeoutVote = document.getElementById('timeoutVoteValue').valueAsNumber
     await db.put('other', settings, 'settings')
     createNotif(chrome.i18n.getMessage('successSave'), 'success')
     chrome.runtime.sendMessage('reloadSettings')
