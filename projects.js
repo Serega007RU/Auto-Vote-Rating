@@ -864,7 +864,7 @@ var allProjects = {
     ServersMinecraft: {
         voteURL: (project) => 'https://servers-minecraft.net/' + project.id + '/vote',
         pageURL: (project) => 'https://servers-minecraft.net/' + project.id,
-        projectName: (doc) => doc.querySelector('div.text-xl').textContent,
+        projectName: (doc) => doc.querySelector('div.text-xl').textContent.trim(),
         exampleURL: () => ['https://servers-minecraft.net/', 'server-complex-gaming.58', '/vote'],
         URL: () => 'servers-minecraft.net',
         parseURL: (url) => ({id: url.pathname.split('/')[1]})

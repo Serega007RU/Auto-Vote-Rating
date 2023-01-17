@@ -3,6 +3,11 @@ async function vote(first) {
         return
     }
 
+    //Костыльный фикс на костыльные какие-то popup которые грузятся костыльно
+    if (document.querySelector('.site-body > script')?.nextElementSibling.tagName === 'SCRIPT') {
+        await wait(5000)
+    }
+
     if (document.querySelector('.ct-popup-content')) {
         const message = document.querySelector('.ct-popup-content').innerText
         if (message.length > 10) {
@@ -39,7 +44,7 @@ async function vote(first) {
     }
 
     //Костыль, reCAPTCHA загружается только после scroll, странно, да?
-    document.querySelector('#username').scrollIntoView()
+    document.querySelector('#username').scrollIntoView({block: 'center'})
     window.scrollTo(window.scrollX, window.scrollY + 16)
     document.dispatchEvent(new Event('scroll'))
 
