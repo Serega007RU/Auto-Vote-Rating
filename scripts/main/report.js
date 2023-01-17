@@ -10,7 +10,7 @@ async function generateReport(request, sender, sendResponse) {
         if (node) {
             if (node.nodeName) {
                 const nodeName = node.nodeName.toLowerCase()
-                if (nodeName === '#comment') {
+                if (nodeName.includes('video') || nodeName === '#comment') {
                     return false
                 }
             }
