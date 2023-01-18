@@ -1,6 +1,6 @@
 async function vote(first) {
     if (first === false) return
-    if (document.querySelector('div.alert-success')?.textContent.includes('succesfully voted')) {
+    if (document.querySelector('div.alert-success')?.textContent.includes('succesfully voted') || document.querySelector('div.alert-success')?.textContent.includes('successfully voted')) {
         chrome.runtime.sendMessage({successfully: true})
     } else if (document.querySelector('div.alert-warning') != null && (document.querySelector('div.alert-warning').textContent.includes('You can only vote once') || document.querySelector('div.alert-warning').textContent.includes('already voted'))) {
         chrome.runtime.sendMessage({later: Date.now() + 43200000})
