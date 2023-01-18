@@ -5,7 +5,11 @@ async function vote(first) {
 
     //Костыльный фикс на костыльные какие-то popup которые грузятся костыльно
     if (document.querySelector('.site-body > script')?.nextElementSibling.tagName === 'SCRIPT') {
-        await wait(5000)
+        const script = document.querySelector('.site-body > script')?.nextElementSibling.textContent.toLowerCase()
+        if (script.includes('popupvoted();') && script.includes('you voted') && script.includes('thank you')) {
+            chrome.runtime.sendMessage({successfully: true})
+            return
+        }
     }
 
     if (document.querySelector('.ct-popup-content')) {
