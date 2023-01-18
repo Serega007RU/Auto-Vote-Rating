@@ -23,7 +23,7 @@ async function silentVoteMonitoringMinecraft(project) {
 
         if (response.doc.querySelector('body') != null && response.doc.querySelector('body').textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
             if (i >= 3) {
-                endVote({message: chrome.i18n.getMessage('errorAttemptVote') + response.doc.querySelector('body').textContent, html: response.doc.body.outerHTML}, null, project)
+                endVote({message: chrome.i18n.getMessage('errorAttemptVote') + response.doc.querySelector('body').textContent, html: response.doc.body.outerHTML, url: response.url}, null, project)
                 return
             }
             await wait(5000)
@@ -41,7 +41,7 @@ async function silentVoteMonitoringMinecraft(project) {
         }
         if (response.doc.querySelector('input[name=player]') != null) {
             if (i >= 3) {
-                endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(response.doc.querySelector('input[name=player]'))), html: response.doc.body.outerHTML}, null, project)
+                endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(response.doc.querySelector('input[name=player]'))), html: response.doc.body.outerHTML, url: response.url}, null, project)
                 return
             }
             await wait(5000)

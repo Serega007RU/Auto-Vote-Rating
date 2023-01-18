@@ -409,7 +409,8 @@ async function silentVote(project) {
             const request = {}
             request.errorVoteNoElement = message
             if (silentResponseBody[project.rating]) {
-                request.html = silentResponseBody[project.rating].body.outerHTML
+                request.html = silentResponseBody[project.rating].doc.body.outerHTML
+                request.url = silentResponseBody[project.rating].url
             }
             endVote(request, null, project)
         }
@@ -428,7 +429,9 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     response.html = await response.text()
     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
-    silentResponseBody[project.rating] = response.doc
+    silentResponseBody[project.rating] = {}
+    silentResponseBody[project.rating].doc = response.doc
+    silentResponseBody[project.rating].url = response.url
     if (vk && host.includes('vk.com')) {
         //Узнаём причину почему мы зависли на авторизации ВК
         let text
@@ -1260,7 +1263,8 @@ async function sendReport(request, sender, tabDetails, project, reported) {
     message3.event_id = uuidv4()
     message3.platform = 'javascript'
     message3.timestamp = date.getTime() / 1000
-    message3.environment = 'Auto-Vote-Rating@' + chrome.runtime.getManifest().version
+    message3.environment = 'production'
+    message3.release = 'Auto-Vote-Rating@' + chrome.runtime.getManifest().version
     message3.extra = {}
     if (detailsError) message3.extra.detailsError = detailsError
     message3.extra.project = project
@@ -1268,6 +1272,8 @@ async function sendReport(request, sender, tabDetails, project, reported) {
     message3.request = {headers: {'User-Agent': self.navigator.userAgent}}
     if (sender?.url) {
         message3.request.url = sender.url
+    } else if (request.url) {
+        message3.request.url = request.url
     } else {
         message3.request.url = 'chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd/background.js'
     }
