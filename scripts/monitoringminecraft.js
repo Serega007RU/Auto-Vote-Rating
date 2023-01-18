@@ -19,7 +19,7 @@ async function vote(first) {
         } else if (request.message.includes('Вы успешно проголосовали!')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
-            if (request.message.includes('Ошибка подключения VK')) {
+            if (request.message.includes('Ошибка подключения VK') || request.message.includes('Неправильное имя игрока')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)

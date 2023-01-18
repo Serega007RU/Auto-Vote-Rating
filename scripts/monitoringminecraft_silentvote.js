@@ -30,7 +30,13 @@ async function silentVoteMonitoringMinecraft(project) {
             continue
         }
         if (response.doc.querySelector('form[method="POST"]') != null && response.doc.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
-            endVote({message: response.doc.querySelector('form[method="POST"]').textContent.trim(), html: response.doc.body.outerHTML}, null, project)
+            const request = {}
+            request.message = response.doc.querySelector('form[method="POST"]').textContent.trim()
+            request.html = response.doc.body.outerHTML
+            if (request.message.includes('Ошибка подключения VK') || request.message.includes('Неправильное имя игрока')) {
+                request.ignoreReport = true
+            }
+            endVote(request, null, project)
             return
         }
         if (response.doc.querySelector('input[name=player]') != null) {
@@ -51,7 +57,7 @@ async function silentVoteMonitoringMinecraft(project) {
             endVote({successfully: true}, null, project)
             return
         } else {
-            if (request.message.includes('Ошибка подключения VK')) {
+            if (request.message.includes('Ошибка подключения VK') || request.message.includes('Неправильное имя игрока')) {
                 request.ignoreReport = true
             }
             request.html = response.doc.body.outerHTML
