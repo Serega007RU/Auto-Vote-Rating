@@ -19,6 +19,16 @@ async function vote() {
         return
     }
 
+    if (document.querySelector('div.general > .card > div.card-body h1')) {
+        const request = {}
+        request.message = document.querySelector('div.general > .card > div.card-body').innerText
+        if (request.message.includes('Страница не найдена')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     const btn = document.querySelector('#main .card-body .btn.btn-blue')
     if (btn) {
         if (!isVisible(btn)) {
@@ -90,6 +100,8 @@ const timer = setInterval(async ()=>{
             } else if (message.includes('Голос принят')) {
                 await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({successfully: true})
+            } else if (message.includes('Авторизация')) {
+                chrome.runtime.sendMessage({auth: true})
             } else {
                 await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({message})
