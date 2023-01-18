@@ -25,16 +25,20 @@ async function vote(first) {
 
     for (const el of document.querySelectorAll('div.alert.alert-danger')) {
         if (el.querySelector('center > strong')) continue
-        const message = el.textContent.trim()
-        if (message.includes('need to accept our Privacy Policy')) continue
-        if (message.includes('already voted') || message.includes('have reached your daily vote limit')) {
+        const request = {}
+        request.message = el.textContent.trim()
+        if (request.message.includes('need to accept our Privacy Policy')) continue
+        if (request.message.includes('already voted') || request.message.includes('have reached your daily vote limit')) {
             chrome.runtime.sendMessage({later: true})
             return
         }
-        if (message.toLowerCase().includes('captcha')) {
+        if (request.message.toLowerCase().includes('captcha')) {
             if (first) chrome.runtime.sendMessage({captcha: true})
         } else {
-            chrome.runtime.sendMessage({message})
+            if (request.message.includes('username maximum length')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
             return
         }
     }
