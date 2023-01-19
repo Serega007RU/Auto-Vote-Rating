@@ -19,7 +19,12 @@ async function run() {
     try {
         //Если мы находимся на странице авторизации Steam
         if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
-            document.getElementById('imageLogin').click()
+            if (document.getElementById('imageLogin')) {
+                document.getElementById('imageLogin').click()
+            } else {
+                chrome.runtime.sendMessage({authSteam: true})
+                return
+            }
             const timer2 = setInterval(()=>{
                 try {
                     if (document.getElementById('error_display').style.display !== 'none') {
