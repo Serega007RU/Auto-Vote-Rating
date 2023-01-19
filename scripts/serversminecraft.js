@@ -15,7 +15,7 @@ async function vote(first) {
     if (document.querySelector('.ct-popup-content')) {
         const message = document.querySelector('.ct-popup-content').innerText
         if (message.length > 10) {
-            if (message.toLowerCase().includes('you voted') && message.toLowerCase().includes('thank you')) {
+            if ((message.toLowerCase().includes('you voted') && message.toLowerCase().includes('thank you')) || message.toLowerCase().includes('thanks for voting')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
                 chrome.runtime.sendMessage({message})
