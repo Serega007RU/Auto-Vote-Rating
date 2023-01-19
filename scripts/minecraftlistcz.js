@@ -1,3 +1,5 @@
+let reasonInvincible
+
 async function vote(first) {
     if (document.body.innerHTML.length === 0) {
         chrome.runtime.sendMessage({emptyError: true, ignoreReport: true})
@@ -42,7 +44,9 @@ async function vote(first) {
     document.querySelector('input[name="username"]').value = project.nick
     const gdpr = document.querySelector("div > form > div.row > div.col-lg-7 > div.vote__box__checkboxx > div:nth-child(1) > input")
     if (!gdpr || !isVisible(gdpr) || gdpr.getAttribute('style')) {
-        chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible. Protection from auto-voting? Inform the extension developer about this error!"})
+        if (!gdpr) reasonInvincible = 'is null'
+        if (gdpr.getAttribute('style')) reasonInvincible = 'style'
+        chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible, " + reasonInvincible + ". Protection from auto-voting? Inform the extension developer about this error!"})
         return
     } else {
         gdpr.checked = true
@@ -56,29 +60,53 @@ function isVisible(elem) {
     if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
     elem.scrollIntoView({block: 'center'})
     const style = getComputedStyle(elem)
-    if (style.display === 'none') return false
-    if (style.visibility !== 'visible') return false
-    if (style.opacity && style.opacity < 1) return false
+    if (style.display === 'none') {
+        reasonInvincible = '1'
+        return false
+    }
+    if (style.visibility !== 'visible') {
+        reasonInvincible = '2'
+        return false
+    }
+    if (style.opacity && style.opacity < 1) {
+        reasonInvincible = '3'
+        return false
+    }
 
-    if (elem.offsetHeight < 16 || elem.offsetWidth < 16) return false // 1 пиксель?
+    // 1 пиксель?
+    if (elem.offsetHeight < 16 || elem.offsetWidth < 16) {
+        reasonInvincible = '4'
+        return false
+    }
     // if (!getText(elem)) return false // Есть текст?
 
     if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
         elem.getBoundingClientRect().width === 0) {
+        reasonInvincible = '5'
         return false
     }
     const elemCenter   = {
         x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
         y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
     };
-    if (elemCenter.x < 0) return false
-    if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false
+    if (elemCenter.x < 0) {
+        reasonInvincible = '6'
+        return false
+    }
+    if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) {
+        reasonInvincible = '7'
+        return false
+    }
     // TODO если элемент вне видимости страницы то это плохо
     if (elemCenter.y < 0) return true
-    if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return false
+    if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) {
+        reasonInvincible = '8'
+        return false
+    }
     let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
     do {
         if (pointContainer === elem) return true;
     } while (pointContainer = pointContainer.parentNode)
+    reasonInvincible = '9'
     return false
 }
