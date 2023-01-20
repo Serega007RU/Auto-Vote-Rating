@@ -31,8 +31,12 @@ async function vote(first) {
         if (request.message.includes('already voted') || request.message.includes('have reached your daily vote limit')) {
             chrome.runtime.sendMessage({later: true})
             return
-        }
-        if (request.message.toLowerCase().includes('captcha')) {
+        } else if (request.message.toLowerCase().includes('steam login')) {
+            if (first) {
+                chrome.runtime.sendMessage({auth: true})
+                return
+            }
+        } else if (request.message.toLowerCase().includes('captcha')) {
             if (first) chrome.runtime.sendMessage({captcha: true})
         } else {
             if (request.message.includes('username maximum length')) {
