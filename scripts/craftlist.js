@@ -32,6 +32,13 @@ async function vote(first) {
         })
         return
     }
+    if (document.querySelector('body #server-error')) {
+        chrome.runtime.sendMessage({
+            message: document.querySelector('body #server-error').innerText,
+            ignoreReport: true
+        })
+        return
+    }
     // Костыль
     if (document.location.pathname.split('/')[1] === 'cs' && !document.location.pathname.split('/')[2]) {
         const request = {}
