@@ -43,7 +43,7 @@ function runVote() {
                     chrome.runtime.sendMessage({captcha: true})
                     alreadySent = true
                 } else {
-                    if (request.message.includes('not a valid playername') || request.message.includes('could not connect to Votifier') || request.message.includes('verification expired due to timeout')) {
+                    if (request.message.toLowerCase().includes('not a valid playername') || request.message.includes('could not connect to Votifier') || request.message.includes('verification expired due to timeout')) {
                         request.ignoreReport = true
                     }
                     chrome.runtime.sendMessage(request)
