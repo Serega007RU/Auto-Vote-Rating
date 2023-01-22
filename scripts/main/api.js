@@ -148,7 +148,15 @@ async function run() {
             return
         }
 
-        if (document.querySelector('body > center > h1') && (document.querySelector('body > center:nth-child(3)')?.textContent.includes('cloudflare') || document.querySelector('body > center:nth-child(3)')?.textContent.includes('nginx'))) {
+        if (document.querySelector('body > center > h1') && (document.querySelector('body > center:last-of-type')?.textContent.includes('cloudflare') || document.querySelector('body > center:last-of-type')?.textContent.includes('nginx'))) {
+            const request = {}
+            request.message = document.body.innerText
+            request.ignoreReport = true
+            chrome.runtime.sendMessage(request)
+            return
+        }
+
+        if (document.querySelector('body > h1') && document.querySelector('body > address')?.textContent.toLowerCase().includes('apache')) {
             const request = {}
             request.message = document.body.innerText
             request.ignoreReport = true
