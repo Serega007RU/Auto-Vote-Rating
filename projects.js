@@ -502,7 +502,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.container li h1').textContent,
         exampleURL: () => ['https://serverlist101.com/server/', '1547', '/vote/'],
         URL: () => 'serverlist101.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        alertManualCaptcha: () => true
     },
     MCServerList: {
         voteURL: (project) => 'https://mcserver-list.eu/hlasovat/' + project.id,

@@ -7,16 +7,28 @@ async function vote(first) {
         chrome.runtime.sendMessage({later: true})
         return
     }
-    if (document.querySelector('div.nk-info-box.text-danger.nk-info-box-noicon') != null) {
-        chrome.runtime.sendMessage({message: document.querySelector('div.nk-info-box.text-danger.nk-info-box-noicon').textContent})
-        return
+    if (document.querySelector('div.nk-info-box.text-danger.nk-info-box-noicon')) {
+        const request = {}
+        request.message = document.querySelector('div.nk-info-box.text-danger.nk-info-box-noicon').textContent
+        if (request.message.toLowerCase().includes('captcha')) {
+            // None
+        } else {
+            chrome.runtime.sendMessage(request)
+            return
+        }
     }
 
-    if (first) return
-
-    if (document.querySelector('form[method="POST"] > input[name="username"]') != null) {
-        const project = await getProject('ServerList101')
+    const project = await getProject('ServerList101')
+    if (document.querySelector('form[method="POST"] > input[name="username"]')) {
         document.querySelector('form[method="POST"] > input[name="username"]').value = project.nick
     }
-    document.querySelector('form[method="POST"] > input[type="submit"]').click()
+    chrome.runtime.sendMessage({captcha: true})
+
+    // if (first) return
+    //
+    // if (document.querySelector('form[method="POST"] > input[name="username"]')) {
+    //     const project = await getProject('ServerList101')
+    //     document.querySelector('form[method="POST"] > input[name="username"]').value = project.nick
+    // }
+    // document.querySelector('form[method="POST"] > input[type="submit"]').click()
 }
