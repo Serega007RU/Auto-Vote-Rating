@@ -22,7 +22,7 @@ async function vote(first) {
                 'x-requested-with': 'XMLHttpRequest'
             },
             'referrerPolicy': 'no-referrer-when-downgrade',
-            'body': 'action=qaptcha&qaptcha_key=' + document.querySelector('div.QapTcha > input[type=hidden]').name,
+            'body': 'action=qaptcha&qaptcha_key=' + document.querySelector('div.QapTcha > input[type=hidden]:last-of-type').name,
             'method': 'POST',
             'mode': 'cors',
             'credentials': 'include'
