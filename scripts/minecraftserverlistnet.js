@@ -11,8 +11,12 @@ async function vote(first) {
         if (request.message.includes('Server existiert nicht')) {
             request.ignoreReport = true
         }
-        chrome.runtime.sendMessage(request)
-        return
+        if (request.message.toLowerCase().includes('captcha')) {
+            // None
+        } else {
+            chrome.runtime.sendMessage(request)
+            return
+        }
     }
     if (document.querySelector('div.alert.alert-success') != null) {
         chrome.runtime.sendMessage({successfully: true})
