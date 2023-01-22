@@ -46,6 +46,10 @@ async function run() {
             }, 1000)
             return
         }
+        if (document.URL.startsWith('https://steamcommunity.com/login/home')) {
+            chrome.runtime.sendMessage({authSteam: true})
+            return
+        }
 
         //Если мы находися на странице авторизации ВКонтакте
         if (document.URL.match(/vk.com\/*/)) {
