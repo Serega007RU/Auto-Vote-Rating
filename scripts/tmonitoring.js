@@ -26,7 +26,7 @@ const timer = setInterval(()=>{
                 chrome.runtime.sendMessage({later: Date.now() + milliseconds})
                 clearInterval(timer)
             } else {
-                if (!message.includes('капча')) {
+                if (!message.toLowerCase().includes('капча')) {
                     chrome.runtime.sendMessage({message})
                     clearInterval(timer)
                 }
