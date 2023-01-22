@@ -9,6 +9,7 @@ var allProjects = {
         exampleURL: () => ['https://topcraft.ru/servers/', '10496', '/'],
         URL: () => 'topcraft.ru',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 21}),
         needAdditionalOrigins: ()=> ['*://*.vk.com/*']
     },
     McTOP: {
@@ -18,6 +19,7 @@ var allProjects = {
         exampleURL: () => ['https://mctop.su/servers/', '5231', '/'],
         URL: () => 'mctop.su',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 21}),
         needAdditionalOrigins: ()=> ['*://*.vk.com/*']
     },
     MCRate: {
@@ -27,6 +29,7 @@ var allProjects = {
         exampleURL: () => ['http://mcrate.su/rate/', '4396', ''],
         URL: () => 'mcrate.su',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 22}),
         oneProject: () => 1,
         notFound: (doc) => doc.querySelector('div[class=error]') != null && doc.querySelector('div[class=error]').textContent.includes('Проект с таким ID не найден'),
         needAdditionalOrigins: ()=> ['*://*.vk.com/*']
@@ -38,6 +41,7 @@ var allProjects = {
         exampleURL: () => ['https://minecraftrating.ru/projects/', 'cubixworld', '/'],
         URL: () => 'minecraftrating.ru',
         parseURL: (url) => ({game: url.pathname.split('/')[1] === 'projects' ? 'projects': 'servers', id: url.pathname.split('/')[2]}),
+        timeout: (project) => project.game === 'projects' ? ({hour: 21}) : ({hours: 24}),
         exampleURLGame: () => ['https://minecraftrating.ru/', 'projects', '/mcskill/'],
         defaultGame: () => 'projects',
         gameList: () => new Map([
@@ -54,6 +58,7 @@ var allProjects = {
         exampleURL: () => ['https://monitoringminecraft.ru/top/', 'gg', '/vote'],
         URL: () => 'monitoringminecraft.ru',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 21}),
         silentVote: () => true,
         notRequiredCaptcha: () => true,
         needAdditionalOrigins: () => ['*://*.vk.com/*'],
@@ -65,7 +70,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('#app h1.header').innerText.replace('Голосование за проект ', ''),
         exampleURL: () => ['https://ionmc.top/projects/', '80', '/vote'],
         URL: () => 'ionmc.top',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 21})
     },
     MinecraftServersOrg: {
         voteURL: (project) => 'https://minecraftservers.org/vote/' + project.id,
@@ -74,6 +80,7 @@ var allProjects = {
         exampleURL: () => ['https://minecraftservers.org/vote/', '25531', ''],
         URL: () => 'minecraftservers.org',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 0}),
         oneProject: () => 1
     },
     ServeurPrive: {
@@ -96,6 +103,7 @@ var allProjects = {
             }
             return project
         },
+        timeout: () => ({hours: 1, minutes: 30}),
         limitedCountVote: () => true,
         exampleURLGame: () => ['https://serveur-prive.net/', 'minecraft', '/gommehd-net-4932'],
         defaultGame: () => 'minecraft',
@@ -122,7 +130,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('#resource-title-text').textContent,
         exampleURL: () => ['https://www.planetminecraft.com/server/', 'legends-evolved', '/vote/'],
         URL: () => 'planetminecraft.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 5})
     },
     TopG: {
         voteURL: (project) => 'https://topg.org/' + project.game + '/server-' + project.id,
@@ -131,6 +140,7 @@ var allProjects = {
         exampleURL: () => ['https://topg.org/minecraft-servers/server-', '405637', ''],
         URL: () => 'topg.org',
         parseURL: (url) => ({ game: url.pathname.split('/')[1], id: url.pathname.split('/')[2].replace('server-', '')}),
+        timeout: () => ({hours: 12}),
         exampleURLGame: () => ['https://topg.org/', 'minecraft-servers', '/server-405637'],
         gameList: () => new Map([
             ['minecraft-servers', 'Minecraft'],
@@ -162,6 +172,7 @@ var allProjects = {
             }
             return project
         },
+        timeout: () => ({hour: 5}),
         notFound: (doc) => {
             for (const el of doc.querySelectorAll('div.alert.alert-info')) {
                 if (el.textContent.includes('server has been removed')) {
@@ -221,7 +232,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.server-heading > a').textContent,
         exampleURL: () => ['https://minecraft-server-list.com/server/', '292028', '/vote/'],
         URL: () => 'minecraft-server-list.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 23})
     },
     ServerPact: {
         voteURL: (project) => 'https://www.serverpact.com/vote-' + project.id,
@@ -230,6 +242,7 @@ var allProjects = {
         exampleURL: () => ['https://www.serverpact.com/vote-', '26492123', ''],
         URL: () => 'serverpact.com',
         parseURL: (url) => ({id: url.pathname.split('/')[1].replace('vote-', '')}),
+        timeout: () => ({hours: 11, minutes: 7}),
         oneProject: () => 1,
         notFound: (doc) => doc.querySelector('div.container > div.row > div > center') != null && doc.querySelector('div.container > div.row > div > center').textContent.includes('This server does not exist'),
         silentVote: () => true,
@@ -250,7 +263,8 @@ var allProjects = {
                 project.id = url.searchParams.get('listingID')
             }
             return project
-        }
+        },
+        timeout: () => ({hours: 24})
     },
     TopMinecraftServers: {
         voteURL: (project) => 'https://topminecraftservers.org/vote/' + project.id,
@@ -258,7 +272,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('h1[property="name"]').textContent,
         exampleURL: () => ['https://topminecraftservers.org/vote/', '9126', ''],
         URL: () => 'topminecraftservers.org',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 4})
     },
     MinecraftServersBiz: {
         voteURL: (project) => 'https://minecraftservers.biz/' + project.id + '/',
@@ -266,7 +281,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.panel-heading strong').textContent.trim(),
         exampleURL: () => ['https://minecraftservers.biz/', 'purpleprison', '/#vote_now'],
         URL: () => 'minecraftservers.biz',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]})
+        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hours: 12})
     },
     HotMC: {
         voteURL: (project) => 'https://hotmc.ru/vote-' + project.id,
@@ -282,6 +298,7 @@ var allProjects = {
             project.id = project.id.replace('minecraft-server-', '')
             return project
         },
+        timeout: () => ({hours: 24}),
         oneProject: () => 1
     },
     MinecraftServerNet: {
@@ -290,7 +307,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.card-header > h2').textContent,
         exampleURL: () => ['https://minecraft-server.net/vote/', 'TitanicFreak', '/'],
         URL: () => 'minecraft-server.net',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     TopGames: {
         voteURL: (project) => {
@@ -332,6 +350,7 @@ var allProjects = {
             }
             return project
         },
+        timeout: () => ({hours: 2}),
         limitedCountVote: () => true,
         exampleURLGame: () => ['https://top-serveurs.net/', 'minecraft', '/hailcraft'],
         defaultGame: () => 'minecraft',
@@ -365,7 +384,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div[class="info clearfix"] > div.pull-left > h1').textContent,
         exampleURL: () => ['https://tmonitoring.com/server/', 'qoobworldru', ''],
         URL: () => 'tmonitoring.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     TopGG: {
         voteURL: (project) => 'https://top.gg/' + project.game + '/' + project.id + '/vote' + project.addition,
@@ -391,6 +411,7 @@ var allProjects = {
             }
             return project
         },
+        timeout: () => ({hours: 12}),
         exampleURLGame: () => ['https://top.gg/', 'bot', '/270904126974590976/vote'],
         defaultGame: () => 'bot',
         gameList: () => new Map([
@@ -408,6 +429,7 @@ var allProjects = {
         exampleURL: () => ['https://discordbotlist.com/bots/', 'dank-memer', '/upvote'],
         URL: () => 'discordbotlist.com',
         parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 12}),
         notRequiredNick: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
@@ -418,6 +440,7 @@ var allProjects = {
         exampleURL: () => ['https://discords.com/bots/bot/', '469610550159212554', '/vote'],
         URL: () => 'discords.com',
         parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
+        timeout: (project) => project.game === 'bots/bot' ? ({hours: 12}) : ({hours: 6}),
         notRequiredNick: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
@@ -452,6 +475,7 @@ var allProjects = {
             }
             return project
         },
+        timeout: () => ({hour: 20}),
         oneProject: () => 1,
         ordinalWorld: () => true,
         exampleURLGame: () => ['https://', 'pw', '.mmotop.ru/servers/25895/votes/new'],
@@ -477,7 +501,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.main-panel h1').textContent,
         exampleURL: () => ['https://mc-servers.com/server/', '1890', '/'],
         URL: () => 'mc-servers.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     MinecraftList: {
         voteURL: (project) => 'https://minecraftlist.org/vote/' + project.id,
@@ -485,7 +510,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.container h1').textContent.trim().replace('Minecraft Server', ''),
         exampleURL: () => ['https://minecraftlist.org/vote/', '11227', ''],
         URL: () => 'minecraftlist.org',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 5})
     },
     MinecraftIndex: {
         voteURL: (project) => 'https://www.minecraft-index.com/' + project.id + '/vote',
@@ -494,6 +520,7 @@ var allProjects = {
         exampleURL: () => ['https://www.minecraft-index.com/', '33621-extremecraft-net', '/vote'],
         URL: () => 'minecraft-index.com',
         parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hour: 0}),
         alertManualCaptcha: () => true
     },
     ServerList101: {
@@ -503,6 +530,7 @@ var allProjects = {
         exampleURL: () => ['https://serverlist101.com/server/', '1547', '/vote/'],
         URL: () => 'serverlist101.com',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 23}),
         alertManualCaptcha: () => true
     },
     MCServerList: {
@@ -512,6 +540,7 @@ var allProjects = {
         exampleURL: () => ['https://mcserver-list.eu/hlasovat/', '416', ''],
         URL: () => 'mcserver-list.eu',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 2}),
         silentVote: () => true,
         limitedCountVote: () => true,
         notRequiredCaptcha: () => true
@@ -522,7 +551,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('main h1').textContent,
         exampleURL: () => ['https://craftlist.org/', 'basicland', ''],
         URL: () => 'craftlist.org',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]})
+        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hours: 24})
     },
     CzechCraft: {
         voteURL: (project) => 'https://czech-craft.eu/server/' + project.id + '/vote/',
@@ -531,6 +561,7 @@ var allProjects = {
         exampleURL: () => ['https://czech-craft.eu/server/', 'trenend', '/vote/'],
         URL: () => 'czech-craft.eu',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 2}),
         limitedCountVote: () => true
     },
     MinecraftBuzz: {
@@ -539,7 +570,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('#vote-line').previousElementSibling.textContent.trim(),
         exampleURL: () => ['https://minecraft.buzz/vote/', '306', ''],
         URL: () => 'minecraft.buzz',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 0})
     },
     MinecraftServery: {
         voteURL: (project) => 'https://minecraftservery.eu/server/' + project.id,
@@ -548,6 +580,7 @@ var allProjects = {
         exampleURL: () => ['https://minecraftservery.eu/server/', '105', ''],
         URL: () => 'minecraftservery.eu',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 2}),
         limitedCountVote: () => true
     },
     RPGParadize: {
@@ -574,7 +607,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('a.server-name').textContent.trim(),
         exampleURL: () => ['https://www.minecraft-serverlist.net/vote/', '51076', ''],
         URL: () => 'minecraft-serverlist.net',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 23})
     },
     MinecraftServerEu: {
         voteURL: (project) => 'https://minecraft-server.eu/vote/index/' + project.id,
@@ -582,7 +616,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.serverName').textContent,
         exampleURL: () => ['https://minecraft-server.eu/vote/index/', '1A73C', ''],
         URL: () => 'minecraft-server.eu',
-        parseURL: (url) => ({id: url.pathname.split('/')[3]})
+        parseURL: (url) => ({id: url.pathname.split('/')[3]}),
+        timeout: () => ({hour: 23})
     },
     MinecraftKrant: {
         voteURL: (project) => 'https://www.minecraftkrant.nl/serverlijst/' + project.id,
@@ -606,7 +641,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.header > div.ui.container').textContent.trim(),
         exampleURL: () => ['https://mc-lists.org/', 'server-luxurycraft.1818', '/vote'],
         URL: () => 'mc-lists.org',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]})
+        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hours: 12})
     },
     TopMCServersCom: {
         voteURL: (project) => 'https://topmcservers.com/server/' + project.id + '/vote',
@@ -614,7 +650,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('#serverPage h1.header').textContent,
         exampleURL: () => ['https://topmcservers.com/server/', '17', '/vote'],
         URL: () => 'topmcservers.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     BestServersCom: {
         voteURL: (project) => 'https://bestservers.com/server/' + project.id + '/vote',
@@ -631,7 +668,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.serverpage-navigation-headername.header').firstChild.textContent.trim(),
         exampleURL: () => ['https://craft-list.net/minecraft-server/', 'Advancius-Network', '/vote'],
         URL: () => 'craft-list.net',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     MinecraftServersListOrg: {
         voteURL: (project) => 'https://www.minecraft-servers-list.org/index.php?a=in&u=' + project.id,
@@ -745,6 +783,7 @@ var allProjects = {
         exampleURL: () => ['https://wargm.ru/server/', '23394', '/votes'],
         URL: () => 'wargm.ru',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 16}),
         needIsTrusted: () => true,
         notRequiredNick: () => true,
         banAttention: () => true,
@@ -757,7 +796,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('h1.section-title').textContent.trim(),
         exampleURL: () => ['https://minestatus.net/server/vote/', 'mine.sylphmc.com', ''],
         URL: () => 'minestatus.net',
-        parseURL: (url) => ({id: url.pathname.split('/')[2] === 'vote' ? url.pathname.split('/')[3] : url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2] === 'vote' ? url.pathname.split('/')[3] : url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     MisterLauncher: {
         voteURL: (project) => {
@@ -775,6 +815,7 @@ var allProjects = {
         exampleURL: () => ['https://misterlauncher.org/projects/', 'omegamc', '/'],
         URL: () => 'misterlauncher.org',
         parseURL: (url) => ({game: url.pathname.split('/')[1] === 'projects' ? 'projects' : 'servers', id: url.pathname.split('/')[2]}),
+        timeout: (project) => project.game === 'projects' ? ({hour: 21}) : ({hours: 24}),
         exampleURLGame: () => ['https://misterlauncher.org/', 'projects', '/omegamc/'],
         defaultGame: () => 'projects',
         gameList: () => new Map([
@@ -792,7 +833,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.container h1').textContent,
         exampleURL: () => ['https://minecraft-servers.de/server/', 'twerion', '/vote'],
         URL: () => 'minecraft-servers.de',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     DiscordBoats: {
         voteURL: (project) => 'https://discord.boats/bot/' + project.id + '/vote',
@@ -801,6 +843,7 @@ var allProjects = {
         exampleURL: () => ['https://discord.boats/bot/', '557628352828014614', '/vote'],
         URL: () => 'discord.boats',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 12}),
         notRequiredNick: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
@@ -810,7 +853,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.card-title-server h5').textContent,
         exampleURL: () => ['https://serverlist.games/vote/', '2052', ''],
         URL: () => 'serverlist.games',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 20})
     },
     BestMinecraftServers: {
         voteURL: (project) => 'https://best-minecraft-servers.co/' + project.id + '/vote',
@@ -826,7 +870,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.page-header').textContent.trim().replace('Vote for ', ''),
         exampleURL: () => ['https://minecraftservers100.com/vote/', '2340', ''],
         URL: () => 'minecraftservers100.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     MCServerListCZ: {
         voteURL: (project) => 'https://mc-serverlist.cz/' + project.id + '/vote',
@@ -843,6 +888,7 @@ var allProjects = {
         exampleURL: () => ['https://mineservers.com/server/', 'jvvHdPJy', '/vote'],
         URL: () => 'mineservers.com',
         parseURL: (url) => ({game: url.hostname, id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 0}),
         exampleURLGame: () => ['https://', 'mineservers.com', '/server/2zQ6UmWN/vote'],
         defaultGame: () => 'mineservers.com',
         gameList: () => new Map([
@@ -860,7 +906,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('ol li:nth-child(3)').textContent.trim(),
         exampleURL: () => ['https://atlauncher.com/servers/server/', 'KineticNetworkSkyfactory4', '/vote'],
         URL: () => 'atlauncher.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[3]})
+        parseURL: (url) => ({id: url.pathname.split('/')[3]}),
+        timeout: () => ({hours: 24})
     },
     ServersMinecraft: {
         voteURL: (project) => 'https://servers-minecraft.net/' + project.id + '/vote',
@@ -877,6 +924,7 @@ var allProjects = {
         exampleURL: () => ['https://www.minecraft-list.cz/server/', 'czech-survival', '/vote'],
         URL: () => 'minecraft-list.cz',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 2}),
         limitedCountVote: () => true
     },
     ListeServeursMinecraft: {
@@ -900,6 +948,7 @@ var allProjects = {
             }
             return project
         },
+        timeout: () => ({hours: 3}),
         notFound: (doc) => doc.querySelector('#core_middle_column div.panel-body') != null && doc.querySelector('#core_middle_column div.panel-body').textContent.includes('serveur est introuvable'),
         limitedCountVote: () => true
     },
@@ -910,6 +959,7 @@ var allProjects = {
         exampleURL: () => ['https://mcservidores.com/servidor/', '122', ''],
         URL: () => 'mcservidores.com',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24}),
         oneProject: () => 1
     },
     XtremeTop100: {
@@ -936,7 +986,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.server.icon').parentElement.innerText.trim(),
         exampleURL: () => ['https://minecraft-server.sk/', 'server-luoend.52', '/vote'],
         URL: () => 'minecraft-server.sk',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     ServeursMinecraftOrg: {
         voteURL: (project) => 'https://www.serveursminecraft.org/serveur/' + project.id + '/',
@@ -944,7 +995,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.panel-heading b').textContent,
         exampleURL: () => ['https://www.serveursminecraft.org/serveur/', '1017', '/'],
         URL: () => 'serveursminecraft.org',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     ServeursMCNet: {
         voteURL: (project) => 'https://serveurs-mc.net/serveur/' + project.id + '/voter',
@@ -953,6 +1005,7 @@ var allProjects = {
         exampleURL: () => ['https://serveurs-mc.net/serveur/', '82', '/voter'],
         URL: () => 'serveurs-mc.net',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 2}),
         limitedCountVote: () => true
     },
     ServeursMinecraftCom: {
@@ -962,6 +1015,7 @@ var allProjects = {
         exampleURL: () => ['https://serveur-minecraft.com/', '2908', ''],
         URL: () => 'serveur-minecraft.com',
         parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hours: 3}),
         limitedCountVote: () => true
     },
     ServeurMinecraftVoteFr: {
@@ -971,6 +1025,7 @@ var allProjects = {
         exampleURL: () => ['https://serveur-minecraft-vote.fr/serveurs/', 'ectalia.425', '/vote'],
         URL: () => 'serveur-minecraft-vote.fr',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 1, minutes: 30}),
         limitedCountVote: () => true
     },
     MineBrowseCom: {
@@ -1101,7 +1156,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.server.icon').parentElement.innerText.trim(),
         exampleURL: () => ['https://mcservertime.com/', 'server-blastmc-asia.1399', '/vote'],
         URL: () => 'mcservertime.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]})
+        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hours: 12})
     },
     ListeServeursFr: {
         voteURL: (project) => 'https://www.liste-serveurs.fr/' + project.id + '/vote',
@@ -1110,6 +1166,7 @@ var allProjects = {
         exampleURL: () => ['https://www.liste-serveurs.fr/', 'server-pixel-prime-serveur-pixelmon.512', '/vote'],
         URL: () => 'liste-serveurs.fr',
         parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hours: 3}),
         limitedCountVote: () => true
     },
     ServeurMinecraftFr: {
