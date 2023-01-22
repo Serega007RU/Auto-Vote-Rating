@@ -6,8 +6,8 @@ async function vote(/*first*/) {
 
 const timer = setInterval(()=> {
     try {
-        const message = document.querySelector('.toast-container').textContent
-        if (message.length > 0) {
+        const message = document.querySelector('.toast-container')?.textContent
+        if (message?.length > 0) {
             if (message.includes('devez attendre')) {
                 const numbers = message.match(/\d+/g).map(Number)
                 let milliseconds
