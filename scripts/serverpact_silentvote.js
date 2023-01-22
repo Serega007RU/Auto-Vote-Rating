@@ -50,7 +50,7 @@ async function silentVoteServerPact(project) {
     })
     let json = captcha.json()
     if (json.error) {
-        endVote({message: 'Error in captcha', html: JSON.stringify(json)}, null, project)
+        endVote({message: 'Error in captcha', html: JSON.stringify(json), url: response.url}, null, project)
         return
     }
 
@@ -74,13 +74,13 @@ async function silentVoteServerPact(project) {
         'credentials': 'include'
     })
     if (!await checkResponseError(project, response, 'serverpact.com')) return
-    if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
+    if (response.doc.querySelector('div.alert-success')?.textContent.includes('succesfully voted') || response.doc.querySelector('div.alert-success')?.textContent.includes('successfully voted')) {
         endVote({successfully: true}, null, project)
-    } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null && (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('You can only vote once') || response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('already voted'))) {
+    } else if (response.doc.querySelector('div.alert-warning') && (response.doc.querySelector('div.alert.alert-warning').textContent.includes('You can only vote once') || response.doc.querySelector('div.alert.alert-warning').textContent.includes('already voted'))) {
         endVote({later: Date.now() + 43200000}, null, project)
-    } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null) {
-        endVote({message: response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.substring(0, response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.indexOf('\n')), html: response.doc.body.outerHTML}, null, project)
+    } else if (response.doc.querySelector('div.alert-warning')) {
+        endVote({message: response.doc.querySelector('div.alert-warning').textContent.substring(0, response.doc.querySelector('div.alert-warning').textContent.indexOf('\n')), html: response.doc.body.outerHTML, url: response.url}, null, project)
     } else {
-        endVote({emptyError: true, html: response.doc.body.outerHTML}, null, project)
+        endVote({emptyError: true, html: response.doc.body.outerHTML, url: response.url}, null, project)
     }
 }

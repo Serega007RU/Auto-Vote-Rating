@@ -19,7 +19,12 @@ async function run() {
     try {
         //Если мы находимся на странице авторизации Steam
         if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
-            document.getElementById('imageLogin').click()
+            if (document.getElementById('imageLogin')) {
+                document.getElementById('imageLogin').click()
+            } else {
+                chrome.runtime.sendMessage({authSteam: true})
+                return
+            }
             const timer2 = setInterval(()=>{
                 try {
                     if (document.getElementById('error_display').style.display !== 'none') {
@@ -39,6 +44,10 @@ async function run() {
                     clearInterval(timer2)
                 }
             }, 1000)
+            return
+        }
+        if (document.URL.startsWith('https://steamcommunity.com/login/home')) {
+            chrome.runtime.sendMessage({authSteam: true})
             return
         }
 
@@ -143,7 +152,15 @@ async function run() {
             return
         }
 
-        if (document.querySelector('body > center > h1') && (document.querySelector('body > center:nth-child(3)')?.textContent.includes('cloudflare') || document.querySelector('body > center:nth-child(3)')?.textContent.includes('nginx'))) {
+        if (document.querySelector('body > center > h1') && (document.querySelector('body > center:last-of-type')?.textContent.includes('cloudflare') || document.querySelector('body > center:last-of-type')?.textContent.includes('nginx'))) {
+            const request = {}
+            request.message = document.body.innerText
+            request.ignoreReport = true
+            chrome.runtime.sendMessage(request)
+            return
+        }
+
+        if (document.querySelector('body > h1') && document.querySelector('body > address')?.textContent.toLowerCase().includes('apache')) {
             const request = {}
             request.message = document.body.innerText
             request.ignoreReport = true

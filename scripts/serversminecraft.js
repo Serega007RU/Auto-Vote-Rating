@@ -3,10 +3,19 @@ async function vote(first) {
         return
     }
 
+    //Костыльный фикс на костыльные какие-то popup которые грузятся костыльно
+    if (document.querySelector('.site-body > script')?.nextElementSibling.tagName === 'SCRIPT') {
+        const script = document.querySelector('.site-body > script')?.nextElementSibling.textContent.toLowerCase()
+        if (script.includes('popupvoted();') && script.includes('you voted') && script.includes('thank you')) {
+            chrome.runtime.sendMessage({successfully: true})
+            return
+        }
+    }
+
     if (document.querySelector('.ct-popup-content')) {
         const message = document.querySelector('.ct-popup-content').innerText
         if (message.length > 10) {
-            if (message.toLowerCase().includes('you voted') && message.toLowerCase().includes('thank you')) {
+            if ((message.toLowerCase().includes('you voted') && message.toLowerCase().includes('thank you')) || message.toLowerCase().includes('thanks for voting')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
                 chrome.runtime.sendMessage({message})
@@ -39,7 +48,7 @@ async function vote(first) {
     }
 
     //Костыль, reCAPTCHA загружается только после scroll, странно, да?
-    document.querySelector('#username').scrollIntoView()
+    document.querySelector('#username').scrollIntoView({block: 'center'})
     window.scrollTo(window.scrollX, window.scrollY + 16)
     document.dispatchEvent(new Event('scroll'))
 

@@ -14,7 +14,7 @@ async function vote(first) {
         return
     }
 
-    if (document.querySelector('a[href="https://mmotop.ru/users/sign_in"]') || document.querySelector('a[href="/users/sign_in"]') || document.querySelector('form[action="/users/sign_in"]')) {
+    if (document.querySelector('a[href="https://mmotop.ru/users/sign_in"]') || document.querySelector('a[href="/users/sign_in"]') || document.querySelector('form[action="/users/sign_in"]') || document.querySelector('form#new_user')) {
         chrome.runtime.sendMessage({auth: true})
         return
     }
@@ -23,12 +23,24 @@ async function vote(first) {
         chrome.runtime.sendMessage({later: true})
         return
     }
-    if (document.querySelector('body > div.ui-pnotify') != null) {
-        if (document.querySelector('body > div.ui-pnotify').textContent.includes('Голос принят') || document.querySelector('body > div.ui-pnotify').textContent.includes('vote accepted')) {
+    if (document.querySelector('body > div.ui-pnotify')) {
+        const request = {}
+        request.message = document.querySelector('body > div.ui-pnotify').textContent
+        if (request.message.includes('Голос принят') || request.message.includes('vote accepted')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('body > div.ui-pnotify').textContent})
+            if (request.message.includes('Quaptcha check fail')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
         }
+        return
+    }
+    if (document.querySelector('body > h1[align="center"]') && document.body.innerText.trim().length < 200) {
+        chrome.runtime.sendMessage({
+            message: document.body.innerText.trim(),
+            ignoreReport: true
+        })
         return
     }
 

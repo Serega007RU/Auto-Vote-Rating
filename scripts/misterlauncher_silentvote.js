@@ -7,15 +7,15 @@ async function silentVoteMisterLauncher(project) {
         if (response.doc.querySelector('.container div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
             endVote({later: true}, null, project)
         } else {
-            endVote({message: response.doc.querySelector('.container div.alert.alert-danger').textContent, html: response.doc.body.outerHTML}, null, project)
+            endVote({message: response.doc.querySelector('.container div.alert.alert-danger').textContent, html: response.doc.body.outerHTML, url: response.url}, null, project)
         }
     } else if (response.doc.querySelector('.container div.alert.alert-success') != null) {
         if (response.doc.querySelector('.container div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
             endVote({successfully: true}, null, project)
         } else {
-            endVote({message: response.doc.querySelector('.container div.alert.alert-success').textContent, html: response.doc.body.outerHTML}, null, project)
+            endVote({message: response.doc.querySelector('.container div.alert.alert-success').textContent, html: response.doc.body.outerHTML, url: response.url}, null, project)
         }
     } else {
-        endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null', html: response.doc.body.outerHTML}, null, project)
+        endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null', html: response.doc.body.outerHTML, url: response.url}, null, project)
     }
 }

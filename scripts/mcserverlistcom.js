@@ -13,6 +13,12 @@ async function vote(/*first*/) {
             return
         }
     }
+    if (document.querySelector('body > div.container-fluid  div.jumbotron > div > h2')?.textContent === 'Sorry!') {
+        chrome.runtime.sendMessage({
+            message: document.querySelector('body > div.container-fluid  div.jumbotron > div').innerText,
+            ignoreReport: true
+        })
+    }
 
     const project = await getProject('MCServerListCom')
     document.querySelector('#mc_username').value = project.nick

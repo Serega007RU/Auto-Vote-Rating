@@ -25,6 +25,29 @@ async function vote(first) {
         }
         return
     }
+    if (document.querySelector('body #tracy-error')) {
+        chrome.runtime.sendMessage({
+            message: document.querySelector('body #tracy-error').innerText,
+            ignoreReport: true
+        })
+        return
+    }
+    if (document.querySelector('body #server-error')) {
+        chrome.runtime.sendMessage({
+            message: document.querySelector('body #server-error').innerText,
+            ignoreReport: true
+        })
+        return
+    }
+    // Костыль
+    if (document.location.pathname.split('/')[1] === 'cs' && !document.location.pathname.split('/')[2]) {
+        const request = {}
+        request.errorVoteNoElement = 'Redirected to server list'
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     const btnText = document.querySelector('a.btn-vote').textContent
     if (btnText.includes('possible vote')
         || btnText.includes('možný hlas')
