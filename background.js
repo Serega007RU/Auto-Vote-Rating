@@ -93,13 +93,19 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
 })
 
 async function reloadAllAlarms() {
-    await new Promise(resolve => chrome.alarms.clearAll(resolve))
+    await chrome.alarms.clearAll()
     let cursor = await db.transaction('projects').store.openCursor()
     const times = []
     while (cursor) {
         const project = cursor.value
         if (project.time != null && project.time > Date.now() && times.indexOf(project.time) === -1) {
-            chrome.alarms.create(String(cursor.key), {when: project.time})
+            let when = project.time
+            if (when - Date.now() < 65000) when = Date.now() + 65000
+            try {
+                chrome.alarms.create(String(cursor.key), {when})
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error)
+            }
             times.push(project.time)
         }
         // noinspection JSVoidFunctionReturnValueUsed
@@ -236,16 +242,24 @@ async function newWindow(project) {
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
-    let create = true
-    let alarms = await chrome.alarms.getAll()
-    for (const alarm of alarms) {
-        if (alarm.scheduledTime === project.nextAttempt) {
-            create = false
-            break
+    if (!settings.disabledRestartOnTimeout) {
+        let create = true
+        let alarms = await chrome.alarms.getAll()
+        for (const alarm of alarms) {
+            if (alarm.scheduledTime === project.nextAttempt) {
+                create = false
+                break
+            }
         }
-    }
-    if (create) {
-        chrome.alarms.create(String(project.key), {when: project.nextAttempt})
+        if (create) {
+            let when = project.nextAttempt
+            if (when - Date.now() < 65000) when = Date.now() + 65000
+            try {
+                await chrome.alarms.create('nextAttempt_' + project.key, {when})
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error)
+            }
+        }
     }
 
     let silentVoteMode = false
@@ -1167,18 +1181,25 @@ async function endVote(request, sender, project) {
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
-    await chrome.alarms.clear(String(project.key))
+    await chrome.alarms.clear('nextAttempt_' + project.key)
     if (project.time != null && project.time > Date.now()) {
         let create2 = true
+        let when = project.time
+        if (when - Date.now() < 65000) when = Date.now() + 65000
         const alarms = await chrome.alarms.getAll()
         for (const alarm of alarms) {
-            if (alarm.scheduledTime === project.time) {
+            // noinspection JSCheckFunctionSignatures
+            if (!isNaN(alarm.name) && alarm.scheduledTime === when) {
                 create2 = false
                 break
             }
         }
         if (create2) {
-            chrome.alarms.create(String(project.key), {when: project.time})
+            try {
+                await chrome.alarms.create(String(project.key), {when})
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error)
+            }
         }
     }
 
@@ -1207,8 +1228,12 @@ async function endVote(request, sender, project) {
 
     // TODO мы не можем быть уверены что setTimeout в Service Worker 100% отработает, поэтому мы на всякий случай создаём chrome.alarm
     let alarmTimeout = timeout
-    if (alarmTimeout < 60000) alarmTimeout = 60000
-    chrome.alarms.create('checkVote', {when: Date.now() + alarmTimeout})
+    if (alarmTimeout < 65000) alarmTimeout = 65000
+    try {
+        await chrome.alarms.create('checkVote', {when: Date.now() + alarmTimeout})
+    } catch (error) {
+        console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error)
+    }
 }
 
 
