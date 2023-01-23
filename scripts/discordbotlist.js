@@ -13,7 +13,7 @@ function vote(first) {
             }
 
             const vote = findElement('button', ['upvote'])
-            if (!vote.disabled) {
+            if (vote && !vote.disabled) {
                 clearInterval(timer1)
                 vote.click()
 
