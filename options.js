@@ -1,6 +1,9 @@
-//Где храним настройки
-// let storageArea = 'local'
 // noinspection ES6MissingAwait
+
+const initializeFunc = initializeConfig()
+
+let resolveLoad
+const loaded = new Promise(resolve => resolveLoad = resolve)
 
 let evil
 
@@ -170,7 +173,7 @@ let Timer = function(callback, delay) {
 }
 
 document.addEventListener('DOMContentLoaded', async()=>{
-    await initializeConfig()
+    await initializeFunc
 
     await restoreOptions(true)
 
@@ -195,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
 })
 
 window.addEventListener('load', async () => {
-    await waitInitialize()
+    await initializeFunc
     if (!settings.disabledUseRemoteCode) {
         if (!evil) { // noinspection JSUnresolvedVariable,JSUnresolvedFunction
             evil = evalCore.getEvalInstance(self)
@@ -213,7 +216,7 @@ window.addEventListener('load', async () => {
     if (settings.enableCustom) addCustom()
     document.getElementById('addedLoading').style.display = 'none'
     document.getElementById('notAddedAll').removeAttribute('style')
-    initialized3 = true
+    resolveLoad()
 })
 
 // Restores select box and checkbox state using the preferences
@@ -2202,9 +2205,9 @@ async function onMessage(request) {
     } else if (request.installed) {
         alert(chrome.i18n.getMessage('firstInstall'))
     } else if (request.openProject) {
-        await waitInitialize()
+        await initializeFunc
         document.getElementById('addedTab').click()
-        await waitInitialize3()
+        await loaded
         const project = await db.get('projects', request.openProject)
         await listSelect({currentTarget: document.querySelector('#' + project.rating + 'Button')}, project.rating)
         document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})

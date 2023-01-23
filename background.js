@@ -1,32 +1,16 @@
 // noinspection ES6MissingAwait
 
+const state = self.serviceWorker.state
+
 importScripts('libs/idb.umd.js')
 importScripts('projects.js')
 importScripts('main.js')
 
 // TODO отложенный importScripts пока не работают, подробнее https://bugs.chromium.org/p/chromium/issues/detail?id=1198822
-self.addEventListener('install', async () => {
+self.addEventListener('install', () => {
     importScripts('libs/linkedom.js')
     importScripts('libs/evalCore.umd.js')
     importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
-
-    // noinspection JSUndeclaredVariable
-    initialized2 = false
-
-    await waitInitialize1()
-
-    if (openedProjects.size > 0) {
-        for (const [key, value] of openedProjects) {
-            openedProjects.delete(key)
-            tryCloseTab(key, value, 0)
-        }
-        await db.put('other', openedProjects, 'openedProjects')
-    }
-
-    // noinspection JSUndeclaredVariable
-    initialized2 = true
-
-    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 })
 
 //Текущие fetch запросы
@@ -48,12 +32,12 @@ let silentResponseBody = {}
 
 //Инициализация настроек расширения
 // noinspection JSIgnoredPromiseFromCall
-initializeConfig(true)
+const initializeFunc = initializeConfig(true)
 
 //Проверка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
 
-    await waitInitialize()
+    await initializeFunc
 
     //Если нет интернета, то не голосуем
     if (!settings.disabledCheckInternet && !navigator.onLine) {
@@ -490,7 +474,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
 }
 
 chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
-    await waitInitialize()
+    await initializeFunc
     if (openedProjects.has(details.tabId)) {
         if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
             const project = await db.get('projects', openedProjects.get(details.tabId).key)
@@ -510,7 +494,7 @@ chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
 
 chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
     if (details.url === 'about:blank') return
-    await waitInitialize()
+    await initializeFunc
     let project = openedProjects.get(details.tabId)
     if (!project) return
     const files = []
@@ -566,7 +550,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
 chrome.webNavigation.onCompleted.addListener(async function(details) {
-    await waitInitialize()
+    await initializeFunc
     let project = openedProjects.get(details.tabId)
     if (!project) return
     if (details.frameId === 0) {
@@ -700,7 +684,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 })
 
 chrome.tabs.onRemoved.addListener(async function(tabId) {
-    await waitInitialize()
+    await initializeFunc
     let project = openedProjects.get(tabId)
     if (!project) return
     project = await db.get('projects', project.key)
@@ -709,7 +693,7 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
 
 // TODO к сожалению в manifest v3 не возможно узнать status code страницы, не знаю как это ещё сделать
 // chrome.webRequest.onCompleted.addListener(async function(details) {
-//     await waitInitialize()
+//     await initializeFunc
 //     let project = openedProjects.get(details.tabId)
 //     if (!project) return
 //     project = await db.get('projects', project.key)
@@ -724,7 +708,7 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
 // }, {urls: ['<all_urls>']})
 //
 // chrome.webRequest.onErrorOccurred.addListener(async function(details) {
-//     await waitInitialize()
+//     await initializeFunc
 //     // noinspection JSUnresolvedVariable
 //     if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
 //         let project = fetchProjects.get(details.requestId)
@@ -812,7 +796,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         return
     }
 
-    await waitInitialize()
+    await initializeFunc
 
     if (request === 'checkVote') {
         checkVote()
@@ -881,7 +865,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         request.projectRestart.time = null
         await db.put('projects', request.projectRestart, request.projectRestart.key)
         console.log(getProjectPrefix(request.projectRestart, true) + chrome.i18n.getMessage('projectRestarted'))
-        checkVote()
+        // checkVote()
         sendResponse('success')
         return
     }
@@ -1483,7 +1467,7 @@ async function updateValue(objStore, value) {
 }
 
 chrome.runtime.onInstalled.addListener(async function(details) {
-    await waitInitialize()
+    await initializeFunc
     if (details.reason === 'install') {
         await openOptionsPage()
         chrome.runtime.sendMessage({installed: true})

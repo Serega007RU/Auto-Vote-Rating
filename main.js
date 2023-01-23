@@ -14,10 +14,6 @@ let dbLogs
 //Текущие открытые вкладки расширением
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()
-//Полностью ли запущено расширение?
-let initialized = false
-let initialized2 = true
-let initialized3 = false
 
 self.addEventListener('error', (errorMsg, url, lineNumber) => {
     if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
@@ -101,55 +97,23 @@ async function initializeConfig(background, version) {
     todayStats = await db.get('other', 'todayStats')
     openedProjects = await db.get('other', 'openedProjects')
 
-    if (!background) {
-        initialized = true
-        initialized2 = true
-        return
-    }
+    if (!background) return
 
-    initialized = true
+    if (state !== 'activated') {
+        console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
+
+        if (openedProjects.size > 0) {
+            for (const [key, value] of openedProjects) {
+                openedProjects.delete(key)
+                // noinspection ES6MissingAwait
+                tryCloseTab(key, value, 0)
+            }
+            await db.put('other', openedProjects, 'openedProjects')
+        }
+    }
 
     // noinspection ES6MissingAwait
     checkVote()
-}
-
-async function waitInitialize() {
-    if (!initialized || !initialized2) {
-        await new Promise(resolve => {
-            const timer = setInterval(()=>{
-                if (initialized && initialized2) {
-                    clearInterval(timer)
-                    resolve()
-                }
-            }, 100)
-        })
-    }
-}
-
-async function waitInitialize1() {
-    if (!initialized) {
-        await new Promise(resolve => {
-            const timer = setInterval(()=>{
-                if (initialized) {
-                    clearInterval(timer)
-                    resolve()
-                }
-            }, 100)
-        })
-    }
-}
-
-async function waitInitialize3() {
-    if (!initialized3) {
-        await new Promise(resolve => {
-            const timer = setInterval(()=>{
-                if (initialized3) {
-                    clearInterval(timer)
-                    resolve()
-                }
-            }, 100)
-        })
-    }
 }
 
 async function upgrade(db, oldVersion, newVersion, transaction) {
