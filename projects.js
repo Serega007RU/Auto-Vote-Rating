@@ -496,8 +496,8 @@ var allProjects = {
         ])
     },
     MCServers: {
-        voteURL: (project) => 'https://mc-servers.com/vote/' + project.id + '/',
-        pageURL: (project) => 'https://mc-servers.com/server/' + project.id + '/',
+        voteURL: (project) => 'https://mc-servers.com/vote/' + project.id,
+        pageURL: (project) => 'https://mc-servers.com/server/' + project.id,
         projectName: (doc) => doc.querySelector('.main-panel h1').textContent,
         exampleURL: () => ['https://mc-servers.com/server/', '1890', '/'],
         URL: () => 'mc-servers.com',
