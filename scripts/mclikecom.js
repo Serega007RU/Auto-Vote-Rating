@@ -23,7 +23,7 @@ async function vote(first) {
     if (document.querySelector('#w1 > div.error-message > div')) {
         const message = document.querySelector('#w1 > div.error-message > div').textContent
         //Если вы уже голосовали
-        if (message.includes('Вы сможете повторно проголосовать') || message.includes('already voted')) {
+        if (message.includes('сможете повторно проголосовать') || message.includes('already voted') || message.includes('can re-vote')) {
             let leftTime = parseInt(message.match(/\d/g).join(''))
             leftTime = leftTime + 1
             leftTime = leftTime * 3600000
