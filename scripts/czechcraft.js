@@ -3,10 +3,10 @@ async function vote(first) {
         chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent.trim()})
         return
     }
-    if (document.querySelector('div.alert.alert-error')) {
+    if (document.querySelector('div.alert.alert-error:last-of-type')) {
         const request = {}
-        request.message = document.querySelector('div.alert.alert-error').textContent.trim()
-        if (request.message.includes('Již si hlasoval')) {
+        request.message = document.querySelector('div.alert.alert-error:last-of-type').textContent.trim()
+        if (request.message.includes('Již si hlasoval') || request.message.includes('Nyní nemůžeš hlasovat. Zkus to prosím znovu')) {
             if (request.message.match(/\d+/g)) {
                 const numbers = request.message.match(/\d+/g).map(Number)
                 const date = new Date()
@@ -15,7 +15,7 @@ async function vote(first) {
                 chrome.runtime.sendMessage({later: true})
             }
         } else {
-            if (request.includes('Nastala chyba')) {
+            if (request.message.includes('Nastala chyba')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)

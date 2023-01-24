@@ -2,6 +2,8 @@ async function vote(first) {
     if (first === false) return
     if (document.querySelector('div.alert-success')?.textContent.includes('succesfully voted') || document.querySelector('div.alert-success')?.textContent.includes('successfully voted')) {
         chrome.runtime.sendMessage({successfully: true})
+    } else if (document.querySelector('.container h1.sp-title')?.nextSibling?.nextSibling?.textContent.includes('succesfully voted') || document.querySelector('.container h1.sp-title')?.nextSibling?.nextSibling?.textContent.includes('successfully voted')) {
+        chrome.runtime.sendMessage({successfully: true})
     } else if (document.querySelector('div.alert-warning') != null && (document.querySelector('div.alert-warning').textContent.includes('You can only vote once') || document.querySelector('div.alert-warning').textContent.includes('already voted'))) {
         chrome.runtime.sendMessage({later: Date.now() + 43200000})
         //ToDo <Serega007> а зачем нам говорить сколько осталось до следующего голосования? Нееет, мы по тупому просто напишем 12 часов и пошлём нафиг, зачем это нужно ServerPact'у?
