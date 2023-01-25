@@ -1,17 +1,5 @@
 async function vote(first) {
-    if (document.querySelector('div.justify-center.w-screen')) {
-        const message = document.querySelector('div.justify-center.w-screen').innerText
-        if (message.length > 0) {
-            if (message.toLowerCase().includes('thanks')) {
-                chrome.runtime.sendMessage({successfully: true})
-            } else if (message.includes('can only vote once')) {
-                chrome.runtime.sendMessage({later: true})
-            } else {
-                chrome.runtime.sendMessage({message})
-            }
-            return
-        }
-    }
+    if (checkPopup()) return
 
     if (first) return
 
@@ -22,21 +10,35 @@ async function vote(first) {
 
 const timer = setInterval(()=>{
     try {
-        if (document.querySelector('div.justify-center.w-screen')) {
-            const message = document.querySelector('div.justify-center.w-screen').innerText
-            if (message.length > 0) {
-                clearInterval(timer)
-                if (message.toLowerCase().includes('thanks')) {
-                    chrome.runtime.sendMessage({successfully: true})
-                } else if (message.includes('can only vote once')) {
-                    chrome.runtime.sendMessage({later: true})
-                } else {
-                    chrome.runtime.sendMessage({message})
-                }
-            }
+        if (checkPopup()) {
+            clearInterval(timer)
         }
     } catch (e) {
         clearInterval(timer)
         throwError(e)
     }
 }, 1000)
+
+function checkPopup() {
+    if (document.querySelector('div.justify-center.w-screen')) {
+        const request = {}
+        request.message = document.querySelector('div.justify-center.w-screen').innerText
+        if (request.message.length > 0) {
+            if (request.message.toLowerCase().includes('thanks')) {
+                chrome.runtime.sendMessage({successfully: true})
+                return true
+            } else if (request.message.includes('can only vote once')) {
+                chrome.runtime.sendMessage({later: true})
+                return true
+            } else {
+                if (request.message.includes('confirm reCaptcha')) {
+                    // None
+                } else {
+                    chrome.runtime.sendMessage(request)
+                    return true
+                }
+            }
+        }
+    }
+    return false
+}
