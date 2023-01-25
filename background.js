@@ -827,7 +827,11 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         settings = await db.get('other', 'settings')
         generalStats = await db.get('other', 'generalStats')
         todayStats = await db.get('other', 'todayStats')
-        openedProjects = await db.get('other', 'openedProjects')
+        for (const[key,value] of openedProjects) {
+            openedProjects.delete(key)
+            tryCloseTab(key, value, 0)
+        }
+        await db.put('other', openedProjects, 'openedProjects')
         reloadAllAlarms()
         checkVote()
         return

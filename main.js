@@ -122,7 +122,12 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion == null) oldVersion = 1
 
     if (oldVersion !== newVersion) {
-        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        if (self.createNotif) {
+            // noinspection ES6MissingAwait
+            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        } else {
+            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        }
     }
 
     if (oldVersion === 0) {

@@ -239,28 +239,14 @@ async function restoreOptions(first) {
     document.getElementById('disabledUseRemoteCode').checked = settings.disabledUseRemoteCode
     document.getElementById('disabledSendErrorSentry').checked = settings.disabledSendErrorSentry
     document.getElementById('expertMode').checked = settings.expertMode
-    if (settings.expertMode) {
-        document.getElementById("enabledSilentVote").parentElement.removeAttribute('style')
-        document.getElementById("timeout").parentElement.removeAttribute('style')
-        document.getElementById("timeoutError").parentElement.removeAttribute('style')
-        document.getElementById('timeoutVote').parentElement.removeAttribute('style')
-        document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
-        document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
-        document.getElementById("disabledDebug").parentElement.removeAttribute('style')
-        document.getElementById("disabledCloseTabs").parentElement.removeAttribute('style')
-        document.getElementById('addProject').classList.add('addProjectExpert')
-        document.getElementById('addProject').classList.remove('addProjectExpertManual')
-        document.getElementById('advSettingsAdd').removeAttribute('style')
-        document.getElementById('emptyDiv').remove()
-    } else {
-        if (document.getElementById('addTab').classList.contains('active')) document.getElementById('append').style.display = 'block'
-    }
+    document.getElementById('expertMode').dispatchEvent(new Event('change'))
     if (first) {
         document.getElementById('addTab').classList.add('active')
         document.getElementById('load').style.display = 'none'
         document.getElementById('append').removeAttribute('style')
+    } else {
+        await reloadProjectList()
     }
-    if (!first) await reloadProjectList()
 }
 
 //Добавить проект в список проекта
@@ -640,7 +626,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('addProject').classList.add('addProjectExpert')
                 document.getElementById('addProject').classList.remove('addProjectExpertManual')
                 document.getElementById('advSettingsAdd').removeAttribute('style')
-                document.getElementById('emptyDiv').remove()
+                document.getElementById('emptyDiv')?.remove()
             } else {
                 document.getElementById("enabledSilentVote").parentElement.style.display = 'none'
                 document.getElementById("timeout").parentElement.style.display = 'none'
@@ -653,11 +639,13 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('addProject').classList.add('addProjectExpertManual')
                 document.getElementById('addProject').classList.remove('addProjectExpert')
                 document.getElementById('advSettingsAdd').style.display = 'none'
-                const div = document.createElement('div')
-                div.id = 'emptyDiv'
-                document.getElementById('addProject').prepend(div)
+                if (!document.getElementById('emptyDiv')) {
+                    const div = document.createElement('div')
+                    div.id = 'emptyDiv'
+                    document.getElementById('addProject').prepend(div)
+                }
             }
-            reloadProjectList()
+            if (event.isTrusted) reloadProjectList()
         } else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false
