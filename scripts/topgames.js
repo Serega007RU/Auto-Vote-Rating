@@ -19,11 +19,14 @@ async function vote(first) {
         }
     }
     //Если есть ошибка
-    if (document.querySelector('div.alert.alert-danger')) {
+    for (const el of document.querySelectorAll('div.alert.alert-danger')) {
         const request = {}
-        request.message = document.querySelector('div.alert.alert-danger').innerText
+        request.message = el.innerText
         if (request.message.includes('cannot vote more than once at the same time')) {
             chrome.runtime.sendMessage({later: true})
+            return
+        } else if (request.message.includes('Captcha')) {
+            // None
         } else {
             if (
                     request.message.includes('Sie können nicht wählen, weil Ihr Netzwerk kein')
@@ -35,8 +38,8 @@ async function vote(first) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)
+            return
         }
-        return
     }
 
     if (document.getElementById('playername') != null) {
