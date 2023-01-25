@@ -41,6 +41,16 @@
 	"optional_host_permissions": [
 		"<all_urls>"
 	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"options.html"
+			],
+			"matches": [
+				"https://*.dogecraft.net/*"
+			]
+		}
+	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
 	"version": "7.0.6",
 	"default_locale": "en"
