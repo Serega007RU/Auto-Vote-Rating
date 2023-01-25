@@ -98,7 +98,6 @@ const timer = setInterval(async ()=>{
                 await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({later: true})
             } else if (message.includes('Голос принят')) {
-                await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({successfully: true})
             } else if (message.includes('Авторизация')) {
                 chrome.runtime.sendMessage({auth: true})
