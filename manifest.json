@@ -26,7 +26,8 @@
 		"alarms",
 		"unlimitedStorage",
 		"scripting",
-		"tabGroups"
+		"tabGroups",
+		"idle"
 	],
 	"optional_permissions": [
 		"cookies"

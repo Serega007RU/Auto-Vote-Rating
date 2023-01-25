@@ -213,7 +213,6 @@ window.addEventListener('load', async () => {
     }
     await reloadProjectList()
     generateDataList()
-    if (settings.enableCustom) addCustom()
     document.getElementById('addedLoading').style.display = 'none'
     document.getElementById('notAddedAll').removeAttribute('style')
     resolveLoad()
@@ -1004,8 +1003,13 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
         }
         if (document.getElementById('customTimeOut').checked || project.rating === 'Custom') {
             if (document.getElementById('selectTime').value === 'ms') {
+                delete project.timeoutHour
+                delete project.timeoutMinute
+                delete project.timeoutSecond
+                delete project.timeoutMS
                 project.timeout = document.getElementById('time').valueAsNumber
             } else {
+                delete project.timeout
                 project.timeoutHour = Number(document.getElementById('hour').value.split(':')[0])
                 if (Number.isNaN(project.timeoutHour)) project.timeoutHour = 0
                 project.timeoutMinute = Number(document.getElementById('hour').value.split(':')[1])
@@ -1061,13 +1065,25 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
 //      project.id = body
         project.body = body
         project.responseURL = document.getElementById('responseURL').value
+
+        if (!settings.enableCustom) await addCustom()
     }
 
     if (event.submitter.id === 'submitEditProject') {
         await db.put('projects', project, project.key)
         resetEdit(project)
         await onMessage({updateValue: 'projects', value: project})
-        if (project.time < Date.now()) chrome.runtime.sendMessage('checkVote')
+        if (project.time == null || project.time < Date.now()) {
+            chrome.runtime.sendMessage('checkVote')
+        } else {
+            let when = project.time
+            if (when - Date.now() < 65000) when = Date.now() + 65000
+            try {
+                await chrome.alarms.create(String(project.key), {when})
+            } catch (error) {
+                createNotif('Ошибка при создании chrome.alarms ' + error.message, 'warn')
+            }
+        }
     } else {
         await addProject(project)
     }
@@ -1740,7 +1756,7 @@ async function fastAdd() {
 }
 
 async function addCustom() {
-    if (document.querySelector('option[name="Custom"]').disabled) {
+    if (document.querySelector('option[name="Custom"]')?.disabled) {
         document.querySelector('option[name="Custom"]').disabled = false
     }
 
@@ -2027,6 +2043,7 @@ document.getElementById('rating').addEventListener('input', function() {
         document.getElementById('id').required = false
 
         document.getElementById('selectTime').parentElement.removeAttribute('style')
+        document.getElementById('selectTime').dispatchEvent(new Event('change'))
         document.getElementById('customBody').parentElement.removeAttribute('style')
         document.getElementById('responseURL').parentElement.removeAttribute('style')
 
@@ -2159,14 +2176,12 @@ function generateDataList() {
         const option = document.createElement('option')
         option.setAttribute('name', rating)
         option.value = url
+        if (rating === 'Custom') {
+            option.disabled = !settings.enableCustom
+            option.textContent = chrome.i18n.getMessage('Custom')
+        }
         datalist.append(option)
     }
-    const option = document.createElement('option')
-    option.setAttribute('name', 'Custom')
-    option.value = 'Custom'
-    option.textContent = chrome.i18n.getMessage('Custom')
-    option.disabled = true
-    datalist.append(option)
 }
 
 chrome.runtime.onMessage.addListener(onMessage)

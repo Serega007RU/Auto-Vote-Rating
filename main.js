@@ -14,6 +14,7 @@ let dbLogs
 //Текущие открытые вкладки расширением
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()
+let onLine
 
 self.addEventListener('error', (errorMsg, url, lineNumber) => {
     if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
@@ -63,7 +64,7 @@ async function initializeConfig(background, version) {
     }
     // noinspection JSUnusedGlobalSymbols
     try {
-        db = await idb.openDB('avr', version ? version : 11, {upgrade})
+        db = await idb.openDB('avr', version ? version : 12, {upgrade})
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
@@ -72,7 +73,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 110)
+            await initializeConfig(background, 120)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error})
@@ -96,6 +97,7 @@ async function initializeConfig(background, version) {
     generalStats = await db.get('other', 'generalStats')
     todayStats = await db.get('other', 'todayStats')
     openedProjects = await db.get('other', 'openedProjects')
+    onLine = await db.get('other', 'onLine')
 
     if (!background) return
 
@@ -110,10 +112,10 @@ async function initializeConfig(background, version) {
             }
             await db.put('other', openedProjects, 'openedProjects')
         }
-    }
 
-    // noinspection ES6MissingAwait
-    checkVote()
+        // noinspection ES6MissingAwait
+        checkVote()
+    }
 }
 
 async function upgrade(db, oldVersion, newVersion, transaction) {
@@ -279,6 +281,11 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         settings = await transaction.objectStore('other').get('settings')
         settings.timeoutVote = 900000
         await transaction.objectStore('other').put(settings, 'settings')
+    }
+
+    if (oldVersion <= 11) {
+        onLine = true
+        await transaction.objectStore('other').put(onLine, 'onLine')
     }
 
     if (!todayStats) {

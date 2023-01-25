@@ -39,9 +39,17 @@ async function checkVote() {
 
     await initializeFunc
 
-    //Если нет интернета, то не голосуем
-    if (!settings.disabledCheckInternet && !navigator.onLine) {
-        return
+    //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
+    if (!settings.disabledCheckInternet && !onLine) {
+        if (navigator.onLine) {
+            console.log(chrome.i18n.getMessage('internetRestored'))
+            onLine = true
+            db.put('other', onLine, 'onLine')
+        } else {
+            // TODO к сожалению в Service Worker отсутствует слушатель на восстановление соединения с интернетом, у нас остаётся только 1 вариант, это попытаться снова запустить checkVote через минуту
+            chrome.alarms.create('checkVote', {when: Date.now() + 65000})
+            return
+        }
     }
 
     if (check) {
@@ -76,6 +84,14 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
     checkVote()
 })
 
+// TODO костыльное решение бага https://bugs.chromium.org/p/chromium/issues/detail?id=471524
+chrome.idle.onStateChanged.addListener(async function(newState) {
+    if (newState === 'active') {
+        // noinspection JSIgnoredPromiseFromCall
+        checkVote()
+    }
+})
+
 async function reloadAllAlarms() {
     await chrome.alarms.clearAll()
     let cursor = await db.transaction('projects').store.openCursor()
@@ -97,16 +113,22 @@ async function reloadAllAlarms() {
     }
 }
 
-self.addEventListener('online', ()=> {
-    // noinspection JSIgnoredPromiseFromCall
-    checkVote()
-})
-
 let promises = []
 async function checkOpen(project/*, transaction*/) {
-    //Если нет подключения к интернету
-    if (!settings.disabledCheckInternet && !navigator.onLine) {
-        return
+    //Если нет интернета, то не голосуем
+    if (!settings.disabledCheckInternet) {
+        if (!navigator.onLine && onLine) {
+            // TODO к сожалению в Service Worker отсутствует слушатель на восстановление соединения с интернетом, у нас остаётся только 1 вариант, это попытаться снова запустить checkVote через минуту
+            chrome.alarms.create('checkVote', {when: Date.now() + 65000})
+
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'))
+            console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('internetDisconected'))
+            onLine = false
+            db.put('other', onLine, 'onLine')
+            return
+        } else if (!onLine) {
+            return
+        }
     }
 
     for (const[tab,value] of openedProjects) {
@@ -865,7 +887,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         request.projectRestart.time = null
         await db.put('projects', request.projectRestart, request.projectRestart.key)
         console.log(getProjectPrefix(request.projectRestart, true) + chrome.i18n.getMessage('projectRestarted'))
-        // checkVote()
+        checkVote()
         sendResponse('success')
         return
     }
