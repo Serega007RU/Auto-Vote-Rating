@@ -1363,7 +1363,7 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         if (!response.ok) {
             console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', json)
         }
-        console.log('An error report has been sent, details:', json)
+        console.log(getProjectPrefix(project, true), 'An error report has been sent, details:', json)
     } catch (error) {
         console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error)
     } finally {

@@ -53,6 +53,6 @@
 		}
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "7.0.6",
+	"version": "7.0.7",
 	"default_locale": "en"
 }
