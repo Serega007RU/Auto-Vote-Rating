@@ -191,6 +191,10 @@ document.addEventListener('DOMContentLoaded', async()=>{
         }
     }
 
+    if (!onLine && !navigator.onLine) {
+        createNotif(chrome.i18n.getMessage('internetDisconected'), 'warn', 15000)
+    }
+
     document.getElementById('rating').dispatchEvent(new Event('input'))
     document.getElementById('link').dispatchEvent(new Event('input'))
 

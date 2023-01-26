@@ -121,7 +121,7 @@ async function checkOpen(project/*, transaction*/) {
             // TODO к сожалению в Service Worker отсутствует слушатель на восстановление соединения с интернетом, у нас остаётся только 1 вариант, это попытаться снова запустить checkVote через минуту
             chrome.alarms.create('checkVote', {when: Date.now() + 65000})
 
-            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'))
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'), 'openProject_' + project.key)
             console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('internetDisconected'))
             onLine = false
             db.put('other', onLine, 'onLine')
@@ -142,7 +142,7 @@ async function checkOpen(project/*, transaction*/) {
                 return
             } else {
                 console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
-                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
+                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'), 'openProject_' + value.key)
                 openedProjects.delete(tab)
                 db.put('other', openedProjects, 'openedProjects')
                 // noinspection JSCheckFunctionSignatures
@@ -220,7 +220,7 @@ async function newWindow(project) {
     }
 
     console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
-    if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
+    if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'), 'openProject_' + project.key)
 
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
