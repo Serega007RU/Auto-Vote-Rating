@@ -1,6 +1,9 @@
-//Где храним настройки
-// let storageArea = 'local'
 // noinspection ES6MissingAwait
+
+const initializeFunc = initializeConfig()
+
+let resolveLoad
+const loaded = new Promise(resolve => resolveLoad = resolve)
 
 let evil
 
@@ -170,7 +173,7 @@ let Timer = function(callback, delay) {
 }
 
 document.addEventListener('DOMContentLoaded', async()=>{
-    await initializeConfig()
+    await initializeFunc
 
     await restoreOptions(true)
 
@@ -188,6 +191,10 @@ document.addEventListener('DOMContentLoaded', async()=>{
         }
     }
 
+    if (!onLine && !navigator.onLine) {
+        createNotif(chrome.i18n.getMessage('internetDisconected'), 'warn', 15000)
+    }
+
     document.getElementById('rating').dispatchEvent(new Event('input'))
     document.getElementById('link').dispatchEvent(new Event('input'))
 
@@ -195,7 +202,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
 })
 
 window.addEventListener('load', async () => {
-    await waitInitialize()
+    await initializeFunc
     if (!settings.disabledUseRemoteCode) {
         if (!evil) { // noinspection JSUnresolvedVariable,JSUnresolvedFunction
             evil = evalCore.getEvalInstance(self)
@@ -210,10 +217,9 @@ window.addEventListener('load', async () => {
     }
     await reloadProjectList()
     generateDataList()
-    if (settings.enableCustom) addCustom()
     document.getElementById('addedLoading').style.display = 'none'
     document.getElementById('notAddedAll').removeAttribute('style')
-    initialized3 = true
+    resolveLoad()
 })
 
 // Restores select box and checkbox state using the preferences
@@ -237,28 +243,14 @@ async function restoreOptions(first) {
     document.getElementById('disabledUseRemoteCode').checked = settings.disabledUseRemoteCode
     document.getElementById('disabledSendErrorSentry').checked = settings.disabledSendErrorSentry
     document.getElementById('expertMode').checked = settings.expertMode
-    if (settings.expertMode) {
-        document.getElementById("enabledSilentVote").parentElement.removeAttribute('style')
-        document.getElementById("timeout").parentElement.removeAttribute('style')
-        document.getElementById("timeoutError").parentElement.removeAttribute('style')
-        document.getElementById('timeoutVote').parentElement.removeAttribute('style')
-        document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
-        document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
-        document.getElementById("disabledDebug").parentElement.removeAttribute('style')
-        document.getElementById("disabledCloseTabs").parentElement.removeAttribute('style')
-        document.getElementById('addProject').classList.add('addProjectExpert')
-        document.getElementById('addProject').classList.remove('addProjectExpertManual')
-        document.getElementById('advSettingsAdd').removeAttribute('style')
-        document.getElementById('emptyDiv').remove()
-    } else {
-        if (document.getElementById('addTab').classList.contains('active')) document.getElementById('append').style.display = 'block'
-    }
+    document.getElementById('expertMode').dispatchEvent(new Event('change'))
     if (first) {
         document.getElementById('addTab').classList.add('active')
         document.getElementById('load').style.display = 'none'
         document.getElementById('append').removeAttribute('style')
+    } else {
+        await reloadProjectList()
     }
-    if (!first) await reloadProjectList()
 }
 
 //Добавить проект в список проекта
@@ -638,7 +630,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('addProject').classList.add('addProjectExpert')
                 document.getElementById('addProject').classList.remove('addProjectExpertManual')
                 document.getElementById('advSettingsAdd').removeAttribute('style')
-                document.getElementById('emptyDiv').remove()
+                document.getElementById('emptyDiv')?.remove()
             } else {
                 document.getElementById("enabledSilentVote").parentElement.style.display = 'none'
                 document.getElementById("timeout").parentElement.style.display = 'none'
@@ -651,11 +643,13 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('addProject').classList.add('addProjectExpertManual')
                 document.getElementById('addProject').classList.remove('addProjectExpert')
                 document.getElementById('advSettingsAdd').style.display = 'none'
-                const div = document.createElement('div')
-                div.id = 'emptyDiv'
-                document.getElementById('addProject').prepend(div)
+                if (!document.getElementById('emptyDiv')) {
+                    const div = document.createElement('div')
+                    div.id = 'emptyDiv'
+                    document.getElementById('addProject').prepend(div)
+                }
             }
-            reloadProjectList()
+            if (event.isTrusted) reloadProjectList()
         } else if (this.id === 'disableCheckProjects') {
             if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
                 this.checked = false
@@ -1001,8 +995,13 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
         }
         if (document.getElementById('customTimeOut').checked || project.rating === 'Custom') {
             if (document.getElementById('selectTime').value === 'ms') {
+                delete project.timeoutHour
+                delete project.timeoutMinute
+                delete project.timeoutSecond
+                delete project.timeoutMS
                 project.timeout = document.getElementById('time').valueAsNumber
             } else {
+                delete project.timeout
                 project.timeoutHour = Number(document.getElementById('hour').value.split(':')[0])
                 if (Number.isNaN(project.timeoutHour)) project.timeoutHour = 0
                 project.timeoutMinute = Number(document.getElementById('hour').value.split(':')[1])
@@ -1058,13 +1057,25 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
 //      project.id = body
         project.body = body
         project.responseURL = document.getElementById('responseURL').value
+
+        if (!settings.enableCustom) await addCustom()
     }
 
     if (event.submitter.id === 'submitEditProject') {
         await db.put('projects', project, project.key)
         resetEdit(project)
         await onMessage({updateValue: 'projects', value: project})
-        if (project.time < Date.now()) chrome.runtime.sendMessage('checkVote')
+        if (project.time == null || project.time < Date.now()) {
+            chrome.runtime.sendMessage('checkVote')
+        } else {
+            let when = project.time
+            if (when - Date.now() < 65000) when = Date.now() + 65000
+            try {
+                await chrome.alarms.create(String(project.key), {when})
+            } catch (error) {
+                createNotif('Ошибка при создании chrome.alarms ' + error.message, 'warn')
+            }
+        }
     } else {
         await addProject(project)
     }
@@ -1737,7 +1748,7 @@ async function fastAdd() {
 }
 
 async function addCustom() {
-    if (document.querySelector('option[name="Custom"]').disabled) {
+    if (document.querySelector('option[name="Custom"]')?.disabled) {
         document.querySelector('option[name="Custom"]').disabled = false
     }
 
@@ -2024,6 +2035,7 @@ document.getElementById('rating').addEventListener('input', function() {
         document.getElementById('id').required = false
 
         document.getElementById('selectTime').parentElement.removeAttribute('style')
+        document.getElementById('selectTime').dispatchEvent(new Event('change'))
         document.getElementById('customBody').parentElement.removeAttribute('style')
         document.getElementById('responseURL').parentElement.removeAttribute('style')
 
@@ -2156,14 +2168,12 @@ function generateDataList() {
         const option = document.createElement('option')
         option.setAttribute('name', rating)
         option.value = url
+        if (rating === 'Custom') {
+            option.disabled = !settings.enableCustom
+            option.textContent = chrome.i18n.getMessage('Custom')
+        }
         datalist.append(option)
     }
-    const option = document.createElement('option')
-    option.setAttribute('name', 'Custom')
-    option.value = 'Custom'
-    option.textContent = chrome.i18n.getMessage('Custom')
-    option.disabled = true
-    datalist.append(option)
 }
 
 chrome.runtime.onMessage.addListener(onMessage)
@@ -2202,9 +2212,9 @@ async function onMessage(request) {
     } else if (request.installed) {
         alert(chrome.i18n.getMessage('firstInstall'))
     } else if (request.openProject) {
-        await waitInitialize()
+        await initializeFunc
         document.getElementById('addedTab').click()
-        await waitInitialize3()
+        await loaded
         const project = await db.get('projects', request.openProject)
         await listSelect({currentTarget: document.querySelector('#' + project.rating + 'Button')}, project.rating)
         document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})

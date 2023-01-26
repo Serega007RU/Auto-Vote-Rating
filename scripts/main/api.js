@@ -238,9 +238,14 @@ function throwError(error) {
     }
 
     const request = {}
-    request.errorVoteNoElement = message + (document.body.innerText.trim().length < 150 ? ' ' + document.body.innerText.trim() : '')
-    if (document.location.pathname === '/' && document.location.search === '') {
-        request.ignoreReport = true
+    const siteText = document.body.innerText.trim()
+    if (siteText.length === 0) {
+        request.emptySite = true
+    } else {
+        request.errorVoteNoElement = message + (siteText.length < 200 ? ' ' + siteText : '')
+        if (document.location.pathname === '/' && document.location.search === '') {
+            request.ignoreReport = true
+        }
     }
 
     chrome.runtime.sendMessage(request)

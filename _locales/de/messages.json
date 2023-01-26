@@ -707,7 +707,7 @@
     "message": "Nur registrierte Benutzer können über diese Bewertung abstimmen. Bitte loggen Sie sich ein oder registrieren Sie sich."
   },
   "emptySite": {
-    "message": "Es scheint, dass diese Bewertung mit einer leeren Seite reagiert hat. Versuchen Sie, diese Seite zu besuchen und fügen Sie sie dann erneut hinzu"
+    "message": "Es scheint, dass diese Bewertung mit einer leeren Seite reagiert hat."
   },
   "ordinalWorld": {
     "message": "Weltweite Zählnummer"

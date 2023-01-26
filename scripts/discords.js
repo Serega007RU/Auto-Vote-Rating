@@ -45,15 +45,20 @@ async function vote(first) {
             return
         }
 
-        if (document.getElementById('errorsubtitle') != null) {
-            if (document.getElementById('errorsubtitle').textContent.toLowerCase().includes('successfully')) {
+        if (document.getElementById('errorsubtitle')) {
+            const request = {}
+            request.message = document.getElementById('errorsubtitle').textContent.trim()
+            if (request.message.toLowerCase().includes('successfully')) {
                 chrome.runtime.sendMessage({successfully: true})
                 return
-            } else if (document.getElementById('errorsubtitle').textContent.toLowerCase().includes('already voted')) {
+            } else if (request.message.toLowerCase().includes('already voted')) {
                 chrome.runtime.sendMessage({later: true})
                 return
+            } else if (request.message.includes('did not complete the captcha')) {
+                chrome.runtime.sendMessage({captcha: true})
+                return
             }
-            chrome.runtime.sendMessage({message: document.getElementById('errorsubtitle').textContent.trim()})
+            chrome.runtime.sendMessage(request)
             return
         }
 

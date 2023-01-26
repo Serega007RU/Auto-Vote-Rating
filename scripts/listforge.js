@@ -39,7 +39,7 @@ async function vote(first) {
         } else if (request.message.toLowerCase().includes('captcha')) {
             if (first) chrome.runtime.sendMessage({captcha: true})
         } else {
-            if (request.message.includes('username maximum length')) {
+            if (request.message.includes('username maximum length') || request.message.toLowerCase().includes('vote time expired')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)

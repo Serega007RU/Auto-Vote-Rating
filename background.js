@@ -1,32 +1,16 @@
 // noinspection ES6MissingAwait
 
+const state = self.serviceWorker.state
+
 importScripts('libs/idb.umd.js')
 importScripts('projects.js')
 importScripts('main.js')
 
 // TODO отложенный importScripts пока не работают, подробнее https://bugs.chromium.org/p/chromium/issues/detail?id=1198822
-self.addEventListener('install', async () => {
+self.addEventListener('install', () => {
     importScripts('libs/linkedom.js')
     importScripts('libs/evalCore.umd.js')
     importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
-
-    // noinspection JSUndeclaredVariable
-    initialized2 = false
-
-    await waitInitialize1()
-
-    if (openedProjects.size > 0) {
-        for (const [key, value] of openedProjects) {
-            openedProjects.delete(key)
-            tryCloseTab(key, value, 0)
-        }
-        await db.put('other', openedProjects, 'openedProjects')
-    }
-
-    // noinspection JSUndeclaredVariable
-    initialized2 = true
-
-    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 })
 
 //Текущие fetch запросы
@@ -48,16 +32,24 @@ let silentResponseBody = {}
 
 //Инициализация настроек расширения
 // noinspection JSIgnoredPromiseFromCall
-initializeConfig(true)
+const initializeFunc = initializeConfig(true)
 
 //Проверка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
 
-    await waitInitialize()
+    await initializeFunc
 
-    //Если нет интернета, то не голосуем
-    if (!settings.disabledCheckInternet && !navigator.onLine) {
-        return
+    //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
+    if (!settings.disabledCheckInternet && !onLine) {
+        if (navigator.onLine) {
+            console.log(chrome.i18n.getMessage('internetRestored'))
+            onLine = true
+            db.put('other', onLine, 'onLine')
+        } else {
+            // TODO к сожалению в Service Worker отсутствует слушатель на восстановление соединения с интернетом, у нас остаётся только 1 вариант, это попытаться снова запустить checkVote через минуту
+            chrome.alarms.create('checkVote', {when: Date.now() + 65000})
+            return
+        }
     }
 
     if (check) {
@@ -92,14 +84,28 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
     checkVote()
 })
 
+// TODO костыльное решение бага https://bugs.chromium.org/p/chromium/issues/detail?id=471524
+chrome.idle.onStateChanged.addListener(async function(newState) {
+    if (newState === 'active') {
+        // noinspection JSIgnoredPromiseFromCall
+        checkVote()
+    }
+})
+
 async function reloadAllAlarms() {
-    await new Promise(resolve => chrome.alarms.clearAll(resolve))
+    await chrome.alarms.clearAll()
     let cursor = await db.transaction('projects').store.openCursor()
     const times = []
     while (cursor) {
         const project = cursor.value
         if (project.time != null && project.time > Date.now() && times.indexOf(project.time) === -1) {
-            chrome.alarms.create(String(cursor.key), {when: project.time})
+            let when = project.time
+            if (when - Date.now() < 65000) when = Date.now() + 65000
+            try {
+                chrome.alarms.create(String(cursor.key), {when})
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error)
+            }
             times.push(project.time)
         }
         // noinspection JSVoidFunctionReturnValueUsed
@@ -107,16 +113,22 @@ async function reloadAllAlarms() {
     }
 }
 
-self.addEventListener('online', ()=> {
-    // noinspection JSIgnoredPromiseFromCall
-    checkVote()
-})
-
 let promises = []
 async function checkOpen(project/*, transaction*/) {
-    //Если нет подключения к интернету
-    if (!settings.disabledCheckInternet && !navigator.onLine) {
-        return
+    //Если нет интернета, то не голосуем
+    if (!settings.disabledCheckInternet) {
+        if (!navigator.onLine && onLine) {
+            // TODO к сожалению в Service Worker отсутствует слушатель на восстановление соединения с интернетом, у нас остаётся только 1 вариант, это попытаться снова запустить checkVote через минуту
+            chrome.alarms.create('checkVote', {when: Date.now() + 65000})
+
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'), 'openProject_' + project.key)
+            console.warn(getProjectPrefix(project, true) + chrome.i18n.getMessage('internetDisconected'))
+            onLine = false
+            db.put('other', onLine, 'onLine')
+            return
+        } else if (!onLine) {
+            return
+        }
     }
 
     for (const[tab,value] of openedProjects) {
@@ -130,7 +142,7 @@ async function checkOpen(project/*, transaction*/) {
                 return
             } else {
                 console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
-                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
+                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'), 'openProject_' + value.key)
                 openedProjects.delete(tab)
                 db.put('other', openedProjects, 'openedProjects')
                 // noinspection JSCheckFunctionSignatures
@@ -208,7 +220,7 @@ async function newWindow(project) {
     }
 
     console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
-    if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
+    if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'), 'openProject_' + project.key)
 
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
@@ -236,16 +248,24 @@ async function newWindow(project) {
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
-    let create = true
-    let alarms = await chrome.alarms.getAll()
-    for (const alarm of alarms) {
-        if (alarm.scheduledTime === project.nextAttempt) {
-            create = false
-            break
+    if (!settings.disabledRestartOnTimeout) {
+        let create = true
+        let alarms = await chrome.alarms.getAll()
+        for (const alarm of alarms) {
+            if (alarm.scheduledTime === project.nextAttempt) {
+                create = false
+                break
+            }
         }
-    }
-    if (create) {
-        chrome.alarms.create(String(project.key), {when: project.nextAttempt})
+        if (create) {
+            let when = project.nextAttempt
+            if (when - Date.now() < 65000) when = Date.now() + 65000
+            try {
+                await chrome.alarms.create('nextAttempt_' + project.key, {when})
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error)
+            }
+        }
     }
 
     let silentVoteMode = false
@@ -476,7 +496,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
 }
 
 chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
-    await waitInitialize()
+    await initializeFunc
     if (openedProjects.has(details.tabId)) {
         if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
             const project = await db.get('projects', openedProjects.get(details.tabId).key)
@@ -496,7 +516,7 @@ chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
 
 chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
     if (details.url === 'about:blank') return
-    await waitInitialize()
+    await initializeFunc
     let project = openedProjects.get(details.tabId)
     if (!project) return
     const files = []
@@ -552,7 +572,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
 chrome.webNavigation.onCompleted.addListener(async function(details) {
-    await waitInitialize()
+    await initializeFunc
     let project = openedProjects.get(details.tabId)
     if (!project) return
     if (details.frameId === 0) {
@@ -686,7 +706,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 })
 
 chrome.tabs.onRemoved.addListener(async function(tabId) {
-    await waitInitialize()
+    await initializeFunc
     let project = openedProjects.get(tabId)
     if (!project) return
     project = await db.get('projects', project.key)
@@ -695,7 +715,7 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
 
 // TODO к сожалению в manifest v3 не возможно узнать status code страницы, не знаю как это ещё сделать
 // chrome.webRequest.onCompleted.addListener(async function(details) {
-//     await waitInitialize()
+//     await initializeFunc
 //     let project = openedProjects.get(details.tabId)
 //     if (!project) return
 //     project = await db.get('projects', project.key)
@@ -710,7 +730,7 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
 // }, {urls: ['<all_urls>']})
 //
 // chrome.webRequest.onErrorOccurred.addListener(async function(details) {
-//     await waitInitialize()
+//     await initializeFunc
 //     // noinspection JSUnresolvedVariable
 //     if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
 //         let project = fetchProjects.get(details.requestId)
@@ -798,7 +818,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         return
     }
 
-    await waitInitialize()
+    await initializeFunc
 
     if (request === 'checkVote') {
         checkVote()
@@ -807,7 +827,11 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         settings = await db.get('other', 'settings')
         generalStats = await db.get('other', 'generalStats')
         todayStats = await db.get('other', 'todayStats')
-        openedProjects = await db.get('other', 'openedProjects')
+        for (const[key,value] of openedProjects) {
+            openedProjects.delete(key)
+            tryCloseTab(key, value, 0)
+        }
+        await db.put('other', openedProjects, 'openedProjects')
         reloadAllAlarms()
         checkVote()
         return
@@ -1167,18 +1191,25 @@ async function endVote(request, sender, project) {
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
-    await chrome.alarms.clear(String(project.key))
+    await chrome.alarms.clear('nextAttempt_' + project.key)
     if (project.time != null && project.time > Date.now()) {
         let create2 = true
+        let when = project.time
+        if (when - Date.now() < 65000) when = Date.now() + 65000
         const alarms = await chrome.alarms.getAll()
         for (const alarm of alarms) {
-            if (alarm.scheduledTime === project.time) {
+            // noinspection JSCheckFunctionSignatures
+            if (!isNaN(alarm.name) && alarm.scheduledTime === when) {
                 create2 = false
                 break
             }
         }
         if (create2) {
-            chrome.alarms.create(String(project.key), {when: project.time})
+            try {
+                await chrome.alarms.create(String(project.key), {when})
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error)
+            }
         }
     }
 
@@ -1207,8 +1238,12 @@ async function endVote(request, sender, project) {
 
     // TODO мы не можем быть уверены что setTimeout в Service Worker 100% отработает, поэтому мы на всякий случай создаём chrome.alarm
     let alarmTimeout = timeout
-    if (alarmTimeout < 60000) alarmTimeout = 60000
-    chrome.alarms.create('checkVote', {when: Date.now() + alarmTimeout})
+    if (alarmTimeout < 65000) alarmTimeout = 65000
+    try {
+        await chrome.alarms.create('checkVote', {when: Date.now() + alarmTimeout})
+    } catch (error) {
+        console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error)
+    }
 }
 
 
@@ -1218,15 +1253,21 @@ async function reportError(request, sender, project) {
 
     let tabDetails
     if (sender) {
-        try {
-            await chrome.scripting.executeScript({target: {tabId: sender.tab.id}, files: ['libs/html-to-image.js', 'scripts/main/report.js']})
-            tabDetails = await chrome.tabs.sendMessage(sender.tab.id, {generateReport: true})
-            if (!tabDetails.screenshotError) tabDetails.screenshot = new Uint8Array(await convertBase64ToBlob(tabDetails.screenshot).arrayBuffer())
-        } catch (error) {
-            if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
-                console.warn(getProjectPrefix(project, true) + 'Ошибка получении скриншота вкладки для отправки отчёта об ошибке', error)
-            }
-        }
+        await new Promise(resolve => {
+            chrome.pageCapture.saveAsMHTML({tabId: sender.tab.id}, function (details) {
+                const error = chrome.runtime.lastError?.message
+                if (error) {
+                    if (!error.includes('Cannot find the tab for this request')) {
+                        console.warn(getProjectPrefix(project, true) + 'Ошибка получении скриншота вкладки для отправки отчёта об ошибке', error)
+                    }
+                    resolve()
+                    return
+                }
+                tabDetails = {}
+                tabDetails.mhtml = details
+                resolve()
+            })
+        })
     }
 
     if (!tabDetails && !request.html) return
@@ -1283,6 +1324,10 @@ async function sendReport(request, sender, tabDetails, project, reported) {
     if (!tabDetails && request.html) {
         tabDetails = {html: request.html}
     }
+    if (tabDetails.mhtml) {
+        // noinspection JSUnresolvedFunction
+        tabDetails.mhtml = new Uint8Array(await tabDetails.mhtml.arrayBuffer())
+    }
 
     // Да тут полный кринж, работа с байтами крайне убога, но мы работаем с тем чем имеем
     if (tabDetails) {
@@ -1290,17 +1335,13 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         let documentArrayBody
         let documentArray
 
-        let screenshotArrayHead
-        let screenshotArrayBody
-        let screenshotArray
-
         let enc = new TextEncoder()
 
         const attachmentHTML = {}
-        documentArrayBody = enc.encode(tabDetails.html)
+        documentArrayBody = tabDetails.html ? enc.encode(tabDetails.html) : tabDetails.mhtml
         attachmentHTML.type = 'attachment'
         attachmentHTML.length = documentArrayBody.length
-        attachmentHTML.filename = 'document.html'
+        attachmentHTML.filename = tabDetails.html ? 'document.html' : 'document.mhtml'
         documentArrayHead = enc.encode('\n' + JSON.stringify(attachmentHTML) + '\n')
         documentArray = new Uint8Array(documentArrayHead.length + documentArrayBody.length)
         documentArray.set(documentArrayHead)
@@ -1311,24 +1352,7 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         newBody2.set(newBody)
         newBody2.set(documentArray, newBody.length)
 
-        if (tabDetails.screenshot || tabDetails.screenshotError) {
-            const attachmentScreenshot = {}
-            screenshotArrayBody = tabDetails.screenshotError ? enc.encode(tabDetails.screenshotError) : tabDetails.screenshot
-            attachmentScreenshot.type = 'attachment'
-            attachmentScreenshot.length = screenshotArrayBody.length
-            attachmentScreenshot.filename = tabDetails.screenshotError ? 'screenshot.txt' : 'screenshot.png'
-            screenshotArrayHead = enc.encode('\n' + JSON.stringify(attachmentScreenshot) + '\n')
-            screenshotArray = new Uint8Array(screenshotArrayHead.length + screenshotArrayBody.length)
-            screenshotArray.set(screenshotArrayHead)
-            screenshotArray.set(screenshotArrayBody, screenshotArrayHead.length)
-
-            let newBody3 = new Uint8Array(newBody2.length + screenshotArray.length)
-            newBody3.set(newBody2)
-            newBody3.set(screenshotArray, newBody2.length)
-            body = newBody3
-        } else {
-            body = newBody2
-        }
+        body = newBody2
     }
 
     const options = {body}
@@ -1339,7 +1363,7 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         if (!response.ok) {
             console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', json)
         }
-        console.log('An error report has been sent, details:', json)
+        console.log(getProjectPrefix(project, true), 'An error report has been sent, details:', json)
     } catch (error) {
         console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error)
     } finally {
@@ -1353,28 +1377,6 @@ function uuidv4() {
     return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
-}
-
-function convertBase64ToBlob(base64Image) {
-    // Split into two parts
-    const parts = base64Image.split(';base64,');
-
-    // Hold the content type
-    const imageType = parts[0].split(':')[1];
-
-    // Decode Base64 string
-    const decodedData = self.atob(parts[1]);
-
-    // Create UNIT8ARRAY of size same as row data length
-    const uInt8Array = new Uint8Array(decodedData.length);
-
-    // Insert all character code into uInt8Array
-    for (let i = 0; i < decodedData.length; ++i) {
-        uInt8Array[i] = decodedData.charCodeAt(i);
-    }
-
-    // Return BLOB image after conversion
-    return new Blob([uInt8Array], { type: imageType });
 }
 
 //Отправитель уведомлений
@@ -1458,7 +1460,7 @@ async function updateValue(objStore, value) {
 }
 
 chrome.runtime.onInstalled.addListener(async function(details) {
-    await waitInitialize()
+    await initializeFunc
     if (details.reason === 'install') {
         await openOptionsPage()
         chrome.runtime.sendMessage({installed: true})

@@ -14,10 +14,7 @@ let dbLogs
 //Текущие открытые вкладки расширением
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()
-//Полностью ли запущено расширение?
-let initialized = false
-let initialized2 = true
-let initialized3 = false
+let onLine
 
 self.addEventListener('error', (errorMsg, url, lineNumber) => {
     if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
@@ -67,7 +64,7 @@ async function initializeConfig(background, version) {
     }
     // noinspection JSUnusedGlobalSymbols
     try {
-        db = await idb.openDB('avr', version ? version : 11, {upgrade})
+        db = await idb.openDB('avr', version ? version : 12, {upgrade})
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
@@ -76,7 +73,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 110)
+            await initializeConfig(background, 120)
             return
         }
         dbError({target: {source: {name: 'avr'}}, error: error})
@@ -100,55 +97,24 @@ async function initializeConfig(background, version) {
     generalStats = await db.get('other', 'generalStats')
     todayStats = await db.get('other', 'todayStats')
     openedProjects = await db.get('other', 'openedProjects')
+    onLine = await db.get('other', 'onLine')
 
-    if (!background) {
-        initialized = true
-        initialized2 = true
-        return
-    }
+    if (!background) return
 
-    initialized = true
+    if (state !== 'activated') {
+        console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 
-    // noinspection ES6MissingAwait
-    checkVote()
-}
+        if (openedProjects.size > 0) {
+            for (const [key, value] of openedProjects) {
+                openedProjects.delete(key)
+                // noinspection ES6MissingAwait
+                tryCloseTab(key, value, 0)
+            }
+            await db.put('other', openedProjects, 'openedProjects')
+        }
 
-async function waitInitialize() {
-    if (!initialized || !initialized2) {
-        await new Promise(resolve => {
-            const timer = setInterval(()=>{
-                if (initialized && initialized2) {
-                    clearInterval(timer)
-                    resolve()
-                }
-            }, 100)
-        })
-    }
-}
-
-async function waitInitialize1() {
-    if (!initialized) {
-        await new Promise(resolve => {
-            const timer = setInterval(()=>{
-                if (initialized) {
-                    clearInterval(timer)
-                    resolve()
-                }
-            }, 100)
-        })
-    }
-}
-
-async function waitInitialize3() {
-    if (!initialized3) {
-        await new Promise(resolve => {
-            const timer = setInterval(()=>{
-                if (initialized3) {
-                    clearInterval(timer)
-                    resolve()
-                }
-            }, 100)
-        })
+        // noinspection ES6MissingAwait
+        checkVote()
     }
 }
 
@@ -156,7 +122,12 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion == null) oldVersion = 1
 
     if (oldVersion !== newVersion) {
-        console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        if (self.createNotif) {
+            // noinspection ES6MissingAwait
+            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        } else {
+            console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+        }
     }
 
     if (oldVersion === 0) {
@@ -315,6 +286,11 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         settings = await transaction.objectStore('other').get('settings')
         settings.timeoutVote = 900000
         await transaction.objectStore('other').put(settings, 'settings')
+    }
+
+    if (oldVersion <= 11) {
+        onLine = true
+        await transaction.objectStore('other').put(onLine, 'onLine')
     }
 
     if (!todayStats) {

@@ -11,8 +11,7 @@ async function vote(first) {
             const request = {}
             request.message = document.querySelector('.notification').textContent.trim()
             if (request.message.toLowerCase().includes('captcha') || request.message.toLowerCase().includes('že nejste robot')) {
-                if (first) chrome.runtime.sendMessage({captcha: true})
-                return
+                // None
             } else {
                 if (request.message.includes('server byl označen jako neaktivní')) {
                     request.ignoreReport = true
@@ -28,6 +27,13 @@ async function vote(first) {
         if (request.message.includes('stránka nebyla nalezena')) {
             request.ignoreReport = true
         }
+        chrome.runtime.sendMessage(request)
+        return
+    }
+    if (document.querySelector('body .container h1.title')?.textContent.includes('Internal Server Error')) {
+        const request = {}
+        request.message = document.querySelector('body .container h1.title').parentElement.innerText
+        request.ignoreReport = true
         chrome.runtime.sendMessage(request)
         return
     }

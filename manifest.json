@@ -26,7 +26,9 @@
 		"alarms",
 		"unlimitedStorage",
 		"scripting",
-		"tabGroups"
+		"tabGroups",
+		"idle",
+		"pageCapture"
 	],
 	"optional_permissions": [
 		"cookies"
@@ -40,7 +42,17 @@
 	"optional_host_permissions": [
 		"<all_urls>"
 	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"options.html"
+			],
+			"matches": [
+				"https://*.dogecraft.net/*"
+			]
+		}
+	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "7.0.6",
+	"version": "7.0.7",
 	"default_locale": "en"
 }

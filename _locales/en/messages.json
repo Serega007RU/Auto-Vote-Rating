@@ -727,7 +727,7 @@
     "message": "Log in to vote"
   },
   "emptySite": {
-    "message": "It seems that this rating responded with an empty page, try to visit this page and then try adding again"
+    "message": "It seems that this rating responded with an empty page"
   },
   "ordinalWorld": {
     "message": "World count number"

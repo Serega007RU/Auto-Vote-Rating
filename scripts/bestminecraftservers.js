@@ -17,13 +17,16 @@ async function vote(/*first*/) {
         request.message = document.querySelector('div.ui.error.message').textContent.trim()
         if (request.message.includes('must wait until tomorrow before voting again')) {
             chrome.runtime.sendMessage({later: true})
+            return
+        } else if (request.message.toLowerCase().includes('review text has to be')) {
+            // None
         } else {
             if (request.message.includes('Vote limit has been exceed')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)
+            return
         }
-        return
     }
     if (document.querySelector('div.ui.success.message') != null) {
         chrome.runtime.sendMessage({successfully: true})
