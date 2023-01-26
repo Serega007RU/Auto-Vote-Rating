@@ -27,7 +27,8 @@
 		"unlimitedStorage",
 		"scripting",
 		"tabGroups",
-		"idle"
+		"idle",
+		"pageCapture"
 	],
 	"optional_permissions": [
 		"cookies"

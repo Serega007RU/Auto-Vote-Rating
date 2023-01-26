@@ -1253,15 +1253,21 @@ async function reportError(request, sender, project) {
 
     let tabDetails
     if (sender) {
-        try {
-            await chrome.scripting.executeScript({target: {tabId: sender.tab.id}, files: ['libs/html-to-image.js', 'scripts/main/report.js']})
-            tabDetails = await chrome.tabs.sendMessage(sender.tab.id, {generateReport: true})
-            if (!tabDetails.screenshotError) tabDetails.screenshot = new Uint8Array(await convertBase64ToBlob(tabDetails.screenshot).arrayBuffer())
-        } catch (error) {
-            if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
-                console.warn(getProjectPrefix(project, true) + 'Ошибка получении скриншота вкладки для отправки отчёта об ошибке', error)
-            }
-        }
+        await new Promise(resolve => {
+            chrome.pageCapture.saveAsMHTML({tabId: sender.tab.id}, function (details) {
+                const error = chrome.runtime.lastError?.message
+                if (error) {
+                    if (!error.includes('Cannot find the tab for this request')) {
+                        console.warn(getProjectPrefix(project, true) + 'Ошибка получении скриншота вкладки для отправки отчёта об ошибке', error)
+                    }
+                    resolve()
+                    return
+                }
+                tabDetails = {}
+                tabDetails.mhtml = details
+                resolve()
+            })
+        })
     }
 
     if (!tabDetails && !request.html) return
@@ -1318,6 +1324,10 @@ async function sendReport(request, sender, tabDetails, project, reported) {
     if (!tabDetails && request.html) {
         tabDetails = {html: request.html}
     }
+    if (tabDetails.mhtml) {
+        // noinspection JSUnresolvedFunction
+        tabDetails.mhtml = new Uint8Array(await tabDetails.mhtml.arrayBuffer())
+    }
 
     // Да тут полный кринж, работа с байтами крайне убога, но мы работаем с тем чем имеем
     if (tabDetails) {
@@ -1325,17 +1335,13 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         let documentArrayBody
         let documentArray
 
-        let screenshotArrayHead
-        let screenshotArrayBody
-        let screenshotArray
-
         let enc = new TextEncoder()
 
         const attachmentHTML = {}
-        documentArrayBody = enc.encode(tabDetails.html)
+        documentArrayBody = tabDetails.html ? enc.encode(tabDetails.html) : tabDetails.mhtml
         attachmentHTML.type = 'attachment'
         attachmentHTML.length = documentArrayBody.length
-        attachmentHTML.filename = 'document.html'
+        attachmentHTML.filename = tabDetails.html ? 'document.html' : 'document.mhtml'
         documentArrayHead = enc.encode('\n' + JSON.stringify(attachmentHTML) + '\n')
         documentArray = new Uint8Array(documentArrayHead.length + documentArrayBody.length)
         documentArray.set(documentArrayHead)
@@ -1346,24 +1352,7 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         newBody2.set(newBody)
         newBody2.set(documentArray, newBody.length)
 
-        if (tabDetails.screenshot || tabDetails.screenshotError) {
-            const attachmentScreenshot = {}
-            screenshotArrayBody = tabDetails.screenshotError ? enc.encode(tabDetails.screenshotError) : tabDetails.screenshot
-            attachmentScreenshot.type = 'attachment'
-            attachmentScreenshot.length = screenshotArrayBody.length
-            attachmentScreenshot.filename = tabDetails.screenshotError ? 'screenshot.txt' : 'screenshot.png'
-            screenshotArrayHead = enc.encode('\n' + JSON.stringify(attachmentScreenshot) + '\n')
-            screenshotArray = new Uint8Array(screenshotArrayHead.length + screenshotArrayBody.length)
-            screenshotArray.set(screenshotArrayHead)
-            screenshotArray.set(screenshotArrayBody, screenshotArrayHead.length)
-
-            let newBody3 = new Uint8Array(newBody2.length + screenshotArray.length)
-            newBody3.set(newBody2)
-            newBody3.set(screenshotArray, newBody2.length)
-            body = newBody3
-        } else {
-            body = newBody2
-        }
+        body = newBody2
     }
 
     const options = {body}
@@ -1388,28 +1377,6 @@ function uuidv4() {
     return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
-}
-
-function convertBase64ToBlob(base64Image) {
-    // Split into two parts
-    const parts = base64Image.split(';base64,');
-
-    // Hold the content type
-    const imageType = parts[0].split(':')[1];
-
-    // Decode Base64 string
-    const decodedData = self.atob(parts[1]);
-
-    // Create UNIT8ARRAY of size same as row data length
-    const uInt8Array = new Uint8Array(decodedData.length);
-
-    // Insert all character code into uInt8Array
-    for (let i = 0; i < decodedData.length; ++i) {
-        uInt8Array[i] = decodedData.charCodeAt(i);
-    }
-
-    // Return BLOB image after conversion
-    return new Blob([uInt8Array], { type: imageType });
 }
 
 //Отправитель уведомлений
