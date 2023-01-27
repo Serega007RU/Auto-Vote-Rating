@@ -42,7 +42,7 @@ async function vote(first) {
 
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
-    const gdpr = document.querySelector("#vote-form > div.row > div.col-lg-7 > div:nth-child(3) > div > input")
+    const gdpr = document.querySelector('a[href="https://www.minecraft-list.cz/gdpr"]')?.parentElement?.parentElement?.firstElementChild
     if (!gdpr || !isVisible(gdpr) || gdpr.getAttribute('style')) {
         if (!gdpr) {
             reasonInvincible = 'is null'
