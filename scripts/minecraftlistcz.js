@@ -24,6 +24,12 @@ async function vote(first) {
             }
         }
     }
+    if (document.querySelector('.alert.alert-danger')) {
+        const request = {}
+        request.message = document.querySelector('.alert.alert-danger').textContent.trim()
+        chrome.runtime.sendMessage(request)
+        return
+    }
     if (document.querySelector('div.content.content-full h1')) {
         const request = {}
         request.message = document.querySelector('div.content.content-full h1').textContent.trim() + ' ' + document.querySelector('div.content.content-full h2').textContent.trim()
@@ -42,7 +48,7 @@ async function vote(first) {
 
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
-    const gdpr = document.querySelector('a[href="https://www.minecraft-list.cz/gdpr"]')?.parentElement?.parentElement?.firstElementChild
+    const gdpr = document.querySelector('a[href="https://www.minecraft-list.cz/gdpr"]')?.parentElement?.parentElement?.querySelector('input')
     if (!gdpr || !isVisible(gdpr) || gdpr.getAttribute('style')) {
         if (!gdpr) {
             reasonInvincible = 'is null'
