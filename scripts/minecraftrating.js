@@ -4,12 +4,15 @@ async function vote(first) {
         chrome.runtime.sendMessage({message: document.querySelector('.container .text-center').textContent, ignoreReport: true})
         return
     }
-    if (document.querySelector('body > #warning-container') && document.body.innerText.trim().length < 150) {
-        chrome.runtime.sendMessage({
-            message: document.body.innerText.trim(),
-            ignoreReport: true
-        })
-        return
+    if (document.body.innerText.trim().length < 150) {
+        const message = document.body.innerText.trim()
+        if (document.querySelector('body > #warning-container') || message === '419\nPage Expired') {
+            chrome.runtime.sendMessage({
+                message: document.body.innerText.trim(),
+                ignoreReport: true
+            })
+            return
+        }
     }
     if (project.game === 'projects') {
         if (document.querySelector('div.alert.alert-danger') != null) {
