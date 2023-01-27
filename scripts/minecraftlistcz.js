@@ -48,18 +48,18 @@ async function vote(first) {
 
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
-    const gdpr = document.querySelector('a[href="https://www.minecraft-list.cz/gdpr"]')?.parentElement?.parentElement?.querySelector('input')
-    if (!gdpr || !isVisible(gdpr) || gdpr.getAttribute('style')) {
-        if (!gdpr) {
-            reasonInvincible = 'is null'
-        } else if (gdpr.getAttribute('style')) {
-            reasonInvincible = 'style'
-        }
-        chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible, " + reasonInvincible + ". Protection from auto-voting? Inform the extension developer about this error!"})
-        return
-    } else {
+    const gdpr = document.querySelector('#gdpr')
+    // if (!gdpr || !isVisible(gdpr) || gdpr.getAttribute('style')) {
+    //     if (!gdpr) {
+    //         reasonInvincible = 'is null'
+    //     } else if (gdpr.getAttribute('style')) {
+    //         reasonInvincible = 'style'
+    //     }
+    //     chrome.runtime.sendMessage({message: "Agree (Souhlasím) is not visible, " + reasonInvincible + ". Protection from auto-voting? Inform the extension developer about this error!"})
+    //     return
+    // } else {
         gdpr.checked = true
-    }
+    // }
 
     document.querySelector('div.vote__box__buttonRow__button button[type="submit"]').click()
 }
