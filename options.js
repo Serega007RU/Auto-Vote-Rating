@@ -1049,8 +1049,8 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
         let body
         try {
             body = JSON.parse(document.getElementById('customBody').value)
-        } catch (e) {
-            createNotif(e, 'error')
+        } catch (error) {
+            createNotif(error.message, 'error')
             event.submitter.disabled = false
             return
         }
@@ -1170,12 +1170,12 @@ async function addProject(project, element) {
             } else {
                 response = await fetch(url, {credentials: 'include'})
             }
-        } catch (e) {
-            if (e === 'TypeError: Failed to fetch') {
+        } catch (error) {
+            if (error === 'TypeError: Failed to fetch') {
                 createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error', null, element)
                 return
             } else {
-                createNotif(e, 'error', null, element)
+                createNotif(error.message, 'error', null, element)
                 return
             }
         }
@@ -1212,8 +1212,8 @@ async function addProject(project, element) {
 
             project.name = allProjects[project.rating].projectName(doc, project)
             if (!project.name) project.name = ''
-        } catch (e) {
-            console.error(e)
+        } catch (error) {
+            console.error(error.message)
             if (!project.name) project.name = ''
         }
         createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
@@ -1225,12 +1225,12 @@ async function addProject(project, element) {
             let response2
             try {
                 response2 = await fetch(url2, {redirect: 'manual', credentials: 'include'})
-            } catch (e) {
-                if (e === 'TypeError: Failed to fetch') {
+            } catch (error) {
+                if (error === 'TypeError: Failed to fetch') {
                     createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error', null, element)
                     return
                 } else {
-                    createNotif(e, 'error', null, element)
+                    createNotif(error.message, 'error', null, element)
                     return
                 }
             }
@@ -1553,8 +1553,8 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         await restoreOptions()
 
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
-    } catch (e) {
-        createNotif(e, 'error')
+    } catch (error) {
+        createNotif(error.message, 'error')
     } finally {
         document.getElementById('file-upload').value = ''
     }
