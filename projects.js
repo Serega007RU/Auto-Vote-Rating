@@ -439,7 +439,18 @@ var allProjects = {
         projectName: (doc, project) => project.game === 'servers' ? doc.querySelector('.servernameh1').textContent : doc.querySelector('.bot-title-bp h2').textContent,
         exampleURL: () => ['https://discords.com/bots/bot/', '469610550159212554', '/vote'],
         URL: () => 'discords.com',
-        parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
+        parseURL: (url) => {
+            const project = {}
+            const paths = url.pathname.split('/')
+            if (paths[1] === 'servers') {
+                project.id = paths[2]
+                project.game = 'servers'
+            } else {
+                project.id = paths[3]
+                project.game = 'bots/bot'
+            }
+            return project
+        },
         timeout: (project) => project.game === 'bots/bot' ? ({hours: 12}) : ({hours: 6}),
         notRequiredNick: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
