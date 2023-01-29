@@ -29,63 +29,38 @@ async function vote() {
         return
     }
 
-    const btn = document.querySelector('#main .card-body .btn.btn-blue')
-    if (btn) {
-        if (!isVisible(btn)) {
-            await wait(Math.floor(Math.random() * 9000 + 1000))
-            chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
-            return
-        }
-        const message = getText(btn)
-        if (message.includes('ч.')) {
-            const numbers = message.match(/\d+/g).map(Number)
-            const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
-            await wait(Math.floor(Math.random() * 9000 + 1000))
-            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
-        } else {
-            chrome.runtime.sendMessage({message: 'Что-то не так с кнопкой голосования, ' + message})
-        }
-    } else {
-        const event = new Event('mousemove')
-        document.body.dispatchEvent(event)
-
-        let waiting = false
-        let timer2 = setInterval(async () => {
-            try {
-                if (waiting) return
-                let buttons = findVoteButton()
-                if (buttons.length === 0) return
-                let button = buttons[buttons.length - 1]
-                if (!button) return
-                // const message = getText(button)
-                if (!isVisible(button)) {
-                    clearInterval(timer2)
-                    await wait(Math.floor(Math.random() * 9000 + 1000))
-                    chrome.runtime.sendMessage({message: 'Кнопка голосования стала невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
-                } else if ((button.disabled == null || button.disabled === false) && button.getAttribute('disabled') == null) {
-                    waiting = true
-                    await wait(Math.floor(Math.random() * 9000 + 1000))
-                    buttons = findVoteButton()
-                    if (buttons.length === 0) {
-                        waiting = false
-                        return
-                    }
-                    button = buttons[buttons.length - 1]
-                    if (!button) {
-                        waiting = false
-                        return
-                    }
-                    clearInterval(timer2)
-                    const event = new Event('mousemove')
-                    document.body.dispatchEvent(event)
-                    button.click()
-                }
-            } catch (e) {
+    let waiting = false
+    const timer2 = setInterval(async () => {
+        try {
+            if (waiting) return
+            const button = document.querySelector('#main .card-body .btn.btn-blue')
+            if (!button) return
+            if (!isVisible(button)) {
                 clearInterval(timer2)
-                throwError(e)
+                await wait(Math.floor(Math.random() * 9000 + 1000))
+                chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
+                return
             }
-        }, 1000)
-    }
+            const message = getText(button)
+            if (message.includes('ч.')) {
+                const numbers = message.match(/\d+/g).map(Number)
+                const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
+                waiting = true
+                await wait(Math.floor(Math.random() * 9000 + 1000))
+                chrome.runtime.sendMessage({successfully: Date.now() + milliseconds})
+                return
+            }
+            if ((button.disabled == null || button.disabled === false) && button.getAttribute('disabled') == null) {
+                waiting = true
+                await wait(Math.floor(Math.random() * 9000 + 1000))
+                button.click()
+                clearInterval(timer2)
+            }
+        } catch (e) {
+            clearInterval(timer2)
+            throwError(e)
+        }
+    }, 1000)
 }
 
 const timer = setInterval(async ()=>{
@@ -98,7 +73,9 @@ const timer = setInterval(async ()=>{
                 await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({later: true})
             } else if (message.includes('Голос принят')) {
-                chrome.runtime.sendMessage({successfully: true})
+                // TODO кринж кринжа, сайт уведомление об успешном голосовании отображает буквально на секунду, ничего дибильнее придумать автор сайта не может
+                // await wait(Math.floor(Math.random() * 9000 + 1000))
+                // chrome.runtime.sendMessage({successfully: true})
             } else if (message.includes('Авторизация')) {
                 chrome.runtime.sendMessage({auth: true})
             } else {
