@@ -43,6 +43,14 @@ async function vote(first) {
         chrome.runtime.sendMessage({later: true})
         return
     }
+    // Ошибки 5xx
+    if (document.querySelector("#main-container div.hero div.text-center h1")) {
+        const request = {}
+        request.message = document.querySelector("#main-container div.hero div.text-center h1").parentElement.innerText
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return
+    }
 
     if (first) return
 
