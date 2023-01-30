@@ -13,15 +13,17 @@ const timer = setInterval(()=>{
         //     clearInterval(timer)
         //     return
         // }
-        if (document.querySelector('#error-message') != null) {
-            if (document.querySelector('#error-message').textContent.includes('already voted')) {
-                const numbers = document.querySelector('#error-message').textContent.match(/\d+/g).map(Number)
+        if (document.querySelector('#error-message')) {
+            const request = {}
+            request.message = document.querySelector('#error-message').innerText
+            if (request.message.includes('already voted') || request.message.includes('reached your daily voting limit')) {
+                const numbers = request.message.match(/\d+/g).map(Number)
                 const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
                 chrome.runtime.sendMessage({later: Date.now() + milliseconds + 60000})
-            } else if (document.querySelector('#error-message').textContent.includes('Thanks for voting')) {
+            } else if (request.message.includes('Thanks for voting')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
-                chrome.runtime.sendMessage({message: document.querySelector('#error-message').textContent})
+                chrome.runtime.sendMessage(request)
             }
             clearInterval(timer)
         }
