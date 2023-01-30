@@ -1,8 +1,6 @@
 async function vote(first) {
-    if (document.querySelector('#alert_box') != null) {
-        if (analyseText(document.querySelector('#alert_box').textContent)) {
-            return
-        }
+    if (analyseText()) {
+        return
     }
 
     if (first) return
@@ -19,25 +17,36 @@ async function vote(first) {
 }
 
 const timer = setInterval(()=>{
-    if (document.querySelector('#toast-container') != null) {
-        if (analyseText(document.querySelector('#toast-container').textContent)) {
-            clearInterval(timer)
-        }
+    if (analyseText()) {
+        clearInterval(timer)
     }
 }, 500)
 
-function analyseText(text) {
-    if (text.includes('have successfully cast your vote')) {
+function analyseText() {
+    const request = {}
+    if (document.querySelector('#alert_box')) {
+        request.message = document.querySelector('#alert_box').textContent
+    } else if (document.querySelector('#toast-container')) {
+        request.message = document.querySelector('#toast-container').textContent
+    } else if (document.querySelector("div.content h2")?.textContent.includes('Application error')) {
+        request.message = document.querySelector("div.content h2")?.textContent
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return true
+    } else {
+        return false
+    }
+    if (request.message.includes('have successfully cast your vote')) {
         chrome.runtime.sendMessage({successfully: true})
-    } else if (text.includes('captcha is not valid')) {
+    } else if (request.message.includes('captcha is not valid')) {
         // None
         return false
-    } else if (text.includes('You can vote again in') && /\d/.test(text)) {
-        const numbers = text.match(/\d+/g).map(Number)
+    } else if (request.message.includes('You can vote again in') && /\d/.test(request.message)) {
+        const numbers = request.message.match(/\d+/g).map(Number)
         const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
         chrome.runtime.sendMessage({later: Date.now() + milliseconds})
     } else {
-        chrome.runtime.sendMessage({message: text})
+        chrome.runtime.sendMessage(request)
     }
     return true
 }
