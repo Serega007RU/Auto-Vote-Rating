@@ -6,7 +6,7 @@ async function vote(first) {
     }
     if (document.body.innerText.trim().length < 150) {
         const message = document.body.innerText.trim()
-        if (document.querySelector('body > #warning-container') || message === '419\nPage Expired') {
+        if (document.querySelector('body > #warning-container') || message.toLocaleLowerCase() === '419\npage expired') {
             chrome.runtime.sendMessage({
                 message: document.body.innerText.trim(),
                 ignoreReport: true
