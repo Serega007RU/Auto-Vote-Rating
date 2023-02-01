@@ -35,13 +35,7 @@ async function vote() {
             if (waiting) return
             const button = document.querySelector('#main .card-body .btn.btn-blue')
             if (!button) return
-            if (!isVisible(button)) {
-                clearInterval(timer2)
-                await wait(Math.floor(Math.random() * 9000 + 1000))
-                chrome.runtime.sendMessage({message: 'Кнопка голосования невидимая! Защита от авто-голосования? Сообщите разработчику расширения о данной ошибке!'})
-                return
-            }
-            const message = getText(button)
+            const message = button.textContent
             if (message.includes('ч.')) {
                 const numbers = message.match(/\d+/g).map(Number)
                 const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
@@ -93,94 +87,3 @@ const timer = setInterval(async ()=>{
         throwError(e)
     }
 }, 200)
-
-// https://stackoverflow.com/a/41698614/11235240
-function isVisible(elem) {
-    if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
-    elem.scrollIntoView({block: 'center'})
-    const style = getComputedStyle(elem)
-    if (style.display === 'none') return false
-    if (style.visibility !== 'visible') return false
-    if (style.opacity && style.opacity < 0.5) return false
-
-    if (elem.offsetHeight < 40 || elem.offsetWidth < 40) return false // 1 пиксель?
-    // if (!getText(elem)) return false // Есть текст?
-
-    if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
-        elem.getBoundingClientRect().width === 0) {
-        return false
-    }
-    const elemCenter   = {
-        x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
-        y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
-    };
-    if (elemCenter.x < 0) return false
-    if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false
-    // TODO если элемент вне видимости страницы то это плохо
-    if (elemCenter.y < 0) return true
-    if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return true
-    let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
-    do {
-        if (pointContainer === elem) return true;
-    } while (pointContainer = pointContainer.parentNode)
-    return false
-}
-
-function findVoteButton() {
-    const elements = []
-    for (const elem of document.querySelector('#main .card-body').querySelectorAll('*')) {
-        if (isVisible(elem)) {
-            elements.push(elem)
-        }
-    }
-    return elements
-}
-
-function findElement(text) {
-    const result = []
-    for (const element of document.querySelectorAll("*")) {
-        const txt = getText(element)
-        if (txt && txt.toLowerCase() === text) {
-            result.push(element)
-        }
-    }
-    return result
-}
-
-function getText(elem) {
-    if (!(elem instanceof Element)) throw Error('DomUtil: elem is not an element.')
-    // https://stackoverflow.com/a/60263053/11235240
-    let prop = window.getComputedStyle(elem, '::before').getPropertyValue('content')
-    let text
-    if (!prop || prop === 'none' || prop === 'normal') prop = window.getComputedStyle(elem, '::after').getPropertyValue('content')
-    if (!prop || prop === 'none' || prop === 'normal') {
-        if (elem.innerText && elem.innerText.length > 3) text = elem.innerText
-    } else if (prop.length > 3) {
-        text = prop
-    }
-    if (!text) return null
-    return text.replaceAll('"', '')
-}
-
-// TODO не работает на ::after content: 'текст'
-// function findElement(text) {
-//     // https://stackoverflow.com/a/29289196/11235240
-//     const xPathResult = document.evaluate(xpathPrepare(text), document, null, XPathResult.ANY_TYPE, null)
-//
-//     // https://stackoverflow.com/a/47017702/11235240
-//     const nodes = []
-//     let node = xPathResult.iterateNext()
-//     while (node) {
-//         nodes.push(node)
-//         node = xPathResult.iterateNext()
-//     }
-//     return nodes
-// }
-//
-// // https://stackoverflow.com/a/8474109/11235240
-// function xpathPrepare(searchString) {
-//     const xpath = "//text()[contains(translate(., '$u', '$l'), '$s')]";
-//     return xpath.replace("$u", searchString.toUpperCase())
-//         .replace("$l", searchString.toLowerCase())
-//         .replace("$s", searchString.toLowerCase());
-// }
