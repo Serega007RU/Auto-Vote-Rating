@@ -13,7 +13,7 @@ async function vote(/*first*/) {
     }
 
     // TODO что-то этот сайт совсем умер, возможно даже сменились ссылки, подробнее в sentry, id: c4fdd5a51b5d445192e5740b00904a8a
-    if (document.querySelector('div.text-center a[href="http://minecraftbestservers.com/"]')) {
+    if (document.querySelector('div.text-center a[href="https://minecraftbestservers.com"]')) {
         chrome.runtime.sendMessage({message: document.querySelector('div.text-center').innerText, ignoreReport: true})
         return
     }
