@@ -499,7 +499,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
 //     await initializeFunc
 //     if (openedProjects.has(details.tabId)) {
 //         if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
-//             const project = await db.get('projects', openedProjects.get(details.tabId).key)
+//             const project = openedProjects.get(details.tabId)
 //             if (
 //                 //Chrome
 //                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
@@ -709,7 +709,6 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
     await initializeFunc
     let project = openedProjects.get(tabId)
     if (!project) return
-    project = await db.get('projects', project.key)
     endVote({closedTab: true}, {tab: {id: tabId}}, project)
 })
 
@@ -717,7 +716,6 @@ chrome.webRequest.onCompleted.addListener(async function(details) {
     await initializeFunc
     let project = openedProjects.get(details.tabId)
     if (!project) return
-    project = await db.get('projects', project.key)
 
     // Иногда некоторые проекты намеренно выдаёт ошибку в status code, нам ничего не остаётся кроме как игнорировать все ошибки, подробнее https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
     if (allProjects[project.rating].ignoreErrors?.()) return
@@ -736,7 +734,7 @@ chrome.webRequest.onErrorOccurred.addListener(async function(details) {
         endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
     } else */if (openedProjects.has(details.tabId)) {
         if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
-            const project = await db.get('projects', openedProjects.get(details.tabId).key)
+            const project = openedProjects.get(details.tabId)
             if (
                 //Chrome
                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
@@ -904,8 +902,9 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         console.warn('Пришёл нераспознанный chrome.runtime.message, что это?' + JSON.stringify(request))
         return
     }
-    const project = await db.get('projects', openedProjects.get(sender.tab.id).key)
+    let project = openedProjects.get(sender.tab.id)
     if (request.captcha || request.authSteam || request.discordLogIn || request.auth) {//Если требует ручное прохождение капчи
+        project = await db.get('projects', project.key)
         let message
         if (request.captcha) {
             if (settings.disabledWarnCaptcha) return
@@ -921,6 +920,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         // delete project.nextAttempt
         updateValue('projects', project)
     } else if (request.errorCaptcha && !request.restartVote) {
+        project = await db.get('projects', project.key)
         const message = chrome.i18n.getMessage('errorCaptcha', request.errorCaptcha)
         console.warn(getProjectPrefix(project, true), message)
         if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
@@ -983,7 +983,7 @@ async function endVote(request, sender, project) {
         } catch (error) {
             console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error.message)
         } finally {
-            if (!request.closedTab) {
+            if (sender && !request.closedTab) {
                 tryCloseTab(sender.tab.id, project, 0)
             }
         }
@@ -1017,6 +1017,8 @@ async function endVote(request, sender, project) {
     //         fetchProjects.delete(key)
     //     }
     // }
+
+    project = await db.get('projects', project.key)
 
     delete project.nextAttempt
     delete project.timeoutQueue
