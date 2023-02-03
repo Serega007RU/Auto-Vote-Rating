@@ -20,6 +20,9 @@ async function vote(first) {
         if (el.textContent.includes('Thank you for your vote')) {
             chrome.runtime.sendMessage({successfully: true})
             return
+        } else if (el.textContent.includes('Voting is disabled for few minutes')) {
+            chrome.runtime.sendMessage({message: el.textContent, ignoreReport: true})
+            return
         }
     }
 

@@ -439,7 +439,18 @@ var allProjects = {
         projectName: (doc, project) => project.game === 'servers' ? doc.querySelector('.servernameh1').textContent : doc.querySelector('.bot-title-bp h2').textContent,
         exampleURL: () => ['https://discords.com/bots/bot/', '469610550159212554', '/vote'],
         URL: () => 'discords.com',
-        parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
+        parseURL: (url) => {
+            const project = {}
+            const paths = url.pathname.split('/')
+            if (paths[1] === 'servers') {
+                project.id = paths[2]
+                project.game = 'servers'
+            } else {
+                project.id = paths[3]
+                project.game = 'bots/bot'
+            }
+            return project
+        },
         timeout: (project) => project.game === 'bots/bot' ? ({hours: 12}) : ({hours: 6}),
         notRequiredNick: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
@@ -773,8 +784,7 @@ var allProjects = {
             ['Ultima-Online', 'Ultima Online'],
             ['War-of-the-Immortals', 'War of the Immortals'],
             ['World-of-Warcraft', 'World of Warcraft']
-        ]),
-        alertManualCaptcha: () => true
+        ])
     },
     WARGM: {
         voteURL: (project) => 'https://wargm.ru/server/' + project.id + '/votes',
@@ -784,10 +794,8 @@ var allProjects = {
         URL: () => 'wargm.ru',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
         timeout: () => ({hours: 16}),
-        needIsTrusted: () => true,
         notRequiredNick: () => true,
         banAttention: () => true,
-        notRequiredCaptcha: () => true,
         needAdditionalOrigins: ()=> ['*://*.steamcommunity.com/*']
     },
     MineStatus: {

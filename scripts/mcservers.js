@@ -5,13 +5,20 @@
 
 async function vote(first) {
 //  if (first == true || first == false) return
-    if (document.querySelector('div.main-panel > p') != null) {
-        if (document.querySelector('div.main-panel > p').textContent.includes('already voted')) {
+    if (document.querySelector('div.main-panel > p')) {
+        const request = {}
+        request.message = document.querySelector('div.main-panel > p').textContent
+        if (request.message.includes('already voted')) {
             chrome.runtime.sendMessage({later: true})
+            return
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.main-panel > p').textContent})
+            if (request.message.includes('Captcha is not correct')) {
+                // None
+            } else {
+                chrome.runtime.sendMessage(request)
+                return
+            }
         }
-        return
     }
     if (document.querySelector('div.main-panel > span') != null) {
         if (document.querySelector('div.main-panel > span').textContent.includes('vote was success')) {
