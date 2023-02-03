@@ -40,7 +40,7 @@ async function vote(first) {
         return
     }
     // Костыль
-    if (document.location.pathname.split('/')[1] === 'cs' && !document.location.pathname.split('/')[2]) {
+    if ((document.location.pathname.split('/')[1] === 'cs' || document.location.pathname.split('/')[1] === 'sk') && !document.location.pathname.split('/')[2]) {
         const request = {}
         request.errorVoteNoElement = 'Redirected to server list'
         request.ignoreReport = true
