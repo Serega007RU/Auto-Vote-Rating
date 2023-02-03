@@ -1180,16 +1180,16 @@ async function addProject(project, element) {
             }
         }
 
-        if (response.status === 404) {
+        // Иногда некоторые проекты намеренно выдаёт ошибку в status code, нам ничего не остаётся кроме как игнорировать все ошибки, подробнее https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
+        if (allProjects[project.rating].ignoreErrors?.()) {
+            // None
+        } else if (response.status === 404) {
             createNotif(chrome.i18n.getMessage('notFoundProjectCode', String(response.status)), 'error', null, element)
             return
         } else if (response.redirected) {
             createNotif(chrome.i18n.getMessage('notFoundProjectRedirect', response.url), 'error', null, element)
             return
         } else if (response.status === 503) {
-            //None
-        // Иногда некоторые проекты намеренно выдаёт ошибку в status code, нам ничего не остаётся кроме как игнорировать все ошибки, подробнее https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
-        } else if (allProjects[project.rating].ignoreErrors?.()) {
             //None
         } else if (!response.ok) {
             createNotif(chrome.i18n.getMessage('notConnect', [project.rating, String(response.status)]), 'error', null, element)

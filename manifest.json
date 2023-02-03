@@ -23,6 +23,7 @@
 		"notifications",
 		"background",
 		"webNavigation",
+		"webRequest",
 		"alarms",
 		"unlimitedStorage",
 		"scripting",

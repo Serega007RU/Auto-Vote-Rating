@@ -495,24 +495,24 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     return true
 }
 
-chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
-    await initializeFunc
-    if (openedProjects.has(details.tabId)) {
-        if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
-            const project = await db.get('projects', openedProjects.get(details.tabId).key)
-            if (
-                //Chrome
-                details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
-                //FireFox
-                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
-                // console.warn(getProjectPrefix(project, true), details.error)
-                return
-            }
-            const sender = {tab: {id: details.tabId}}
-            endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
-        }
-    }
-})
+// chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
+//     await initializeFunc
+//     if (openedProjects.has(details.tabId)) {
+//         if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+//             const project = await db.get('projects', openedProjects.get(details.tabId).key)
+//             if (
+//                 //Chrome
+//                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
+//                 //FireFox
+//                 || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
+//                 // console.warn(getProjectPrefix(project, true), details.error)
+//                 return
+//             }
+//             const sender = {tab: {id: details.tabId}}
+//             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
+//         }
+//     }
+// })
 
 chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
     if (details.url === 'about:blank') return
@@ -713,45 +713,44 @@ chrome.tabs.onRemoved.addListener(async function(tabId) {
     endVote({closedTab: true}, {tab: {id: tabId}}, project)
 })
 
-// TODO к сожалению в manifest v3 не возможно узнать status code страницы, не знаю как это ещё сделать
-// chrome.webRequest.onCompleted.addListener(async function(details) {
-//     await initializeFunc
-//     let project = openedProjects.get(details.tabId)
-//     if (!project) return
-//     project = await db.get('projects', project.key)
-//
-//     // TODO это какой-то кринж для https://www.minecraft-serverlist.net/, ошибка 500 считается как успешный запрос https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
-//     if (project.rating === 'MinecraftServerListNet') return
-//
-//     if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
-//         const sender = {tab: {id: details.tabId}}
-//         endVote({errorVote: [String(details.statusCode), details.url]}, sender, project)
-//     }
-// }, {urls: ['<all_urls>']})
-//
-// chrome.webRequest.onErrorOccurred.addListener(async function(details) {
-//     await initializeFunc
-//     // noinspection JSUnresolvedVariable
-//     if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
-//         let project = fetchProjects.get(details.requestId)
-//         endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
-//     } else if (openedProjects.has(details.tabId)) {
-//         if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
-//             const project = await db.get('projects', openedProjects.get(details.tabId).key)
-//             if (
-//                 //Chrome
-//                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
-//                 //FireFox
-//                 || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
-//                     // console.warn(getProjectPrefix(project, true), details.error)
-//                     return
-//             }
-//             const sender = {tab: {id: details.tabId}}
-//             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
-//         }
-//     }
-// }, {urls: ['<all_urls>']})
-//
+chrome.webRequest.onCompleted.addListener(async function(details) {
+    await initializeFunc
+    let project = openedProjects.get(details.tabId)
+    if (!project) return
+    project = await db.get('projects', project.key)
+
+    // Иногда некоторые проекты намеренно выдаёт ошибку в status code, нам ничего не остаётся кроме как игнорировать все ошибки, подробнее https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
+    if (allProjects[project.rating].ignoreErrors?.()) return
+
+    if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
+        const sender = {tab: {id: details.tabId}}
+        endVote({errorVote: [String(details.statusCode), details.url]}, sender, project)
+    }
+}, {urls: ['<all_urls>']})
+
+chrome.webRequest.onErrorOccurred.addListener(async function(details) {
+    await initializeFunc
+    // noinspection JSUnresolvedVariable
+    /*if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
+        let project = fetchProjects.get(details.requestId)
+        endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
+    } else */if (openedProjects.has(details.tabId)) {
+        if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+            const project = await db.get('projects', openedProjects.get(details.tabId).key)
+            if (
+                //Chrome
+                details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
+                //FireFox
+                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
+                    // console.warn(getProjectPrefix(project, true), details.error)
+                    return
+            }
+            const sender = {tab: {id: details.tabId}}
+            endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
+        }
+    }
+}, {urls: ['<all_urls>']})
+
 // async function _fetch(url, options, project) {
 //     let listener
 //     const removeListener = ()=>{
