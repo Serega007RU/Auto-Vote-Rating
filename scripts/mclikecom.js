@@ -29,9 +29,12 @@ async function vote(first) {
             leftTime = leftTime * 3600000
             chrome.runtime.sendMessage({later: Date.now() + leftTime})
             return
+        } else if (message.includes('I\'m not a robot')) {
+            // None
+        } else {
+            chrome.runtime.sendMessage({message})
+            return
         }
-        chrome.runtime.sendMessage({message})
-        return
     }
 
     if (first) return
