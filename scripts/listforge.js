@@ -97,7 +97,8 @@ async function vote(first) {
             document.querySelector('button[form="vote_form"]').click()
         //Ещё какая-то разновидность кнопки Vote (Specially for Minecraft Pocket Servers)
         } else {
-            document.querySelector('a[href="javascript:document.vote_form.submit();"]').click()
+            // document.querySelector('a[href="javascript:document.vote_form.submit();"]').click()
+            document.querySelector('form[name="vote_form"]').submit()
         }
     } else {
         // noinspection ExceptionCaughtLocallyJS
