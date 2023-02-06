@@ -161,6 +161,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         await other.add(generalStats, 'generalStats')
         await other.add(todayStats, 'todayStats')
         await other.add(openedProjects, 'openedProjects')
+        onLine = true
+        other.add(onLine, 'onLine')
         return
     }
 
