@@ -54,6 +54,16 @@ async function run() {
         //Если мы находися на странице авторизации ВКонтакте
         if (document.URL.match(/vk.com\/*/)) {
             // TODO нужно полностью переписать тут всю логику под новую версию интерфейса ВК
+
+            // https://cdn.discordapp.com/attachments/1072161816693710868/1072172021473095700/image.png
+            const timer7 = setInterval(() => {
+                if (document.querySelector('#error .vkuiModalCardBase__container')) {
+                    clearInterval(timer7)
+                    chrome.runtime.sendMessage({errorAuthVK: document.querySelector('#error .vkuiModalCardBase__container').textContent})
+                }
+            }, 1000)
+            if (document.querySelector('#error .vkuiModalCardBase__container')) return
+
             if (document.querySelector('.vkc__AuthRoot__contentIn')) {
                 const timer = setInterval(()=>{
                     if (document.querySelector('.vkc__AcceptPrivacyPolicy__content button[type="submit"]')) {
