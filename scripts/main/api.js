@@ -5,10 +5,14 @@ if (!window.loaded) {
     run()
 }
 
+let resolveProject
+const waitProject = new Promise(resolve => resolveProject = resolve)
+
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
     if (request.sendProject) {
         window.proj = request.project
         if (request.vkontakte) window.vkontakte = request.vkontakte
+        resolveProject()
     } else if (request === 'captchaPassed') {
         // noinspection JSIgnoredPromiseFromCall
         startVote(false)
@@ -231,6 +235,7 @@ async function startVote(first) {
 }
 
 async function getProject() {
+    await waitProject
     return window.proj
 }
 
