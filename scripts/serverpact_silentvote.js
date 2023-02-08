@@ -76,7 +76,7 @@ async function silentVoteServerPact(project) {
     if (!await checkResponseError(project, response, 'serverpact.com')) return
     if (response.doc.querySelector('div.alert-success')?.textContent.includes('succesfully voted') || response.doc.querySelector('div.alert-success')?.textContent.includes('successfully voted')) {
         endVote({successfully: true}, null, project)
-    } else if (response.doc.querySelector('.container h1.sp-title')?.nextSibling?.nextSibling?.textContent.includes('succesfully voted') || response.doc.querySelector('.container h1.sp-title')?.nextSibling?.nextSibling?.textContent.includes('successfully voted')) {
+    } else if (response.doc.querySelector('.container h1.sp-title')?.nextElementSibling?.nextSibling?.textContent.includes('succesfully voted') || response.doc.querySelector('.container h1.sp-title')?.nextElementSibling?.nextSibling?.textContent.includes('successfully voted')) {
         endVote({successfully: true}, null, project)
     } else if (response.doc.querySelector('div.alert-warning') && (response.doc.querySelector('div.alert.alert-warning').textContent.includes('You can only vote once') || response.doc.querySelector('div.alert.alert-warning').textContent.includes('already voted'))) {
         endVote({later: Date.now() + 43200000}, null, project)
