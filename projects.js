@@ -1206,11 +1206,10 @@ var allProjects = {
     MinecraftBestServersCom: {
         voteURL: (project) => 'https://minecraftbestservers.com/' + project.id + '/vote',
         pageURL: (project) => 'https://minecraftbestservers.com/' + project.id,
-        projectName: (doc) => doc.querySelector('table .server.icon').parentElement.innerText.trim(),
+        projectName: (doc) => doc.querySelector('header div.container h1.text-center').textContent.replace(' Minecraft Server Info, Voting, and More', ''),
         exampleURL: () => ['https://minecraftbestservers.com/', 'server-cherry-survival.4599', '/vote'],
         URL: () => 'minecraftbestservers.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
-        needAdditionalOrigins: ()=> ['*://*.steamcommunity.com/*']
+        parseURL: (url) => ({id: url.pathname.split('/')[1]})
     },
     MCLikeCom: {
         voteURL: (project) => 'https://mclike.com/vote-' + project.id,
