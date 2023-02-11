@@ -20,17 +20,21 @@ async function vote(first) {
     }
 
     //Если есть ошибка
-    if (document.querySelector('#w1 > div.error-message > div') != null) {
+    if (document.querySelector('#w1 > div.error-message > div')) {
+        const message = document.querySelector('#w1 > div.error-message > div').textContent
         //Если вы уже голосовали
-        if (document.querySelector('#w1 > div.error-message > div').textContent.includes('Вы сможете повторно проголосовать')) {
-            let leftTime = parseInt(document.querySelector('#w1 > div.error-message > div').textContent.match(/\d/g).join(''))
+        if (message.includes('Вы сможете повторно проголосовать')) {
+            let leftTime = parseInt(message.match(/\d/g).join(''))
             leftTime = leftTime + 1
             leftTime = leftTime * 3600000
             chrome.runtime.sendMessage({later: Date.now() + leftTime})
             return
+        } else if (message.includes('Я не робот')) {
+            // None
+        } else {
+            chrome.runtime.sendMessage({message})
+            return
         }
-        chrome.runtime.sendMessage({message: document.querySelector('#w1 > div.error-message > div').textContent})
-        return
     }
 
     if (first) return
