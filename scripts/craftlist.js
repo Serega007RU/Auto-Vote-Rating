@@ -48,7 +48,7 @@ async function vote(first) {
         return
     }
 
-    const btnText = document.querySelector('a.btn-vote').textContent
+    const btnText = document.querySelector('.sidebar .card-body .btn.btn-primary').textContent
     if (btnText.includes('possible vote')
         || btnText.includes('možný hlas')
         || btnText.includes('ist möglich')) {
@@ -72,7 +72,7 @@ async function vote(first) {
         chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         return
     } else {
-        document.querySelector('a.btn-vote').click()
+        document.querySelector('.sidebar .card-body .btn.btn-primary').click()
     }
 
     if (first) return
@@ -85,5 +85,5 @@ async function vote(first) {
         chrome.runtime.sendMessage({changeProject: project})
     }
     document.querySelector('input[name="nickName"]').value = project.nick
-    document.querySelector('button.btn.btn-vote').click()
+    document.querySelector('.modal-footer button.btn.btn-primary[type="submit"]').click()
 }

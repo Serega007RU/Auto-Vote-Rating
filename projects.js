@@ -559,7 +559,7 @@ var allProjects = {
     CraftList: {
         voteURL: (project) => 'https://craftlist.org/' + project.id,
         pageURL: (project) => 'https://craftlist.org/' + project.id,
-        projectName: (doc) => doc.querySelector('main h1').textContent,
+        projectName: (doc) => doc.querySelector('main h1').innerText,
         exampleURL: () => ['https://craftlist.org/', 'basicland', ''],
         URL: () => 'craftlist.org',
         parseURL: (url) => ({id: url.pathname.split('/')[1]}),
