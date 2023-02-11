@@ -40,7 +40,7 @@ async function vote(first) {
         return
     }
     // Костыль
-    if ((document.location.pathname.split('/')[1] === 'cs' || document.location.pathname.split('/')[1] === 'sk') && !document.location.pathname.split('/')[2]) {
+    if ((document.location.pathname.split('/')[1] === 'cz' || document.location.pathname.split('/')[1] === 'cs' || document.location.pathname.split('/')[1] === 'sk') && !document.location.pathname.split('/')[2]) {
         const request = {}
         request.errorVoteNoElement = 'Redirected to server list'
         request.ignoreReport = true
@@ -48,7 +48,7 @@ async function vote(first) {
         return
     }
 
-    const btnText = document.querySelector('.sidebar .card-body .btn.btn-primary').textContent
+    const btnText = document.querySelector('.sidebar .card-body .btn').textContent
     if (btnText.includes('possible vote')
         || btnText.includes('možný hlas')
         || btnText.includes('ist möglich')) {
@@ -72,7 +72,7 @@ async function vote(first) {
         chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         return
     } else {
-        document.querySelector('.sidebar .card-body .btn.btn-primary').click()
+        document.querySelector('.sidebar .card-body .btn').click()
     }
 
     if (first) return
@@ -84,6 +84,13 @@ async function vote(first) {
         project.timeout = milliseconds
         chrome.runtime.sendMessage({changeProject: project})
     }
-    document.querySelector('input[name="nickName"]').value = project.nick
-    document.querySelector('.modal-footer button.btn.btn-primary[type="submit"]').click()
+    document.querySelector('.modal-body input[required]').value = project.nick
+    document.querySelector('.modal-footer button.btn').click()
 }
+
+const timer = setInterval(() => {
+    if (document.querySelector(".modal-body .text-danger")) {
+        clearInterval(timer)
+        chrome.runtime.sendMessage({message: document.querySelector(".modal-body .text-danger").innerText})
+    }
+}, 1000)
