@@ -1,6 +1,10 @@
+let openedModal = false
+
 async function vote(first) {
-    if (document.querySelector('div.alert.alert-success')) {
-        const message = document.querySelector('div.alert.alert-success').textContent
+    if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
+
+    if (querySelector('div.alert.alert-success')) {
+        const message = querySelector('div.alert.alert-success').textContent
         if (message.includes('vote was successfully')
             || message.includes('hlas byl úspěšně přijatý')
             || message.includes('hlas bol úspešne prijatý')
@@ -12,8 +16,8 @@ async function vote(first) {
         }
         return
     }
-    if (document.querySelector('div.alert.alert-info')) {
-        const message = document.querySelector('div.alert.alert-info').textContent
+    if (querySelector('div.alert.alert-info')) {
+        const message = querySelector('div.alert.alert-info').textContent
         if (message.includes('next vote')
             || message.includes('možný hlas za tento server můžeš odeslat')
             || message.includes('možný hlas za tento server môžeš odoslať')
@@ -25,16 +29,16 @@ async function vote(first) {
         }
         return
     }
-    if (document.querySelector('body #tracy-error')) {
+    if (querySelector('body #tracy-error')) {
         chrome.runtime.sendMessage({
-            message: document.querySelector('body #tracy-error').innerText,
+            message: querySelector('body #tracy-error').innerText,
             ignoreReport: true
         })
         return
     }
-    if (document.querySelector('body #server-error')) {
+    if (querySelector('body #server-error')) {
         chrome.runtime.sendMessage({
-            message: document.querySelector('body #server-error').innerText,
+            message: querySelector('body #server-error').innerText,
             ignoreReport: true
         })
         return
@@ -48,49 +52,119 @@ async function vote(first) {
         return
     }
 
-    const btnText = document.querySelector('.sidebar .card-body .btn').textContent
-    if (btnText.includes('possible vote')
-        || btnText.includes('možný hlas')
-        || btnText.includes('ist möglich')) {
-        //Из текста достаёт все цифры в Array List
-        const numbers = btnText.match(/\d+/g).map(Number)
-        let count = 0
-        let hour = 0
-        let min = 0
-        let sec = 0
-        for (const i in numbers) {
-            if (count === 0) {
-                hour = numbers[i]
-            } else if (count === 1) {
-                min = numbers[i]
-            } else if (count === 2) {
-                sec = numbers[i]
+    const project = await getProject('CraftList')
+
+    if (first && !openedModal) {
+        openedModal = true
+        const btnText = querySelector('.sidebar .card-body .btn')?.textContent
+        if (btnText &&
+            (btnText.includes('possible vote')
+            || btnText.includes('možný hlas')
+            || btnText.includes('ist möglich'))) {
+            //Из текста достаёт все цифры в Array List
+            const numbers = btnText.match(/\d+/g).map(Number)
+            let count = 0
+            let hour = 0
+            let min = 0
+            let sec = 0
+            for (const i in numbers) {
+                if (count === 0) {
+                    hour = numbers[i]
+                } else if (count === 1) {
+                    min = numbers[i]
+                } else if (count === 2) {
+                    sec = numbers[i]
+                }
+                count++
             }
-            count++
+            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+            return
+        } else {
+            querySelector('.sidebar .card-body .btn')?.click()
         }
-        const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-        chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+
+        const timeout = querySelector('#voteModal p.text-center')
+        if (timeout) {
+            const hours = timeout.textContent.match(/\d+/g).map(Number)[0]
+            const milliseconds = (hours * 60 * 60 * 1000)
+            if (project.timeout == null || project.timeout !== milliseconds) {
+                project.timeout = milliseconds
+                chrome.runtime.sendMessage({changeProject: project})
+            }
+        }
         return
-    } else {
-        document.querySelector('.sidebar .card-body .btn').click()
     }
 
-    if (first) return
+    querySelectorAll('.modal-body input').value = project.nick
 
-    let project = await getProject('CraftList')
-    let hours = document.querySelector('#voteModal p.text-center').textContent.match(/\d+/g).map(Number)[0]
-    const milliseconds = (hours * 60 * 60 * 1000)
-    if (project.timeout == null || project.timeout !== milliseconds) {
-        project.timeout = milliseconds
-        chrome.runtime.sendMessage({changeProject: project})
-    }
-    document.querySelector('.modal-body input[required]').value = project.nick
-    document.querySelector('.modal-footer button.btn').click()
+    querySelectorAll('.modal-footer button').click()
 }
 
 const timer = setInterval(() => {
-    if (document.querySelector(".modal-body .text-danger")) {
-        clearInterval(timer)
-        chrome.runtime.sendMessage({message: document.querySelector(".modal-body .text-danger").innerText})
+    const elements = document.querySelectorAll('.modal-body .text-danger')
+    for (const el of elements) {
+        if (isVisible(el) === true && el.innerText.length > 3) {
+            clearInterval(timer)
+            chrome.runtime.sendMessage({message: document.querySelector(".modal-body .text-danger").innerText})
+            break
+        }
     }
 }, 1000)
+
+function querySelectorAll(selector) {
+    const elements = document.querySelectorAll(selector)
+    for (const element of elements) {
+        if (isVisible(element) === true) return element
+    }
+}
+
+function querySelector(selector) {
+    const element = document.querySelector(selector)
+    if (isVisible(element) === true) return element
+}
+
+// https://stackoverflow.com/a/41698614/11235240
+function isVisible(elem) {
+    if (!(elem instanceof Element)) return 'element null'
+    elem.scrollIntoView({block: 'center'})
+    const style = getComputedStyle(elem)
+    if (style.display === 'none') {
+        return 'style display none'
+    }
+    if (style.visibility !== 'visible') {
+        return 'visibility'
+    }
+    if (style.opacity && style.opacity < 0.5) {
+        return 'opacity'
+    }
+
+    // 1 пиксель?
+    if (elem.offsetHeight < 16 || elem.offsetWidth < 16) {
+        return 'offset'
+    }
+    // if (!getText(elem)) return false // Есть текст?
+
+    if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
+        elem.getBoundingClientRect().width === 0) {
+        return 'offset bounding'
+    }
+    const elemCenter   = {
+        x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
+        y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
+    };
+    if (elemCenter.x < 0) {
+        return 'pixel x'
+    }
+    if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) {
+        return 'pixel y'
+    }
+    // TODO если элемент вне видимости страницы то это плохо
+    if (elemCenter.y < 0) return true
+    if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return true
+    let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
+    do {
+        if (pointContainer === elem) return true;
+    } while (pointContainer = pointContainer.parentNode)
+    return 'end'
+}
