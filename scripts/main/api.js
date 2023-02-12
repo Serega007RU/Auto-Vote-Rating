@@ -137,7 +137,7 @@ async function run() {
         }
 
         //Если идёт проверка (новый CloudFlare?)
-        if (document.querySelector('#challenge-form')) {
+        if (document.querySelector('#challenge-form') || document.querySelector('#challenge-body-text')) {
             //Если нам требуется нажать на "Verify you are human" https://gyazo.com/56426c80a3072e5b4d565949af7da81b
             const timer5 = setInterval(()=>{
                 if (document.querySelector('#cf-norobot-container input[type="button"]')) {
