@@ -28,6 +28,7 @@ async function vote(first) {
 
     for (const el of document.querySelectorAll('div.alert.alert-danger')) {
         if (el.querySelector('center > strong')) continue
+        if (!el.innerText) continue
         const request = {}
         request.message = el.textContent.trim()
         if (request.message.includes('need to accept our Privacy Policy')) continue
