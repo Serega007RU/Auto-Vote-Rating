@@ -106,7 +106,9 @@ const timer = setInterval(() => {
     for (const el of elements) {
         if (isVisible(el) === true && el.innerText.length > 3) {
             clearInterval(timer)
-            chrome.runtime.sendMessage({message: document.querySelector(".modal-body .text-danger").innerText})
+            setTimeout(() => {
+                chrome.runtime.sendMessage({message: document.querySelector(".modal-body .text-danger").innerText})
+            }, 15000)
             break
         }
     }
