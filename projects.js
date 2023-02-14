@@ -3,7 +3,7 @@
 
 var allProjects = {
     TopCraft: {
-        voteURL: (project) => 'https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/',
+        voteURL: (project) => 'https://topcraft.ru/servers/' + project.id + '/',
         pageURL: (project) => 'https://topcraft.ru/servers/' + project.id + '/',
         projectName: (doc) => doc.querySelector('.project-header > h1').textContent,
         exampleURL: () => ['https://topcraft.ru/servers/', '10496', '/'],
@@ -13,7 +13,7 @@ var allProjects = {
         needAdditionalOrigins: ()=> ['*://*.vk.com/*']
     },
     McTOP: {
-        voteURL: (project) => 'https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/',
+        voteURL: (project) => 'https://mctop.su/servers/' + project.id + '/',
         pageURL: (project) => 'https://mctop.su/servers/' + project.id + '/',
         projectName: (doc) => doc.querySelector('.project-header > h1').textContent,
         exampleURL: () => ['https://mctop.su/servers/', '5231', '/'],
