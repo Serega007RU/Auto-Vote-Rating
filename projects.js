@@ -59,7 +59,6 @@ var allProjects = {
         URL: () => 'monitoringminecraft.ru',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
         timeout: () => ({hour: 21}),
-        silentVote: () => true,
         notRequiredCaptcha: () => true,
         needAdditionalOrigins: () => ['*://*.vk.com/*'],
         needAdditionalPermissions: () => ['cookies']
