@@ -993,7 +993,7 @@ async function endVote(request, sender, project) {
         }
     }
 
-    if (!settings.disabledUseRemoteCode && evilProjects < Date.now()) {
+    if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
         evilProjects = Date.now() + 300000
         try {
             const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
