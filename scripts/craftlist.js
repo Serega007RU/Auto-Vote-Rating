@@ -4,7 +4,7 @@ async function vote(first) {
     if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
 
     if (querySelector('div.alert.alert-success')) {
-        const message = querySelector('div.alert.alert-success').textContent
+        const message = querySelector('div.alert.alert-success', true).textContent
         if (message.includes('vote was successfully')
             || message.includes('hlas byl úspěšně přijatý')
             || message.includes('hlas bol úspešne prijatý')
@@ -17,7 +17,7 @@ async function vote(first) {
         return
     }
     if (querySelector('div.alert.alert-info')) {
-        const message = querySelector('div.alert.alert-info').textContent
+        const message = querySelector('div.alert.alert-info', true).textContent
         if (message.includes('next vote')
             || message.includes('možný hlas za tento server můžeš odeslat')
             || message.includes('možný hlas za tento server môžeš odoslať')
@@ -31,14 +31,14 @@ async function vote(first) {
     }
     if (querySelector('body #tracy-error')) {
         chrome.runtime.sendMessage({
-            message: querySelector('body #tracy-error').innerText,
+            message: querySelector('body #tracy-error', true).innerText,
             ignoreReport: true
         })
         return
     }
     if (querySelector('body #server-error')) {
         chrome.runtime.sendMessage({
-            message: querySelector('body #server-error').innerText,
+            message: querySelector('body #server-error', true).innerText,
             ignoreReport: true
         })
         return
@@ -56,7 +56,7 @@ async function vote(first) {
 
     if (first && !openedModal) {
         openedModal = true
-        const btnText = querySelector('.sidebar .card-body .btn')?.textContent
+        const btnText = querySelector('.sidebar .card-body .btn', first)?.textContent
         if (btnText &&
             (btnText.includes('possible vote')
             || btnText.includes('možný hlas')
@@ -81,7 +81,7 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
             return
         } else {
-            querySelector('.sidebar .card-body .btn')?.click()
+            querySelector('.sidebar .card-body .btn', first)?.click()
         }
 
         const timeout = querySelector('#voteModal p.text-center')
@@ -96,34 +96,37 @@ async function vote(first) {
         return
     }
 
-    querySelectorAll('.modal-body input').value = project.nick
+    querySelectorAll('.modal-body input', true).value = project.nick
 
-    querySelectorAll('.modal-footer button').click()
+    querySelectorAll('.modal-footer button', true).click()
 }
 
 const timer = setInterval(() => {
-    const elements = document.querySelectorAll('.modal-body .text-danger')
-    for (const el of elements) {
-        if (isVisible(el) === true && el.innerText.length > 3) {
-            clearInterval(timer)
-            setTimeout(() => {
-                chrome.runtime.sendMessage({message: document.querySelector(".modal-body .text-danger").innerText})
-            }, 15000)
-            break
-        }
+    const message = querySelectorAll('.modal-body .text-danger')
+    if (message && message.innerText.length > 3) {
+        clearInterval(timer)
+        setTimeout(() => {
+            chrome.runtime.sendMessage({message})
+        }, 15000)
     }
 }, 1000)
 
-function querySelectorAll(selector) {
+function querySelectorAll(selector, required) {
     const elements = document.querySelectorAll(selector)
+    const results = []
     for (const element of elements) {
-        if (isVisible(element) === true) return element
+        const result = isVisible(element)
+        if (result === true) return element
+        results.push(result)
     }
+    if (required) throw selector + ' ' + results.toString()
 }
 
-function querySelector(selector) {
+function querySelector(selector, required) {
     const element = document.querySelector(selector)
-    if (isVisible(element) === true) return element
+    const result = isVisible(element)
+    if (result === true) return element
+    if (required) throw selector + ' ' + result
 }
 
 // https://stackoverflow.com/a/41698614/11235240
