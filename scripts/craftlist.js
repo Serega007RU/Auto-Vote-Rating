@@ -1,7 +1,7 @@
 let openedModal = false
 
 async function vote(first) {
-    if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
+    // if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
 
     if (querySelector('div.alert.alert-success')) {
         const message = querySelector('div.alert.alert-success', true).textContent
