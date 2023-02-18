@@ -1,6 +1,11 @@
 async function vote(/*first*/) {
     if (document.querySelector('div.alert.alert-danger') != null) {
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent.trim()})
+        const request = {}
+        request.message = document.querySelector('div.alert.alert-danger').textContent.trim()
+        if (request.message.includes('Recapcha error')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
         return
     }
     if (document.querySelector('div.alert.alert-success') != null) {
