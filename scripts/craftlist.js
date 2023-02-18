@@ -154,6 +154,7 @@ function isVisible(elem) {
         elem.getBoundingClientRect().width === 0) {
         return 'offset bounding'
     }
+
     const elemCenter   = {
         x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
         y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
@@ -164,12 +165,21 @@ function isVisible(elem) {
     if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) {
         return 'pixel y'
     }
+
     // TODO если элемент вне видимости страницы то это плохо
     if (elemCenter.y < 0) return true
     if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return true
+
+    // TODO если мы видим bframe reCAPTCHA то значит искомый элемент в любом случае будет невидим
+    for (const iframe of [...document.querySelectorAll('iframe[src*="https://www.google.com/recaptcha/api2/bframe"]'), ...document.querySelectorAll('iframe[src*="https://www.recaptcha.net/recaptcha/api2/bframe"]')]) {
+        if (window.getComputedStyle(iframe).visibility === 'visible') {
+            return true
+        }
+    }
+
     let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
     do {
-        if (pointContainer === elem) return true;
+        if (pointContainer === elem || pointContainer.style.display) return true;
     } while (pointContainer = pointContainer.parentNode)
     return 'end'
 }
