@@ -528,6 +528,8 @@ function generateBtnListRating(rating, count) {
 
 //Удалить проект из списка проекта
 async function removeProjectList(project) {
+    if (editingProject?.key === project.key) resetEdit()
+
     const li = document.getElementById('projects' + project.key)
     if (li != null) {
         try {
