@@ -33,6 +33,9 @@ function checkAnswer() {
         } else if (request.message.includes('Thanks for voting')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
+            if (request.message.includes('session expired')) {
+                request.ignoreReport = true
+            }
             chrome.runtime.sendMessage(request)
         }
         clearInterval(timer)
