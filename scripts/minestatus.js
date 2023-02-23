@@ -19,7 +19,7 @@ async function vote(/*first*/) {
             const later = Date.now() + (document.querySelector('div.alert.alert-warning').textContent.match(/\d+/g).map(Number)[0] + 1) * 3600000
             chrome.runtime.sendMessage({later})
         } else {
-            if (request.message.includes('Recapcha error')) {
+            if (request.message.includes('Recapcha error') || request.message.includes('votifier error')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)
