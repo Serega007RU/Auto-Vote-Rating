@@ -241,18 +241,20 @@ async function getProject() {
 
 function throwError(error) {
     let message
+    const request = {}
+
     if (error.stack) {
         // noinspection JSUnresolvedVariable
         if (self.evalCore) {
             message = error.toString()
         } else {
             message = error.stack
+            request.ignoreReport = true
         }
     } else {
         message = error
     }
 
-    const request = {}
     const siteText = document.body.innerText.trim()
     if (siteText.length === 0) {
         request.emptySite = true
