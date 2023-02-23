@@ -41,5 +41,6 @@ async function vote(first) {
 
     const project = await getProject('MCLikeCom')
     document.querySelector('#playercollector-nickname').value = project.nick
-    document.querySelector('#w0 button[type=submit]').click()
+    document.querySelector('#w0 button[type=submit]')?.click()
+    document.querySelector('#w1 button[type=submit]')?.click()
 }
