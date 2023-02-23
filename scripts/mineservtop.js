@@ -23,7 +23,7 @@ const timer = setInterval(()=>{
             chrome.runtime.sendMessage({successfully: true})
         } else if (document.querySelector('.b-vote-modal__content_error')) {
             clearInterval(timer)
-            if (document.querySelector('.b-vote-modal__content_error').textContent.includes('уже голосовали')) {
+            if (document.querySelector('.b-vote-modal__content_error').textContent.includes('уже голосовал')) {
                 chrome.runtime.sendMessage({later: true})
             } else {
                 chrome.runtime.sendMessage({message: document.querySelector('.b-vote-modal__content_error').textContent.trim()})
