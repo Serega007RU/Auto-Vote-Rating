@@ -33,6 +33,12 @@ async function vote(/*first*/) {
         return
     }
 
+    const voteButton = document.querySelector('#serverPage a[href*="/vote"]')
+    if (voteButton && !voteButton.classList.contains('active')) {
+        voteButton.click()
+        return
+    }
+
     const project = await getProject('BestMinecraftServers')
     document.querySelector('#main-content input[name="username"]').value = project.nick
     document.querySelector('#main-content button[type="submit"]').click()
