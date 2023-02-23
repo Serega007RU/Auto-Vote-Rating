@@ -8,7 +8,7 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
             return
         }
-        if (request.message.includes('Server existiert nicht')) {
+        if (request.message.includes('Server existiert nicht') || request.message.includes('Da ist irgendetwas schief gelaufen')) {
             request.ignoreReport = true
         }
         if (request.message.toLowerCase().includes('captcha')) {
