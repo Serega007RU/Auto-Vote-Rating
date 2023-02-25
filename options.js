@@ -375,7 +375,32 @@ async function addProjectList(project) {
 
     const div2 = document.createElement('div')
     div2.classList.add('error')
-    div2.textContent = project.error
+    if (project.error) {
+        if (project.error.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
+            // TODO функция не оптимизированная и может иметь косяки, другого способа я не нашёл как это сделать адекватно
+            // https://stackoverflow.com/a/60311728/11235240
+            const error = project.error.match(/(?:http(s)?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)|\s*\S+\s*/g)
+            for (const el of error) {
+                // https://stackoverflow.com/a/49849482/11235240
+                if (el.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
+                    const link = document.createElement('a')
+                    link.classList.add('link')
+                    link.target = 'blank_'
+                    link.href = el
+                    if (el.length > 32) {
+                        link.textContent = el.substring(0, 32) + '...'
+                    } else {
+                        link.textContent = el
+                    }
+                    div2.append(link)
+                } else {
+                    div2.append(el)
+                }
+            }
+        } else {
+            div2.textContent = project.error
+        }
+    }
     contDiv.appendChild(div2)
 
     const nextVoteMes = document.createElement('div')
