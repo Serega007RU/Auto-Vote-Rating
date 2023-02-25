@@ -943,8 +943,14 @@
   "edit": {
     "message": "Edit"
   },
-  "confirmRestart": {
-    "message": "This project is voting right now, do you want to restart voting anyway?"
+  "confirmNow": {
+    "message": "This project is voting right now, this will cancel the voting that is currently underway, do you still want to restart the voting?"
+  },
+  "confirmQueue": {
+    "message": "There is a project in the voting queue that is currently voting, this will cancel the voting that is currently underway, do you still want to restart the voting?"
+  },
+  "canceledVote": {
+    "message": "The vote was canceled by the user"
   },
   "projectRestarted": {
     "message": "Voting restarted by the user"

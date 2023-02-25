@@ -114,7 +114,7 @@ async function reloadAllAlarms() {
 }
 
 let promises = []
-async function checkOpen(project/*, transaction*/) {
+function checkOpen(project/*, transaction*/) {
     //Если нет интернета, то не голосуем
     if (!settings.disabledCheckInternet) {
         if (!navigator.onLine && onLine) {
@@ -860,34 +860,46 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         sendResponse('success')
         return
     } else if (request.projectRestart) {
-        let inQueue = false
         for (const[key,value] of openedProjects) {
-            if (settings.disabledOneVote) {
-                sendResponse('inQueue')
-                return
-            }
             if (request.projectRestart.key === value.key) {
                 if (request.confirmed) {
                     openedProjects.delete(key)
+                    db.put('other', openedProjects, 'openedProjects')
                     tryCloseTab(key, value, 0)
-                    await db.put('other', openedProjects, 'openedProjects')
-                    break
+                    console.log(getProjectPrefix(request.projectRestart, true), chrome.i18n.getMessage('canceledVote'))
                 } else {
-                    sendResponse('needConfirm')
+                    sendResponse('confirmNow')
                     return
                 }
-            } else if (request.projectRestart.rating === value.rating) {
-                inQueue = true
             }
         }
-        if (inQueue) {
-            sendResponse('inQueue')
-            return
+        for (const[key,value] of openedProjects) {
+            if (request.projectRestart.rating === value.rating || settings.disabledOneVote) {
+                if (request.confirmed) {
+                    openedProjects.delete(key)
+                    await db.put('other', openedProjects, 'openedProjects')
+                    tryCloseTab(key, value, 0)
+                    const project = await db.get('projects', value.key)
+                    if (project.timeoutQueue || project.nextAttempt) {
+                        delete project.timeoutQueue
+                        delete project.nextAttempt
+                        await updateValue('projects', project)
+                    }
+                    console.log(getProjectPrefix(project, true), chrome.i18n.getMessage('canceledVote'))
+                } else {
+                    sendResponse('confirmQueue')
+                    return
+                }
+            }
         }
+
         await chrome.alarms.clear(String(request.projectRestart.key))
         request.projectRestart.time = null
-        await db.put('projects', request.projectRestart, request.projectRestart.key)
+        delete request.projectRestart.timeoutQueue
+        delete request.projectRestart.nextAttempt
+        await updateValue('projects', request.projectRestart)
         console.log(getProjectPrefix(request.projectRestart, true), chrome.i18n.getMessage('projectRestarted'))
+        checkOpen(request.projectRestart)
         checkVote()
         sendResponse('success')
         return

@@ -427,26 +427,17 @@ async function addProjectList(project) {
             // noinspection JSVoidFunctionReturnValueUsed
             let message = await chrome.runtime.sendMessage({projectRestart: project})
             // noinspection JSIncompatibleTypesComparison
-            if (message === 'needConfirm') {
-                if (confirm(chrome.i18n.getMessage('confirmRestart'))) {
+            if (message === 'confirmNow' || message === 'confirmQueue') {
+                // noinspection JSCheckFunctionSignatures
+                if (confirm(chrome.i18n.getMessage(message))) {
                     try {
                         // noinspection JSVoidFunctionReturnValueUsed
-                        message = await chrome.runtime.sendMessage({projectRestart: project, confirmed: true})
-                        // noinspection JSIncompatibleTypesComparison
-                        if (message === 'inQueue') {
-                            createNotif(chrome.i18n.getMessage('restartInQueue'), 'error')
-                            return
-                        }
+                        await chrome.runtime.sendMessage({projectRestart: project, confirmed: true})
                     } catch (error) {
                         createNotif(error.message, 'error')
                         return
                     }
                 } else {
-                    return
-                }
-            } else { // noinspection JSIncompatibleTypesComparison
-                if (message === 'inQueue') {
-                    createNotif(chrome.i18n.getMessage('restartInQueue'), 'error')
                     return
                 }
             }
