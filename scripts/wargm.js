@@ -61,25 +61,29 @@ const timer = setInterval(async ()=>{
     try {
         const msg = document.querySelector('div.MsgBox')
         if (msg != null && msg.innerText.length > 0) {
-            const message = msg.innerText
-            if (message.includes('уже проголосовали')) {
+            const request = {}
+            request.message = msg.innerText
+            if (request.message.includes('уже проголосовали')) {
                 clearInterval(timer)
                 await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({later: true})
-            } else if (message.includes('Голос принят')) {
+            } else if (request.message.includes('Голос принят')) {
                 clearInterval(timer)
                 // TODO кринж кринжа, сайт уведомление об успешном голосовании отображает буквально на секунду, ничего дибильнее придумать автор сайта не может
                 // await wait(Math.floor(Math.random() * 9000 + 1000))
                 // chrome.runtime.sendMessage({successfully: true})
-            } else if (message.includes('Авторизация')) {
+            } else if (request.message.includes('Авторизация')) {
                 clearInterval(timer)
                 chrome.runtime.sendMessage({auth: true})
-            } else if (message === 'Успешно') {
+            } else if (request.message === 'Успешно') {
                 // None
             } else {
+                if (request.message.includes('Сервис временно недоступен')) {
+                    request.ignoreReport = true
+                }
                 clearInterval(timer)
                 await wait(Math.floor(Math.random() * 9000 + 1000))
-                chrome.runtime.sendMessage({message})
+                chrome.runtime.sendMessage(request)
             }
         }
     } catch (e) {

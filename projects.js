@@ -3,7 +3,7 @@
 
 var allProjects = {
     TopCraft: {
-        voteURL: (project) => 'https://topcraft.ru/accounts/vk/login/?process=login&next=/servers/' + project.id + '/',
+        voteURL: (project) => 'https://topcraft.ru/servers/' + project.id + '/',
         pageURL: (project) => 'https://topcraft.ru/servers/' + project.id + '/',
         projectName: (doc) => doc.querySelector('.project-header > h1').textContent,
         exampleURL: () => ['https://topcraft.ru/servers/', '10496', '/'],
@@ -13,7 +13,7 @@ var allProjects = {
         needAdditionalOrigins: ()=> ['*://*.vk.com/*']
     },
     McTOP: {
-        voteURL: (project) => 'https://mctop.su/accounts/vk/login/?process=login&next=/servers/' + project.id + '/',
+        voteURL: (project) => 'https://mctop.su/servers/' + project.id + '/',
         pageURL: (project) => 'https://mctop.su/servers/' + project.id + '/',
         projectName: (doc) => doc.querySelector('.project-header > h1').textContent,
         exampleURL: () => ['https://mctop.su/servers/', '5231', '/'],
@@ -59,7 +59,6 @@ var allProjects = {
         URL: () => 'monitoringminecraft.ru',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
         timeout: () => ({hour: 21}),
-        silentVote: () => true,
         notRequiredCaptcha: () => true,
         needAdditionalOrigins: () => ['*://*.vk.com/*'],
         needAdditionalPermissions: () => ['cookies']
@@ -559,7 +558,7 @@ var allProjects = {
     CraftList: {
         voteURL: (project) => 'https://craftlist.org/' + project.id,
         pageURL: (project) => 'https://craftlist.org/' + project.id,
-        projectName: (doc) => doc.querySelector('main h1').textContent,
+        projectName: (doc) => doc.querySelector('main h1').innerText.trim(),
         exampleURL: () => ['https://craftlist.org/', 'basicland', ''],
         URL: () => 'craftlist.org',
         parseURL: (url) => ({id: url.pathname.split('/')[1]}),
@@ -1206,11 +1205,10 @@ var allProjects = {
     MinecraftBestServersCom: {
         voteURL: (project) => 'https://minecraftbestservers.com/' + project.id + '/vote',
         pageURL: (project) => 'https://minecraftbestservers.com/' + project.id,
-        projectName: (doc) => doc.querySelector('table .server.icon').parentElement.innerText.trim(),
+        projectName: (doc) => doc.querySelector('header div.container h1.text-center').textContent.replace(' Minecraft Server Info, Voting, and More', ''),
         exampleURL: () => ['https://minecraftbestservers.com/', 'server-cherry-survival.4599', '/vote'],
         URL: () => 'minecraftbestservers.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
-        needAdditionalOrigins: ()=> ['*://*.steamcommunity.com/*']
+        parseURL: (url) => ({id: url.pathname.split('/')[1]})
     },
     MCLikeCom: {
         voteURL: (project) => 'https://mclike.com/vote-' + project.id,

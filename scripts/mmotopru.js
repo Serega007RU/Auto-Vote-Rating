@@ -50,6 +50,17 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('#vote_loading')) {
+        await new Promise(resolve => {
+            const timer = setInterval(() => {
+                if (!document.querySelector('#vote_loading')) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 1000)
+        })
+    }
+
     //Делаем форму голосования видимой
     document.querySelector('div.vote-fields').removeAttribute('style')
 

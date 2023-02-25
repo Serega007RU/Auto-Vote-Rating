@@ -29,14 +29,18 @@ async function vote(first) {
             leftTime = leftTime * 3600000
             chrome.runtime.sendMessage({later: Date.now() + leftTime})
             return
+        } else if (message.includes('I\'m not a robot') || message.includes('enter a nickname')) {
+            // None
+        } else {
+            chrome.runtime.sendMessage({message})
+            return
         }
-        chrome.runtime.sendMessage({message})
-        return
     }
 
     if (first) return
 
     const project = await getProject('MCLikeCom')
     document.querySelector('#playercollector-nickname').value = project.nick
-    document.querySelector('#w0 button[type=submit]').click()
+    document.querySelector('#w0 button[type=submit]')?.click()
+    document.querySelector('#w1 button[type=submit]')?.click()
 }

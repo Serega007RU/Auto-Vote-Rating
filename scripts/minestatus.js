@@ -1,6 +1,11 @@
 async function vote(/*first*/) {
     if (document.querySelector('div.alert.alert-danger') != null) {
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent.trim()})
+        const request = {}
+        request.message = document.querySelector('div.alert.alert-danger').textContent.trim()
+        if (request.message.includes('Recapcha error')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
         return
     }
     if (document.querySelector('div.alert.alert-success') != null) {
@@ -14,7 +19,7 @@ async function vote(/*first*/) {
             const later = Date.now() + (document.querySelector('div.alert.alert-warning').textContent.match(/\d+/g).map(Number)[0] + 1) * 3600000
             chrome.runtime.sendMessage({later})
         } else {
-            if (request.message.includes('Recapcha error')) {
+            if (request.message.includes('Recapcha error') || request.message.includes('votifier error')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)

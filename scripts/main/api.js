@@ -5,10 +5,14 @@ if (!window.loaded) {
     run()
 }
 
+let resolveProject
+const waitProject = new Promise(resolve => resolveProject = resolve)
+
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
     if (request.sendProject) {
         window.proj = request.project
         if (request.vkontakte) window.vkontakte = request.vkontakte
+        resolveProject()
     } else if (request === 'captchaPassed') {
         // noinspection JSIgnoredPromiseFromCall
         startVote(false)
@@ -54,6 +58,16 @@ async function run() {
         //Если мы находися на странице авторизации ВКонтакте
         if (document.URL.match(/vk.com\/*/)) {
             // TODO нужно полностью переписать тут всю логику под новую версию интерфейса ВК
+
+            // https://cdn.discordapp.com/attachments/1072161816693710868/1072172021473095700/image.png
+            const timer7 = setInterval(() => {
+                if (document.querySelector('#error .vkuiModalCardBase__container')) {
+                    clearInterval(timer7)
+                    chrome.runtime.sendMessage({errorAuthVK: document.querySelector('#error .vkuiModalCardBase__container').textContent})
+                }
+            }, 1000)
+            if (document.querySelector('#error .vkuiModalCardBase__container')) return
+
             if (document.querySelector('.vkc__AuthRoot__contentIn')) {
                 const timer = setInterval(()=>{
                     if (document.querySelector('.vkc__AcceptPrivacyPolicy__content button[type="submit"]')) {
@@ -123,7 +137,7 @@ async function run() {
         }
 
         //Если идёт проверка (новый CloudFlare?)
-        if (document.querySelector('#challenge-form')) {
+        if (document.querySelector('#challenge-form') || document.querySelector('#challenge-body-text')) {
             //Если нам требуется нажать на "Verify you are human" https://gyazo.com/56426c80a3072e5b4d565949af7da81b
             const timer5 = setInterval(()=>{
                 if (document.querySelector('#cf-norobot-container input[type="button"]')) {
@@ -221,23 +235,26 @@ async function startVote(first) {
 }
 
 async function getProject() {
+    await waitProject
     return window.proj
 }
 
 function throwError(error) {
     let message
+    const request = {}
+
     if (error.stack) {
         // noinspection JSUnresolvedVariable
         if (self.evalCore) {
             message = error.toString()
         } else {
             message = error.stack
+            request.ignoreReport = true
         }
     } else {
         message = error
     }
 
-    const request = {}
     const siteText = document.body.innerText.trim()
     if (siteText.length === 0) {
         request.emptySite = true

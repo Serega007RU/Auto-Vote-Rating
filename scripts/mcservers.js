@@ -15,6 +15,9 @@ async function vote(first) {
             if (request.message.includes('Captcha is not correct')) {
                 // None
             } else {
+                if (request.message.includes('some problems sending your vote')) {
+                    request.ignoreReport = true
+                }
                 chrome.runtime.sendMessage(request)
                 return
             }

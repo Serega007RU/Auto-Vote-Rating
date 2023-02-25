@@ -49,12 +49,19 @@ async function vote(first) {
         chrome.runtime.sendMessage(request)
         return
     }
+    if (document.querySelector('a[href*="/vote"]')) {
+        document.querySelector('a[href*="/vote"]').click()
+        return
+    }
 
     if (first) return
 
     const project = await getProject('MinecraftListCZ')
     document.querySelector('input[name="username"]').value = project.nick
     document.querySelector('#gdpr').checked = true
+
+    // TODO ну хорошо, подождём мы секунду, но явно проблема не в "быстром JavaScript" (костыльное решение ошибки "Souhlas s GDPR musí být vyplněn.")
+    await wait(Math.floor(Math.random() * 500 + 500))
 
     document.querySelector('div.vote__box__buttonRow__button button[type="submit"]').click()
 }

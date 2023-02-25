@@ -18,15 +18,21 @@ async function vote(first) {
         const timer = setInterval(()=>{
             try {
                 if (document.querySelector('#messages').textContent.length > 0) {
-                    if (document.querySelector('#messages').textContent.includes('Спасибо за Ваш голос')) {
+                    const request = {}
+                    request.message = document.querySelector('#messages').textContent
+                    if (request.message.includes('Спасибо за Ваш голос')) {
+                        clearInterval(timer)
                         chrome.runtime.sendMessage({successfully: true})
-                    } else if (document.querySelector('#messages').textContent.includes('уже голосовали')) {
-                        const numbers = document.querySelector('#messages').textContent.match(/\d+/g).map(Number)
-                        chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] -1, numbers[0], numbers[3], numbers[4], numbers[5]) - 10800000 + 60000})
+                    } else if (request.message.includes('уже голосовали')) {
+                        clearInterval(timer)
+                        const numbers = request.message.match(/\d+/g).map(Number)
+                        chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] - 1, numbers[0], numbers[3], numbers[4], numbers[5]) - 10800000 + 60000})
+                    } else if (request.message.includes('Проверка на робота не пройдена')) {
+                        // None
                     } else {
-                        chrome.runtime.sendMessage({message: document.querySelector('#messages').textContent})
+                        clearInterval(timer)
+                        chrome.runtime.sendMessage(request)
                     }
-                    clearInterval(timer)
                 }
             } catch (e) {
                 clearInterval(timer)

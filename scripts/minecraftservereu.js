@@ -1,7 +1,5 @@
 async function vote(first) {
 
-    if (first === false) return
-
     // Если мы каким-то образом попали на форум значит что-то не так
     if (document.location.pathname.split('/')[1] === 'forum') {
         const request = {}
@@ -11,9 +9,9 @@ async function vote(first) {
     }
 
     //К чему это ожидание?
-    if (document.querySelector('#infoMessage') != null) document.querySelector('#infoMessage').style.display = 'none'
-    if (document.querySelector('#inputFields') != null) document.querySelector('#inputFields').removeAttribute('style')
-    if (document.querySelector('#voteBox') != null) document.querySelector('#voteBox').removeAttribute('style')
+    // if (document.querySelector('#infoMessage') != null) document.querySelector('#infoMessage').style.display = 'none'
+    // if (document.querySelector('#inputFields') != null) document.querySelector('#inputFields').removeAttribute('style')
+    // if (document.querySelector('#voteBox') != null) document.querySelector('#voteBox').removeAttribute('style')
 
     if (document.querySelector('div.alert.alert-success') != null) {
         chrome.runtime.sendMessage({successfully: true})
@@ -28,8 +26,23 @@ async function vote(first) {
         chrome.runtime.sendMessage({message})
         return
     }
-
-    const project = await getProject('MinecraftServerEu')
-    document.querySelector('#voteBox input').value = project.nick
-    document.querySelector('#voteBox button').click()
 }
+
+const timer = setInterval(async () => {
+    try {
+        if (!document.querySelector("#voteBox") || document.querySelector("#voteBox").style.display === 'none') return
+        clearInterval(timer)
+        if (document.querySelector("#voteBox").firstElementChild.tagName === 'INPUT') {
+            const project = await getProject('MinecraftServerEu')
+            document.querySelector("#voteBox").firstElementChild.value = project.nick
+            document.querySelector("#voteBox").querySelector('button').click()
+        } else if (document.querySelector("#voteBox").firstElementChild.tagName === 'BUTTON') {
+            document.querySelector("#voteBox").firstElementChild.click()
+        } else {
+            chrome.runtime.sendMessage({message: 'Not found element'})
+        }
+    } catch (e) {
+        clearInterval(timer)
+        throwError(e)
+    }
+})

@@ -58,5 +58,5 @@ async function vote(first) {
 
 
     document.getElementById('game_user').value = project.nick
-    document.querySelector('#vote button[type="submit"]').click()
+    document.querySelector('#submit').click()
 }

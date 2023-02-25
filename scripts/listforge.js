@@ -17,6 +17,8 @@ async function vote(first) {
     }
 
     for (const el of document.querySelectorAll('strong')) {
+        if (el.textContent.includes('website is made possible by displaying online advertisements')) continue
+
         if (el.textContent.includes('Thank you for your vote')) {
             chrome.runtime.sendMessage({successfully: true})
             return
@@ -28,9 +30,13 @@ async function vote(first) {
 
     for (const el of document.querySelectorAll('div.alert.alert-danger')) {
         if (el.querySelector('center > strong')) continue
+        if (!el.innerText) continue
+
         const request = {}
         request.message = el.textContent.trim()
-        if (request.message.includes('need to accept our Privacy Policy')) continue
+
+        if (request.message.includes('need to accept our Privacy Policy') || request.message.includes('website is made possible by displaying online advertisements')) continue
+
         if (request.message.includes('already voted') || request.message.includes('have reached your daily vote limit')) {
             chrome.runtime.sendMessage({later: true})
             return
@@ -97,7 +103,8 @@ async function vote(first) {
             document.querySelector('button[form="vote_form"]').click()
         //Ещё какая-то разновидность кнопки Vote (Specially for Minecraft Pocket Servers)
         } else {
-            document.querySelector('a[href="javascript:document.vote_form.submit();"]').click()
+            // document.querySelector('a[href="javascript:document.vote_form.submit();"]').click()
+            document.querySelector('form[name="vote_form"]').submit()
         }
     } else {
         // noinspection ExceptionCaughtLocallyJS

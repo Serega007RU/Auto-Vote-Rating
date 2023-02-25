@@ -1,6 +1,10 @@
+let openedModal = false
+
 async function vote(first) {
-    if (document.querySelector('div.alert.alert-success')) {
-        const message = document.querySelector('div.alert.alert-success').textContent
+    // if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
+
+    if (querySelector('div.alert.alert-success')) {
+        const message = querySelector('div.alert.alert-success', true).textContent
         if (message.includes('vote was successfully')
             || message.includes('hlas byl úspěšně přijatý')
             || message.includes('hlas bol úspešne prijatý')
@@ -12,8 +16,8 @@ async function vote(first) {
         }
         return
     }
-    if (document.querySelector('div.alert.alert-info')) {
-        const message = document.querySelector('div.alert.alert-info').textContent
+    if (querySelector('div.alert.alert-info')) {
+        const message = querySelector('div.alert.alert-info', true).textContent
         if (message.includes('next vote')
             || message.includes('možný hlas za tento server můžeš odeslat')
             || message.includes('možný hlas za tento server môžeš odoslať')
@@ -25,22 +29,22 @@ async function vote(first) {
         }
         return
     }
-    if (document.querySelector('body #tracy-error')) {
+    if (querySelector('body #tracy-error')) {
         chrome.runtime.sendMessage({
-            message: document.querySelector('body #tracy-error').innerText,
+            message: querySelector('body #tracy-error', true).innerText,
             ignoreReport: true
         })
         return
     }
-    if (document.querySelector('body #server-error')) {
+    if (querySelector('body #server-error')) {
         chrome.runtime.sendMessage({
-            message: document.querySelector('body #server-error').innerText,
+            message: querySelector('body #server-error', true).innerText,
             ignoreReport: true
         })
         return
     }
     // Костыль
-    if ((document.location.pathname.split('/')[1] === 'cs' || document.location.pathname.split('/')[1] === 'sk') && !document.location.pathname.split('/')[2]) {
+    if ((document.location.pathname.split('/')[1] === 'cz' || document.location.pathname.split('/')[1] === 'cs' || document.location.pathname.split('/')[1] === 'sk') && !document.location.pathname.split('/')[2]) {
         const request = {}
         request.errorVoteNoElement = 'Redirected to server list'
         request.ignoreReport = true
@@ -48,42 +52,134 @@ async function vote(first) {
         return
     }
 
-    const btnText = document.querySelector('a.btn-vote').textContent
-    if (btnText.includes('possible vote')
-        || btnText.includes('možný hlas')
-        || btnText.includes('ist möglich')) {
-        //Из текста достаёт все цифры в Array List
-        const numbers = btnText.match(/\d+/g).map(Number)
-        let count = 0
-        let hour = 0
-        let min = 0
-        let sec = 0
-        for (const i in numbers) {
-            if (count === 0) {
-                hour = numbers[i]
-            } else if (count === 1) {
-                min = numbers[i]
-            } else if (count === 2) {
-                sec = numbers[i]
+    const project = await getProject('CraftList')
+
+    if (first && !openedModal) {
+        openedModal = true
+        const btnText = querySelector('.sidebar .card-body .btn', first)?.textContent
+        if (btnText &&
+            (btnText.includes('possible vote')
+            || btnText.includes('možný hlas')
+            || btnText.includes('ist möglich'))) {
+            //Из текста достаёт все цифры в Array List
+            const numbers = btnText.match(/\d+/g).map(Number)
+            let count = 0
+            let hour = 0
+            let min = 0
+            let sec = 0
+            for (const i in numbers) {
+                if (count === 0) {
+                    hour = numbers[i]
+                } else if (count === 1) {
+                    min = numbers[i]
+                } else if (count === 2) {
+                    sec = numbers[i]
+                }
+                count++
             }
-            count++
+            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+            return
+        } else {
+            querySelector('.sidebar .card-body .btn', first)?.click()
         }
-        const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
-        chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+
+        const timeout = querySelector('#voteModal p.text-center')
+        if (timeout) {
+            const hours = timeout.textContent.match(/\d+/g).map(Number)[0]
+            const milliseconds = (hours * 60 * 60 * 1000)
+            if (project.timeout == null || project.timeout !== milliseconds) {
+                project.timeout = milliseconds
+                chrome.runtime.sendMessage({changeProject: project})
+            }
+        }
         return
-    } else {
-        document.querySelector('a.btn-vote').click()
     }
 
-    if (first) return
+    querySelectorAll('.modal-body input', true).value = project.nick
 
-    let project = await getProject('CraftList')
-    let hours = document.querySelector('#voteModal p.text-center').textContent.match(/\d+/g).map(Number)[0]
-    const milliseconds = (hours * 60 * 60 * 1000)
-    if (project.timeout == null || project.timeout !== milliseconds) {
-        project.timeout = milliseconds
-        chrome.runtime.sendMessage({changeProject: project})
+    querySelectorAll('.modal-footer button', true).click()
+}
+
+const timer = setInterval(() => {
+    const message = querySelectorAll('.modal-body .text-danger')
+    if (message && message.innerText.length > 3) {
+        clearInterval(timer)
+        setTimeout(() => {
+            chrome.runtime.sendMessage({message})
+        }, 15000)
     }
-    document.querySelector('input[name="nickName"]').value = project.nick
-    document.querySelector('button.btn.btn-vote').click()
+}, 1000)
+
+function querySelectorAll(selector, required) {
+    const elements = document.querySelectorAll(selector)
+    const results = []
+    for (const element of elements) {
+        const result = isVisible(element)
+        if (result === true) return element
+        results.push(result)
+    }
+    if (required) throw selector + ' ' + results.toString()
+}
+
+function querySelector(selector, required) {
+    const element = document.querySelector(selector)
+    const result = isVisible(element)
+    if (result === true) return element
+    if (required) throw selector + ' ' + result
+}
+
+// https://stackoverflow.com/a/41698614/11235240
+function isVisible(elem) {
+    if (!(elem instanceof Element)) return 'element null'
+    elem.scrollIntoView({block: 'center'})
+    const style = getComputedStyle(elem)
+    if (style.display === 'none') {
+        return 'style display none'
+    }
+    if (style.visibility !== 'visible') {
+        return 'visibility'
+    }
+    if (style.opacity && style.opacity < 0.5) {
+        return 'opacity'
+    }
+
+    // 1 пиксель?
+    if (elem.offsetHeight < 16 || elem.offsetWidth < 16) {
+        return 'offset'
+    }
+    // if (!getText(elem)) return false // Есть текст?
+
+    if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
+        elem.getBoundingClientRect().width === 0) {
+        return 'offset bounding'
+    }
+
+    const elemCenter   = {
+        x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
+        y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
+    };
+    if (elemCenter.x < 0) {
+        return 'pixel x'
+    }
+    if (elemCenter.x > (document.documentElement.clientWidth || window.innerWidth)) {
+        return 'pixel y'
+    }
+
+    // TODO если элемент вне видимости страницы то это плохо
+    if (elemCenter.y < 0) return true
+    if (elemCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return true
+
+    // TODO если мы видим bframe reCAPTCHA то значит искомый элемент в любом случае будет невидим
+    for (const iframe of [...document.querySelectorAll('iframe[src*="https://www.google.com/recaptcha/api2/bframe"]'), ...document.querySelectorAll('iframe[src*="https://www.recaptcha.net/recaptcha/api2/bframe"]')]) {
+        if (window.getComputedStyle(iframe).visibility === 'visible') {
+            return true
+        }
+    }
+
+    let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
+    do {
+        if (pointContainer === elem || pointContainer.style.display) return true;
+    } while (pointContainer = pointContainer.parentNode)
+    return 'end'
 }

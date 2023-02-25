@@ -70,16 +70,19 @@ function vote(first) {
         try {
             if (document.querySelector('div[role="status"]').children.length > 0) {
                 clearTimeout(timer3)
-                let text
+                let request = {}
                 for (const el of document.querySelector('.toasted-container').children) {
                     if (el.textContent.includes('already voted')) {
                         chrome.runtime.sendMessage({later: true})
                         return
                     } else {
-                        text = el.textContent
+                        request.message = el.textContent
                     }
                 }
-                chrome.runtime.sendMessage({message: text})
+                if (request.message.includes('must watch the ad to upvote')) {
+                    request.ignoreReport = true
+                }
+                chrome.runtime.sendMessage(request)
             }
         } catch (e) {
             clearInterval(timer3)

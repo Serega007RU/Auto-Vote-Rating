@@ -10,7 +10,7 @@ importScripts('main.js')
 self.addEventListener('install', () => {
     importScripts('libs/linkedom.js')
     importScripts('libs/evalCore.umd.js')
-    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/monitoringminecraft_silentvote.js', 'scripts/serverpact_silentvote.js')
+    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/serverpact_silentvote.js')
 })
 
 //Текущие fetch запросы
@@ -132,7 +132,7 @@ async function checkOpen(project/*, transaction*/) {
     }
 
     for (const[tab,value] of openedProjects) {
-        if (value.timeoutQueue && Date.now() > value.timeoutQueue) {
+        if (value.timeoutQueue && Date.now() < value.timeoutQueue) {
             openedProjects.delete(tab)
             db.put('other', openedProjects, 'openedProjects')
             continue
@@ -185,7 +185,7 @@ async function checkOpen(project/*, transaction*/) {
         }
     }
 
-    if (!settings.disabledUseRemoteCode && evilProjects < Date.now()) {
+    if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
         evilProjects = Date.now() + 300000
         promises.push(fetchProjects())
         async function fetchProjects() {
@@ -963,12 +963,22 @@ async function tryCloseTab(tabId, project, attempt) {
 
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
+    let timeout = settings.timeout
+
+    delete project.timeoutQueue
+    delete project.nextAttempt
+
     for (const [tab,value] of openedProjects) {
         if (project.key === value.key) {
             // noinspection JSCheckFunctionSignatures
             if (isNaN(tab) && !tab.startsWith('background_')) {
                 return
             } else {
+                if (project.randomize) {
+                    timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
+                }
+                project.timeoutQueue = Date.now() + timeout
+
                 openedProjects.delete(tab)
                 openedProjects.set('queue_' + project.key, project)
                 db.put('other', openedProjects, 'openedProjects')
@@ -993,7 +1003,7 @@ async function endVote(request, sender, project) {
         }
     }
 
-    if (!settings.disabledUseRemoteCode && evilProjects < Date.now()) {
+    if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
         evilProjects = Date.now() + 300000
         try {
             const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
@@ -1182,12 +1192,6 @@ async function endVote(request, sender, project) {
         todayStats.errorVotes++
     }
 
-    let timeout = settings.timeout
-    if (project.randomize) {
-        timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
-    }
-    project.timeoutQueue = timeout
-
     await db.put('other', generalStats, 'generalStats')
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
@@ -1222,7 +1226,7 @@ async function endVote(request, sender, project) {
             }
         }
         project = await db.get('projects', project.key)
-        if (project) {
+        if (project && project.timeoutQueue) {
             delete project.timeoutQueue
             updateValue('projects', project)
         }
