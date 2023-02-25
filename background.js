@@ -185,7 +185,7 @@ async function checkOpen(project/*, transaction*/) {
         }
     }
 
-    if (!settings.disabledUseRemoteCode && evilProjects < Date.now()) {
+    if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
         evilProjects = Date.now() + 300000
         promises.push(fetchProjects())
         async function fetchProjects() {
