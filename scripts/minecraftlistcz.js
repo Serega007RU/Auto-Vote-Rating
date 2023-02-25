@@ -49,6 +49,10 @@ async function vote(first) {
         chrome.runtime.sendMessage(request)
         return
     }
+    if (document.querySelector('a[href*="/vote"]')) {
+        document.querySelector('a[href*="/vote"]').click()
+        return
+    }
 
     if (first) return
 
