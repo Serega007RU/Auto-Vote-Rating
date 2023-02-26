@@ -254,11 +254,10 @@ async function restoreOptions(first) {
 }
 
 //Добавить проект в список проекта
-async function addProjectList(project) {
+async function addProjectList(project, preBend) {
     if (document.getElementById(project.rating + 'Button') == null) {
         generateBtnListRating(project.rating, 0)
     }
-    let preBend = false
     if (!project.key) {
         if (project.priority) {
             preBend = true
@@ -376,12 +375,15 @@ async function addProjectList(project) {
     const div2 = document.createElement('div')
     div2.classList.add('error')
     if (project.error) {
+        // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass
         if (project.error.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
             // TODO функция не оптимизированная и может иметь косяки, другого способа я не нашёл как это сделать адекватно
             // https://stackoverflow.com/a/60311728/11235240
+            // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass,RegExpUnnecessaryNonCapturingGroup
             const error = project.error.match(/(?:http(s)?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)|\s*\S+\s*/g)
             for (const el of error) {
                 // https://stackoverflow.com/a/49849482/11235240
+                // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass
                 if (el.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
                     const link = document.createElement('a')
                     link.classList.add('link')
@@ -543,8 +545,8 @@ function generateBtnListRating(rating, count) {
 }
 
 //Удалить проект из списка проекта
-async function removeProjectList(project) {
-    if (editingProject?.key === project.key) resetEdit()
+async function removeProjectList(project, editing) {
+    if (!editing && editingProject?.key === project.key) resetEdit()
 
     const li = document.getElementById('projects' + project.key)
     if (li != null) {
@@ -554,25 +556,30 @@ async function removeProjectList(project) {
             // noinspection JSIncompatibleTypesComparison
             if (message === 'reject') {
                 createNotif(chrome.i18n.getMessage('rejectDelete'), 'error')
-                return
+                return false
             }
         } catch (error) {
             createNotif(error.message, 'error')
         }
         usageSpace()
 
-        const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
-        if (count <= 0) {
-            document.getElementById(project.rating + 'Tab').remove()
-            document.getElementById(project.rating + 'Button').remove()
-            if (document.querySelector('.buttonBlock').childElementCount <= 0) {
-                document.getElementById('notAddedAll').textContent = chrome.i18n.getMessage('notAddedAll')
+        if (!editing) {
+            const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
+            if (count <= 0) {
+                document.getElementById(project.rating + 'Tab').remove()
+                document.getElementById(project.rating + 'Button').remove()
+                if (document.querySelector('.buttonBlock').childElementCount <= 0) {
+                    document.getElementById('notAddedAll').textContent = chrome.i18n.getMessage('notAddedAll')
+                }
+            } else {
+                li.remove()
+                document.querySelector('#' + project.rating + 'Button > span').textContent = String(count)
             }
         } else {
             li.remove()
-            document.querySelector('#' + project.rating + 'Button > span').textContent = String(count)
         }
     }
+    return true
 }
 
 //Перезагрузка списка проектов
@@ -792,7 +799,9 @@ function resetEdit(project) {
     document.getElementById('submitAddProject').removeAttribute('style')
     document.getElementById('submitEditProject').parentElement.style.display = 'none'
     document.getElementById('switchAddMode').disabled = false
-    document.getElementById('switchAddMode').click()
+    document.getElementById('switchAddMode').checked = false
+    document.getElementById('switchAddMode').dispatchEvent(new Event('change'))
+    document.getElementById('disableCheckProjects').disabled = false
     document.getElementById('rating').disabled = false
 
     if (project) {
@@ -809,10 +818,11 @@ function editProject(project, switchToEdit) {
     document.querySelector('#addTab div').textContent = chrome.i18n.getMessage('edit')
     document.querySelector('#addTab img').src = 'images/icons/edit.svg'
     if (switchToEdit) document.getElementById('addTab').click()
-    if (!document.getElementById('switchAddMode').checked) {
-        document.getElementById('switchAddMode').click()
-    }
+    document.getElementById('switchAddMode').checked = true
+    document.getElementById('switchAddMode').dispatchEvent(new Event('change'))
     document.getElementById('switchAddMode').disabled = true
+    document.getElementById('disableCheckProjects').checked = false
+    document.getElementById('disableCheckProjects').disabled = true
     document.getElementById('rating').disabled = true
 
     const funcRating = allProjects[project.rating]
@@ -879,7 +889,6 @@ function editProject(project, switchToEdit) {
     }
     if (project.priority) {
         document.getElementById('priority').checked = true
-        document.getElementById('priority').dispatchEvent(new Event('change'))
     }
     if (project.randomize) {
         document.getElementById('randomizeMin').value = project.randomize.min
@@ -1051,11 +1060,6 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
             delete project.silentMode
             delete project.emulateMode
         }
-        if (document.getElementById('priority').checked) {
-            project.priority = true
-        } else {
-            delete project.priority
-        }
         if (document.getElementById('randomize').checked) {
             project.randomize = {min: document.getElementById('randomizeMin').valueAsNumber, max: document.getElementById('randomizeMax').valueAsNumber}
         } else {
@@ -1080,7 +1084,32 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
     }
 
     if (event.submitter.id === 'submitEditProject') {
-        await db.put('projects', project, project.key)
+        if (document.getElementById('priority').checked && !project.priority) {
+            project.priority = true
+            if (!await removeProjectList(project, true)) {
+                event.submitter.disabled = false
+                return
+            }
+            const cursor = await db.transaction('projects').store.openCursor()
+            if (!cursor || cursor.key === 1) {
+                project.key = -1
+            } else {
+                project.key = cursor.key - 1
+            }
+            await db.put('projects', project, project.key)
+            await addProjectList(project, true)
+        } else if (!document.getElementById('priority').checked && project.priority) {
+            delete project.priority
+            if (!await removeProjectList(project, true)) {
+                event.submitter.disabled = false
+                return
+            }
+            project.key = await db.put('projects', project)
+            await db.put('projects', project, project.key)
+            await addProjectList(project)
+        } else {
+            await db.put('projects', project, project.key)
+        }
         resetEdit(project)
         await onMessage({updateValue: 'projects', value: project})
         if (project.time == null || project.time < Date.now()) {
