@@ -210,6 +210,7 @@ async function run() {
     }
 
     const timer1 = setInterval(()=>{
+        // noinspection CssInvalidHtmlTagReference
         if (document.querySelector('head > captcha-widgets')) {
             document.querySelectorAll('.captcha-solver').forEach(el => {
                 if (el.dataset.state === 'solved') {
@@ -217,6 +218,11 @@ async function run() {
                     clearInterval(timer1)
                 }
             })
+        } else if (document.querySelector('.antigate_solver')) {
+            if (document.querySelector('.solved_flag')) {
+                startVote(false)
+                clearInterval(timer1)
+            }
         }
     })
 }

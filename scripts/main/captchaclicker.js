@@ -1,13 +1,22 @@
+let dontSolve = false
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
     if (!window.loadedCaptcha && request.sendProject) {
         window.loadedCaptcha = true
+        if (request.settings.disabledClickCaptcha) {
+            dontSolve = true
+        }
         run()
     }
 })
 
 function run() {
-    if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) && document.querySelector('head > captcha-widgets') == null/*Интеграция с 2Captcha Solver*/) {
+    if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) {
         const timer1 = setInterval(()=>{
+            // noinspection CssInvalidHtmlTagReference
+            if (dontSolve || document.querySelector('head > captcha-widgets')) {
+                clearInterval(timer1)
+                return
+            }
 
             if (document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border') != null
                 && isScrolledIntoView(document.querySelector('#recaptcha-anchor > div.recaptcha-checkbox-border'))
@@ -25,12 +34,6 @@ function run() {
             if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0)) {
                 clearInterval(timer2)
                 chrome.runtime.sendMessage('captchaPassed')
-                // TODO данный мазохизм был сделан из-за того что капча иногда загружалась раньше чем страница, теперь мы капчу проходим только после полной загрузки страницы
-                // chrome.runtime.sendMessage('vote', function (response) {
-                //     if (response === 'startedVote') {
-                //         clearInterval(timer2)
-                //     }
-                // })
             }
 
             if (document.querySelector('.rc-anchor-error-msg-container').style.display !== 'none' && document.querySelector('.rc-anchor-error-msg-container').textContent.length > 0) {
@@ -83,6 +86,11 @@ function run() {
         chrome.runtime.sendMessage({errorCaptcha: document.body.innerText.trim(), restartVote: true})
     } else if (window.location.href.match(/.hcaptcha.com\/captcha.v\d\//)) {
         const timer4 = setInterval(()=>{
+            // noinspection CssInvalidHtmlTagReference
+            if (dontSolve || document.querySelector('head > captcha-widgets')) {
+                clearInterval(timer4)
+                return
+            }
 
             if (document.getElementById('checkbox') != null
                 && isScrolledIntoView(document.getElementById('checkbox'))
@@ -97,12 +105,6 @@ function run() {
             if (document.getElementById('checkbox') != null && document.getElementById('checkbox').getAttribute('aria-checked') === 'true') {
                 clearInterval(timer5)
                 chrome.runtime.sendMessage('captchaPassed')
-                // TODO данный мазохизм был сделан из-за того что капча иногда загружалась раньше чем страница, теперь мы капчу проходим только после полной загрузки страницы
-                // chrome.runtime.sendMessage('vote', function (response) {
-                //     if (response === 'startedVote') {
-                //         clearInterval(timer5)
-                //     }
-                // })
             }
         }, 1000)
 

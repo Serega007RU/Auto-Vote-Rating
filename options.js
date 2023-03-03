@@ -238,6 +238,7 @@ async function restoreOptions(first) {
     document.getElementById('timeoutErrorValue').value = settings.timeoutError
     document.getElementById('timeoutVoteValue').value = settings.timeoutVote
     document.getElementById('disabledWarnCaptcha').checked = settings.disabledWarnCaptcha
+    document.getElementById('disabledClickCaptcha').checked = settings.disabledClickCaptcha
     document.getElementById('disabledDebug').checked = settings.debug
     document.getElementById('disabledCloseTabs').checked = settings.disabledCloseTabs
     document.getElementById('disabledUseRemoteCode').checked = settings.disabledUseRemoteCode
@@ -633,6 +634,8 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             settings.disabledFocusedTab = this.checked
         else if (this.id === 'disabledWarnCaptcha')
             settings.disabledWarnCaptcha = this.checked
+        else if (this.id === 'disabledClickCaptcha')
+            settings.disabledClickCaptcha = this.checked
         else if (this.id === 'disabledDebug')
             settings.debug = this.checked
         else if (this.id === 'disabledCloseTabs')

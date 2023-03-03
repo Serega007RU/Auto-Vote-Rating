@@ -99,10 +99,16 @@
     "message": "Open a tab and switch to it automatically"
   },
   "disabledWarnCaptcha": {
-    "message": "My captcha is solved automatically"
+    "message": "Disable notifications about the need to manually pass the captcha"
   },
   "disabledWarnCaptchaTooltip": {
     "message": "Disables notifications and logging that the captcha needs to be passed manually"
+  },
+  "disabledClickCaptcha": {
+    "message": "Don't click on \"I'm not a robot\""
+  },
+  "disabledClickCaptchaTooltip": {
+    "message": "The extension will not click on \"I am not a robot\" in reCAPTCHA or hCaptcha, this is necessary if your captcha is automatically solved"
   },
   "disabledDebug": {
     "message": "Debug"

@@ -643,7 +643,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 }
             }
 
-            await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
+            await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project, settings})
         } catch (error) {
             if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
                 project = await db.get('projects', project.key)
@@ -688,7 +688,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             // Если вкладка уже загружена, повторно туда высылаем sendProject который обозначает что мы готовы к голосованию
             const tab = await chrome.tabs.get(details.tabId)
             if (tab.status !== 'complete') return
-            await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project})
+            await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project, settings})
         } catch (error) {
             if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
                 project = await db.get('projects', project.key)
@@ -806,7 +806,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         return
     } else if (request === 'captchaPassed') {
         try {
-            await chrome.tabs.sendMessage(sender.tab.id, 'captchaPassed')
+            await chrome.tabs.sendMessage(sender.tab.id, request)
         } catch (error) {
             if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
                 console.warn(error.message)
