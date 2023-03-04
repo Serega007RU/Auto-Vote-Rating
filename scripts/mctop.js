@@ -81,7 +81,8 @@ const timer = setInterval(()=>{
                     || textContent.includes('ошибка авторизации через социальную сеть')
                     || textContent.includes('ошибка 500')
                     || textContent === 'ошибка'
-                    || textContent.includes('капча временно не работает')) {
+                    || textContent.includes('капча временно не работает')
+                    || textContent.includes('аккаунт заблокирован')) {
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent, ignoreReport: true})
             } else if (textContent.includes('поставьте галочку в капче') || textContent.includes('обязательное поле')) {
                 return
