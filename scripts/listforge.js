@@ -77,14 +77,19 @@ async function vote(first) {
         return
     }
 
-    //Соглашаемся с Privacy Policy
-    document.getElementById('accept').checked = true
-
     //Если требуется авторизация Steam
     if (document.querySelector('form[name="steam_form"] > input[type="image"]') != null) {
         document.querySelector('form[name="steam_form"] > input[type="image"]').click()
         return
     }
+
+    //Если нас каким-то образом выкинул на страницу описания сервера
+    if (document.querySelector('a[role="button"][title="Vote"]')) {
+        document.querySelector('a[role="button"][title="Vote"]').click()
+    }
+
+    //Соглашаемся с Privacy Policy
+    document.getElementById('accept').checked = true
 
     const project = await getProject('ListForge', true)
     //Вводим ник если он существует
@@ -100,7 +105,7 @@ async function vote(first) {
             document.getElementById('voteBtn').click()
         //Если hCaptcha
         } else if (document.querySelector('button[form="vote_form"]') != null) {
-            document.querySelector('button[form="vote_form"]').click()
+                document.querySelector('button[form="vote_form"]').click()
         //Ещё какая-то разновидность кнопки Vote (Specially for Minecraft Pocket Servers)
         } else {
             // document.querySelector('a[href="javascript:document.vote_form.submit();"]').click()
