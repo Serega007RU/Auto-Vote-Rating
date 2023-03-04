@@ -3,7 +3,7 @@ async function vote(first) {
         if (document.querySelector('.notification.is-success') != null) {
             chrome.runtime.sendMessage({successfully: true})
             return
-        } else if (document.querySelector('.notification.is-warning') != null && document.querySelector('.notification.is-warning').textContent.includes('Hlasovat můžete až')) {
+        } else if (document.querySelector('.notification.is-warning') != null && (document.querySelector('.notification.is-warning').textContent.includes('Hlasovat můžete až') || document.querySelector('.notification.is-warning').textContent.includes('Hlasovať môžete až'))) {
             //Сайт предоставляет когда следующее голосование но не понятно в каком часовом поясе указано время, также не указывается день (пишет только часы и минуты) что ещё больше осложняет определение времени следующего голосования
             chrome.runtime.sendMessage({later: Date.now() + 7200000})
             return
