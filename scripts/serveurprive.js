@@ -38,7 +38,7 @@ function checkAnswer() {
             const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         } else {
-            if (request.message.toLowerCase().includes('proxy') && request.message.toLowerCase().includes('VPN')) {
+            if (request.message.toLowerCase().includes('proxy') && request.message.toLowerCase().includes('vpn')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)
