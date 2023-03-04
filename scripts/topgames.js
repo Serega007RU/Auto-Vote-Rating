@@ -22,7 +22,7 @@ async function vote(first) {
     for (const el of document.querySelectorAll('div.alert.alert-danger')) {
         const request = {}
         request.message = el.innerText
-        if (request.message.includes('cannot vote more than once at the same time')) {
+        if (request.message.includes('cannot vote more than once at the same time') || request.message.includes('avant de pouvoir voter à nouveau')) {
             chrome.runtime.sendMessage({later: true})
             return
         } else if (request.message.includes('Captcha')) {
