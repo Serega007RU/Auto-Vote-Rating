@@ -1265,6 +1265,14 @@ async function endVote(request, sender, project) {
 
 
 async function reportError(request, sender, project) {
+    if (sender?.url || request.url) {
+        const url = sender?.url || request.url
+        const domain = getDomainWithoutSubdomain(url)
+        // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
+        if (!projectByURL.get(domain)) {
+            return
+        }
+    }
     const reported = await db.get('other', 'sentryReported')
     if (reported?.[project.rating] > Date.now()) return
 
@@ -1379,8 +1387,9 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         const json = await response.json()
         if (!response.ok) {
             console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', json)
+        } else {
+            console.log(getProjectPrefix(project, true), 'An error report has been sent, details:', json)
         }
-        console.log(getProjectPrefix(project, true), 'An error report has been sent, details:', json)
     } catch (error) {
         console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error.message)
     } finally {
