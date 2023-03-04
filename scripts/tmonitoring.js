@@ -19,15 +19,19 @@ async function vote(first) {
 const timer = setInterval(()=>{
     try {
         if (document.querySelector('div[class="message error"]')) {
-            const message = document.querySelector('div[class="message error"]').textContent
-            if (message.includes('уже голосовали')) {
+            const request = {}
+            request.message = document.querySelector('div[class="message error"]').textContent
+            if (request.message.includes('уже голосовали')) {
                 const numbers = document.querySelector('div[class="message error"]').textContent.match(/\d+/g).map(Number)
                 const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
                 chrome.runtime.sendMessage({later: Date.now() + milliseconds})
                 clearInterval(timer)
             } else {
-                if (!message.toLowerCase().includes('капча')) {
-                    chrome.runtime.sendMessage({message})
+                if (!request.message.toLowerCase().includes('капча')) {
+                    if (request.message.includes('Ключи безопасности не совпадают')) {
+                        request.ignoreReport = true
+                    }
+                    chrome.runtime.sendMessage(request)
                     clearInterval(timer)
                 }
             }
