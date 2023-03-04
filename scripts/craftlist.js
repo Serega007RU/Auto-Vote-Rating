@@ -29,6 +29,19 @@ async function vote(first) {
         }
         return
     }
+    if (querySelector('div.alert.alert-error')) {
+        const message = querySelector('div.alert.alert-error', true).textContent
+        if (message.includes('next vote')
+            || message.includes('možný hlas za tento server můžeš odeslat')
+            || message.includes('možný hlas za tento server môžeš odoslať')
+            || message.includes('nächster Vote')) {
+            const numbers = message.match(/\d+/g).map(Number)
+            chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] - 1, numbers[0], numbers[3], numbers[4]) + 3600000})
+        } else {
+            chrome.runtime.sendMessage({message})
+        }
+    }
+
     if (querySelector('body #tracy-error')) {
         chrome.runtime.sendMessage({
             message: querySelector('body #tracy-error', true).innerText,
@@ -61,23 +74,8 @@ async function vote(first) {
             (btnText.includes('possible vote')
             || btnText.includes('možný hlas')
             || btnText.includes('ist möglich'))) {
-            //Из текста достаёт все цифры в Array List
             const numbers = btnText.match(/\d+/g).map(Number)
-            let count = 0
-            let hour = 0
-            let min = 0
-            let sec = 0
-            for (const i in numbers) {
-                if (count === 0) {
-                    hour = numbers[i]
-                } else if (count === 1) {
-                    min = numbers[i]
-                } else if (count === 2) {
-                    sec = numbers[i]
-                }
-                count++
-            }
-            const milliseconds = (hour * 60 * 60 * 1000) + (min * 60 * 1000) + (sec * 1000)
+            const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
             return
         } else {
@@ -179,7 +177,7 @@ function isVisible(elem) {
 
     let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
     do {
-        if (pointContainer === elem || pointContainer.style.display) return true;
+        if (pointContainer === elem || pointContainer?.style?.display) return true;
     } while (pointContainer = pointContainer.parentNode)
     return 'end'
 }
