@@ -33,7 +33,7 @@ async function vote() {
     const timer2 = setInterval(async () => {
         try {
             if (waiting) return
-            const button = document.querySelector('#main .card-body .btn.btn-blue')
+            const button = document.querySelector('#main .card-footer .btn.btn-blue')
             if (!button) return
             const message = button.textContent
             if (message.includes('ч.')) {
@@ -75,7 +75,7 @@ const timer = setInterval(async ()=>{
             } else if (request.message.includes('Авторизация')) {
                 clearInterval(timer)
                 chrome.runtime.sendMessage({auth: true})
-            } else if (request.message === 'Успешно') {
+            } else if (request.message === 'Успешно' || request.message === ' In process...') {
                 // None
             } else {
                 if (request.message.includes('Сервис временно недоступен')) {
