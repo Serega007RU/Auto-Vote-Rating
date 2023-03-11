@@ -1269,6 +1269,15 @@ var allProjects = {
         URL: () => 'minecraft.global',
         parseURL: (url) => ({id: url.pathname.split('/')[2]})
     },
+    Warface: {
+        voteURL: () => 'https://ru.warface.com/bonus/',
+        pageURL: () => 'https://ru.warface.com/bonus/',
+        projectName: () => "Bonus",
+        exampleURL: () => ['https://ru.warface.com/bonus/', '', ''],
+        URL: () => 'warface.com',
+        silentVote: () => true,
+        parseURL: () => ({id: ''})
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1405,6 +1414,7 @@ var projectByURL = new Map([
     ['servidoresdeminecraft.es', 'ServidoresdeMinecraftEs'],
     ['minecraftsurvivalservers.com', 'MinecraftSurvivalServersCom'],
     ['minecraft.global', 'MinecraftGlobal'],
+    ['warface.com', 'Warface'],
     ['Custom', 'Custom']
 ])
 
