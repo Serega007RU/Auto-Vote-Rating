@@ -49,7 +49,8 @@
 				"options.html"
 			],
 			"matches": [
-				"https://*.dogecraft.net/*"
+				"https://*.dogecraft.net/*",
+				"https://*.mythicalworld.su/*"
 			]
 		}
 	],
