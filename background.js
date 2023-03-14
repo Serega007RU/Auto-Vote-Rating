@@ -1106,7 +1106,7 @@ async function endVote(request, sender, project) {
             } else if (timeoutRating.week != null) {
                 let needCalculateDate = true
                 // https://stackoverflow.com/a/11789820/11235240
-                const distance = (project.timeoutWeek + 7 - time.getDay()) % 7
+                const distance = (timeoutRating.week + 7 - time.getDay()) % 7
                 if (distance > 0) {
                     needCalculateDate = false
                     time.setDate(time.getDate() + distance)
@@ -1115,22 +1115,22 @@ async function endVote(request, sender, project) {
                     if (time.getUTCHours() >= timeoutRating.hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
                         time.setUTCDate(time.getUTCDate() + 7)
                     }
-                    time.setUTCHours(timeoutRating.hour, (project.priority ? 0 : 10), 0, 0)
                 }
+                time.setUTCHours(timeoutRating.hour, (project.priority ? 0 : 10), 0, 0)
             } else if (timeoutRating.month != null) {
                 let needCalculateDate = true
-                if (time.getDate() !== project.timeoutMonth) {
+                if (time.getDate() !== timeoutRating.month) {
                     needCalculateDate = false
-                    if (time.getDate() > project.timeoutMonth) time.setMonth(time.getMonth() + 1)
-                    time.setDate(project.timeoutMonth)
+                    if (time.getDate() > timeoutRating.month) time.setMonth(time.getMonth() + 1)
+                    time.setDate(timeoutRating.month)
                 }
                 if (needCalculateDate) {
                     if (time.getUTCHours() >= timeoutRating.hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
                         time.setMonth(time.getMonth() + 1)
-                        time.setDate(project.timeoutMonth)
+                        time.setDate(timeoutRating.month)
                     }
-                    time.setUTCHours(timeoutRating.hour, (project.priority ? 0 : 10), 0, 0)
                 }
+                time.setUTCHours(timeoutRating.hour, (project.priority ? 0 : 10), 0, 0)
             } else if (timeoutRating.hour != null) {
                 //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
                 if (time.getUTCHours() >= timeoutRating.hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {

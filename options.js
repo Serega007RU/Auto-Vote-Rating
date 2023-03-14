@@ -728,6 +728,13 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                     document.getElementById('time').parentElement.removeAttribute('style')
                     document.getElementById('time').required = true
                 } else {
+                    if (document.getElementById('selectTime').value === 'week') {
+                        document.getElementById('week').parentElement.removeAttribute('style')
+                        document.getElementById('week').required = true
+                    } else if (document.getElementById('selectTime').value === 'month') {
+                        document.getElementById('month').parentElement.removeAttribute('style')
+                        document.getElementById('month').required = true
+                    }
                     document.getElementById('hour').parentElement.removeAttribute('style')
                     document.getElementById('hour').required = true
                 }
@@ -789,13 +796,11 @@ document.getElementById('switchAddMode').addEventListener('change', (event)=>{
         document.getElementById('rating').required = true
         document.getElementById('link').parentElement.style.display = 'none'
         document.getElementById('link').required = false
-        document.getElementById('id').required = true
     } else {
         document.getElementById('rating').parentElement.style.display = 'none'
         document.getElementById('rating').required = false
         document.getElementById('link').parentElement.removeAttribute('style')
         document.getElementById('link').required = true
-        document.getElementById('id').required = false
     }
 })
 
@@ -888,6 +893,7 @@ function editProject(project, switchToEdit) {
         document.getElementById('scheduleTime').value = time.toISOString().slice(0,23)
     }
     if (project.timeout || project.timeoutHour || project.rating === 'Custom') {
+        document.getElementById('customTimeOut').checked = true
         if (project.timeout) {
             document.getElementById('selectTime').value = 'ms'
             document.getElementById('time').valueAsNumber = project.timeout
@@ -907,7 +913,7 @@ function editProject(project, switchToEdit) {
             hours.setMinutes(hours.getMinutes() - hours.getTimezoneOffset())
             document.getElementById('hour').value = hours.toISOString().slice(11,23)
         }
-        document.getElementById('selectTime').dispatchEvent(new Event('change'))
+        document.getElementById('customTimeOut').dispatchEvent(new Event('change'))
     }
     if (project.lastDayMonth) {
         document.getElementById('lastDayMonth').checked = true
