@@ -1499,10 +1499,20 @@ async function openOptionsPage() {
 }
 
 function getProjectPrefix(project, detailed) {
-    if (detailed) {
-        return '[' + allProjects[project.rating]?.URL() + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '')
+    let text = ''
+    if (project.nick && project.nick !== '') text += ' – ' + project.nick
+    if (detailed && project.game && project.game !== '') text += ' – ' + project.game
+    if (detailed && project.id && project.id !== '') text += ' – ' + project.id
+    if (project.name && project.name !== '') {
+        text += ' – ' + project.name
+    } else if (project.id && project.id !== '') {
+        text += ' – ' + project.id
+    }
+    if (text === '') {
+        return '[' + allProjects[project.rating]?.URL() + ']'
     } else {
-        return '[' + allProjects[project.rating]?.URL() + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' ' : '') + (project.name != null ? '– ' + project.name : '– ' + project.id)
+        text = text.replace(' – ', '')
+        return '[' + allProjects[project.rating]?.URL() + '] ' + text
     }
 }
 

@@ -370,7 +370,23 @@ async function addProjectList(project, preBend) {
     contDiv.classList.add('message')
 
     const nameProjectMes = document.createElement('div')
-    nameProjectMes.textContent = (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + (!project.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!project.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (project.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (project.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (project.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
+    let textProject = ''
+    if (project.nick && project.nick !== '') textProject += ' – ' + project.nick
+    if (project.game && project.game !== '') textProject += ' – ' + project.game
+    if (project.id && project.id !== '') textProject += ' – ' + project.id
+    if (project.name && project.name !== '') textProject += ' – ' + project.name
+    if (textProject === '') {
+        textProject = project.rating
+    } else {
+        textProject = textProject.replace(' – ', '')
+    }
+    if (project.priority) textProject += ' (' + chrome.i18n.getMessage('inPriority') + ')'
+    if (project.randomize) textProject += ' (' + chrome.i18n.getMessage('inRandomize') + ')'
+    if (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null)) textProject += ' (' + chrome.i18n.getMessage('customTimeOut2') + ')'
+    if (project.lastDayMonth) textProject += ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')'
+    if (project.silentMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')'
+    if (project.emulateMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')'
+    nameProjectMes.textContent = textProject
     contDiv.append(nameProjectMes)
 
     const div2 = document.createElement('div')
@@ -469,7 +485,15 @@ async function updateModalStats(project, toggle) {
     } else {
         if (!document.getElementById('stats').classList.contains('active') || document.getElementById('stats' + project.key) == null) return
     }
-    document.querySelector('.statsSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
+    let text = project.rating
+    if (project.nick && project.nick !== '') text += ' – ' + project.nick
+    if (project.game && project.game !== '') text += ' – ' + project.game
+    if (project.name && project.name !== '') {
+        text += ' – ' + project.name
+    } else if (project.id && project.id !== '') {
+        text += ' – ' + project.id
+    }
+    document.querySelector('.statsSubtitle').textContent = text
     document.querySelector('.statsSubtitle').id = 'stats' + project.key
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = project.stats.successVotes
     document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = project.stats.monthSuccessVotes
@@ -832,7 +856,7 @@ function editProject(project, switchToEdit) {
     document.getElementById('rating').value = funcRating.URL()
     if (project.rating === 'Custom') {
         document.getElementById('nick').value = project.id
-    } else {
+    } else if (!funcRating.notRequiredId?.()) {
         document.getElementById('id').value = project.id
     }
     if (funcRating.exampleURLGame) {
@@ -919,7 +943,15 @@ function editProject(project, switchToEdit) {
     document.querySelector('[data-resource="addTitle"]').textContent = chrome.i18n.getMessage('editTitle')
     document.querySelector('.editSubtitle').removeAttribute('style')
     document.querySelector('.editSubtitle').id = 'edit' + project.key
-    document.querySelector('.editSubtitle').textContent = project.rating + (project.nick != null && project.nick !== '' ? ' – ' + project.nick : '') + (project.game != null ? ' – ' + project.game : '') + (' – ' + (project.name != null ? project.name : project.id))
+    let text = project.rating
+    if (project.nick && project.nick !== '') text += ' – ' + project.nick
+    if (project.game && project.game !== '') text += ' – ' + project.game
+    if (project.name && project.name !== '') {
+        text += ' – ' + project.name
+    } else if (project.id && project.id !== '') {
+        text += ' – ' + project.id
+    }
+    document.querySelector('.editSubtitle').textContent = text
 }
 
 //Слушатель кнопки "Добавить"
@@ -945,7 +977,7 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
             project = funcRating.parseURL(new URL(url))
             project.rating = rating
 
-            if (project.id == null) {
+            if (!funcRating.notRequiredId?.() && (project.id == null || project.id === '')) {
                 createNotif(chrome.i18n.getMessage('errorLinkParam', 'id'), 'error')
                 event.submitter.disabled = false
                 return
@@ -980,7 +1012,7 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
 
         if (project.rating === 'Custom') {
             project.id = document.getElementById('nick').value
-        } else {
+        } else if (!funcRating.notRequiredId?.()) {
             project.id = document.getElementById('id').value
         }
 
@@ -999,8 +1031,6 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
 
     if (project.rating !== 'Custom' && !funcRating.notRequiredNick?.(project)) {
         project.nick = document.getElementById('nick').value
-    } else {
-        project.nick = ''
     }
 
     if (funcRating.limitedCountVote?.()) {
@@ -1207,22 +1237,24 @@ async function addProject(project, element) {
     }
 
     if (!document.getElementById('disableCheckProjects').checked) {
-        // noinspection JSUnresolvedFunction
-        let found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
-        if (found > 0) {
-            const message = chrome.i18n.getMessage('alreadyAdded')
-            if (!secondBonusText) {
-                createNotif(message, 'success', null, element)
-            } else {
-                createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
-            }
-            addProjectsBonus(project, element)
-            return
-        } else if (allProjects[project.rating].oneProject?.() > 0) {
+        if (project.id == null || allProjects[project.rating].oneProject?.() > 0) {
             // noinspection JSUnresolvedFunction
-            found = await db.countFromIndex('projects', 'rating', project.rating)
+            let found = await db.countFromIndex('projects', 'rating', project.rating)
             if (found >= allProjects[project.rating].oneProject?.()) {
                 createNotif(chrome.i18n.getMessage('oneProject', [project.rating, String(allProjects[project.rating].oneProject?.())]), 'error', null, element)
+                return
+            }
+        } else {
+            // noinspection JSUnresolvedFunction
+            let found = await db.countFromIndex('projects', 'rating, id', [project.rating, project.id])
+            if (found > 0) {
+                const message = chrome.i18n.getMessage('alreadyAdded')
+                if (!secondBonusText) {
+                    createNotif(message, 'success', null, element)
+                } else {
+                    createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
+                }
+                addProjectsBonus(project, element)
                 return
             }
         }
@@ -1778,12 +1810,17 @@ async function fastAdd() {
         for (const project of projects) {
             const html = document.createElement('div')
             html.classList.add('fastAddEl')
-            html.setAttribute('div', project.rating+'–'+project.nick+'–'+project.id)
+            let divName = project.rating
+            if (project.nick && project.nick !== '') divName += '–' + project.nick
+            if (project.id && project.id !== '') divName += '–' + project.id
+            html.setAttribute('div', divName)
             html.appendChild(svgFail.cloneNode(true))
 
             const div = document.createElement('div')
             const p = document.createElement('p')
-            p.textContent = project.rating+' – '+project.nick+' – '+project.id
+            p.textContent = project.rating
+            if (project.nick && project.nick !== '') p.textContent += ' – ' + project.nick
+            if (project.id && project.id !== '') p.textContent += ' – ' + project.id
             const status = document.createElement('span')
             p.append(document.createElement('br'))
             p.append(status)
@@ -2054,7 +2091,7 @@ document.getElementById('rating').addEventListener('input', function() {
         document.getElementById('id').value = ''
         document.getElementById('id').parentElement.style.display = 'none'
         document.getElementById('id').name = 'name'
-        document.getElementById('id').required = true
+        document.getElementById('id').required = false
         document.getElementById('projectIDTooltip1').textContent = ''
         document.getElementById('projectIDTooltip2').textContent = ''
         document.getElementById('projectIDTooltip3').textContent = ''
@@ -2123,11 +2160,14 @@ document.getElementById('rating').addEventListener('input', function() {
 
     let funcRating = allProjects[rating]
 
-    document.getElementById('id').parentElement.removeAttribute('style')
-    document.getElementById('projectIDTooltip1').textContent = funcRating.exampleURL()[0]
-    document.getElementById('projectIDTooltip2').textContent = funcRating.exampleURL()[1]
-    document.getElementById('projectIDTooltip3').textContent = funcRating.exampleURL()[2]
-    document.getElementById('id').name = 'id' + rating
+    if (!funcRating.notRequiredId?.()) {
+        document.getElementById('id').parentElement.removeAttribute('style')
+        document.getElementById('id').required = true
+        document.getElementById('projectIDTooltip1').textContent = funcRating.exampleURL()[0]
+        document.getElementById('projectIDTooltip2').textContent = funcRating.exampleURL()[1]
+        document.getElementById('projectIDTooltip3').textContent = funcRating.exampleURL()[2]
+        document.getElementById('id').name = 'id' + rating
+    }
 
     if (!funcRating.notRequiredNick?.()) {
         document.getElementById('nick').parentElement.removeAttribute('style')
@@ -2282,7 +2322,23 @@ async function onMessage(request) {
                         }
                     }
                 }
-                el.querySelector('div > div').textContent = (request.value.nick != null && request.value.nick !== '' ? request.value.nick + ' – ' : '') + (request.value.game != null ? request.value.game + ' – ' : '') + request.value.id + (request.value.name != null ? ' – ' + request.value.name : '') + (!request.value.priority ? '' : ' (' + chrome.i18n.getMessage('inPriority') + ')') + (!request.value.randomize ? '' : ' (' + chrome.i18n.getMessage('inRandomize') + ')') + (request.value.rating !== 'Custom' && (request.value.timeout != null || request.value.timeoutHour != null) ? ' (' + chrome.i18n.getMessage('customTimeOut2') + ')' : '') + (request.value.lastDayMonth ? ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')' : '') + (request.value.silentMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')' : '') + (request.value.emulateMode ? ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')' : '')
+                let textProject = ''
+                if (request.value.nick && request.value.nick !== '') textProject += ' – ' + request.value.nick
+                if (request.value.game && request.value.game !== '') textProject += ' – ' + request.value.game
+                if (request.value.id && request.value.id !== '') textProject += ' – ' + request.value.id
+                if (request.value.name && request.value.name !== '') textProject += ' – ' + request.value.name
+                if (textProject === '') {
+                    textProject = request.value.rating
+                } else {
+                    textProject = textProject.replace(' – ', '')
+                }
+                if (request.value.priority) textProject += ' (' + chrome.i18n.getMessage('inPriority') + ')'
+                if (request.value.randomize) textProject += ' (' + chrome.i18n.getMessage('inRandomize') + ')'
+                if (request.value.rating !== 'Custom' && (request.value.timeout != null || request.value.timeoutHour != null)) textProject += ' (' + chrome.i18n.getMessage('customTimeOut2') + ')'
+                if (request.value.lastDayMonth) textProject += ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')'
+                if (request.value.silentMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')'
+                if (request.value.emulateMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')'
+                el.querySelector('div > div').textContent = textProject
                 el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
                 el.querySelector('.error').textContent = request.value.error
                 updateModalStats(request.value)
