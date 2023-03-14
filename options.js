@@ -1752,6 +1752,7 @@ async function fastAdd() {
 
             html.append(div)
             listFastAdd.append(html)
+            listFastAdd.scrollTop = listFastAdd.scrollHeight
         }
         if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] === 'true') {
             settings.disabledNotifWarn = true
@@ -1768,6 +1769,7 @@ async function fastAdd() {
 
             html.append(div)
             listFastAdd.append(html)
+            listFastAdd.scrollTop = listFastAdd.scrollHeight
         }
         if (vars['disableNotifStart'] != null && vars['disableNotifStart'] === 'true') {
             settings.disabledNotifStart = true
@@ -1783,6 +1785,7 @@ async function fastAdd() {
             div.append(p)
             html.append(div)
             listFastAdd.append(html)
+            listFastAdd.scrollTop = listFastAdd.scrollHeight
         }
 
         const projects = getUrlProjects()
@@ -1798,6 +1801,7 @@ async function fastAdd() {
         div2.append(p2)
         html2.append(div2)
         listFastAdd.append(html2)
+        listFastAdd.scrollTop = listFastAdd.scrollHeight
         if (!await checkPermissions(projects, status2)) {
             const buttonRetry = document.createElement('button')
             buttonRetry.classList.add('btn')
@@ -1828,6 +1832,7 @@ async function fastAdd() {
             div.append(p)
             html.append(div)
             listFastAdd.append(html)
+            listFastAdd.scrollTop = listFastAdd.scrollHeight
             await addProject(project, status)
         }
 
@@ -1844,6 +1849,7 @@ async function fastAdd() {
             successFastAdd.append(document.createElement('br'))
             successFastAdd.append(chrome.i18n.getMessage('closeTab'))
             listFastAdd.append(successFastAdd)
+            listFastAdd.scrollTop = listFastAdd.scrollHeight
         } else {
             return
         }
