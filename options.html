@@ -134,6 +134,8 @@
                             <select required id="selectTime" class="select">
                                 <option value="ms" data-resource="timeoutMS"></option>
                                 <option value="hour" data-resource="timeoutHour"></option>
+                                <option value="week" data-resource="timeoutWeek"></option>
+                                <option value="month" data-resource="timeoutMonth"></option>
                             </select>
                         </div>
                         <!--Задержка в миллисекундах-->
@@ -145,6 +147,24 @@
                         <div style="display: none;" class="input-block">
                             <label for="hour" data-resource="chooseHour"></label>
                             <input id="hour" name="chooseHour" placeholder="chooseHour" type="time" step="0.001" min="0" max="23" class="input"/>
+                        </div>
+                        <!--Неделя-->
+                        <div style="display: none;" class="input-block">
+                            <label for="week" data-resource="chooseWeek"></label>
+                            <select required id="week" class="select">
+                                <option value="1" data-resource="monday"></option>
+                                <option value="2" data-resource="tuesday"></option>
+                                <option value="3" data-resource="wednesday"></option>
+                                <option value="4" data-resource="thursday"></option>
+                                <option value="5" data-resource="friday"></option>
+                                <option value="6" data-resource="saturday"></option>
+                                <option value="0" data-resource="sunday"></option>
+                            </select>
+                        </div>
+                        <!--Число-->
+                        <div style="display: none;" class="input-block">
+                            <label for="month" data-resource="chooseMonth"></label>
+                            <input id="month" name="chooseMonth" placeholder="chooseMonth" type="number" min="1" max="31" class="input"/>
                         </div>
                         <!--Запланировать голосование-->
                         <div style="display: none;" class="input-block">

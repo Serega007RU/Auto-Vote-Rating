@@ -689,27 +689,27 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             }
             _return = true
         } else if (this.id === 'customTimeOut') {
+            document.getElementById('hour').parentElement.style.display = 'none'
+            document.getElementById('hour').required = false
+            document.getElementById('time').parentElement.style.display = 'none'
+            document.getElementById('time').required = false
+            document.getElementById('week').parentElement.style.display = 'none'
+            document.getElementById('week').required = false
+            document.getElementById('month').parentElement.style.display = 'none'
+            document.getElementById('month').required = false
             if (this.checked) {
                 document.getElementById('lastDayMonth').disabled = false
                 document.getElementById('selectTime').parentElement.removeAttribute('style')
                 if (document.getElementById('selectTime').value === 'ms') {
                     document.getElementById('time').parentElement.removeAttribute('style')
                     document.getElementById('time').required = true
-                    document.getElementById('hour').parentElement.style.display = 'none'
-                    document.getElementById('hour').required = false
                 } else {
                     document.getElementById('hour').parentElement.removeAttribute('style')
                     document.getElementById('hour').required = true
-                    document.getElementById('time').parentElement.style.display = 'none'
-                    document.getElementById('time').required = false
                 }
             } else {
                 document.getElementById('lastDayMonth').disabled = true
                 document.getElementById('selectTime').parentElement.style.display = 'none'
-                document.getElementById('time').parentElement.style.display = 'none'
-                document.getElementById('time').required = false
-                document.getElementById('hour').parentElement.style.display = 'none'
-                document.getElementById('hour').required = false
             }
             _return = true
         } else if (this.id === 'lastDayMonth') {
@@ -868,7 +868,15 @@ function editProject(project, switchToEdit) {
             document.getElementById('selectTime').value = 'ms'
             document.getElementById('time').valueAsNumber = project.timeout
         } else {
-            document.getElementById('selectTime').value = 'hour'
+            if (project.timeoutWeek != null) {
+                document.getElementById('selectTime').value = 'week'
+                document.getElementById('week').value = project.timeoutWeek
+            } else if (project.timeoutMonth != null) {
+                document.getElementById('selectTime').value = 'month'
+                document.getElementById('month').value = project.timeoutMonth
+            } else {
+                document.getElementById('selectTime').value = 'hour'
+            }
             // TODO сомнительный код, я не знаю как ещё вынести обратно в input Date без смещений во времени из-за часового пояса
             // https://stackoverflow.com/a/61082536/11235240
             const hours = new Date(1980, 0, 1, project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
@@ -1029,6 +1037,8 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
                 delete project.timeoutMinute
                 delete project.timeoutSecond
                 delete project.timeoutMS
+                delete project.timeoutWeek
+                delete project.timeoutMonth
                 project.timeout = document.getElementById('time').valueAsNumber
             } else {
                 delete project.timeout
@@ -1040,6 +1050,16 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
                 if (Number.isNaN(project.timeoutSecond)) project.timeoutSecond = 0
                 project.timeoutMS = Number(document.getElementById('hour').value.split('.')[1])
                 if (Number.isNaN(project.timeoutMS)) project.timeoutMS = 0
+                if (document.getElementById('selectTime').value === 'week') {
+                    project.timeoutWeek = Number(document.getElementById('week').value)
+                } else {
+                    delete project.timeoutWeek
+                }
+                if (document.getElementById('selectTime').value === 'month') {
+                    project.timeoutMonth = document.getElementById('month').valueAsNumber
+                } else {
+                    delete project.timeoutMonth
+                }
             }
         } else {
             delete project.timeout
@@ -1047,6 +1067,8 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
             delete project.timeoutMinute
             delete project.timeoutSecond
             delete project.timeoutMS
+            delete project.timeoutWeek
+            delete project.timeoutMonth
         }
         if (document.getElementById('lastDayMonth').checked) {
             project.lastDayMonth = true
@@ -2185,16 +2207,27 @@ document.getElementById('rating').addEventListener('input', function() {
 
 //Слушатель на выбор типа timeout для Custom
 document.getElementById('selectTime').addEventListener('change', function() {
+    document.getElementById('hour').parentElement.style.display = 'none'
+    document.getElementById('hour').required = false
+    document.getElementById('time').parentElement.style.display = 'none'
+    document.getElementById('time').required = false
+    document.getElementById('week').parentElement.style.display = 'none'
+    document.getElementById('week').required = false
+    document.getElementById('month').parentElement.style.display = 'none'
+    document.getElementById('month').required = false
     if (this.value === 'ms') {
         document.getElementById('time').parentElement.removeAttribute('style')
         document.getElementById('time').required = true
-        document.getElementById('hour').parentElement.style.display = 'none'
-        document.getElementById('hour').required = false
     } else {
+        if (this.value === 'week') {
+            document.getElementById('week').parentElement.removeAttribute('style')
+            document.getElementById('week').required = true
+        } else if (this.value === 'month') {
+            document.getElementById('month').parentElement.removeAttribute('style')
+            document.getElementById('month').required = true
+        }
         document.getElementById('hour').parentElement.removeAttribute('style')
         document.getElementById('hour').required = true
-        document.getElementById('time').parentElement.style.display = 'none'
-        document.getElementById('time').required = false
     }
 })
 

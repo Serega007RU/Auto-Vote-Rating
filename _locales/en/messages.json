@@ -705,8 +705,20 @@
   "timeoutHour": {
     "message": "After the certain time (once per day)"
   },
+  "timeoutWeek": {
+    "message": "After the certain time (once per week)"
+  },
+  "timeoutMonth": {
+    "message": "After the certain time (once per month)"
+  },
   "chooseHour": {
     "message": "Set the time"
+  },
+  "chooseWeek": {
+    "message": "Set the week"
+  },
+  "chooseMonth": {
+    "message": "Set the number (day)"
   },
   "advSettings": {
     "message": "Advanced setting:"
@@ -998,5 +1010,26 @@
   },
   "disabledRestartOnTimeout": {
     "message": "Disable the restart of voting if it lasts too long"
+  },
+  "monday": {
+    "message": "Monday"
+  },
+  "tuesday": {
+    "message": "Tuesday"
+  },
+  "wednesday": {
+    "message": "Wednesday"
+  },
+  "thursday": {
+    "message": "Thursday"
+  },
+  "friday": {
+    "message": "Friday"
+  },
+  "saturday": {
+    "message": "Saturday"
+  },
+  "sunday": {
+    "message": "Sunday"
   }
 }

@@ -1049,13 +1049,38 @@ async function endVote(request, sender, project) {
     let sendMessage
     if (request.successfully || request.later != null) {
         let time = new Date()
-        if (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null) && !(project.lastDayMonth && new Date(time.getFullYear(), time.getMonth(), time.getDay() + 1).getMonth() === new Date().getMonth())) {
+        if (project.rating === 'Custom' || ((project.timeout != null || project.timeoutHour != null) && !(project.lastDayMonth && new Date(time.getFullYear(), time.getMonth(), time.getDay() + 1).getMonth() === new Date().getMonth()))) {
             if (project.timeoutHour != null) {
                 if (project.timeoutMinute == null) project.timeoutMinute = 0
                 if (project.timeoutSecond == null) project.timeoutSecond = 0
                 if (project.timeoutMS == null) project.timeoutMS = 0
-                if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
-                    time.setDate(time.getDate() + 1)
+
+                let needCalculateDate = true
+                if (project.timeoutWeek != null) {
+                    // https://stackoverflow.com/a/11789820/11235240
+                    const distance = (project.timeoutWeek + 7 - time.getDay()) % 7
+                    if (distance > 0) {
+                        needCalculateDate = false
+                        time.setDate(time.getDate() + distance)
+                    }
+                } else if (project.timeoutMonth != null) {
+                    if (time.getDate() !== project.timeoutMonth) {
+                        needCalculateDate = false
+                        if (time.getDate() > project.timeoutMonth) time.setMonth(time.getMonth() + 1)
+                        time.setDate(project.timeoutMonth)
+                    }
+                }
+                if (needCalculateDate) {
+                    if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
+                        if (project.timeoutWeek != null) {
+                            time.setDate(time.getDate() + 7)
+                        } else if (project.timeoutMonth != null) {
+                            time.setMonth(time.getMonth() + 1)
+                            time.setDate(project.timeoutMonth)
+                        } else {
+                            time.setDate(time.getDate() + 1)
+                        }
+                    }
                 }
                 time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
             } else {
@@ -1075,21 +1100,37 @@ async function endVote(request, sender, project) {
             const timeoutRating = allProjects[project.rating]?.timeout?.(project)
             if (Number.isInteger(request.successfully)) {
                 time = new Date(request.successfully)
-            } else if (project.rating === 'Custom') {
-                if (project.timeoutHour != null) {
-                    if (project.timeoutMinute == null) project.timeoutMinute = 0
-                    if (project.timeoutSecond == null) project.timeoutSecond = 0
-                    if (project.timeoutMS == null) project.timeoutMS = 0
-                    if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
-                        time.setDate(time.getDate() + 1)
-                    }
-                    time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
-                } else {
-                    time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
-                }
             } else if (!timeoutRating) {
                 //Если нам не известен таймаут, ставим по умолчанию +24 часа
                 time.setUTCDate(time.getUTCDate() + 1)
+            } else if (timeoutRating.week != null) {
+                let needCalculateDate = true
+                // https://stackoverflow.com/a/11789820/11235240
+                const distance = (project.timeoutWeek + 7 - time.getDay()) % 7
+                if (distance > 0) {
+                    needCalculateDate = false
+                    time.setDate(time.getDate() + distance)
+                }
+                if (needCalculateDate) {
+                    if (time.getUTCHours() >= timeoutRating.hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
+                        time.setUTCDate(time.getUTCDate() + 7)
+                    }
+                    time.setUTCHours(timeoutRating.hour, (project.priority ? 0 : 10), 0, 0)
+                }
+            } else if (timeoutRating.month != null) {
+                let needCalculateDate = true
+                if (time.getDate() !== project.timeoutMonth) {
+                    needCalculateDate = false
+                    if (time.getDate() > project.timeoutMonth) time.setMonth(time.getMonth() + 1)
+                    time.setDate(project.timeoutMonth)
+                }
+                if (needCalculateDate) {
+                    if (time.getUTCHours() >= timeoutRating.hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
+                        time.setMonth(time.getMonth() + 1)
+                        time.setDate(project.timeoutMonth)
+                    }
+                    time.setUTCHours(timeoutRating.hour, (project.priority ? 0 : 10), 0, 0)
+                }
             } else if (timeoutRating.hour != null) {
                 //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
                 if (time.getUTCHours() >= timeoutRating.hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {

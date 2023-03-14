@@ -671,8 +671,20 @@
   "timeoutHour": {
     "message": "После заданного времени (раз в день)"
   },
+  "timeoutWeek": {
+    "message": "После заданного времени (раз в неделю)"
+  },
+  "timeoutMonth": {
+    "message": "После заданного времени (раз в месяц)"
+  },
   "chooseHour": {
     "message": "Задайте время"
+  },
+  "chooseWeek": {
+    "message": "Задайте неделю"
+  },
+  "chooseMonth": {
+    "message": "Задайте число (день)"
   },
   "advSettings": {
     "message": "Дополнительные параметры:"
@@ -964,5 +976,26 @@
   },
   "disabledRestartOnTimeout": {
     "message": "Отключить перезапуск голосования если оно слишком долго длится"
+  },
+  "monday": {
+    "message": "Понедельник"
+  },
+  "tuesday": {
+    "message": "Вторник"
+  },
+  "wednesday": {
+    "message": "Среда"
+  },
+  "thursday": {
+    "message": "Четверг"
+  },
+  "friday": {
+    "message": "Пятника"
+  },
+  "saturday": {
+    "message": "Суббота"
+  },
+  "sunday": {
+    "message": "Воскресенье"
   }
 }
