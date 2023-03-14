@@ -1502,11 +1502,15 @@ function getProjectPrefix(project, detailed) {
     let text = ''
     if (project.nick && project.nick !== '') text += ' – ' + project.nick
     if (detailed && project.game && project.game !== '') text += ' – ' + project.game
-    if (detailed && project.id && project.id !== '') text += ' – ' + project.id
-    if (project.name && project.name !== '') {
-        text += ' – ' + project.name
-    } else if (project.id && project.id !== '') {
-        text += ' – ' + project.id
+    if (detailed) {
+        if (project.id && project.id !== '') text += ' – ' + project.id
+        if (project.name && project.name !== '') text += ' – ' + project.name
+    } else {
+        if (project.name && project.name !== '') {
+            text += ' – ' + project.name
+        } else if (project.id && project.id !== '') {
+            text += ' – ' + project.id
+        }
     }
     if (text === '') {
         return '[' + allProjects[project.rating]?.URL() + ']'
