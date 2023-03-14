@@ -1293,7 +1293,7 @@ async function addProject(project, element) {
         } else if (response.redirected) {
             createNotif(chrome.i18n.getMessage('notFoundProjectRedirect', response.url), 'error', null, element)
             return
-        } else if (response.status === 503) {
+        } else if (response.status === 503 || response.status === 403) { // Игнорируем проверку CloudFlare
             //None
         } else if (!response.ok) {
             createNotif(chrome.i18n.getMessage('notConnect', [project.rating, String(response.status)]), 'error', null, element)
