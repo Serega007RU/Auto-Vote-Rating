@@ -1,13 +1,22 @@
 // noinspection ES6MissingAwait
 
 async function silentVoteWarface(project) {
-    let response = await fetch('https://ru.warface.com/dynamic/bonus/?a=weapons&json=true', {
+    let response = await fetch('https://ru.warface.com/dynamic/bonus/?a=init&json=true')
+    let json = await response.json()
+    if (json.error) {
+        endVote({message: JSON.stringify(json)}, null, project)
+        return
+    }
+    console.log('init', JSON.stringify(json))
+
+    response = await fetch('https://ru.warface.com/dynamic/bonus/?a=weapons&json=true', {
         headers: {
             accept: 'application/json, text/plain, */*',
         },
         method: 'GET',
     })
-    let json = await response.json()
+    json = await response.json()
+    console.log('weapons', JSON.stringify(json))
 
     const bonuses = {}
     // noinspection JSUnresolvedVariable
@@ -30,7 +39,7 @@ async function silentVoteWarface(project) {
         body: formData
     })
     json = await response.json()
-    console.log(JSON.stringify(json))
+    console.log('bonus', JSON.stringify(json))
 
     endVote({successfully: true}, null, project)
 }

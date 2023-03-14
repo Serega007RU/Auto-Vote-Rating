@@ -1277,7 +1277,7 @@ var allProjects = {
         URL: () => 'warface.com',
         silentVote: () => true,
         parseURL: () => ({}),
-        timeout: () => ({week: 21, hour: 13}),
+        timeout: () => ({week: 3, hour: 13}),
         notRequiredNick: () => true,
         notRequiredId: () => true
     },
