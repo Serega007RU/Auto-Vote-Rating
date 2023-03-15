@@ -78,7 +78,7 @@ const timer = setInterval(async ()=>{
             } else if (request.message === 'Успешно' || request.message === ' In process...') {
                 // None
             } else {
-                if (request.message.includes('Сервис временно недоступен')) {
+                if (request.message.includes('Сервис временно недоступен') || request.message.includes('Страница устарела')) {
                     request.ignoreReport = true
                 }
                 clearInterval(timer)
