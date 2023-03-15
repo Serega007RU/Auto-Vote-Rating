@@ -86,6 +86,11 @@ async function vote(first) {
     //Если нас каким-то образом выкинул на страницу описания сервера
     if (document.querySelector('a[role="button"][title="Vote"]')) {
         document.querySelector('a[role="button"][title="Vote"]').click()
+        return
+    }
+    if (document.querySelector('a.btn[title="Vote for this server"]')) {
+        document.querySelector('a.btn[title="Vote for this server"]').click()
+        return
     }
 
     //Соглашаемся с Privacy Policy
