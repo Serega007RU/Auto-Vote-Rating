@@ -75,7 +75,7 @@ const timer = setInterval(async ()=>{
             } else if (request.message.includes('Авторизация')) {
                 clearInterval(timer)
                 chrome.runtime.sendMessage({auth: true})
-            } else if (request.message === 'Успешно' || request.message === ' In process...') {
+            } else if (request.message === 'Успешно' || request.message.includes('In process...')) {
                 // None
             } else {
                 if (request.message.includes('Сервис временно недоступен') || request.message.includes('Страница устарела') || request.message === 'Ошибка') {
