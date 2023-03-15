@@ -1,5 +1,3 @@
-let openedModal = false
-
 async function vote(first) {
     // if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
 
@@ -71,8 +69,7 @@ async function vote(first) {
 
     const project = await getProject('CraftList')
 
-    if (first && !openedModal) {
-        openedModal = true
+    if (first && !document.querySelector('#voteModal')?.classList.contains('show')) {
         const btnText = querySelector('.sidebar .card-body .btn', first)?.textContent
         if (btnText &&
             (btnText.includes('possible vote')
@@ -96,6 +93,11 @@ async function vote(first) {
             }
         }
         return
+    }
+
+    // Если пользователь умудрится закрыть модалку
+    if (!document.querySelector('#voteModal')?.classList.contains('show')) {
+        querySelector('.sidebar .card-body .btn', first)?.click()
     }
 
     querySelectorAll('.modal-body input', true).value = project.nick
@@ -182,6 +184,6 @@ function isVisible(elem) {
     let pointContainer = document.elementFromPoint(elemCenter.x, elemCenter.y)
     do {
         if (pointContainer === elem || pointContainer?.style?.display) return true;
-    } while (pointContainer = pointContainer.parentNode)
+    } while (pointContainer = pointContainer?.parentNode)
     return 'end'
 }
