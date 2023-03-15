@@ -61,6 +61,11 @@ async function vote(first) {
         })
     }
 
+    if (document.querySelector('.vote-content .payment_select')) {
+        chrome.runtime.sendMessage({message: 'Авто-голосование не доступно на платном голосовании, не вмешивайтесь в процесс авто-голосования!', ignoreReport: true})
+        return
+    }
+
     //Делаем форму голосования видимой
     document.querySelector('div.vote-fields').removeAttribute('style')
 
