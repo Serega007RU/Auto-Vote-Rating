@@ -300,21 +300,6 @@ async function addProjectList(project, preBend) {
     if (listProject.childElementCount === 0 && listProject.parentElement.style.display === 'none') return
     const li = document.createElement('li')
     li.id = 'projects' + project.key
-    //Расчёт времени
-    let text = chrome.i18n.getMessage('soon')
-    if (!(project.time == null || project.time === '') && Date.now() < project.time) {
-        text = new Date(project.time).toLocaleString().replace(',', '')
-    } else {
-        for (const value of openedProjects.values()) {
-            if (project.rating === value.rating) {
-                text = chrome.i18n.getMessage('inQueue')
-                if (project.key === value.key) {
-                    text = chrome.i18n.getMessage('now')
-                    break
-                }
-            }
-        }
-    }
 
     const div = document.createElement('div')
     div.classList.add('controlItems')
@@ -370,61 +355,14 @@ async function addProjectList(project, preBend) {
     contDiv.classList.add('message')
 
     const nameProjectMes = document.createElement('div')
-    let textProject = ''
-    if (project.nick && project.nick !== '') textProject += ' – ' + project.nick
-    if (project.game && project.game !== '') textProject += ' – ' + project.game
-    if (project.id && project.id !== '') textProject += ' – ' + project.id
-    if (project.name && project.name !== '') textProject += ' – ' + project.name
-    if (textProject === '') {
-        textProject = project.rating
-    } else {
-        textProject = textProject.replace(' – ', '')
-    }
-    if (project.priority) textProject += ' (' + chrome.i18n.getMessage('inPriority') + ')'
-    if (project.randomize) textProject += ' (' + chrome.i18n.getMessage('inRandomize') + ')'
-    if (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null)) textProject += ' (' + chrome.i18n.getMessage('customTimeOut2') + ')'
-    if (project.lastDayMonth) textProject += ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')'
-    if (project.silentMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')'
-    if (project.emulateMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')'
-    nameProjectMes.textContent = textProject
     contDiv.append(nameProjectMes)
 
     const div2 = document.createElement('div')
     div2.classList.add('error')
-    if (project.error) {
-        // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass
-        if (project.error.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
-            // TODO функция не оптимизированная и может иметь косяки, другого способа я не нашёл как это сделать адекватно
-            // https://stackoverflow.com/a/60311728/11235240
-            // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass,RegExpUnnecessaryNonCapturingGroup
-            const error = project.error.match(/(?:http(s)?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)|\s*\S+\s*/g)
-            for (const el of error) {
-                // https://stackoverflow.com/a/49849482/11235240
-                // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass
-                if (el.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
-                    const link = document.createElement('a')
-                    link.classList.add('link')
-                    link.target = 'blank_'
-                    link.href = el
-                    if (el.length > 32) {
-                        link.textContent = el.substring(0, 32) + '...'
-                    } else {
-                        link.textContent = el
-                    }
-                    div2.append(link)
-                } else {
-                    div2.append(el)
-                }
-            }
-        } else {
-            div2.textContent = project.error
-        }
-    }
     contDiv.appendChild(div2)
 
     const nextVoteMes = document.createElement('div')
     nextVoteMes.classList.add('textNextVote')
-    nextVoteMes.textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
     contDiv.append(nextVoteMes)
 
     li.append(contDiv)
@@ -435,6 +373,9 @@ async function addProjectList(project, preBend) {
     } else {
         listProject.append(li)
     }
+
+    await updateProjectText(project)
+
     //Слушатель кнопки "Удалить" на проект
     img2.addEventListener('click', async () => {
         await removeProjectList(project)
@@ -475,7 +416,6 @@ async function addProjectList(project, preBend) {
             editProject(project, true)
         })
     }
-    updateModalStats(project)
 }
 
 async function updateModalStats(project, toggle) {
@@ -1392,17 +1332,17 @@ async function addProject(project, element) {
         array.push(secondBonusText)
         array.push(secondBonusButton)
     }
-    if (!(element != null || allProjects[project.rating].notRequiredCaptcha?.(project) || allProjects[project.rating].alertManualCaptcha?.())) {
-        array.push(document.createElement('br'))
-        array.push(document.createElement('br'))
-        array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
-        const a = document.createElement('a')
-        a.target = 'blank_'
-        a.classList.add('link')
-        a.href = 'https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
-        a.textContent = chrome.i18n.getMessage('here')
-        array.push(a)
-    }
+    // if (!(element != null || allProjects[project.rating].notRequiredCaptcha?.(project) || allProjects[project.rating].alertManualCaptcha?.())) {
+    //     array.push(document.createElement('br'))
+    //     array.push(document.createElement('br'))
+    //     array.push(createMessage(chrome.i18n.getMessage('passageCaptcha'), 'warn'))
+    //     const a = document.createElement('a')
+    //     a.target = 'blank_'
+    //     a.classList.add('link')
+    //     a.href = 'https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Guide-how-to-automate-the-passage-of-captcha-(reCAPTCHA-and-hCaptcha)'
+    //     a.textContent = chrome.i18n.getMessage('here')
+    //     array.push(a)
+    // }
     if (array.length > 1) {
         createNotif(array, 'success', 15000, element)
     } else {
@@ -2317,48 +2257,7 @@ async function onMessage(request) {
     if (request.updateValue) {
         usageSpace()
         if (request.updateValue === 'projects') {
-            const el = document.getElementById('projects' + request.value.key)
-            if (el) {
-                let text = chrome.i18n.getMessage('soon')
-                if (!(request.value.time == null || request.value.time === '') && Date.now() < request.value.time) {
-                    text = new Date(request.value.time).toLocaleString().replace(',', '')
-                } else {
-                    openedProjects = await db.get('other', 'openedProjects')
-                    for (const value of openedProjects.values()) {
-                        if (request.value.rating === value.rating) {
-                            text = chrome.i18n.getMessage('inQueue')
-                            if (request.value.key === value.key) {
-                                text = chrome.i18n.getMessage('now')
-                                break
-                            }
-                        }
-                    }
-                }
-                let textProject = ''
-                if (request.value.nick && request.value.nick !== '') textProject += ' – ' + request.value.nick
-                if (request.value.game && request.value.game !== '') textProject += ' – ' + request.value.game
-                if (request.value.id && request.value.id !== '') textProject += ' – ' + request.value.id
-                if (request.value.name && request.value.name !== '') textProject += ' – ' + request.value.name
-                if (textProject === '') {
-                    textProject = request.value.rating
-                } else {
-                    textProject = textProject.replace(' – ', '')
-                }
-                if (request.value.priority) textProject += ' (' + chrome.i18n.getMessage('inPriority') + ')'
-                if (request.value.randomize) textProject += ' (' + chrome.i18n.getMessage('inRandomize') + ')'
-                if (request.value.rating !== 'Custom' && (request.value.timeout != null || request.value.timeoutHour != null)) textProject += ' (' + chrome.i18n.getMessage('customTimeOut2') + ')'
-                if (request.value.lastDayMonth) textProject += ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')'
-                if (request.value.silentMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')'
-                if (request.value.emulateMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')'
-                el.querySelector('div > div').textContent = textProject
-                el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
-                el.querySelector('.error').textContent = request.value.error
-                updateModalStats(request.value)
-            }
-            const el2 = document.getElementById('edit' + request.value.key)
-            if (el2) {
-                editProject(request.value)
-            }
+            updateProjectText(request.value)
         }
     } else if (request.installed) {
         alert(chrome.i18n.getMessage('firstInstall'))
@@ -2371,6 +2270,81 @@ async function onMessage(request) {
         document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})
         highlight(document.getElementById('projects' + project.key))
         window.history.replaceState(null, null, 'options.html')
+    }
+}
+
+async function updateProjectText(project) {
+    const el = document.getElementById('projects' + project.key)
+    if (el) {
+        let text = chrome.i18n.getMessage('soon')
+        if (!(project.time == null || project.time === '') && Date.now() < project.time) {
+            text = new Date(project.time).toLocaleString().replace(',', '')
+        } else {
+            openedProjects = await db.get('other', 'openedProjects')
+            for (const value of openedProjects.values()) {
+                if (project.rating === value.rating) {
+                    text = chrome.i18n.getMessage('inQueue')
+                    if (project.key === value.key) {
+                        text = chrome.i18n.getMessage('now')
+                        break
+                    }
+                }
+            }
+        }
+        let textProject = ''
+        if (project.nick && project.nick !== '') textProject += ' – ' + project.nick
+        if (project.game && project.game !== '') textProject += ' – ' + project.game
+        if (project.id && project.id !== '') textProject += ' – ' + project.id
+        if (project.name && project.name !== '') textProject += ' – ' + project.name
+        if (textProject === '') {
+            textProject = project.rating
+        } else {
+            textProject = textProject.replace(' – ', '')
+        }
+        if (project.priority) textProject += ' (' + chrome.i18n.getMessage('inPriority') + ')'
+        if (project.randomize) textProject += ' (' + chrome.i18n.getMessage('inRandomize') + ')'
+        if (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null)) textProject += ' (' + chrome.i18n.getMessage('customTimeOut2') + ')'
+        if (project.lastDayMonth) textProject += ' (' + chrome.i18n.getMessage('lastDayMonth2') + ')'
+        if (project.silentMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteSilent') + ')'
+        if (project.emulateMode) textProject += ' (' + chrome.i18n.getMessage('enabledSilentVoteNoSilent') + ')'
+        el.querySelector('div > div').textContent = textProject
+        el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
+        const errorElement = el.querySelector('.error')
+        errorElement.textContent = ''
+        if (project.error) {
+            // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass
+            if (project.error.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
+                // TODO функция не оптимизированная и может иметь косяки, другого способа я не нашёл как это сделать адекватно
+                // https://stackoverflow.com/a/60311728/11235240
+                // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass,RegExpUnnecessaryNonCapturingGroup
+                const error = project.error.match(/(?:http(s)?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)|\s*\S+\s*/g)
+                for (const el of error) {
+                    // https://stackoverflow.com/a/49849482/11235240
+                    // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass
+                    if (el.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
+                        const link = document.createElement('a')
+                        link.classList.add('link')
+                        link.target = 'blank_'
+                        link.href = el
+                        if (el.length > 32) {
+                            link.textContent = el.substring(0, 32) + '...'
+                        } else {
+                            link.textContent = el
+                        }
+                        errorElement.append(link)
+                    } else {
+                        errorElement.append(el)
+                    }
+                }
+            } else {
+                errorElement.textContent = project.error
+            }
+        }
+        updateModalStats(project)
+    }
+    const el2 = document.getElementById('edit' + project.key)
+    if (el2) {
+        editProject(project)
     }
 }
 

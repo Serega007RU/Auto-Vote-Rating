@@ -999,20 +999,27 @@ async function endVote(request, sender, project) {
         }
     }
 
-    if (!settings.disabledSendErrorSentry && !request.ignoreReport && (request.message != null || request.errorVoteNoElement || request.emptyError)) {
-        try {
-            await reportError(request, sender, project)
-        } catch (error) {
-            console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error.message)
-        } finally {
-            if (sender && !request.closedTab) {
-                tryCloseTab(sender.tab.id, project, 0)
+    if (!request.successfully && request.later == null) {
+        if (sender?.url || request.url) {
+            const url = sender?.url || request.url
+            const domain = getDomainWithoutSubdomain(url)
+            // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
+            if (projectByURL.get(domain) !== project.rating) {
+                request.incorrectDomain = domain
             }
         }
-    } else {
-        if (sender && !request.closedTab) {
-            tryCloseTab(sender.tab.id, project, 0)
+
+        if (!settings.disabledSendErrorSentry && !request.ignoreReport && !request.incorrectDomain) {
+            try {
+                await reportError(request, sender, project)
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error.message)
+            }
         }
+    }
+
+    if (sender && !request.closedTab) {
+        tryCloseTab(sender.tab.id, project, 0)
     }
 
     if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
@@ -1220,6 +1227,9 @@ async function endVote(request, sender, project) {
             message = request.message
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
+        if (request.incorrectDomain) {
+            message += ' Incorrect domain ' + request.incorrectDomain
+        }
         let retryCoolDown
         if ((request.errorVote && request.errorVote[0] === '404') || (request.message && project.rating === 'WARGM' && project.randomize)) {
             retryCoolDown = 21600000
@@ -1306,14 +1316,6 @@ async function endVote(request, sender, project) {
 
 
 async function reportError(request, sender, project) {
-    if (sender?.url || request.url) {
-        const url = sender?.url || request.url
-        const domain = getDomainWithoutSubdomain(url)
-        // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
-        if (!projectByURL.get(domain)) {
-            return
-        }
-    }
     const reported = await db.get('other', 'sentryReported')
     if (reported?.[project.rating] > Date.now()) return
 

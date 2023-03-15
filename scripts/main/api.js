@@ -249,13 +249,14 @@ function throwError(error) {
     let message
     const request = {}
 
+    let ignoreReport = false
     if (error.stack) {
         // noinspection JSUnresolvedVariable
         if (self.evalCore) {
             message = error.toString()
         } else {
             message = error.stack
-            request.ignoreReport = true
+            ignoreReport = true
         }
     } else {
         message = error
@@ -267,9 +268,11 @@ function throwError(error) {
     } else {
         request.errorVoteNoElement = message + (siteText.length < 200 ? ' ' + siteText : '')
         if (document.location.pathname === '/' && document.location.search === '') {
-            request.ignoreReport = true
+            ignoreReport = true
         }
     }
+
+    if (ignoreReport) request.ignoreReport = true
 
     chrome.runtime.sendMessage(request)
 }
