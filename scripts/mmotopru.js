@@ -100,7 +100,13 @@ async function vote(first) {
     document.getElementById('charname').firstElementChild.value = project.nick
     //Выбираем нужный мир
     const ordinalWorld = project.ordinalWorld - 1
-    document.querySelectorAll('#world > div > table > tbody > tr')[ordinalWorld].click()
+    const world = document.querySelectorAll('#world > div > table > tbody > tr')[ordinalWorld]
+    if (!world) {
+        chrome.runtime.sendMessage({message: 'Мир под номером ' + project.ordinalWorld + ' не найден, проверьте правильность указанного номера мира', ignoreReport: true})
+        return
+    } else {
+        world.click()
+    }
     //Кликает голосовать
     document.getElementById('check_vote_form').click()
 }
