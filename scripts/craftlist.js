@@ -37,8 +37,12 @@ async function vote(first) {
             || message.includes('nächster Vote')) {
             const numbers = message.match(/\d+/g).map(Number)
             chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] - 1, numbers[0], numbers[3], numbers[4]) + 3600000})
+            return
+        } else if (message.includes('robot')) {
+            // None
         } else {
             chrome.runtime.sendMessage({message})
+            return
         }
     }
 
