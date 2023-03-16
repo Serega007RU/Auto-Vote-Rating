@@ -1,6 +1,7 @@
 // noinspection ES6MissingAwait
 
 async function silentVoteWarface(project) {
+    await fetch('https://ru.warface.com/dynamic/auth/?profile_reload=0')
     let response = await fetch('https://ru.warface.com/dynamic/bonus/?a=init&json=true')
     let json = await response.json()
     if (json.error) {
@@ -38,8 +39,13 @@ async function silentVoteWarface(project) {
         method: 'POST',
         body: formData
     })
-    json = await response.json()
-    console.log('bonus', JSON.stringify(json))
+    let text = await response.text()
+    console.log('bonus', text)
+    try {
+        text = JSON.parse(text)
+    } catch (error) {
+        console.error(error)
+    }
 
     endVote({successfully: true}, null, project)
 }
