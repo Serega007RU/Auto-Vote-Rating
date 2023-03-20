@@ -922,7 +922,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('div.text-xl').textContent.trim(),
         exampleURL: () => ['https://servers-minecraft.net/', 'server-complex-gaming.58', '/vote'],
         URL: () => 'servers-minecraft.net',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]})
+        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hour: 5})
     },
     MinecraftListCZ: {
         voteURL: (project) => 'https://www.minecraft-list.cz/server/' + project.id + '/vote',
