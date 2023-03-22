@@ -21,8 +21,8 @@ async function vote() {
         }, 1000)
     })
     const project = await getProject('MinecraftServerList')
-    document.getElementById('ignn').value = project.nick
-    document.querySelector('#voteform > input.buttonsmall.pointer.green.size10').click()
+    document.querySelector('#voteform > #ignn').value = project.nick
+    document.querySelector('#voteform > input[value="Click to Vote"]').click()
 }
 
 function runVote() {
