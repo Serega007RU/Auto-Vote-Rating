@@ -40,6 +40,6 @@ async function vote(first) {
     if (first) return
 
     const project = await getProject('MCServers')
-    document.getElementById('username').value = project.nick
+    if (document.querySelector('#username')) document.querySelector('#username').value = project.nick
     document.querySelector('form[method="POST"] > button[type="submit"]').click()
 }
