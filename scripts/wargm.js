@@ -78,7 +78,7 @@ const timer = setInterval(async ()=>{
             } else if (request.message === 'Успешно' || request.message.includes('In process...')) {
                 // None
             } else {
-                if (request.message.includes('Сервис временно недоступен') || request.message.includes('Страница устарела') || request.message === 'Ошибка' || (request.message.includes('Запрос отклонен') && request.message.includes('Поступило слишком много запросов'))) {
+                if (request.message.includes('Сервис временно недоступен') || request.message.includes('Страница устарела') || request.message === 'Ошибка' || (request.message.includes('Запрос отклонен') && request.message.includes('Поступило слишком много запросов')) || request.message.includes('Важные документы')) {
                     request.ignoreReport = true
                 }
                 clearInterval(timer)
