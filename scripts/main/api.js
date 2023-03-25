@@ -266,7 +266,7 @@ function throwError(error) {
     if (siteText.length === 0) {
         request.emptySite = true
     } else {
-        request.errorVoteNoElement = message + (siteText.length < 200 ? ' ' + siteText : '')
+        request.errorVoteNoElement = message + (siteText.length < 300 ? ' ' + siteText : '')
         if (document.location.pathname === '/' && document.location.search === '') {
             ignoreReport = true
         }

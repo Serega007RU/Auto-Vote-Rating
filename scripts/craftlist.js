@@ -118,10 +118,17 @@ const timer = setInterval(() => {
 function querySelectorAll(selector, required) {
     const elements = document.querySelectorAll(selector)
     const results = []
+    const success = []
     for (const element of elements) {
         const result = isVisible(element)
-        if (result === true) return element
-        results.push(result)
+        if (result === true) {
+            success.push(element)
+        } else {
+            results.push(result)
+        }
+    }
+    if (success.length > 0) {
+        return success[success.length - 1]
     }
     if (required) throw selector + ' ' + results.toString()
 }
