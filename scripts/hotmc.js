@@ -40,6 +40,6 @@ async function vote(first) {
     if (first) return
 
     const project = await getProject('HotMC')
-    document.querySelector('#playercollector-nickname').value = project.nick
-    document.querySelector('#w0 button[type=submit]').click()
+    document.querySelector('form[action*="/vote-"] #playercollector-nickname').value = project.nick
+    document.querySelector('form[action*="/vote-"] button[type=submit]').click()
 }
