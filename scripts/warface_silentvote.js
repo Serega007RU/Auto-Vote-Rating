@@ -8,7 +8,6 @@ async function silentVoteWarface(project) {
         endVote({message: JSON.stringify(json)}, null, project)
         return
     }
-    console.log('init', JSON.stringify(json))
 
     response = await fetch('https://ru.warface.com/dynamic/bonus/?a=weapons&json=true', {
         headers: {
@@ -17,7 +16,6 @@ async function silentVoteWarface(project) {
         method: 'GET',
     })
     json = await response.json()
-    console.log('weapons', JSON.stringify(json))
 
     const bonuses = {}
     // noinspection JSUnresolvedVariable
@@ -40,12 +38,9 @@ async function silentVoteWarface(project) {
         body: formData
     })
     let text = await response.text()
-    console.log('bonus', text)
-    try {
-        text = JSON.parse(text)
-    } catch (error) {
-        console.error(error)
+    if (text.toLowerCase().includes('подарок успешно')) {
+        endVote({successfully: true}, null, project)
+    } else {
+        endVote({message: text}, null, project)
     }
-
-    endVote({successfully: true}, null, project)
 }
