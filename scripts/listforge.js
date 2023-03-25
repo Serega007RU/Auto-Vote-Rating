@@ -7,6 +7,7 @@ async function vote(first) {
     document.getElementById('privacysettings-notice')?.remove()
     document.getElementById('vote-form-block')?.removeAttribute('style')
     document.getElementById('vote-button-block')?.removeAttribute('style')
+    document.querySelector('.alert-danger a[href*="/servers/premium/"]')?.parentElement?.remove()
     document.querySelector('a[href="/servers/premium/"]')?.remove()
 
     for (const el of document.querySelectorAll('div.alert.alert-info')) {
