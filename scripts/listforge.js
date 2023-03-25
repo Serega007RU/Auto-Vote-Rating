@@ -11,7 +11,7 @@ async function vote(first) {
 
     for (const el of document.querySelectorAll('div.alert.alert-info')) {
         if (el.textContent.includes('server has been removed')) {
-            chrome.runtime.sendMessage({message: el.textContent.trim()})
+            chrome.runtime.sendMessage({message: el.textContent.trim(), ignoreReport: true})
             return
         }
     }
