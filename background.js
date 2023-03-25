@@ -1062,46 +1062,49 @@ async function endVote(request, sender, project) {
                 if (project.timeoutSecond == null) project.timeoutSecond = 0
                 if (project.timeoutMS == null) project.timeoutMS = 0
 
+                let month = time.getMonth()
+                let date = time.getDate()
+
                 let needCalculateDate = true
                 if (project.timeoutWeek != null) {
                     // https://stackoverflow.com/a/11789820/11235240
                     const distance = (project.timeoutWeek + 7 - time.getDay()) % 7
                     if (distance > 0) {
                         needCalculateDate = false
-                        time.setDate(time.getDate() + distance)
+                        date += distance
                     }
                 } else if (project.timeoutMonth != null) {
                     if (time.getDate() !== project.timeoutMonth) {
                         needCalculateDate = false
-                        if (time.getDate() > project.timeoutMonth) time.setMonth(time.getMonth() + 1)
-                        time.setDate(project.timeoutMonth)
+                        if (time.getDate() > project.timeoutMonth) month += 1
+                        date = project.timeoutMonth
                     }
                 }
                 if (needCalculateDate) {
                     if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
                         if (project.timeoutWeek != null) {
-                            time.setDate(time.getDate() + 7)
+                            date += 7
                         } else if (project.timeoutMonth != null) {
-                            time.setMonth(time.getMonth() + 1)
-                            time.setDate(project.timeoutMonth)
+                            month += 1
+                            date = project.timeoutMonth
                         } else {
-                            time.setDate(time.getDate() + 1)
+                            date += 1
                         }
                     }
                 }
-                time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
+
+                time = new Date(time.getFullYear(), month, date, project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
             } else {
                 time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
             }
         } else if (request.later && Number.isInteger(request.later)) {
-            time = new Date(request.later)
             if (allProjects[project.rating]?.limitedCountVote?.()) {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
-                    time = new Date()
-                    time.setDate(time.getDate() + 1)
-                    time.setHours(0, (project.priority ? 0 : 10), 0, 0)
+                    time = new Date(time.getFullYear(), time.getMonth(), time.getDate() + 1, 0, (project.priority ? 0 : 10), 0, 0)
                 }
+            } else {
+                time = new Date(request.later)
             }
         } else {
             const timeoutRating = allProjects[project.rating]?.timeout?.(project)
@@ -1111,64 +1114,53 @@ async function endVote(request, sender, project) {
                 //Если нам не известен таймаут, ставим по умолчанию +24 часа
                 time.setUTCDate(time.getUTCDate() + 1)
             } else if (timeoutRating.week != null) {
-                let needCalculateDate = true
+                let date = time.getUTCDate()
                 // https://stackoverflow.com/a/11789820/11235240
-                const distance = (timeoutRating.week + 7 - time.getDay()) % 7
+                const distance = (timeoutRating.week + 7 - time.getUTCDay()) % 7
                 if (distance > 0) {
-                    needCalculateDate = false
-                    time.setDate(time.getDate() + distance)
-                }
-                if (needCalculateDate) {
-                    if (time.getUTCHours() >= timeoutRating.hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
-                        time.setUTCDate(time.getUTCDate() + 7)
+                    date += distance
+                } else {
+                    if (time.getUTCHours() >= timeoutRating.hour) {
+                        date += 7
                     }
                 }
-                time.setUTCHours(timeoutRating.hour, (project.priority ? 0 : 10), 0, 0)
+                time = new Date(Date.UTC(time.getUTCFullYear(), time.getUTCMonth(), date, timeoutRating.hour, (project.priority ? 0 : 10), 0, 0))
             } else if (timeoutRating.month != null) {
-                let needCalculateDate = true
-                if (time.getDate() !== timeoutRating.month) {
-                    needCalculateDate = false
-                    if (time.getDate() > timeoutRating.month) time.setMonth(time.getMonth() + 1)
-                    time.setDate(timeoutRating.month)
-                }
-                if (needCalculateDate) {
-                    if (time.getUTCHours() >= timeoutRating.hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
-                        time.setMonth(time.getMonth() + 1)
-                        time.setDate(timeoutRating.month)
+                let month = time.getUTCMonth()
+                let date = time.getUTCDate()
+                if (time.getUTCDate() !== timeoutRating.month) {
+                    if (time.getUTCDate() > timeoutRating.month) month += 1
+                    date = timeoutRating.month
+                } else {
+                    if (time.getUTCHours() >= timeoutRating.hour) {
+                        month += 1
+                        date = timeoutRating.month
                     }
                 }
-                time.setUTCHours(timeoutRating.hour, (project.priority ? 0 : 10), 0, 0)
+                time = new Date(Date.UTC(time.getUTCFullYear(), month, date, timeoutRating.hour, (project.priority ? 0 : 10), 0, 0))
             } else if (timeoutRating.hour != null) {
                 //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
-                if (time.getUTCHours() >= timeoutRating.hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
-                    time.setUTCDate(time.getUTCDate() + 1)
-                }
-                time.setUTCHours(timeoutRating.hour, (project.priority ? 0 : 10), 0, 0)
+                let date = time.getUTCHours() >= timeoutRating.hour ? time.getUTCDate() + 1 : time.getUTCDate()
+                time = new Date(Date.UTC(time.getUTCFullYear(), time.getUTCMonth(), date, timeoutRating.hour, (project.priority ? 0 : 10), 0, 0))
             } else if (timeoutRating.hours != null) {
                 //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
-                let countHours = true
                 if (allProjects[project.rating]?.limitedCountVote?.()) {
                     project.countVote = project.countVote + 1
                     if (project.countVote >= project.maxCountVote) {
-                        countHours = false
-                        time.setDate(time.getDate() + 1)
-                        time.setHours(0, (project.priority ? 0 : 10), 0, 0)
+                        time = new Date(time.getFullYear(), time.getMonth(), time.getDate() + 1, 0, (project.priority ? 0 : 10), 0, 0)
                         project.countVote = 0
                     }
-                }
-                if (countHours) {
-                    time.setUTCHours(time.getUTCHours() + timeoutRating.hours)
-                    if (timeoutRating.minutes != null) {
-                        time.setUTCMinutes(time.getUTCMinutes() + timeoutRating.minutes)
-                    }
+                } else {
+                    let hours = time.getHours() + timeoutRating.hours
+                    let minutes = time.getMinutes()
+                    let seconds = time.getSeconds()
+                    let milliseconds = time.getMilliseconds()
+                    if (timeoutRating.minutes != null) minutes += timeoutRating.minutes
                     // noinspection JSUnresolvedVariable
-                    if (timeoutRating.seconds != null) {
-                        time.setUTCSeconds(time.getUTCSeconds() + timeoutRating.seconds)
-                    }
+                    if (timeoutRating.seconds != null) seconds += timeoutRating.seconds
                     // noinspection JSUnresolvedVariable
-                    if (timeoutRating.milliseconds != null) {
-                        time.setUTCMilliseconds(time.getUTCMilliseconds() + timeoutRating.milliseconds)
-                    }
+                    if (timeoutRating.milliseconds != null) milliseconds += timeoutRating.milliseconds
+                    time = new Date(time.getFullYear(), time.getMonth(), time.getDate(), hours, minutes, seconds, milliseconds)
                 }
             }
         }

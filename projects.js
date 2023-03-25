@@ -297,7 +297,7 @@ var allProjects = {
             project.id = project.id.replace('minecraft-server-', '')
             return project
         },
-        timeout: () => ({hours: 24}),
+        timeout: () => ({hour: 21}),
         oneProject: () => 1
     },
     MinecraftServerNet: {
