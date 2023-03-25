@@ -30,7 +30,7 @@ function checkAnswer() {
         const request = {}
         request.message = document.querySelector('.alert.alert-danger').textContent
         //Если не удалось пройти капчу
-        if (request.message.includes('captcha')) {
+        if (request.message.includes('captcha') || request.message.includes('pseudo')) {
             return false
             //Если вы уже голосовали
         } else if (request.message.includes('Vous avez déjà voté pour ce serveur')) {
