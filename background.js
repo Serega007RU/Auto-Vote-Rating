@@ -743,7 +743,7 @@ chrome.webRequest.onErrorOccurred.addListener(async function(details) {
                     // console.warn(getProjectPrefix(project, true), details.error)
                     return
             }
-            const sender = {tab: {id: details.tabId}}
+            const sender = {tab: {id: details.tabId}, url: details.url}
             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
         }
     }
@@ -1009,7 +1009,7 @@ async function endVote(request, sender, project) {
             }
         }
 
-        if (!settings.disabledSendErrorSentry && !request.ignoreReport && !request.incorrectDomain) {
+        if (!settings.disabledSendErrorSentry && !request.ignoreReport && !request.incorrectDomain && (request.message != null || request.errorVoteNoElement || request.emptyError)) {
             try {
                 await reportError(request, sender, project)
             } catch (error) {
