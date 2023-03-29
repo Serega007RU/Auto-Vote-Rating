@@ -1102,6 +1102,8 @@ async function endVote(request, sender, project) {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
                     time = new Date(time.getFullYear(), time.getMonth(), time.getDate() + 1, 0, (project.priority ? 0 : 10), 0, 0)
+                } else {
+                    time = new Date(request.later)
                 }
             } else {
                 time = new Date(request.later)
