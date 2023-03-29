@@ -2136,7 +2136,7 @@ document.getElementById('rating').addEventListener('input', function() {
     if (funcRating.exampleURLGame) {
         document.getElementById('chooseGame').parentElement.removeAttribute('style')
         document.getElementById('chooseGame').name = 'chooseGame' + rating
-        if (funcRating.defaultGame) document.getElementById('chooseGame').value = funcRating.defaultGame()
+        if (funcRating.defaultGame && !editingProject) document.getElementById('chooseGame').value = funcRating.defaultGame()
         document.getElementById('urlGameTooltip1').textContent = funcRating.exampleURLGame()[0]
         document.getElementById('urlGameTooltip2').textContent = funcRating.exampleURLGame()[1]
         document.getElementById('urlGameTooltip3').textContent = funcRating.exampleURLGame()[2]
@@ -2154,7 +2154,7 @@ document.getElementById('rating').addEventListener('input', function() {
     if (funcRating.langList) {
         document.getElementById('chooseLang').parentElement.removeAttribute('style')
         document.getElementById('chooseLang').name = 'chooseLang' + rating
-        if (funcRating.defaultLand) document.getElementById('chooseLang').value = funcRating.defaultLand()
+        if (funcRating.defaultLand && !editingProject) document.getElementById('chooseLang').value = funcRating.defaultLand()
         const langList = document.getElementById('langList')
         for (const [value, name] of funcRating.langList()) {
             const option = document.createElement('option')
