@@ -1031,5 +1031,49 @@
   },
   "sunday": {
     "message": "Sunday"
+  },
+  "notSupportedBrowser": {
+    "message": "Opera is not supported by the extension"
+  },
+  "notSupportedBrowserContent1": {
+    "message": "Your browser is not supported by the extension. Please use any other Chromium-based browser (for example, Google Chrome, Microsoft Edge, Vivaldi, Yandex Browser, etc.)"
+  },
+  "notSupportedBrowserContent2": {
+    "message": "Why is Opera not supported by the extension? There are many reasons for this, there is no support for tab groupings, there is no access to the captcha (Google reCAPTCHA), there is no support for the File System Access API, there is no support for the background operation of the extension (when all browser tabs are closed), there is no activity on opera.addons.com (it is not possible to publish an extension there) and many other little things"
+  },
+  "deleteExtension": {
+    "message": "Delete an extension"
+  },
+  "limitedModeButton1": {
+    "message": "I still want to use the extension on Opera despite the limitations"
+  },
+  "areYouSure": {
+    "message": "Are you sure?"
+  },
+  "limitedModeContent": {
+    "message": "Before using this extension on the Opera browser, you should understand that the extension will work in a limited mode, this is:"
+  },
+  "limitedModeContent1": {
+    "message": "Tabs opened by the extension will not be grouped and you will not understand where the tab is opened by the extension, please note that you should not get into the voting process (except in the case when the extension asked you to manually pass the captcha), this can lead to errors"
+  },
+  "limitedModeContent2": {
+    "message": "Your browser will not work in the background, which means that when the voting time comes and your browser is closed (no tabs will be opened), voting will not begin until you start the browser."
+  },
+  "limitedModeContent3": {
+    "message": "The extension does not have access to Google captcha, you will need to manually give this access otherwise the extension will not be able to click on 'I'm not a robot', you can find out how to grant access to Google captcha in this instruction: "
+  },
+  "limitedModeButton2": {
+    "message": "I have read everything, followed all the instructions and realize that the extension will work in a limited mode"
+  },
+  "waitSeconds": {
+    "message": "Wait $seconds$ seconds",
+    "placeholders": {
+      "seconds": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmUninstallSelf": {
+    "message": "Do you really want to delete? All extension settings will be permanently deleted."
   }
 }

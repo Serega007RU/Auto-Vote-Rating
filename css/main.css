@@ -218,6 +218,15 @@ nav .logo img {
 	height: 365px;
 }
 
+#modals .modal.notSupportedBrowser {
+	width: 550px;
+	padding: 15px;
+}
+
+#modals .modal.notSupportedBrowser .message {
+	height: 200px;
+	text-align: left !important;
+}
 
 #modals .modal#statsToday {
 	height: 215px;
@@ -338,9 +347,11 @@ nav .logo img {
 }
 
 #modals .modal .content .events {
-    bottom: 25px;
-    display: flex;
-    justify-content: space-around
+	bottom: 25px;
+	display: flex;
+	justify-content: space-around;
+	margin: 5px auto;
+	grid-column-gap: 20px;
 }
 
 #modals .modal#addFastProject .content {

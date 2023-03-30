@@ -39,6 +39,11 @@ async function checkVote() {
 
     await initializeFunc
 
+    // noinspection JSUnresolvedReference
+    if (!settings.operaAttention2 && (navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' || (!!self.opr && !!opr.addons) || !!self.opera || navigator.userAgent.indexOf(' OPR/') >= 0)) {
+        return
+    }
+
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
     if (!settings.disabledCheckInternet && !onLine) {
         if (navigator.onLine) {
@@ -1538,6 +1543,11 @@ async function updateValue(objStore, value) {
 
 chrome.runtime.onInstalled.addListener(async function(details) {
     await initializeFunc
+    // noinspection JSUnresolvedReference
+    if (!settings.operaAttention2 && (navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' || (!!self.opr && !!opr.addons) || !!self.opera || navigator.userAgent.indexOf(' OPR/') >= 0)) {
+        chrome.runtime.openOptionsPage()
+        return
+    }
     if (details.reason === 'install') {
         await openOptionsPage()
         chrome.runtime.sendMessage({installed: true})

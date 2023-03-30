@@ -198,7 +198,12 @@ document.addEventListener('DOMContentLoaded', async()=>{
     document.getElementById('rating').dispatchEvent(new Event('input'))
     document.getElementById('link').dispatchEvent(new Event('input'))
 
-    fastAdd()
+    // noinspection JSUnresolvedReference
+    if (!settings.operaAttention2 && (navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' || (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0)) {
+        toggleModal('notSupportedBrowser')
+    } else {
+        fastAdd()
+    }
 })
 
 window.addEventListener('load', async () => {
@@ -1320,7 +1325,7 @@ async function addProject(project, element) {
     await addProjectList(project)
 
     // noinspection JSUnresolvedVariable
-    if (!settings.operaAttention && navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' && !(allProjects[project.rating].notRequiredCaptcha?.(project) || allProjects[project.rating].alertManualCaptcha?.())) {
+    if (!settings.operaAttention && (navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' || (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) && !(allProjects[project.rating].notRequiredCaptcha?.(project) || allProjects[project.rating].alertManualCaptcha?.())) {
         settings.operaAttention = true
         db.put('other', settings, 'settings')
     }
@@ -2032,7 +2037,7 @@ document.getElementById('link').addEventListener('input', function() {
         document.getElementById('rewardAttention').removeAttribute('style')
     }
     // noinspection JSUnresolvedVariable
-    if (!settings.operaAttention && navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' && !(funcRating.notRequiredCaptcha?.(project) || funcRating.alertManualCaptcha?.())) {
+    if (!settings.operaAttention && (navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' || (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) && !(funcRating.notRequiredCaptcha?.(project) || funcRating.alertManualCaptcha?.())) {
         document.getElementById('operaAttention').removeAttribute('style')
     }
 })
@@ -2355,6 +2360,10 @@ document.querySelectorAll('#modals .modal .close').forEach((closeBtn)=> {
             location.href = 'options.html'
         }
         toggleModal(closeBtn.parentElement.parentElement.id)
+        if (closeBtn.parentElement.parentElement.id === 'notSupportedBrowser2') {
+            toggleModal('notSupportedBrowser')
+            clearInterval(timerConfirm)
+        }
     })
 })
 
@@ -2380,6 +2389,39 @@ modalsBlock.querySelector('.overlay').addEventListener('click', ()=> {
     }
     activeModal.style.transform = 'scale(1.1)'
     setTimeout(()=> activeModal.removeAttribute('style'), 100)
+})
+
+document.querySelectorAll('button[data-resource="deleteExtension"]').forEach(element => {
+    element.addEventListener('click', () => {
+        if (confirm(chrome.i18n.getMessage('confirmUninstallSelf'))) {
+            chrome.management.uninstallSelf()
+        }
+    })
+})
+let timerConfirm
+document.querySelector('button[data-resource="limitedModeButton1"]').addEventListener('click', () => {
+    toggleModal('notSupportedBrowser')
+    toggleModal('notSupportedBrowser2')
+    let count = 90
+    document.querySelector('button[data-resource="limitedModeButton2"]').textContent = chrome.i18n.getMessage('limitedModeButton2') + ' (' + chrome.i18n.getMessage('waitSeconds', String(count)) + ')'
+    timerConfirm = setInterval(() => {
+        if (!count) {
+            clearInterval(timerConfirm)
+            document.querySelector('button[data-resource="limitedModeButton2"]').textContent = chrome.i18n.getMessage('limitedModeButton2')
+            document.querySelector('button[data-resource="limitedModeButton2"]').disabled = false
+        } else {
+            document.querySelector('button[data-resource="limitedModeButton2"]').textContent = chrome.i18n.getMessage('limitedModeButton2') + ' (' + chrome.i18n.getMessage('waitSeconds', String(--count)) + ')'
+        }
+    }, 1000)
+})
+document.querySelector('button[data-resource="limitedModeButton2"]').addEventListener('click', async () => {
+    toggleModal('notSupportedBrowser2')
+    settings.operaAttention2 = true
+    await db.put('other', settings, 'settings')
+    await chrome.runtime.sendMessage('reloadSettings')
+    usageSpace()
+    await chrome.runtime.sendMessage('checkVote')
+    fastAdd()
 })
 
 function highlight(element) {
