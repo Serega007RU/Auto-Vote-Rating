@@ -1,11 +1,12 @@
 // noinspection ES6MissingAwait
 
 async function silentVoteWarface(project) {
+    await fetch('https://ru.warface.com/dynamic/auth/?a=checkuser')
     await fetch('https://ru.warface.com/dynamic/auth/?profile_reload=0')
     let response = await fetch('https://ru.warface.com/dynamic/bonus/?a=init&json=true')
     let json = await response.json()
     if (json.error) {
-        endVote({message: JSON.stringify(json)}, null, project)
+        endVote({message: JSON.stringify(json), html: JSON.stringify(json), url: response.url}, null, project)
         return
     }
 
@@ -16,6 +17,11 @@ async function silentVoteWarface(project) {
         method: 'GET',
     })
     json = await response.json()
+
+    if (json.error || !json.message) {
+        endVote({message: JSON.stringify(json), html: JSON.stringify(json), url: response.url}, null, project)
+        return
+    }
 
     const bonuses = {}
     // noinspection JSUnresolvedVariable
@@ -41,6 +47,6 @@ async function silentVoteWarface(project) {
     if (text.toLowerCase().includes('подарок успешно')) {
         endVote({successfully: true}, null, project)
     } else {
-        endVote({message: text}, null, project)
+        endVote({message: text, html: text, url: response.url}, null, project)
     }
 }
