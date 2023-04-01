@@ -59,6 +59,8 @@ async function vote() {
 
 const timer = setInterval(async ()=>{
     try {
+        if (document.querySelector('div.MsgBox .g-recaptcha')) return
+
         const msg = document.querySelector('div.MsgBox')
         if (msg != null && msg.innerText.length > 0) {
             const request = {}
