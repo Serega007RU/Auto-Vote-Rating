@@ -272,6 +272,10 @@ function throwError(error) {
         }
     }
 
+    if (document.querySelector('html')?.classList.contains('translated-ltr')) {
+        ignoreReport = true
+    }
+
     if (ignoreReport) request.ignoreReport = true
 
     chrome.runtime.sendMessage(request)
