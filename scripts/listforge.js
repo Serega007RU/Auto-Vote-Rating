@@ -36,7 +36,9 @@ async function vote(first) {
         const request = {}
         request.message = el.textContent.trim()
 
-        if (request.message.includes('need to accept our Privacy Policy') || request.message.includes('website is made possible by displaying online advertisements')) continue
+        if (request.message.includes('need to accept our Privacy Policy')
+            || request.message.includes('website is made possible by displaying online advertisements')
+            || request.message.includes('have one unread message')) continue
 
         if (request.message.includes('already voted') || request.message.includes('have reached your daily vote limit')) {
             chrome.runtime.sendMessage({later: true})

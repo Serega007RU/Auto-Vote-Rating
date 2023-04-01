@@ -1,4 +1,14 @@
 async function vote(/*first*/) {
+    if (document.querySelector('#__next > div > div > div > h2')) {
+        const request = {}
+        request.message = document.querySelector('#__next > div > div').innerText
+        if (request.message.includes('page could not be found')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     if (document.querySelector('div.border-2')) {
         const message = document.querySelector('div.border-2').textContent
         if (message.includes('Thanks for voting')) {
