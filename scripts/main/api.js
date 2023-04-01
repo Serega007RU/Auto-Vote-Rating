@@ -272,7 +272,7 @@ function throwError(error) {
         }
     }
 
-    if (document.querySelector('html')?.classList.contains('translated-ltr')) {
+    if (document.querySelector('html')?.classList.contains('translated-ltr') || (document.querySelector('[_msttexthash]') && document.querySelector('[_msthash]'))) {
         ignoreReport = true
     }
 
