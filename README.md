@@ -117,6 +117,9 @@
 <a href="https://servidoresdeminecraft.es/">servidoresdeminecraft.es</a>  
 <a href="https://minecraftsurvivalservers.com/">minecraftsurvivalservers.com</a>  
 <a href="https://minecraft.global/">minecraft.global</a>
+<a href="https://ru.warface.com/bonus/">warface.com</a>
+<a href="https://www.curseforge.com/servers/">curseforge.com</a>
+<a href="https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481">hoyolab.com</a>
 </details>
 
 ### Links to the extension where you can install it:

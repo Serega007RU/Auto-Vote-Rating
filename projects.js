@@ -1281,6 +1281,14 @@ var allProjects = {
         notRequiredNick: () => true,
         notRequiredId: () => true
     },
+    CurseForge: {
+        voteURL: (project) => 'https://www.curseforge.com/servers/server/' + project.id + '/vote',
+        pageURL: (project) => 'https://www.curseforge.com/servers/server/' + project.id + '/',
+        projectName: (doc) => doc.querySelector('title').textContent.replaceAll(' - The Best Minecraft Servers - CurseForge', ''),
+        exampleURL: () => ['https://www.curseforge.com/servers/server/', 'lemoncloud', '/vote'],
+        URL: () => 'curseforge.com',
+        parseURL: (url) => ({id: url.pathname.split('/')[3]})
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1418,6 +1426,7 @@ var projectByURL = new Map([
     ['minecraftsurvivalservers.com', 'MinecraftSurvivalServersCom'],
     ['minecraft.global', 'MinecraftGlobal'],
     ['warface.com', 'Warface'],
+    ['curseforge.com', 'CurseForge'],
     ['Custom', 'Custom']
 ])
 
