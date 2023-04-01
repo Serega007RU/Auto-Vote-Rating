@@ -1276,7 +1276,6 @@ var allProjects = {
         projectName: () => "Bonus",
         exampleURL: () => ['https://ru.warface.com/bonus/', '', ''],
         URL: () => 'warface.com',
-        silentVote: () => true,
         parseURL: () => ({}),
         timeout: () => ({week: 3, hour: 13}),
         notRequiredNick: () => true,
