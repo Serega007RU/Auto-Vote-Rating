@@ -1285,11 +1285,12 @@ var allProjects = {
     Warface: {
         voteURL: () => 'https://ru.warface.com/bonus/',
         pageURL: () => 'https://ru.warface.com/bonus/',
-        projectName: () => "Bonus",
+        projectName: () => 'Bonus',
         exampleURL: () => ['https://ru.warface.com/bonus/', '', ''],
         URL: () => 'warface.com',
         parseURL: () => ({}),
         timeout: () => ({week: 3, hour: 13}),
+        notRequiredCaptcha: () => true,
         notRequiredNick: () => true,
         notRequiredId: () => true
     },
@@ -1300,6 +1301,19 @@ var allProjects = {
         exampleURL: () => ['https://www.curseforge.com/servers/server/', 'lemoncloud', '/vote'],
         URL: () => 'curseforge.com',
         parseURL: (url) => ({id: url.pathname.split('/')[3]})
+    },
+    HoYoLAB: {
+        voteURL: () => 'https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us',
+        pageURL: () => 'https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us',
+        projectName: () => 'Genshin Impact Daily check-in',
+        exampleURL: () => ['https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us', '', ''],
+        URL: () => 'hoyolab.com',
+        parseURL: () => ({}),
+        timeout: () => ({hour: 16}),
+        silentVote: () => true,
+        notRequiredCaptcha: () => true,
+        notRequiredNick: () => true,
+        notRequiredId: () => true
     },
     Custom: {
         voteURL: (project) => project.responseURL,
@@ -1439,6 +1453,7 @@ var projectByURL = new Map([
     ['minecraft.global', 'MinecraftGlobal'],
     ['warface.com', 'Warface'],
     ['curseforge.com', 'CurseForge'],
+    ['hoyolab.com', 'HoYoLAB'],
     ['Custom', 'Custom']
 ])
 

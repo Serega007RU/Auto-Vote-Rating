@@ -10,7 +10,7 @@ importScripts('main.js')
 self.addEventListener('install', () => {
     importScripts('libs/linkedom.js')
     importScripts('libs/evalCore.umd.js')
-    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/serverpact_silentvote.js')
+    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/serverpact_silentvote.js', 'scripts/hoyolab_silentvote.js')
 })
 
 //Текущие fetch запросы
