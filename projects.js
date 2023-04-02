@@ -133,12 +133,24 @@ var allProjects = {
         timeout: () => ({hour: 5})
     },
     TopG: {
-        voteURL: (project) => 'https://topg.org/' + project.game + '/server-' + project.id,
-        pageURL: (project) => 'https://topg.org/' + project.game + '/server-' + project.id,
+        voteURL: (project) => {
+            // noinspection JSCheckFunctionSignatures
+            if (!isNaN(project.id.at(0))) { // TODO временное решение, следует в следующей версии перевести на новый формат id
+                project.id = 'server-' + project.id
+            }
+            return 'https://topg.org/' + project.game + '/' + project.id
+        },
+        pageURL: (project) => {
+            // noinspection JSCheckFunctionSignatures
+            if (!isNaN(project.id.at(0))) { // TODO временное решение, следует в следующей версии перевести на новый формат id
+                project.id = 'server-' + project.id
+            }
+            return 'https://topg.org/' + project.game + '/' + project.id
+        },
         projectName: (doc) => doc.querySelector('div.sheader').textContent,
-        exampleURL: () => ['https://topg.org/minecraft-servers/server-', '405637', ''],
+        exampleURL: () => ['https://topg.org/minecraft-servers/', 'server-405637', ''],
         URL: () => 'topg.org',
-        parseURL: (url) => ({ game: url.pathname.split('/')[1], id: url.pathname.split('/')[2].replace('server-', '')}),
+        parseURL: (url) => ({ game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
         timeout: () => ({hours: 12}),
         exampleURLGame: () => ['https://topg.org/', 'minecraft-servers', '/server-405637'],
         gameList: () => new Map([
