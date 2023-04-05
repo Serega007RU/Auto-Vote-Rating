@@ -25,7 +25,7 @@ async function vote(first) {
     if (document.querySelector('.alert.alert-danger')) {
         const request = {}
         request.message = document.querySelector('.alert.alert-danger').textContent.trim()
-        if (!request.message.includes('GDPR musí být vyplněn')) {
+        if (!request.message.includes('GDPR musí být vyplněn') && !request.message.includes('Nick musí být vyplněno')) {
             chrome.runtime.sendMessage(request)
             return
         }
