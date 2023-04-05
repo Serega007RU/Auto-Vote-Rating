@@ -120,6 +120,8 @@
 <a href="https://ru.warface.com/bonus/">warface.com</a>
 <a href="https://www.curseforge.com/servers/">curseforge.com</a>
 <a href="https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481">hoyolab.com</a>
+<a href="https://trackingservers.cloud/">trackingservers.cloud</a>
+<a href="https://mclist.io/">mclist.io</a>
 </details>
 
 ### Links to the extension where you can install it:

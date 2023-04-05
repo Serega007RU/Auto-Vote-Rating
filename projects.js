@@ -1332,6 +1332,14 @@ var allProjects = {
             return project
         }
     },
+    McListIo: {
+        voteURL: (project) => 'https://mclist.io/server/' + project.id + '/vote',
+        pageURL: (project) => 'https://mclist.io/server/' + project.id,
+        projectName: (doc) => doc.querySelector('title').textContent.replaceAll(' | mclist.io - Minecraft Server List', ''),
+        exampleURL: () => ['https://mclist.io/server/', '61609', '/vote'],
+        URL: () => 'mclist.io',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1472,6 +1480,7 @@ var projectByURL = new Map([
     ['curseforge.com', 'CurseForge'],
     ['hoyolab.com', 'HoYoLAB'],
     ['trackingservers.cloud', 'TrackingServers'],
+    ['mclist.io', 'McListIo'],
     ['Custom', 'Custom']
 ])
 
