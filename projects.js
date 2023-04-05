@@ -1315,6 +1315,23 @@ var allProjects = {
         notRequiredNick: () => true,
         notRequiredId: () => true
     },
+    TrackingServers: {
+        voteURL: (project) => 'https://trackingservers.cloud/server/vote/' + project.id,
+        pageURL: (project) => 'https://trackingservers.cloud/server/' + project.id,
+        projectName: (doc) => doc.querySelector('th.rank').innerText.trim(),
+        exampleURL: () => ['https://trackingservers.cloud/server/vote/', 'dcgaming-network', ''],
+        URL: () => 'trackingservers.cloud',
+        parseURL: (url) => {
+            const project = {}
+            const paths = url.pathname.split('/')
+            if (paths[2] === 'vote') {
+                project.id = paths[3]
+            } else {
+                project.id = paths[2]
+            }
+            return project
+        }
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1454,6 +1471,7 @@ var projectByURL = new Map([
     ['warface.com', 'Warface'],
     ['curseforge.com', 'CurseForge'],
     ['hoyolab.com', 'HoYoLAB'],
+    ['trackingservers.cloud', 'TrackingServers'],
     ['Custom', 'Custom']
 ])
 
