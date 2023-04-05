@@ -166,6 +166,15 @@ async function run() {
             return
         }
 
+        // Если ошибка (запрещён доступ) CloudFlare
+        if (document.querySelector('div.cf-main-wrapper div.cf-error-description')) {
+            const request = {}
+            request.message = document.querySelector('div.cf-main-wrapper').innerText
+            request.ignoreReport = true
+            chrome.runtime.sendMessage(request)
+            return
+        }
+
         if (document.querySelector('body > center > h1') && (document.querySelector('body > center:last-of-type')?.textContent.includes('cloudflare') || document.querySelector('body > center:last-of-type')?.textContent.includes('nginx'))) {
             const request = {}
             request.message = document.body.innerText
