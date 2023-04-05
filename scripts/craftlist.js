@@ -100,6 +100,17 @@ async function vote(first) {
         querySelector('.sidebar .card-body .btn', first)?.click()
     }
 
+    const btnText = querySelectorAll('.modal-footer a span')?.textContent
+    if (btnText &&
+        (btnText.includes('possible vote')
+            || btnText.includes('možný hlas')
+            || btnText.includes('ist möglich'))) {
+        const numbers = btnText.match(/\d+/g).map(Number)
+        const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
+        chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+        return
+    }
+
     querySelectorAll('.modal-body input', true).value = project.nick
 
     querySelectorAll('.modal-footer button', true).click()
