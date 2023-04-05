@@ -29,7 +29,7 @@ async function vote(first) {
             leftTime = leftTime * 3600000
             chrome.runtime.sendMessage({later: Date.now() + leftTime})
             return
-        } else if (message.includes('Я не робот')) {
+        } else if (message.includes('Я не робот') || message.includes('укажите ник')) {
             // None
         } else {
             chrome.runtime.sendMessage({message})
