@@ -5,7 +5,7 @@ if (typeof loaded2 === 'undefined') {
     runVote()
 }
 
-async function vote() {
+async function vote(first) {
     await new Promise(resolve => {
         const timer = setInterval(()=>{
             try {
@@ -20,6 +20,7 @@ async function vote() {
             }
         }, 1000)
     })
+    if (first === false) return
     const project = await getProject('MinecraftServerList')
     document.querySelector('#voteform > #ignn').value = project.nick
     document.querySelector('#voteform > input[value="Click to Vote"]').click()

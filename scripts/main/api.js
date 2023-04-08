@@ -232,6 +232,9 @@ async function run() {
                 startVote(false)
                 clearInterval(timer1)
             }
+        } else if (document.querySelector('img.cm-addon-icon[src*="green"]')) {
+            startVote(false)
+            clearInterval(timer1)
         }
     })
 }
