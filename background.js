@@ -1103,14 +1103,15 @@ async function endVote(request, sender, project) {
                 time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
             }
         } else if (request.later && Number.isInteger(request.later)) {
+            let needSetTime = true
             if (allProjects[project.rating]?.limitedCountVote?.()) {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
+                    needSetTime = false
                     time = new Date(time.getFullYear(), time.getMonth(), time.getDate() + 1, 0, (project.priority ? 0 : 10), 0, 0)
-                } else {
-                    time = new Date(request.later)
                 }
-            } else {
+            }
+            if (needSetTime) {
                 time = new Date(request.later)
             }
         } else {
@@ -1150,14 +1151,17 @@ async function endVote(request, sender, project) {
                 let date = time.getUTCHours() >= timeoutRating.hour ? time.getUTCDate() + 1 : time.getUTCDate()
                 time = new Date(Date.UTC(time.getUTCFullYear(), time.getUTCMonth(), date, timeoutRating.hour, (project.priority ? 0 : 10), 0, 0))
             } else if (timeoutRating.hours != null) {
+                let needSetTime = true
                 //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
                 if (allProjects[project.rating]?.limitedCountVote?.()) {
                     project.countVote = project.countVote + 1
                     if (project.countVote >= project.maxCountVote) {
+                        needSetTime = false
                         time = new Date(time.getFullYear(), time.getMonth(), time.getDate() + 1, 0, (project.priority ? 0 : 10), 0, 0)
                         project.countVote = 0
                     }
-                } else {
+                }
+                if (needSetTime) {
                     let hours = time.getHours() + timeoutRating.hours
                     let minutes = time.getMinutes()
                     let seconds = time.getSeconds()
