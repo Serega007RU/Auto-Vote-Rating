@@ -1221,7 +1221,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('header div.container h1.text-center').textContent.replace(' Minecraft Server Info, Voting, and More', ''),
         exampleURL: () => ['https://minecraftbestservers.com/', 'server-cherry-survival.4599', '/vote'],
         URL: () => 'minecraftbestservers.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[1]})
+        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hour: 0})
     },
     MCLikeCom: {
         voteURL: (project) => 'https://mclike.com/vote-' + project.id,
