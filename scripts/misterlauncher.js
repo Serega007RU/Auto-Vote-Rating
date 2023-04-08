@@ -2,18 +2,29 @@ async function vote(first) {
     const project = await getProject('MisterLauncher')
     if (project.game === 'projects') {
         if (first === false) return
-        if (document.querySelector('.container div.alert.alert-danger') != null) {
-            if (document.querySelector('.container div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
+
+        if (document.querySelector('.container div.alert.alert-danger') && document.querySelector('.container div.alert.alert-danger').style.display !== 'none') {
+            const message = document.querySelector('.container div.alert.alert-danger').textContent
+            if (message.includes('Вы уже голосовали за этот проект')) {
                 chrome.runtime.sendMessage({later: true})
+            } else {
+                chrome.runtime.sendMessage({message})
             }
-        } else if (document.querySelector('.container div.alert.alert-success') != null && document.querySelector('.container div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
-            chrome.runtime.sendMessage({successfully: true})
-        } else if (document.querySelector('input[name=nick]') != null) {
-            document.querySelector('input[name=nick]').value = project.nick
-            document.querySelector('button[type=submit]').click()
-        } else {
-            setTimeout(()=>chrome.runtime.sendMessage({message: 'Ошибка, input[name=nick] является null'}), 10000)
+            return
         }
+
+        if (document.querySelector('.container div.alert.alert-success') && document.querySelector('.container div.alert.alert-success').style.display !== 'none') {
+            const message = document.querySelector('.container div.alert.alert-success').textContent
+            if (message.includes('Спасибо за Ваш голос!')) {
+                chrome.runtime.sendMessage({successfully: true})
+            } else {
+                chrome.runtime.sendMessage({message})
+            }
+            return
+        }
+
+        document.querySelector('input[name=nick]').value = project.nick
+        document.querySelector('button[type=submit]').click()
     } else {
         const timer = setInterval(()=>{
             try {
