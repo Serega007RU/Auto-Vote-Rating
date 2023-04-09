@@ -837,7 +837,7 @@ function editProject(project, switchToEdit) {
         time.setMinutes(time.getMinutes() - time.getTimezoneOffset())
         document.getElementById('scheduleTime').value = time.toISOString().slice(0,23)
     }
-    if (project.timeout || project.timeoutHour || project.rating === 'Custom') {
+    if (project.timeout != null || project.timeoutHour != null || project.rating === 'Custom') {
         document.getElementById('customTimeOut').checked = true
         if (project.timeout) {
             document.getElementById('selectTime').value = 'ms'
@@ -1056,20 +1056,20 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
         } else {
             delete project.lastDayMonth
         }
+
+        delete project.silentMode
+        delete project.emulateMode
         if (project.rating !== 'Custom' && document.getElementById('voteMode').checked) {
             if (document.getElementById('voteModeSelect').value === 'silentMode') {
                 project.silentMode = true
             } else if (document.getElementById('voteModeSelect').value === 'emulateMode') {
                 project.emulateMode = true
             }
-        } else {
-            delete project.silentMode
-            delete project.emulateMode
         }
+
+        delete project.randomize
         if (document.getElementById('randomize').checked) {
             project.randomize = {min: document.getElementById('randomizeMin').valueAsNumber, max: document.getElementById('randomizeMax').valueAsNumber}
-        } else {
-            delete project.randomize
         }
     }
 
