@@ -216,27 +216,36 @@ async function run() {
         startVote(true)
     } catch (e) {
         throwError(e)
+        return
     }
 
-    const timer1 = setInterval(()=>{
-        // noinspection CssInvalidHtmlTagReference
-        if (document.querySelector('head > captcha-widgets')) {
-            document.querySelectorAll('.captcha-solver').forEach(el => {
-                if (el.dataset.state === 'solved') {
-                    startVote(false)
-                    clearInterval(timer1)
-                }
-            })
-        } else if (document.querySelector('.antigate_solver')) {
-            if (document.querySelector('.solved_flag')) {
-                startVote(false)
-                clearInterval(timer1)
-            }
+    // Интеграция с расширениями на автоматические решение капч
+    const timer1 = setInterval(()=> {
+        // 2 Captcha
+        if (document.querySelector('.captcha-solver[data-state="solved"]')) {
+            startVote(false)
+            clearInterval(timer1)
+        // Anti Captcha
+        } else if (document.querySelector('.antigate_solver') && document.querySelector('.solved_flag')) {
+            startVote(false)
+            clearInterval(timer1)
+        // Cap Monster Cloud
         } else if (document.querySelector('img.cm-addon-icon[src*="green"]')) {
             startVote(false)
             clearInterval(timer1)
         }
-    })
+    }, 1000)
+    const timer2 = setInterval(() => {
+        // 2 Captcha
+        if (isVisibleElement(document.querySelector('.captcha-solver[data-state="ready"]'))) {
+            document.querySelector('.captcha-solver[data-state="ready"]').click()
+            clearInterval(timer2)
+        // Cap Monster Cloud
+        } else if (isVisibleElement(document.querySelector('img.cm-addon-icon[src*="white-cogs"]'))) {
+            document.querySelector('img.cm-addon-icon[src*="white-cogs"]').click()
+            clearInterval(timer2)
+        }
+    }, 1000)
 }
 
 async function startVote(first) {
@@ -295,6 +304,32 @@ function throwError(error) {
 
 function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function isVisibleElement(elem) {
+    if (!(elem instanceof Element)) return false
+    const style = getComputedStyle(elem)
+    if (style.display === 'none') {
+        return false
+    }
+    if (style.visibility !== 'visible') {
+        return false
+    }
+    if (style.opacity && style.opacity < 0.5) {
+        return false
+    }
+
+    // 1 пиксель?
+    if (elem.offsetHeight < 16 || elem.offsetWidth < 16) {
+        return false
+    }
+
+    if (elem.offsetWidth + elem.offsetHeight + elem.getBoundingClientRect().height +
+        elem.getBoundingClientRect().width === 0) {
+        return false
+    }
+
+    return true
 }
 
 //Костыль для FireFox

@@ -35,5 +35,5 @@ async function vote(first) {
 
     const project = await getProject('MinecraftBestServersCom')
     document.querySelector('#username').value = project.nick
-    document.querySelector('.tab form button').click()
+    document.querySelector('.tab form button.justify-center').click()
 }
