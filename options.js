@@ -1171,7 +1171,7 @@ async function addVK(repair, imp) {
             } else {
                 VK.name = doc.querySelector('#pedit_first_name')?.value + ' ' + doc.querySelector('#pedit_last_name')?.value
             }
-            VK.id = doc.querySelector('#l_pr > a').href.replace(/^.*\/\/[^\/]+/, '')
+            VK.id = doc.querySelector('#l_pr > a')?.href.replace(/^.*\/\/[^\/]+/, '') || doc.querySelector('#top_profile_link')?.href.replace(/^.*\/\/[^\/]+/, '')
             VK.id = VK.id.substring(1, VK.id.length)
         } catch(e) {
             createNotif(e, 'error')
