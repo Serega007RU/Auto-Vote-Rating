@@ -15,8 +15,19 @@ async function silentVoteHoYoLAB(project) {
     const json = await response.json()
     if (json.message === 'OK') {
         endVote({successfully: true}, null, project)
-    } else if (json.message?.includes('already checked in today')) {
-        endVote({later: true}, null, project)
+    } else if (json.message) {
+        if (json.message.includes('already checked in today')) {
+            endVote({later: true}, null, project)
+        } else {
+            const request = {}
+            request.message = json.message
+            if (request.message.includes('create a character in game first')) {
+                request.ignoreReport = true
+            }
+            request.html = JSON.stringify(json)
+            request.url = response.url
+            endVote(request, null, project)
+        }
     } else {
         endVote({message: JSON.stringify(json), html: JSON.stringify(json), url: response.url}, null, project)
     }

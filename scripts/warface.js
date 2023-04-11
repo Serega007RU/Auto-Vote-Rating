@@ -1,4 +1,6 @@
 async function vote(first) {
+    if (first === false) return
+
     if (document.querySelector('.done_present')) {
         const message = document.querySelector('.done_present').textContent.trim()
         if (message.includes('уже получен')) {
@@ -6,6 +8,11 @@ async function vote(first) {
         } else {
             chrome.runtime.sendMessage({message})
         }
+        return
+    }
+
+    if (document.querySelector('#app__access_denied')?.innerText.includes('вам необходимо авторизоваться')) {
+        chrome.runtime.sendMessage({auth: true})
         return
     }
 
