@@ -136,7 +136,7 @@ function checkOpen(project/*, transaction*/) {
         }
     }
 
-    for (const[tab,value] of openedProjects) {
+    for (let[tab,value] of openedProjects) {
         if (value.timeoutQueue && Date.now() < value.timeoutQueue) {
             openedProjects.delete(tab)
             db.put('other', openedProjects, 'openedProjects')
@@ -150,8 +150,35 @@ function checkOpen(project/*, transaction*/) {
                 if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'), 'openProject_' + value.key)
                 openedProjects.delete(tab)
                 db.put('other', openedProjects, 'openedProjects')
-                // noinspection JSCheckFunctionSignatures
-                tryCloseTab(tab, value, 0)
+
+                if (!isNaN(tab) && !settings.disabledSendErrorSentry) {
+                    (async() => {
+                        try {
+                            value = await db.get('projects', value.key)
+                            if (!value.nextAttempt) return
+
+                            const details = await chrome.tabs.get(tab)
+                            if (details.url) {
+                                const domain = getDomainWithoutSubdomain(details.url)
+                                // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
+                                if (projectByURL.get(domain) !== value.rating) {
+                                    return
+                                }
+                            }
+                            await reportError({timeout: true}, {tab: {id: details.id}, url: details.url}, value)
+                        } catch (error) {
+                            if (!error.message.includes('No tab with id')) {
+                                console.warn(getProjectPrefix(value, true), error.message)
+                            }
+                        } finally {
+                            // noinspection JSCheckFunctionSignatures,JSIgnoredPromiseFromCall
+                            tryCloseTab(tab, value, 0)
+                        }
+                    })()
+                } else {
+                    // noinspection JSCheckFunctionSignatures,JSIgnoredPromiseFromCall
+                    tryCloseTab(tab, value, 0)
+                }
                 break
             }
         }
@@ -163,6 +190,7 @@ function checkOpen(project/*, transaction*/) {
         if (project.randomize) {
             retryCoolDown = Math.floor(Math.random() * 600000 + 1800000)
         } else {
+            if (!settings.timeoutVote) settings.timeoutVote = 900000
             retryCoolDown = settings.timeoutVote
         }
         project.nextAttempt = Date.now() + retryCoolDown
@@ -513,7 +541,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
 //                 // console.warn(getProjectPrefix(project, true), details.error)
 //                 return
 //             }
-//             const sender = {tab: {id: details.tabId}}
+//             const sender = {tab: {id: details.tabId}, url: details.url}
 //             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
 //         }
 //     }
@@ -726,7 +754,7 @@ chrome.webRequest.onCompleted.addListener(async function(details) {
     if (allProjects[project.rating].ignoreErrors?.()) return
 
     if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
-        const sender = {tab: {id: details.tabId}}
+        const sender = {tab: {id: details.tabId}, url: details.url}
         endVote({errorVote: [String(details.statusCode), details.url]}, sender, project)
     }
 }, {urls: ['<all_urls>']})
@@ -920,28 +948,22 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         return
     }
     let project = openedProjects.get(sender.tab.id)
-    if (request.captcha || request.authSteam || request.discordLogIn || request.auth) {//Если требует ручное прохождение капчи
+    if (request.captcha || request.authSteam || request.discordLogIn || request.auth || (request.errorCaptcha && !request.restartVote)) {//Если требует ручное прохождение капчи
         project = await db.get('projects', project.key)
         let message
         if (request.captcha) {
-            if (settings.disabledWarnCaptcha) return
             message = chrome.i18n.getMessage('requiresCaptcha')
         } else if (request.auth && request.auth !== true) {
             message = request.auth
         } else {
             message = chrome.i18n.getMessage(Object.keys(request)[0])
         }
-        console.warn(getProjectPrefix(project, true), message)
-        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
-        project.error = message
-        // delete project.nextAttempt
-        updateValue('projects', project)
-    } else if (request.errorCaptcha && !request.restartVote) {
-        project = await db.get('projects', project.key)
-        const message = chrome.i18n.getMessage('errorCaptcha', request.errorCaptcha)
-        console.warn(getProjectPrefix(project, true), message)
-        if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
-        project.error = message
+        if (!request.captcha && !settings.disabledWarnCaptcha) {
+            console.warn(getProjectPrefix(project, true), message)
+            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
+            project.error = message
+        }
+        delete project.nextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
         updateValue('projects', project)
     } else {
         endVote(request, sender, project)
@@ -1362,6 +1384,8 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         detailsError = request.errorVoteNoElement
     } else if (request.emptyError) {
         titleError = titleError + 'Empty error'
+    } else if (request.timeout) {
+        titleError = titleError + 'Timeout'
     }
 
     const eventId = uuidv4()
