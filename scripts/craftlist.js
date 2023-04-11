@@ -177,6 +177,8 @@ function isVisible(elem) {
         return 'offset bounding'
     }
 
+    return true // TODO временный код, внимательно следует следить если автор сайта снова начнёт играться с невидимыми элементами
+
     const elemCenter   = {
         x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
         y: elem.getBoundingClientRect().top + elem.offsetHeight / 2
