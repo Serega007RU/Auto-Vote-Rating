@@ -387,15 +387,17 @@ async function addProjectList(project, preBend) {
 
     //Слушатель кнопки "Удалить" на проект
     img2.addEventListener('click', async (event) => {
+        if (event.target.disabled) return
         event.target.disabled = true
-        await removeProjectList(project)
+        await removeProjectList(project, false, event)
         event.target.disabled = false
     })
     //Слушатель кнопка "Перезапустить голосование" на проект
     img0.addEventListener('click', async (event) => {
+        if (event.target.disabled) return
         event.target.disabled = true
         project = await db.get('projects', project.key)
-        let timer = setTimeout(lagServiceWorker, 5000)
+        let timer = setTimeout(() => lagServiceWorker(event), 5000)
         try {
             // noinspection JSVoidFunctionReturnValueUsed
             let message = await chrome.runtime.sendMessage({projectRestart: project})
@@ -405,7 +407,7 @@ async function addProjectList(project, preBend) {
                 // noinspection JSCheckFunctionSignatures
                 const confirmed = confirm(chrome.i18n.getMessage(message))
                 if (confirmed) {
-                    timer = setTimeout(lagServiceWorker, 5000)
+                    timer = setTimeout(() => lagServiceWorker(event), 5000)
                     try {
                         // noinspection JSVoidFunctionReturnValueUsed
                         await chrome.runtime.sendMessage({projectRestart: project, confirmed: true})
@@ -531,12 +533,12 @@ function generateBtnListRating(rating, count) {
 }
 
 //Удалить проект из списка проекта
-async function removeProjectList(project, editing) {
+async function removeProjectList(project, editing, event) {
     if (!editing && editingProject?.key === project.key) resetEdit()
 
     const li = document.getElementById('projects' + project.key)
     if (li != null) {
-        const timer = setTimeout(lagServiceWorker, 5000)
+        const timer = setTimeout(() => lagServiceWorker(event), 5000)
         try {
             // noinspection JSVoidFunctionReturnValueUsed
             const message = await chrome.runtime.sendMessage({projectDeleted: project})
@@ -1112,7 +1114,7 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
     if (event.submitter.id === 'submitEditProject') {
         if (document.getElementById('priority').checked && !project.priority) {
             project.priority = true
-            if (!await removeProjectList(project, true)) {
+            if (!await removeProjectList(project, true, event)) {
                 event.submitter.disabled = false
                 return
             }
@@ -1126,7 +1128,7 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
             await addProjectList(project, true)
         } else if (!document.getElementById('priority').checked && project.priority) {
             delete project.priority
-            if (!await removeProjectList(project, true)) {
+            if (!await removeProjectList(project, true, event)) {
                 event.submitter.disabled = false
                 return
             }
@@ -2276,7 +2278,7 @@ function generateDataList() {
     }
 }
 
-function lagServiceWorker() {
+function lagServiceWorker(event) {
     const button = document.createElement('button')
     button.classList.add('btn')
     button.id = 'restartBtn'
@@ -2287,6 +2289,8 @@ function lagServiceWorker() {
     })
     button.textContent = chrome.i18n.getMessage('restartExtension')
     createNotif([chrome.i18n.getMessage('lagServiceWorker'), button], 'warn', 60000)
+    if (event.target) event.target.disabled = false
+    if (event.submitter) event.submitter.disabled = false
 }
 
 chrome.runtime.onMessage.addListener(onMessage)
