@@ -958,7 +958,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         } else {
             message = chrome.i18n.getMessage(Object.keys(request)[0])
         }
-        if (!request.captcha && !settings.disabledWarnCaptcha) {
+        if (!(request.captcha && settings.disabledWarnCaptcha)) {
             console.warn(getProjectPrefix(project, true), message)
             if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
             project.error = message
