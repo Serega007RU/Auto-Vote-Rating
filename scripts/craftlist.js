@@ -111,14 +111,15 @@ async function vote(first) {
         return
     }
 
-    querySelectorAll('.modal-body input', true).value = project.nick
+    if (first) return
 
+    querySelectorAll('.modal-body input', true).value = project.nick
     querySelectorAll('.modal-footer button', true).click()
 }
 
 const timer = setInterval(() => {
-    const message = querySelectorAll('.modal-body .text-danger')
-    if (message && message.innerText.length > 3) {
+    const message = querySelectorAll('.modal-body .text-danger')?.innerText
+    if (message && message.length > 3 && !message.includes('field is required')) {
         clearInterval(timer)
         setTimeout(() => {
             chrome.runtime.sendMessage({message})

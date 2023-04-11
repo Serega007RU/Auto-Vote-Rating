@@ -2355,7 +2355,7 @@ async function updateProjectText(project) {
         errorElement.textContent = ''
         if (project.error) {
             // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass
-            if (project.error.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
+            if (project.error.match && project.error.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
                 // TODO функция не оптимизированная и может иметь косяки, другого способа я не нашёл как это сделать адекватно
                 // https://stackoverflow.com/a/60311728/11235240
                 // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass,RegExpUnnecessaryNonCapturingGroup
