@@ -55,7 +55,7 @@
 		}
 	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "7.0.13",
+	"version": "7.0.14",
 	"minimum_chrome_version": "105.0",
 	"default_locale": "en"
 }
