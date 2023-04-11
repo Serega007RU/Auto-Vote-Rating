@@ -1341,6 +1341,18 @@ var allProjects = {
         URL: () => 'mclist.io',
         parseURL: (url) => ({id: url.pathname.split('/')[2]})
     },
+    LoliLand: {
+        voteURL: () => 'https://loliland.ru/bonus',
+        pageURL: () => 'https://loliland.ru/bonus',
+        projectName: () => 'Бонус за подписку',
+        exampleURL: () => ['https://loliland.ru/bonus', '', ''],
+        URL: () => 'loliland.ru',
+        parseURL: () => ({}),
+        timeout: () => ({hours: 24}),
+        notRequiredCaptcha: () => true,
+        notRequiredNick: () => true,
+        notRequiredId: () => true
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1482,6 +1494,7 @@ var projectByURL = new Map([
     ['hoyolab.com', 'HoYoLAB'],
     ['trackingservers.cloud', 'TrackingServers'],
     ['mclist.io', 'McListIo'],
+    ['loliland.ru', 'LoliLand'],
     ['Custom', 'Custom']
 ])
 
