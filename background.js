@@ -1532,14 +1532,16 @@ function wait(ms) {
 async function updateValue(objStore, value) {
     const found = await db.count(objStore, value.key)
     if (found) {
-        await db.put(objStore, value, value.key)
-        try {
-            await chrome.runtime.sendMessage({updateValue: objStore, value})
-        } catch (error) {
-            if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
-                console.error(error.message)
+        await db.put(objStore, value, value.key);
+        (async () => {
+            try {
+                await chrome.runtime.sendMessage({updateValue: objStore, value})
+            } catch (error) {
+                if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+                    console.error(error.message)
+                }
             }
-        }
+        })();
     } else {
         console.warn('The ' + objStore + ' could not be found, it may have been deleted', JSON.stringify(value))
     }

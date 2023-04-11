@@ -159,14 +159,18 @@ let Timer = function(callback, delay) {
     let timerId, start, remaining = delay
 
     this.pause = function() {
-        window.clearTimeout(timerId)
+        clearTimeout(timerId)
         remaining -= Date.now() - start
     }
 
     this.resume = function() {
         start = Date.now()
-        window.clearTimeout(timerId)
-        timerId = window.setTimeout(callback, remaining)
+        clearTimeout(timerId)
+        timerId = setTimeout(callback, remaining)
+    }
+
+    this.getTimerId = function () {
+        return timerId
     }
 
     this.resume()
@@ -382,25 +386,34 @@ async function addProjectList(project, preBend) {
     await updateProjectText(project)
 
     //Слушатель кнопки "Удалить" на проект
-    img2.addEventListener('click', async () => {
+    img2.addEventListener('click', async (event) => {
+        event.target.disabled = true
         await removeProjectList(project)
+        event.target.disabled = false
     })
     //Слушатель кнопка "Перезапустить голосование" на проект
-    img0.addEventListener('click', async () => {
+    img0.addEventListener('click', async (event) => {
+        event.target.disabled = true
         project = await db.get('projects', project.key)
+        let timer = setTimeout(lagServiceWorker, 5000)
         try {
             // noinspection JSVoidFunctionReturnValueUsed
             let message = await chrome.runtime.sendMessage({projectRestart: project})
             // noinspection JSIncompatibleTypesComparison
             if (message === 'confirmNow' || message === 'confirmQueue') {
+                clearTimeout(timer)
                 // noinspection JSCheckFunctionSignatures
-                if (confirm(chrome.i18n.getMessage(message))) {
+                const confirmed = confirm(chrome.i18n.getMessage(message))
+                if (confirmed) {
+                    timer = setTimeout(lagServiceWorker, 5000)
                     try {
                         // noinspection JSVoidFunctionReturnValueUsed
                         await chrome.runtime.sendMessage({projectRestart: project, confirmed: true})
                     } catch (error) {
                         createNotif(error.message, 'error')
                         return
+                    } finally {
+                        clearTimeout(timer)
                     }
                 } else {
                     return
@@ -409,6 +422,9 @@ async function addProjectList(project, preBend) {
         } catch (error) {
             createNotif(error.message, 'error')
             return
+        } finally {
+            event.target.disabled = false
+            clearTimeout(timer)
         }
         createNotif(chrome.i18n.getMessage('restarted'), 'success')
     })
@@ -520,6 +536,7 @@ async function removeProjectList(project, editing) {
 
     const li = document.getElementById('projects' + project.key)
     if (li != null) {
+        const timer = setTimeout(lagServiceWorker, 5000)
         try {
             // noinspection JSVoidFunctionReturnValueUsed
             const message = await chrome.runtime.sendMessage({projectDeleted: project})
@@ -530,6 +547,9 @@ async function removeProjectList(project, editing) {
             }
         } catch (error) {
             createNotif(error.message, 'error')
+            return false
+        } finally {
+            clearTimeout(timer)
         }
         usageSpace()
 
@@ -2254,6 +2274,19 @@ function generateDataList() {
         }
         datalist.append(option)
     }
+}
+
+function lagServiceWorker() {
+    const button = document.createElement('button')
+    button.classList.add('btn')
+    button.id = 'restartBtn'
+    button.addEventListener('click', () => {
+        if (confirm(chrome.i18n.getMessage('confirmRestartExtension'))) {
+            chrome.runtime.reload()
+        }
+    })
+    button.textContent = chrome.i18n.getMessage('restartExtension')
+    createNotif([chrome.i18n.getMessage('lagServiceWorker'), button], 'warn', 60000)
 }
 
 chrome.runtime.onMessage.addListener(onMessage)

@@ -1075,5 +1075,14 @@
   },
   "confirmUninstallSelf": {
     "message": "Do you really want to delete? All extension settings will be permanently deleted."
+  },
+  "lagServiceWorker": {
+    "message": "It looks like we can't contact the Service Worker (the background process of the extension), it probably freezes, let's try to restart the extension?"
+  },
+  "restartExtension": {
+    "message": "Restart the extension"
+  },
+  "confirmRestartExtension": {
+    "message": "Restart the extension? After restarting the extension, the settings will be closed and they will need to be manually reopened"
   }
 }
