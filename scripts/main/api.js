@@ -111,6 +111,8 @@ async function run() {
                 //Пилюля от жадности в правах
                 url = url.replace('%20guilds.join', '')
                 url = url.replace('%20guilds', '')
+                url = url.replace('+guilds.join', '')
+                url = url.replace('+guilds', '')
                 url = url.replace('%20email', '')
                 url = url.replace('+email', '')
                 //Заставляем авторизацию авторизоваться не беспокоя пользователя если права уже были предоставлены
