@@ -1349,9 +1349,11 @@ var allProjects = {
         URL: () => 'loliland.ru',
         parseURL: () => ({}),
         timeout: () => ({hours: 24}),
+        silentVote: () => true,
         notRequiredCaptcha: () => true,
         notRequiredNick: () => true,
-        notRequiredId: () => true
+        notRequiredId: () => true,
+        needAdditionalPermissions: () => ['cookies']
     },
     Custom: {
         voteURL: (project) => project.responseURL,
