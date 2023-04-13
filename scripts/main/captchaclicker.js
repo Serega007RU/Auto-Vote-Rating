@@ -73,6 +73,12 @@ function run() {
                 chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-doscaptcha-body-text').textContent})
                 clearInterval(timer7)
             }
+
+            // TODO костыльное временное решение нажатие на кнопку "Verify" для расширения NopeCHA методом решения капчи "Speech", подробнее https://github.com/NopeCHALLC/nopecha-extension/issues/11
+            if (document.querySelector("#audio-response")?.value.length > 3) {
+                clearInterval(timer7)
+                document.querySelector("#recaptcha-verify-button")?.click()
+            }
         }, 2000)
 
         const timer3 = setInterval(() => {
@@ -120,16 +126,23 @@ function run() {
         }, 1000)
     } else if (window.location.href.match(/https:\/\/challenges.cloudflare.com\/*/)) {
         //Если требуется ручное прохождение капчи CloudFlare
-        const timer7 = setInterval(()=>{
+        const timer7 = setInterval(()=> {
             if (document.querySelector('#cf-norobot-container')) {
                 clearInterval(timer7)
                 document.querySelector('#cf-norobot-container span.mark').click()
-            }
-            if (document.querySelector('#cf-stage #success')?.style.display !== 'none') {
+            } else if (document.querySelector('#challenge-stage span.mark')) {
                 clearInterval(timer7)
-                chrome.runtime.sendMessage('captchaPassed')
+                document.querySelector('#challenge-stage span.mark').click()
             }
         }, 1000)
+
+        // Если мы прошли капчу CloudFlare
+        const timer8 = setInterval(() => {
+            if (document.querySelector('#cf-stage #success')?.style.display !== 'none') {
+                clearInterval(timer8)
+                chrome.runtime.sendMessage('captchaPassed')
+            }
+        })
     }
 }
 

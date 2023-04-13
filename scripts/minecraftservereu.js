@@ -8,6 +8,18 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('div[role="dialog"]')) {
+        chrome.runtime.sendMessage({auth: true})
+        await new Promise(resolve => {
+            const timer2 = setInterval(() => {
+                if (!document.querySelector('div[role="dialog"]')) {
+                    clearInterval(timer2)
+                    resolve()
+                }
+            }, 1000)
+        })
+    }
+
     //К чему это ожидание?
     // if (document.querySelector('#infoMessage') != null) document.querySelector('#infoMessage').style.display = 'none'
     // if (document.querySelector('#inputFields') != null) document.querySelector('#inputFields').removeAttribute('style')

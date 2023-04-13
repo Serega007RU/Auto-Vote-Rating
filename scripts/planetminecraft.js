@@ -8,6 +8,18 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('div[role="dialog"]')) {
+        chrome.runtime.sendMessage({auth: true})
+        await new Promise(resolve => {
+            const timer2 = setInterval(() => {
+                if (!document.querySelector('div[role="dialog"]')) {
+                    clearInterval(timer2)
+                    resolve()
+                }
+            }, 1000)
+        })
+    }
+
     if (document.querySelector('#error_page div.notice_box')) {
         const request = {}
         request.message = document.querySelector('#error_page div.notice_box').innerText

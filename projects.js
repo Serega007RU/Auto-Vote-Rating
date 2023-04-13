@@ -1296,12 +1296,12 @@ var allProjects = {
         notRequiredId: () => true
     },
     CurseForge: {
-        voteURL: (project) => 'https://www.curseforge.com/servers/server/' + project.id + '/vote',
-        pageURL: (project) => 'https://www.curseforge.com/servers/server/' + project.id + '/',
+        voteURL: (project) => 'https://www.curseforge.com/servers/minecraft/game/' + project.id + '/vote',
+        pageURL: (project) => 'https://www.curseforge.com/servers/minecraft/game/' + project.id + '/',
         projectName: (doc) => doc.querySelector('title').textContent.replaceAll(' - The Best Minecraft Servers - CurseForge', ''),
-        exampleURL: () => ['https://www.curseforge.com/servers/server/', 'lemoncloud', '/vote'],
+        exampleURL: () => ['https://www.curseforge.com/servers/minecraft/game/', 'lemoncloud', '/vote'],
         URL: () => 'curseforge.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[3]})
+        parseURL: (url) => ({id: url.pathname.split('/')[4]})
     },
     HoYoLAB: {
         voteURL: () => 'https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us',
@@ -1348,7 +1348,10 @@ var allProjects = {
         exampleURL: () => ['https://loliland.ru/bonus', '', ''],
         URL: () => 'loliland.ru',
         parseURL: () => ({}),
-        timeout: () => ({hours: 24}),
+        timeout: () => ({
+            hours: 24,
+            minutes: 1 // TODO 1-на минутная задержка так как LoliLand не умеет считать правильно 24 часа
+        }),
         silentVote: () => true,
         notRequiredCaptcha: () => true,
         notRequiredNick: () => true,

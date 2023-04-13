@@ -1,11 +1,5 @@
 async function vote(first) {
-    if (document.querySelector('div.grid div.text-center h2')) {
-        const message = document.querySelector('div.grid div.text-center h2').textContent
-        if (message.includes('Thanks for voting')) {
-            chrome.runtime.sendMessage({successfully: true})
-            return
-        }
-    }
+    if (checkAnswer()) return
 
     if (first) return
 
@@ -17,11 +11,26 @@ async function vote(first) {
 }
 
 const timer = setInterval(() => {
+    if (checkAnswer()) {
+        clearInterval(timer)
+    }
+}, 1000)
+
+function checkAnswer() {
     if (document.querySelector('div.grid div.text-center h2')) {
         const message = document.querySelector('div.grid div.text-center h2').textContent
         if (message.includes('Thanks for voting')) {
             chrome.runtime.sendMessage({successfully: true})
-            clearInterval(timer)
+            return true
         }
+    } else if (document.querySelector('div.grid div.text-center p.text-error')) {
+        const message = document.querySelector('div.grid div.text-center p.text-error').textContent
+        if (message.includes('already voted')) {
+            chrome.runtime.sendMessage({later: true})
+        } else {
+            chrome.runtime.sendMessage({message})
+        }
+        return true
     }
-}, 1000)
+    return false
+}

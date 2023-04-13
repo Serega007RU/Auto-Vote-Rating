@@ -1,6 +1,18 @@
 async function vote(first) {
-    if (document.querySelector('.container h3') && document.querySelector('.container h3').textContent.toLowerCase().includes('submitting vote in')) {
+    if (document.querySelector('.container h3')?.textContent.toLowerCase().includes('submitting vote in')) {
         return
+    }
+
+    if (document.querySelector('div[id*="sp_message_container"]')) {
+        chrome.runtime.sendMessage({auth: true})
+        await new Promise(resolve => {
+            const timer2 = setInterval(() => {
+                if (!document.querySelector('div[id*="sp_message_container"]')) {
+                    clearInterval(timer2)
+                    resolve()
+                }
+            }, 1000)
+        })
     }
 
     //Костыльный фикс на костыльные какие-то popup которые грузятся костыльно

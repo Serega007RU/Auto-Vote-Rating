@@ -145,6 +145,9 @@ async function run() {
                 if (document.querySelector('#cf-norobot-container input[type="button"]')) {
                     clearInterval(timer5)
                     document.querySelector('#cf-norobot-container input[type="button"]').click()
+                } else if (document.querySelector('input[type="button"][value="Verify you are human"]')) {
+                    clearInterval(timer5)
+                    document.querySelector('input[type="button"][value="Verify you are human"]').click()
                 }
             }, 1000)
             return

@@ -3,6 +3,19 @@ async function vote(/*first*/) {
         chrome.runtime.sendMessage({emptyError: true, ignoreReport: true})
         return
     }
+
+    if (document.querySelector('div[role="dialog"]')) {
+        chrome.runtime.sendMessage({auth: true})
+        await new Promise(resolve => {
+            const timer2 = setInterval(() => {
+                if (!document.querySelector('div[role="dialog"]')) {
+                    clearInterval(timer2)
+                    resolve()
+                }
+            }, 1000)
+        })
+    }
+
     if (document.querySelector('.ui.segments')) {
         const request = {}
         request.message = document.querySelector('.ui.segments').textContent.trim()
@@ -12,6 +25,7 @@ async function vote(/*first*/) {
         chrome.runtime.sendMessage(request)
         return
     }
+
     if (document.querySelector('div.ui.error.message')) {
         const request = {}
         request.message = document.querySelector('div.ui.error.message').textContent.trim()
@@ -28,6 +42,7 @@ async function vote(/*first*/) {
             return
         }
     }
+
     if (document.querySelector('div.ui.success.message') != null) {
         chrome.runtime.sendMessage({successfully: true})
         return
