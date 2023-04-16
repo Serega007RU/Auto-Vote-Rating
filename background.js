@@ -528,24 +528,24 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     return true
 }
 
-// chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
-//     await initializeFunc
-//     if (openedProjects.has(details.tabId)) {
-//         if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
-//             const project = openedProjects.get(details.tabId)
-//             if (
-//                 //Chrome
-//                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
-//                 //FireFox
-//                 || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
-//                 // console.warn(getProjectPrefix(project, true), details.error)
-//                 return
-//             }
-//             const sender = {tab: {id: details.tabId}, url: details.url}
-//             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
-//         }
-//     }
-// })
+chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
+    await initializeFunc
+    if (openedProjects.has(details.tabId)) {
+        if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+            const project = openedProjects.get(details.tabId)
+            if (
+                //Chrome
+                details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
+                //FireFox
+                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
+                // console.warn(getProjectPrefix(project, true), details.error)
+                return
+            }
+            const sender = {tab: {id: details.tabId}, url: details.url}
+            endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
+        }
+    }
+})
 
 chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
     if (details.url === 'about:blank') return
@@ -944,9 +944,10 @@ async function onRuntimeMessage(request, sender, sendResponse) {
     }
 
     if (!openedProjects.has(sender.tab.id)) {
-        console.warn('Пришёл нераспознанный chrome.runtime.message, что это?' + JSON.stringify(request))
+        console.warn('A double attempt to complete the vote? chrome.runtime.onMessage', JSON.stringify(request), JSON.stringify(sender))
         return
     }
+
     let project = openedProjects.get(sender.tab.id)
     if (request.captcha || request.authSteam || request.discordLogIn || request.auth || (request.errorCaptcha && !request.restartVote)) {//Если требует ручное прохождение капчи
         project = await db.get('projects', project.key)
@@ -1007,12 +1008,15 @@ async function endVote(request, sender, project) {
     delete project.timeoutQueue
     delete project.nextAttempt
 
+    let found = false
     for (const [tab,value] of openedProjects) {
         if (project.key === value.key) {
             // noinspection JSCheckFunctionSignatures
             if (isNaN(tab) && !tab.startsWith('background_')) {
+                console.warn('A double attempt to complete the vote? endVote, has openedProjects', JSON.stringify(request), JSON.stringify(sender), JSON.stringify(project))
                 return
             } else {
+                found = true
                 if (project.randomize) {
                     timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
                 }
@@ -1024,6 +1028,10 @@ async function endVote(request, sender, project) {
             }
             break
         }
+    }
+    if (!found) {
+        console.warn('A double attempt to complete the vote? endVote, not found openedProjects', JSON.stringify(request), JSON.stringify(sender), JSON.stringify(project))
+        return
     }
 
     if (!request.successfully && request.later == null) {
