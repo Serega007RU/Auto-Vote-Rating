@@ -1084,5 +1084,8 @@
   },
   "confirmRestartExtension": {
     "message": "Restart the extension? After restarting the extension, the settings will be closed and they will need to be manually reopened"
+  },
+  "requiredConfirmTOS": {
+    "message": "The site requires you to confirm something"
   }
 }

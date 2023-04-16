@@ -151,34 +151,35 @@ function checkOpen(project/*, transaction*/) {
                 openedProjects.delete(tab)
                 db.put('other', openedProjects, 'openedProjects')
 
-                if (!isNaN(tab) && !settings.disabledSendErrorSentry) {
-                    (async() => {
-                        try {
-                            value = await db.get('projects', value.key)
-                            if (!value.nextAttempt) return
-
-                            const details = await chrome.tabs.get(tab)
-                            if (details.url) {
-                                const domain = getDomainWithoutSubdomain(details.url)
-                                // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
-                                if (projectByURL.get(domain) !== value.rating) {
-                                    return
-                                }
-                            }
-                            await reportError({timeout: true}, {tab: {id: details.id}, url: details.url}, value)
-                        } catch (error) {
-                            if (!error.message.includes('No tab with id')) {
-                                console.warn(getProjectPrefix(value, true), error.message)
-                            }
-                        } finally {
-                            // noinspection JSCheckFunctionSignatures,JSIgnoredPromiseFromCall
-                            tryCloseTab(tab, value, 0)
-                        }
-                    })()
-                } else {
+                // TODO временно закомментировано
+                // if (!isNaN(tab) && !settings.disabledSendErrorSentry) {
+                //     (async() => {
+                //         try {
+                //             value = await db.get('projects', value.key)
+                //             if (!value.nextAttempt) return
+                //
+                //             const details = await chrome.tabs.get(tab)
+                //             if (details.url) {
+                //                 const domain = getDomainWithoutSubdomain(details.url)
+                //                 // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
+                //                 if (projectByURL.get(domain) !== value.rating) {
+                //                     return
+                //                 }
+                //             }
+                //             await reportError({timeout: true}, {tab: {id: details.id}, url: details.url}, value)
+                //         } catch (error) {
+                //             if (!error.message.includes('No tab with id')) {
+                //                 console.warn(getProjectPrefix(value, true), error.message)
+                //             }
+                //         } finally {
+                //             // noinspection JSCheckFunctionSignatures,JSIgnoredPromiseFromCall
+                //             tryCloseTab(tab, value, 0)
+                //         }
+                //     })()
+                // } else {
                     // noinspection JSCheckFunctionSignatures,JSIgnoredPromiseFromCall
                     tryCloseTab(tab, value, 0)
-                }
+                // }
                 break
             }
         }
@@ -598,6 +599,7 @@ chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
             console.error(getProjectPrefix(project, true), error.message)
             if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
             project.error = error.message
+            delete project.nextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
             updateValue('projects', project)
         }
     }
@@ -683,6 +685,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 console.error(getProjectPrefix(project, true), error.message)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
                 project.error = error.message
+                delete project.nextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
                 updateValue('projects', project)
             }
         }
@@ -732,6 +735,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 console.error(getProjectPrefix(project, true), error.message)
                 if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
                 project.error = message
+                delete project.nextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
                 updateValue('projects', project)
             }
         }
@@ -949,15 +953,17 @@ async function onRuntimeMessage(request, sender, sendResponse) {
     }
 
     let project = openedProjects.get(sender.tab.id)
-    if (request.captcha || request.authSteam || request.discordLogIn || request.auth || (request.errorCaptcha && !request.restartVote)) {//Если требует ручное прохождение капчи
+    if (request.captcha || request.authSteam || request.discordLogIn || request.auth || request.requiredConfirmTOS || (request.errorCaptcha && !request.restartVote)) {//Если требует ручное прохождение капчи
         project = await db.get('projects', project.key)
         let message
         if (request.captcha) {
             message = chrome.i18n.getMessage('requiresCaptcha')
-        } else if (request.auth && request.auth !== true) {
-            message = request.auth
         } else {
-            message = chrome.i18n.getMessage(Object.keys(request)[0])
+            if (Object.values(request)[0] !== true) {
+                message = chrome.i18n.getMessage(Object.keys(request)[0], Object.values(request)[0])
+            } else {
+                message = chrome.i18n.getMessage(Object.keys(request)[0])
+            }
         }
         if (!(request.captcha && settings.disabledWarnCaptcha)) {
             console.warn(getProjectPrefix(project, true), message)
@@ -1421,6 +1427,10 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         message3.request.url = request.url
     } else {
         message3.request.url = 'chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd/background.js'
+    }
+    if (project.nick) {
+        message3.user = {}
+        message3.user.username = project.nick
     }
     let body = JSON.stringify(message1) + '\n' + JSON.stringify(message2) + '\n' + JSON.stringify(message3)
 
