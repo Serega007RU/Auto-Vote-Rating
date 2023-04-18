@@ -16,7 +16,7 @@ async function vote(first) {
                     chrome.runtime.sendMessage({successfully: true})
                     clearInterval(timer1)
                 } else if (result.textContent.toLowerCase().includes('already voted')) {
-                    if (countAlreadyVoted > 30) {
+                    if (countAlreadyVoted > 5) {
                         chrome.runtime.sendMessage({later: true})
                         clearInterval(timer1)
                     } else {
