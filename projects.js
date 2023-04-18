@@ -915,7 +915,8 @@ var allProjects = {
             ['pixelmonservers.com', ''],
             ['tekkitserverlist.com', ''],
             ['technicservers.com', ''],
-            ['ftbservers.com', '']
+            ['ftbservers.com', ''],
+            ['attackofthebteamservers.com', '']
         ]),
         alertManualCaptcha: () => true
     },
@@ -1358,6 +1359,16 @@ var allProjects = {
         notRequiredId: () => true,
         needAdditionalPermissions: () => ['cookies']
     },
+    MCServersTOP: {
+        voteURL: (project) => 'https://mcservers.top/server/' + project.id,
+        pageURL: (project) => 'https://mcservers.top/server/' + project.id,
+        projectName: (doc) => doc.querySelector('h1[itemprop="name"]').textContent,
+        exampleURL: () => ['https://mcservers.top/server/', '1113', ''],
+        URL: () => 'mcservers.top',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        needPrompt: () => true,
+        notRequiredCaptcha: () => true
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1464,6 +1475,7 @@ var projectByURL = new Map([
     ['tekkitserverlist.com', 'MineServers'],
     ['technicservers.com', 'MineServers'],
     ['ftbservers.com', 'MineServers'],
+    ['attackofthebteamservers.com', 'MineServers'],
     ['atlauncher.com', 'ATLauncher'],
     ['servers-minecraft.net', 'ServersMinecraft'],
     ['minecraft-list.cz', 'MinecraftListCZ'],
@@ -1500,6 +1512,7 @@ var projectByURL = new Map([
     ['trackingservers.cloud', 'TrackingServers'],
     ['mclist.io', 'McListIo'],
     ['loliland.ru', 'LoliLand'],
+    ['mcservers.top', 'MCServersTOP'],
     ['Custom', 'Custom']
 ])
 
