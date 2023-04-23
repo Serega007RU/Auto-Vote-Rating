@@ -21,7 +21,7 @@ async function silentVoteHoYoLAB(project) {
         } else {
             const request = {}
             request.message = json.message
-            if (request.message.includes('create a character in game first')) {
+            if (request.message.includes('create a character in game first') || request.message.includes('Not logged in')) {
                 request.ignoreReport = true
             }
             request.html = JSON.stringify(json)

@@ -1,8 +1,8 @@
 async function vote(first) {
     if (first === false) return
 
-    if (document.querySelector('.fc-dialog-container')) {
-        chrome.runtime.sendMessage({auth: true})
+    if (isVisibleElement(document.querySelector('.fc-dialog-container'))) {
+        chrome.runtime.sendMessage({requiredConfirmTOS: true})
         await new Promise(resolve => {
             const timer2 = setInterval(() => {
                 if (!document.querySelector('.fc-dialog-container')) {

@@ -3,8 +3,8 @@ async function vote(first) {
         return
     }
 
-    if (document.querySelector('div[id*="sp_message_container"]')) {
-        chrome.runtime.sendMessage({auth: true})
+    if (isVisibleElement(document.querySelector('div[id*="sp_message_container"]'))) {
+        chrome.runtime.sendMessage({requiredConfirmTOS: true})
         await new Promise(resolve => {
             const timer2 = setInterval(() => {
                 if (!document.querySelector('div[id*="sp_message_container"]')) {

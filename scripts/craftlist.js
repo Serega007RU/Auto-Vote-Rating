@@ -100,7 +100,7 @@ async function vote(first) {
         querySelector('.sidebar .card-body .btn', first)?.click()
     }
 
-    const btnText = querySelectorAll('.modal-footer a span')?.textContent
+    const btnText = querySelectorAll('.modal-footer a span', false, 0)?.textContent
     if (btnText &&
         (btnText.includes('possible vote')
             || btnText.includes('možný hlas')
@@ -119,7 +119,7 @@ async function vote(first) {
 
 const timer = setInterval(() => {
     const message = querySelectorAll('.modal-body .text-danger')?.innerText
-    if (message && message.length > 3 && !message.includes('field is required')) {
+    if (message && message.length > 3 && !message.includes('field is required') && !message.includes('pole je povinný')) {
         clearInterval(timer)
         setTimeout(() => {
             chrome.runtime.sendMessage({message})
@@ -127,7 +127,7 @@ const timer = setInterval(() => {
     }
 }, 1000)
 
-function querySelectorAll(selector, required) {
+function querySelectorAll(selector, required, index) {
     const elements = document.querySelectorAll(selector)
     const results = []
     const success = []
@@ -140,7 +140,11 @@ function querySelectorAll(selector, required) {
         }
     }
     if (success.length > 0) {
-        return success[success.length - 1]
+        if (index != null) {
+            return success[index]
+        } else {
+            return success[success.length - 1]
+        }
     }
     if (required) throw selector + ' ' + results.toString()
 }

@@ -2,7 +2,7 @@ async function vote(/*first*/) {
     if (document.querySelector('div.alert.alert-danger') != null) {
         const request = {}
         request.message = document.querySelector('div.alert.alert-danger').textContent.trim()
-        if (request.message.includes('Recapcha error')) {
+        if (request.message.includes('Recapcha error') || request.message.includes('Server not found')) {
             request.ignoreReport = true
         }
         chrome.runtime.sendMessage(request)
