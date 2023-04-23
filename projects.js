@@ -1369,6 +1369,19 @@ var allProjects = {
         needPrompt: () => true,
         notRequiredCaptcha: () => true
     },
+    Discadia: {
+        voteURL: (project) => 'https://discadia.com/vote/' + project.id + '/',
+        pageURL: (project) => 'https://discadia.com/server/' + project.id + '/',
+        projectName: (doc) => doc.querySelector('section.items-center > h1').textContent,
+        exampleURL: () => ['https://discadia.com/server/', 'rq6-valorant-boost', '/'],
+        URL: () => 'discadia.com',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24}), // https://discord.com/channels/371699266747629568/760393040174120990/1099781014206820352
+        oneProject: () => 1,
+        notRequiredNick: () => true,
+        notRequiredCaptcha: () => true,
+        needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1513,6 +1526,7 @@ var projectByURL = new Map([
     ['mclist.io', 'McListIo'],
     ['loliland.ru', 'LoliLand'],
     ['mcservers.top', 'MCServersTOP'],
+    ['discadia.com', 'Discadia'],
     ['Custom', 'Custom']
 ])
 

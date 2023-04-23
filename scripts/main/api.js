@@ -106,15 +106,17 @@ async function run() {
 
         //Если мы находися на странице авторизации Дискорд
         if (document.URL.match(/discord.com\/*/)) {
-            if (document.URL.includes('%20guilds') || document.URL.includes('%20email') || document.URL.includes('+email') || !document.URL.includes('prompt=none')) {
+            if ((!document.location.search.includes('client_id=423718605226639361') && (document.URL.includes('%20guilds') || document.URL.includes('%20email') || document.URL.includes('+email'))) || !document.URL.includes('prompt=none')) {
                 let url = document.URL
                 //Пилюля от жадности в правах
-                url = url.replace('%20guilds.join', '')
-                url = url.replace('%20guilds', '')
-                url = url.replace('+guilds.join', '')
-                url = url.replace('+guilds', '')
-                url = url.replace('%20email', '')
-                url = url.replace('+email', '')
+                if (!document.location.search.includes('client_id=423718605226639361')) {
+                    url = url.replace('%20guilds.join', '')
+                    url = url.replace('%20guilds', '')
+                    url = url.replace('+guilds.join', '')
+                    url = url.replace('+guilds', '')
+                    url = url.replace('%20email', '')
+                    url = url.replace('+email', '')
+                }
                 //Заставляем авторизацию авторизоваться не беспокоя пользователя если права уже были предоставлены
                 if (!document.URL.includes('prompt=none')) url = url.concat('&prompt=none')
                 document.location.replace(url)
