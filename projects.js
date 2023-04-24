@@ -1382,6 +1382,14 @@ var allProjects = {
         notRequiredCaptcha: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
+    MinecraftSurvivalServers: {
+        voteURL: (project) => 'https://minecraftsurvivalservers.net/server/' + project.id + '/vote',
+        pageURL: (project) => 'https://minecraftsurvivalservers.net/server/' + project.id,
+        projectName: (doc) => doc.querySelector('h1.large.header').textContent.replaceAll(' Minecraft Server', ''),
+        exampleURL: () => ['https://minecraftsurvivalservers.net/server/', '64', '/vote'],
+        URL: () => 'minecraftsurvivalservers.net',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1527,6 +1535,7 @@ var projectByURL = new Map([
     ['loliland.ru', 'LoliLand'],
     ['mcservers.top', 'MCServersTOP'],
     ['discadia.com', 'Discadia'],
+    ['minecraftsurvivalservers.net', 'MinecraftSurvivalServers'],
     ['Custom', 'Custom']
 ])
 
