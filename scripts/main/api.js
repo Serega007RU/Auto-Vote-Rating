@@ -130,16 +130,6 @@ async function run() {
             return
         }
 
-        //Если мы находимся на странице проверки CloudFlare
-        if (document.querySelector('span[data-translate="complete_sec_check"]')) {
-            return
-        }
-
-        // Bot Verification https://gyazo.com/04797d3f1ba6b9b90c48d1dd57d305a2
-        if (document.querySelector('title')?.textContent?.includes('Bot Verification') || document.querySelector('#recaptchadiv')) {
-            return
-        }
-
         //Если идёт проверка (новый CloudFlare?)
         if (document.querySelector('#challenge-form') || document.querySelector('#challenge-body-text')) {
             //Если нам требуется нажать на "Verify you are human" https://gyazo.com/56426c80a3072e5b4d565949af7da81b
@@ -155,24 +145,6 @@ async function run() {
             return
         }
 
-        //Если идёт проверка CloudFlare
-        if (document.getElementById('cf-content')) {
-            return
-        }
-        if (document.getElementById('cf-wrapper')) {
-            if (document.querySelector('span[data-translate="complete_sec_check"]') == null && document.querySelector('span[data-translate="managed_checking_msg"]') == null) {
-                const request = {}
-                if (document.querySelector('#cf-error-details h1')) {
-                    request.message = document.querySelector('#cf-error-details h1').textContent.trim()
-                } else {
-                    request.message = document.body.innerText.trim()
-                }
-                request.ignoreReport = true
-                chrome.runtime.sendMessage(request)
-            }
-            return
-        }
-
         // Если ошибка (запрещён доступ) CloudFlare
         if (document.querySelector('div.cf-main-wrapper div.cf-error-description')) {
             const request = {}
@@ -182,11 +154,21 @@ async function run() {
             return
         }
 
+        //Если мы находимся на странице проверки CloudFlare https://i.imgur.com/BVk3z6y.png
+        if (document.querySelector('div.main-wrapper div.main-content #challenge-body-text')) {
+            return
+        }
+
         if (document.querySelector('body > center > h1') && (document.querySelector('body > center:last-of-type')?.textContent.includes('cloudflare') || document.querySelector('body > center:last-of-type')?.textContent.includes('nginx'))) {
             const request = {}
             request.message = document.body.innerText
             request.ignoreReport = true
             chrome.runtime.sendMessage(request)
+            return
+        }
+
+        // Bot Verification https://gyazo.com/04797d3f1ba6b9b90c48d1dd57d305a2
+        if (document.querySelector('title')?.textContent?.includes('Bot Verification') || document.querySelector('#recaptchadiv')) {
             return
         }
 
