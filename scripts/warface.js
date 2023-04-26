@@ -1,6 +1,11 @@
 async function vote(first) {
     if (first === false) return
 
+    if (document.querySelector('label #captcha_input')) {
+        chrome.runtime.sendMessage({captcha: true})
+        return
+    }
+
     if (document.querySelector('.done_present')) {
         const message = document.querySelector('.done_present').textContent.trim()
         if (message.includes('уже получен')) {
