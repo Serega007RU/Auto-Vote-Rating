@@ -42,7 +42,7 @@ function run() {
                     document.location.reload()
                 } else {
                     // https://i.imgur.com/WJ3ce9s.png
-                    if (!text.includes('Время проверки истекло') && !text.includes('Verification challenge expired') && !text.includes('Verification expired') && !text.includes('La validation a expiré')) {
+                    if (!text.includes('Время проверки истекло') && !text.includes('Verification challenge expired') && !text.includes('Verification expired') && !text.includes('La validation a expiré') && !text.includes('Platnost výzvy ověření vypršela')) {
                         chrome.runtime.sendMessage({errorCaptcha: document.querySelector('.rc-anchor-error-msg-container').textContent})
                         clearInterval(timer2)
                     }

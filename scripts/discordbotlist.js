@@ -1,4 +1,10 @@
 async function vote(first) {
+    // https://cdn.discordapp.com/attachments/572131636934737921/1100021083891048458/image.png
+    if (document.querySelector('body > h1')?.textContent.includes('Backend fetch failed')) {
+        chrome.runtime.sendMessage({message: document.documentElement.innerText, ignoreReport: true})
+        return
+    }
+
     if (document.querySelector('.main-content').innerText.includes('ogging you in')) {
         await new Promise(resolve => {
             const timer1 = setInterval(() => {

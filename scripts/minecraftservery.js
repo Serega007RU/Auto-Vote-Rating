@@ -13,7 +13,7 @@ async function vote(first) {
             if (request.message.toLowerCase().includes('captcha') || request.message.toLowerCase().includes('že nejste robot')) {
                 // None
             } else {
-                if (request.message.includes('server byl označen jako neaktivní')) {
+                if (request.message.includes('server byl označen jako neaktivní') || request.message.includes('Přezdívka je v nesprávném formátu')) {
                     request.ignoreReport = true
                 }
                 chrome.runtime.sendMessage(request)

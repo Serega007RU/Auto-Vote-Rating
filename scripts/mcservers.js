@@ -23,11 +23,12 @@ async function vote(first) {
             }
         }
     }
-    if (document.querySelector('div.main-panel > span') != null) {
-        if (document.querySelector('div.main-panel > span').textContent.includes('vote was success')) {
+    if (document.querySelector('div.main-panel > span.green')) {
+        const message = document.querySelector('div.main-panel > span.green').textContent
+        if (message.includes('vote was success')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.main-panel > span').textContent})
+            chrome.runtime.sendMessage({message})
         }
         return
     }
