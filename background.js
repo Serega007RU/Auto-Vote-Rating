@@ -548,7 +548,7 @@ chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
     }
 })
 
-chrome.webNavigation.onDOMContentLoaded.addListener(async function(details) {
+chrome.webNavigation.onCommitted.addListener(async function(details) {
     if (details.url === 'about:blank') return
     await initializeFunc
     let project = openedProjects.get(details.tabId)
