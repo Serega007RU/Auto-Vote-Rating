@@ -1290,7 +1290,7 @@ var allProjects = {
         projectName: () => 'Bonus',
         exampleURL: () => ['https://ru.warface.com/bonus/', '', ''],
         URL: () => 'warface.com',
-        parseURL: () => ({}),
+        parseURL: () => ({id: 'bonus'}),
         timeout: () => ({week: 3, hour: 13}),
         notRequiredCaptcha: () => true,
         notRequiredNick: () => true,
@@ -1305,17 +1305,42 @@ var allProjects = {
         parseURL: (url) => ({id: url.pathname.split('/')[4]})
     },
     HoYoLAB: {
-        voteURL: () => 'https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us',
-        pageURL: () => 'https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us',
-        projectName: () => 'Genshin Impact Daily check-in',
+        voteURL: (project) => {
+            if (!project.id || project.id === 'genshin impact daily') {
+                return 'https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us'
+            } else {
+                return 'https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311&lang=en-us'
+            }
+        },
+        pageURL: (project) => {
+            if (!project.id || project.id === 'genshin impact daily') {
+                return 'https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us'
+            } else {
+                return 'https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311&lang=en-us'
+            }
+        },
+        projectName: (doc, project) => {
+            if (!project.id || project.id === 'genshin impact daily') {
+                return 'Genshin Impact Daily check-in'
+            } else {
+                return 'Honkai: Star Rail Daily check-in'
+            }
+        },
         exampleURL: () => ['https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us', '', ''],
         URL: () => 'hoyolab.com',
-        parseURL: () => ({}),
+        parseURL: (url) => {
+            if (url.searchParams.get('act_id') === 'e202303301540311') {
+                return {id: 'honkai star rail daily'}
+            } else if (url.searchParams.get('act_id') === 'e202102251931481') {
+                return {id: 'genshin impact daily'}
+            } else {
+                return {}
+            }
+        },
         timeout: () => ({hour: 16}),
         silentVote: () => true,
         notRequiredCaptcha: () => true,
-        notRequiredNick: () => true,
-        notRequiredId: () => true
+        notRequiredNick: () => true
     },
     TrackingServers: {
         voteURL: (project) => 'https://trackingservers.cloud/server/vote/' + project.id,
@@ -1348,7 +1373,7 @@ var allProjects = {
         projectName: () => 'Бонус за подписку',
         exampleURL: () => ['https://loliland.ru/bonus', '', ''],
         URL: () => 'loliland.ru',
-        parseURL: () => ({}),
+        parseURL: () => ({id: 'bonus subscribe'}),
         timeout: () => ({
             hours: 24,
             minutes: 1 // TODO 1-на минутная задержка так как LoliLand не умеет считать правильно 24 часа
