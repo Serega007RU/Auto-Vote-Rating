@@ -553,7 +553,8 @@ chrome.webNavigation.onCommitted.addListener(async function(details) {
     await initializeFunc
     let project = openedProjects.get(details.tabId)
     if (!project) return
-    const files = []
+    const filesIsolated = []
+    const filesMain = []
     if (details.frameId === 0) {
         // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
         if (details.url.match(/facebook.com\/*/) || details.url.match(/google.com\/*/) || details.url.match(/accounts.google.com\/*/) || details.url.match(/reddit.com\/*/) || details.url.match(/twitter.com\/*/)) {
@@ -568,9 +569,14 @@ chrome.webNavigation.onCommitted.addListener(async function(details) {
             }
         }
 
-        files.push('scripts/main/visible.js')
+        filesMain.push('scripts/main/visible.js')
         if (allProjects[projectByURL.get(getDomainWithoutSubdomain(details.url))]?.needIsTrusted?.()) {
-            files.push('scripts/main/istrusted.js')
+            filesIsolated.push('scripts/main/istrusted_isolated.js')
+            filesMain.push('scripts/main/istrusted_main.js')
+        }
+        if (allProjects[projectByURL.get(getDomainWithoutSubdomain(details.url))]?.needAlert?.()) {
+            filesIsolated.push('scripts/main/alert_isolated.js')
+            filesMain.push('scripts/main/alert_main.js')
         }
     } else if (details.url.match(/hcaptcha.com\/captcha\/*/)
             || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/)
@@ -580,28 +586,35 @@ chrome.webNavigation.onCommitted.addListener(async function(details) {
             || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/)
             || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)
             || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
-        files.push('scripts/main/visible.js')
+        filesMain.push('scripts/main/visible.js')
+        filesIsolated.push('scripts/main/alert_isolated.js')
+        filesMain.push('scripts/main/alert_main.js')
     }
 
-    if (files.length === 0) return
+    if (!filesIsolated.length && !filesMain.length) return
 
-    try {
-        if (details.frameId === 0) {
-            // noinspection JSCheckFunctionSignatures
-            await chrome.scripting.executeScript({target: {tabId: details.tabId}, files, world: 'MAIN', injectImmediately: true})
-        } else {
-            // noinspection JSCheckFunctionSignatures
-            await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files, world: 'MAIN', injectImmediately: true})
-        }
-    } catch (error) {
-        if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
-            project = await db.get('projects', project.key)
-            console.error(getProjectPrefix(project, true), error.message)
-            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
-            project.error = error.message
-            delete project.nextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
-            updateValue('projects', project)
-        }
+    let target = {tabId: details.tabId}
+    if (details.frameId) target.frameIds = [details.frameId]
+
+    if (filesIsolated.length) {
+        (async() => {
+            try {
+                // noinspection JSCheckFunctionSignatures
+                await chrome.scripting.executeScript({target, files: filesIsolated, injectImmediately: true})
+            } catch (error) {
+                catchTabError(error, project)
+            }
+        })()
+    }
+    if (filesMain.length) {
+        (async() => {
+            try {
+                // noinspection JSCheckFunctionSignatures
+                await chrome.scripting.executeScript({target, files: filesMain, world: 'MAIN', injectImmediately: true})
+            } catch (error) {
+                catchTabError(error, project)
+            }
+        })()
     }
 })
 
@@ -650,9 +663,12 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         try {
             if (allProjects[project.rating]?.needPrompt?.()) {
                 const funcPrompt = function(nick) {
-                    prompt = function() {
-                        return nick
-                    }
+                    // noinspection JSUnusedLocalSymbols
+                    window.prompt = new Proxy(window.prompt, {
+                        apply(target, thisArg, argArray) {
+                            return nick
+                        }
+                    })
                 }
                 await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func: funcPrompt, args: [project.nick]})
             }
@@ -680,14 +696,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project, settings})
         } catch (error) {
-            if (error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal') && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
-                project = await db.get('projects', project.key)
-                console.error(getProjectPrefix(project, true), error.message)
-                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
-                project.error = error.message
-                delete project.nextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
-                updateValue('projects', project)
-            }
+            catchTabError(error, project)
         }
     } else if (details.frameId !== 0 && (
         details.url.match(/hcaptcha.com\/captcha\/*/)
@@ -726,21 +735,25 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             if (tab.status !== 'complete') return
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project, settings})
         } catch (error) {
-            if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
-                project = await db.get('projects', project.key)
-                let message = error.message
-                if (message.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
-                    message += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
-                }
-                console.error(getProjectPrefix(project, true), error.message)
-                if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
-                project.error = message
-                delete project.nextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
-                updateValue('projects', project)
-            }
+            catchTabError(error, project)
         }
     }
 })
+
+async function catchTabError(error, project) {
+    if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
+        project = await db.get('projects', project.key)
+        let message = error.message
+        if (message.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
+            message += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
+        }
+        console.error(getProjectPrefix(project, true), error.message)
+        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
+        project.error = message
+        delete project.nextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
+        updateValue('projects', project)
+    }
+}
 
 chrome.tabs.onRemoved.addListener(async function(tabId) {
     await initializeFunc
@@ -953,11 +966,13 @@ async function onRuntimeMessage(request, sender, sendResponse) {
     }
 
     let project = openedProjects.get(sender.tab.id)
-    if (request.captcha || request.authSteam || request.discordLogIn || request.auth || request.requiredConfirmTOS || (request.errorCaptcha && !request.restartVote)) {//Если требует ручное прохождение капчи
+    if (request.captcha || request.authSteam || request.discordLogIn || request.auth || request.requiredConfirmTOS || (request.errorCaptcha && !request.restartVote) || request.restartVote === false) {//Если требует ручное прохождение капчи
         project = await db.get('projects', project.key)
         let message
         if (request.captcha) {
             message = chrome.i18n.getMessage('requiresCaptcha')
+        } else if (request.message) {
+            message = request.message
         } else {
             if (Object.values(request)[0] !== true) {
                 message = chrome.i18n.getMessage(Object.keys(request)[0], Object.values(request)[0])

@@ -1,3 +1,6 @@
+let resolveProject, waitProject
+if (!waitProject) waitProject = new Promise(resolve => resolveProject = resolve)
+
 //Фикс-костыль двойной загрузки (для Rocket Loader)
 if (!window.loaded) {
     window.loaded = true
@@ -5,21 +8,24 @@ if (!window.loaded) {
     run()
 }
 
-let resolveProject
-const waitProject = new Promise(resolve => resolveProject = resolve)
-
-chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
-    if (request.sendProject) {
-        window.proj = request.project
-        if (request.vkontakte) window.vkontakte = request.vkontakte
-        resolveProject()
-    } else if (request === 'captchaPassed') {
-        // noinspection JSIgnoredPromiseFromCall
-        startVote(false)
-    }
-})
-
 async function run() {
+    chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
+        if (request.sendProject) {
+            window.proj = request.project
+            if (request.vkontakte) window.vkontakte = request.vkontakte
+            resolveProject()
+        } else if (request === 'captchaPassed') {
+            // noinspection JSIgnoredPromiseFromCall
+            startVote(false)
+        }
+    })
+
+    if (window.portAlert) {
+        window.portAlert.addEventListener('state', event => {
+            chrome.runtime.sendMessage({message: event.detail.message})
+        })
+    }
+
     try {
         //Если мы находимся на странице авторизации Steam
         if (document.URL.startsWith('https://steamcommunity.com/openid/login')) {
@@ -202,7 +208,8 @@ async function run() {
                 break
             }
         }
-        startVote(true)
+
+        await startVote(true)
     } catch (e) {
         throwError(e)
         return
@@ -238,16 +245,23 @@ async function run() {
 }
 
 async function startVote(first) {
-    const timer3 = setInterval(async ()=>{
-        if (typeof vote === 'function' && window.proj != null) {
-            clearInterval(timer3)
-            try {
-                await vote(first)
-            } catch (e) {
-                throwError(e)
-            }
-        }
-    }, 100)
+    // ыыы костыли? вроде не всегда второй скрипт вовремя загружается
+    if (typeof vote !== 'function') {
+        await new Promise(resolve => {
+            const timer3 = setInterval(()=> {
+                if (typeof vote === 'function') {
+                    clearInterval(timer3)
+                    resolve()
+                }
+            }, 100)
+        })
+    }
+
+    try {
+        await vote(first)
+    } catch (e) {
+        throwError(e)
+    }
 }
 
 async function getProject() {

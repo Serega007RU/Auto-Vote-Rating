@@ -10,6 +10,12 @@ chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/)
 })
 
 function run() {
+    if (window.portAlert) {
+        window.portAlert.addEventListener('state', event => {
+            chrome.runtime.sendMessage({message: event.detail.message, ignoreReport: true})
+        })
+    }
+
     if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) {
         const timer1 = setInterval(()=>{
             // noinspection CssInvalidHtmlTagReference

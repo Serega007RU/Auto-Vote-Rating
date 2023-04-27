@@ -26,6 +26,7 @@
     })
 
     /* focus */
+    // noinspection JSUnusedLocalSymbols
     Document.prototype.hasFocus = new Proxy(Document.prototype.hasFocus, {
         apply(target, self, args) {
             return true
