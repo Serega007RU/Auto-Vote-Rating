@@ -4,11 +4,11 @@ async function vote(first) {
         chrome.runtime.sendMessage({successfully: true})
     } else if (document.querySelector('.container h1.sp-title')?.nextElementSibling?.nextSibling?.textContent.includes('succesfully voted') || document.querySelector('.container h1.sp-title')?.nextElementSibling?.nextSibling?.textContent.includes('successfully voted')) {
         chrome.runtime.sendMessage({successfully: true})
-    } else if (document.querySelector('div.alert-warning') != null && (document.querySelector('div.alert-warning').textContent.includes('You can only vote once') || document.querySelector('div.alert-warning').textContent.includes('already voted'))) {
+    } else if (document.querySelector('div.alert-warning') && (document.querySelector('div.alert-warning').textContent.includes('You can only vote once') || document.querySelector('div.alert-warning').textContent.includes('already voted'))) {
         chrome.runtime.sendMessage({later: Date.now() + 43200000})
         //ToDo <Serega007> а зачем нам говорить сколько осталось до следующего голосования? Нееет, мы по тупому просто напишем 12 часов и пошлём нафиг, зачем это нужно ServerPact'у?
-    } else if (document.querySelector('div.alert-warning') != null) {
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert-warning').textContent})
+    } else if (document.querySelector('div.alert-warning')) {
+        chrome.runtime.sendMessage({message: document.querySelector('div.alert-warning').innerText.trim()})
     } else {
         //Отправка запроса на прохождение капчи (мы типо прошли капчу)
         await fetch('https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php', {

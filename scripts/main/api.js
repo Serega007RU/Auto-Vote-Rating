@@ -161,7 +161,7 @@ async function run() {
         }
 
         //Если мы находимся на странице проверки CloudFlare https://i.imgur.com/BVk3z6y.png
-        if (document.querySelector('div.main-wrapper div.main-content #challenge-body-text')) {
+        if (document.querySelector('div.main-wrapper div.main-content #challenge-body-text') || document.querySelector('div.main-wrapper div.main-content #challenge-running')) {
             return
         }
 
