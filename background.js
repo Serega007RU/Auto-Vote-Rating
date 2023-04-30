@@ -245,6 +245,7 @@ function checkOpen(project/*, transaction*/) {
 }
 
 let promiseGroup
+let promiseWindow
 //Открывает вкладку для голосования или начинает выполнять fetch запросы
 async function newWindow(project) {
     //Ожидаем очистку куки
@@ -322,12 +323,9 @@ async function newWindow(project) {
         db.put('other', openedProjects, 'openedProjects')
         silentVote(project)
     } else {
-        const windows = await chrome.windows.getAll()
-            .catch(error => console.warn(chrome.i18n.getMessage('errorOpenTab', error.message)))
-        if (windows == null || windows.length <= 0) {
-            const window = await chrome.windows.create({focused: false})
-            await chrome.windows.update(window.id, {focused: false})
-        }
+        await promiseWindow
+        promiseWindow = checkWindow()
+        await promiseWindow
 
         const url = allProjects[project.rating].voteURL(project)
 
@@ -342,57 +340,52 @@ async function newWindow(project) {
         db.put('other', openedProjects, 'openedProjects')
 
         if (notSupportedGroupTabs) return
-        await group()
-        async function group() {
-            if (groupId) {
-                try {
-                    await chrome.tabs.group({groupId, tabIds: tab.id})
-                } catch (error) {
-                    if (error.message.includes('No tab with id')) return
-                    if (error.message.includes('No group with id')) {
-                        groupId = await chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id})
-                        await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
-                    } else {
-                        console.warn(error.message)
-                    }
-                }
+        try {
+            await promiseGroup
+            promiseGroup = groupTabs(tab)
+            await promiseGroup
+        } catch (error) {
+            notSupportedGroupTabs = true
+            console.warn(chrome.i18n.getMessage('notSupportedGroupTabs'), error.message)
+        }
+    }
+}
+
+async function checkWindow() {
+    const windows = await chrome.windows.getAll()
+        .catch(error => console.warn(chrome.i18n.getMessage('errorOpenTab', error.message)))
+    if (!windows?.length) {
+        const window = await chrome.windows.create({focused: false})
+        await chrome.windows.update(window.id, {focused: false})
+    }
+}
+
+async function groupTabs(tab) {
+    // С начало ищем группу вкладок
+    if (groupId == null) {
+        const groups = await chrome.tabGroups.query({title: 'Auto Vote Rating'})
+        if (groups.length) groupId = groups[0].id
+    }
+
+    // Потом пробуем сгруппировать если нашли группу
+    if (groupId != null) {
+        try {
+            await chrome.tabs.group({groupId, tabIds: tab.id})
+            return
+        } catch (error) {
+            if (!error.message.includes('No tab with id') && !error.message.includes('No group with id')) {
+                throw error
             }
         }
-        if (!groupId) {
-            if (promiseGroup) {
-                await promiseGroup
-                await group()
-                return
-            }
-            promiseGroup = createGroup()
-            async function createGroup() {
-                let groups
-                try {
-                    groups = await chrome.tabGroups.query({title: 'Auto Vote Rating'})
-                } catch (error) {
-                    notSupportedGroupTabs = true
-                    console.warn(chrome.i18n.getMessage('notSupportedGroupTabs'), error.message)
-                    promiseGroup = null
-                    return
-                }
-                if (groups.length > 0) {
-                    groupId = groups[0].id
-                    await group()
-                } else {
-                    try {
-                        groupId = await chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id})
-                        await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
-                    } catch (error) {
-                        if (error.message.includes('No tab with id')) {
-                            promiseGroup = null
-                            return
-                        }
-                        notSupportedGroupTabs = true
-                        console.warn(chrome.i18n.getMessage('notSupportedGroupTabs'), error.message)
-                    }
-                }
-                promiseGroup = null
-            }
+    }
+
+    // Если мы не нашли групп или не смогли сгруппировать так как нет уже такой группы, то только тогда создаём эту группу
+    try {
+        groupId = await chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id})
+        await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
+    } catch (error) {
+        if (!error.message.includes('No tab with id') && !error.message.includes('No group with id')) {
+            throw error
         }
     }
 }
