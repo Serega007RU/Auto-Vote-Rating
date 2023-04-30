@@ -130,6 +130,15 @@ function run() {
                 clearInterval(timer5)
             }
         }, 1000)
+
+        // Если ошибка в капче https://i.imgur.com/EqEJoMr.png
+        const timer9 = setInterval(() => {
+            const status = document.querySelector('#status')
+            if (status && status.style.display !== 'none' && status.innerText.length > 3) {
+                chrome.runtime.sendMessage({errorCaptcha: status.innerText})
+                clearInterval(timer9)
+            }
+        }, 1000)
     } else if (window.location.href.match(/https:\/\/challenges.cloudflare.com\/*/)) {
         //Если требуется ручное прохождение капчи CloudFlare
         const timer7 = setInterval(()=> {

@@ -47,6 +47,27 @@ async function silentVoteLoliLand(project) {
                 }
                 const milliseconds = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000)
                 endVote({later: Date.now() + milliseconds}, null, project)
+            } else if (json?.data?.type && json?.data?.error) {
+                switch (json.data.error) {
+                    case 0:
+                        endVote({message: 'Ошибка с кодом 0, Текущая сессия истекла'}, null, project)
+                        break
+                    case 1:
+                        endVote({message: 'Ошибка с кодом 1, Не выполнены условия для получения бонуса, Вы не привязали свой аккаунт к VK! Подробнее https://loliland.ru/bonus'}, null, project)
+                        break
+                    case 2:
+                        endVote({message: 'Ошибка с кодом 2, Не выполнены условия для получения бонуса, Вы не подписаны на нашу группу в VK! Подробнее https://loliland.ru/bonus'}, null, project)
+                        break
+                    case 3:
+                        endVote({message: 'Ошибка с кодом 3, Расширение не может посчитать время до следующего голосования? Сообщите об этой ошибке разработчику расширения!', html: event.data, url: socket.url}, null, project)
+                        break
+                    case 4:
+                        endVote({message: 'Ошибка с кодом 4, Обновление баланса не завершилась успешно, попробуйте еще раз!'}, null, project)
+                        break
+                    default:
+                        endVote({message: event.data, html: event.data, url: socket.url}, null, project)
+                        break
+                }
             } else {
                 endVote({message: event.data, html: event.data, url: socket.url}, null, project)
             }

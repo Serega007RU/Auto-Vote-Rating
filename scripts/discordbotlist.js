@@ -76,7 +76,7 @@ const timer2 = setInterval(()=>{
 
 const timer3 = setInterval(()=>{
     try {
-        if (document.querySelector('div[role="status"]').children.length > 0) {
+        if (document.querySelector('div[role="status"]')?.children.length > 0) {
             clearTimeout(timer3)
             let request = {}
             for (const el of document.querySelector('.toasted-container').children) {
