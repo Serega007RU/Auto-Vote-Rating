@@ -80,6 +80,9 @@ async function vote(first) {
         return
     }
 
+    //Соглашаемся с Privacy Policy
+    if (document.querySelector('#accept')) document.querySelector('#accept').checked = true
+
     //Если требуется авторизация Steam
     if (document.querySelector('form[name="steam_form"] > input[type="image"]') != null) {
         document.querySelector('form[name="steam_form"] > input[type="image"]').click()
@@ -95,9 +98,6 @@ async function vote(first) {
         document.querySelector('a.btn[title="Vote for this server"]').click()
         return
     }
-
-    //Соглашаемся с Privacy Policy
-    document.getElementById('accept').checked = true
 
     const project = await getProject('ListForge', true)
     //Вводим ник если он существует
