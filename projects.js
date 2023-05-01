@@ -1590,3 +1590,10 @@ function extractHostname(url) {
 
     return hostname
 }
+
+// Удалённая конфигурация расширения
+if (self.settings && self.db && !settings.disabledSendErrorSentry && (!self.settings.enabledReportTimeout || !self.settings.enabledReportTooManyAttempts)) {
+    settings.enabledReportTimeout = true
+    settings.enabledReportTooManyAttempts = true
+    db.put('other', settings, 'settings')
+}

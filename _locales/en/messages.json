@@ -1087,5 +1087,8 @@
   },
   "requiredConfirmTOS": {
     "message": "The site requires you to confirm something"
+  },
+  "tooManyVoteAttempts": {
+    "message": "There have been too many voting attempts at a time, it seems something has broken. Inform the extension developer about this error"
   }
 }
