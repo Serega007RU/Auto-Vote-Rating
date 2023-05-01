@@ -1415,6 +1415,14 @@ var allProjects = {
         URL: () => 'minecraftsurvivalservers.net',
         parseURL: (url) => ({id: url.pathname.split('/')[2]})
     },
+    TopServersCom: {
+        voteURL: (project) => 'https://topservers.com/' + project.id + '#vote',
+        pageURL: (project) => 'https://topservers.com/' + project.id,
+        projectName: (doc) => doc.querySelector('h1[itemprop="name"]').textContent,
+        exampleURL: () => ['https://topservers.com/', 'minecraft-server-hypixel.3368', '#vote'],
+        URL: () => 'topservers.com',
+        parseURL: (url) => ({id: url.pathname.split('/')[1]})
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1561,6 +1569,7 @@ var projectByURL = new Map([
     ['mcservers.top', 'MCServersTOP'],
     ['discadia.com', 'Discadia'],
     ['minecraftsurvivalservers.net', 'MinecraftSurvivalServers'],
+    ['topservers.com', 'TopServersCom'],
     ['Custom', 'Custom']
 ])
 
