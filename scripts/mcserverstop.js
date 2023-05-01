@@ -6,7 +6,7 @@ async function vote(first) {
 
     if (checkAnswer()) return
 
-    document.querySelector('div.like.votebtn').click()
+    document.querySelector('.like.votebtn').click()
 }
 
 const timer = setInterval(() => {
@@ -16,14 +16,17 @@ const timer = setInterval(() => {
 }, 1000)
 
 function checkAnswer() {
-    const message = document.querySelector('div.like.votebtn').textContent
-    if (message.includes('Vote for the server')) {
-        return false
-    } else if (message.includes('vote has been counted')) {
-        chrome.runtime.sendMessage({successfully: true})
-        return true
-    } else {
-        chrome.runtime.sendMessage({message})
-        return true
+    const message = document.querySelector('.like.votebtn')?.textContent
+    if (message) {
+        if (message.includes('Vote for the server')) {
+            return false
+        } else if (message.includes('vote has been counted')) {
+            chrome.runtime.sendMessage({successfully: true})
+            return true
+        } else {
+            chrome.runtime.sendMessage({message})
+            return true
+        }
     }
+    return false
 }

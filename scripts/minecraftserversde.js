@@ -1,14 +1,18 @@
 async function vote(first) {
     if (document.querySelector('div.alert.alert-error')) {
-        const message = document.querySelector('div.alert.alert-error').innerText
-        if (message.includes('Du hast bereits innerhalb der letzten')) {
+        const request = {}
+        request.message = document.querySelector('div.alert.alert-error').innerText
+        if (request.message.includes('Du hast bereits innerhalb der letzten')) {
             const later = Date.now() + 86400000
             chrome.runtime.sendMessage({later})
             return
-        } else if (message.includes('Captcha ist nicht valid')) {
+        } else if (request.message.includes('Captcha ist nicht valid')) {
             // None
         } else {
-            chrome.runtime.sendMessage({message})
+            if (request.message.includes('hatten ein Problem, deinen Vote an den Server zu senden')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
             return
         }
     }
