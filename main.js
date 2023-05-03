@@ -8,9 +8,11 @@ var generalStats
 // noinspection ES6ConvertVarToLetConst
 var todayStats
 //Оновная база данных
-let db
+// noinspection ES6ConvertVarToLetConst
+var db
 //База данных логов
-let dbLogs
+// noinspection ES6ConvertVarToLetConst
+var dbLogs
 //Текущие открытые вкладки расширением
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()

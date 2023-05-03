@@ -1601,8 +1601,10 @@ function extractHostname(url) {
 }
 
 // Удалённая конфигурация расширения
-if (self.settings && self.db && !settings.disabledSendErrorSentry && (!self.settings.enabledReportTimeout || !self.settings.enabledReportTooManyAttempts)) {
-    settings.enabledReportTimeout = true
+if (typeof settings !== 'undefined' && settings.disabledNotifStart != null && !settings.disabledSendErrorSentry && (!settings.enabledReportTimeout || !settings.enabledReportTooManyAttempts)) {
+    settings.enabledReportTimeout = false
     settings.enabledReportTooManyAttempts = true
-    db.put('other', settings, 'settings')
+    if (typeof db !== 'undefined') {
+        db.put('other', settings, 'settings')
+    }
 }
