@@ -5,6 +5,17 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('#id_spinner')) {
+        await new Promise(resolve => {
+            const timer = setInterval(() => {
+                if (!document.querySelector('#id_spinner')) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 1000)
+        })
+    }
+
     if (document.body.innerText.trim().length < 150 && document.body.innerText.trim().includes('Loading...')) {
         return
     }

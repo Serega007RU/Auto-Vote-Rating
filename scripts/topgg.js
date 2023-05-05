@@ -7,6 +7,12 @@ async function vote(first) {
         return
     }
 
+    const login2 = findElement('a', ['login'])
+    if (login2 != null) {
+        login2.click()
+        return
+    }
+
     let countAlreadyVoted = 0
     const timer1 = setInterval(() => {
         try {
