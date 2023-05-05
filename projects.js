@@ -643,8 +643,8 @@ var allProjects = {
     },
     MinecraftKrant: {
         voteURL: (project) => 'https://www.minecraftkrant.nl/serverlijst/' + project.id,
-        pageURL: (project) => 'https://www.minecraftkrant.nl/serverlijst/' + project.id,
-        projectName: (doc) => doc.querySelector('div.inner-title').firstChild.textContent.trim(),
+        pageURL: (project) => 'https://www.minecraftkrant.nl/serverlijst/' + project.id + '/vote',
+        projectName: (doc) => doc.querySelector('div.s_HeadTitle').innerText,
         exampleURL: () => ['https://www.minecraftkrant.nl/serverlijst/', 'torchcraft', ''],
         URL: () => 'minecraftkrant.nl',
         parseURL: (url) => ({id: url.pathname.split('/')[2]})

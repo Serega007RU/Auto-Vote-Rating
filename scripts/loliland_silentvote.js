@@ -75,7 +75,9 @@ async function silentVoteLoliLand(project) {
     }
 
     socket.onclose = function(event) {
-        endVote({message: 'Соединение с веб сокетом прервано сервером, ' + event.code + ' ' + event.reason, url: socket.url}, null, project)
+        if (!event.wasClean) {
+            endVote({message: 'Соединение с веб сокетом прервано сервером, ' + event.code + ' ' + event.reason, url: socket.url}, null, project)
+        }
     }
 
     socket.onerror = function(error) {

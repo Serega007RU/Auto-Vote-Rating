@@ -5,6 +5,17 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('#id_spinner')) {
+        await new Promise(resolve => {
+            const timer = setInterval(() => {
+                if (!document.querySelector('#id_spinner')) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 1000)
+        })
+    }
+
     if (document.body.innerText.trim().length < 150 && document.body.innerText.trim().includes('Loading...')) {
         return
     }
@@ -25,16 +36,19 @@ async function vote(first) {
     }
     if (document.querySelector('body > div.ui-pnotify')) {
         const request = {}
-        request.message = document.querySelector('body > div.ui-pnotify').textContent
+        request.message = document.querySelector('body > div.ui-pnotify').innerText
         if (request.message.includes('Голос принят') || request.message.includes('vote accepted')) {
             chrome.runtime.sendMessage({successfully: true})
+            return
+        } else if (request.message.includes('Signed in successfully')) {
+            // None
         } else {
             if (request.message.includes('Quaptcha check fail')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)
+            return
         }
-        return
     }
     if (document.querySelector('body > h1[align="center"]') && document.body.innerText.trim().length < 200) {
         chrome.runtime.sendMessage({

@@ -3,13 +3,14 @@ async function vote(/*first*/) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
-    if (document.querySelector('div.ui.negative.message')) {
-        const text = document.querySelector('div.ui.negative.message').textContent
-        if (text.includes(' already voted')) {
+    if (document.querySelector('div.ui.negative.message:last-of-type') || document.querySelector('div.ui.negative.message')) {
+        const error = document.querySelector('div.ui.negative.message:last-of-type') || document.querySelector('div.ui.negative.message')
+        const message = error.innerText
+        if (message.includes(' already voted')) {
             chrome.runtime.sendMessage({later: true})
             return
-        } else if (!text.includes('Internet Explorer')) {
-            chrome.runtime.sendMessage({message: text})
+        } else if (!message.includes('Internet Explorer')) {
+            chrome.runtime.sendMessage({message})
             return
         }
     }

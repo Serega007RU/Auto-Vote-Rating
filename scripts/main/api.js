@@ -201,6 +201,15 @@ async function checkAll(first) {
         return
     }
 
+    // Если ошибка 5xx https://i.imgur.com/aO5H1k8.png
+    if (document.querySelector('div#cf-wrapper div#cf-error-details')) {
+        const request = {}
+        request.message = document.querySelector('div#cf-wrapper div#cf-error-details h1')?.innerText + ' ' + document.querySelector('div#cf-wrapper div#cf-error-details > div > div.clearfix').innerText
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     if (document.querySelector('body > center > h1') && (document.querySelector('body > center:last-of-type')?.textContent.includes('cloudflare') || document.querySelector('body > center:last-of-type')?.textContent.includes('nginx'))) {
         const request = {}
         request.message = document.body.innerText
@@ -291,14 +300,15 @@ function throwError(error) {
     }
 
     const siteText = document.body.innerText.trim()
-    if (siteText.length === 0) {
-        request.emptySite = true
-    } else {
+    // TODO временные меры против mmotop.ru
+    // if (siteText.length === 0) {
+    //     request.emptySite = true
+    // } else {
         request.errorVoteNoElement = message + (siteText.length < 300 ? ' ' + siteText : '')
         if (document.location.pathname === '/' && document.location.search === '') {
             ignoreReport = true
         }
-    }
+    // }
 
     if (document.querySelector('html')?.classList.contains('translated-ltr') || (document.querySelector('[_msttexthash]') && document.querySelector('[_msthash]'))) {
         ignoreReport = true

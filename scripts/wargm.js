@@ -57,6 +57,7 @@ async function vote() {
     }, 1000)
 }
 
+let voted = false
 const timer = setInterval(async ()=>{
     try {
         if (document.querySelector('div.MsgBox .g-recaptcha')) return
@@ -77,8 +78,14 @@ const timer = setInterval(async ()=>{
             } else if (request.message.includes('Авторизация')) {
                 clearInterval(timer)
                 chrome.runtime.sendMessage({auth: true})
-            } else if (request.message === 'Успешно' || request.message.includes('In process...')) {
+            } else if (request.message.includes('In process...')) {
                 // None
+            } else if (request.message === 'Успешно') {
+                if (!voted) {
+                    voted = true
+                    // noinspection ES6MissingAwait
+                    vote()
+                }
             } else {
                 if (request.message.includes('Сервис временно недоступен') || request.message.includes('Страница устарела') || request.message === 'Ошибка' || (request.message.includes('Запрос отклонен') && request.message.includes('Поступило слишком много запросов')) || request.message.includes('Важные документы')) {
                     request.ignoreReport = true
