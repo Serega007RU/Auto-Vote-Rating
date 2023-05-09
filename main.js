@@ -8,19 +8,28 @@ var generalStats
 // noinspection ES6ConvertVarToLetConst
 var todayStats
 //Оновная база данных
-let db
+// noinspection ES6ConvertVarToLetConst
+var db
 //База данных логов
-let dbLogs
+// noinspection ES6ConvertVarToLetConst
+var dbLogs
 //Текущие открытые вкладки расширением
 // noinspection ES6ConvertVarToLetConst
 var openedProjects = new Map()
+let onLine
 
-self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
+self.addEventListener('error', (event) => onUnhandledError(event.error.stack))
+self.addEventListener('unhandledrejection', (event) => onUnhandledError(event.reason.stack))
+function onUnhandledError(error) {
+    if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
+        createNotif(error, 'error', null, null, true)
+        document.querySelectorAll('button[disabled]').forEach((el) => el.disabled = false)
+    }
     if (!dbLogs) return
     const time = new Date().toLocaleString().replace(',', '')
-    const log = '[' + time + ' ERROR]: ' + errorMsg + ' at ' + url + ':' + lineNumber
+    const log = '[' + time + ' ERROR]: ' + error
     try {
-        dbLogs.add('logs', log).catch(e => {
+        dbLogs.put('logs', log).catch(e => {
             if (console._error) console._error(e)
             else console.error(e)
         })
@@ -28,21 +37,7 @@ self.addEventListener('onerror', (errorMsg, url, lineNumber) => {
         if (console._error) console._error(e)
         else console.error(e)
     }
-})
-self.addEventListener('onunhandledrejection', (event) => {
-    if (!dbLogs) return
-    const time = new Date().toLocaleString().replace(',', '')
-    const log = '[' + time + ' ERROR]: ' + event.reason.stack
-    try {
-        dbLogs.add('logs', log).catch(e => {
-            if (console._error) console._error(e)
-            else console.error(e)
-        })
-    } catch (e) {
-        if (console._error) console._error(e)
-        else console.error(e)
-    }
-})
+}
 
 //Инициализация настроек расширения
 async function initializeConfig(background, version) {
@@ -54,47 +49,67 @@ async function initializeConfig(background, version) {
         })
     }
     // noinspection JSUnusedGlobalSymbols
-    db = await idb.openDB('avr', 100, {upgrade})
+    try {
+        db = await idb.openDB('avr', version ? version : 12, {upgrade})
+    } catch (error) {
+        //На случай если это версия MultiVote
+        if (error.name === 'VersionError') {
+            if (version) {
+                dbError({target: {source: {name: 'avr'}}, error: error})
+                return
+            }
+            console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
+            await initializeConfig(background, 120)
+            return
+        }
+        dbError({target: {source: {name: 'avr'}}, error: error})
+        return
+    }
     db.onerror = (event) => dbError(event, false)
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {
         if (background) {
-            if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error)
+            if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error.message)
             if (logs) {
-                console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
+                console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error.message]))
             } else {
-                console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]))
+                console.error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error.message]))
             }
         } else {
-            createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error]), 'error')
+            createNotif(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error.message]), 'error')
         }
     }
     settings = await db.get('other', 'settings')
     generalStats = await db.get('other', 'generalStats')
     todayStats = await db.get('other', 'todayStats')
+    openedProjects = await db.get('other', 'openedProjects')
+    onLine = await db.get('other', 'onLine')
 
     if (!background) return
-    console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 
-    // if (settings && !settings.disabledCheckTime) checkTime()
+    if (state !== 'activated') {
+        console.log(chrome.i18n.getMessage('start', chrome.runtime.getManifest().version))
 
-    openedProjects = await db.get('other', 'openedProjects')
-    if (openedProjects.size > 0) {
-        for (const key of openedProjects.keys()) {
-            openedProjects.delete(key)
-            chrome.tabs.remove(key)
+        if (openedProjects.size > 0) {
+            for (const [key, value] of openedProjects) {
+                openedProjects.delete(key)
+                // noinspection ES6MissingAwait
+                tryCloseTab(key, value, 0)
+            }
+            await db.put('other', openedProjects, 'openedProjects')
         }
-        await db.put('other', openedProjects, 'openedProjects')
-    }
 
-    checkVote()
+        // noinspection ES6MissingAwait
+        checkVote()
+    }
 }
 
 async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion == null) oldVersion = 1
 
     if (oldVersion !== newVersion) {
-        if (typeof createNotif !== 'undefined') {
+        if (self.createNotif) {
+            // noinspection ES6MissingAwait
             createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
         } else {
             console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
@@ -119,15 +134,19 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             disabledNotifWarn: false,
             disabledNotifError: false,
             enabledSilentVote: true,
-            disabledCheckTime: false,
             disabledCheckInternet: false,
             disabledOneVote: false,
+            disabledRestartOnTimeout: false,
             disabledFocusedTab: false,
             enableCustom: false,
-            timeout: 1000,
-            timeoutError: 0,
+            timeout: 10000,
+            timeoutError: 900000,
+            timeoutVote: 900000,
             disabledWarnCaptcha: false,
             debug: false,
+            disabledUseRemoteCode: false,
+            disabledSendErrorSentry: false,
+            expertMode: false,
             proxyBlackList: ["*vk.com", "*minecraftrating.ru", "*captcha.website", "*hcaptcha.com", "*cloudflare.com", "<local>"],
             stopVote: 0,
             autoAuthVK: false,
@@ -142,7 +161,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             useProxyOnUnProxyTop: false,
             useProxyPacScript: false,
             proxyPacScript:
-`function FindProxyForURL(url, host) {
+                `function FindProxyForURL(url, host) {
     return "HTTPS $ip$:$port$";
 }`
         }
@@ -167,6 +186,8 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         await other.add(generalStats, 'generalStats')
         await other.add(todayStats, 'todayStats')
         await other.add(openedProjects, 'openedProjects')
+        onLine = true
+        other.add(onLine, 'onLine')
         return
     }
 
@@ -301,6 +322,17 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion <= 9 || oldVersion <= 90) {
         openedProjects = new Map()
         await transaction.objectStore('other').put(openedProjects, 'openedProjects')
+    }
+
+    if (oldVersion <= 10) {
+        settings = await transaction.objectStore('other').get('settings')
+        settings.timeoutVote = 900000
+        await transaction.objectStore('other').put(settings, 'settings')
+    }
+
+    if (oldVersion <= 11) {
+        onLine = true
+        await transaction.objectStore('other').put(onLine, 'onLine')
     }
 
     if (!todayStats) {

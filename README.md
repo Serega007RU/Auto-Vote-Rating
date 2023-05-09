@@ -117,11 +117,16 @@
 <a href="https://servidoresdeminecraft.es/">servidoresdeminecraft.es</a>  
 <a href="https://minecraftsurvivalservers.com/">minecraftsurvivalservers.com</a>  
 <a href="https://minecraft.global/">minecraft.global</a>
+<a href="https://ru.warface.com/bonus/">warface.com</a>
+<a href="https://www.curseforge.com/servers/">curseforge.com</a>
+<a href="https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481">hoyolab.com</a>
+<a href="https://trackingservers.cloud/">trackingservers.cloud</a>
+<a href="https://mclist.io/">mclist.io</a>
 </details>
 
 ## Install the extension from zip archive
 Here is a short guide how to install an unpacked extension on Google Chrome or Chromium-based browsers
-1. [Download](https://gitlab.com/Serega007/Auto-Vote-Rating/-/archive/multivote/Auto-Vote-Rating-multivote.zip) this repository
+1. [Download](https://github.com/Serega007RU/Auto-Vote-Rating/archive/refs/heads/multivote.zip) this repository
 2. Unzip the archive to any convenient location
 3. Open the "Extensions" page `chrome://extensions/` in the browser and turn on the "Developer mode"
 
@@ -132,7 +137,6 @@ Here is a short guide how to install an unpacked extension on Google Chrome or C
 
 ## Libraries used
 ### [IDB](https://github.com/jakearchibald/idb)
+### [LinkeDOM](https://github.com/WebReflection/linkedom) (also [Polyfill](https://github.com/regseb/castkodi/tree/main/src/polyfill))
+[//]: # (### [eval5]&#40;https://github.com/bplok20010/eval5&#41; & [babel]&#40;https://github.com/babel/babel&#41; &#40;also [chrome-inject-eval]&#40;https://github.com/GrinZero/chrome-inject-eval&#41;&#41;)
 ### [JSZip](https://github.com/Stuk/jszip)
-[//]: # (### [LinkeDOM]&#40;https://github.com/WebReflection/linkedom&#41; version 0.14.21)
-[//]: # (### [Polyfill]&#40;https://github.com/regseb/castkodi/tree/mv3/src/polyfill&#41;)
-[//]: # (### [eval5]&#40;https://github.com/bplok20010/eval5&#41; &#40;also [chrome-inject-eval]&#40;https://github.com/GrinZero/chrome-inject-eval&#41;&#41;)

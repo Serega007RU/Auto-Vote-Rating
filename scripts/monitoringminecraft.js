@@ -11,11 +11,18 @@ async function vote(first) {
         const project = await getProject('MonitoringMinecraft')
         document.querySelector('input[name=player]').value = project.nick
         document.querySelector('input[value=Голосовать]').click()
-    } else if (document.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
-        chrome.runtime.sendMessage({later: true})
-    } else if (document.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
-        chrome.runtime.sendMessage({successfully: true})
     } else {
-        chrome.runtime.sendMessage({errorVoteNoElement: true})
+        const request = {}
+        request.message = document.querySelector('center').textContent
+        if (request.message.includes('Вы уже голосовали сегодня')) {
+            chrome.runtime.sendMessage({later: true})
+        } else if (request.message.includes('Вы успешно проголосовали!')) {
+            chrome.runtime.sendMessage({successfully: true})
+        } else {
+            if (request.message.includes('Ошибка подключения VK') || request.message.includes('Неправильное имя игрока')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
+        }
     }
 }

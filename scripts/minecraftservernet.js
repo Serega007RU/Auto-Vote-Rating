@@ -16,7 +16,7 @@ async function vote(first) {
     if (first) return
 
     const project = await getProject('MinecraftServerNet')
-    document.getElementById('mc_user').value = project.nick
+    if (document.getElementById('mc_user')) document.getElementById('mc_user').value = project.nick
     document.getElementById('rate-10').click()
-    document.querySelector('input[value="Confirm Vote"]').click()
+    document.querySelector('.btn.btn-vote[type="submit"]').click()
 }

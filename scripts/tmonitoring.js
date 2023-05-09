@@ -1,4 +1,8 @@
 async function vote(first) {
+    if (document.querySelector('#content')?.textContent.includes('Страница которую Вы запрашиваете не существует!')) {
+        chrome.runtime.sendMessage({message: document.querySelector('#content').textContent, ignoreReport: true})
+        return
+    }
     if (first) {
         document.querySelector('span[data-target="#voteModal"]').click()
         return
@@ -14,14 +18,22 @@ async function vote(first) {
 
 const timer = setInterval(()=>{
     try {
-        if (document.querySelector('div[class="message error"]') != null) {
-            clearInterval(timer)
-            if (document.querySelector('div[class="message error"]').textContent.includes('уже голосовали')) {
+        if (document.querySelector('div[class="message error"]')) {
+            const request = {}
+            request.message = document.querySelector('div[class="message error"]').textContent
+            if (request.message.includes('уже голосовали')) {
                 const numbers = document.querySelector('div[class="message error"]').textContent.match(/\d+/g).map(Number)
                 const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
                 chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+                clearInterval(timer)
             } else {
-                chrome.runtime.sendMessage({message: document.querySelector('div[class="message error"]').textContent})
+                if (!request.message.toLowerCase().includes('капча')) {
+                    if (request.message.includes('Ключи безопасности не совпадают')) {
+                        request.ignoreReport = true
+                    }
+                    chrome.runtime.sendMessage(request)
+                    clearInterval(timer)
+                }
             }
         } else if (document.querySelector('div[class="message success"]') != null) {
             chrome.runtime.sendMessage({successfully: true})

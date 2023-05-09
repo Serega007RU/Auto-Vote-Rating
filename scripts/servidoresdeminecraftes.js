@@ -7,10 +7,13 @@ async function vote(first) {
         const message = document.querySelector('div.alert-danger').textContent.trim()
         if (message.includes('has votado')) {
             chrome.runtime.sendMessage({later: true})
+            return
+        } else if (message.includes('captcha')) {
+            // None
         } else {
             chrome.runtime.sendMessage({message})
+            return
         }
-        return
     }
 
     if (first) return

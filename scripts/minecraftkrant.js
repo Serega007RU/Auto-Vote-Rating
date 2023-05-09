@@ -15,5 +15,5 @@ async function vote(first) {
 
     const project = await getProject('MinecraftKrant')
     document.querySelector('input[name="minecraft_name"]').value = project.nick
-    document.querySelector('input[value="Vote"]').click()
+    document.querySelector('input[value="Stem"]').click()
 }

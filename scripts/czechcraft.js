@@ -1,19 +1,24 @@
 async function vote(first) {
-    if (document.querySelector('div.alert.alert-danger') != null) {
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
+    if (document.querySelector('div.alert.alert-danger')) {
+        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent.trim()})
         return
     }
-    if (document.querySelector('div.alert.alert-error') != null) {
-        if (document.querySelector('div.alert.alert-error').textContent.includes('Již si hlasoval')) {
-            if (document.querySelector('div.alert.alert-error').textContent.match(/\d+/g)) {
-                const numbers = document.querySelector('div.alert.alert-error').textContent.match(/\d+/g).map(Number)
+    if (document.querySelector('div.alert.alert-error:last-of-type')) {
+        const request = {}
+        request.message = document.querySelector('div.alert.alert-error:last-of-type').textContent.trim()
+        if (request.message.includes('Již si hlasoval') || request.message.includes('Nyní nemůžeš hlasovat. Zkus to prosím znovu')) {
+            if (request.message.match(/\d+/g)) {
+                const numbers = request.message.match(/\d+/g).map(Number)
                 const date = new Date()
                 chrome.runtime.sendMessage({later: Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), numbers[0] - 2/*На czech-craft время указано в часовом поясе UTC +2*/, numbers[1], numbers[2])})
             } else {
                 chrome.runtime.sendMessage({later: true})
             }
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-error').textContent})
+            if (request.message.includes('Nastala chyba')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
         }
         return
     }

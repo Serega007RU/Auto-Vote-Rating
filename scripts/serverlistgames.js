@@ -1,6 +1,5 @@
 async function vote(first) {
-    if (document.querySelector('#alert_box') != null) {
-        analyseText(document.querySelector('#alert_box').textContent)
+    if (analyseText()) {
         return
     }
 
@@ -8,41 +7,46 @@ async function vote(first) {
 
     const project = await getProject('ServerListGames')
 
-    const script = document.createElement('script')
-    script.textContent = `
-        const textInputRef = document.querySelector('#username')
-        const valueSetter = Object.getOwnPropertyDescriptor(textInputRef, 'value').set;
-        const prototype = Object.getPrototypeOf(textInputRef);
-        const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
-        if (valueSetter && valueSetter !== prototypeValueSetter) {
-            prototypeValueSetter.call(textInputRef, "` + project.nick + `");
-        } else {
-            valueSetter.call(textInputRef, "` + project.nick + `");
-        }
-        textInputRef.dispatchEvent(new Event('input', { bubbles: true }));
-        document.querySelector('button.vote-button').click()
-        `
-    document.head.appendChild(script)
-    // document.querySelector('#username').value = project.nick
+    const textInputRef = document.querySelector('#username')
+    const prototype = Object.getPrototypeOf(textInputRef)
+    const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set
+    prototypeValueSetter.call(textInputRef, project.nick)
+    textInputRef.dispatchEvent(new Event('input', { bubbles: true }))
 
-    // document.querySelector('button.vote-button').click()
+    document.querySelector('button.vote-button').click()
 }
 
 const timer = setInterval(()=>{
-    if (document.querySelector('#toast-container') != null) {
-        analyseText(document.querySelector('#toast-container').textContent)
+    if (analyseText()) {
         clearInterval(timer)
     }
 }, 500)
 
-function analyseText(text) {
-    if (text.includes('have successfully cast your vote')) {
+function analyseText() {
+    const request = {}
+    if (document.querySelector('#alert_box')) {
+        request.message = document.querySelector('#alert_box').textContent
+    } else if (document.querySelector('#toast-container')) {
+        request.message = document.querySelector('#toast-container').textContent
+    } else if (document.querySelector("div.content h2")?.textContent.includes('Application error')) {
+        request.message = document.querySelector("div.content h2")?.textContent
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return true
+    } else {
+        return false
+    }
+    if (request.message.includes('have successfully cast your vote')) {
         chrome.runtime.sendMessage({successfully: true})
-    } else if (text.includes('You can vote again in') && /\d/.test(text)) {
-        const numbers = text.match(/\d+/g).map(Number)
+    } else if (request.message.includes('captcha is not valid')) {
+        // None
+        return false
+    } else if (request.message.includes('You can vote again in') && /\d/.test(request.message)) {
+        const numbers = request.message.match(/\d+/g).map(Number)
         const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
         chrome.runtime.sendMessage({later: Date.now() + milliseconds})
     } else {
-        chrome.runtime.sendMessage({message: text})
+        chrome.runtime.sendMessage(request)
     }
+    return true
 }

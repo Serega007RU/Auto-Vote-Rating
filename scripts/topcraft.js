@@ -10,14 +10,19 @@ async function vote(first) {
         }
     }
 
-    if (document.querySelector('#container > h1') != null) {
-        let message = document.querySelector('#container > h1').textContent
-        if (document.querySelector('#container > h1').nextElementSibling != null) {
-            message = message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
+    if (document.querySelector('#container > h1')) {
+        let request = {}
+        request.message = document.querySelector('#container > h1').textContent
+        if (document.querySelector('#container > h1').nextElementSibling) {
+            request.message = request.message + ' ' + document.querySelector('#container > h1').nextElementSibling.textContent
         }
-        chrome.runtime.sendMessage({message})
+        if (request.message.toLowerCase().includes('ошибка авторизации через социальную сеть')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
         return
     }
+
     const project = await getProject('TopCraft')
     //Авторизованы ли мы в аккаунте?
     if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
@@ -110,6 +115,19 @@ const timer = setInterval(()=>{
                 chrome.runtime.sendMessage({later: true})
             } else if (textContent.includes('за ваш голос') || textContent.includes('спасибо за голос') ||  textContent.includes('голос принят') || textContent.includes('голос засчитан') || textContent.includes('успех') || textContent.includes('успешн')) {
                 chrome.runtime.sendMessage({successfully: true})
+            } else if (
+                    textContent.includes('некорректный ник')
+                    || textContent.includes('ваш айпи находится в базе данных спамеров')
+                    || textContent.includes('ваш айпи попал в базу данных спамеров')
+                    || (textContent.includes('код ошибки') && textContent.includes('обновить страницу'))
+                    || textContent.includes('ошибка авторизации через социальную сеть')
+                    || textContent.includes('ошибка 500')
+                    || textContent === 'ошибка'
+                    || textContent.includes('капча временно не работает')
+                    || textContent.includes('аккаунт заблокирован')) {
+                chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent, ignoreReport: true})
+            } else if (textContent.includes('поставьте галочку в капче') || textContent.includes('обязательное поле')) {
+                return
             } else {
                 chrome.runtime.sendMessage({message: document.querySelectorAll('div[class=tooltip-inner]').item(0).textContent})
             }
@@ -127,7 +145,7 @@ const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
         if (entry.name === 'https://topcraft.ru/projects/vote/') {
             fixTimer = setTimeout(()=>{
-                chrome.runtime.sendMessage({message: 'Мы получили что vote запрос прошёл но ответ от TopCraft так и не поступил, скорее всего в vote запросе произошла ошибка, смотрите подробности в консоли в момент голосования'})
+                chrome.runtime.sendMessage({message: 'Мы получили что vote запрос прошёл но ответ от TopCraft так и не поступил, скорее всего в vote запросе произошла ошибка, смотрите подробности в консоли в момент голосования', ignoreReport: true})
             }, 5000)
         }
     }

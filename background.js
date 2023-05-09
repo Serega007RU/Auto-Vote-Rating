@@ -1,18 +1,25 @@
+// noinspection ES6MissingAwait
+
+const state = self.serviceWorker.state
+
+importScripts('libs/idb.umd.js')
+importScripts('projects.js')
+importScripts('main.js')
+
+// TODO отложенный importScripts пока не работают, подробнее https://bugs.chromium.org/p/chromium/issues/detail?id=1198822
+self.addEventListener('install', () => {
+    importScripts('libs/linkedom.js')
+    importScripts('libs/evalCore.umd.js')
+    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/serverpact_silentvote.js', 'scripts/hoyolab_silentvote.js', 'scripts/loliland_silentvote.js')
+})
+
 //Текущие fetch запросы
 // noinspection ES6ConvertVarToLetConst
-var fetchProjects = new Map()
-//Текущие проекты за которые сейчас голосует расширение
-// noinspection ES6ConvertVarToLetConst
-var queueProjects = new Set()
-//Айди группы вкладок в которой щас открыты вкладки расширения
+// var fetchProjects = new Map()
+//ID группы вкладок в которой сейчас открыты вкладки расширения
 let groupId
 //Если этот браузер не поддерживает группировку вкладок
 let notSupportedGroupTabs = false
-
-//Есть ли доступ в интернет?
-let online = true
-
-let secondVoteMinecraftIpList = false
 
 // noinspection ES6ConvertVarToLetConst
 var currentVK
@@ -23,41 +30,46 @@ let currentPacScriptProxy
 //Прерывает выполнение fetch запросов на случай ошибки в режиме MultiVote
 let controller = new AbortController()
 
-//Токен TunnelBear
-let tunnelBear = {}
-
-//Нужно ли щас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
+//Нужно ли сейчас делать проверку голосования, false может быть только лишь тогда когда предыдущая проверка ещё не завершилась
 let check = true
+let doubleCheck = false
 let _break = false
 let notFoundAccs = {}
 let lastErrorNotFound
 let searchAcc = true
 
-//Закрывать ли вкладку после окончания голосования? Это нужно для диагностирования ошибки
-let closeTabs = true
+let evil
+let evilProjects
+
+let silentResponseBody = {}
 
 let nextLoop = false
 
-let updateAvailable = false
-
-//Где храним настройки
-// let storageArea = 'local'
-
 //Инициализация настроек расширения
-initializeConfig(true)
+// noinspection JSIgnoredPromiseFromCall
+const initializeFunc = initializeConfig(true)
 
-//Проверялка: нужно ли голосовать, сверяет время текущее с временем из конфига
+//Проверка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
 
-    if (!settings) return
+    await initializeFunc
+
     if (settings.stopVote > Date.now()) return
 
+    // noinspection JSUnresolvedReference
+    if (!settings.operaAttention2 && (navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' || (!!self.opr && !!opr.addons) || !!self.opera || navigator.userAgent.indexOf(' OPR/') >= 0)) {
+        return
+    }
+
     //Если после попытки голосования не было интернета, проверяется есть ли сейчас интернет и если его нет то не допускает последующую проверку но есои наоборот появился интернет, устаналвивает статус online на true и пропускает код дальше
-    if (!settings.disabledCheckInternet && !online) {
+    if (!settings.disabledCheckInternet && !onLine) {
         if (navigator.onLine) {
             console.log(chrome.i18n.getMessage('internetRestored'))
-            online = true
+            onLine = true
+            db.put('other', onLine, 'onLine')
         } else {
+            // TODO к сожалению в Service Worker отсутствует слушатель на восстановление соединения с интернетом, у нас остаётся только 1 вариант, это попытаться снова запустить checkVote через минуту
+            chrome.alarms.create('checkVote', {when: Date.now() + 65000})
             return
         }
     }
@@ -66,6 +78,7 @@ async function checkVote() {
         check = false
         _break = false
     } else {
+        doubleCheck = true
         return
     }
 
@@ -79,6 +92,7 @@ async function checkVote() {
         if ((!project.time || project.time < Date.now()) && (lastErrorNotFound == null || !(notFoundAccs[project.rating]?.[project.id] > Date.now()))) {
             await checkOpen(project, transaction)
         }
+        // noinspection JSVoidFunctionReturnValueUsed
         cursor = await cursor.continue()
     }
 
@@ -93,70 +107,129 @@ async function checkVote() {
         await db.put('other', settings, 'settings')
         chrome.runtime.sendMessage({stopVote: lastErrorNotFound})
         stopVote(true)
+        return
+    }
+
+    if (doubleCheck) {
+        doubleCheck = false
+        checkVote()
     }
 }
 
 //Триггер на голосование когда подходит время голосования
 chrome.alarms.onAlarm.addListener(function (alarm) {
     if (settings?.debug) console.log('chrome.alarms.onAlarm', JSON.stringify(alarm))
+    // noinspection JSIgnoredPromiseFromCall
     checkVote()
 })
 
+// TODO костыльное решение бага https://bugs.chromium.org/p/chromium/issues/detail?id=471524
+chrome.idle.onStateChanged.addListener(async function(newState) {
+    if (newState === 'active') {
+        // noinspection JSIgnoredPromiseFromCall
+        checkVote()
+    }
+})
+
 async function reloadAllAlarms() {
-    await new Promise(resolve => chrome.alarms.clearAll(resolve))
+    await chrome.alarms.clearAll()
     let cursor = await db.transaction('projects').store.openCursor()
     const times = []
     while (cursor) {
         const project = cursor.value
         if (project.time != null && project.time > Date.now() && times.indexOf(project.time) === -1) {
-            chrome.alarms.create(String(cursor.key), {when: project.time})
+            let when = project.time
+            if (when - Date.now() < 65000) when = Date.now() + 65000
+            try {
+                chrome.alarms.create(String(cursor.key), {when})
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error.message)
+            }
             times.push(project.time)
         }
+        // noinspection JSVoidFunctionReturnValueUsed
         cursor = await cursor.continue()
     }
 }
 
-self.addEventListener('online', ()=> {
-    online = true
-    checkVote()
-})
-self.addEventListener('offline', ()=> {
-    online = false
-})
-
 let promises = []
 async function checkOpen(project, transaction) {
     if (settings.stopVote > Date.now()) return
-    //Если нет подключения к интернету
+    //Если нет интернета, то не голосуем
     if (!settings.disabledCheckInternet) {
-        if (!navigator.onLine && online) {
-            online = false
-            console.warn(chrome.i18n.getMessage('internetDisconected'))
-            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'))
+        if (!navigator.onLine && onLine) {
+            // TODO к сожалению в Service Worker отсутствует слушатель на восстановление соединения с интернетом, у нас остаётся только 1 вариант, это попытаться снова запустить checkVote через минуту
+            chrome.alarms.create('checkVote', {when: Date.now() + 65000})
+
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'), 'openProject_' + project.key)
+            console.warn(getProjectPrefix(project, true), chrome.i18n.getMessage('internetDisconected'))
+            onLine = false
+            db.put('other', onLine, 'onLine')
             return
-        } else if (!online) {
+        } else if (!onLine) {
             return
         }
     }
 
-    //Не позволяет открыть больше одной вкладки для одного топа или если проект рандомизирован но если проект голосует больше 5 или 15 минут то идёт на повторное голосование
-    for (let value of queueProjects) {
-        if (project.rating === value.rating || value.randomize && project.randomize || settings.disabledOneVote) {
-            if (!value.nextAttempt) return
-            if (Date.now() < value.nextAttempt) {
+    for (let[tab,value] of openedProjects) {
+        if (value.openedTimeoutQueue && Date.now() < value.openedTimeoutQueue) {
+            openedProjects.delete(tab)
+            db.put('other', openedProjects, 'openedProjects')
+            continue
+        }
+        if (project.rating === value.rating || (value.randomize && project.randomize) || settings.disabledOneVote) {
+            if (settings.disabledRestartOnTimeout || tab.startsWith?.('queue_') || Date.now() < value.openedNextAttempt) {
                 return
             } else {
-                queueProjects.delete(value)
-                console.warn(getProjectPrefix(value, true) + chrome.i18n.getMessage('timeout'))
-                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'))
+                if (!value.openedNextAttempt) {
+                    console.warn(getProjectPrefix(value, true), 'openedNextAttempt is undefined, maybe it\'s an error')
+                }
+                console.warn(getProjectPrefix(value, true), chrome.i18n.getMessage('timeout'))
+                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(value, false), chrome.i18n.getMessage('timeout'), 'openProject_' + value.key)
+                openedProjects.delete(tab)
+                db.put('other', openedProjects, 'openedProjects')
+
+                // noinspection PointlessBooleanExpressionJS
+                if (false && settings.enabledReportTimeout && Number.isInteger(tab) && !settings.disabledSendErrorSentry) {
+                    (async() => {
+                        try {
+                            value = await db.get('projects', value.key)
+                            if (!value.openedNextAttempt) return
+
+                            // noinspection JSCheckFunctionSignatures
+                            const details = await chrome.tabs.get(tab)
+                            if (details.url) {
+                                const domain = getDomainWithoutSubdomain(details.url)
+                                // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
+                                if (projectByURL.get(domain) !== value.rating) {
+                                    return
+                                }
+                            }
+                            await reportError({timeout: true}, {tab: {id: details.id}, url: details.url}, value)
+                        } catch (error) {
+                            if (!error.message.includes('No tab with id')) {
+                                console.warn(getProjectPrefix(value, true), error.message)
+                            }
+                        } finally {
+                            tryCloseTab(tab, value, 0)
+                        }
+                    })()
+                } else {
+                    // noinspection JSIgnoredPromiseFromCall
+                    tryCloseTab(tab, value, 0)
+                }
+
                 if (currentProxy != null) {
                     currentProxy.notWorking = chrome.i18n.getMessage('timeout')
                     updateValue('proxies', currentProxy)
                     stopVote()
                     return
                 }
+
+                break
             }
         }
+
         if (nextLoop) return
 
         //Проект с MultiVote и с без MultiVote не должны вместе голосовать
@@ -179,6 +252,7 @@ async function checkOpen(project, transaction) {
             }
         }
     }
+
     if (currentProxy != null && project.useMultiVote === false) return//Если пытается пройти проект с отключённым MultiVote, он не должен пройти с включённым прокси
     if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
         //Не позволяет голосовать проекту если он уже голосовал на текущем ВК или прокси
@@ -535,29 +609,25 @@ async function checkOpen(project, transaction) {
 
     }
 
-    let retryCoolDown
-    if (project.randomize) {
-        retryCoolDown = Math.floor(Math.random() * 600000 + 1800000)
-    } else if (((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) || /*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ (project.rating === 'MisterLauncher' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-        retryCoolDown = 300000
-    } else {
-        retryCoolDown = 900000
-    }
-    project.nextAttempt = Date.now() + retryCoolDown
-    queueProjects.add(project)
+    delete project.openedTimeoutQueue
+    delete project.openedNextAttempt
+    delete project.openedCountInject
 
-    //Если эта вкладка была уже открыта, он закрывает её
-    for (const[key,value] of openedProjects.entries()) {
-        if (project.key === value) {
-            openedProjects.delete(key)
-            db.put('other', openedProjects, 'openedProjects')
-            if (closeTabs) {
-                tryCloseTab(key, project, 0)
-            }
+    if (!settings.disabledRestartOnTimeout) {
+        let retryCoolDown
+        if (project.randomize) {
+            retryCoolDown = Math.floor(Math.random() * 600000 + 1800000)
+        } else {
+            if (!settings.timeoutVote) settings.timeoutVote = 900000
+            retryCoolDown = settings.timeoutVote
         }
+        project.openedNextAttempt = Date.now() + retryCoolDown
     }
 
-    if (settings.debug) console.log(getProjectPrefix(project, true) + 'престарт')
+    openedProjects.set('start_' + project.key, project)
+    db.put('other', openedProjects, 'openedProjects')
+
+    if (settings.debug) console.log(getProjectPrefix(project, true), 'пред запуск')
 
     if (project.rating === 'MonitoringMinecraft') {
         promises.push(clearMonitoringMinecraftCookies())
@@ -566,15 +636,34 @@ async function checkOpen(project, transaction) {
             if (project.rating === 'MonitoringMinecraft') {
                 url = '.monitoringminecraft.ru'
             }
-            let cookies = await new Promise(resolve=>{
-                chrome.cookies.getAll({domain: url}, function(cookies) {
-                    resolve(cookies)
-                })
-            })
+            let cookies = await chrome.cookies.getAll({domain: url})
             if (settings.debug) console.log(chrome.i18n.getMessage('deletingCookies', url))
             for (let i = 0; i < cookies.length; i++) {
                 if (cookies[i].domain.charAt(0) === '.') cookies[i].domain = cookies[i].domain.substring(1, cookies[i].domain.length)
-                await removeCookie('https://' + cookies[i].domain + cookies[i].path, cookies[i].name)
+                await chrome.cookies.remove({url: 'https://' + cookies[i].domain + cookies[i].path, name: cookies[i].name})
+            }
+        }
+    }
+
+    // noinspection PointlessBooleanExpressionJS
+    if (false && !settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
+        evilProjects = Date.now() + 300000
+        promises.push(fetchProjects())
+        async function fetchProjects() {
+            try {
+                const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
+                const projects = await response.text()
+                if (!evil) {
+                    // noinspection JSUnresolvedVariable
+                    if (!self.evalCore) {
+                        importScripts('libs/evalCore.umd.js')
+                    }
+                    // noinspection JSUnresolvedFunction,JSUnresolvedVariable
+                    evil = evalCore.getEvalInstance(self)
+                }
+                evil(projects)
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода projects.js, использую вместо этого локальный код', error.message)
             }
         }
     }
@@ -583,7 +672,8 @@ async function checkOpen(project, transaction) {
 }
 
 let promiseGroup
-//Открывает вкладку для голосования или начинает выполнять fetch закросы
+let promiseWindow
+//Открывает вкладку для голосования или начинает выполнять fetch запросы
 async function newWindow(project) {
     //Ожидаем очистку куки, применение аккаунтов или прокси
     let result = await Promise.all(promises)
@@ -593,8 +683,8 @@ async function newWindow(project) {
 
     if (settings.stopVote > Date.now()) return
 
-    console.log(getProjectPrefix(project, true) + chrome.i18n.getMessage('startedAutoVote'))
-    if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'))
+    console.log(getProjectPrefix(project, true), chrome.i18n.getMessage('startedAutoVote'))
+    if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'), 'openProject_' + project.key)
 
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
@@ -622,466 +712,189 @@ async function newWindow(project) {
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
-    let create = true
-    await new Promise(resolve => {
-        chrome.alarms.getAll(function(alarms) {
-            for (const alarm of alarms) {
-                if (alarm.scheduledTime === project.nextAttempt) {
-                    create = false
-                    resolve()
-                    break
-                }
+    if (!settings.disabledRestartOnTimeout) {
+        let create = true
+        let alarms = await chrome.alarms.getAll()
+        for (const alarm of alarms) {
+            if (alarm.scheduledTime === project.openedNextAttempt) {
+                create = false
+                break
             }
-            resolve()
-        })
-    })
-    if (create) {
-        chrome.alarms.create(String(project.key), {when: project.nextAttempt})
+        }
+        if (create) {
+            let when = project.openedNextAttempt
+            if (when - Date.now() < 65000) when = Date.now() + 65000
+            try {
+                await chrome.alarms.create('nextAttempt_' + project.key, {when})
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error.message)
+            }
+        }
     }
 
     let silentVoteMode = false
     if (project.rating === 'Custom') {
         silentVoteMode = true
     } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
+        if (!project.emulateMode && allProjects[project.rating].silentVote?.(project)) {
             silentVoteMode = true
         }
-    } else if (project.silentMode && (/*project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') ||*/ project.rating === 'MonitoringMinecraft' || project.rating === 'ServerPact' || project.rating === 'MinecraftIpList' || project.rating === 'MCServerList' || (project.rating === 'MisterLauncher' && project.game === 'projects'))) {
+    } else if (project.silentMode && allProjects[project.rating].silentVote?.(project)) {
         silentVoteMode = true
     }
     if (settings.debug) console.log('[' + project.rating + '] ' + project.nick + (project.Custom ? '' : ' – ' + project.id) + (project.name != null ? ' – ' + project.name : '') + (silentVoteMode ? ' Начинаю Fetch запрос' : ' Открываю вкладку'))
     if (silentVoteMode) {
+        for (const [tab,value] of openedProjects) {
+            if (project.key === value.key) {
+                openedProjects.delete(tab)
+            }
+        }
+        openedProjects.set('background_' + project.key, project)
+        db.put('other', openedProjects, 'openedProjects')
         silentVote(project)
     } else {
-        const windows = await new Promise(resolve=>{
-            chrome.windows.getAll(function(win) {
-                if (chrome.runtime.lastError) {
-                    console.error(chrome.i18n.getMessage('errorOpenTab') + chrome.runtime.lastError.message)
-                }
-                resolve(win)
-            })
-        })
-        if (windows == null || windows.length <= 0) {
-            const window = await new Promise(resolve=>{
-                chrome.windows.create({focused: false}, function(win) {
-                    resolve(win)
-                })
-            })
-            chrome.windows.update(window.id, {focused: false})
-        }
+        await promiseWindow
+        promiseWindow = checkWindow()
+        await promiseWindow
 
-        let url = allProjects[project.rating]('voteURL', project)
+        const url = allProjects[project.rating].voteURL(project)
 
-        if (currentVK != null && (project.rating === 'TopCraft' || project.rating === 'McTOP') && currentVK['password' + project.rating]) {
-            url = allProjects[project.rating]('pageURL', project)
-        }
-
-        let tab = await new Promise(resolve=>{
-            chrome.tabs.create({url, active: settings.disabledFocusedTab}, function(tab_) {
-                if (chrome.runtime.lastError) {
-                    resolve()
-                    endVote({message: chrome.runtime.lastError.message}, null, project)
-                } else {
-                    resolve(tab_)
-                }
-            })
-        })
+        let tab = await tryOpenTab({url, active: settings.disabledFocusedTab}, project, 0)
         if (tab == null) return
-        openedProjects.set(tab.id, project.key)
-        db.put('other', openedProjects, 'openedProjects')
-        if (notSupportedGroupTabs) return
-        await group()
-        async function group() {
-            if (groupId) {
-                await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, (/*details*/) => {
-                    if (chrome.runtime.lastError && chrome.runtime.lastError.message.includes('No group with id')) {
-                        groupId = null
-                    }
-                    resolve()
-                }))
-                //Дважды группируем? А чо? Костылим что бы цвет группы был голубым. :D
-                if (groupId) await new Promise(resolve => chrome.tabs.group({groupId, tabIds: tab.id}, resolve))
+        for (const [tab,value] of openedProjects) {
+            if (project.key === value.key) {
+                openedProjects.delete(tab)
             }
         }
-        if (!groupId) {
-            if (!chrome.tabs.group) {
-                notSupportedGroupTabs = true
-                console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', 'chrome.tabs.group is not a function'))
-                return
+        openedProjects.set(tab.id, project)
+        db.put('other', openedProjects, 'openedProjects')
+
+        if (notSupportedGroupTabs) return
+        try {
+            await promiseGroup
+            promiseGroup = groupTabs(tab)
+            await promiseGroup
+        } catch (error) {
+            notSupportedGroupTabs = true
+            console.warn(chrome.i18n.getMessage('notSupportedGroupTabs'), error.message)
+        }
+    }
+}
+
+async function checkWindow() {
+    const windows = await chrome.windows.getAll()
+        .catch(error => console.warn(chrome.i18n.getMessage('errorOpenTab', error.message)))
+    if (!windows?.length) {
+        const window = await chrome.windows.create({focused: false})
+        await chrome.windows.update(window.id, {focused: false})
+    }
+}
+
+async function groupTabs(tab) {
+    // С начало ищем группу вкладок
+    if (groupId == null) {
+        const groups = await chrome.tabGroups.query({title: 'Auto Vote Rating'})
+        if (groups.length) groupId = groups[0].id
+    }
+
+    // Потом пробуем сгруппировать если нашли группу
+    if (groupId != null) {
+        try {
+            await chrome.tabs.group({groupId, tabIds: tab.id})
+            return
+        } catch (error) {
+            if (!error.message.includes('No tab with id') && !error.message.includes('No group with id')) {
+                throw error
             }
-            if (promiseGroup) {
-                await promiseGroup
-                await group()
-                return
-            }
-            promiseGroup = createGroup()
-            async function createGroup() {
-                await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, () => {
-                    if (chrome.runtime.lastError) {
-                        notSupportedGroupTabs = true
-                        console.warn(chrome.i18n.getMessage('notSupportedGroupTabs', chrome.runtime.lastError.message))
-                    }
-                    resolve()
-                }))
-                if (notSupportedGroupTabs) return
-                //Дважды группируем? А чо? Костылим что бы цвет группы был голубым. :D
-                groupId = await new Promise(resolve => chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id}, resolve))
-                promiseGroup = null
-            }
+        }
+    }
+
+    // Если мы не нашли групп или не смогли сгруппировать так как нет уже такой группы, то только тогда создаём эту группу
+    try {
+        groupId = await chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id})
+        await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
+    } catch (error) {
+        if (!error.message.includes('No tab with id') && !error.message.includes('No group with id')) {
+            throw error
         }
     }
 }
 
 async function silentVote(project) {
+    if (!self.DOMParser) {
+        importScripts('libs/linkedom.js')
+    }
     try {
-        // if (project.rating === 'MinecraftRating') {
-        //     let response = await _fetch('https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=https://minecraftrating.ru/projects/' + project.id + '/&state=' + project.nick + '&response_type=code&v=5.45', null, project)
-        //     if (!await checkResponseError(project, response, 'minecraftrating.ru', null, true)) return
-        //     if (response.doc.querySelector('div.alert.alert-danger') != null) {
-        //         if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
-        //             endVote({later: true}, null, project)
-        //         } else {
-        //             endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
-        //         }
-        //     } else if (response.doc.querySelector('div.alert.alert-success') != null) {
-        //         if (response.doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
-        //             endVote({successfully: true}, null, project)
-        //         } else {
-        //             endVote({message: response.doc.querySelector('div.alert.alert-success').textContent}, null, project)
-        //         }
-        //     } else {
-        //         endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null'}, null, project)
-        //     }
-        // } else
-
-        if (project.rating === 'MonitoringMinecraft') {
-            let i = 0
-            while (i <= 3) {
-                i++
-                let response = await _fetch('https://monitoringminecraft.ru/top/' + project.id + '/vote', {
-                    'headers': {
-                        'content-type': 'application/x-www-form-urlencoded'
-                    },
-                    'body': 'player=' + project.nick + '',
-                    'method': 'POST'
-                }, project)
-                if (!await checkResponseError(project, response, 'monitoringminecraft.ru', [503], true)) return
-                if (response.status === 503) {
-                    if (i >= 3) {
-                        endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'response code: ' + String(response.status))}, null, project)
-                        return
-                    }
-                    await wait(5000)
-                    continue
-                }
-
-                if (response.doc.querySelector('body') != null && response.doc.querySelector('body').textContent.includes('Вы слишком часто обновляете страницу. Умерьте пыл.')) {
-                    if (i >= 3) {
-                        endVote({message: chrome.i18n.getMessage('errorAttemptVote') + response.doc.querySelector('body').textContent}, null, project)
-                        return
-                    }
-                    await wait(5000)
-                    continue
-                }
-                if (response.doc.querySelector('form[method="POST"]') != null && response.doc.querySelector('form[method="POST"]').textContent.includes('Ошибка')) {
-                    endVote({message: response.doc.querySelector('form[method="POST"]').textContent.trim()}, null, project)
-                    return
-                }
-                if (response.doc.querySelector('input[name=player]') != null) {
-                    if (i >= 3) {
-                        endVote({message: chrome.i18n.getMessage('errorAttemptVote', 'input[name=player] is ' + JSON.stringify(response.doc.querySelector('input[name=player]')))}, null, project)
-                        return
-                    }
-                    await wait(5000)
-                    continue
-                }
-
-                if (response.doc.querySelector('center').textContent.includes('Вы уже голосовали сегодня')) {
-                    endVote({later: true}, null, project)
-                    return
-                } else if (response.doc.querySelector('center').textContent.includes('Вы успешно проголосовали!')) {
-                    endVote({successfully: true}, null, project)
-                    return
-                } else {
-                    endVote({errorVoteNoElement: true}, null, project)
-                    return
-                }
-            }
-        } else
-
-        if (project.rating === 'ServerPact') {
-            let response = await _fetch('https://www.serverpact.com/vote-' + project.id, {
-                'headers': {
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                    'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
-                    'cache-control': 'no-cache',
-                    'pragma': 'no-cache',
-                    'sec-fetch-dest': 'document',
-                    'sec-fetch-mode': 'navigate',
-                    'sec-fetch-site': 'none',
-                    'sec-fetch-user': '?1',
-                    'upgrade-insecure-requests': '1'
-                },
-                'referrerPolicy': 'no-referrer-when-downgrade',
-                'body': null,
-                'method': 'GET',
-                'mode': 'cors',
-                'credentials': 'include'
-            }, project)
-            if (!await checkResponseError(project, response, 'serverpact.com')) return
-            function generatePass(nb) {
-                let chars = 'azertyupqsdfghjkmwxcvbn23456789AZERTYUPQSDFGHJKMWXCVBN_-#@'
-                let pass = ''
-                for (let i = 0; i < nb; i++) {
-                    let wpos = Math.round(Math.random() * chars.length)
-                    pass += chars.substring(wpos, wpos + 1)
-                }
-                return pass
-            }
-            let captchaPass = generatePass(32)
-            let captcha = await _fetch('https://www.serverpact.com/v2/QapTcha-master/php/Qaptcha.jquery.php', {
-                'headers': {
-                    'accept': 'application/json, text/javascript, */*; q=0.01',
-                    'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
-                    'cache-control': 'no-cache',
-                    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                    'pragma': 'no-cache',
-                    'sec-fetch-dest': 'empty',
-                    'sec-fetch-mode': 'cors',
-                    'sec-fetch-site': 'same-origin',
-                    'x-requested-with': 'XMLHttpRequest'
-                },
-                'referrerPolicy': 'no-referrer-when-downgrade',
-                'body': 'action=qaptcha&qaptcha_key=' + captchaPass,
-                'method': 'POST',
-                'mode': 'cors',
-                'credentials': 'include'
-            }, project)
-            let json = captcha.json()
-            if (json.error) {
-                endVote({message: 'Error in captcha'}, null, project)
-                return
-            }
-
-            response = await _fetch('https://www.serverpact.com/vote-' + project.id, {
-                'headers': {
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                    'accept-language': 'ru,en;q=0.9,en-US;q=0.8',
-                    'cache-control': 'no-cache',
-                    'content-type': 'application/x-www-form-urlencoded',
-                    'pragma': 'no-cache',
-                    'sec-fetch-dest': 'document',
-                    'sec-fetch-mode': 'navigate',
-                    'sec-fetch-site': 'same-origin',
-                    'sec-fetch-user': '?1',
-                    'upgrade-insecure-requests': '1'
-                },
-                'referrerPolicy': 'no-referrer-when-downgrade',
-                'body': response.doc.querySelector('div.QapTcha > input[type=hidden]').name + '=' + response.doc.querySelector('div.QapTcha > input[type=hidden]').value + '&' + captchaPass + '=&minecraftusername=' + project.nick + '&voten=Send+your+vote',
-                'method': 'POST',
-                'mode': 'cors',
-                'credentials': 'include'
-            }, project)
-            if (!await checkResponseError(project, response, 'serverpact.com')) return
-            if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)') != null && response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div:nth-child(4)').textContent.includes('You have successfully voted')) {
-                endVote({successfully: true}, null, project)
-            } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null && (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('You can only vote once') || response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning').textContent.includes('already voted'))) {
-                endVote({later: Date.now() + 43200000}, null, project)
-            } else if (response.doc.querySelector('body > div.container.sp-o > div.row > div.col-md-9 > div.alert.alert-warning') != null) {
-                endVote({message: response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.substring(0, response.doc.querySelector('body > div.container.sp-o > div > div.col-md-9 > div.alert.alert-warning').textContent.indexOf('\n'))}, null, project)
-            } else {
-                endVote({errorVoteUnknown2: true}, null, project)
-            }
-        } else
-
-        if (project.rating === 'MinecraftIpList') {
-            let response = await _fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
-                'headers': {
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                    'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
-                    'cache-control': 'no-cache',
-                    'pragma': 'no-cache',
-                    'sec-fetch-dest': 'document',
-                    'sec-fetch-mode': 'navigate',
-                    'sec-fetch-site': 'same-origin',
-                    'sec-fetch-user': '?1',
-                    'upgrade-insecure-requests': '1'
-                },
-                'referrerPolicy': 'no-referrer-when-downgrade',
-                'body': null,
-                'method': 'GET',
-                'mode': 'cors',
-                'credentials': 'include'
-            }, project)
-            if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
-
-            if (response.doc.querySelector('#InnerWrapper > script:nth-child(10)') != null && response.doc.querySelector('table[class="CraftingTarget"]') == null) {
-                if (secondVoteMinecraftIpList) {
-                    secondVoteMinecraftIpList = false
-                    endVote('Error time zone', null, project)
-                    return
-                }
-                await _fetch('https://minecraftiplist.com/timezone.php?timezone=Europe/Moscow', {
-                    'headers': {
-                        'accept': '*/*',
-                        'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
-                        'cache-control': 'no-cache',
-                        'pragma': 'no-cache',
-                        'sec-fetch-dest': 'empty',
-                        'sec-fetch-mode': 'cors',
-                        'sec-fetch-site': 'same-origin',
-                        'x-requested-with': 'XMLHttpRequest'
-                    },
-                    'referrerPolicy': 'no-referrer-when-downgrade',
-                    'body': null,
-                    'method': 'GET',
-                    'mode': 'cors',
-                    'credentials': 'include'
-                }, project)
-                secondVoteMinecraftIpList = true
-                silentVote(project)
-                return
-            }
-            if (secondVoteMinecraftIpList) secondVoteMinecraftIpList = false
-
-            if (response.doc.querySelector('#Content > div.Error') != null) {
-                if (response.doc.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
-                    endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
-                    return
-                }
-                if (response.doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server') || response.doc.querySelector('#Content > div.Error').textContent.includes('has no votes')) {
-                    let numbers = response.doc.querySelector('#Content > div.Error').textContent.substring(response.doc.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
-                    let milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
-                    endVote({later: Date.now() + (86400000 - milliseconds)}, null, project)
-                    return
-                }
-                endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
-                return
-            }
-
-            if (!await getRecipe(response.doc.querySelector('table[class="CraftingTarget"]').firstElementChild.firstElementChild.firstElementChild.firstElementChild.src.replace(/^.*\/\/[^\/]+/, 'https://minecraftiplist.com'))) {
-                endVote({message: 'Couldnt find the recipe: ' + response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(1) > td > table > tbody > tr > td:nth-child(3) > table > tbody > tr > td > img').src.replace(/^.*\/\/[^\/]+/, 'https://minecraftiplist.com')}, null, project)
-                return
-            }
-            await craft(response.doc.querySelector('#Content > form > table > tbody > tr:nth-child(2) > td > table').getElementsByTagName('img'))
-
-            let code = 0
-            let code2 = 0
-
-            for (let i = 0; i < 6; i++) {
-                code += content[i] << (i * 5)
-            }
-            for (let i = 6; i < 9; i++) {
-                code2 += content[i] << ((i - 6) * 5)
-            }
-
-            response = await _fetch('https://minecraftiplist.com/index.php?action=vote&listingID=' + project.id, {
-                'headers': {
-                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                    'accept-language': 'ru,en;q=0.9,ru-RU;q=0.8,en-US;q=0.7',
-                    'cache-control': 'no-cache',
-                    'content-type': 'application/x-www-form-urlencoded',
-                    'pragma': 'no-cache',
-                    'sec-fetch-dest': 'document',
-                    'sec-fetch-mode': 'navigate',
-                    'sec-fetch-site': 'same-origin',
-                    'sec-fetch-user': '?1',
-                    'upgrade-insecure-requests': '1'
-                },
-                'referrerPolicy': 'no-referrer-when-downgrade',
-                'body': 'userign=' + project.nick + '&action=vote&action2=placevote&captchacode1=' + code + '&captchacode2=' + code2,
-                'method': 'POST',
-                'mode': 'cors',
-                'credentials': 'include'
-            }, project)
-            if (!await checkResponseError(project, response, 'minecraftiplist.com')) return
-
-            if (response.doc.querySelector('#Content > div.Error') != null) {
-                if (response.doc.querySelector('#Content > div.Error').textContent.includes('You did not complete the crafting table correctly')) {
-                    endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
-                    return
-                }
-                if (response.doc.querySelector('#Content > div.Error').textContent.includes('last voted for this server')) {
-                    let numbers = response.doc.querySelector('#Content > div.Error').textContent.substring(response.doc.querySelector('#Content > div.Error').textContent.length - 30).match(/\d+/g).map(Number)
-                    let milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
-                    endVote({later: Date.now() + (86400000 - milliseconds)}, null, project)
-                    return
-                }
-                endVote({message: response.doc.querySelector('#Content > div.Error').textContent}, null, project)
-                return
-            }
-            if (response.doc.querySelector('#Content > div.Good') != null && response.doc.querySelector('#Content > div.Good').textContent.includes('You voted for this server!')) {
-                endVote({successfully: true}, null, project)
-            }
-        } else
-
-        if (project.rating === 'MCServerList') {
-            let response = await _fetch('https://mcserver-list.eu/api/sendvote/' + project.id + '/' + project.nick, {'headers': {'content-type': 'application/x-www-form-urlencoded'}, 'body': null}, project)
-            let json = await response.json()
-            if (response.ok) {
-                if (json.data.status === 'success') {
-                    endVote({successfully: true}, null, project)
-                } else if (json.data.error) {
-                    if (json.data.error.includes('username_voted')) {
-                        endVote({later: true}, null, project)
-                    } else {
-                        endVote({message: json.data.error}, null, project)
-                    }
-                } else {
-                    endVote({message: JSON.stringify(json)}, null, project)
-                }
-            } else {
-                endVote({errorVote: [String(response.status), response.url]}, null, project)
-            }
-        } else
-
-        if (project.rating === 'MisterLauncher') {
-            let response = await _fetch('https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code', null, project)
-            if (!await checkResponseError(project, response, 'misterlauncher.org', null, true)) return
-            if (response.doc.querySelector('div.alert.alert-danger') != null) {
-                if (response.doc.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
-                    endVote({later: true}, null, project)
-                } else {
-                    endVote({message: response.doc.querySelector('div.alert.alert-danger').textContent}, null, project)
-                }
-            } else if (response.doc.querySelector('div.alert.alert-success') != null) {
-                if (response.doc.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
-                    endVote({successfully: true}, null, project)
-                } else {
-                    endVote({message: response.doc.querySelector('div.alert.alert-success').textContent}, null, project)
-                }
-            } else {
-                endVote({message: 'Error! div.alert.alert-success или div.alert.alert-danger is null'}, null, project)
-            }
-        } else
-
         if (project.rating === 'Custom') {
-            let response = await _fetch(project.responseURL, {...project.body}, project)
+            let response = await fetch(project.responseURL, {...project.body})
             await response.text()
             if (response.ok) {
                 endVote({successfully: true}, null, project)
             } else {
                 endVote({errorVote: [String(response.status), response.url]}, null, project)
             }
+            return
         }
-    } catch (e) {
-        if (e.message === 'Failed to fetch' || e.message === 'NetworkError when attempting to fetch resource.') {
-            let found = false
-            for (const p of fetchProjects.values()) {
-                if (p.key === project.key) {
-                    found = true
-                    break
+
+        // noinspection PointlessBooleanExpressionJS
+        if (false && !settings.disabledUseRemoteCode) {
+            try {
+                const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_silentvote.js')
+                const textScript = await response.text()
+                if (!evil) {
+                    // noinspection JSUnresolvedVariable
+                    if (!self.evalCore) {
+                        importScripts('libs/evalCore.umd.js')
+                    }
+                    // noinspection JSUnresolvedFunction,JSUnresolvedVariable
+                    evil = evalCore.getEvalInstance(self)
                 }
+                evil(textScript)
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода scripts/' + project.rating.toLowerCase() + '_silentvote.js, использую вместо этого локальный код', error.message)
             }
-            if (!found) {
-                // endVote({notConnectInternet: true}, null, project)
-                endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
-            }
-        } else if (e.message === 'The user aborted a request.') {
-            //None
-        } else {
-            endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (e.stack ? e.stack : e)}, null, project)
         }
+
+        if (!self['silentVote' + project.rating]) {
+            importScripts('scripts/' + project.rating.toLowerCase() + '_silentvote.js')
+        }
+
+        await self['silentVote' + project.rating](project)
+    } catch (error) {
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError when attempting to fetch resource')) {
+            // let found = false
+            // for (const p of fetchProjects.values()) {
+            //     if (p.key === project.key) {
+            //         found = true
+            //         break
+            //     }
+            // }
+            // if (!found) {
+                endVote({notConnectInternet: true}, null, project)
+                // endVote({message: chrome.i18n.getMessage('errorVoteUnknown') + (error.stack ? error.stack : e)}, null, project)
+            // }
+        } else {
+            let message
+            if (error.stack) {
+                // noinspection PointlessBooleanExpressionJS
+                if (false && !settings.disabledUseRemoteCode) {
+                    message = error.toString()
+                } else {
+                    message = error.stack
+                }
+            } else {
+                message = error.message
+            }
+            const request = {}
+            request.errorVoteNoElement = message
+            if (silentResponseBody[project.rating]) {
+                request.html = silentResponseBody[project.rating].doc.body.outerHTML
+                request.url = silentResponseBody[project.rating].url
+            }
+            endVote(request, null, project)
+        }
+    } finally {
+        delete silentResponseBody[project.rating]
     }
 }
 
@@ -1095,6 +908,9 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     }
     response.html = await response.text()
     response.doc = new DOMParser().parseFromString(response.html, 'text/html')
+    silentResponseBody[project.rating] = {}
+    silentResponseBody[project.rating].doc = response.doc
+    silentResponseBody[project.rating].url = response.url
     if (vk && host.includes('vk.com')) {
         //Узнаём причину почему мы зависли на авторизации ВК
         let text
@@ -1145,91 +961,189 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     return true
 }
 
-chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
-    const projectKey = openedProjects.get(details.tabId)
-    if (!projectKey) return
-    if (details.frameId === 0) {
-        if (details.url.match(/wargm.ru\/*/)) {
-            chrome.tabs.executeScript(details.tabId, {file: 'scripts/istrusted.js', runAt: 'document_end'}, async function() {
-                if (chrome.runtime.lastError) {
-                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')) {
-                        const project = await db.get('projects', projectKey)
-                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                        project.error = chrome.runtime.lastError.message
-                        updateValue('projects', project)
-                    }
-                }
-            })
+chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
+    await initializeFunc
+    if (openedProjects.has(details.tabId)) {
+        if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+            const project = openedProjects.get(details.tabId)
+            if (
+                //Chrome
+                details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
+                //FireFox
+                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
+                // console.warn(getProjectPrefix(project, true), details.error)
+                return
+            }
+            const sender = {tab: {id: details.tabId}, url: details.url}
+            endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
         }
+    }
+})
+
+chrome.webNavigation.onCommitted.addListener(async function(details) {
+    if (details.url === 'about:blank') return
+    await initializeFunc
+    let project = openedProjects.get(details.tabId)
+    if (!project) return
+    const filesIsolated = []
+    const filesMain = []
+    if (details.frameId === 0) {
+        // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
+        if (details.url.match(/facebook.com\/*/) || details.url.match(/google.com\/*/) || details.url.match(/accounts.google.com\/*/) || details.url.match(/reddit.com\/*/) || details.url.match(/twitter.com\/*/)) {
+            return
+        }
+        // Если пользователь авторизовывается через эти сайты, но у расширения на это нет прав, всё равно не мешаем ему, пускай сам авторизуется не смотря, на то что есть автоматизация авторизации
+        if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login') || details.url.startsWith('https://steamcommunity.com/login/home')) {
+            // noinspection JSUnresolvedFunction
+            let granted = await chrome.permissions.contains({origins: [details.url]})
+            if (!granted) {
+                return
+            }
+        }
+
+        filesMain.push('scripts/main/visible.js')
+        if (allProjects[projectByURL.get(getDomainWithoutSubdomain(details.url))]?.needIsTrusted?.()) {
+            filesIsolated.push('scripts/main/istrusted_isolated.js')
+            filesMain.push('scripts/main/istrusted_main.js')
+        }
+        if (allProjects[projectByURL.get(getDomainWithoutSubdomain(details.url))]?.needAlert?.()) {
+            filesIsolated.push('scripts/main/alert_isolated.js')
+            filesMain.push('scripts/main/alert_main.js')
+        }
+    } else if (details.url.match(/hcaptcha.com\/captcha\/*/)
+            || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/)
+            || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/)
+            || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/)
+            || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/)
+            || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/)
+            || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)
+            || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+        filesMain.push('scripts/main/visible.js')
+        filesIsolated.push('scripts/main/alert_isolated.js')
+        filesMain.push('scripts/main/alert_main.js')
+    }
+
+    if (!filesIsolated.length && !filesMain.length) return
+
+    let target = {tabId: details.tabId}
+    if (details.frameId) target.frameIds = [details.frameId]
+
+    if (filesIsolated.length) {
+        (async() => {
+            try {
+                // noinspection JSCheckFunctionSignatures
+                await chrome.scripting.executeScript({target, files: filesIsolated, injectImmediately: true})
+            } catch (error) {
+                catchTabError(error, project)
+            }
+        })()
+    }
+    if (filesMain.length) {
+        (async() => {
+            try {
+                // noinspection JSCheckFunctionSignatures
+                await chrome.scripting.executeScript({target, files: filesMain, world: 'MAIN', injectImmediately: true})
+            } catch (error) {
+                catchTabError(error, project)
+            }
+        })()
     }
 })
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
 chrome.webNavigation.onCompleted.addListener(async function(details) {
-    const projectKey = openedProjects.get(details.tabId)
-    if (!projectKey) return
-    const project = await db.get('projects', projectKey)
+    await initializeFunc
+    let project = openedProjects.get(details.tabId)
+    if (!project) return
+
+    if (project.openedCountInject >= 10) {
+        endVote({tooManyVoteAttempts: true}, {tab: {id: details.tabId}, url: details.url}, project)
+        return
+    }
+
     if (details.frameId === 0) {
         // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
         if (details.url.match(/facebook.com\/*/) || details.url.match(/google.com\/*/) || details.url.match(/accounts.google.com\/*/) || details.url.match(/reddit.com\/*/) || details.url.match(/twitter.com\/*/)) {
             return
         }
 
-        // Если пользователь авторизовывается через эти сайты но у расширения на это нет прав, всё равно не мешаем ему, пускай сам авторизуется не смотря на то что есть автоматизация авторизации
-        if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login')) {
-            let granted = await new Promise(resolve=>{
-                chrome.permissions.contains({origins: [details.url]}, resolve)
-            })
+        // Если пользователь авторизовывается через эти сайты, но у расширения на это нет прав, всё равно не мешаем ему, пускай сам авторизуется не смотря, на то что есть автоматизация авторизации
+        if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login') || details.url.startsWith('https://steamcommunity.com/login/home')) {
+            // noinspection JSUnresolvedFunction
+            let granted = await chrome.permissions.contains({origins: [details.url]})
             if (!granted) {
-                console.warn(getProjectPrefix(project, true) + 'Not granted permissions for ' + details.url)
+                console.warn(getProjectPrefix(project, true), 'Not granted permissions for ' + details.url)
                 return
             }
         }
 
-        await new Promise(resolve => {
-            chrome.tabs.executeScript(details.tabId, {file: 'scripts/' + project.rating.toLowerCase() +'.js'}, function() {
-                if (chrome.runtime.lastError) {
-                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')) {
-                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                        project.error = chrome.runtime.lastError.message
-                        updateValue('projects', project)
-                    }
+        let eval = true
+        let textApi, textScript, textWorld
+        // noinspection PointlessBooleanExpressionJS
+        if (false && !settings.disabledUseRemoteCode) {
+            try {
+                const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/api.js')
+                textApi = await responseApi.text()
+                const responseScript = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '.js')
+                textScript = await responseScript.text()
+                // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                if (allProjects[project.rating]?.needWorld?.()) {
+                    const responseWorld = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_world.js')
+                    textWorld = await responseWorld.text()
                 }
-                resolve()
-            })
-        })
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода, использую вместо этого локальный код', error.message)
+                eval = false
+            }
+        } else {
+            eval = false
+        }
 
-        await new Promise(resolve => {
-            chrome.tabs.executeScript(details.tabId, {file: 'scripts/api.js'}, function() {
-                if (chrome.runtime.lastError) {
-                    if (chrome.runtime.lastError.message !== 'The tab was closed.' && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal') && !chrome.runtime.lastError.message.includes('Missing host permission for the tab')) {
-                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                        project.error = chrome.runtime.lastError.message
-                        updateValue('projects', project)
-                    }
+        try {
+            if (allProjects[project.rating]?.needPrompt?.()) {
+                const funcPrompt = function(nick) {
+                    // noinspection JSUnusedLocalSymbols
+                    window.prompt = new Proxy(window.prompt, {
+                        apply(target, thisArg, argArray) {
+                            return nick
+                        }
+                    })
                 }
-                resolve()
-            })
-        })
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func: funcPrompt, args: [project.nick]})
+            }
 
-        await new Promise(resolve => {
-            let send = {sendProject: true, project}
-            if (currentVK != null) send.vkontakte = currentVK
-            chrome.tabs.sendMessage(details.tabId, send, function (){
-                if (chrome.runtime.lastError) {
-                    if (!chrome.runtime.lastError.message.includes('Could not establish connection. Receiving end does not exist') && !chrome.runtime.lastError.message.includes('The message port closed before a response was received')) {
-                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                        project.error = chrome.runtime.lastError.message
-                        updateValue('projects', project)
+            if (eval) {
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
+                await chrome.tabs.sendMessage(details.tabId, {textEval: true, textApi, textScript})
+                // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                if (allProjects[project.rating]?.needWorld?.()) {
+                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['libs/evalCore.umd.js']})
+                    const funcWorld = function(text) {
+                        // noinspection JSUnresolvedFunction,JSUnresolvedVariable
+                        const evil = evalCore.getEvalInstance(window)
+                        evil(text)
                     }
+                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func: funcWorld, args: [textWorld]})
                 }
-                resolve()
-            })
-        })
+            } else {
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
+                // noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                if (allProjects[project.rating]?.needWorld?.()) {
+                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + project.rating.toLowerCase() +'_world.js']})
+                }
+            }
+
+            await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project, vkontakte: currentVK, settings})
+
+            if (openedProjects.has(details.tabId)) {
+                if (!project.openedCountInject) project.openedCountInject = 0
+                project.openedCountInject++
+                openedProjects.set(details.tabId, project)
+                db.put('other', openedProjects, 'openedProjects')
+            }
+        } catch (error) {
+            catchTabError(error, project)
+        }
     } else if (details.frameId !== 0 && (
         details.url.match(/hcaptcha.com\/captcha\/*/)
         || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/)
@@ -1239,222 +1153,412 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/)
         || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)
         || details.url.match(/https:\/\/challenges.cloudflare.com\/*/))) {
-        chrome.tabs.executeScript(details.tabId, {file: 'scripts/captchaclicker.js', frameId: details.frameId}, function() {
-            if (chrome.runtime.lastError) {
-                if (chrome.runtime.lastError.message !== 'The frame was removed.' && !chrome.runtime.lastError.message.includes('No frame with id') && !chrome.runtime.lastError.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/) {
-                    let error = chrome.runtime.lastError.message
-                    if (error.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
-                        error += ' Try this solution: https://gitlab.com/Serega007/Auto-Vote-Rating/-/wikis/Problems-with-Opera'
-                    }
-                    console.error(getProjectPrefix(project, true) + error)
-                    if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                    project.error = error
-                    updateValue('projects', project)
-                }
-            }
-        })
+
+        // let eval = true
+        // let textCaptcha
+        // if (!settings.disabledUseRemoteCode) {
+        //     try {
+        //         const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/captchaclicker.js')
+        //         textCaptcha = await responseApi.text()
+        //     } catch (error) {
+        //         console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода scripts/main/captchaclicker.js, использую вместо этого локальный код', error.message)
+        //         eval = false
+        //     }
+        // } else {
+        //     eval = false
+        // }
+
+        try {
+            // if (eval) {
+            //     await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
+            //     await chrome.tabs.sendMessage(details.tabId, {textEval: true, textCaptcha})
+            // } else {
+                await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['scripts/main/captchaclicker.js']})
+            // }
+
+            // Если вкладка уже загружена, повторно туда высылаем sendProject который обозначает что мы готовы к голосованию
+            const tab = await chrome.tabs.get(details.tabId)
+            if (tab.status !== 'complete') return
+            await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project, settings})
+        } catch (error) {
+            catchTabError(error, project)
+        }
     }
 })
 
+async function catchTabError(error, project) {
+    if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
+        project = await db.get('projects', project.key)
+        let message = error.message
+        if (message.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {
+            message += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
+        }
+        console.error(getProjectPrefix(project, true), error.message)
+        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
+        project.error = message
+        delete project.openedNextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
+        updateValue('projects', project)
+    }
+}
+
 chrome.tabs.onRemoved.addListener(async function(tabId) {
-    const projectKey = openedProjects.get(tabId)
-    if (!projectKey) return
-    const project = await db.get('projects', projectKey)
+    await initializeFunc
+    let project = openedProjects.get(tabId)
+    if (!project) return
     endVote({closedTab: true}, {tab: {id: tabId}}, project)
 })
 
 chrome.webRequest.onCompleted.addListener(async function(details) {
-    const projectKey = openedProjects.get(details.tabId)
-    if (!projectKey) return
-    const project = await db.get('projects', projectKey)
+    await initializeFunc
+    let project = openedProjects.get(details.tabId)
+    if (!project) return
 
-    // TODO это какой-то кринж для https://www.minecraft-serverlist.net/, ошибка 500 считается как успешный запрос https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
-    if (project.rating === 'MinecraftServerListNet') return
+    // Иногда некоторые проекты намеренно выдаёт ошибку в status code, нам ничего не остаётся кроме как игнорировать все ошибки, подробнее https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
+    if (allProjects[project.rating].ignoreErrors?.()) return
 
     if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
-        const sender = {tab: {id: details.tabId}}
+        const sender = {tab: {id: details.tabId}, url: details.url}
         endVote({errorVote: [String(details.statusCode), details.url]}, sender, project)
     }
 }, {urls: ['<all_urls>']})
 
 chrome.webRequest.onErrorOccurred.addListener(async function(details) {
+    await initializeFunc
     // noinspection JSUnresolvedVariable
-    if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
+    /*if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
         let project = fetchProjects.get(details.requestId)
         endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
-    } else if (openedProjects.has(details.tabId)) {
-        if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/)) {
-            const project = await db.get('projects', openedProjects.get(details.tabId))
+    } else */if (openedProjects.has(details.tabId)) {
+        if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+            const project = openedProjects.get(details.tabId)
             if (
                 //Chrome
                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
                 //FireFox
                 || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
-                // console.warn(getProjectPrefix(project, true) + "chrome.webRequest.onErrorOccurred:", details.error, details.url)
-                return
+                    // console.warn(getProjectPrefix(project, true), details.error)
+                    return
             }
-            const sender = {tab: {id: details.tabId}}
+            const sender = {tab: {id: details.tabId}, url: details.url}
             endVote({errorVoteNetwork: [details.error, details.url]}, sender, project)
         }
     }
 }, {urls: ['<all_urls>']})
 
-async function _fetch(url, options, project) {
-    let listener
-    const removeListener = ()=>{
-        if (listener) {
-            chrome.webRequest.onBeforeRequest.removeListener(listener)
-            listener = null
-        }
-    }
+// async function _fetch(url, options, project) {
+//     let listener
+//     const removeListener = ()=>{
+//         if (listener) {
+//             chrome.webRequest.onBeforeRequest.removeListener(listener)
+//             listener = null
+//         }
+//     }
+//
+//     listener = (details)=>{
+//         //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net::ERR из fetch запроса?
+//         // noinspection JSUnresolvedVariable
+//         if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && details.url.includes(url)) {
+//             fetchProjects.set(details.requestId, project)
+//             removeListener()
+//         }
+//     }
+//     chrome.webRequest.onBeforeRequest.addListener(listener, {urls: ['<all_urls>']})
+//
+//     if (!options) options = {}
+//
+//     try {
+//         return await fetch(url, options)
+//     } catch(error) {
+//         throw error
+//     } finally {
+//         removeListener()
+//     }
+// }
 
-    listener = (details)=>{
-        //Да это костыль, а есть другой адекватный вариант достать requestId или хотя бы код ошибки net::ERR из fetch запроса?
-        // noinspection JSUnresolvedVariable
-        if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && details.url.includes(url)) {
-            fetchProjects.set(details.requestId, project)
-            removeListener()
-        }
-    }
-    chrome.webRequest.onBeforeRequest.addListener(listener, {urls: ['<all_urls>']})
-
-    if (!options) options = {}
-    if (controller.signal.aborted) {
-        controller = new AbortController()
-    }
-    options.signal = controller.signal
-    //Поддержка для браузера Uran (Chrome версии 59+)
-    options.credentials = 'include'
-
-    try {
-        return await fetch(url, options)
-    } catch(e) {
-        throw e
-    } finally {
-        removeListener()
-    }
-}
-
-let promisesProxy = []
 //Слушатель сообщений и ошибок
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (sender && openedProjects.has(sender.tab.id)) {
-        if (request === 'vote' /*|| request === 'voteReady'*/ || request === 'reloadCaptcha' /*|| request === 'startedVote'*/) {
-            chrome.tabs.sendMessage(sender.tab.id, request, async function (response) {
-                if (chrome.runtime.lastError) {
-                    if (!chrome.runtime.lastError.message.includes('Could not establish connection. Receiving end does not exist') && !chrome.runtime.lastError.message.includes('The message port closed before a response was received')) {
-                        const project = await db.get('projects', openedProjects.get(sender.tab.id))
-                        console.error(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-                        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
-                        project.error = chrome.runtime.lastError.message
-                        updateValue('projects', project)
-                        return
-                    }
-                }
-                sendResponse(response)
-            })
-            if (request === 'vote' && sender.tab.status === 'complete') {
-                if (request === 'vote' && sender.tab.status === 'complete') {
-                    //Костыль для FireFox, FireFox почему-то не передаёт функцию sendResponse и по этому мы её вызываем сами не дожидаясь загрузки api.js, тут ничо не поделаешь
-                    // noinspection JSUnresolvedVariable
-                    if (typeof InstallTrigger !== 'undefined') {
-                        sendResponse('startedVote')
-                    } else {
-                        return true
-                    }
-                }
-            }
-        } else if (request.changeProxy) {
-            if (settings.useProxyPacScript && currentProxy != null) {
-                Promise.all(promisesProxy).then(()=>{
-                    promisesProxy.push(new Promise(resolve => {
-                        if (currentPacScriptProxy.includes('false/*rating_' + request.changeProxy)) {
-                            console.log('Смена прокси для', request.changeProxy)
-                            currentPacScriptProxy = currentPacScriptProxy.replace('false/*rating_' + request.changeProxy + '*/', 'true/*rating_' + request.changeProxy + '*/')
-                            const config = {mode: 'pac_script', pacScript: {data: currentPacScriptProxy}}
-                            chrome.proxy.settings.set({value: config, scope: 'regular'}, () => {
-                                sendResponse('success')
-                                resolve()
-                            })
-                        } else {
-                            sendResponse('none')
-                            resolve()
-                        }
-                    }))
-                })
-                return true
-            } else {
-                sendResponse('none')
-            }
-        } else {
-            (async function () {
-                if (request.captcha || request.authSteam || request.discordLogIn || request.auth) {//Если требует ручное прохождение капчи
-                    const project = await db.get('projects', openedProjects.get(sender.tab.id))
-                    let message
-                    if (request.captcha) {
-                        if (settings.disabledWarnCaptcha) return
-                        message = chrome.i18n.getMessage('requiresCaptcha')
-                    } else if (request.auth && request.auth !== true) {
-                        message = request.auth
-                    } else {
-                        message = chrome.i18n.getMessage(Object.keys(request)[0])
-                    }
-                    console.warn(getProjectPrefix(project, true) + message)
-                    if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
-                    project.error = message
-                    // delete project.nextAttempt
-                    updateValue('projects', project)
-                } else if (request.errorCaptcha && !request.restartVote) {
-                    const project = await db.get('projects', openedProjects.get(sender.tab.id))
-                    const message = chrome.i18n.getMessage('errorCaptcha', request.errorCaptcha)
-                    console.warn(getProjectPrefix(project, true) + message)
-                    if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message)
-                    project.error = message
-                    updateValue('projects', project)
-                } else if (request.changeProject) {
-                    updateValue('projects', request.project)
-                } else {
-                    endVote(request, sender, null)
-                }
-            })()
-        }
+    // noinspection JSIgnoredPromiseFromCall
+    onRuntimeMessage(request, sender, sendResponse)
+    if (request.projectDeleted || request.projectRestart) {
+        return true
     }
 })
 
-function tryCloseTab(tabId, project, attempt) {
-    chrome.tabs.remove(tabId, async () => {
-        if (chrome.runtime.lastError) {
-            if (chrome.runtime.lastError.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
-                await wait(500)
-                tryCloseTab(tabId, project, ++attempt)
-                return
+async function onRuntimeMessage(request, sender, sendResponse) {
+    if (request === 'reloadCaptcha') {
+        // noinspection JSVoidFunctionReturnValueUsed,JSCheckFunctionSignatures
+        const frames = await chrome.webNavigation.getAllFrames({tabId: sender.tab.id})
+        for (const frame of frames) {
+            // noinspection JSUnresolvedVariable
+            if (frame.url.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || frame.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) {
+                function reload() {
+                    document.location.reload()
+                }
+
+                // noinspection JSCheckFunctionSignatures,JSUnresolvedVariable
+                await chrome.scripting.executeScript({target: {tabId: sender.tab.id, frameIds: [frame.frameId]}, func: reload})
             }
-            console.warn(getProjectPrefix(project, true) + chrome.runtime.lastError.message)
-            if (!settings.disabledNotifError && chrome.runtime.lastError.message !== 'No tab with id.')
-                sendNotification(getProjectPrefix(project, false), chrome.runtime.lastError.message)
         }
-    })
+        return
+    } else if (request === 'captchaPassed') {
+        try {
+            await chrome.tabs.sendMessage(sender.tab.id, request)
+        } catch (error) {
+            if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+                console.warn(error.message)
+            }
+        }
+        return
+    }
+
+    await initializeFunc
+
+    if (request === 'checkVote') {
+        checkVote()
+        return
+    } else if (request === 'reloadAllSettings') {
+        settings = await db.get('other', 'settings')
+        generalStats = await db.get('other', 'generalStats')
+        todayStats = await db.get('other', 'todayStats')
+        for (const[key,value] of openedProjects) {
+            openedProjects.delete(key)
+            tryCloseTab(key, value, 0)
+        }
+        await db.put('other', openedProjects, 'openedProjects')
+        reloadAllAlarms()
+        checkVote()
+        return
+    } else if (request === 'reloadSettings') {
+        settings = await db.get('other', 'settings')
+        return
+    } else if (request.projectDeleted) {
+        let nowVoting = false
+        //Если эта вкладка была уже открыта, он закрывает её
+        for (const[key,value] of openedProjects) {
+            if (request.projectDeleted.key === value.key) {
+                if (key === 'start_' + request.projectDeleted.key) {
+                    sendResponse('reject')
+                    return
+                }
+                nowVoting = true
+                openedProjects.delete(key)
+                tryCloseTab(key, value, 0)
+                await db.put('other', openedProjects, 'openedProjects')
+                break
+            }
+        }
+        await db.delete('projects', request.projectDeleted.key)
+        await chrome.alarms.clear(String(request.projectDeleted.key))
+        if (nowVoting) {
+            checkVote()
+            console.log(getProjectPrefix(request.projectDeleted, true), chrome.i18n.getMessage('projectDeleted'))
+        }
+        sendResponse('success')
+        return
+    } else if (request.projectRestart) {
+        for (const[key,value] of openedProjects) {
+            if (request.projectRestart.key === value.key) {
+                if (request.confirmed) {
+                    openedProjects.delete(key)
+                    db.put('other', openedProjects, 'openedProjects')
+                    tryCloseTab(key, value, 0)
+                    console.log(getProjectPrefix(request.projectRestart, true), chrome.i18n.getMessage('canceledVote'))
+                } else {
+                    sendResponse('confirmNow')
+                    return
+                }
+            }
+        }
+        for (const[key,value] of openedProjects) {
+            if (request.projectRestart.rating === value.rating || settings.disabledOneVote) {
+                if (request.confirmed) {
+                    openedProjects.delete(key)
+                    await db.put('other', openedProjects, 'openedProjects')
+                    tryCloseTab(key, value, 0)
+                    const project = await db.get('projects', value.key)
+                    if (project.openedTimeoutQueue || project.openedNextAttempt) {
+                        delete project.openedTimeoutQueue
+                        delete project.openedNextAttempt
+                        delete project.openedCountInject
+                        await updateValue('projects', project)
+                    }
+                    console.log(getProjectPrefix(project, true), chrome.i18n.getMessage('canceledVote'))
+                } else {
+                    sendResponse('confirmQueue')
+                    return
+                }
+            }
+        }
+
+        await chrome.alarms.clear(String(request.projectRestart.key))
+        request.projectRestart.time = null
+        delete request.projectRestart.openedTimeoutQueue
+        delete request.projectRestart.openedNextAttempt
+        delete request.projectRestart.openedCountInject
+        await updateValue('projects', request.projectRestart)
+        console.log(getProjectPrefix(request.projectRestart, true), chrome.i18n.getMessage('projectRestarted'))
+        checkOpen(request.projectRestart)
+        checkVote()
+        sendResponse('success')
+        return
+    }
+
+    if (request.changeProject) {
+        updateValue('projects', request.changeProject)
+        return
+    }
+
+    if (!openedProjects.has(sender.tab.id)) {
+        console.warn('A double attempt to complete the vote? chrome.runtime.onMessage', JSON.stringify(request), JSON.stringify(sender))
+        return
+    }
+
+    let project = openedProjects.get(sender.tab.id)
+    if (request.captcha || request.authSteam || request.discordLogIn || request.auth || request.requiredConfirmTOS || (request.errorCaptcha && !request.restartVote) || request.restartVote === false) {//Если требует ручное прохождение капчи
+        project = await db.get('projects', project.key)
+        let message
+        if (request.captcha) {
+            message = chrome.i18n.getMessage('requiresCaptcha')
+        } else if (request.message) {
+            message = request.message
+        } else {
+            if (Object.values(request)[0] !== true) {
+                message = chrome.i18n.getMessage(Object.keys(request)[0], Object.values(request)[0])
+            } else {
+                message = chrome.i18n.getMessage(Object.keys(request)[0])
+            }
+        }
+        if (!(request.captcha && settings.disabledWarnCaptcha)) {
+            console.warn(getProjectPrefix(project, true), message)
+            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
+            project.error = message
+        }
+        delete project.openedNextAttempt // TODO по идеи это не отражается в openedProjects но нужно для понимания нужно ли отсылать репорт если произойдёт timeout
+        updateValue('projects', project)
+    } else {
+        endVote(request, sender, project)
+    }
+}
+
+async function tryOpenTab(request, project, attempt) {
+    try {
+        return await chrome.tabs.create(request)
+    } catch (error) {
+        if (error.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
+            await wait(500)
+            return await tryOpenTab(request, project, ++attempt)
+        }
+        endVote({errorOpenTab: error.message}, null, project)
+        return null
+    }
+}
+
+async function tryCloseTab(tabId, project, attempt) {
+    if (!Number.isInteger(tabId) || settings.disabledCloseTabs) return
+    try {
+        await chrome.tabs.remove(tabId)
+    } catch (error) {
+        if (error.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
+            await wait(500)
+            await tryCloseTab(tabId, project, ++attempt)
+            return
+        }
+        if (!error.message.includes('No tab with id')) {
+            console.warn(getProjectPrefix(project, true), error.message)
+            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
+        }
+    }
 }
 
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
-    if (sender && openedProjects.has(sender.tab.id)) {
-        //Если сообщение доставлено из вкладки и если вкладка была открыта расширением
-        project = await db.get('projects', openedProjects.get(sender.tab.id))
-        if (closeTabs && !request.closedTab) {
-            tryCloseTab(sender.tab.id, project, 0)
-        }
-        openedProjects.delete(sender.tab.id)
-        db.put('other', openedProjects, 'openedProjects')
-    } else if (!project) return
+    let timeout = settings.timeout
 
-    for (const[key,value] of fetchProjects.entries()) {
-        if (value.key === project.key) {
-            fetchProjects.delete(key)
+    delete project.openedTimeoutQueue
+    delete project.openedNextAttempt
+    delete project.openedCountInject
+
+    let found = false
+    for (const [tab,value] of openedProjects) {
+        if (project.key === value.key) {
+            // noinspection JSCheckFunctionSignatures
+            if (!Number.isInteger(tab) && !tab.startsWith('background_')) {
+                console.warn('A double attempt to complete the vote? endVote, has openedProjects', JSON.stringify(request), JSON.stringify(sender), JSON.stringify(project))
+                return
+            } else {
+                found = true
+                if (project.randomize) {
+                    timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
+                }
+                project.openedTimeoutQueue = Date.now() + timeout
+
+                openedProjects.delete(tab)
+                openedProjects.set('queue_' + project.key, project)
+                db.put('other', openedProjects, 'openedProjects')
+            }
+            break
+        }
+    }
+    if (!found) {
+        console.warn('A double attempt to complete the vote? endVote, not found openedProjects', JSON.stringify(request), JSON.stringify(sender), JSON.stringify(project))
+        return
+    }
+
+    if (!request.successfully && request.later == null) {
+        if (sender?.url || request.url) {
+            const url = sender?.url || request.url
+            const domain = getDomainWithoutSubdomain(url)
+            // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
+            if (projectByURL.get(domain) !== project.rating) {
+                request.incorrectDomain = domain
+            }
+        }
+
+        // noinspection PointlessBooleanExpressionJS
+        if (false && !settings.disabledSendErrorSentry && !settings.disabledUseRemoteCode && !request.ignoreReport && !request.incorrectDomain && (request.message != null || request.errorVoteNoElement || request.emptyError || (request.timeout && settings.enabledReportTimeout) || (request.tooManyVoteAttempts && settings.enabledReportTooManyAttempts))) {
+            try {
+                await reportError(request, sender, project)
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error.message)
+            }
         }
     }
 
-    delete project.nextAttempt
+    if (sender && !request.closedTab) {
+        tryCloseTab(sender.tab.id, project, 0)
+    }
+
+    // noinspection PointlessBooleanExpressionJS
+    if (false && !settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
+        evilProjects = Date.now() + 300000
+        try {
+            const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
+            const projects = await response.text()
+            if (!evil) {
+                // noinspection JSUnresolvedVariable
+                if (!self.evalCore) {
+                    importScripts('libs/evalCore.umd.js')
+                }
+                // noinspection JSUnresolvedFunction,JSUnresolvedVariable
+                evil = evalCore.getEvalInstance(self)
+            }
+            evil(projects)
+        } catch (error) {
+            console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода projects.js, использую вместо этого локальный код', error.message)
+        }
+    }
+
+    // for (const[key,value] of fetchProjects) {
+    //     if (value.key === project.key) {
+    //         fetchProjects.delete(key)
+    //     }
+    // }
+
+    project = await db.get('projects', project.key)
+
+    delete project.openedTimeoutQueue
+    delete project.openedNextAttempt
+    delete project.openedCountInject
 
     //Если усё успешно
     let sendMessage
@@ -1471,97 +1575,118 @@ async function endVote(request, sender, project) {
             }
         }
         let time = new Date()
-        if (project.rating !== 'Custom' && (project.timeout != null || project.timeoutHour != null) && !(project.lastDayMonth && new Date(time.getFullYear(), time.getMonth(), time.getDay() + 1).getMonth() === new Date().getMonth())) {
+        if (project.rating === 'Custom' || ((project.timeout != null || project.timeoutHour != null) && !Number.isInteger(request.later) && !(project.lastDayMonth && new Date(time.getFullYear(), time.getMonth(), time.getDay() + 1).getMonth() === new Date().getMonth()))) {
             if (project.timeoutHour != null) {
                 if (project.timeoutMinute == null) project.timeoutMinute = 0
                 if (project.timeoutSecond == null) project.timeoutSecond = 0
                 if (project.timeoutMS == null) project.timeoutMS = 0
-                if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
-                    time.setDate(time.getDate() + 1)
+
+                let month = time.getMonth()
+                let date = time.getDate()
+
+                let needCalculateDate = true
+                if (project.timeoutWeek != null) {
+                    // https://stackoverflow.com/a/11789820/11235240
+                    const distance = (project.timeoutWeek + 7 - time.getDay()) % 7
+                    if (distance > 0) {
+                        needCalculateDate = false
+                        date += distance
+                    }
+                } else if (project.timeoutMonth != null) {
+                    if (time.getDate() !== project.timeoutMonth) {
+                        needCalculateDate = false
+                        if (time.getDate() > project.timeoutMonth) month += 1
+                        date = project.timeoutMonth
+                    }
                 }
-                time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
+                if (needCalculateDate) {
+                    if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
+                        if (project.timeoutWeek != null) {
+                            date += 7
+                        } else if (project.timeoutMonth != null) {
+                            month += 1
+                            date = project.timeoutMonth
+                        } else {
+                            date += 1
+                        }
+                    }
+                }
+
+                time = new Date(time.getFullYear(), month, date, project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
             } else {
                 time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
             }
         } else if (request.later && Number.isInteger(request.later)) {
-            time = new Date(request.later)
-            if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || request.rating === 'ServeurMinecraftVoteFr' || request.rating === 'ListeServeursFr') {
+            let needSetTime = true
+            if (allProjects[project.rating]?.limitedCountVote?.()) {
                 project.countVote = project.countVote + 1
                 if (project.countVote >= project.maxCountVote) {
-                    time = new Date()
-                    time.setDate(time.getDate() + 1)
-                    time.setHours(0, (project.priority ? 0 : 10), 0, 0)
+                    needSetTime = false
+                    time = new Date(time.getFullYear(), time.getMonth(), time.getDate() + 1, 0, (project.priority ? 0 : 10), 0, 0)
                 }
+            }
+            if (needSetTime) {
+                time = new Date(request.later)
             }
         } else {
-            //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
-            let hour
-            if (project.rating === 'TopCraft' || project.rating === 'McTOP' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || project.rating === 'IonMc' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-                //Топы на которых время сбрасывается в 00:00 по МСК
-                hour = 21
-            } else if (project.rating === 'MCRate') {
-                hour = 22
-            } else if (project.rating === 'MinecraftServerList' || project.rating === 'ServerList101' || project.rating === 'MinecraftServerListNet' || project.rating === 'MinecraftServerEu') {
-                hour = 23
-            } else if (project.rating === 'PlanetMinecraft' || project.rating === 'ListForge' || project.rating === 'MinecraftList') {
-                hour = 5
-            } else if (project.rating === 'MinecraftServersOrg' || project.rating === 'MinecraftIndex' || project.rating === 'MinecraftBuzz' || project.rating === 'MineServers') {
-                hour = 0
-            } else if (project.rating === 'TopMinecraftServers') {
-                hour = 4
-            } else if (project.rating === 'MMoTopRU') {
-                hour = 20
-            }
-            if (hour != null) {
-                if (time.getUTCHours() >= hour/* || (time.getUTCHours() === hour && time.getUTCMinutes() >= (project.priority ? 0 : 10))*/) {
-                    time.setUTCDate(time.getUTCDate() + 1)
-                }
-                time.setUTCHours(hour, (project.priority ? 0 : 10), 0, 0)
-            //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
-            } else if (project.rating === 'TopG' || project.rating === 'MinecraftServersBiz' || project.rating === 'TopGG' || project.rating === 'DiscordBotList' || project.rating === 'MCListsOrg' || (project.rating === 'Discords' && project.game === 'bots/bot') || project.rating === 'DiscordBoats' || project.rating === 'McServerTimeCom') {
-                time.setUTCHours(time.getUTCHours() + 12)
-            } else if (project.rating === 'MinecraftIpList' || project.rating === 'HotMC' || project.rating === 'MinecraftServerNet' || project.rating === 'TMonitoring' || project.rating === 'MCServers' || project.rating === 'CraftList' || project.rating === 'TopMCServersCom' || project.rating === 'CraftListNet' || project.rating === 'MinecraftServers100' || project.rating === 'MineStatus' || project.rating === 'MinecraftServersDe' || (project.rating === 'MinecraftRating' && project.game === 'servers') || (project.rating === 'MisterLauncher' && project.game === 'servers') || project.rating === 'ATLauncher' || project.rating === 'MCServidores' || project.rating === 'MinecraftServerSk' || project.rating === 'ServeursMinecraftOrg') {
-                time.setUTCDate(time.getUTCDate() + 1)
-            } else if (project.rating === 'ServeurPrive' || project.rating === 'TopGames' || project.rating === 'MCServerList' || project.rating === 'CzechCraft' || project.rating === 'MinecraftServery' || project.rating === 'MinecraftListCZ' || project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMCNet' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ServeurMinecraftVoteFr' || project.rating === 'ListeServeursFr') {
-                project.countVote = project.countVote + 1
-                if (project.countVote >= project.maxCountVote) {
-                    time.setDate(time.getDate() + 1)
-                    time.setHours(0, (project.priority ? 0 : 10), 0, 0)
-                    project.countVote = 0
-                } else {
-                    if (project.rating === 'ServeurPrive' || project.rating === 'ServeurMinecraftVoteFr') {
-                        time.setUTCHours(time.getUTCHours() + 1, time.getUTCMinutes() + 30)
-                    } else if (project.rating === 'ListeServeursMinecraft' || project.rating === 'ServeursMinecraftCom' || project.rating === 'ListeServeursFr') {
-                        time.setUTCHours(time.getUTCHours() + 3)
-                    } else {
-                        time.setUTCHours(time.getUTCHours() + 2)
-                    }
-                }
-            } else if (project.rating === 'ServerPact') {
-                time.setUTCHours(time.getUTCHours() + 11)
-                time.setUTCMinutes(time.getUTCMinutes() + 7)
-            } else if (project.rating === 'Custom') {
-                if (project.timeoutHour != null) {
-                    if (project.timeoutMinute == null) project.timeoutMinute = 0
-                    if (project.timeoutSecond == null) project.timeoutSecond = 0
-                    if (project.timeoutMS == null) project.timeoutMS = 0
-                    if (time.getHours() > project.timeoutHour || (time.getHours() === project.timeoutHour && time.getMinutes() >= project.timeoutMinute)) {
-                        time.setDate(time.getDate() + 1)
-                    }
-                    time.setHours(project.timeoutHour, project.timeoutMinute, project.timeoutSecond, project.timeoutMS)
-                } else {
-                    time.setUTCMilliseconds(time.getUTCMilliseconds() + project.timeout)
-                }
-            } else if (project.rating === 'CraftList') {
+            const timeoutRating = allProjects[project.rating]?.timeout?.(project)
+            if (Number.isInteger(request.successfully)) {
                 time = new Date(request.successfully)
-            } else if (project.rating === 'Discords' && project.game === 'servers') {
-                time.setUTCHours(time.getUTCHours() + 6)
-            } else if (project.rating === 'WARGM') {
-                time.setUTCHours(time.getUTCHours() + 16)
-            } else if (project.rating === 'ServerListGames') {
-                time.setUTCHours(time.getUTCHours() + 20)
-            } else {
+            } else if (!timeoutRating) {
+                //Если нам не известен таймаут, ставим по умолчанию +24 часа
                 time.setUTCDate(time.getUTCDate() + 1)
+            } else if (timeoutRating.week != null) {
+                let date = time.getUTCDate()
+                // https://stackoverflow.com/a/11789820/11235240
+                const distance = (timeoutRating.week + 7 - time.getUTCDay()) % 7
+                if (distance > 0) {
+                    date += distance
+                } else {
+                    if (time.getUTCHours() >= timeoutRating.hour) {
+                        date += 7
+                    }
+                }
+                time = new Date(Date.UTC(time.getUTCFullYear(), time.getUTCMonth(), date, timeoutRating.hour, (project.priority ? 0 : 10), 0, 0))
+            } else if (timeoutRating.month != null) {
+                let month = time.getUTCMonth()
+                let date = time.getUTCDate()
+                if (time.getUTCDate() !== timeoutRating.month) {
+                    if (time.getUTCDate() > timeoutRating.month) month += 1
+                    date = timeoutRating.month
+                } else {
+                    if (time.getUTCHours() >= timeoutRating.hour) {
+                        month += 1
+                        date = timeoutRating.month
+                    }
+                }
+                time = new Date(Date.UTC(time.getUTCFullYear(), month, date, timeoutRating.hour, (project.priority ? 0 : 10), 0, 0))
+            } else if (timeoutRating.hour != null) {
+                //Рейтинги с таймаутом сбрасывающемся раз в день в определённый час
+                let date = time.getUTCHours() >= timeoutRating.hour ? time.getUTCDate() + 1 : time.getUTCDate()
+                time = new Date(Date.UTC(time.getUTCFullYear(), time.getUTCMonth(), date, timeoutRating.hour, (project.priority ? 0 : 10), 0, 0))
+            } else if (timeoutRating.hours != null) {
+                let needSetTime = true
+                //Рейтинги с таймаутом сбрасывающемся через определённый промежуток времени с момента последнего голосования
+                if (allProjects[project.rating]?.limitedCountVote?.()) {
+                    project.countVote = project.countVote + 1
+                    if (project.countVote >= project.maxCountVote) {
+                        needSetTime = false
+                        time = new Date(time.getFullYear(), time.getMonth(), time.getDate() + 1, 0, (project.priority ? 0 : 10), 0, 0)
+                        project.countVote = 0
+                    }
+                }
+                if (needSetTime) {
+                    let hours = time.getHours() + timeoutRating.hours
+                    let minutes = time.getMinutes()
+                    let seconds = time.getSeconds()
+                    let milliseconds = time.getMilliseconds()
+                    if (timeoutRating.minutes != null) minutes += timeoutRating.minutes
+                    // noinspection JSUnresolvedVariable
+                    if (timeoutRating.seconds != null) seconds += timeoutRating.seconds
+                    // noinspection JSUnresolvedVariable
+                    if (timeoutRating.milliseconds != null) milliseconds += timeoutRating.milliseconds
+                    time = new Date(time.getFullYear(), time.getMonth(), time.getDate(), hours, minutes, seconds, milliseconds)
+                }
             }
         }
 
@@ -1612,7 +1737,7 @@ async function endVote(request, sender, project) {
 
         if (request.successfully) {
             sendMessage = chrome.i18n.getMessage('successAutoVote')
-            if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
             project.stats.successVotes++
             project.stats.monthSuccessVotes++
@@ -1635,19 +1760,14 @@ async function endVote(request, sender, project) {
                 }
             }
             sendMessage = chrome.i18n.getMessage('alreadyVoted')
-            if (typeof request.later == 'string') sendMessage = sendMessage + ' ' + request.later
-            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage)
+            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
             project.stats.laterVotes++
 
             generalStats.laterVotes++
             todayStats.laterVotes++
         }
-        if (request.successfully) {
-            console.log(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        } else {
-            console.warn(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        }
+        console.log(getProjectPrefix(project, true), sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
         //Если ошибка
     } else {
         let message
@@ -1661,6 +1781,9 @@ async function endVote(request, sender, project) {
             message = request.message
         }
         if (message.length === 0) message = chrome.i18n.getMessage('emptyError')
+        if (request.incorrectDomain) {
+            message += ' Incorrect domain ' + request.incorrectDomain
+        }
         let retryCoolDown
         if (currentVK != null && ((project.rating === 'TopCraft' && currentVK.passwordTopCraft) || (project.rating === 'McTOP' && currentVK.passwordMcTOP))) {
             if (request && request.message && (request.message.includes('Имя пользователя и/или пароль не верны') /*|| request.message.includes('бедитесь, что это значение содержит не более') || request.message.includes('password' + project.rating)*/)) {
@@ -1747,8 +1870,8 @@ async function endVote(request, sender, project) {
         //     project.time = null
         // }
         project.error = message
-        console.error(getProjectPrefix(project, true) + sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage)
+        console.error(getProjectPrefix(project, true), sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
+        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
         project.stats.errorVotes++
 
@@ -1772,43 +1895,51 @@ async function endVote(request, sender, project) {
     await db.put('other', todayStats, 'todayStats')
     await updateValue('projects', project)
 
-    await new Promise(resolve => chrome.alarms.clear(String(project.key), resolve))
+    await chrome.alarms.clear('nextAttempt_' + project.key)
     if (project.time != null && project.time > Date.now()) {
         let create2 = true
-        await new Promise(resolve => {
-            chrome.alarms.getAll(function(alarms) {
-                for (const alarm of alarms) {
-                    if (alarm.scheduledTime === project.time) {
-                        create2 = false
-                        resolve()
-                        break
-                    }
-                }
-                resolve()
-            })
-        })
+        let when = project.time
+        if (when - Date.now() < 65000) when = Date.now() + 65000
+        const alarms = await chrome.alarms.getAll()
+        for (const alarm of alarms) {
+            // noinspection JSCheckFunctionSignatures
+            if (!isNaN(alarm.name) && alarm.scheduledTime === when) {
+                create2 = false
+                break
+            }
+        }
         if (create2) {
-            chrome.alarms.create(String(project.key), {when: project.time})
+            try {
+                await chrome.alarms.create(String(project.key), {when})
+            } catch (error) {
+                console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error.message)
+            }
         }
     }
 
-    function removeQueue() {
-        const clonedQueueProjects = new Set(queueProjects)
-        for (const value of clonedQueueProjects) {
-            if (project.key === value.key) {
-                clonedQueueProjects.delete(value)
+    async function removeQueue() {
+        for (const [tab,value] of openedProjects) {
+            // noinspection JSCheckFunctionSignatures
+            if (tab.startsWith?.('queue_') && project.key === value.key) {
+                openedProjects.delete(tab)
             }
         }
+        project = await db.get('projects', project.key)
+        if (project && project.openedTimeoutQueue) {
+            delete project.openedTimeoutQueue
+            updateValue('projects', project)
+        }
+        db.put('other', openedProjects, 'openedProjects')
         if ((settings.useMultiVote && project.useMultiVote !== false) || project.useMultiVote) {
             if (currentVK != null || currentProxy != null) {
-                if (clonedQueueProjects.size === 0) {
+                if (openedProjects.size === 0) {
                     if (currentProxy != null) clearProxy()
                     currentVK = null
                     nextLoop = false
                 } else {
                     let countVK = 0
                     let countProxy = 0
-                    for (const value of clonedQueueProjects) {
+                    for (const value of openedProjects) {
                         if (countVK > 0 && countProxy > 0) break
                         if (value.useMultiVote !== false) {
                             if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || (value.rating === 'MinecraftRating' && value.game === 'projects') || (value.rating === 'MisterLauncher' && value.game === 'projects') || value.rating === 'MonitoringMinecraft') {
@@ -1833,12 +1964,12 @@ async function endVote(request, sender, project) {
         }
         if (settings.useMultiVote && project.useMultiVote === false) {
             if (currentVK != null) {
-                if (clonedQueueProjects.size === 0) {
+                if (openedProjects.size === 0) {
                     currentVK = null
                     nextLoop = false
                 } else {
                     let countVK = 0
-                    for (const value of clonedQueueProjects) {
+                    for (const value of openedProjects) {
                         if (countVK > 0) break
                         if (value.rating === 'TopCraft' || value.rating === 'McTOP' || value.rating === 'MCRate' || (value.rating === 'MinecraftRating' && value.game === 'projects') || (value.rating === 'MisterLauncher' && value.game === 'projects') || value.rating === 'MonitoringMinecraft') {
                             countVK++
@@ -1851,32 +1982,171 @@ async function endVote(request, sender, project) {
                 }
             }
         }
-        for (const value of queueProjects) {
-            if (project.key === value.key) {
-                queueProjects.delete(value)
-            }
-        }
-        if (queueProjects.size === 0) {
+        if (openedProjects.size === 0) {
             promises = []
             promisesProxy = []
-            if (updateAvailable) {
-                chrome.runtime.reload()
-                return
-            }
         }
         checkVote()
     }
-    let timeout = settings.timeout
-    if (project.randomize) {
-        timeout += Math.floor(Math.random() * (60000 - 10000) + 10000)
-    }
+
     setTimeout(()=>{
         removeQueue()
     }, timeout)
+
+    // TODO мы не можем быть уверены что setTimeout в Service Worker 100% отработает, поэтому мы на всякий случай создаём chrome.alarm
+    let alarmTimeout = timeout
+    if (alarmTimeout < 65000) alarmTimeout = 65000
+    try {
+        await chrome.alarms.create('checkVote', {when: Date.now() + alarmTimeout})
+    } catch (error) {
+        console.warn(getProjectPrefix(project, true), 'Ошибка при создании chrome.alarms', error.message)
+    }
+}
+
+
+async function reportError(request, sender, project) {
+    const reported = await db.get('other', 'sentryReported')
+    if (reported?.[project.rating] > Date.now()) return
+
+    let tabDetails
+    if (sender) {
+        await new Promise(resolve => {
+            chrome.pageCapture.saveAsMHTML({tabId: sender.tab.id}, function (details) {
+                const error = chrome.runtime.lastError?.message
+                if (error) {
+                    if (!error.includes('Cannot find the tab for this request')) {
+                        console.warn(getProjectPrefix(project, true), 'Ошибка получении скриншота вкладки для отправки отчёта об ошибке', error)
+                    }
+                    resolve()
+                    return
+                }
+                tabDetails = {}
+                tabDetails.mhtml = details
+                resolve()
+            })
+        })
+    }
+
+    if (!tabDetails && !request.html) return
+
+    sendReport(request, sender, tabDetails, project, reported)
+}
+
+async function sendReport(request, sender, tabDetails, project, reported) {
+    let titleError = project.rating + ' '
+    let detailsError
+    if (request.message != null) {
+        if (typeof request.message === 'string' && request.message.length > 0) {
+            titleError = titleError + request.message
+        } else if (typeof request.message === 'object') {
+            titleError = titleError + JSON.stringify(request.message)
+        } else {
+            titleError = titleError + 'Empty error'
+        }
+    } else if (request.errorVoteNoElement) {
+        titleError = titleError + 'No element'
+        detailsError = request.errorVoteNoElement
+    } else if (request.emptyError) {
+        titleError = titleError + 'Empty error'
+    } else if (request.timeout) {
+        titleError = titleError + 'Timeout'
+    } else if (request.tooManyVoteAttempts) {
+        titleError = titleError + 'Too many vote attempts'
+    }
+
+    const eventId = uuidv4()
+    const date = new Date()
+    const message1 = {}
+    message1.event_id = eventId
+    message1.sent_at = date.toISOString()
+    const message2 = {type: 'event'}
+    const message3 = {}
+    message3.message = titleError
+    message3.level = 'error'
+    message3.event_id = uuidv4()
+    message3.platform = 'javascript'
+    message3.timestamp = date.getTime() / 1000
+    message3.environment = 'production'
+    message3.release = 'Auto-Vote-Rating@' + chrome.runtime.getManifest().version
+    message3.extra = {}
+    if (detailsError) message3.extra.detailsError = detailsError
+    message3.extra.project = project
+    message3.extra.settings = settings
+    message3.request = {headers: {'User-Agent': self.navigator.userAgent}}
+    if (sender?.url) {
+        message3.request.url = sender.url
+    } else if (request.url) {
+        message3.request.url = request.url
+    } else {
+        message3.request.url = 'chrome-extension://mdfmiljoheedihbcfiifopgmlcincadd/background.js'
+    }
+    if (project.nick) {
+        message3.user = {}
+        message3.user.username = project.nick
+    }
+    let body = JSON.stringify(message1) + '\n' + JSON.stringify(message2) + '\n' + JSON.stringify(message3)
+
+    if (!tabDetails && request.html) {
+        tabDetails = {html: request.html}
+    }
+    if (tabDetails.mhtml) {
+        // noinspection JSUnresolvedFunction
+        tabDetails.mhtml = new Uint8Array(await tabDetails.mhtml.arrayBuffer())
+    }
+
+    // Да тут полный кринж, работа с байтами крайне убога, но мы работаем с тем чем имеем
+    if (tabDetails) {
+        let documentArrayHead
+        let documentArrayBody
+        let documentArray
+
+        let enc = new TextEncoder()
+
+        const attachmentHTML = {}
+        documentArrayBody = tabDetails.html ? enc.encode(tabDetails.html) : tabDetails.mhtml
+        attachmentHTML.type = 'attachment'
+        attachmentHTML.length = documentArrayBody.length
+        attachmentHTML.filename = tabDetails.html ? 'document.html' : 'document.mhtml'
+        documentArrayHead = enc.encode('\n' + JSON.stringify(attachmentHTML) + '\n')
+        documentArray = new Uint8Array(documentArrayHead.length + documentArrayBody.length)
+        documentArray.set(documentArrayHead)
+        documentArray.set(documentArrayBody, documentArrayHead.length)
+
+        let newBody = enc.encode(body)
+        let newBody2 = new Uint8Array(newBody.length + documentArray.length)
+        newBody2.set(newBody)
+        newBody2.set(documentArray, newBody.length)
+
+        body = newBody2
+    }
+
+    const options = {body}
+    options.method = 'POST'
+    try {
+        const response = await fetch("https://o1160467.ingest.sentry.io/api/6244963/envelope/?sentry_key=a9f5f15340e847fa9f8af7120188faf3", options)
+        const json = await response.json()
+        if (!response.ok) {
+            console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', json)
+        } else {
+            console.log(getProjectPrefix(project, true), 'An error report has been sent, details:', json)
+        }
+    } catch (error) {
+        console.warn(getProjectPrefix(project, true), 'Ошибка отправки отчёта об ошибке', error.message)
+    } finally {
+        if (!reported) reported = {}
+        reported[project.rating] = Date.now() + 86400000
+        await db.put('other', reported, 'sentryReported')
+    }
+}
+
+function uuidv4() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
 }
 
 //Отправитель уведомлений
-function sendNotification(title, message) {
+function sendNotification(title, message, notificationId) {
     if (!message) message = ''
     let notification = {
         type: 'basic',
@@ -1884,89 +2154,69 @@ function sendNotification(title, message) {
         title: title,
         message: message
     }
-    chrome.notifications.create('', notification, function() {})
+    if (!notificationId) notificationId = ''
+    chrome.notifications.create(notificationId, notification, function() {})
 }
+chrome.notifications.onClicked.addListener(async function (notificationId) {
+    if (notificationId.startsWith('openTab_')) {
+        try {
+            const tabId = Number(notificationId.replace('openTab_', ''))
+            if (!tabId) return
+            const tab = await chrome.tabs.update(tabId, {active: true})
+            if (!tab) return
+            await chrome.windows.update(tab.windowId, {focused: true})
+        } catch (error) {
+            if (!error.message.includes('No tab with id')) {
+                console.warn('Ошибка при фокусировке на вкладку', error.message)
+            }
+        }
+    } else if (notificationId.startsWith('openProject_')) {
+        try {
+            const projectKey = Number(notificationId.replace('openProject_', ''))
+            const found = await db.count('projects', projectKey)
+            if (!found) return
+            await openOptionsPage()
+            await chrome.runtime.sendMessage({openProject: projectKey})
+        } catch (error) {
+            console.warn('Ошибка открытия настроек с определённым проектом', error.message)
+        }
+    }
+})
 
-function getProjectPrefix(project, detailed) {
-    if (detailed) {
-        return '[' + allProjects[project.rating]('URL', project) + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' – ' : '') + (project.game != null ? project.game + ' – ' : '') + project.id + (project.name != null ? ' – ' + project.name : '') + ' '
-    } else {
-        return '[' + allProjects[project.rating]('URL', project) + '] ' + (project.nick != null && project.nick !== '' ? project.nick + ' ' : '') + (project.name != null ? '– ' + project.name : '– ' + project.id)
+async function openOptionsPage() {
+    await chrome.runtime.openOptionsPage()
+    // Дикий костыль на ожидание загрузки вкладки, мы не можем адекватно передать в настройки нужные данные, поэтому придётся так костылять
+    const tab = await chrome.tabs.query({active: true, lastFocusedWindow: true})
+    if (!tab.length) return
+    if (tab[0].status !== 'complete') {
+        for (let i = 0; i < 9; i++) {
+            await wait(250)
+            const t = await chrome.tabs.get(tab[0].id)
+            if (t.status === 'complete') break
+        }
     }
 }
 
-//Проверяет правильное ли у вас время
-// async function checkTime() {
-//     try {
-//         let response = await fetch('https://me-admin.cifrazia.com/')
-//         if (response.ok && !response.redirected) {
-//             // если HTTP-статус в диапазоне 200-299 и не было переадресаций
-//             // получаем тело ответа и сравниваем время
-//             let json = await response.json()
-//             let serverTimeUTC = Number(json.timestamp.toString().replace('.', '').substring(0, 13))
-//             let timeUTC = Date.now()
-//             let timeDifference = (timeUTC - serverTimeUTC)
-//             if (Math.abs(timeDifference) > 300000) {
-//                 let text
-//                 let time
-//                 let unit
-//                 if (timeDifference > 0) {
-//                     text = chrome.i18n.getMessage('clockHurry')
-//                 } else {
-//                     text = chrome.i18n.getMessage('clockLagging')
-//                 }
-//                 if (timeDifference > 3600000 || timeDifference < -3600000) {
-//                     time = (Math.abs(timeDifference) / 1000 / 60 / 60).toFixed(1)
-//                     unit = chrome.i18n.getMessage('clockHourns')
-//                 } else {
-//                     time = (Math.abs(timeDifference) / 1000 / 60).toFixed(1)
-//                     unit = chrome.i18n.getMessage('clockMinutes')
-//                 }
-//                 let text2 = chrome.i18n.getMessage('clockInaccurate', [text, time, unit])
-//                 console.warn(text2)
-//                 if (!settings.disabledNotifWarn)
-//                     sendNotification(chrome.i18n.getMessage('clockInaccurateLog', text), text2)
-//             }
-//         } else {
-//             console.error(chrome.i18n.getMessage('errorClock2', String(response.status)))
-//         }
-//     } catch (e) {
-//         console.error(chrome.i18n.getMessage('errorClock', e))
-//     }
-// }
-
-// noinspection JSUnusedGlobalSymbols
-async function setCookie(url, name, value) {
-    return new Promise(resolve=>{
-        chrome.cookies.set({'url': url, 'name': name, 'value': value}, function(details) {
-            resolve(details)
-        })
-    })
-}
-
-async function setCookieDetails(details) {
-    return new Promise(resolve=>{
-        chrome.cookies.set(details, function(det) {
-            resolve(det)
-        })
-    })
-}
-
-// noinspection JSUnusedGlobalSymbols
-async function getCookie(url, name) {
-    return new Promise(resolve=>{
-        chrome.cookies.get({'url': url, 'name': name}, function(cookie) {
-            resolve(cookie)
-        })
-    })
-}
-
-async function removeCookie(url, name) {
-    return new Promise(resolve=>{
-        chrome.cookies.remove({'url': url, 'name': name}, function(details) {
-            resolve(details)
-        })
-    })
+function getProjectPrefix(project, detailed) {
+    let text = ''
+    if (project.nick && project.nick !== '') text += ' – ' + project.nick
+    if (detailed && project.game && project.game !== '') text += ' – ' + project.game
+    if (detailed) {
+        if (project.id && project.id !== '') text += ' – ' + project.id
+        if (project.name && project.name !== '') text += ' – ' + project.name
+    } else {
+        if (project.name && project.name !== '') {
+            text += ' – ' + project.name
+        } else if (project.id && project.id !== '') {
+            text += ' – ' + project.id
+        }
+    }
+    if (text === '') {
+        return '[' + allProjects[project.rating]?.URL() + ']'
+    } else {
+        text = text.replace(' – ', '')
+        return '[' + allProjects[project.rating]?.URL() + '] ' + text
+    }
 }
 
 async function clearProxy() {
@@ -2008,29 +2258,19 @@ function wait(ms) {
 async function updateValue(objStore, value) {
     const found = await db.count(objStore, value.key)
     if (found) {
-        await db.put(objStore, value, value.key)
-        chrome.runtime.sendMessage({updateValue: objStore, value})
+        await db.put(objStore, value, value.key);
+        (async () => {
+            try {
+                await chrome.runtime.sendMessage({updateValue: objStore, value})
+            } catch (error) {
+                if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+                    console.error(error.message)
+                }
+            }
+        })();
     } else {
         console.warn('The ' + objStore + ' could not be found, it may have been deleted', JSON.stringify(value))
     }
-}
-
-function extractHostname(url) {
-    let hostname
-    //find & remove protocol (http, ftp, etc.) and get hostname
-
-    if (url.indexOf('//') > -1) {
-        hostname = url.split('/')[2]
-    } else {
-        hostname = url.split('/')[0]
-    }
-
-    //find & remove port number
-    hostname = hostname.split(':')[0]
-    //find & remove '?'
-    hostname = hostname.split('?')[0]
-
-    return hostname
 }
 
 async function stopVote(dontStart, user) {
@@ -2240,23 +2480,24 @@ async function getCredentialsProxy(proxy, pacScript) {
 }
 
 chrome.runtime.onInstalled.addListener(async function(details) {
-    if (details.reason === 'install') {
-        chrome.tabs.create({url: 'options.html?installed'})
-    }/* else if (details.reason === 'update' && details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version('6.0.0')) === -1) {
-
-    }*/
-    if (details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version(chrome.runtime.getManifest().version)) === -1) {
-        chrome.tabs.create({url: 'options.html?updated'})
-    } else if (details.previousVersion === chrome.runtime.getManifest().version) {
-        chrome.tabs.create({url: 'options.html'})
+    await initializeFunc
+    // noinspection JSUnresolvedReference
+    if (!settings.operaAttention2 && (navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' || (!!self.opr && !!opr.addons) || !!self.opera || navigator.userAgent.indexOf(' OPR/') >= 0)) {
+        chrome.runtime.openOptionsPage()
+        return
     }
-})
+    if (details.reason === 'install') {
+        await openOptionsPage()
+        chrome.runtime.sendMessage({installed: true})
+    } else if (details.previousVersion && (new Version(details.previousVersion)).compareTo(new Version(chrome.runtime.getManifest().version)) === -1) {
+        await openOptionsPage()
+        chrome.runtime.sendMessage({updated: true})
+    } else if (details.previousVersion === chrome.runtime.getManifest().version) {
+        await openOptionsPage()
+    }
 
-chrome.runtime.onUpdateAvailable.addListener(function() {
-    if (queueProjects.size > 0) {
-        updateAvailable = true
-    } else {
-        chrome.runtime.reload()
+    if (details.reason === 'update') {
+        checkVote()
     }
 })
 
@@ -2271,6 +2512,7 @@ Version.prototype.compareTo = function(v){
         if (diff) return diff>0 ? 1 : -1
     }
 }
+
 
 /* Store the original log functions. */
 console._log = console.log
@@ -2317,5 +2559,5 @@ console._collect = function (type, args) {
 
 /*
 Открытый репозиторий:
-https://gitlab.com/Serega007/Auto-Vote-Rating
+https://github.com/Serega007RU/Auto-Vote-Rating/
 */

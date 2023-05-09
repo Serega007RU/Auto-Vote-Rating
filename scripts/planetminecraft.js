@@ -7,6 +7,27 @@ async function vote(first) {
         chrome.runtime.sendMessage({later: true})
         return
     }
+
+    if (isVisibleElement(document.querySelector('div[role="dialog"]'))) {
+        chrome.runtime.sendMessage({requiredConfirmTOS: true})
+        await new Promise(resolve => {
+            const timer2 = setInterval(() => {
+                if (!document.querySelector('div[role="dialog"]')) {
+                    clearInterval(timer2)
+                    resolve()
+                }
+            }, 1000)
+        })
+    }
+
+    if (document.querySelector('#error_page div.notice_box')) {
+        const request = {}
+        request.message = document.querySelector('#error_page div.notice_box').innerText
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     const project = await getProject('PlanetMinecraft')
     if (document.querySelector('#submit_vote_form > input[name="mcname"]') != null) {
         document.querySelector('#submit_vote_form > input[name="mcname"]').value = project.nick

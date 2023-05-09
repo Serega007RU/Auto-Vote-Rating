@@ -17,10 +17,10 @@
             <div class="logo">
                 <img src="images/logo.png">
                 <div>A.V.R.</div>
-                <div id="versionLabel">MultiVote</div>
+                <a id="versionLabel" class="link" target="_blank" href="https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Common-or-MultiVote%3F-What-does-it-mean%3F">MultiVote</a>
             </div>
             <div class="navigation">
-                <button class="tablinks active" id="addTab" data-tab="append">
+                <button class="tablinks" id="addTab" data-tab="append">
                     <img src="images/icons/addBtn.svg" alt="addBtn">
                     <div data-resource="addButton"></div>
                 </button>
@@ -48,57 +48,158 @@
         </nav>
         <div class="container">
             <!-- Добавить -->
-            <div id="append" class="tabcontent" style="display: block;">
+            <div id="append" class="tabcontent" style="display: none;">
                 <h4 data-resource="addTitle"></h4>
+                <div class="editSubtitle" style="display: none;"></div>
                 <hr color="#5A5A5C">
-                <form id="addProject">
+                <form id="addProject" class="addProject addProjectExpertManual">
+                    <input type="checkbox" name="switchAddMode" id="switchAddMode" class="switchAddMode">
+                    <label for="switchAddMode" data-resource="switchAddMode"></label>
+                    <div id="emptyDiv"></div>
                     <div>
+                        <!--Cсылка-->
                         <div class="input-block">
+                            <label data-resource="link" for="link"></label>
+                            <input class="input" name="link" id="link" required placeholder="linkPlaceholder" type="text" spellcheck="false">
+                        </div>
+                        <!--Выбор сайта-->
+                        <div style="display: none;" class="input-block">
+                            <label data-resource="siteTop" for="rating"></label>
+                            <input class="input" name="project" type="text" id="rating" placeholder="selectTop" list="ratingList" spellcheck="false">
+                            <datalist id="ratingList"></datalist>
+                        </div>
+                        <!--Никнейм-->
+                        <div class="input-block" style="display: none">
                             <label data-resource="yourNick" for="nick"></label>
-                            <input class="input" name="nick" id="nick" required placeholder="enterNick" type="text">
+                            <input class="input" name="nick" id="nick" placeholder="enterNick" type="text" spellcheck="false" pattern="[^' ']+">
                             <div class="input-block" style="display: none">
                                 <input id="importNicksFile" type="file" accept=".txt"/>
                             </div>
                         </div>
-                        <div class="input-block">
-                            <label data-resource="siteTop" for="project"></label>
-                            <input class="input" name="project" type="text" id="project" placeholder="selectTop" list="projectList" required>
-                            <datalist id="projectList"></datalist>
+                        <!--ID проекта-->
+                        <div style="display: none;" class="input-block">
+                            <label for="id" data-resource="projectID">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span style="color:#d32f2f;">ID</span>
+                                        <span data-resource="projectIDTooltip"></span>
+                                        <br>
+                                        <span id="projectIDTooltip1"></span><span id="projectIDTooltip2" style="color:#d32f2f;"></span><span id="projectIDTooltip3"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input class="input" name="id" id="id" placeholder="inputProjectID" spellcheck="false">
                         </div>
-                        <!--Custom-->
-                        <div style="display: none;" id="label6" class="input-block">
+                        <!--Дополнительные параметры URL-->
+                        <div style="display: none;" class="input-block">
+                            <label data-resource="additionURL" for="additionURL">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span id="additionURLTooltip1"></span><span id="additionURLTooltip2" style="color:#d32f2f;"></span><span id="additionURLTooltip3"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input id="additionURL" name="additionURL" placeholder="additionURL" type="text" class="input" spellcheck="false"/>
+                        </div>
+                        <!--Выбор игры-->
+                        <div style="display: none;" class="input-block">
+                            <label data-resource="urlGame" for="chooseGame">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span style="color:red;">URL</span>
+                                        <span data-resource="gameIDTooltip"></span>
+                                        <br>
+                                        <span id="urlGameTooltip1"></span><span id="urlGameTooltip2" style="color:#d32f2f;"></span><span id="urlGameTooltip3"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input class="input" name="chooseGame" type="text" id="chooseGame" placeholder="chooseGameURL" list="gameList" spellcheck="false">
+                            <datalist id="gameList"></datalist>
+                        </div>
+                        <!--Выбор языка-->
+                        <div style="display: none;" class="input-block">
+                            <label data-resource="chooseLang" for="chooseLang"></label>
+                            <input class="input" name="chooseLang" type="text" id="chooseLang" placeholder="chooseLang" list="langList" spellcheck="false">
+                            <datalist id="langList"></datalist>
+                        </div>
+                        <!--Максимальное кол-во голосов в день-->
+                        <div style="display: none;" class="input-block">
+                            <label for="countVote" data-resource="countVote"></label>
+                            <input id="countVote" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="input" value="5">
+                        </div>
+                        <!--Выбор порядкового номера мира-->
+                        <div style="display: none;" class="input-block">
+                            <label for="ordinalWorld" data-resource="ordinalWorld">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span data-resource="ordinalWorldTooltip"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input id="ordinalWorld" name="ordinalWorld" type="number" min="1" max="16" placeholder="ordinalWorld" class="input">
+                        </div>
+
+                        <!--Выбор типа таймаута-->
+                        <div style="display: none;" class="input-block">
                             <label for="selectTime" data-resource="selectTime"></label>
                             <select required id="selectTime" class="select">
                                 <option value="ms" data-resource="timeoutMS"></option>
                                 <option value="hour" data-resource="timeoutHour"></option>
+                                <option value="week" data-resource="timeoutWeek"></option>
+                                <option value="month" data-resource="timeoutMonth"></option>
                             </select>
                         </div>
-                        <div style="display: none;" id="label3" class="input-block">
+                        <!--Задержка в миллисекундах-->
+                        <div style="display: none;" class="input-block">
                             <label for="time" data-resource="delayFetch"></label>
                             <input id="time" name="customTime" placeholder="delayFetch" type="number" min="10000" class="input"/>
                         </div>
-                        <div style="display: none;" id="label7" class="input-block">
+                        <!--Час-->
+                        <div style="display: none;" class="input-block">
                             <label for="hour" data-resource="chooseHour"></label>
                             <input id="hour" name="chooseHour" placeholder="chooseHour" type="time" step="0.001" min="0" max="23" class="input"/>
                         </div>
-                        <div style="display: none;" id="label9" class="input-block">
+                        <!--Неделя-->
+                        <div style="display: none;" class="input-block">
+                            <label for="week" data-resource="chooseWeek"></label>
+                            <select required id="week" class="select">
+                                <option value="1" data-resource="monday"></option>
+                                <option value="2" data-resource="tuesday"></option>
+                                <option value="3" data-resource="wednesday"></option>
+                                <option value="4" data-resource="thursday"></option>
+                                <option value="5" data-resource="friday"></option>
+                                <option value="6" data-resource="saturday"></option>
+                                <option value="0" data-resource="sunday"></option>
+                            </select>
+                        </div>
+                        <!--Число-->
+                        <div style="display: none;" class="input-block">
+                            <label for="month" data-resource="chooseMonth"></label>
+                            <input id="month" name="chooseMonth" placeholder="chooseMonth" type="number" min="1" max="31" class="input"/>
+                        </div>
+                        <!--Запланировать голосование-->
+                        <div style="display: none;" class="input-block">
                             <label for="scheduleTime" data-resource="scheduleTime"></label>
                             <input id="scheduleTime" type="datetime-local" class="input" step="0.001">
                         </div>
-                        <div style="display: none;" id="label11" class="input-block">
+                        <!--Рандомизация голосования-->
+                        <div style="display: none;" class="input-block">
                             <label for="randomizeMin" data-resource="randomizeInput"></label>
                             <input id="randomizeMin" type="number" class="input" placeholder="min">
                             <input id="randomizeMax" type="number" class="input" placeholder="max">
                         </div>
-                        <div style="display: none;" id="label2" class="input-block">
+                        <!--URL запроса-->
+                        <div style="display: none;" class="input-block">
                             <label for="responseURL" data-resource="urlFetch"></label>
-                            <input id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="input"/>
+                            <input id="responseURL" name="customURL" placeholder="urlFetch" type="text" class="input" spellcheck="false"/>
                         </div>
-                        <div style="display: none;" id="label1" class="input-block">
+                        <!--Тело запроса-->
+                        <div style="display: none;" class="input-block">
                             <label for="customBody" data-resource="bodyFetch"></label>
-                            <textarea id="customBody" name="customBody" placeholder="bodyFetch" class="textarea"></textarea>
+                            <textarea id="customBody" name="customBody" placeholder="bodyFetch" class="textarea" spellcheck="false"></textarea>
                         </div>
-                        <div style="display: none;" id="label8" class="input-block">
+                        <!--Выбор режима голосования (тихий или эмуляция)-->
+                        <div style="display: none;" class="input-block">
                             <label for="voteModeSelect" data-resource="enabledSilentVote">
                                 <span class="tooltip2">
                                     <span data-resource="enabledSilentVoteTooltip" class="tooltip2text"></span>
@@ -109,575 +210,23 @@
                                 <option data-resource="enabledSilentVoteNoSilent" value="emulateMode"></option>
                             </select>
                         </div>
-                        <div style="display: none;" id="label12" class="input-block">
-                            <label for="voteModeSelect" data-resource="enableMultiVoteMode"></label>
-                            <select id="multivoteModeSelect" class="select">
-                                <option data-resource="withMultiVote" value="withMultiVote"></option>
-                                <option data-resource="withoutMultiVote" value="withoutMultiVote"></option>
-                            </select>
-                        </div>
-                        <!--MinecraftRating-->
-                        <div style="display: none;" id="chooseMinecraftRating1" class="input-block">
-                            <label data-resource="chooseTopGG" for="chooseMinecraftRating">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span>https://minecraftrating.ru/</span><span style="color:#d32f2f;">projects</span><span>/mcskill/</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <select id="chooseMinecraftRating" class="select">
-                                <option value="projects" data-resource="projects"></option>
-                                <option style="color:red" value="servers" data-resource="serversMinecraftRating"></option>
-                            </select>
-                        </div>
-                        <!--TopGG-->
-                        <div style="display: none;" id="chooseTopGG1" class="input-block">
-                            <label data-resource="chooseTopGG" for="chooseTopGG">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span>https://top.gg/</span><span style="color:#d32f2f;">bot</span><span>/270904126974590976/vote</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <select id="chooseTopGG" class="select">
-                                <option value="bot" data-resource="bots"></option>
-                                <option value="servers" data-resource="guilds"></option>
-                            </select>
-                        </div>
-                        <div style="display: none;" id="additionTopGG1" class="input-block">
-                            <label data-resource="additionTopGG" for="additionTopGG">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span>https://top.gg/bot/617037497574359050/vote</span><span style="color:#d32f2f;">?currency=DOGE</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input id="additionTopGG" name="additionTopGG" placeholder="additionTopGG" type="text" class="input"/>
-                        </div>
-                        <!--ListForge-->
-                        <div style="display: none;" id="urlGame" class="input-block">
-                            <label data-resource="urlGame">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:red;">URL</span>
-                                        <span data-resource="gameIDTooltip"></span>
-                                        <br>
-                                        <span>https://</span><span style="color:#d32f2f;">minecraft-mp.com</span><span>/server/207380/vote/</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGameListForge" placeholder="chooseGameURL" list="gameListListForge">
-                            <datalist id="gameListListForge">
-                                <option value="7daystodie-servers.com">7 Days To Die</option>
-                                <option value="ark-servers.net">ARK : Survival Evolved</option>
-                                <option value="arma3-servers.net">Arma3</option>
-                                <option value="atlas-servers.io">Atlas</option>
-                                <option value="conan-exiles.com">Conan Exiles</option>
-                                <option value="counter-strike-servers.net">Counter Strike : Global Offensive</option>
-                                <option value="cubeworld-servers.com">Cube World</option>
-                                <option value="dayz-servers.org">DayZ</option>
-                                <option value="ecoservers.io">ECO</option>
-                                <option value="empyrion-servers.com">Empyrion</option>
-                                <option value="gmod-servers.com">Garry's Mod</option>
-                                <option value="hurtworld-servers.net">Hurtworld</option>
-                                <option value="hytale-servers.io">Hytale</option>
-                                <option value="life-is-feudal.org">Life is Feudal</option>
-                                <option value="minecraft-mp.com">Minecraft</option>
-                                <option value="minecraftpocket-servers.com">Minecraft Pocket</option>
-                                <option value="minecraft-tracker.com">Minecraft Tracker</option>
-                                <option value="miscreated-servers.com">Miscreated</option>
-                                <option value="reign-of-kings.net">Reign of Kings</option>
-                                <option value="rust-servers.net">Rust</option>
-                                <option value="space-engineers.com">Space Engineers</option>
-                                <option value="squad-servers.com">Squad</option>
-                                <option value="starbound-servers.net">Starbound</option>
-                                <option value="tf2-servers.com">Team Fortress 2</option>
-                                <option value="teamspeak-servers.org">Teamspeak</option>
-                                <option value="terraria-servers.com">Terraria</option>
-                                <option value="unturned-servers.net">Unturned</option>
-                                <option value="wurm-unlimited.com">Wurm Unlimited</option>
-                            </datalist>
-                        </div>
-                        <!--gTop100-->
-                        <div style="display: none;" id="urlGame2" class="input-block">
-                            <label data-resource="urlGame">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:red;">URL</span>
-                                        <span data-resource="gameIDTooltip"></span>
-                                        <br>
-                                        <span>https://gtop100.com/topsites/</span><span style="color:#d32f2f;">MapleStory</span><span>/sitedetails/Ristonia--v224--98344?vote=1&pingUsername=kingcloudian</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGamegTop100" placeholder="chooseGameURL" list="gameListgTop100">
-                            <datalist id="gameListgTop100">
-                                <option value="4Story">4Story</option>
-                                <option value="ACE-Online">ACE Online</option>
-                                <option value="ARK-Survival-Evolved">ARK Survival Evolved</option>
-                                <option value="Agario">Agario</option>
-                                <option value="Aion-Online">Aion Online</option>
-                                <option value="Allods-Online">Allods Online</option>
-                                <option value="Battle-of-the-Immortals">Battle of the Immortals</option>
-                                <option value="Black-Desert-Online">Black Desert Online</option>
-                                <option value="Cabal-Online">Cabal Online</option>
-                                <option value="Conquer-Online">Conquer Online</option>
-                                <option value="Counter-Strike">Counter Strike</option>
-                                <option value="Dekaron">Dekaron</option>
-                                <option value="Dragon-Nest">Dragon Nest</option>
-                                <option value="Dragonica-Online">Dragonica Online</option>
-                                <option value="dungeon-fighter-online-private-servers">Dungeon Fighter Online</option>
-                                <option value="Ether-Saga-Odyssey">Ether Saga Odyssey</option>
-                                <option value="Flyff">Flyff</option>
-                                <option value="Forsaken-World">Forsaken World</option>
-                                <option value="Free-Online-Games">Free Online Games</option>
-                                <option value="Grand-Chase">Grand Chase</option>
-                                <option value="Habbo-Hotel">Habbo Hotel</option>
-                                <option value="Helbreath">Helbreath</option>
-                                <option value="Iris-Online">Iris Online</option>
-                                <option value="Jade-Dynasty">Jade Dynasty</option>
-                                <option value="Knight-Online">Knight Online</option>
-                                <option value="Last-Chaos">Last Chaos</option>
-                                <option value="Latale">Latale</option>
-                                <option value="Legend-Of-Mir">Legend Of Mir</option>
-                                <option value="Legends-of-Aria">Legends of Aria</option>
-                                <option value="life-is-feudal-servers">Life is feudal</option>
-                                <option value="Lineage-2">Lineage 2</option>
-                                <option value="Luna-Online">Luna Online</option>
-                                <option value="MMORPG-And-MPOG">MMORPG And MPOG</option>
-                                <option value="MapleStory">MapleStory</option>
-                                <option value="Metin2">Metin2</option>
-                                <option value="Minecraft-Servers">Minecraft</option>
-                                <option value="Mu-Online">Mu Online</option>
-                                <option value="Ogame">Ogame</option>
-                                <option value="Perfect-World">Perfect World</option>
-                                <option value="Priston-Tale">Priston Tale</option>
-                                <option value="RF-Online">RF Online</option>
-                                <option value="Ragnarok-Online">Ragnarok Online</option>
-                                <option value="RaiderZ-Online">RaiderZ Online</option>
-                                <option value="Ran-Online">Ran Online</option>
-                                <option value="Rappelz">Rappelz</option>
-                                <option value="Rohan">Rohan</option>
-                                <option value="Rose-Online">Rose Online</option>
-                                <option value="Runes-of-Magic">Runes of Magic</option>
-                                <option value="Runescape-private-server-top-100-list">Runescape</option>
-                                <option value="Rust">Rust</option>
-                                <option value="Rusty-Hearts">Rusty Hearts</option>
-                                <option value="Seal-Online">Seal Online</option>
-                                <option value="Shaiya">Shaiya</option>
-                                <option value="Silkroad-Online">Silkroad Online</option>
-                                <option value="Swordsman">Swordsman</option>
-                                <option value="Tales-Of-Pirates">Tales Of Pirates</option>
-                                <option value="Tera">Tera</option>
-                                <option value="Terraria">Terraria</option>
-                                <option value="Travian">Travian</option>
-                                <option value="Ultima-Online">Ultima Online</option>
-                                <option value="War-of-the-Immortals">War of the Immortals</option>
-                                <option value="World-of-Warcraft">World of Warcraft</option>
-                            </datalist>
-                        </div>
-                        <!--TopG-->
-                        <div style="display: none;" id="urlGameTopG" class="input-block">
-                            <label data-resource="urlGame">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:red;">URL</span>
-                                        <span data-resource="gameIDTooltip"></span>
-                                        <br>
-                                        <span>https://topg.org/</span><span style="color:#d32f2f;">minecraft-servers</span><span>/server-405637</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGameTopG" placeholder="chooseGameURL" list="gameListTopG">
-                            <datalist id="gameListTopG">
-                                <option value="minecraft-servers">Minecraft</option>
-                                <option value="cs-servers">Counter Strike: 1.6</option>
-                                <option value="mu-private-servers">Mu Online</option>
-                                <option value="wow-private-servers">World of Warcraft</option>
-                                <option value="runescape-private-servers">Runescape</option>
-                            </datalist>
-                        </div>
-                        <!--ServeurPrive, TopGames and MMoTopRU-->
-                        <div style="display: none;" id="idGame" class="input-block">
-                            <label data-resource="idGame">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:red;">ID</span>
-                                        <span data-resource="gameIDTooltip"></span>
-                                        <br>
-                                        <span id="gameIDTooltip1"></span><span id="gameIDTooltip2" style="color:#d32f2f;"></span><span id="gameIDTooltip3"></span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input style="display: none;" class="input" name="chooseGame" type="text" id="chooseGameTopGames" placeholder="chooseGame" list="gameListTopGames" value="minecraft">
-                            <datalist id="gameListTopGames">
-                                <option value="ark">ARK</option>
-                                <option value="dayz">Dayz</option>
-                                <option value="discord">Discord</option>
-                                <option value="garrys-mod">Garry's mod</option>
-                                <option value="gta">GTA 5</option>
-                                <option value="hytale">Hytale</option>
-                                <option value="l4d2">Left 4 Dead 2</option>
-                                <option value="minecraft">Minecraft</option>
-                                <option value="rdr">Red Dead Redemption 2</option>
-                                <option value="roblox">Roblox</option>
-                                <option value="rust">Rust</option>
-                                <option value="terraria">Terraria</option>
-                            </datalist>
-                            <input style="display: none;" class="input" name="chooseGame" type="text" id="chooseGameServeurPrive" placeholder="chooseGame" list="gameListServeurPrive" value="minecraft">
-                            <datalist id="gameListServeurPrive">
-                                <option value="ark">ARK</option>
-                                <option value="ark-survival-evolved">Ark : Survival Evolved</option>
-                                <option value="discord">Discord</option>
-                                <option value="garrys-mod">Garry's Mod</option>
-                                <option value="grand-theft-auto">Grand Theft Auto V</option>
-                                <option value="hytale">Hytale</option>
-                                <option value="minecraft">Minecraft</option>
-                                <option value="minecraft-bedrock">Minecraft Bedrock</option>
-                                <option value="rust">Rust</option>
-                            </datalist>
-                            <input style="display: none;" class="input" name="chooseGame" type="text" id="chooseGameMMoTopRU" placeholder="chooseGame" list="gameListMMoTopRU">
-                            <datalist id="gameListMMoTopRU">
-                                <option value="aion">Aion</option>
-                                <option value="mu">Global FIU Online</option>
-                                <option value="jd">Jade Dynasty</option>
-                                <option value="la2">Lineage 2</option>
-                                <option value="all">Online Games (All)</option>
-                                <option value="pw">Perfect World</option>
-                                <option value="rf">RF Online</option>
-                                <option value="wow">World War Craft</option>
-                            </datalist>
-                        </div>
-                        <div style="display: none;" class="input-block" id="label4">
-                            <label for="selectLangTopGames" data-resource="chooseLang"></label>
-                            <select style="display: none;" id="selectLangTopGames" class="select">
-                                <option value="de">Deutsch</option>
-                                <option value="en">English</option>
-                                <option value="es">Español</option>
-                                <option value="fr" selected>Français</option>
-                                <option value="pt">Português</option>
-                                <option value="ru">Русский</option>
-                            </select>
-                            <select style="display: none;" id="selectLangServeurPrive" class="select">
-                                <option value="en">English</option>
-                                <option value="fr" selected>Français</option>
-                            </select>
-                            <select style="display: none;" id="selectLangMMoTopRU" class="select">
-                                <option value="en">English</option>
-                                <option value="ru" selected>Русский</option>
-                            </select>
-                        </div>
-                        <div style="display: none;" class="input-block" id="label5">
-                            <label for="countVote" data-resource="countVote"></label>
-                            <input id="countVote" name="countVote" type="number" min="1" max="16" placeholder="countVote" class="input" value="5">
-                        </div>
-                        <div style="display: none;" class="input-block" id="label10">
-                            <label for="ordinalWorld" data-resource="ordinalWorld">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text" id="spanOrdinalWorld">
-                                        <span data-resource="ordinalWorldTooltip"></span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input id="ordinalWorld" name="ordinalWorld" type="number" min="1" max="16" placeholder="ordinalWorld" class="input">
-                        </div>
-                        <!--MineServers-->
-                        <div style="display: none;" id="urlGame3" class="input-block">
-                            <label data-resource="urlGame">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:red;">URL</span>
-                                        <span data-resource="gameIDTooltip"></span>
-                                        <br>
-                                        <span>https://</span><span style="color:#d32f2f;">mineservers.com</span><span>/server/2zQ6UmWN/vote</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGameMineServers" placeholder="chooseGameURL" list="gameListMineServers" value="mineservers.com">
-                            <datalist id="gameListMineServers">
-                                <option value="mineservers.com"></option>
-                                <option value="pixelmonservers.com"></option>
-                                <option value="tekkitserverlist.com"></option>
-                                <option value="technicservers.com"></option>
-                                <option value="ftbservers.com"></option>
-                            </datalist>
-                        </div>
-                        <!--MmoRpgTop-->
-                        <div style="display: none;" id="urlGame4" class="input-block">
-                            <label data-resource="urlGame">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:red;">URL</span>
-                                        <span data-resource="gameIDTooltip"></span>
-                                        <br>
-                                        <span>https://</span><span style="color:#d32f2f;">wow</span><span>.mmorpg.top/server/23</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGameMmoRpgTop" placeholder="chooseGameURL" list="gameListMmoRpgTop">
-                            <datalist id="gameListMmoRpgTop">
-                                <option value="l2">Lineage 2</option>
-                                <option value="wow">World of Warcraft</option>
-                                <option value="aion">Aion</option>
-                                <option value="mu">MU Online</option>
-                                <option value="jd">Jade Dynasty</option>
-                                <option value="pw">Perfect World</option>
-                                <option value="rf">RF Online</option>
-                                <option value="so">Silkroad Online</option>
-                                <option value="co">Conquer Online</option>
-                                <option value="og">Other games</option>
-                            </datalist>
-                        </div>
-                        <!--MmoVoteRu-->
-                        <div style="display: none;" id="urlGame5" class="input-block">
-                            <label data-resource="urlGame">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:red;">URL</span>
-                                        <span data-resource="gameIDTooltip"></span>
-                                        <br>
-                                        <span>https://</span><span style="color:#d32f2f;">wow</span><span>.mmovote.ru/ru/vote/85</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGameMmoVoteRu" placeholder="chooseGameURL" list="gameListMmoVoteRu">
-                            <datalist id="gameListMmoVoteRu">
-                                <option value="wow">World of Warcraft</option>
-                                <option value="l2">Lineage 2</option>
-                                <option value="aion">Aion</option>
-                                <option value="mu">MU Online</option>
-                                <option value="rf">RF Online</option>
-                                <option value="jade">Jade Dynasty</option>
-                                <option value="games">Online Games</option>
-                                <option value="pw">Perfect World</option>
-                                <option value="minecraft">Minecraft</option>
-                            </datalist>
-                        </div>
-                        <!--McMonitoringInfo-->
-                        <div style="display: none;" id="urlGame6" class="input-block">
-                            <label data-resource="urlGame">
-                                <span class="tooltip1">
-                                    <span class="tooltip1text">
-                                        <span style="color:red;">URL</span>
-                                        <span data-resource="gameIDTooltip"></span>
-                                        <br>
-                                        <span>https://mc-monitoring.info/</span><span style="color:#d32f2f;">wow</span><span>/server/vote/112</span>
-                                    </span>
-                                </span>
-                            </label>
-                            <input class="input" name="chooseGame" type="text" id="chooseGameMcMonitoringInfo" placeholder="chooseGameURL" list="gameListMcMonitoringInfo">
-                            <datalist id="gameListMcMonitoringInfo">
-                                <option value="wow">World of Warcraft</option>
-                                <option value="l2">Lineage 2</option>
-                                <option value="gta">GTA</option>
-                                <option value="minecraft">Minecraft</option>
-                            </datalist>
-                        </div>
-                        <!--Main-->
-                        <div id="idSelector" style="display: none;">
-                            <div class="input-block">
-                                <label for="id" data-resource="projectID">
-                                    <span class="tooltip1">
-                                        <span class="tooltip1text">
-                                            <span style="color:#d32f2f;">ID</span>
-                                            <span data-resource="projectIDTooltip"></span>
-                                            <br>
-                                            <span id="projectIDTooltip1"></span><span id="projectIDTooltip2" style="color:#d32f2f;"></span><span id="projectIDTooltip3"></span>
-                                        </span>
-                                    </span>
-                                </label>
-                                <input class="input" name="id" id="id">
-                            </div>
-                            <datalist id="TopCraftIDList">
-                                <option value="10340">Cifrazia</option>
-                                <option value="6711">WarMine</option>
-                                <option value="7411">CenturyMine</option>
-                                <option value="7666">Arago.Games</option>
-                                <option value="7126">Borealis</option>
-                                <option value="6482">CubixWorld</option>
-                                <option value="8732">DiverseMine</option>
-                                <option value="10695">Elician</option>
-                                <option value="308">Excalibur-Craft</option>
-                                <option value="3254">FineMine</option>
-                                <option value="7125">FrostLand</option>
-                                <option value="628">Gamai</option>
-                                <option value="7863">GamePoint</option>
-                                <option value="1041">Grand-Mine</option>
-                                <option value="9536">GrandGear</option>
-                                <option value="11214">GravityCraft</option>
-                                <option value="7755">HillMine</option>
-                                <option value="5966">HunterCraft</option>
-                                <option value="216">IPlayCraft</option>
-                                <option value="10363">Kayrison</option>
-<!--                            <option value="2762">LavaCraft</option> -->
-                                <option value="11162">LavaCraft</option>
-                                <option value="5835">Letragon</option>
-                                <option value="10312">LoliLand</option>
-                                <option value="10895">LunoGrad</option>
-                                <option value="218">McSKill</option>
-                                <option value="304">MinecraftOnly</option>
-                                <option value="6287">MythicalPlanet</option>
-                                <option value="5323">MythicalWorld</option>
-                                <option value="9598">OneLand</option>
-                                <option value="9311">OrangeCraft</option>
-                                <option value="8223">PartyMine</option>
-                                <option value="5451">PentaCraft</option>
-                                <option value="6031">Pixelmon.PRO</option>
-                                <option value="600">SMARTYcraft</option>
-                                <option value="9597">ShadowCraft</option>
-                                <option value="8992">ShowyCraft</option>
-                                <option value="9867">SideMC</option>
-                                <option value="1283">SimpleMinecraft</option>
-                                <option value="11111">TikTokWorld</option>
-                                <option value="8179">VictoryCraft</option>
-                                <option value="318">qoobworld</option>
-                                <option value="9584">skolot.fun</option>
-                            </datalist>
-                            <datalist id="McTOPIDList">
-                                <option value="4975">WarMine</option>
-                                <option value="4888">CenturyMine</option>
-                                <option value="4561">Arago.Games</option>
-                                <option value="2241">Borealis</option>
-                                <option value="5089">DiverseMine</option>
-                                <option value="6391">Elician</option>
-                                <option value="1088">Excalibur-Craft</option>
-                                <option value="3337">FineMine</option>
-                                <option value="4580">FrostLand</option>
-                                <option value="1765">Gamai</option>
-                                <option value="4763">GamePoint</option>
-                                <option value="5516">GrandGear</option>
-                                <option value="6514">GravityCraft</option>
-                                <option value="4709">HillMine</option>
-                                <option value="3050">HunterCraft</option>
-                                <option value="5864">IPlayCraft</option>
-                                <option value="6029">Kayrison</option>
-<!--                            <option value="45">LavaCraft</option> -->
-                                <option value="397">Letragon</option>
-                                <option value="6343">LunoGrad</option>
-                                <option value="54">MinecraftOnly</option>
-                                <option value="4483">MythicalPlanet</option>
-                                <option value="1654">MythicalWorld</option>
-                                <option value="2474">PentaCraft</option>
-                                <option value="4585">Pixelmon.PRO</option>
-                                <option value="317">SMARTYcraft</option>
-                                <option value="5231">ShowyCraft</option>
-                                <option value="1">SimpleMinecraft</option>
-                                <option value="4729">VictoryCraft</option>
-                                <option value="1142">qoobworld</option>
-                                <option value="5685">skolot.fun</option>
-                            </datalist>
-                            <datalist id="MCRateIDList">
-                                <option value="8935">Cifrazia</option>
-                                <option value="7003">CubixWorld</option>
-                                <option value="4396">Excalibur-Craft</option>
-                                <option value="4703">FineMine</option>
-                                <option value="7450">FrostLand</option>
-                                <option value="8428">Gamai</option>
-                                <option value="8493">GrandGear</option>
-                                <option value="9372">GravityCraft</option>
-                                <option value="4427">HillMine</option>
-                                <option value="10">LavaCraft</option>
-                                <option value="4852">Letragon</option>
-                                <option value="5154">MinecraftOnly</option>
-                                <option value="6099">MythicalWorld</option>
-                                <option value="6828">PartyMine</option>
-                                <option value="6071">PentaCraft</option>
-                                <option value="6434">Pixelmon.PRO</option>
-                                <option value="4692">SimpleMinecraft</option>
-                                <option value="1762">qoobworld</option>
-                            </datalist>
-                            <datalist id="MinecraftRatingIDList">
-                                <option value="borealis">Borealis</option>
-                                <option value="cubixworld">CubixWorld</option>
-                                <option value="diversemine">DiverseMine</option>
-                                <option value="elician">Elician</option>
-                                <option value="excalibur-craft">Excalibur-Craft</option>
-                                <option value="gamepoint">GamePoint</option>
-                                <option value="grandmine">Grand-Mine</option>
-                                <option value="grandgear">GrandGear</option>
-                                <option value="gravity-craft">GravityCraft</option>
-                                <option value="hillmine">HillMine</option>
-                                <option value="loliland">LoliLand</option>
-                                <option value="mcskill">McSKill</option>
-                                <option value="minecraftonly">MinecraftOnly</option>
-                                <option value="mythicalworld">MythicalWorld</option>
-                                <option value="oneland">OneLand</option>
-                                <option value="orangecraft">OrangeCraft</option>
-                                <option value="penta-craft">PentaCraft</option>
-                                <option value="pixelmon">Pixelmon.PRO</option>
-                                <option value="shadowcraft">ShadowCraft</option>
-                                <option value="sidemc">SideMC</option>
-                                <option value="simpleminecraft">SimpleMinecraft</option>
-                                <option value="ttw">TikTokWorld</option>
-                                <option value="victorycraft">VictoryCraft</option>
-                            </datalist>
-                            <datalist id="MonitoringMinecraftIDList">
-                                <option value="cubixworld">CubixWorld</option>
-                                <option value="fdworlds">Elician</option>
-                                <option value="grand-mine">Grand-Mine</option>
-                                <option value="gg">GrandGear</option>
-                                <option value="gravity_craft">GravityCraft</option>
-                                <option value="loliland">LoliLand</option>
-                                <option value="mcskill">McSKill</option>
-                                <option value="minecraftonly">MinecraftOnly</option>
-                                <option value="mythicalworld">MythicalWorld</option>
-                                <option value="orangecraft">OrangeCraft</option>
-                                <option value="pixelmonpro">Pixelmon.PRO</option>
-                                <option value="smc">SimpleMinecraft</option>
-                                <option value="skolotfun">skolot.fun</option>
-                            </datalist>
-                            <datalist id="IonMcIDList">
-                                <option value="83">FineMine.RU</option>
-                                <option value="80">Pixelmon.PRO 1.12.2</option>
-                            </datalist>
-                            <datalist id="MinecraftServersOrgIDList">
-                                <option value="564053">Legends Evolved</option>
-                            </datalist>
-                            <datalist id="ServeurPriveIDList">
-                                <option value="gommehd-net-4932">GommeHD.net</option>
-                            </datalist>
-                            <datalist id="PlanetMinecraftIDList">
-                                <option value="legends-evolved">Legends Evolved</option>
-                            </datalist>
-                            <datalist id="TopGIDList">
-                                <option value="405637">Hypixel</option>
-                                <option value="512397">Legends Evolved</option>
-                                <option value="414300">Mineplex</option>
-                            </datalist>
-                            <datalist id="MinecraftServerListIDList">
-                                <option value="292028">Hypixel</option>
-                                <option value="218820">Mineplex</option>
-                            </datalist>
-                            <datalist id="ServerPactIDList">
-                                <option value="24604">Hypixel</option>
-                            </datalist>
-                            <datalist id="MinecraftIpListIDList">
-                                <option value="2576">Hypixel</option>
-                            </datalist>
-                            <datalist id="HotMCIDList">
-                                <option value="199493">qoobworld</option>
-                            </datalist>
-                            <datalist id="TMonitoringIDList">
-                                <option value="qoobworldru">qoobworld</option>
-                            </datalist>
-                            <datalist id="TopGGIDList">
-                                <option value="memes">Dank Memer</option>
-                                <option value="172002275412279296">Tatsumaki</option>
-                                <option value="zerotwo">Zero Two</option>
-                            </datalist>
-                            <datalist id="DiscordBotListIDList">
-                                <option value="dank-memer">Dank Memer</option>
-                                <option value="tatsu">Tatsumaki</option>
-                                <option value="zerotwo">Zero Two</option>
-                            </datalist>
-                            <datalist id="BotsForDiscordIDList">
-                                <option value="469610550159212554">Zero Two</option>
-                            </datalist>
-                        </div>
+
                         <button class="submitBtn" data-resource="addButton" id="submitAddProject" type="submit"></button>
+
+                        <div class="editProjectButtons" style="display: none;">
+                            <button class="submitBtn" data-resource="save" id="submitEditProject" type="submit"></button>
+                            <button class="submitBtn" data-resource="cancel" id="submitCancelProject" type="button"></button>
+                        </div>
+
                         <div data-resource="banAttention" id="banAttention" style="display: none"></div>
+                        <div data-resource="rewardAttention" id="rewardAttention" style="display: none"></div>
+                        <div data-resource="operaAttention" id="operaAttention" style="display: none">
+                            <br>
+                            <br>
+                            <a class="link" target="_blank" href="https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera">Problems with Opera</a>
+                        </div>
                     </div>
-                    <div>
+                    <div id="advSettingsAdd" style="display: none">
                         <div class="label-block">
                             <label data-resource="advSettings"></label>
                         </div>
@@ -761,19 +310,19 @@
                             <input class="checkbox" id="disabledNotifError" type="checkbox" name="checkbox"/>
                             <label data-resource="disabledNotifError" for="disabledNotifError"></label>
                         </div>
-<!--                        <div class="check-block">-->
-<!--                            <input class="checkbox" id="disabledCheckTime" type="checkbox" name="checkbox"/>-->
-<!--                            <label data-resource="disabledCheckTime" for="disabledCheckTime"></label>-->
-<!--                        </div>-->
                         <div class="check-block">
                             <input class="checkbox" id="disabledCheckInternet" type="checkbox" name="checkbox"/>
                             <label data-resource="disabledCheckInternet" for="disabledCheckInternet"></label>
                         </div>
-                        <div class="check-block">
+                        <div class="check-block" style="display: none">
                             <input class="checkbox" id="disabledOneVote" type="checkbox" name="checkbox"/>
                             <label data-resource="disabledOneVote" for="disabledOneVote"></label>
                         </div>
                         <div class="check-block">
+                            <input class="checkbox" id="disabledRestartOnTimeout" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledRestartOnTimeout" for="disabledRestartOnTimeout"></label>
+                        </div>
+                        <div class="check-block" style="display: none">
                             <input class="checkbox" id="disabledFocusedTab" type="checkbox" name="checkbox"/>
                             <label data-resource="disabledFocusedTab" for="disabledFocusedTab">
                                 <span class="tooltip1">
@@ -790,6 +339,14 @@
                             </label>
                         </div>
                         <div class="check-block">
+                            <input class="checkbox" id="disabledClickCaptcha" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledClickCaptcha" for="disabledClickCaptcha">
+                                <span class="tooltip1">
+                                    <span data-resource="disabledClickCaptchaTooltip" class="tooltip1text"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="check-block" style="display: none">
                             <input class="checkbox" id="disabledDebug" type="checkbox" name="checkbox"/>
                             <label data-resource="disabledDebug" for="disabledDebug">
                                 <span class="tooltip1">
@@ -797,10 +354,42 @@
                                 </span>
                             </label>
                         </div>
+                        <div class="check-block" style="display: none">
+                            <input class="checkbox" id="disabledCloseTabs" type="checkbox" name="checkbox"/>
+                            <label data-resource="disabledCloseTabs" for="disabledCloseTabs">
+                                <span class="tooltip1">
+                                    <span data-resource="disabledDebugTooltip" class="tooltip1text"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledUseRemoteCode" type="checkbox" name="checkbox" disabled checked/>
+                            <label data-resource="disabledUseRemoteCode" for="disabledUseRemoteCode">
+                                <span class="tooltip1">
+                                    <span data-resource="disabledUseRemoteCodeTooltip" class="tooltip1text"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="disabledSendErrorSentry" type="checkbox" name="checkbox" disabled checked/>
+                            <label data-resource="disabledSendErrorSentry" for="disabledSendErrorSentry">
+                                <span class="tooltip1">
+                                    <span data-resource="disabledSendErrorSentryTooltip" class="tooltip1text"></span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="check-block">
+                            <input class="checkbox" id="expertMode" type="checkbox" name="checkbox" disabled checked/>
+                            <label data-resource="expertMode" for="expertMode">
+                                <span class="tooltip1">
+                                    <span data-resource="expertModeTooltip" class="tooltip1text"></span>
+                                </span>
+                            </label>
+                        </div>
                         <button class="submitBtn" id="forceUpdate" data-resource="forceUpdate"></button>
                     </div>
                     <div>
-                        <div class="input-block">
+                        <div class="input-block" style="display: none">
                             <label data-resource="enabledSilentVote" for="enabledSilentVote">
                                 <span class="tooltip2">
                                     <span data-resource="enabledSilentVoteTooltip" class="tooltip2text"></span>
@@ -811,17 +400,36 @@
                                 <option data-resource="enabledSilentVoteNoSilent" value="disabled"></option>
                             </select>
                         </div>
-                        <div class="input-block">
-                            <label data-resource="cooldown" for="timeoutValue"></label>
+                        <div class="input-block" style="display: none">
+                            <label data-resource="cooldown" for="timeoutValue">
+                                <span class="tooltip2">
+                                    <span data-resource="timeoutTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
                             <form id="timeout">
                                 <input class="input" name="cooldown" id="timeoutValue" required type="number" min="0">
                                 <button data-resource="setCooldown" type="submit" class="justBtn"></button>
                             </form>
                         </div>
-                        <div class="input-block">
-                            <label data-resource="cooldownError" for="timeoutErrorValue"></label>
+                        <div class="input-block" style="display: none">
+                            <label data-resource="cooldownError" for="timeoutErrorValue">
+                                <span class="tooltip2">
+                                    <span data-resource="timeoutErrorTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
                             <form id="timeoutError">
                                 <input class="input" name="cooldownError" id="timeoutErrorValue" required type="number" min="0">
+                                <button data-resource="setCooldown" type="submit" class="justBtn"></button>
+                            </form>
+                        </div>
+                        <div class="input-block" style="display: none">
+                            <label data-resource="cooldownVote" for="timeoutVoteValue">
+                                <span class="tooltip2">
+                                    <span data-resource="timeoutVoteTooltip" class="tooltip2text"></span>
+                                </span>
+                            </label>
+                            <form id="timeoutVote">
+                                <input class="input" name="cooldownVote" id="timeoutVoteValue" required type="number" min="1000">
                                 <button data-resource="setCooldown" type="submit" class="justBtn"></button>
                             </form>
                         </div>
@@ -855,6 +463,7 @@
                                 </label>
                             </div>
                         </div>
+                        <div id="storageUsed"></div>
                     </div>
                 </div>
             </div>
@@ -862,7 +471,8 @@
             <div id="added" class="tabcontent" style="display: none;">
                 <h4 data-resource="addedProjects"></h4>
                 <hr color="#5A5A5C">
-                <p data-resource="notAddedAll"></p>
+                <p id="addedLoading" data-resource="load"></p>
+                <p id="notAddedAll" data-resource="notAddedAll" style="display: none;"></p>
                 <div class="projectsBlock">
                     <div class="buttonBlock"></div>
                     <div class="contentBlock"></div>
@@ -1096,11 +706,16 @@
                     	<div class="text">
                     	    <span data-resource="feedback"></span>
                             <a class="link" target="_blank" href="https://discord.gg/GyvMtbU"><span data-resource="dmDiscord"></span></a>
-                            <span data-resource="feedback2">
-                    	        <a class="link" target="_blank" href="https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd/support">
-                    	            <span data-resource="dmChromeWebStore"></span>
+                            <span data-resource="feedback4">
+                    	        <a class="link" target="_blank" href="https://github.com/Serega007RU/Auto-Vote-Rating/issues/new">
+                    	            <span>GitHub</span>
                     	        </a>
                     	    </span>
+<!--                            <span data-resource="feedback2">-->
+<!--                    	        <a class="link" target="_blank" href="https://chrome.google.com/webstore/detail/auto-vote-minecraft-ratin/mdfmiljoheedihbcfiifopgmlcincadd/support">-->
+<!--                    	            <span data-resource="dmChromeWebStore"></span>-->
+<!--                    	        </a>-->
+<!--                    	    </span>-->
 <!--                            <span data-resource="feedback3">-->
 <!--                    	        <a class="link" target="_blank" href="mailto:ermaksochi@gmail.com">-->
 <!--                    	            <span data-resource="email"></span>-->
@@ -1108,7 +723,7 @@
 <!--                    	    </span>-->
                     	</div>
                     </div>
-                    <a target="_blank" href="https://gitlab.com/Serega007/Auto-Vote-Rating" class="social"><img src="images/icons/git.svg" alt="git"></a>
+                    <a target="_blank" href="https://github.com/Serega007RU/Auto-Vote-Rating" class="social"><img src="images/icons/git.svg" alt="git"></a>
                 </div>
             </div>
             <!-- Ассеты -->
@@ -1117,6 +732,11 @@
                 <a id="todayStats" data-resource="todayStats"></a>
 <!--                <a class="link" id="donate" data-resource="supportDev" target="_blank" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>-->
                 <a class="link" id="donate" target="_blank" href="https://my.qiwi.com/Sergei-EV-7E02hYH"></a>
+            </div>
+            <!-- Загрузка -->
+            <div id="load" style="display: block;">
+                <div>Loading...</div>
+                <img src="images/icons/spinner.svg">
             </div>
         </div>
 
@@ -1133,6 +753,9 @@
                     <div class="message"></div>
                     <div class="events"></div>
                 </div>
+            </div>
+            <div class="modal" id="loading">
+                <img src="images/icons/spinner.svg">
             </div>
             <!-- Info -->
             <div class="modal" id="info">
@@ -1159,6 +782,47 @@
                     <div class="message"></div>
                     <div class="events">
                         <button class="btn redBtn" data-resource="cancel"></button>
+                    </div>
+                </div>
+            </div>
+            <!-- Неподдерживаемый браузер -->
+            <div class="modal notSupportedBrowser" id="notSupportedBrowser">
+                <div class="head">
+                    <h3 data-resource="notSupportedBrowser"></h3>
+                </div>
+                <div class="content">
+                    <div class="message">
+                        <div data-resource="notSupportedBrowserContent1"></div>
+                        <br>
+                        <div data-resource="notSupportedBrowserContent2"></div>
+                    </div>
+                    <div class="events">
+                        <button class="btn" data-resource="deleteExtension"></button>
+                        <button class="btn redBtn" data-resource="limitedModeButton1" style="width: 340px"></button>
+                    </div>
+                </div>
+            </div>
+            <!-- Неподдерживаемый браузер 2 -->
+            <div class="modal notSupportedBrowser" id="notSupportedBrowser2">
+                <div class="head">
+                    <h3 data-resource="areYouSure"></h3>
+                    <div class="close"></div>
+                </div>
+                <div class="content">
+                    <div class="message">
+                        <div data-resource="limitedModeContent"></div>
+                        <br>
+                        <div data-resource="limitedModeContent3"></div>
+                        <a class="link" target="_blank" href="https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera">Problems with Opera</a>
+                        <br>
+                        <br>
+                        <div data-resource="limitedModeContent1"></div>
+                        <br>
+                        <div data-resource="limitedModeContent2"></div>
+                    </div>
+                    <div class="events">
+                        <button class="btn" data-resource="deleteExtension"></button>
+                        <button class="btn redBtn" data-resource="limitedModeButton2" style="width: 400px" disabled></button>
                     </div>
                 </div>
             </div>
@@ -1251,9 +915,11 @@
                 </div>
             </div>
         </div>
-        <script src="libs/umd.js"></script>
+        <script src="libs/idb.umd.js"></script>
         <script src="projects.js"></script>
         <script src="main.js"></script>
         <script src="options.js"></script>
+<!--        <script async src="libs/evalCore.umd.js"></script>-->
         <script async src="libs/jszip.js"></script>
     </body>
+</html>

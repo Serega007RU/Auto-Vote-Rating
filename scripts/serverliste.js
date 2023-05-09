@@ -1,12 +1,17 @@
 async function vote(first) {
-    const text = document.querySelector('#vote i')?.parentElement?.innerText
-    if (text != null && text.length > 0) {
-        if (text.includes('hast erfolgreich')) {
+    const message = document.querySelector('#vote i')?.parentElement?.innerText
+    if (message && message.length > 3) {
+        const request = {}
+        request.message = message.trim()
+        if (request.message.includes('hast erfolgreich')) {
             chrome.runtime.sendMessage({successfully: true})
-        } else if (text.includes('hast heute schon')) {
+        } else if (request.message.includes('hast heute schon')) {
             chrome.runtime.sendMessage({later: true})
         } else {
-            chrome.runtime.sendMessage({message: text.trim()})
+            if (request.message.includes('Fehler bei Captcha-Prüfung')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
         }
         return
     }

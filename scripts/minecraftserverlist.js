@@ -5,7 +5,7 @@ if (typeof loaded2 === 'undefined') {
     runVote()
 }
 
-async function vote() {
+async function vote(first) {
     await new Promise(resolve => {
         const timer = setInterval(()=>{
             try {
@@ -20,23 +20,34 @@ async function vote() {
             }
         }, 1000)
     })
+    if (first === false) return
     const project = await getProject('MinecraftServerList')
-    document.getElementById('ignn').value = project.nick
-    document.querySelector('#voteform > input.buttonsmall.pointer.green.size10').click()
+    document.querySelector('#voteform > #ignn').value = project.nick
+    document.querySelector('#voteform > input[value="Click to Vote"]').click()
 }
 
 function runVote() {
+    let alreadySent = false
     const timer2 = setInterval(()=>{
         try {
             if (document.querySelector('#voteerror > font') != null) {
-                if (document.querySelector('#voteerror > font').textContent.includes('Vote Registered')) {
+                const request = {}
+                request.message = document.querySelector('#voteerror > font').textContent
+                if (request.message.includes('Vote Registered')) {
                     chrome.runtime.sendMessage({successfully: true})
-                } else if (document.querySelector('#voteerror > font').textContent.includes('already voted')) {
+                } else if (request.message.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
-                } else if (document.querySelector('#voteerror > font').textContent.includes('Please Wait')) {
+                } else if (request.message.includes('Please Wait')) {
                     return
+                } else if (request.message.includes('cannot verify your vote due to a low browser score') || request.message.includes('with the Anti Spam check')) {
+                    if (alreadySent) return
+                    chrome.runtime.sendMessage({captcha: true})
+                    alreadySent = true
                 } else {
-                    chrome.runtime.sendMessage({message: document.querySelector('#voteerror > font').textContent})
+                    if (request.message.toLowerCase().includes('not a valid playername') || request.message.includes('could not connect to Votifier') || request.message.includes('verification expired due to timeout') || request.message.includes('Playername can not be empty') || request.message.includes('Your name is to short')) {
+                        request.ignoreReport = true
+                    }
+                    chrome.runtime.sendMessage(request)
                 }
                 clearInterval(timer2)
             }

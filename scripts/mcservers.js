@@ -5,19 +5,30 @@
 
 async function vote(first) {
 //  if (first == true || first == false) return
-    if (document.querySelector('div.main-panel > p') != null) {
-        if (document.querySelector('div.main-panel > p').textContent.includes('already voted')) {
+    if (document.querySelector('div.main-panel > p')) {
+        const request = {}
+        request.message = document.querySelector('div.main-panel > p').textContent
+        if (request.message.includes('already voted')) {
             chrome.runtime.sendMessage({later: true})
+            return
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.main-panel > p').textContent})
+            if (request.message.includes('Captcha is not correct')) {
+                // None
+            } else {
+                if (request.message.includes('some problems sending your vote')) {
+                    request.ignoreReport = true
+                }
+                chrome.runtime.sendMessage(request)
+                return
+            }
         }
-        return
     }
-    if (document.querySelector('div.main-panel > span') != null) {
-        if (document.querySelector('div.main-panel > span').textContent.includes('vote was success')) {
+    if (document.querySelector('div.main-panel > span.green')) {
+        const message = document.querySelector('div.main-panel > span.green').textContent
+        if (message.includes('vote was success')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
-            chrome.runtime.sendMessage({message: document.querySelector('div.main-panel > span').textContent})
+            chrome.runtime.sendMessage({message})
         }
         return
     }
@@ -30,6 +41,6 @@ async function vote(first) {
     if (first) return
 
     const project = await getProject('MCServers')
-    document.getElementById('username').value = project.nick
+    if (document.querySelector('#username')) document.querySelector('#username').value = project.nick
     document.querySelector('form[method="POST"] > button[type="submit"]').click()
 }

@@ -3,24 +3,10 @@
 	"short_name": "AVR",
 	"author": "Serega007",
 	"background": {
-		"scripts": [
-			"libs/umd.js",
-			"projects.js",
-		    "main.js",
-			"background.js",
-			"scripts/minecraftiplist.js"
-		],
-		"persistent": true
-	},
-	"browser_specific_settings": {
-		"gecko": {
-			"id": "ermaksochi@gmail.com",
-			"strict_min_version": "91.1.0"
-		}
+		"service_worker": "background.js"
 	},
 	"description": "__MSG_appDesc__",
-	"manifest_version": 2,
-	"minimum_chrome_version": "85.0",
+	"manifest_version": 3,
 	"name": "__MSG_appName__",
 	"options_ui": {
 		"open_in_tab": true,
@@ -37,16 +23,41 @@
 		"notifications",
 		"background",
 		"webRequest",
-		"webRequestBlocking",
+		"webRequestAuthProvider",
 		"webNavigation",
+		"webRequest",
 		"alarms",
 		"unlimitedStorage",
+		"scripting",
+		"tabGroups",
+		"idle",
+		"pageCapture",
 		"cookies",
 		"proxy",
-		"<all_urls>",
 		"browsingData"
 	],
+	"host_permissions": [
+		"https://*.hcaptcha.com/captcha/*",
+		"https://www.google.com/recaptcha/*",
+		"https://www.recaptcha.net/recaptcha/*",
+		"https://challenges.cloudflare.com/*"
+	],
+	"optional_host_permissions": [
+		"<all_urls>"
+	],
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"options.html"
+			],
+			"matches": [
+				"https://*.dogecraft.net/*",
+				"https://*.mythicalworld.su/*"
+			]
+		}
+	],
 	"update_url": "https://clients2.google.com/service/update2/crx",
-	"version": "6.8.6",
+	"version": "7.0.16",
+	"minimum_chrome_version": "105.0",
 	"default_locale": "en"
 }

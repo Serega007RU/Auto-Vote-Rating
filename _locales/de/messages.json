@@ -86,10 +86,6 @@
     "message": "Fehlerbenachrichtigungen deaktivieren",
     "description": "Checkbox. Error notifications"
   },
-  "disabledCheckTime": {
-    "message": "Zeitprüfung beim Start der Verlängerung deaktivieren",
-    "description": "Checkbox. Disable time checking"
-  },
   "disabledCheckInternet": {
     "message": "Überprüfung der Internetverbindung deaktivieren"
   },
@@ -130,10 +126,6 @@
   "enabledSilentVoteNoSilent": {
     "message": "Emulations Modus",
     "description": "Input. Mode."
-  },
-  "cooldown": {
-    "message": "Abstimmungszeit in Millisekunden zwischen Projekten für 1 Bewertung",
-    "description": "Label. Cooldown input"
   },
   "cooldownError": {
     "message": "Timeout in ms im Falle eines Fehlers"
@@ -309,14 +301,6 @@
       }
     }
   },
-  "warnSilentVote": {
-    "message": "Bitte beachten Sie, dass $top$ im Modus der stillen Abstimmung nicht verfügbar ist.",
-    "placeholders": {
-      "top": {
-        "content": "$1"
-      }
-    }
-  },
   "cooldownChanged": {
     "message": "Sie müssen die Erweiterung neu starten, um die Änderungen zu übernehmen. Öffnen Sie nach dem Neustart erneut die Einstellungen. Neustart der Erweiterung?"
   },
@@ -399,9 +383,6 @@
   "inputProjectID": {
     "message": "ID eingeben"
   },
-  "inputProjectIDOrList": {
-    "message": "Wählen Sie eine ID aus der Liste aus oder geben Sie Ihre ID ein"
-  },
   "developers": {
     "message": "Entwickler:"
   },
@@ -448,7 +429,12 @@
     "message": "Sie haben bereits abgestimmt"
   },
   "errorOpenTab": {
-    "message": "Beim Öffnen des Tabs ist ein Fehler aufgetreten: "
+    "message": "Beim Öffnen des Tabs ist ein Fehler aufgetreten: $error$",
+    "placeholders": {
+      "error": {
+        "content": "$1"
+      }
+    }
   },
   "errorAuthVK": {
     "message": "Fehler mit dem VK-Konto! $error$",
@@ -478,34 +464,12 @@
     }
   },
   "errorVoteNoElement": {
-    "message": "Abstimmungsfehler, es scheint ein notwendiges Element/Button zu fehlen. Melden Sie diesen Fehler an den Entwickler der Erweiterung"
-  },
-  "errorVoteNoElement2": {
     "message": "Fehler! Es scheint, dass ein notwendiges Element (Schaltfläche oder Eingabefeld) fehlt. Hier ist, was wir wissen: $error$. Melden Sie diesen Fehler an den Entwickler der Erweiterung",
     "placeholders": {
       "error": {
         "content": "$1"
       }
     }
-  },
-  "errorVoteNoNick": {
-    "message": "Abstimmungsfehler! Es ist eine Umleitung zu einer unbekannten Seite aufgetreten: $url$ Überprüfen Sie diese URL",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorVoteNoNick2": {
-    "message": "Unerwarteter Fehler, das Projekt konnte nicht gefunden werden. URL: $url$",
-    "placeholders": {
-      "url": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorVoteUnknown": {
-    "message": "Fehler bei der Abstimmung! Hier ist, das was wir wissen: "
   },
   "errorVoteNetwork": {
     "message": "Fehler bei der Abstimmung! Fehlercode: $code$ URL: $url$",
@@ -579,9 +543,6 @@
       }
     }
   },
-  "errorVoteUnknown2": {
-    "message": "Unerwarteter Fehler! Keine Fehlermeldung"
-  },
   "projectID": {
     "message": "ID project"
   },
@@ -612,9 +573,6 @@
   },
   "countVote": {
     "message": "Wie viele Stimmen pro Tag machen"
-  },
-  "warnSilentVoteTooltip": {
-    "message": "This rating will always work in emulation mode (regardless of the voting mode setting). It is set so because this top has a ReCaptcha that's impossible to bypass. We do not recommend adding more than 1 project to one voting page where ReCaptcha is active. ReCaptcha operates on the trust factor, if you pass it too often, then ReCaptcha may ask you to solve it again(select images where 'paste any object here' is shown), which this extension doesn't know how. Also if you are using a proxy or VPN then ReCaptcha's trust factor may not work"
   },
   "requiresCaptcha": {
     "message": "Erfordert das manuelle Lösen des Captcha"
@@ -779,7 +737,7 @@
     "message": "Es findet gerade eine Abstimmung statt..."
   },
   "timeout": {
-    "message": "Die Wartezeit für die Abstimmung ist abgelaufen, die Abstimmung wird neu gestartet."
+    "message": "Die Wartezeit für die Abstimmung ist abgelaufen."
   },
   "repeatAttemptLater": {
     "message": "Ignorieren Sie zumindest die Fehlermeldung 'Sie haben bereits gewählt'."
@@ -945,7 +903,7 @@
     "message": "Nur registrierte Benutzer können über diese Bewertung abstimmen. Bitte loggen Sie sich ein oder registrieren Sie sich."
   },
   "emptySite": {
-    "message": "Es scheint, dass diese Bewertung mit einer leeren Seite reagiert hat. Versuchen Sie, diese Seite zu besuchen und fügen Sie sie dann erneut hinzu"
+    "message": "Es scheint, dass diese Bewertung mit einer leeren Seite reagiert hat."
   },
   "ordinalWorld": {
     "message": "Weltweite Zählnummer"
@@ -959,25 +917,7 @@
   "alertCaptcha": {
     "message": "Es gibt ein Captcha auf dieser Bewertungsseite, das die Erweiterung nicht lösen kann. Sie müssen es manuell lösen, die Erweiterung wird Sie darauf hinweisen."
   },
-  "chooseTopGG": {
-    "message": "Was wählen wir?"
-  },
-  "bots": {
-    "message": "Bots"
-  },
-  "guilds": {
-    "message": "Guilds"
-  },
-  "servers": {
-    "message": "Servers"
-  },
-  "serversMinecraftRating": {
-    "message": "Servers (keine Belohnung für die Abstimmung)"
-  },
-  "projects": {
-    "message": "Projects"
-  },
-  "additionTopGG": {
+  "additionURL": {
     "message": "Zusätzliche Parameter (optional)"
   },
   "emptyError": {
@@ -1084,9 +1024,6 @@
         "content": "$1"
       }
     }
-  },
-  "notFast": {
-    "message": "Nicht so schnell, warten Sie auf die Ausführung der Funktion"
   },
   "updateAvailbe": {
     "message": "Verfügbare $Version$ aktualisieren",
@@ -1367,12 +1304,7 @@
     "message": "Übersetzt ins Deutsche: [GER]msebastian100#6704"
   },
   "notSupportedGroupTabs": {
-    "message": "Ihr Browser scheint die Gruppierung von Tabs nicht zu unterstützen: $error$",
-    "placeholders": {
-      "error": {
-        "content": "$1"
-      }
-    }
+    "message": "Ihr Browser scheint die Gruppierung von Tabs nicht zu unterstützen"
   },
   "cancel": {
     "message": "Abbrechen"

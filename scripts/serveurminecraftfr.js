@@ -13,6 +13,6 @@ async function vote(/*first*/) {
     }
 
     const project = await getProject('ServeurMinecraftFr')
-    document.querySelector('#main-content input[name="username"]').value = project.nick
+    if (document.querySelector('#main-content input[name="username"]')) document.querySelector('#main-content input[name="username"]').value = project.nick
     chrome.runtime.sendMessage({captcha: true})
 }
