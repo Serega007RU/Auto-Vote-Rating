@@ -137,7 +137,7 @@ function checkOpen(project/*, transaction*/) {
     }
 
     for (let[tab,value] of openedProjects) {
-        if (value.openedTimeoutQueue && Date.now() < value.openedTimeoutQueue) {
+        if (value.openedTimeoutQueue && Date.now() >= value.openedTimeoutQueue) {
             openedProjects.delete(tab)
             db.put('other', openedProjects, 'openedProjects')
             continue
@@ -1118,7 +1118,6 @@ async function endVote(request, sender, project) {
 
     project = await db.get('projects', project.key)
 
-    delete project.openedTimeoutQueue
     delete project.openedNextAttempt
     delete project.openedCountInject
 
