@@ -33,7 +33,7 @@ function runVote() {
             if (document.querySelector('#voteerror > font') != null) {
                 const request = {}
                 request.message = document.querySelector('#voteerror > font').textContent
-                if (request.message.includes('Vote Registered')) {
+                if (request.message.includes('Vote Registered') || request.message.includes('Vote saved. But could not connect to Votifier')) {
                     chrome.runtime.sendMessage({successfully: true})
                 } else if (request.message.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
@@ -44,7 +44,7 @@ function runVote() {
                     chrome.runtime.sendMessage({captcha: true})
                     alreadySent = true
                 } else {
-                    if (request.message.toLowerCase().includes('not a valid playername') || request.message.includes('could not connect to Votifier') || request.message.includes('verification expired due to timeout') || request.message.includes('Playername can not be empty') || request.message.includes('Your name is to short')) {
+                    if (request.message.toLowerCase().includes('not a valid playername') || request.message.includes('verification expired due to timeout') || request.message.includes('Playername can not be empty') || request.message.includes('Your name is to short')) {
                         request.ignoreReport = true
                     }
                     chrome.runtime.sendMessage(request)

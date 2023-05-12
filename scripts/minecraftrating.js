@@ -31,31 +31,33 @@ async function vote(first) {
 
         document.querySelector('#submitVote').click()
     } else {
-        const timer = setInterval(()=>{
-            try {
-                if (document.querySelector('#msgBox').textContent.length > 0) {
-                    const message = document.querySelector('#msgBox').textContent
-                    if (message.includes('Спасибо за Ваш голос')) {
-                        clearInterval(timer)
-                        chrome.runtime.sendMessage({successfully: true})
-                    } else if (message.includes('уже голосовали')) {
-                        clearInterval(timer)
-                        const numbers = message.match(/\d+/g).map(Number)
-                        chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] - 1, numbers[0], numbers[3], numbers[4], numbers[5]) - 10800000 + 60000})
-                    } else if (message.includes('Проверка на робота не пройдена')) {
-                        // None
-                    } else {
-                        clearInterval(timer)
-                        chrome.runtime.sendMessage({message})
+        if (first) {
+            const timer = setInterval(()=>{
+                try {
+                    if (document.querySelector('#msgBox').textContent.length > 0) {
+                        const message = document.querySelector('#msgBox').textContent
+                        if (message.includes('Спасибо за Ваш голос')) {
+                            clearInterval(timer)
+                            chrome.runtime.sendMessage({successfully: true})
+                        } else if (message.includes('уже голосовали')) {
+                            clearInterval(timer)
+                            const numbers = message.match(/\d+/g).map(Number)
+                            chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] - 1, numbers[0], numbers[3], numbers[4], numbers[5]) - 10800000 + 60000})
+                        } else if (message.includes('Проверка на робота не пройдена')) {
+                            // None
+                        } else {
+                            clearInterval(timer)
+                            chrome.runtime.sendMessage({message})
+                        }
                     }
+                } catch (e) {
+                    clearInterval(timer)
+                    throwError(e)
                 }
-            } catch (e) {
-                clearInterval(timer)
-                throwError(e)
-            }
-        }, 500)
+            }, 500)
 
-        if (first) return
+            return
+        }
 
         document.querySelector('#voteForm button[type="submit"]').click()
     }

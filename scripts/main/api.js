@@ -187,24 +187,24 @@ async function checkAll(first) {
         return
     }
 
-    // Если ошибка (запрещён доступ) CloudFlare
-    if (document.querySelector('div.cf-main-wrapper div.cf-error-description')) {
-        const request = {}
-        request.message = document.querySelector('div.cf-main-wrapper').innerText
-        request.ignoreReport = true
-        chrome.runtime.sendMessage(request)
-        return
-    }
-
     //Если мы находимся на странице проверки CloudFlare https://i.imgur.com/BVk3z6y.png
     if (document.querySelector('div.main-wrapper div.main-content #challenge-body-text') || document.querySelector('div.main-wrapper div.main-content #challenge-running')) {
         return
     }
 
     // Если ошибка 5xx https://i.imgur.com/aO5H1k8.png
-    if (document.querySelector('div#cf-wrapper div#cf-error-details')) {
+    if (document.querySelector('div#cf-wrapper div#cf-error-details h1') && document.querySelector('div#cf-wrapper div#cf-error-details > div > div.clearfix')) {
         const request = {}
         request.message = document.querySelector('div#cf-wrapper div#cf-error-details h1')?.innerText + ' ' + document.querySelector('div#cf-wrapper div#cf-error-details > div > div.clearfix').innerText
+        request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
+    // Если ошибка (запрещён доступ) CloudFlare https://i.imgur.com/u3kPXYL.png (или любая другая ошибка, не за что там сделать querySelector)
+    if (document.querySelector('div#cf-wrapper #cf-error-details')) {
+        const request = {}
+        request.message = document.querySelector('div#cf-wrapper #cf-error-details').innerText
         request.ignoreReport = true
         chrome.runtime.sendMessage(request)
         return
