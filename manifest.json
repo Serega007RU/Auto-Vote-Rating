@@ -36,8 +36,8 @@
 	],
 	"host_permissions": [
 		"https://*.hcaptcha.com/captcha/*",
-		"https://www.google.com/recaptcha/*",
-		"https://www.recaptcha.net/recaptcha/*",
+		"https://*.google.com/recaptcha/*",
+		"https://*.recaptcha.net/recaptcha/*",
 		"https://challenges.cloudflare.com/*"
 	],
 	"optional_host_permissions": [

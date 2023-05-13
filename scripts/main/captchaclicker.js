@@ -16,7 +16,7 @@ function run() {
         })
     }
 
-    if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) {
+    if (window.location.href.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/enterprise\/anchor*/) || window.location.href.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/enterprise\/anchor*/)) {
         const timer1 = setInterval(()=>{
             // noinspection CssInvalidHtmlTagReference
             if (dontSolve || document.querySelector('head > captcha-widgets')) {
@@ -55,7 +55,7 @@ function run() {
                 }
             }
         }, 1000)
-    } else if ((window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/bframe/)) && document.querySelector('head > yandex-captcha-solver') == null) {
+    } else if ((window.location.href.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api\d\/bframe/) || window.location.href.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/enterprise\/bframe*/) || window.location.href.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/enterprise\/bframe*/)) && document.querySelector('head > yandex-captcha-solver') == null) {
         //Интеграция с расширением Buster: Captcha Solver for Humans
         let count = 0
         let repeat = 2
@@ -94,7 +94,7 @@ function run() {
                 clearInterval(timer3)
             }
         }, 1000)
-    } else if (window.location.href.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/) || window.location.href.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)) {
+    } else if (window.location.href.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api\/fallback*/) || window.location.href.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api\/fallback*/) || window.location.href.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/enterprise\/fallback*/) || window.location.href.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/enterprise\/fallback*/)) {
         chrome.runtime.sendMessage({errorCaptcha: document.body.innerText.trim(), restartVote: true})
     } else if (window.location.href.match(/.hcaptcha.com\/captcha.v\d\//)) {
         const timer4 = setInterval(()=>{

@@ -529,7 +529,7 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
 chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
     await initializeFunc
     if (openedProjects.has(details.tabId)) {
-        if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+        if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/*/) || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
             const project = openedProjects.get(details.tabId)
             if (
                 //Chrome
@@ -576,12 +576,15 @@ chrome.webNavigation.onCommitted.addListener(async function(details) {
             filesMain.push('scripts/main/alert_main.js')
         }
     } else if (details.url.match(/hcaptcha.com\/captcha\/*/)
-            || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/)
-            || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/)
-            || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/)
-            || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/)
-            || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/)
-            || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)
+            || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api.\/anchor*/)
+            || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api.\/bframe*/)
+            || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api.\/anchor*/)
+            || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api.\/bframe*/)
+            || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api\/fallback*/)
+            || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api\/fallback*/)
+            || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/enterprise\/fallback*/)
+            || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/enterprise\/anchor*/)
+            || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/enterprise\/bframe*/)
             || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
         filesMain.push('scripts/main/visible.js')
         filesIsolated.push('scripts/main/alert_isolated.js')
@@ -710,12 +713,15 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         }
     } else if (details.frameId !== 0 && (
         details.url.match(/hcaptcha.com\/captcha\/*/)
-        || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/anchor*/)
-        || details.url.match(/https:\/\/www.google.com\/recaptcha\/api.\/bframe*/)
-        || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/anchor*/)
-        || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api.\/bframe*/)
-        || details.url.match(/https:\/\/www.google.com\/recaptcha\/api\/fallback*/)
-        || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\/fallback*/)
+        || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api.\/anchor*/)
+        || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api.\/bframe*/)
+        || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api.\/anchor*/)
+        || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api.\/bframe*/)
+        || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api\/fallback*/)
+        || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api\/fallback*/)
+        || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/enterprise\/fallback*/)
+        || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/enterprise\/anchor*/)
+        || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/enterprise\/bframe*/)
         || details.url.match(/https:\/\/challenges.cloudflare.com\/*/))) {
 
         // let eval = true
@@ -793,7 +799,7 @@ chrome.webRequest.onErrorOccurred.addListener(async function(details) {
         let project = fetchProjects.get(details.requestId)
         endVote({errorVoteNetwork: [details.error, details.url]}, null, project)
     } else */if (openedProjects.has(details.tabId)) {
-        if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https:\/\/www.google.com\/recaptcha\/*/) || details.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+        if (details.type === 'main_frame' || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/*/) || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
             const project = openedProjects.get(details.tabId)
             if (
                 //Chrome
@@ -854,7 +860,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         const frames = await chrome.webNavigation.getAllFrames({tabId: sender.tab.id})
         for (const frame of frames) {
             // noinspection JSUnresolvedVariable
-            if (frame.url.match(/https:\/\/www.google.com\/recaptcha\/api\d\/anchor/) || frame.url.match(/https:\/\/www.recaptcha.net\/recaptcha\/api\d\/anchor/)) {
+            if (frame.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api.\/anchor*/) || frame.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api.\/anchor*/) || frame.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/enterprise\/anchor*/)) {
                 function reload() {
                     document.location.reload()
                 }
