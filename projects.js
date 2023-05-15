@@ -1423,6 +1423,19 @@ var allProjects = {
         URL: () => 'topservers.com',
         parseURL: (url) => ({id: url.pathname.split('/')[1]})
     },
+    GenshinDrop: {
+        voteURL: () => 'https://genshindrop.com/case/24-chasa-oskolki',
+        pageURL: () => 'https://genshindrop.com/case/24-chasa-oskolki',
+        projectName: () => 'Бесплатный кейс 24 часа от Катерины',
+        exampleURL: () => ['https://genshindrop.com/', 'case/24-chasa-oskolki', ''],
+        URL: () => 'genshindrop.com',
+        parseURL: () => ({id: '24hcasekaterina'}),
+        timeout: () => ({hours: 24}),
+        silentVote: () => true,
+        notRequiredCaptcha: () => true,
+        notRequiredNick: () => true,
+        notRequiredId: () => true
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1570,6 +1583,7 @@ var projectByURL = new Map([
     ['discadia.com', 'Discadia'],
     ['minecraftsurvivalservers.net', 'MinecraftSurvivalServers'],
     ['topservers.com', 'TopServersCom'],
+    ['genshindrop.com', 'GenshinDrop'],
     ['Custom', 'Custom']
 ])
 
