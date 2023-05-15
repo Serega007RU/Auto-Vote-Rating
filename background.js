@@ -385,7 +385,7 @@ async function groupTabs(tab) {
 
     // Если мы не нашли групп или не смогли сгруппировать так как нет уже такой группы, то только тогда создаём эту группу
     try {
-        groupId = await chrome.tabs.group({createProperties: {windowId: tab.windowId}, tabIds: tab.id})
+        groupId = await chrome.tabs.group({tabIds: tab.id})
         await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
     } catch (error) {
         if (!error.message.includes('No tab with id') && !error.message.includes('No group with id')) {
@@ -748,7 +748,11 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
             // Если вкладка уже загружена, повторно туда высылаем sendProject который обозначает что мы готовы к голосованию
             const tab = await chrome.tabs.get(details.tabId)
-            if (tab.status !== 'complete') return
+            // TODO костыльная совместимость с Kiwi Browser, данный браузер в tab.status отдаёт undefined, нам ничего не остаётся кроме как игнорировать данный факт и голосовать как есть
+            // не работоспособность данной проверки может привести к тому что капча может быть решена раньше чем страница загружена но такое обстоятельство весьма редкое
+            // расширение отошлёт сообщение о пройденной капче ещё не внедрённому скрипту голосования что приведёт к зависанию голосования
+            // например сайт ionmc.top загружает капчу раньше чем страница загрузилась
+            if (tab.status != null && tab.status !== 'complete') return
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project, settings})
         } catch (error) {
             catchTabError(error, project)

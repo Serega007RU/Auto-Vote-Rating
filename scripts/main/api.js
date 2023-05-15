@@ -348,11 +348,3 @@ function isVisibleElement(elem) {
 
     return true
 }
-
-//Костыль для FireFox
-if (typeof result === 'undefined') {
-    // noinspection ES6ConvertVarToLetConst
-    var result = ''
-}
-// noinspection BadExpressionStatementJS
-result

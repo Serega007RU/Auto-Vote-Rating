@@ -172,11 +172,3 @@ function isScrolledIntoView(el) {
     isVisible = elemTop < window.innerHeight && elemBottom >= 0
     return isVisible
 }
-
-//Костыль для FireFox
-if (typeof result2 === 'undefined') {
-    // noinspection ES6ConvertVarToLetConst
-    var result2 = ''
-}
-// noinspection BadExpressionStatementJS
-result2
