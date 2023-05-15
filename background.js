@@ -349,8 +349,12 @@ async function newWindow(project) {
             promiseGroup = groupTabs(tab)
             await promiseGroup
         } catch (error) {
-            notSupportedGroupTabs = true
-            console.warn(chrome.i18n.getMessage('notSupportedGroupTabs'), error.message)
+            if (error.message === 'Tabs cannot be edited right now (user may be dragging a tab).') {
+                console.warn(getProjectPrefix(project, true), 'Error when grouping tabs,', error.message)
+            } else {
+                notSupportedGroupTabs = true
+                console.warn(chrome.i18n.getMessage('notSupportedGroupTabs'), error.message)
+            }
         }
     }
 }
@@ -374,7 +378,7 @@ async function groupTabs(tab) {
     // Потом пробуем сгруппировать если нашли группу
     if (groupId != null) {
         try {
-            await chrome.tabs.group({groupId, tabIds: tab.id})
+            await tryGroupTabs({groupId, tabIds: tab.id}, 0)
             return
         } catch (error) {
             if (!error.message.includes('No tab with id') && !error.message.includes('No group with id')) {
@@ -385,7 +389,7 @@ async function groupTabs(tab) {
 
     // Если мы не нашли групп или не смогли сгруппировать так как нет уже такой группы, то только тогда создаём эту группу
     try {
-        groupId = await chrome.tabs.group({tabIds: tab.id})
+        groupId = await tryGroupTabs({tabIds: tab.id}, 0)
         await chrome.tabGroups.update(groupId, {color: 'blue', title: 'Auto Vote Rating'})
     } catch (error) {
         if (!error.message.includes('No tab with id') && !error.message.includes('No group with id')) {
@@ -1044,6 +1048,18 @@ async function tryCloseTab(tabId, project, attempt) {
     }
 }
 
+async function tryGroupTabs(options, attempt) {
+    try {
+        return await chrome.tabs.group(options)
+    } catch (error) {
+        if (error.message === 'Tabs cannot be edited right now (user may be dragging a tab).' && attempt < 3) {
+            await wait(500)
+            return await tryGroupTabs(options, ++attempt)
+        }
+        throw error
+    }
+}
+
 //Завершает голосование, если есть ошибка то обрабатывает её
 async function endVote(request, sender, project) {
     let timeout = settings.timeout
@@ -1055,8 +1071,7 @@ async function endVote(request, sender, project) {
     let found = false
     for (const [tab,value] of openedProjects) {
         if (project.key === value.key) {
-            // noinspection JSCheckFunctionSignatures
-            if (!Number.isInteger(tab) && !tab.startsWith('background_')) {
+            if (!Number.isInteger(tab) && !tab.startsWith('background_') && !tab.startsWith('start_')) {
                 console.warn('A double attempt to complete the vote? endVote, has openedProjects', JSON.stringify(request), JSON.stringify(sender), JSON.stringify(project))
                 return
             } else {
@@ -1360,7 +1375,6 @@ async function endVote(request, sender, project) {
 
     async function removeQueue() {
         for (const [tab,value] of openedProjects) {
-            // noinspection JSCheckFunctionSignatures
             if (tab.startsWith?.('queue_') && project.key === value.key) {
                 openedProjects.delete(tab)
             }
