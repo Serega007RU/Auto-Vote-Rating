@@ -158,7 +158,7 @@ function checkOpen(project/*, transaction*/) {
                     (async() => {
                         try {
                             value = await db.get('projects', value.key)
-                            if (!value.openedNextAttempt) return
+                            if (!value.openedNextAttempt && !value.openedCountInject) return
 
                             // noinspection JSCheckFunctionSignatures
                             const details = await chrome.tabs.get(tab)

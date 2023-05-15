@@ -1,10 +1,4 @@
 async function vote(first) {
-    //MMoTopRU, что за костыли?
-    if (document.querySelector('body > div') == null && document.querySelectorAll('body > script[type="text/javascript"]').length === 1) {
-        // chrome.runtime.sendMessage({emptySite: true})
-        return
-    }
-
     if (document.querySelector('#id_spinner')) {
         await new Promise(resolve => {
             const timer = setInterval(() => {
@@ -16,24 +10,16 @@ async function vote(first) {
         })
     }
 
-    if (document.body.innerText.trim().length < 150 && document.body.innerText.trim().includes('Loading...')) {
-        return
-    }
-
-    if (document.querySelector('form[name="form"] input[name="captcha"]')) {
-        chrome.runtime.sendMessage({captcha: true})
-        return
-    }
-
     if (document.querySelector('a[href="https://mmotop.ru/users/sign_in"]') || document.querySelector('a[href="/users/sign_in"]') || document.querySelector('form[action="/users/sign_in"]') || document.querySelector('form#new_user')) {
         chrome.runtime.sendMessage({auth: true})
         return
     }
 
-    if (document.querySelector('div[class="can-vote"]') != null) {
+    if (document.querySelector('div[class="can-vote"]')) {
         chrome.runtime.sendMessage({later: true})
         return
     }
+
     if (document.querySelector('body > div.ui-pnotify')) {
         const request = {}
         request.message = document.querySelector('body > div.ui-pnotify').innerText
@@ -50,17 +36,24 @@ async function vote(first) {
             return
         }
     }
-    if (document.querySelector('body > h1[align="center"]') && document.body.innerText.trim().length < 200) {
-        chrome.runtime.sendMessage({
-            message: document.body.innerText.trim(),
-            ignoreReport: true
-        })
+
+    // Если мы вдруг пропустили уведомление, то пытаемся снова войти в меню голосования
+    if (document.querySelector('.header-2 a.btn.btn-danger')) {
+        document.querySelector('.header-2 a.btn.btn-danger').click()
         return
     }
 
-    // Если мы вдруг попустили уведомление, то пытаемся снова войти в меню голосования
-    if (document.querySelector('.header-2 a.btn.btn-danger')) {
-        document.querySelector('.header-2 a.btn.btn-danger').click()
+    // Если аккаунт не подтверждённый
+    if (document.querySelector('.vote-content [href*="resend_confirmation_token"]')) {
+        chrome.runtime.sendMessage({message: document.querySelector('.vote-content').innerText, ignoreReport: true})
+    }
+
+    if (document.querySelector('div.notice div.alert')) {
+        const request = {}
+        request.message = document.querySelector('div.notice div.alert').innerText
+        if (request.message.includes('требуется активировать аккаунт')) {
+            request.ignoreReport = true
+        }
         return
     }
 
@@ -77,6 +70,11 @@ async function vote(first) {
 
     if (document.querySelector('.vote-content .payment_select')) {
         chrome.runtime.sendMessage({message: 'Авто-голосование не доступно на платном голосовании, не вмешивайтесь в процесс авто-голосования!', ignoreReport: true})
+        return
+    }
+
+    if (document.querySelector('form[name="form"] input[name="captcha"]')) {
+        chrome.runtime.sendMessage({captcha: true})
         return
     }
 
