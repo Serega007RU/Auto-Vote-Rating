@@ -348,3 +348,7 @@ function isVisibleElement(elem) {
 
     return true
 }
+
+// TODO возвращаем хоть какой-то результат в background при executeScript во избежании ошибки "Could not establish connection. Receiving end does not exist"
+// noinspection BadExpressionStatementJS
+true

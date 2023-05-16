@@ -765,7 +765,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 })
 
 async function catchTabError(error, project) {
-    if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
+    if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && error.message !== 'The tab was closed.' && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
         project = await db.get('projects', project.key)
         let message = error.message
         if (message.includes('This page cannot be scripted due to an ExtensionsSettings policy')) {

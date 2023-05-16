@@ -172,3 +172,7 @@ function isScrolledIntoView(el) {
     isVisible = elemTop < window.innerHeight && elemBottom >= 0
     return isVisible
 }
+
+// TODO возвращаем хоть какой-то результат в background при executeScript во избежании ошибки "Could not establish connection. Receiving end does not exist"
+// noinspection BadExpressionStatementJS
+true
