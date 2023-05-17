@@ -1262,7 +1262,7 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.server-header h1').textContent,
         exampleURL: () => ['https://servidoresdeminecraft.es/server/vote/', 'gRQ7HvE8/play.minelatino.com', ''],
         URL: () => 'servidoresdeminecraft.es',
-        parseURL: (url) => ({id: url.pathname.split('/')[3]})
+        parseURL: (url) => ({id: url.pathname.split('/')[3] + '/' + url.pathname.split('/')[4]})
     },
     MinecraftSurvivalServersCom: {
         voteURL: (project) => 'https://minecraftsurvivalservers.com/vote/' + project.id,
