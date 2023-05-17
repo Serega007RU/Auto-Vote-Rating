@@ -1436,6 +1436,14 @@ var allProjects = {
         notRequiredNick: () => true,
         notRequiredId: () => true
     },
+    EmeraldServers: {
+        voteURL: (project) => 'https://emeraldservers.com/server/' + project.id,
+        pageURL: (project) => 'https://emeraldservers.com/server/' + project.id,
+        projectName: (doc) => doc.querySelector('.infobar2 h1').innerText.trim(),
+        exampleURL: () => ['https://emeraldservers.com/server/', '595', ''],
+        URL: () => 'emeraldservers.com',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1584,6 +1592,7 @@ var projectByURL = new Map([
     ['minecraftsurvivalservers.net', 'MinecraftSurvivalServers'],
     ['topservers.com', 'TopServersCom'],
     ['genshindrop.com', 'GenshinDrop'],
+    ['emeraldservers.com', 'EmeraldServers'],
     ['Custom', 'Custom']
 ])
 
