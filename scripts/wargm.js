@@ -1,5 +1,7 @@
-async function vote() {
-    if (document.querySelector('div.MsgBox') != null && document.querySelector('div.MsgBox').innerText.length > 0) return
+async function vote(first) {
+    if (first === false) return
+
+    if (first !== 'manual' && document.querySelector('div.MsgBox') != null && document.querySelector('div.MsgBox').innerText.length > 0) return
 
     if (document.querySelector('div.ui.error.message') != null) {
         if (document.querySelector('div.ui.error.message').textContent.includes('must wait until tomorrow')) {
@@ -84,7 +86,7 @@ const timer = setInterval(async ()=>{
                 if (!voted) {
                     voted = true
                     // noinspection ES6MissingAwait
-                    vote()
+                    vote('manual')
                 }
             } else {
                 if (request.message.includes('Сервис временно недоступен') || request.message.includes('Страница устарела') || request.message === 'Ошибка' || (request.message.includes('Запрос отклонен') && request.message.includes('Поступило слишком много запросов')) || request.message.includes('Важные документы')) {

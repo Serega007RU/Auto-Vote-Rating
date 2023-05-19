@@ -99,6 +99,20 @@ async function vote(first) {
         return
     }
 
+    // На случай если гугл капча не полностью загрузилась, во избежание ошибки "Captcha data missing"
+    if (document.querySelector('#vote_form div.g-recaptcha')) {
+        if (!document.querySelector('#g-recaptcha-response')) {
+            await new Promise(resolve => {
+                const timer = setInterval(() => {
+                    if (document.querySelector('#g-recaptcha-response')) {
+                        clearInterval(timer)
+                        resolve()
+                    }
+                }, 1000)
+            })
+        }
+    }
+
     const project = await getProject('ListForge', true)
     //Вводим ник если он существует
     if (document.getElementById('nickname') != null) {
