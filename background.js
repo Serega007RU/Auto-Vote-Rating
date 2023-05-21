@@ -1325,6 +1325,8 @@ async function endVote(request, sender, project) {
         let retryCoolDown
         if ((request.errorVote && request.errorVote[0] === '404') || (request.message && project.rating === 'WARGM' && project.randomize)) {
             retryCoolDown = 21600000
+        } else if (request.retryCoolDown) {
+            retryCoolDown = request.retryCoolDown
         } else if (request.closedTab) {
             retryCoolDown = 60000
         } else {
