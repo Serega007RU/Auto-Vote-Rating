@@ -1452,6 +1452,17 @@ var allProjects = {
         URL: () => '40servidoresmc.es',
         parseURL: (url) => ({id: url.pathname.split('/')[1].replaceAll('-votar', '')})
     },
+    MinecraftServersBiz2: {
+        voteURL: (project) => 'https://minecraft-servers.biz/server/' + project.id + '/vote/',
+        pageURL: (project) => 'https://minecraft-servers.biz/server/' + project.id + '/',
+        projectName: (doc) => doc.querySelector('div[itemprop="name"]').innerText.trim(),
+        exampleURL: () => ['https://minecraft-servers.biz/server/', 'roleplay-hub-schoolrp', '/vote/'],
+        URL: () => 'minecraft-servers.biz',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 22}),
+        alertManualCaptcha: () => true,
+        optionalNick: () => true
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1602,6 +1613,7 @@ var projectByURL = new Map([
     ['genshindrop.com', 'GenshinDrop'],
     ['emeraldservers.com', 'EmeraldServers'],
     ['40servidoresmc.es', 'ServidoresMC'],
+    ['minecraft-servers.biz', 'MinecraftServersBiz2'],
     ['Custom', 'Custom']
 ])
 
