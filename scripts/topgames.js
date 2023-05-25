@@ -76,4 +76,13 @@ async function vote(first) {
     if (document.querySelector('.mtcaptcha') != null) {
         chrome.runtime.sendMessage({captcha: true})
     }
+
+    if (document.querySelector('button[type="submit"]').disabled === true) {
+        const timer = setInterval(() => {
+            if (document.querySelector('button[type="submit"]')?.disabled === false) {
+                clearInterval(timer)
+                document.querySelector('button[type="submit"]').click()
+            }
+        }, 1000)
+    }
 }
