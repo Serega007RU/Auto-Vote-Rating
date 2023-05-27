@@ -642,12 +642,30 @@ var allProjects = {
         timeout: () => ({hour: 23})
     },
     MinecraftKrant: {
-        voteURL: (project) => 'https://www.minecraftkrant.nl/serverlijst/' + project.id + '/vote',
-        pageURL: (project) => 'https://www.minecraftkrant.nl/serverlijst/' + project.id,
+        voteURL: (project) => {
+            if (!project.game) project.game = 'www.minecraftkrant.nl'
+            const serverlist = project.game === 'www.minecraftkrant.nl' ? 'serverlijst' : 'servers'
+            return 'https://' + project.game + '/' + serverlist + '/' + project.id + '/vote'
+        },
+        pageURL: (project) => {
+            if (!project.game) project.game = 'www.minecraftkrant.nl'
+            const serverlist = project.game === 'www.minecraftkrant.nl' ? 'serverlijst' : 'servers'
+            return 'https://' + project.game + '/' + serverlist + '/' + project.id
+        },
         projectName: (doc) => doc.querySelector('div.s_HeadTitle').innerText.trim(),
-        exampleURL: () => ['https://www.minecraftkrant.nl/serverlijst/', 'torchcraft', ''],
+        exampleURL: () => ['https://www.minecraftkrant.nl/serverlijst/', 'torchcraft', '/vote'],
         URL: () => 'minecraftkrant.nl',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => {
+            const project = {}
+            project.game = url.host
+            project.id = url.pathname.split('/')[2]
+            return project
+        },
+        exampleURLGame: () => ['https://', 'minecraftkrant.nl', '/serverlijst/torchcraft/vote'],
+        gameList: () => new Map([
+            ['www.minecraftkrant.nl', 'Nederlands'],
+            ['minecraft-news.net', 'English']
+        ])
     },
     TrackyServer: {
         voteURL: (project) => 'https://www.trackyserver.com/server/' + project.id,
@@ -1546,6 +1564,7 @@ var projectByURL = new Map([
     ['rpg-paradize.com', 'RPGParadize'],
     ['minecraft-serverlist.net', 'MinecraftServerListNet'],
     ['minecraft-server.eu', 'MinecraftServerEu'],
+    ['minecraft-news.net', 'MinecraftKrant'],
     ['minecraftkrant.nl', 'MinecraftKrant'],
     ['trackyserver.com', 'TrackyServer'],
     ['mc-lists.org', 'MCListsOrg'],

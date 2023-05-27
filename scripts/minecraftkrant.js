@@ -1,14 +1,16 @@
 async function vote(first) {
-    if (document.querySelector('div.alert.alert-success') != null) {
+    if (document.querySelector('div.alert.alert-success')) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
-    if (document.querySelector('div.alert.alert-danger') != null) {
-        if (document.querySelector('div.alert.alert-danger').textContent.includes('Je mag maar')) {
+    if (document.querySelector('div.alert.alert-danger')) {
+        const request = {}
+        request.message = document.querySelector('div.alert.alert-danger').innerText.trim()
+        if (request.message.includes('Je mag maar') || request.message.includes('can only vote once per')) {
             chrome.runtime.sendMessage({later: true})
             return
         }
-        chrome.runtime.sendMessage({message: document.querySelector('div.alert.alert-danger').textContent})
+        chrome.runtime.sendMessage(request)
         return
     }
 
