@@ -8,6 +8,16 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('#center > .content > img[src*="not_found"]')) {
+        const request = {}
+        request.message = document.querySelector('#center > .content').innerText.trim()
+        if (request.message.includes('Submission not available')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     if (isVisibleElement(document.querySelector('div[role="dialog"]'))) {
         chrome.runtime.sendMessage({requiredConfirmTOS: true})
         await new Promise(resolve => {

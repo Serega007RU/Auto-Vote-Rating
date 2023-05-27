@@ -1,5 +1,22 @@
 async function vote(first) {
     const project = await getProject('MinecraftRating')
+
+    if (project.id === 'borealis') {
+        const request = {}
+        request.message = 'Отключено расширением. В целях безопасности мы временно отключили вам авто-голосование для проекта Borealis.su. На данном проекте его владелец (Bartolomeo) крайне неадекватно себя ведёт и появилась большая вероятность что вас могут забанить за авто-голосование на данном проекте. Не спрашивайте на этом проекте про авто-голосование, иначе вас могут забанить!'
+        request.ignoreReport = true
+        request.retryCoolDown = 604800000
+        chrome.runtime.sendMessage(request)
+        return
+    } else if (project.id === 'arago') {
+        const request = {}
+        request.message = 'Отключено расширением. Проект закрыт. Если это не так - сообщите разработчику расширения'
+        request.ignoreReport = true
+        request.retryCoolDown = 604800000
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     if (document.querySelector('.container .text-center')?.textContent.includes('Страница не найдена')) {
         chrome.runtime.sendMessage({message: document.querySelector('.container .text-center').textContent, ignoreReport: true})
         return

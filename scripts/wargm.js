@@ -38,7 +38,7 @@ async function vote(first) {
             const button = document.querySelector('#main .card-footer .btn.btn-blue')
             if (!button) return
             const message = button.textContent
-            if (message.includes('ч.')) {
+            if (message.includes('ч.') || message.includes('м.')) {
                 const numbers = message.match(/\d+/g).map(Number)
                 const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
                 waiting = true
@@ -91,6 +91,10 @@ const timer = setInterval(async ()=>{
             } else {
                 if (request.message.includes('Сервис временно недоступен') || request.message.includes('Страница устарела') || request.message === 'Ошибка' || (request.message.includes('Запрос отклонен') && request.message.includes('Поступило слишком много запросов')) || request.message.includes('Важные документы')) {
                     request.ignoreReport = true
+                }
+                if (request.message.includes('Достигнут лимит голосов за день')) {
+                    request.ignoreReport = true
+                    request.retryCoolDown = 3600000 // 24 часа
                 }
                 clearInterval(timer)
                 await wait(Math.floor(Math.random() * 9000 + 1000))

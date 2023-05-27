@@ -1,4 +1,14 @@
 async function vote(first) {
+    if (document.querySelector('div.alert-error')) {
+        const request = {}
+        request.message = document.querySelector('div.alert-error').innerText.trim()
+        if (request.message.includes('not found')) {
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     if (first) {
         document.querySelector('[data-target="#vote"]').click()
         return

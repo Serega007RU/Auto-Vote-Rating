@@ -1,3 +1,5 @@
+let timer4, timer5
+
 async function vote(first) {
     // https://cdn.discordapp.com/attachments/572131636934737921/1100021083891048458/image.png
     if (document.querySelector('body > h1')?.textContent.includes('Backend fetch failed')) {
@@ -26,18 +28,22 @@ async function vote(first) {
 
     if (captcha && first) return
 
-    const vote = findElement('button', ['upvote'])
-    if (vote && !vote.disabled) {
-        vote.click()
+    if (timer4 != null || timer5 != null) return
 
-        const timer4 = setInterval(()=>{
-            const vote2 = findElement('button', ['upvote anyway'])
-            if (vote2 && !vote2.disabled) {
-                clearInterval(timer4)
-                vote2.click()
-            }
-        }, 1000)
-    }
+    timer4 = setInterval(() => {
+        const vote = findElement('button', ['upvote'])
+        if (vote && !vote.disabled) {
+            clearInterval(timer4)
+            vote.click()
+        }
+    }, 1000)
+    timer5 = setInterval(() => {
+        const vote2 = findElement('button', ['upvote anyway'])
+        if (vote2 && !vote2.disabled) {
+            clearInterval(timer5)
+            vote2.click()
+        }
+    }, 1000)
 }
 
 const timer2 = setInterval(()=>{

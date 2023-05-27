@@ -8,6 +8,16 @@ async function vote(first) {
         return
     }
     const project = await getProject('TMonitoring')
+
+    if (project.id === 'arago') {
+        const request = {}
+        request.message = 'Отключено расширением. Проект закрыт. Если это не так - сообщите разработчику расширения'
+        request.ignoreReport = true
+        request.retryCoolDown = 604800000
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     if (document.getElementById("nickname") != null) {
         document.getElementById("nickname").value = project.nick
     } else {

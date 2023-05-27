@@ -24,6 +24,16 @@ async function vote(first) {
     }
 
     const project = await getProject('McTOP')
+
+    if (project.id === '2241') {
+        const request = {}
+        request.message = 'Отключено расширением. В целях безопасности мы временно отключили вам авто-голосование для проекта Borealis.su. На данном проекте его владелец (Bartolomeo) крайне неадекватно себя ведёт и появилась большая вероятность что вас могут забанить за авто-голосование на данном проекте. Не спрашивайте на этом проекте про авто-голосование, иначе вас могут забанить!'
+        request.ignoreReport = true
+        request.retryCoolDown = 604800000
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     //Авторизованы ли мы в аккаунте?
     if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
         const timerLogin = setInterval(() => {

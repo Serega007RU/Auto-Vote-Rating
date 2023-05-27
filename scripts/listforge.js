@@ -68,9 +68,10 @@ async function vote(first) {
         chrome.runtime.sendMessage(request)
     }
 
-    if (document.location.pathname.split('/')[1] === 'country') {
+    // Иногда если сервер/проект был удалён то сайт просто переадресует на главную страницу или на список серверов никак не сообщая о об ошибке 404 или о том что сервер удалён
+    if (document.querySelector('ul.pagination')) {
         const request = {}
-        request.errorVoteNoElement = 'Redirected to server list'
+        request.errorVoteNoElement = 'It looks like the site redirected to the main page (list of servers), most likely this server/project was deleted. If this is not the case and you think it is a error, inform the extension developer'
         request.ignoreReport = true
         return
     }
