@@ -1481,6 +1481,14 @@ var allProjects = {
         alertManualCaptcha: () => true,
         optionalNick: () => true
     },
+    TopMCServersNet: {
+        voteURL: (project) => 'https://top-mc-servers.net/server/' + project.id,
+        pageURL: (project) => 'https://top-mc-servers.net/server/' + project.id,
+        projectName: (doc) => doc.querySelector('.container h1.ibmpm').innerText.trim(),
+        exampleURL: () => ['https://top-mc-servers.net/server/', '5', ''],
+        URL: () => 'top-mc-servers.net',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1633,6 +1641,7 @@ var projectByURL = new Map([
     ['emeraldservers.com', 'EmeraldServers'],
     ['40servidoresmc.es', 'ServidoresMC'],
     ['minecraft-servers.biz', 'MinecraftServersBiz2'],
+    ['top-mc-servers.net', 'TopMCServersNet'],
     ['Custom', 'Custom']
 ])
 
