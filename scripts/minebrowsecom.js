@@ -22,7 +22,7 @@ async function vote(first) {
 const timer = setInterval(()=>{
     try {
         const resp = document.querySelector('#response')
-        if (resp.style.display !== 'none') {
+        if (resp && resp.style.display !== 'none') {
             const text = resp.textContent
             if (text.includes('successfully')) {
                 chrome.runtime.sendMessage({successfully: true})

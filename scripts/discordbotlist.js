@@ -35,13 +35,14 @@ async function vote(first) {
         if (vote && !vote.disabled) {
             clearInterval(timer4)
             vote.click()
-        }
-    }, 1000)
-    timer5 = setInterval(() => {
-        const vote2 = findElement('button', ['upvote anyway'])
-        if (vote2 && !vote2.disabled) {
-            clearInterval(timer5)
-            vote2.click()
+
+            timer5 = setInterval(() => {
+                const vote2 = findElement('button', ['upvote anyway'])
+                if (vote2 && !vote2.disabled) {
+                    clearInterval(timer5)
+                    vote2.click()
+                }
+            }, 1000)
         }
     }, 1000)
 }
