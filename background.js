@@ -1568,6 +1568,8 @@ chrome.notifications.onClicked.addListener(async function (notificationId) {
         } catch (error) {
             console.warn('Ошибка открытия настроек с определённым проектом', error.message)
         }
+    } else if (notificationId.startsWith('openSettings')) {
+        await chrome.runtime.openOptionsPage()
     }
 })
 

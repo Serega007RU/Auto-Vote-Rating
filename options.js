@@ -40,6 +40,7 @@ document.querySelector('#load div').textContent = chrome.i18n.getMessage('load')
 
 //notifications
 async function createNotif(message, type, delay, element, dontLog) {
+    if (!message || message === '') message = 'An empty error, see the details in the console'
     if (!type) type = 'hint'
     if (!dontLog) {
         if (type === 'error') console.error('['+type+']', message)

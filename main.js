@@ -18,14 +18,28 @@ var dbLogs
 var openedProjects = new Map()
 let onLine
 
-self.addEventListener('error', (event) => onUnhandledError(event.error.stack))
-self.addEventListener('unhandledrejection', (event) => onUnhandledError(event.reason.stack))
-function onUnhandledError(error) {
+self.addEventListener('error', (event) => onUnhandledError(event))
+self.addEventListener('unhandledrejection', (event) => onUnhandledError(event))
+function onUnhandledError(event) {
+    let error
+    if (event.reason) {
+        error = event.reason.message
+    } else if (event.error) {
+        error = event.error.message
+    } else {
+        error = 'Unidentified error, see the details in the console '
+        if (console._error) console._error(event)
+        else console.error(event)
+        error += JSON.stringify(event)
+    }
+
     if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
         createNotif(error, 'error', null, null, true)
         document.querySelectorAll('button[disabled]').forEach((el) => el.disabled = false)
     }
+
     if (!dbLogs) return
+
     const time = new Date().toLocaleString().replace(',', '')
     const log = '[' + time + ' ERROR]: ' + error
     try {
@@ -55,21 +69,21 @@ async function initializeConfig(background, version) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
             if (version) {
-                dbError({target: {source: {name: 'avr'}}, error: error})
+                dbError({target: {source: {name: 'avr'}, error: error}})
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
             await initializeConfig(background, 120)
             return
         }
-        dbError({target: {source: {name: 'avr'}}, error: error})
+        dbError({target: {source: {name: 'avr'}, error: error}})
         return
     }
     db.onerror = (event) => dbError(event, false)
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {
         if (background) {
-            if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error.message)
+            if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error.message, 'openSettings')
             if (logs) {
                 console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error.message]))
             } else {
