@@ -47,6 +47,28 @@ async function vote(first) {
         }
 
         document.querySelector('#submitVote').click()
+
+        await wait(5000)
+
+        // Дикий костыль в обход ошибки "CSRF token mismatch."
+        const response = await fetch(document.location.href)
+        const text = await response.text()
+        const doc = new DOMParser().parseFromString(text, 'text/html')
+        const csrfToken = doc.querySelector('#form-vote input[name="_token"]').value
+        document.querySelector('#form-vote input[name="_token"]').value = csrfToken
+        const response2 = await fetch('/set-cookie/', {
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            method: 'POST',
+            body: '_token=' + csrfToken + '&' + 'name=' + 'voted_project' + '&' + 'value= ' + document.querySelector('[name=url]').value + '__' + project.nick,
+        })
+        if (!response2.ok) {
+            chrome.runtime.sendMessage({errorVote: [String(response2.status), response2.url]})
+            return
+        }
+
+        document.querySelector('#form-vote').submit()
     } else {
         if (first) {
             const timer = setInterval(()=>{
