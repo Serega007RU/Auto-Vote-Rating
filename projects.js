@@ -1489,6 +1489,15 @@ var allProjects = {
         URL: () => 'top-mc-servers.net',
         parseURL: (url) => ({id: url.pathname.split('/')[2]})
     },
+    MinecraftServerListCom: {
+        voteURL: (project) => 'https://minecraft-serverlist.com/server/' + project.id + '/vote',
+        pageURL: (project) => 'https://minecraft-serverlist.com/server/' + project.id,
+        projectName: (doc) => doc.querySelector('h1.server-page__title').innerText.trim(),
+        exampleURL: () => ['https://minecraft-serverlist.com/server/', '517', '/vote'],
+        URL: () => 'minecraft-serverlist.com',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        oneProject: () => 3
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1642,6 +1651,7 @@ var projectByURL = new Map([
     ['40servidoresmc.es', 'ServidoresMC'],
     ['minecraft-servers.biz', 'MinecraftServersBiz2'],
     ['top-mc-servers.net', 'TopMCServersNet'],
+    ['minecraft-serverlist.com', 'MinecraftServerListCom'],
     ['Custom', 'Custom']
 ])
 
