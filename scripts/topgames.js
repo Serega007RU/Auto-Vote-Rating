@@ -64,7 +64,7 @@ async function vote(first) {
         try {
             if (document.querySelector('#captcha-content > div > div.grecaptcha-logo > iframe') != null) {
                 //Ждёт загрузки reCaptcha
-                document.querySelector('button[type="submit"]').click()
+                document.querySelector('form.form-vote button[type="submit"]').click()
                 clearInterval(timer)
             }
         } catch (e) {
@@ -77,11 +77,11 @@ async function vote(first) {
         chrome.runtime.sendMessage({captcha: true})
     }
 
-    if (document.querySelector('button[type="submit"]').disabled === true) {
+    if (document.querySelector('form.form-vote button[type="submit"]').disabled === true) {
         const timer = setInterval(() => {
-            if (document.querySelector('button[type="submit"]')?.disabled === false) {
+            if (document.querySelector('form.form-vote button[type="submit"]')?.disabled === false) {
                 clearInterval(timer)
-                document.querySelector('button[type="submit"]').click()
+                document.querySelector('form.form-vote button[type="submit"]').click()
             }
         }, 1000)
     }

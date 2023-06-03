@@ -18,11 +18,7 @@ async function vote(first) {
         return
     }
 
-    if (document.getElementById("nickname") != null) {
-        document.getElementById("nickname").value = project.nick
-    } else {
-        console.warn('[Auto Vote Rating] Нет поля ввода никнейма')
-    }
+    if (document.getElementById("nickname")) document.getElementById("nickname").value = project.nick
     document.querySelector("#voteModal > div.modal-dialog > div > div.modal-footer.clearfix > div.pull-right > a").click()
 }
 
@@ -36,14 +32,14 @@ const timer = setInterval(()=>{
                 const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/
                 chrome.runtime.sendMessage({later: Date.now() + milliseconds})
                 clearInterval(timer)
+            } else if (request.message.toLowerCase().includes('капча') || request.message.toLowerCase().includes('заполните обязательные поля')) {
+                // None
             } else {
-                if (!request.message.toLowerCase().includes('капча')) {
-                    if (request.message.includes('Ключи безопасности не совпадают')) {
-                        request.ignoreReport = true
-                    }
-                    chrome.runtime.sendMessage(request)
-                    clearInterval(timer)
+                if (request.message.includes('Ключи безопасности не совпадают')) {
+                    request.ignoreReport = true
                 }
+                chrome.runtime.sendMessage(request)
+                clearInterval(timer)
             }
         } else if (document.querySelector('div[class="message success"]') != null) {
             chrome.runtime.sendMessage({successfully: true})

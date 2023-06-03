@@ -1,4 +1,10 @@
 async function vote(first) {
+    // https://i.imgur.com/yI6PmMA.png
+    if (document.querySelector('body > h1')?.textContent === 'Forbidden') {
+        chrome.runtime.sendMessage({message: document.querySelector('body').innerText.trim(), ignoreReport: true})
+        return
+    }
+
     if (document.querySelector('#id_spinner')) {
         await new Promise(resolve => {
             const timer = setInterval(() => {
@@ -26,7 +32,7 @@ async function vote(first) {
         if (request.message.includes('Голос принят') || request.message.includes('vote accepted')) {
             chrome.runtime.sendMessage({successfully: true})
             return
-        } else if (request.message.includes('Signed in successfully')) {
+        } else if (request.message.includes('Signed in successfully') || request.message.includes('Вы успешно зарегистрировались')) {
             // None
         } else {
             if (request.message.includes('Quaptcha check fail')) {

@@ -9,9 +9,12 @@ async function vote(first) {
         if (request.message.includes('Je mag maar') || request.message.includes('can only vote once per')) {
             chrome.runtime.sendMessage({later: true})
             return
+        } else if (request.message.includes('not validated the captcha')) {
+            // None
+        } else {
+            chrome.runtime.sendMessage(request)
+            return
         }
-        chrome.runtime.sendMessage(request)
-        return
     }
 
     if (first) return

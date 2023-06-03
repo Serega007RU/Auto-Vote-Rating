@@ -4,13 +4,16 @@ async function vote(/*first*/) {
         return
     }
     if (document.querySelector('div.ui.negative.message:last-of-type') || document.querySelector('div.ui.negative.message')) {
-        const error = document.querySelector('div.ui.negative.message:last-of-type') || document.querySelector('div.ui.negative.message')
-        const message = error.innerText
-        if (message.includes(' already voted')) {
+        const request = {}
+        request.message = document.querySelector('div.ui.negative.message:last-of-type')?.innerText || document.querySelector('div.ui.negative.message')?.innerText
+        if (request.message.includes(' already voted')) {
             chrome.runtime.sendMessage({later: true})
             return
-        } else if (!message.includes('Internet Explorer')) {
-            chrome.runtime.sendMessage({message})
+        } else if (!request.message.includes('Internet Explorer')) {
+            if (request.message.includes('Invalid reCAPTCHA')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
             return
         }
     }

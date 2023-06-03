@@ -10,16 +10,17 @@ async function vote(first) {
     if (document.querySelector('.alert.alert-primary')) {
         const request = {}
         request.message = document.querySelector('.alert.alert-primary').textContent.trim()
-        if (request.message.includes('reCaptcha')) {
-            return
+        if (request.message.includes('server u nás nemá nakonfigurované hlasování') || request.message.includes('reCaptcha')) {
+            // None
         } else if (request.message.includes('si hlasoval')) {
             chrome.runtime.sendMessage({later: true})
             return
         } else {
-            if (!request.message.includes('server u nás nemá nakonfigurované hlasování')) {
-                chrome.runtime.sendMessage(request)
-                return
+            if (request.message.includes('Platnost stránky vypršela, zkus to znovu')) {
+                request.ignoreReport = true
             }
+            chrome.runtime.sendMessage(request)
+            return
         }
     }
     if (document.querySelector('.alert.alert-danger')) {

@@ -1,14 +1,7 @@
 async function vote(first) {
     const project = await getProject('MinecraftRating')
 
-    if (project.id === 'borealis') {
-        const request = {}
-        request.message = 'Отключено расширением. В целях безопасности мы временно отключили вам авто-голосование для проекта Borealis.su. На данном проекте его владелец (Bartolomeo) крайне неадекватно себя ведёт и появилась большая вероятность что вас могут забанить за авто-голосование на данном проекте. Не спрашивайте на этом проекте про авто-голосование, иначе вас могут забанить!'
-        request.ignoreReport = true
-        request.retryCoolDown = 604800000
-        chrome.runtime.sendMessage(request)
-        return
-    } else if (project.id === 'arago') {
+    if (project.id === 'arago') {
         const request = {}
         request.message = 'Отключено расширением. Проект закрыт. Если это не так - сообщите разработчику расширения'
         request.ignoreReport = true
@@ -35,9 +28,11 @@ async function vote(first) {
         if (document.querySelector('div.alert.alert-danger') != null) {
             if (document.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
                 chrome.runtime.sendMessage({later: true})
+                return
             }
         } else if (document.querySelector('div.alert.alert-success') != null && document.querySelector('div.alert.alert-success').textContent.includes('Спасибо за Ваш голос!')) {
             chrome.runtime.sendMessage({successfully: true})
+            return
         }
 
         if (first) {
@@ -51,10 +46,20 @@ async function vote(first) {
         await wait(5000)
 
         // Дикий костыль в обход ошибки "CSRF token mismatch."
-        const response = await fetch(document.location.href)
+        let response
+        try {
+            response = await fetch(document.location.href)
+        } catch (error) {
+            chrome.runtime.sendMessage({message: error.toString(), ignoreReport: true})
+            return
+        }
         const text = await response.text()
         const doc = new DOMParser().parseFromString(text, 'text/html')
-        const csrfToken = doc.querySelector('#form-vote input[name="_token"]').value
+        const csrfToken = doc.querySelector('#form-vote input[name="_token"]')?.value
+        if (!csrfToken) {
+            chrome.runtime.sendMessage({errorVoteNoElement: 'Не найден csrf токен', html: text, url: response.url})
+            return
+        }
         document.querySelector('#form-vote input[name="_token"]').value = csrfToken
         const response2 = await fetch('/set-cookie/', {
             headers: {
