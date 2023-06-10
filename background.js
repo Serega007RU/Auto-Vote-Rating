@@ -197,6 +197,7 @@ async function checkOpen(project, transaction) {
     const opened = {}
     opened.key = project.key
     opened.rating = project.rating
+    opened.countInject = 0
     if (project.randomize) opened.randomize = project.randomize
 
     if (!settings.disabledRestartOnTimeout) {
@@ -630,11 +631,6 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
     if (!opened) return
 
     if (details.frameId === 0) {
-        if (opened.countInject >= 10) {
-            endVote({tooManyVoteAttempts: true}, {tab: {id: details.tabId}, url: details.url}, opened)
-            return
-        }
-
         // Через эти сайты пользователь может авторизоваться, я пока не поддерживаю автоматическую авторизацию, не мешаем ему в авторизации
         if (details.url.match(/facebook.com\/*/) || details.url.match(/google.com\/*/) || details.url.match(/accounts.google.com\/*/) || details.url.match(/reddit.com\/*/) || details.url.match(/twitter.com\/*/)) {
             return
@@ -650,6 +646,11 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 console.warn(getProjectPrefix(project, true), 'Not granted permissions for ' + details.url)
                 return
             }
+        }
+
+        if (opened.countInject >= 10) {
+            endVote({tooManyVoteAttempts: true}, {tab: {id: details.tabId}, url: details.url}, opened)
+            return
         }
 
         let eval = true
@@ -710,7 +711,6 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             await chrome.tabs.sendMessage(details.tabId, {sendProject: true, project, settings})
 
             if (openedProjects.has(details.tabId)) {
-                if (!opened.countInject) opened.countInject = 0
                 opened.countInject++
                 db.put('other', openedProjects, 'openedProjects')
             }
@@ -797,9 +797,14 @@ chrome.webRequest.onCompleted.addListener(async function(details) {
     // Иногда некоторые проекты намеренно выдаёт ошибку в status code, нам ничего не остаётся кроме как игнорировать все ошибки, подробнее https://discord.com/channels/371699266747629568/760393040174120990/1053016256535593022
     if (allProjects[opened.rating].ignoreErrors?.()) return
 
-    if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299) && details.statusCode !== 503 && details.statusCode !== 403/*Игнорируем проверку CloudFlare*/) {
-        const sender = {tab: {id: details.tabId}, url: details.url}
-        endVote({errorVote: [String(details.statusCode), details.url]}, sender, opened)
+    if (details.type === 'main_frame' && (details.statusCode < 200 || details.statusCode > 299)) {
+        if (details.statusCode === 503 || details.statusCode === 403) { // Если проверка CloudFlare
+            opened.countInject--
+            db.put('other', openedProjects, 'openedProjects')
+        } else {
+            const sender = {tab: {id: details.tabId}, url: details.url}
+            endVote({errorVote: [String(details.statusCode), details.url]}, sender, opened)
+        }
     }
 }, {urls: ['<all_urls>']})
 
