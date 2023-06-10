@@ -1506,7 +1506,27 @@ var allProjects = {
         exampleURL: () => ['https://findmcserver.com/server/', 'sootmc', ''],
         URL: () => 'findmcserver.com',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 2}),
         notRequiredCaptcha: () => true
+    },
+    ServeurListe: {
+        voteURL: (project) => 'https://www.serveurliste.com/' + project.game + '/' + project.id,
+        pageURL: (project) => 'https://www.serveurliste.com/' + project.game + '/' + project.id + '#voter',
+        projectName: (doc) => doc.querySelector('div.container h1.text-center').innerText,
+        exampleURL: () => ['https://www.serveurliste.com/minecraft/', 'nossaria-serveur-survie', '#voter'],
+        URL: () => 'serveurliste.com',
+        parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
+        exampleURLGame: () => ['https://www.serveurliste.com/', 'minecraft', '/nossaria-serveur-survie#voter'],
+        defaultGame: () => 'minecraft',
+        gameList: () => new Map([
+            ['minecraft', 'Minecraft'],
+            ['rust', 'Rust'],
+            ['fivem', 'fiveM'],
+            ['flyff', 'Flyff'],
+            ['discord', 'Discord'],
+            ['garrys-mod', 'Garry\'s Mod']
+        ]),
+        oneProject: () => 1
     },
     Custom: {
         voteURL: (project) => project.responseURL,
@@ -1663,6 +1683,7 @@ var projectByURL = new Map([
     ['top-mc-servers.net', 'TopMCServersNet'],
     ['minecraft-serverlist.com', 'MinecraftServerListCom'],
     ['findmcserver.com', 'FindMCServer'],
+    ['serveurliste.com', 'ServeurListe'],
     ['Custom', 'Custom']
 ])
 
