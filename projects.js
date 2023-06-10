@@ -1498,6 +1498,16 @@ var allProjects = {
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
         oneProject: () => 3
     },
+    // Похоже на копию ServerListGames, как минимум по технической части схоже
+    FindMCServer: {
+        voteURL: (project) => 'https://findmcserver.com/server/' + project.id,
+        pageURL: (project) => 'https://findmcserver.com/server/' + project.id,
+        projectName: () => null, // сайт-конструктор, отдаёт пустую страницу со скриптами на загрузку, название достать слишком сложно
+        exampleURL: () => ['https://findmcserver.com/server/', 'sootmc', ''],
+        URL: () => 'findmcserver.com',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        notRequiredCaptcha: () => true
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1652,6 +1662,7 @@ var projectByURL = new Map([
     ['minecraft-servers.biz', 'MinecraftServersBiz2'],
     ['top-mc-servers.net', 'TopMCServersNet'],
     ['minecraft-serverlist.com', 'MinecraftServerListCom'],
+    ['findmcserver.com', 'FindMCServer'],
     ['Custom', 'Custom']
 ])
 
