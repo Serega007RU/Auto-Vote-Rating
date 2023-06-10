@@ -1477,40 +1477,38 @@ async function sendReport(request, sender, tabDetails, project, reported) {
         message3.user = {}
         message3.user.username = project.nick
     }
-    let body = JSON.stringify(message1) + '\n' + JSON.stringify(message2) + '\n' + JSON.stringify(message3)
 
-    if (!tabDetails && request.html) {
-        tabDetails = {html: request.html}
+    const enc = new TextEncoder()
+
+    let body = enc.encode(JSON.stringify(message1) + '\n' + JSON.stringify(message2) + '\n' + JSON.stringify(message3))
+
+    if (request.html) {
+        if (!tabDetails) tabDetails = {}
+        tabDetails.html = request.html
     }
-    if (tabDetails.mhtml) {
+    if (tabDetails?.mhtml) {
         // noinspection JSUnresolvedFunction
         tabDetails.mhtml = new Uint8Array(await tabDetails.mhtml.arrayBuffer())
     }
 
-    // Да тут полный кринж, работа с байтами крайне убога, но мы работаем с тем чем имеем
     if (tabDetails) {
-        let documentArrayHead
-        let documentArrayBody
-        let documentArray
-
-        let enc = new TextEncoder()
-
-        const attachmentHTML = {}
-        documentArrayBody = tabDetails.html ? enc.encode(tabDetails.html) : tabDetails.mhtml
-        attachmentHTML.type = 'attachment'
-        attachmentHTML.length = documentArrayBody.length
-        attachmentHTML.filename = tabDetails.html ? 'document.html' : 'document.mhtml'
-        documentArrayHead = enc.encode('\n' + JSON.stringify(attachmentHTML) + '\n')
-        documentArray = new Uint8Array(documentArrayHead.length + documentArrayBody.length)
-        documentArray.set(documentArrayHead)
-        documentArray.set(documentArrayBody, documentArrayHead.length)
-
-        let newBody = enc.encode(body)
-        let newBody2 = new Uint8Array(newBody.length + documentArray.length)
-        newBody2.set(newBody)
-        newBody2.set(documentArray, newBody.length)
-
-        body = newBody2
+        if (tabDetails.mhtml) {
+            const attachmentHTML = {}
+            attachmentHTML.type = 'attachment'
+            attachmentHTML.length = tabDetails.mhtml.length
+            attachmentHTML.filename = 'document.mhtml'
+            body = concatTypedArrays(body, enc.encode('\n' + JSON.stringify(attachmentHTML) + '\n'))
+            body = concatTypedArrays(body, tabDetails.mhtml)
+        }
+        if (tabDetails.html) {
+            const attachmentHTML = {}
+            const documentArrayBody = enc.encode(tabDetails.html)
+            attachmentHTML.type = 'attachment'
+            attachmentHTML.length = documentArrayBody.length
+            attachmentHTML.filename = 'document.html'
+            body = concatTypedArrays(body, enc.encode('\n' + JSON.stringify(attachmentHTML) + '\n'))
+            body = concatTypedArrays(body, documentArrayBody)
+        }
     }
 
     const options = {body}
@@ -1536,6 +1534,13 @@ function uuidv4() {
     return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
+}
+
+function concatTypedArrays(a, b) { // a, b TypedArray of same type
+    const c = new (a.constructor)(a.length + b.length)
+    c.set(a, 0)
+    c.set(b, a.length)
+    return c
 }
 
 //Отправитель уведомлений
