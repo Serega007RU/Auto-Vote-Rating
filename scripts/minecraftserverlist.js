@@ -27,24 +27,23 @@ async function vote(first) {
 }
 
 function runVote() {
-    let alreadySent = false
     const timer2 = setInterval(()=>{
         try {
             if (document.querySelector('#voteerror > font') != null) {
                 const request = {}
-                request.message = document.querySelector('#voteerror > font').textContent
+                request.message = document.querySelector('#voteerror > font').textContent.trim()
                 if (request.message.includes('Vote Registered') || request.message.includes('Vote saved. But could not connect to Votifier')) {
-                    chrome.runtime.sendMessage({successfully: true})
+                    if (request.message.includes('Vote saved. But could not connect to Votifier')) {
+                        chrome.runtime.sendMessage({successfully: request.message})
+                    } else {
+                        chrome.runtime.sendMessage({successfully: true})
+                    }
                 } else if (request.message.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
                 } else if (request.message.includes('Please Wait')) {
                     return
-                } else if (request.message.includes('cannot verify your vote due to a low browser score') || request.message.includes('with the Anti Spam check')) {
-                    if (alreadySent) return
-                    chrome.runtime.sendMessage({captcha: true})
-                    alreadySent = true
                 } else {
-                    if (request.message.toLowerCase().includes('not a valid playername') || request.message.includes('verification expired due to timeout') || request.message.includes('Playername can not be empty') || request.message.includes('Your name is to short')) {
+                    if (request.message.toLowerCase().includes('not a valid playername') || request.message.includes('verification expired due to timeout') || request.message.includes('Playername can not be empty') || request.message.includes('Your name is to short') || request.message.includes('cannot verify your vote due to a low browser score') || request.message.includes('with the Anti Spam check')) {
                         request.ignoreReport = true
                     }
                     chrome.runtime.sendMessage(request)

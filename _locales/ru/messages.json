@@ -409,8 +409,24 @@
   "successAutoVote": {
     "message": "Успешное авто-голосование"
   },
+  "successAutoVoteWarn": {
+    "message": "Успешное авто-голосование, $warn$",
+    "placeholders": {
+      "warn": {
+        "content": "$1"
+      }
+    }
+  },
   "alreadyVoted": {
     "message": "Вы уже голосовали"
+  },
+  "alreadyVotedWarn": {
+    "message": "Вы уже голосовали, $warn$",
+    "placeholders": {
+      "warn": {
+        "content": "$1"
+      }
+    }
   },
   "errorOpenTab": {
     "message": "Ошибка при открытии вкладки: $error$",

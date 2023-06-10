@@ -448,8 +448,24 @@
   "successAutoVote": {
     "message": "Successful auto-voting"
   },
+  "successAutoVoteWarn": {
+    "message": "Successful auto-voting, $warn$",
+    "placeholders": {
+      "warn": {
+        "content": "$1"
+      }
+    }
+  },
   "alreadyVoted": {
     "message": "You have already voted"
+  },
+  "alreadyVotedWarn": {
+    "message": "You have already voted, $warn$",
+    "placeholders": {
+      "warn": {
+        "content": "$1"
+      }
+    }
   },
   "errorOpenTab": {
     "message": "Error occurred while opening the tab: $error$",

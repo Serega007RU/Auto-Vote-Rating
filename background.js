@@ -1275,9 +1275,16 @@ async function endVote(request, sender, project) {
         }
 
         delete project.error
+        delete project.warn
 
         if (request.successfully) {
-            sendMessage = chrome.i18n.getMessage('successAutoVote')
+            if (typeof request.successfully === 'string') {
+                project.warn = request.successfully
+                sendMessage = chrome.i18n.getMessage('successAutoVoteWarn', request.successfully)
+            } else {
+                sendMessage = chrome.i18n.getMessage('successAutoVote')
+            }
+
             if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
             project.stats.successVotes++
@@ -1290,8 +1297,13 @@ async function endVote(request, sender, project) {
             todayStats.successVotes++
             todayStats.lastSuccessVote = Date.now()
         } else {
-            sendMessage = chrome.i18n.getMessage('alreadyVoted')
-//          if (typeof request.later == 'string') sendMessage = sendMessage + ' ' + request.later
+            if (typeof request.later === 'string') {
+                project.warn = request.later
+                sendMessage = chrome.i18n.getMessage('alreadyVotedWarn', request.later)
+            } else {
+                sendMessage = chrome.i18n.getMessage('alreadyVoted')
+            }
+
             if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
 
             project.stats.laterVotes++

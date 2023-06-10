@@ -1107,6 +1107,10 @@ button:disabled {
 	color: #da5e5e;
 }
 
+.warn {
+	color: #f1af4c;
+}
+
 .btn:hover {
     opacity: 1
 }

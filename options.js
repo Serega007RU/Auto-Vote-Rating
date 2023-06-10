@@ -371,6 +371,10 @@ async function addProjectList(project, preBend) {
     div2.classList.add('error')
     contDiv.appendChild(div2)
 
+    const div3 = document.createElement('div')
+    div3.classList.add('warn')
+    contDiv.appendChild(div3)
+
     const nextVoteMes = document.createElement('div')
     nextVoteMes.classList.add('textNextVote')
     contDiv.append(nextVoteMes)
@@ -2354,40 +2358,48 @@ async function updateProjectText(project) {
         el.querySelector('.textNextVote').textContent = chrome.i18n.getMessage('nextVote') + ' ' + text
         const errorElement = el.querySelector('.error')
         errorElement.textContent = ''
+        const warnElement = el.querySelector('.warn')
+        warnElement.textContent = ''
         if (project.error) {
-            // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass
-            if (project.error.match && project.error.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
-                // TODO функция не оптимизированная и может иметь косяки, другого способа я не нашёл как это сделать адекватно
-                // https://stackoverflow.com/a/60311728/11235240
-                // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass,RegExpUnnecessaryNonCapturingGroup
-                const error = project.error.match(/(?:http(s)?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)|\s*\S+\s*/g)
-                for (const el of error) {
-                    // https://stackoverflow.com/a/49849482/11235240
-                    // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass
-                    if (el.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g)) {
-                        const link = document.createElement('a')
-                        link.classList.add('link')
-                        link.target = 'blank_'
-                        link.href = el
-                        if (el.length > 32) {
-                            link.textContent = el.substring(0, 32) + '...'
-                        } else {
-                            link.textContent = el
-                        }
-                        errorElement.append(link)
-                    } else {
-                        errorElement.append(el)
-                    }
-                }
-            } else {
-                errorElement.textContent = project.error
-            }
+            conventPlainTextToLinks(project.error, errorElement)
+        }
+        if (project.warn) {
+            conventPlainTextToLinks(project.warn, warnElement)
         }
         updateModalStats(project)
     }
     const el2 = document.getElementById('edit' + project.key)
     if (el2) {
         editProject(project)
+    }
+}
+
+function conventPlainTextToLinks(text, element) {
+    // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass,RegExpSimplifiable
+    if (text.match && text.match(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#()?&//=]*)/igm)) {
+        // TODO функция не оптимизированная и может иметь косяки, другого способа я не нашёл как это сделать адекватно
+        // https://stackoverflow.com/a/60311728/11235240
+        // noinspection RegExpRedundantEscape,RegExpDuplicateCharacterInClass,RegExpUnnecessaryNonCapturingGroup
+        const error = text.match(/(?:http(s)?:\/\/.)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)|\s*\S+\s*/g)
+        for (const el of error) {
+            // noinspection RegExpSimplifiable,RegExpRedundantEscape,RegExpDuplicateCharacterInClass
+            if (el.match(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#()?&//=]*)/igm)) {
+                const link = document.createElement('a')
+                link.classList.add('link')
+                link.target = 'blank_'
+                link.href = el
+                if (el.length > 64) {
+                    link.textContent = el.substring(0, 64) + '...'
+                } else {
+                    link.textContent = el
+                }
+                element.append(link)
+            } else {
+                element.append(el)
+            }
+        }
+    } else {
+        element.textContent = text
     }
 }
 
