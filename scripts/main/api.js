@@ -144,6 +144,9 @@ async function checkAll(first) {
         }
         chrome.runtime.sendMessage({errorAuthVK: text, notAuth})
         return
+    } else if (document.location.search.includes('error=invalid_request&error_description=Invalid%20display%20parameter')) {
+        chrome.runtime.sendMessage({errorAuthVK: 'Скорее всего ваш аккаунт ВК был заблокирован, если это не так и эта ошибка постоянно повторяется, сообщите разработчику расширения!'})
+        return
     }
 
     //Если мы находися на странице авторизации Дискорд
