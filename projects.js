@@ -1506,7 +1506,6 @@ var allProjects = {
         exampleURL: () => ['https://findmcserver.com/server/', 'sootmc', ''],
         URL: () => 'findmcserver.com',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        timeout: () => ({hours: 2}),
         notRequiredCaptcha: () => true
     },
     ServeurListe: {
