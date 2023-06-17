@@ -156,7 +156,7 @@ async function checkOpen(project, transaction) {
                 console.warn(getProjectPrefix(projectTimeout, true), chrome.i18n.getMessage('timeout'))
                 if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(projectTimeout, false), chrome.i18n.getMessage('timeout'), 'openProject_' + project.key)
 
-                if (settings.enabledReportTimeout && Number.isInteger(tab) && !settings.disabledSendErrorSentry && value.nextAttempt && value.countInject) {
+                if (/*settings.enabledReportTimeout*/ value.rating === 'MMoTopRU' && Number.isInteger(tab) && !settings.disabledSendErrorSentry && value.nextAttempt && value.countInject) {
                     (async() => {
                         try {
                             // noinspection JSCheckFunctionSignatures
@@ -552,7 +552,6 @@ chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
 })
 
 chrome.webNavigation.onCommitted.addListener(async function(details) {
-    if (details.url === 'about:blank') return
     await initializeFunc
     let opened = openedProjects.get(details.tabId)
     if (!opened) return
@@ -598,6 +597,8 @@ chrome.webNavigation.onCommitted.addListener(async function(details) {
     }
 
     if (!filesIsolated.length && !filesMain.length) return
+
+    if (settings.debug) console.log('Injecting ' + JSON.stringify(filesIsolated) + ', ' + JSON.stringify(filesMain) + ' to ' + details.url)
 
     let target = {tabId: details.tabId}
     if (details.frameId) target.frameIds = [details.frameId]
@@ -684,26 +685,32 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                         }
                     })
                 }
+                if (settings.debug) console.log('Injecting funcPrompt to ' + details.url)
                 await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func: funcPrompt, args: [project.nick]})
             }
 
             if (eval) {
+                if (settings.debug) console.log('Injecting libs/evalCore.umd.js, scripts/main/injectEval.js to ' + details.url)
                 await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
                 await chrome.tabs.sendMessage(details.tabId, {textEval: true, textApi, textScript})
                 // noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 if (allProjects[project.rating]?.needWorld?.()) {
+                    if (settings.debug) console.log('Injecting libs/evalCore.umd.js to ' + details.url + ' in MAIN world')
                     await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['libs/evalCore.umd.js']})
                     const funcWorld = function(text) {
                         // noinspection JSUnresolvedFunction,JSUnresolvedVariable
                         const evil = evalCore.getEvalInstance(window)
                         evil(text)
                     }
+                    if (settings.debug) console.log('Injecting funcWorld to ' + details.url + ' in MAIN world')
                     await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', func: funcWorld, args: [textWorld]})
                 }
             } else {
+                if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'.js, scripts/main/api.js to ' + details.url)
                 await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
                 // noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 if (allProjects[project.rating]?.needWorld?.()) {
+                    if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'_world.js to ' + details.url + ' in MAIN world')
                     await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + project.rating.toLowerCase() +'_world.js']})
                 }
             }
@@ -748,9 +755,11 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
         try {
             // if (eval) {
+            //     if (settings.debug) console.log('Injecting libs/evalCore.umd.js, scripts/main/injectEval.js to ' + details.url + ' in MAIN world')
             //     await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
             //     await chrome.tabs.sendMessage(details.tabId, {textEval: true, textCaptcha})
             // } else {
+                if (settings.debug) console.log('Injecting scripts/main/captchaclicker.js to ' + details.url)
                 await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['scripts/main/captchaclicker.js']})
             // }
 
@@ -881,6 +890,9 @@ async function onRuntimeMessage(request, sender, sendResponse) {
                     document.location.reload()
                 }
 
+                if (settings.debug) { // noinspection JSUnresolvedReference
+                    console.log('Injecting funcReloadCaptcha to ' + frame.url)
+                }
                 // noinspection JSCheckFunctionSignatures,JSUnresolvedVariable
                 await chrome.scripting.executeScript({target: {tabId: sender.tab.id, frameIds: [frame.frameId]}, func: reload})
             }
