@@ -1356,8 +1356,6 @@ var allProjects = {
             }
         },
         timeout: () => ({hour: 16}),
-        silentVote: () => true,
-        notRequiredCaptcha: () => true,
         notRequiredNick: () => true
     },
     TrackingServers: {
