@@ -403,6 +403,9 @@
   "gameIDTooltip": {
     "message": " of the game can be obtained from the address bar of project page, for example: "
   },
+  "listingIDTooltip": {
+    "message": " of the listing can be obtained from the address bar of project page, for example: "
+  },
   "inputProjectID": {
     "message": "Enter ID"
   },
@@ -659,17 +662,20 @@
   "chooseLang": {
     "message": "Choose language/region"
   },
-  "chooseGame": {
-    "message": "Enter the game ID or select from the list"
-  },
   "chooseGameURL": {
     "message": "Enter the game URL or select from the list"
+  },
+  "chooseListingURL": {
+    "message": "Enter the listing URL or select from the list"
   },
   "idGame": {
     "message": "Game ID"
   },
   "urlGame": {
     "message": "Game URL"
+  },
+  "urlListing": {
+    "message": "Listing URL"
   },
   "stats": {
     "message": "$project$ stats",

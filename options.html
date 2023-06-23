@@ -105,6 +105,21 @@
                             <input class="input" name="chooseGame" type="text" id="chooseGame" placeholder="chooseGameURL" list="gameList" spellcheck="false">
                             <datalist id="gameList"></datalist>
                         </div>
+                        <!--Выбор списка (чего-то) для игры, например у Дискорда может быть список ботов, серверов и т.д.-->
+                        <div style="display: none;" class="input-block">
+                            <label data-resource="urlListing" for="chooseListing">
+                                <span class="tooltip1">
+                                    <span class="tooltip1text">
+                                        <span style="color:red;">URL</span>
+                                        <span data-resource="listingIDTooltip"></span>
+                                        <br>
+                                        <span id="urlListingTooltip1"></span><span id="urlListingTooltip2" style="color:#d32f2f;"></span><span id="urlListingTooltip3"></span>
+                                    </span>
+                                </span>
+                            </label>
+                            <input class="input" name="chooseListing" type="text" id="chooseListing" placeholder="chooseListingURL" list="listingList" spellcheck="false">
+                            <datalist id="listingList"></datalist>
+                        </div>
                         <!--Выбор языка-->
                         <div style="display: none;" class="input-block">
                             <label data-resource="chooseLang" for="chooseLang"></label>

@@ -1534,6 +1534,33 @@ var allProjects = {
         timeout: () => ({hours: 2}),
         limitedCountVote: () => true
     },
+    RovelStars: {
+        voteURL: (project) => 'https://' + project.game + '.rovelstars.com/' + project.listing + '/' + project.id + '/vote',
+        pageURL: (project) => 'https://' + project.game + '.rovelstars.com/' + project.listing + '/' + project.id,
+        projectName: (doc) => doc.querySelector('.hero-body h1.title').innerText.trim(),
+        exampleURL: () => ['https://discord.rovelstars.com/bots/', '778697286950715413', '/vote'],
+        URL: () => 'rovelstars.com',
+        parseURL: (url) => {
+            const project = {}
+            project.game = url.hostname.split('.')[0]
+            project.listing = url.pathname.split('/')[1]
+            project.id = url.pathname.split('/')[2]
+            return project
+        },
+        exampleURLListing: () => ['https://discord.rovelstars.com/', 'bots', '/778697286950715413/vote'],
+        defaultListing: () => 'bots',
+        listingList: () => new Map([
+            ['bots', 'Bots']
+        ]),
+        exampleURLGame: () => ['https://', 'discord', '.rovelstars.com/bots/778697286950715413/vote'],
+        defaultGame: () => 'discord',
+        gameList: () => new Map([
+            ['discord', 'Discord']
+        ]),
+        notRequiredNick: () => true,
+        notRequiredCaptcha: () => true,
+        needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1691,6 +1718,7 @@ var projectByURL = new Map([
     ['findmcserver.com', 'FindMCServer'],
     ['serveurliste.com', 'ServeurListe'],
     ['craftbook.cz', 'CraftBook'],
+    ['rovelstars.com', 'RovelStars'],
     ['Custom', 'Custom']
 ])
 

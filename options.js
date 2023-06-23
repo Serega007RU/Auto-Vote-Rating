@@ -844,6 +844,9 @@ function editProject(project, switchToEdit) {
     if (funcRating.exampleURLGame) {
         document.getElementById('chooseGame').value = project.game
     }
+    if (funcRating.exampleURLListing) {
+        document.getElementById('chooseListing').value = project.listing
+    }
     if (funcRating.langList) {
         document.getElementById('chooseLang').value = project.lang
     }
@@ -972,6 +975,12 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
                 return
             }
 
+            if (funcRating.exampleURLListing && project.listing == null) {
+                createNotif(chrome.i18n.getMessage('errorLinkParam', 'listing'), 'error')
+                event.submitter.disabled = false
+                return
+            }
+
             if (funcRating.langList && project.lang == null) {
                 createNotif(chrome.i18n.getMessage('errorLinkParam', 'lang'), 'error')
                 event.submitter.disabled = false
@@ -1001,6 +1010,10 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
 
         if (funcRating.exampleURLGame) {
             project.game = document.getElementById('chooseGame').value
+        }
+
+        if (funcRating.exampleURLGame) {
+            project.listing = document.getElementById('chooseListing').value
         }
 
         if (funcRating.langList) {
@@ -2184,6 +2197,24 @@ document.getElementById('rating').addEventListener('input', function() {
                 option.value = value
                 option.textContent = name
                 gameList.append(option)
+            }
+        }
+    }
+
+    if (funcRating.exampleURLListing) {
+        document.getElementById('chooseListing').parentElement.removeAttribute('style')
+        document.getElementById('chooseListing').name = 'chooseListing' + rating
+        if (funcRating.defaultListing && !editingProject) document.getElementById('chooseListing').value = funcRating.defaultListing()
+        document.getElementById('urlListingTooltip1').textContent = funcRating.exampleURLListing()[0]
+        document.getElementById('urlListingTooltip2').textContent = funcRating.exampleURLListing()[1]
+        document.getElementById('urlListingTooltip3').textContent = funcRating.exampleURLListing()[2]
+        if (funcRating.listingList) {
+            const listingList = document.getElementById('listingList')
+            for (const [value, name] of funcRating.listingList()) {
+                const option = document.createElement('option')
+                option.value = value
+                option.textContent = name
+                listingList.append(option)
             }
         }
     }

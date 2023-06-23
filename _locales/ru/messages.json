@@ -364,6 +364,9 @@
   "gameIDTooltip": {
     "message": " игры можно получить из адресной строки находясь на странице проекта, например: "
   },
+  "listingIDTooltip": {
+    "message": " списка можно получить из адресной строки находясь на странице проекта, например: "
+  },
   "inputProjectID": {
     "message": "Введите ID"
   },
@@ -625,17 +628,20 @@
   "chooseLang": {
     "message": "Выберите язык/регион"
   },
-  "chooseGame": {
-    "message": "Введите ID игры или выберите из списка"
-  },
   "chooseGameURL": {
     "message": "Введите URL игры или выберите из списка"
+  },
+  "chooseListingURL": {
+    "message": "Введите URL списка или выберите из списка"
   },
   "idGame": {
     "message": "ID игры"
   },
   "urlGame": {
     "message": "URL игры"
+  },
+  "urlListing": {
+    "message": "URL списка"
   },
   "stats": {
     "message": "Статистика $project$",
