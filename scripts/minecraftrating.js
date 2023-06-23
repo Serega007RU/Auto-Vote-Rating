@@ -97,6 +97,10 @@ const observer = new PerformanceObserver((list) => {
                     chrome.runtime.sendMessage({message: error.toString(), ignoreReport: true})
                     return
                 }
+                if (!response.ok) {
+                    chrome.runtime.sendMessage({errorVote: [String(response.status), response.url]})
+                    return
+                }
                 const text = await response.text()
                 const doc = new DOMParser().parseFromString(text, 'text/html')
                 const csrfToken = doc.querySelector('#form-vote input[name="_token"]')?.value

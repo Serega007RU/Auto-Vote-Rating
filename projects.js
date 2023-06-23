@@ -1503,8 +1503,7 @@ var allProjects = {
         projectName: () => null, // сайт-конструктор, отдаёт пустую страницу со скриптами на загрузку, название достать слишком сложно
         exampleURL: () => ['https://findmcserver.com/server/', 'sootmc', ''],
         URL: () => 'findmcserver.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        notRequiredCaptcha: () => true
+        parseURL: (url) => ({id: url.pathname.split('/')[2]})
     },
     ServeurListe: {
         voteURL: (project) => 'https://www.serveurliste.com/' + project.game + '/' + project.id,

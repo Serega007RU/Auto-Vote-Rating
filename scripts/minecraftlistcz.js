@@ -26,7 +26,15 @@ async function vote(first) {
     if (document.querySelector('.alert.alert-danger')) {
         const request = {}
         request.message = document.querySelector('.alert.alert-danger').textContent.trim()
-        if (!request.message.includes('GDPR musí být vyplněn') && !request.message.includes('Nick musí být vyplněno')) {
+        if (request.message.includes('GDPR musí být vyplněn')) {
+            // Dear Kogol!
+            // I'm tired of enduring the errors of "Souhlas s GDPR musí být vyplněn."
+            // and constantly getting on sentry.io reports,
+            // if the site reported that GDPR was not checked,
+            // then the extension in this case will check the box for the real GDPR,
+            // this is not an extension's problem, but your problem!
+            document.querySelector('#tosgdpr').checked = true
+        } else if (!request.message.includes('Nick musí být vyplněno')) {
             chrome.runtime.sendMessage(request)
             return
         }

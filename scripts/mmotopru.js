@@ -94,26 +94,35 @@ async function vote(first) {
     const project = await getProject('MMoTopRU', true)
 
     //Отправка запроса на прохождение капчи (мы типо прошли капчу)
-    await fetch('https://' + project.game + '.mmotop.ru/votes/quaptcha.json', {
-      'headers': {
-        'accept': 'application/json, text/javascript, */*; q=0.01',
-        'accept-language': 'ru,en;q=0.9,en-US;q=0.8',
-        'cache-control': 'no-cache',
-        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'pragma': 'no-cache',
-        'sec-ch-ua': '\"Google Chrome\";v=\"87\", \" Not;A Brand\";v=\"99\", \"Chromium\";v=\"87\"',
-        'sec-ch-ua-mobile': "?0",
-        'sec-fetch-dest': "empty",
-        'sec-fetch-mode': "cors",
-        'sec-fetch-site': "same-origin",
-        'x-csrf-token': document.querySelector('input[name="authenticity_token"]').value,
-        'x-requested-with': "XMLHttpRequest"
-      },
-      'body': 'action=qaptcha&qaptcha_key=' + document.querySelector('div.QapTcha > input[type=hidden]').name,
-      'method': 'POST',
-      'mode': 'cors',
-      'credentials': 'include'
-    })
+    try {
+        const response = await fetch('https://' + project.game + '.mmotop.ru/votes/quaptcha.json', {
+            'headers': {
+                'accept': 'application/json, text/javascript, */*; q=0.01',
+                'accept-language': 'ru,en;q=0.9,en-US;q=0.8',
+                'cache-control': 'no-cache',
+                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'pragma': 'no-cache',
+                'sec-ch-ua': '\"Google Chrome\";v=\"87\", \" Not;A Brand\";v=\"99\", \"Chromium\";v=\"87\"',
+                'sec-ch-ua-mobile': "?0",
+                'sec-fetch-dest': "empty",
+                'sec-fetch-mode': "cors",
+                'sec-fetch-site': "same-origin",
+                'x-csrf-token': document.querySelector('input[name="authenticity_token"]').value,
+                'x-requested-with': "XMLHttpRequest"
+            },
+            'body': 'action=qaptcha&qaptcha_key=' + document.querySelector('div.QapTcha > input[type=hidden]').name,
+            'method': 'POST',
+            'mode': 'cors',
+            'credentials': 'include'
+        })
+        if (!response.ok) {
+            chrome.runtime.sendMessage({errorVote: [String(response.status), response.url]})
+            return
+        }
+    } catch (error) {
+        chrome.runtime.sendMessage({message: error.toString(), ignoreReport: true})
+        return
+    }
     //Убираем здесь value иначе капча не будет пройдена
     document.querySelector('div.QapTcha > input[type=hidden]').value = ''
     //Делаем кнопку 'Проголосовать' кликабельной

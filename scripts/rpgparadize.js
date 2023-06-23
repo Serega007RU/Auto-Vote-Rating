@@ -12,7 +12,7 @@ function vote(first) {
     if (document.querySelector('.div-page .div-box center')?.innerText?.trim()?.length > 5) {
         const request = {}
         request.message = document.querySelector('.div-page .div-box center').innerText.trim()
-        if (request.message.includes('Captcha incorrect')) {
+        if (request.message.includes('Captcha incorrect') || request.message.includes('2Captcha')) {
             // None
         } else {
             if (request.message.includes('avez effectué trop de tentative de vote pour')) {

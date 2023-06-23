@@ -25,6 +25,17 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('span.form-error')) {
+        const request = {}
+        request.message = document.querySelector('span.form-error').textContent
+        if (request.message.includes('Nick obsahuje nepovolené znaky')) {
+            request.ignoreReport = true
+            request.retryCoolDown = 604800000
+        }
+        chrome.runtime.sendMessage(request)
+        return
+    }
+
     if (document.querySelector('div.alert.alert-success') != null) {
         chrome.runtime.sendMessage({successfully: true})
         return

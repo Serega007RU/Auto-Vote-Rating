@@ -27,6 +27,7 @@ async function vote() {
         const request = {}
         request.errorVoteNoElement = 'It looks like the site redirected to the main page (list of servers), most likely this server/project was deleted. If this is not the case and you think it is a error, inform the extension developer'
         request.ignoreReport = true
+        chrome.runtime.sendMessage(request)
         return
     }
 
