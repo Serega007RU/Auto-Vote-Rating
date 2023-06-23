@@ -1573,6 +1573,18 @@ var allProjects = {
         notRequiredNick: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
+    BotListMe: {
+        voteURL: (project) => 'https://botlist.me/bots/' + project.id + '/vote',
+        pageURL: (project) => 'https://botlist.me/bots/' + project.id,
+        projectName: (doc) => doc.querySelector('title').innerText.trim().replaceAll(' | Discord Bot', ''),
+        exampleURL: () => ['https://botlist.me/bots/', '1052586565395828778', '/vote'],
+        URL: () => 'botlist.me',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 12}),
+        notRequiredNick: () => true,
+        notRequiredCaptcha: () => true,
+        needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1732,6 +1744,7 @@ var projectByURL = new Map([
     ['craftbook.cz', 'CraftBook'],
     ['rovelstars.com', 'RovelStars'],
     ['infinitybots.gg', 'InfinityBots'],
+    ['botlist.me', 'BotListMe'],
     ['Custom', 'Custom']
 ])
 
