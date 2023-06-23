@@ -74,3 +74,60 @@ async function vote(first) {
         document.querySelector('#voteForm button[type="submit"]').click()
     }
 }
+
+let unload = false
+window.onbeforeunload = ()=> {
+    unload = true
+}
+window.onunload = ()=> {
+    unload = true
+}
+const observer = new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+        if (entry.name === 'https://minecraftrating.ru/set-cookie/') {
+            // Дикий костыль в обход ошибки "CSRF token mismatch."
+            setTimeout(async () => {
+                if (unload) return
+                const project = await getProject('MinecraftRating')
+
+                let response
+                try {
+                    response = await fetch(document.location.href)
+                } catch (error) {
+                    chrome.runtime.sendMessage({message: error.toString(), ignoreReport: true})
+                    return
+                }
+                const text = await response.text()
+                const doc = new DOMParser().parseFromString(text, 'text/html')
+                const csrfToken = doc.querySelector('#form-vote input[name="_token"]')?.value
+                if (!csrfToken) {
+                    chrome.runtime.sendMessage({errorVoteNoElement: 'Не найден csrf токен', html: text, url: response.url})
+                    return
+                }
+                document.querySelector('#form-vote input[name="_token"]').value = csrfToken
+
+                try {
+                    response = await fetch('/set-cookie/', {
+                        headers: {
+                            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                        },
+                        method: 'POST',
+                        body: '_token=' + csrfToken + '&' + 'name=' + 'voted_project' + '&' + 'value= ' + document.querySelector('[name=url]').value + '__' + project.nick,
+                    })
+                } catch (error) {
+                    chrome.runtime.sendMessage({message: error.toString(), ignoreReport: true})
+                    return
+                }
+                if (!response.ok) {
+                    chrome.runtime.sendMessage({errorVote: [String(response.status), response.url]})
+                    return
+                }
+
+                document.querySelector('#form-vote').submit()
+            }, 5000)
+        }
+    }
+})
+observer.observe({
+    entryTypes: ["resource"]
+})
