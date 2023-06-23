@@ -13,7 +13,7 @@ async function vote(first) {
         } else {
             chrome.runtime.sendMessage({errorVoteNoElement: 'not loaded page?'})
         }
-    } else  {
+    } else {
         if (document.querySelector('div[class*="prize-list"] div[style*="https://upload-static.hoyoverse.com/event/2023/04/21/5ccbbab8f5eb147df704e16f31fc5788_6285576485616685271.png"]')) {
             document.querySelector('div[class*="prize-list"] div[style*="https://upload-static.hoyoverse.com/event/2023/04/21/5ccbbab8f5eb147df704e16f31fc5788_6285576485616685271.png"]').click()
         } else if (document.querySelector('div[class*="prize-list"] [class*="received"]')) {
@@ -25,7 +25,7 @@ async function vote(first) {
 }
 
 const timer = setInterval(() => {
-    const message = document.querySelector('div.sign-wrapper')?.innerText || document.querySelector('div.van-toast__text')?.innerText
+    const message = document.querySelector('div.sign-wrapper')?.innerText || document.querySelector('div.van-toast__text')?.innerText || document.querySelector('div.m-dialog-body')?.innerText
     if (message && message.length > 3) {
         clearInterval(timer)
         if (message.includes('checked in today')) {
