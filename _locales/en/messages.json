@@ -113,11 +113,14 @@
   "disabledDebug": {
     "message": "Debug"
   },
-  "disabledDebugTooltip": {
+  "disabledCloseTabTooltip": {
     "message": "Enable this only if the developer has asked you to"
   },
-  "disabledCloseTabs": {
-    "message": "Disable closing tabs at the end of voting"
+  "disableCloseTabsOnSuccess": {
+    "message": "Disable closing tabs on successful completion of voting"
+  },
+  "disableCloseTabsOnError": {
+    "message": "Disable closing tabs in case of unsuccessful completion of voting"
   },
   "disableCheckProjects": {
     "message": "Disable check-up",

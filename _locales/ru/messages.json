@@ -92,11 +92,14 @@
   "disabledDebug": {
     "message": "Отладка"
   },
-  "disabledDebugTooltip": {
+  "disabledCloseTabTooltip": {
     "message": "Включать это только если вас об этом попросил разработчик"
   },
-  "disabledCloseTabs": {
-    "message": "Отключить закрытие вкладок при завершении голосования"
+  "disableCloseTabsOnSuccess": {
+    "message": "Отключить закрытие вкладок при успешном завершении голосования"
+  },
+  "disableCloseTabsOnError": {
+    "message": "Отключить закрытие вкладок при не успешном завершении голосования"
   },
   "disableCheckProjects": {
     "message": "Отключить проверку"

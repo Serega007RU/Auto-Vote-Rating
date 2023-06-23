@@ -174,12 +174,12 @@ async function checkOpen(project, transaction) {
                                 console.warn(getProjectPrefix(projectTimeout, true), error.message)
                             }
                         } finally {
-                            tryCloseTab(tab, projectTimeout, 0)
+                            if (!settings.disableCloseTabsOnError) tryCloseTab(tab, projectTimeout, 0)
                         }
                     })()
                 } else {
                     // noinspection JSIgnoredPromiseFromCall
-                    tryCloseTab(tab, projectTimeout, 0)
+                    if (!settings.disableCloseTabsOnError) tryCloseTab(tab, projectTimeout, 0)
                 }
                 break
             }
@@ -1042,7 +1042,7 @@ async function tryOpenTab(request, project, attempt) {
 }
 
 async function tryCloseTab(tabId, project, attempt) {
-    if (!Number.isInteger(tabId) || settings.disabledCloseTabs) return
+    if (!Number.isInteger(tabId)) return
     try {
         await chrome.tabs.remove(tabId)
     } catch (error) {
@@ -1124,7 +1124,11 @@ async function endVote(request, sender, project) {
     }
 
     if (sender && !request.closedTab) {
-        tryCloseTab(sender.tab.id, project, 0)
+        if (!request.successfully && request.later == null) {
+            if (!settings.disableCloseTabsOnError) tryCloseTab(sender.tab.id, project, 0)
+        } else {
+            if (!settings.disableCloseTabsOnSuccess) tryCloseTab(sender.tab.id, project, 0)
+        }
     }
 
     if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
