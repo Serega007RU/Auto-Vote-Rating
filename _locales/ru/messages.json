@@ -92,7 +92,7 @@
   "disabledDebug": {
     "message": "Отладка"
   },
-  "disabledCloseTabTooltip": {
+  "debugTooltip": {
     "message": "Включать это только если вас об этом попросил разработчик"
   },
   "disableCloseTabsOnSuccess": {
