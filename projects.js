@@ -1524,6 +1524,16 @@ var allProjects = {
         ]),
         oneProject: () => 1
     },
+    CraftBook: {
+        voteURL: (project) => 'https://craftbook.cz/server/' + project.id,
+        pageURL: (project) => 'https://craftbook.cz/server/' + project.id,
+        projectName: (doc) => doc.querySelector('#desc h1').textContent,
+        exampleURL: () => ['https://craftbook.cz/server/', 'mc.hesovodoupe.cz:25565', ''],
+        URL: () => 'craftbook.cz',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 2}),
+        limitedCountVote: () => true
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1680,6 +1690,7 @@ var projectByURL = new Map([
     ['minecraft-serverlist.com', 'MinecraftServerListCom'],
     ['findmcserver.com', 'FindMCServer'],
     ['serveurliste.com', 'ServeurListe'],
+    ['craftbook.cz', 'CraftBook'],
     ['Custom', 'Custom']
 ])
 
