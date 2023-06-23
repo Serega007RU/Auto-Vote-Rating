@@ -524,7 +524,7 @@ var allProjects = {
         exampleURL: () => ['https://mc-servers.com/server/', '1890', '/'],
         URL: () => 'mc-servers.com',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        timeout: () => ({hours: 24})
+        timeout: () => ({hour: 4})
     },
     MinecraftList: {
         voteURL: (project) => 'https://minecraftlist.org/vote/' + project.id,
