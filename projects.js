@@ -1547,6 +1547,7 @@ var allProjects = {
             project.id = url.pathname.split('/')[2]
             return project
         },
+        timeout: () => ({hours: 24}),
         exampleURLListing: () => ['https://discord.rovelstars.com/', 'bots', '/778697286950715413/vote'],
         defaultListing: () => 'bots',
         listingList: () => new Map([
@@ -1559,6 +1560,17 @@ var allProjects = {
         ]),
         notRequiredNick: () => true,
         notRequiredCaptcha: () => true,
+        needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
+    },
+    InfinityBots: {
+        voteURL: (project) => 'https://infinitybots.gg/bot/' + project.id + '/vote',
+        pageURL: (project) => 'https://infinitybots.gg/bot/' + project.id,
+        projectName: (doc) => doc.querySelector('title').innerText.trim().replaceAll(' | Infinity Bots', ''),
+        exampleURL: () => ['https://infinitybots.gg/bot/', '1047520294685909158', '/vote'],
+        URL: () => 'rovelstars.com',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 6}),
+        notRequiredNick: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
     Custom: {
@@ -1719,6 +1731,7 @@ var projectByURL = new Map([
     ['serveurliste.com', 'ServeurListe'],
     ['craftbook.cz', 'CraftBook'],
     ['rovelstars.com', 'RovelStars'],
+    ['infinitybots.gg', 'InfinityBots'],
     ['Custom', 'Custom']
 ])
 
