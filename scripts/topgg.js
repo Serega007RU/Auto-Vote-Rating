@@ -1,6 +1,18 @@
 async function vote(first) {
     if (first === false) return
 
+    //Дожидаемся полной загрузки сайта
+    if (document.querySelector('div.chakra-spinner')) {
+        await new Promise(resolve => {
+            const timer = setInterval(() => {
+                if (!document.querySelector('div.chakra-spinner')) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 100)
+        })
+    }
+
     const login = findElement('a', ['login to vote'])
     if (login != null) {
         login.click()
@@ -44,7 +56,8 @@ async function vote(first) {
         }
     }, 1000)
 
-    await wait(Math.floor(Math.random() * 9000 + 1000))
+    // TODO этот костыль сделан из-за того что сайт сначало показывает что вот голосуй, а потом через несколько секунд пишет "Вы уже голосовали"
+    await wait(Math.floor(Math.random() * (10000 - 5000) + 5000))
 
     const timer2 = setInterval(() => {
         try {
@@ -69,6 +82,11 @@ async function vote(first) {
             throwError(e)
         }
     })
+
+    // TODO иногда сайт просто зависает на "You must be logged in to vote." или "You will be able to vote after this ad.", просто втупую через некоторое время перезагружаем страницу
+    setTimeout(() => {
+        document.location.reload()
+    }, Math.floor(Math.random() * (300000 - 420000) + 420000))
 }
 
 function findElement(selector, text) {
