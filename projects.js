@@ -1585,6 +1585,19 @@ var allProjects = {
         notRequiredCaptcha: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
+    TopMinecraftIo: {
+        voteURL: (project) => 'https://topminecraft.io/' + project.lang +'/' + project.id + '/vote',
+        pageURL: (project) => 'https://topminecraft.io/' + project.lang +'/' + project.id,
+        projectName: (doc) => doc.querySelector('div.head h1').textContent,
+        exampleURL: () => ['https://topminecraft.io/fr/', 'vikicraft-5', '/vote'],
+        URL: () => 'topminecraft.io',
+        parseURL: (url) => ({lang: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
+        defaultLand: () => 'fr',
+        langList: () => new Map([
+            ['en', 'English'],
+            ['fr', 'Français']
+        ])
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1745,6 +1758,7 @@ var projectByURL = new Map([
     ['rovelstars.com', 'RovelStars'],
     ['infinitybots.gg', 'InfinityBots'],
     ['botlist.me', 'BotListMe'],
+    ['topminecraft.io', 'TopMinecraftIo'],
     ['Custom', 'Custom']
 ])
 
