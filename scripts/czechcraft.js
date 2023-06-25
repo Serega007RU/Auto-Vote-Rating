@@ -31,9 +31,14 @@ async function vote(first) {
         if (request.message.includes('Nick obsahuje nepovolené znaky')) {
             request.ignoreReport = true
             request.retryCoolDown = 604800000
+            chrome.runtime.sendMessage(request)
+            return
+        } else if (request.message.includes('response parameter is missing')) {
+            // None
+        } else {
+            chrome.runtime.sendMessage(request)
+            return
         }
-        chrome.runtime.sendMessage(request)
-        return
     }
 
     if (document.querySelector('div.alert.alert-success') != null) {

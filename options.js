@@ -1310,7 +1310,7 @@ async function addProject(project, element) {
                 return
             }
 
-            project.name = allProjects[project.rating].projectName(doc, project)
+            project.name = allProjects[project.rating].projectName(doc, project).trim()
             if (!project.name) project.name = ''
         } catch (error) {
             console.error(error.message)

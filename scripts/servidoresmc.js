@@ -24,6 +24,22 @@ async function vote(first) {
 
     if (first) return
 
+    if (document.querySelector('#p1').style.width !== '100%') {
+        await new Promise(resolve => {
+            const timer = setInterval(() => {
+                try {
+                    if (document.querySelector('#p1').style.width === '100%') {
+                        clearInterval(timer)
+                        resolve()
+                    }
+                } catch (error) {
+                    clearInterval(timer)
+                    throwError(error)
+                }
+            }, 100)
+        })
+    }
+
     const project = await getProject('ServidoresMC')
     document.querySelector('input#minecraft').value = project.nick
     document.querySelector('button#votador').click()

@@ -1,7 +1,7 @@
 async function vote(first) {
     if (checkAnswer()) return
 
-    if (document.querySelector('form[wire\\:submit\\.prevent="sendVote"] p.dark\\:text-red-200')) {
+    if (document.querySelector('form[wire\\:submit\\.prevent="sendVote"] p.dark\\:text-red-200')?.innerText.length) {
         const request = {}
         request.message = document.querySelector('form[wire\\:submit\\.prevent="sendVote"] p.dark\\:text-red-200').innerText
         if (request.message.includes('Vous devez attendre encore')) {

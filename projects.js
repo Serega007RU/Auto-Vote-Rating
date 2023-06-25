@@ -1506,8 +1506,8 @@ var allProjects = {
         parseURL: (url) => ({id: url.pathname.split('/')[2]})
     },
     ServeurListe: {
-        voteURL: (project) => 'https://www.serveurliste.com/' + project.game + '/' + project.id,
-        pageURL: (project) => 'https://www.serveurliste.com/' + project.game + '/' + project.id + '#voter',
+        voteURL: (project) => 'https://www.serveurliste.com/' + project.game + '/' + project.id + '#voter',
+        pageURL: (project) => 'https://www.serveurliste.com/' + project.game + '/' + project.id,
         projectName: (doc) => doc.querySelector('div.container h1.text-center').innerText,
         exampleURL: () => ['https://www.serveurliste.com/minecraft/', 'nossaria-serveur-survie', '#voter'],
         URL: () => 'serveurliste.com',
