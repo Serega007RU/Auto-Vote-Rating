@@ -64,7 +64,7 @@ async function run() {
 
 async function checkAll(first) {
     // Если пользователь использовал переводчик
-    if (document.querySelector('html')?.classList.contains('translated-ltr') || (document.querySelector('[_msttexthash]') && document.querySelector('[_msthash]'))) {
+    if (document.querySelector('html')?.classList.contains('translated-ltr') || document.querySelector('html > body > #goog-gt-tt') || (document.querySelector('[_msttexthash]') && document.querySelector('[_msthash]'))) {
         chrome.runtime.sendMessage({
             message: 'It looks like you have used the translator built into the browser, please disable the translator, it interferes with the work of the extension. If this is not the case and you have disabled the translator, inform the extension developer!',
             ignoreReport: true
@@ -153,7 +153,7 @@ async function checkAll(first) {
         }
         chrome.runtime.sendMessage({errorAuthVK: text, notAuth})
         return
-    } else if (document.location.search.includes('error=invalid_request&error_description=Invalid%20display%20parameter')) {
+    } else if (document.location.search.includes('error=invalid_request&error_description=Invalid%20display%20parameter') || document.location.search.includes('error=invalid_request&error_description=Invalid+display+parameter')) {
         chrome.runtime.sendMessage({errorAuthVK: 'Скорее всего ваш аккаунт ВК был заблокирован, если это не так и эта ошибка постоянно повторяется, сообщите разработчику расширения!'})
         return
     }
@@ -322,7 +322,7 @@ function throwError(error) {
         }
     // }
 
-    if (document.querySelector('html')?.classList.contains('translated-ltr') || (document.querySelector('[_msttexthash]') && document.querySelector('[_msthash]'))) {
+    if (document.querySelector('html')?.classList.contains('translated-ltr') || document.querySelector('html > body > #goog-gt-tt') || (document.querySelector('[_msttexthash]') && document.querySelector('[_msthash]'))) {
         ignoreReport = true
     }
 
