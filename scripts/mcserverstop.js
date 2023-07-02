@@ -1,5 +1,5 @@
 async function vote(first) {
-    if (document.querySelector('#content div.pform h1')?.textContent === 'Log in') {
+    if (document.querySelector('form input[value="Log in"]')) {
         chrome.runtime.sendMessage({auth: true})
         return
     }

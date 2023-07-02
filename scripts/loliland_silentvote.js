@@ -33,7 +33,11 @@ async function silentVoteLoliLand(project) {
             socket.close()
             if (json?.data?.type === 'success') {
                 endVote({successfully: true}, null, project)
-            } else if (json?.data?.type === 'error' && json?.data?.time) {
+            } else if (json?.data?.type === 'error' && json?.data?.time != null) {
+                if (json.data.time === '') {
+                    endVote({message: 'LoliLand вернул пустое время следующего голосования. Эта ошибка на стороне LoliLand\'а, просто перезапустите голосование, должно помочь', ignoreReport: true}, null, project)
+                    return
+                }
                 const numbers = json.data.time.match(/\d+/g).map(Number)
                 let hours = 0
                 let minutes = 0

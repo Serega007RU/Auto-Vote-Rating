@@ -4,7 +4,16 @@ async function vote(first) {
     // Мы иногда получаем просто пустую страницу без ничего
     // даже нет иконки обозначающей что что-то загружается (настолько говно код на сайте)
     // нам ничего не остаётся кроме как подождать что-то?
-    await wait(2500)
+    if (document.querySelector('#__next main')?.getElementsByTagName('*')?.length < 50) {
+        await new Promise(resolve => {
+            const timer = setInterval(() => {
+                if (document.querySelector('#__next main')?.getElementsByTagName('*')?.length > 50) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 100)
+        })
+    }
 
     //А это ещё один костыль дожидающий загрузки сайта
     if (document.querySelector('#__next h2')?.textContent.includes('Application error')) {

@@ -1,9 +1,9 @@
-async function vote(first) {
-    if (document.querySelector('div.nk-info-box.text-success.nk-info-box-noicon') != null) {
+async function vote(/*first*/) {
+    if (document.querySelector('div.nk-info-box.text-success.nk-info-box-noicon')) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
-    if (document.querySelector('div.container div.col-lg-6').textContent.includes('already voted')) {
+    if (document.querySelector('div.container div.col-lg-5').textContent.includes('already voted')) {
         chrome.runtime.sendMessage({later: true})
         return
     }

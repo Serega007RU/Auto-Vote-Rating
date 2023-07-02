@@ -1,12 +1,19 @@
 async function vote(first) {
     if (document.querySelector('div.main-panel > span.red') || document.querySelector('div.main-panel > div.red')) {
-        const message = document.querySelector('div.main-panel > span.red')?.textContent || document.querySelector('div.main-panel > div.red')?.textContent
-        if (message.toLowerCase().includes('already voted')) {
+        const request = {}
+        request.message = document.querySelector('div.main-panel > span.red')?.textContent || document.querySelector('div.main-panel > div.red')?.textContent
+        if (request.message.toLowerCase().includes('already voted')) {
             chrome.runtime.sendMessage({later: true})
+            return
+        } else if (request.message.toLowerCase().includes('captcha is not correct')) {
+            // None
         } else {
-            chrome.runtime.sendMessage({message})
+            if (request.message.includes('some problems sending your vote')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
+            return
         }
-        return
     }
 
     if (document.querySelector('div.main-panel > span.green') || document.querySelector('div.main-panel > div.green')) {

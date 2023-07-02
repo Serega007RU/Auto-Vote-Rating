@@ -15,7 +15,7 @@ function vote(first) {
         if (request.message.includes('Captcha incorrect') || request.message.includes('2Captcha')) {
             // None
         } else {
-            if (request.message.includes('avez effectué trop de tentative de vote pour')) {
+            if (request.message.includes('avez effectué trop de tentative de vote pour') || request.message.includes('connexion avec le service reCAPTCHA')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)

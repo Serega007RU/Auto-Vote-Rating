@@ -60,6 +60,7 @@ async function vote(first) {
         if (request.message.includes('требуется активировать аккаунт')) {
             request.ignoreReport = true
         }
+        chrome.runtime.sendMessage(request)
         return
     }
 
@@ -87,7 +88,7 @@ async function vote(first) {
     //Делаем форму голосования видимой
     document.querySelector('div.vote-fields').removeAttribute('style')
 
-    if (document.querySelector("div.g-recaptcha > div > div > iframe") != null && first) {
+    if (document.querySelector("div.g-recaptcha > div > div > iframe") && first) {
         return
     }
 
@@ -140,5 +141,5 @@ async function vote(first) {
         world.click()
     }
     //Кликает голосовать
-    document.getElementById('check_vote_form').click()
+    document.querySelector('#check_vote_form').click()
 }

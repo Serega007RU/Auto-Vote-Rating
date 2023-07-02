@@ -1,5 +1,17 @@
 async function vote(/*first*/) {
     //Дожидаемся полной загрузки сайта
+    if (document.querySelector('div.loading-bar')?.childElementCount === 0) {
+        await new Promise(resolve => {
+            const timer = setInterval(() => {
+                if (document.querySelector('div.loading-bar')?.childElementCount !== 0) {
+                    clearInterval(timer)
+                    resolve()
+                }
+            }, 100)
+        })
+    }
+
+    //Дожидаемся полной загрузки сайта
     // noinspection CssInvalidHtmlTagReference
     if (document.querySelector('iconify-icon.animate-spin')) {
         await new Promise(resolve => {

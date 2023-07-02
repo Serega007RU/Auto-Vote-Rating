@@ -7,7 +7,8 @@ async function vote(first) {
             || message.includes('hlas byl úspěšně přijatý')
             || message.includes('hlas bol úspešne prijatý')
             || message.includes('Dein Vote wurde akzeptiert')
-            || message.includes('Tvůj hlas byl úspěšne přijatý')) {
+            || message.includes('Tvůj hlas byl úspěšne přijatý')
+            || message.includes('głos został pomyślnie zaakceptowany')) {
             chrome.runtime.sendMessage({successfully: true})
         } else {
             chrome.runtime.sendMessage({message})
@@ -19,7 +20,8 @@ async function vote(first) {
         if (message.includes('next vote')
             || message.includes('možný hlas za tento server můžeš odeslat')
             || message.includes('možný hlas za tento server môžeš odoslať')
-            || message.includes('nächster Vote')) {
+            || message.includes('nächster Vote')
+            || message.includes('następny głos będzie możliwy')) {
             const numbers = message.match(/\d+/g).map(Number)
             chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] - 1, numbers[0], numbers[3], numbers[4], numbers[5]) + 3600000})
         } else {
@@ -32,7 +34,8 @@ async function vote(first) {
         if (message.includes('next vote')
             || message.includes('možný hlas za tento server můžeš odeslat')
             || message.includes('možný hlas za tento server môžeš odoslať')
-            || message.includes('nächster Vote')) {
+            || message.includes('nächster Vote')
+            || message.includes('następny głos będzie możliwy')) {
             const numbers = message.match(/\d+/g).map(Number)
             chrome.runtime.sendMessage({later: Date.UTC(numbers[2], numbers[1] - 1, numbers[0], numbers[3], numbers[4]) + 3600000})
             return
@@ -118,11 +121,16 @@ async function vote(first) {
 }
 
 const timer = setInterval(() => {
-    const message = querySelectorAll('.modal-body .text-danger')?.innerText
-    if (message && message.length > 3 && !message.includes('field is required') && !message.includes('pole je povinný')) {
+    const request = {}
+    request.message = querySelectorAll('.modal-body .text-danger')?.innerText
+    if (request.message?.length > 3 && !request.message.includes('field is required') && !request.message.includes('pole je povinný')) {
         clearInterval(timer)
+        if (request.message.includes('Nick je v špatném formátu')) {
+            request.ignoreReport = true
+            request.retryCoolDown = 604800000
+        }
         setTimeout(() => {
-            chrome.runtime.sendMessage({message})
+            chrome.runtime.sendMessage(request)
         }, 15000)
     }
 }, 1000)
