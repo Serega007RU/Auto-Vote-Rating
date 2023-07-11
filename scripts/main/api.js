@@ -368,7 +368,7 @@ function isUsedTranslator() {
         // Edge
         || (document.querySelector('[_msttexthash]') && document.querySelector('[_msthash]'))
         // Yandex
-        || document.querySelector('html')?.getAttribute('data-lt-installed')) {
+        || (document.querySelector('[data-translated]')?.getAttribute('data-translated') === 'true' && document.querySelector('[data-translated]')?.tagName?.toLowerCase().includes('ya-tr'))) {
         return true
     }
     return false
