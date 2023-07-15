@@ -1017,7 +1017,8 @@ var allProjects = {
             return project
         },
         notRequiredNick: () => true,
-        alertManualCaptcha: () => true
+        alertManualCaptcha: () => true,
+        timeout: () => ({hours: 12})
     },
     MinecraftServerSk: {
         voteURL: (project) => 'https://minecraft-server.sk/' + project.id + '/vote',
