@@ -60,7 +60,7 @@ const timer = setInterval(() => {
         if (request.message.includes('Thank you for voting')) {
             clearInterval(timer)
             chrome.runtime.sendMessage({successfully: true})
-        } else if (request.message.includes('Vote not completed. You can vote for this server once per day')) {
+        } else if (request.message.includes('can vote for this server once per day') || request.message.includes('can vote for this server again tomorrow in')) {
             clearInterval(timer)
             chrome.runtime.sendMessage({later: true})
         } else {

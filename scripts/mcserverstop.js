@@ -4,6 +4,11 @@ async function vote(first) {
         return
     }
 
+    if (document.querySelector('.pform .form-messages')) {
+        chrome.runtime.sendMessage({message: document.querySelector('.pform .form-messages').innerText, restartVote: false})
+        return
+    }
+
     if (checkAnswer()) return
 
     document.querySelector('.like.votebtn').click()

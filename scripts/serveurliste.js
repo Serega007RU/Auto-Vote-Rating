@@ -41,6 +41,9 @@ function checkAnswer() {
             const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
             return true
+        } else if (request.message.includes('ReCaptcha')) {
+            // Ignore
+            return false
         } else {
             chrome.runtime.sendMessage(request)
             return true

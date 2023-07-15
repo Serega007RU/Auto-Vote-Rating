@@ -3,6 +3,13 @@ async function vote(first) {
         chrome.runtime.sendMessage({successfully: true})
         return
     }
+
+    // Тупой костыль на успешный голос, сайт просто перестал писать что голос прошёл
+    if (document.location.search.includes('vote=1')) {
+        chrome.runtime.sendMessage({successfully: true})
+        return
+    }
+
     if (document.querySelector('div.alert.alert-danger')) {
         const request = {}
         request.message = document.querySelector('div.alert.alert-danger').innerText.trim()

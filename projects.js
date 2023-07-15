@@ -652,7 +652,7 @@ var allProjects = {
             const serverlist = project.game === 'www.minecraftkrant.nl' ? 'serverlijst' : 'servers'
             return 'https://' + project.game + '/' + serverlist + '/' + project.id
         },
-        projectName: (doc) => doc.querySelector('div.s_HeadTitle').innerText.trim(),
+        projectName: (doc) => doc.querySelector('div.s_HeadTitle h1').firstChild.textContent.trim(),
         exampleURL: () => ['https://www.minecraftkrant.nl/serverlijst/', 'torchcraft', '/vote'],
         URL: () => 'minecraftkrant.nl',
         parseURL: (url) => {
@@ -1503,7 +1503,8 @@ var allProjects = {
         projectName: () => null, // сайт-конструктор, отдаёт пустую страницу со скриптами на загрузку, название достать слишком сложно
         exampleURL: () => ['https://findmcserver.com/server/', 'sootmc', ''],
         URL: () => 'findmcserver.com',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 0})
     },
     ServeurListe: {
         voteURL: (project) => 'https://www.serveurliste.com/' + project.game + '/' + project.id + '#voter',
