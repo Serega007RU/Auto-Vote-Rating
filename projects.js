@@ -1524,6 +1524,8 @@ var allProjects = {
             ['discord', 'Discord'],
             ['garrys-mod', 'Garry\'s Mod']
         ]),
+        timeout: () => ({hours: 1, minutes: 30}),
+        limitedCountVote: () => true,
         oneProject: () => 1
     },
     CraftBook: {
