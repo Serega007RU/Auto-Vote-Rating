@@ -85,7 +85,7 @@ var allProjects = {
     ServeurPrive: {
         voteURL: (project) => 'https://serveur-prive.net/' + (project.lang === 'fr' ? '' : project.lang + '/') + project.game + '/' + project.id + '/vote',
         pageURL: (project) => 'https://serveur-prive.net/' + (project.lang === 'fr' ? '' : project.lang + '/') + project.game + '/' + project.id + '/vote',
-        projectName: (doc) => doc.querySelector('#t h2').textContent,
+        projectName: (doc) => doc.querySelector('.description h2').textContent,
         exampleURL: () => ['https://serveur-prive.net/minecraft/', 'gommehd-net-4932', '/vote'],
         URL: () => 'serveur-prive.net',
         parseURL: (url) => {
@@ -104,6 +104,7 @@ var allProjects = {
         },
         timeout: () => ({hours: 1, minutes: 30}),
         limitedCountVote: () => true,
+        alertManualCaptcha: () => true,
         exampleURLGame: () => ['https://serveur-prive.net/', 'minecraft', '/gommehd-net-4932'],
         defaultGame: () => 'minecraft',
         gameList: () => new Map([

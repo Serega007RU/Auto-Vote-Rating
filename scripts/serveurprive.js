@@ -1,16 +1,9 @@
 async function vote(first) {
     if (checkAnswer()) return
 
-    if (first) {
-        //Если у нас не настоящая капча, значит голосуем сразу без капчи
-        if (!document.querySelector('div.form > div.captcha img[alt="Captcha"]')) {
-            return
-        }
-    }
-
     const project = await getProject('ServeurPrive', true)
-    document.querySelector('#pseudo').value = project.nick
-    document.querySelector('#btnvote').click()
+    document.querySelector('#username').value = project.nick
+    chrome.runtime.sendMessage({captcha: true})
 }
 
 const timer = setInterval(()=>{
@@ -26,17 +19,15 @@ const timer = setInterval(()=>{
 
 function checkAnswer() {
     //Если есть ошибка
-    if (document.querySelector('.alert.alert-danger')) {
+    if (document.querySelector('.alert.alert-danger')?.innerText?.length) {
         const request = {}
-        request.message = document.querySelector('.alert.alert-danger').textContent
+        request.message = document.querySelector('.alert.alert-danger').innerText
         //Если не удалось пройти капчу
         if (request.message.includes('captcha') || request.message.includes('pseudo')) {
             return false
             //Если вы уже голосовали
         } else if (request.message.includes('Vous avez déjà voté pour ce serveur')) {
-            const numbers = document.querySelector('.alert.alert-danger').textContent.match(/\d+/g).map(Number)
-            const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
-            chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+            chrome.runtime.sendMessage({later: true})
         } else {
             if (request.message.toLowerCase().includes('proxy') && request.message.toLowerCase().includes('vpn')) {
                 request.ignoreReport = true
@@ -45,8 +36,8 @@ function checkAnswer() {
         }
         return true
     }
-    //Если успешное автоголосование
-    if (document.querySelector('.alert.alert-success') != null) {
+    //Если успешное авто-голосование
+    if (document.querySelector('.alert.alert-success')) {
         chrome.runtime.sendMessage({successfully: true})
         return true
     }
