@@ -57,11 +57,15 @@ async function vote(first) {
     if (document.querySelector('div.notice div.alert')) {
         const request = {}
         request.message = document.querySelector('div.notice div.alert').innerText
-        if (request.message.includes('требуется активировать аккаунт')) {
-            request.ignoreReport = true
+        if (request.message.includes('News')) {
+            // None
+        } else {
+            if (request.message.includes('требуется активировать аккаунт')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
+            return
         }
-        chrome.runtime.sendMessage(request)
-        return
     }
 
     if (document.querySelector('#vote_loading')) {
