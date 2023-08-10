@@ -6,15 +6,15 @@ async function silentVoteLoliLand(project) {
         return
     }
 
-    const cashedLogin = (await chrome.cookies.get({name: 'cashedLogin', url: 'https://loliland.ru/'}))?.value
-    const accessToken = (await chrome.cookies.get({name: 'accessToken', url: 'https://loliland.ru/'}))?.value
+    const cashedLogin = (await chrome.cookies.get({name: 'cashedLogin', url: 'https://loliland.net/'}))?.value
+    const accessToken = (await chrome.cookies.get({name: 'accessToken', url: 'https://loliland.net/'}))?.value
 
     if (!cashedLogin || !accessToken) {
-        endVote({message: 'Не удалось найти куки loliland\'а, скорее всего вы не авторизовались на сайте https://loliland.ru/'}, null, project)
+        endVote({message: 'Не удалось найти куки loliland\'а, скорее всего вы не авторизовались на сайте https://loliland.net/'}, null, project)
         return
     }
 
-    const socket = new WebSocket('wss://api.loliland.ru/ws')
+    const socket = new WebSocket('wss://api.loliland.io/ws')
 
     socket.onopen = function(event) {
         socket.send(JSON.stringify({data: {login: cashedLogin, key: accessToken}, packet: 'account.authToken'}))
@@ -27,7 +27,7 @@ async function silentVoteLoliLand(project) {
                 socket.send(JSON.stringify({data: {}, packet: 'bonus.get'}))
             } else {
                 socket.close()
-                endVote({message: 'Ошибка с авторизацией, скорее всего вы не авторизовались на сайте https://loliland.ru/, ' + event.data, url: socket.url}, null, project)
+                endVote({message: 'Ошибка с авторизацией, скорее всего вы не авторизовались на сайте https://loliland.net/, ' + event.data, url: socket.url}, null, project)
             }
         } else if (json.packet === 'bonus.get') {
             socket.close()
@@ -57,10 +57,10 @@ async function silentVoteLoliLand(project) {
                         endVote({message: 'Ошибка с кодом 0, Текущая сессия истекла'}, null, project)
                         break
                     case 1:
-                        endVote({message: 'Ошибка с кодом 1, Не выполнены условия для получения бонуса, Вы не привязали свой аккаунт к VK! Подробнее https://loliland.ru/bonus'}, null, project)
+                        endVote({message: 'Ошибка с кодом 1, Не выполнены условия для получения бонуса, Вы не привязали свой аккаунт к VK! Подробнее https://loliland.net/bonus'}, null, project)
                         break
                     case 2:
-                        endVote({message: 'Ошибка с кодом 2, Не выполнены условия для получения бонуса, Вы не подписаны на нашу группу в VK! Подробнее https://loliland.ru/bonus'}, null, project)
+                        endVote({message: 'Ошибка с кодом 2, Не выполнены условия для получения бонуса, Вы не подписаны на нашу группу в VK! Подробнее https://loliland.net/bonus'}, null, project)
                         break
                     case 3:
                         endVote({message: 'Ошибка с кодом 3, Расширение не может посчитать время до следующего голосования? Сообщите об этой ошибке разработчику расширения!', html: event.data, url: socket.url}, null, project)

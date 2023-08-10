@@ -1386,11 +1386,11 @@ var allProjects = {
         parseURL: (url) => ({id: url.pathname.split('/')[2]})
     },
     LoliLand: {
-        voteURL: () => 'https://loliland.ru/bonus',
-        pageURL: () => 'https://loliland.ru/bonus',
+        voteURL: () => 'https://loliland.net/bonus',
+        pageURL: () => 'https://loliland.net/bonus',
         projectName: () => 'Бонус за подписку',
-        exampleURL: () => ['https://loliland.ru/bonus', '', ''],
-        URL: () => 'loliland.ru',
+        exampleURL: () => ['https://loliland.net/bonus', '', ''],
+        URL: () => 'loliland.net',
         parseURL: () => ({id: 'bonus subscribe'}),
         timeout: () => ({
             hours: 24,
@@ -1400,6 +1400,7 @@ var allProjects = {
         notRequiredCaptcha: () => true,
         notRequiredNick: () => true,
         notRequiredId: () => true,
+        needAdditionalOrigins: ()=> ['https://*.loliland.ru/*', 'https://*.loliland.io/*'],
         needAdditionalPermissions: () => ['cookies']
     },
     MCServersTOP: {
@@ -1747,6 +1748,7 @@ var projectByURL = new Map([
     ['trackingservers.cloud', 'TrackingServers'],
     ['mclist.io', 'McListIo'],
     ['loliland.ru', 'LoliLand'],
+    ['loliland.net', 'LoliLand'],
     ['mcservers.top', 'MCServersTOP'],
     ['discadia.com', 'Discadia'],
     ['minecraftsurvivalservers.net', 'MinecraftSurvivalServers'],
