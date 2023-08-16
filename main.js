@@ -34,7 +34,7 @@ function onUnhandledError(event) {
     }
 
     if (self.createNotif) { // noinspection JSIgnoredPromiseFromCall
-        createNotif(error, 'error', null, null, true)
+        createNotif(error, 'error', {dontLog: true})
         document.querySelectorAll('button[disabled]').forEach((el) => el.disabled = false)
     }
 
@@ -83,7 +83,7 @@ async function initializeConfig(background, version) {
     dbLogs.onerror = (event) => dbError(event, true)
     function dbError(event, logs) {
         if (background) {
-            if (!settings || !settings.disabledNotifError) sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error.message, 'openSettings')
+            sendNotification(chrome.i18n.getMessage('errordbTitle', event.target.source.name), event.target.error.message, 'error', 'openSettings')
             if (logs) {
                 console._error(chrome.i18n.getMessage('errordb', [event.target.source.name, event.target.error.message]))
             } else {
@@ -124,7 +124,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion !== newVersion) {
         if (self.createNotif) {
             // noinspection ES6MissingAwait
-            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
+            createNotif(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]), 'hint')
         } else {
             console.log(chrome.i18n.getMessage('oldSettings', [oldVersion, newVersion]))
         }

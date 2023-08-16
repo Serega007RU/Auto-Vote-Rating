@@ -39,32 +39,32 @@ document.getElementById('nick').setAttribute('placeholder', chrome.i18n.getMessa
 document.querySelector('#load div').textContent = chrome.i18n.getMessage('load')
 
 //notifications
-async function createNotif(message, type, delay, element, dontLog) {
+async function createNotif(message, type, options = {}) {
     if (!message || message === '') message = 'An empty error, see the details in the console'
     if (!type) type = 'hint'
-    if (!dontLog) {
+    if (!options.dontLog) {
         if (type === 'error') console.error('['+type+']', message)
         else if (type === 'warn') console.warn('['+type+']', message)
         else console.log('['+type+']', message)
     }
-    if (element != null) {
-        element.textContent = ''
+    if (options.element != null) {
+        options.element.textContent = ''
         if (typeof message[Symbol.iterator] === 'function' && typeof message === 'object') {
-            for (const m of message) element.append(m)
+            for (const m of message) options.element.append(m)
         } else {
-            element.textContent = message
+            options.element.textContent = message
         }
-        element.className = type
+        options.element.className = type
         if (type === 'success') {
-            element.parentElement.parentElement.parentElement.firstElementChild.src = 'images/icons/success.svg'
+            options.element.parentElement.parentElement.parentElement.firstElementChild.src = 'images/icons/success.svg'
         }
         return
     }
     const notif = document.createElement('div')
     notif.classList.add('notif', 'show', type)
-    if (!delay) {
-        if (type === 'error') delay = 30000
-        else delay = 5000
+    if (!options.delay) {
+        if (type === 'error') options.delay = 30000
+        else options.delay = 5000
     }
 
     if (type !== 'hint') {
@@ -74,7 +74,7 @@ async function createNotif(message, type, delay, element, dontLog) {
         let progressBlock = document.createElement('div')
         progressBlock.classList.add('progress')
         let progressBar = document.createElement('div')
-        progressBar.style.animation = 'notif-progress '+delay/1000+'s linear'
+        progressBar.style.animation = 'notif-progress '+options.delay/1000+'s linear'
         progressBlock.append(progressBar)
         notif.append(progressBlock)
     }
@@ -120,14 +120,15 @@ async function createNotif(message, type, delay, element, dontLog) {
     document.getElementById('notifBlock').append(notif)
 
     let timer
-    if (type !== 'hint') timer = new Timer(()=> removeNotif(notif), delay)
+    if (type !== 'hint') timer = new Timer(()=> removeNotif(notif), options.delay)
 
     if (notif.previousElementSibling != null && notif.previousElementSibling.classList.contains('hint')) {
-        setTimeout(()=> removeNotif(notif.previousElementSibling), delay >= 3000 ? 3000 : delay)
+        setTimeout(()=> removeNotif(notif.previousElementSibling), options.delay >= 3000 ? 3000 : options.delay)
     }
 
     notif.addEventListener('click', (e)=> {
-        if (notif.querySelector('a') != null || notif.querySelector('button') != null) {
+        if (notif.querySelector('a') != null || notif.querySelector('button') != null || options.onClick) {
+            if (options.onClick) options.onClick()
             if (e.detail === 2) removeNotif(notif)
         } else {
             removeNotif(notif)
@@ -197,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
     }
 
     if (!onLine && !navigator.onLine) {
-        createNotif(chrome.i18n.getMessage('internetDisconected'), 'warn', 15000)
+        createNotif(chrome.i18n.getMessage('internetDisconected'), 'warn', {delay: 15000})
     }
 
     document.getElementById('rating').dispatchEvent(new Event('input'))
@@ -1215,7 +1216,7 @@ document.getElementById('timeoutVote').addEventListener('submit', async (event)=
 })
 
 async function addProject(project, element) {
-    createNotif(chrome.i18n.getMessage('adding'), null, null, element)
+    createNotif(chrome.i18n.getMessage('adding'), {element})
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
     let secondBonusText
@@ -1237,7 +1238,7 @@ async function addProject(project, element) {
             // noinspection JSUnresolvedFunction
             let found = await db.countFromIndex('projects', 'rating', project.rating)
             if (found >= allProjects[project.rating].oneProject?.()) {
-                createNotif(chrome.i18n.getMessage('oneProject', [project.rating, String(allProjects[project.rating].oneProject?.())]), 'error', null, element)
+                createNotif(chrome.i18n.getMessage('oneProject', [project.rating, String(allProjects[project.rating].oneProject?.())]), 'error', {element})
                 return
             }
         } else {
@@ -1246,9 +1247,9 @@ async function addProject(project, element) {
             if (found > 0) {
                 const message = chrome.i18n.getMessage('alreadyAdded')
                 if (!secondBonusText) {
-                    createNotif(message, 'success', null, element)
+                    createNotif(message, 'success', {element})
                 } else {
-                    createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', 30000, element)
+                    createNotif([message, document.createElement('br'), secondBonusText, secondBonusButton], 'success', {delay: 30000, element})
                 }
                 addProjectsBonus(project, element)
                 return
@@ -1260,7 +1261,7 @@ async function addProject(project, element) {
     if (!await checkPermissions([project])) return
 
     if (!(document.getElementById('disableCheckProjects').checked || project.rating === 'Custom')) {
-        createNotif(chrome.i18n.getMessage('checkHasProject'), null, null, element)
+        createNotif(chrome.i18n.getMessage('checkHasProject'), null, {element})
 
         let response
         try {
@@ -1272,10 +1273,10 @@ async function addProject(project, element) {
             }
         } catch (error) {
             if (error === 'TypeError: Failed to fetch') {
-                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error', null, element)
+                createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error', {element})
                 return
             } else {
-                createNotif(error.message, 'error', null, element)
+                createNotif(error.message, 'error', {element})
                 return
             }
         }
@@ -1284,15 +1285,15 @@ async function addProject(project, element) {
         if (allProjects[project.rating].ignoreErrors?.()) {
             // None
         } else if (response.status === 404) {
-            createNotif(chrome.i18n.getMessage('notFoundProjectCode', String(response.status)), 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notFoundProjectCode', String(response.status)), 'error', {element})
             return
         } else if (response.redirected) {
-            createNotif(chrome.i18n.getMessage('notFoundProjectRedirect', response.url), 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notFoundProjectRedirect', response.url), 'error', {element})
             return
         } else if (response.status === 503 || response.status === 403) { // Игнорируем проверку CloudFlare
             //None
         } else if (!response.ok) {
-            createNotif(chrome.i18n.getMessage('notConnect', [project.rating, String(response.status)]), 'error', null, element)
+            createNotif(chrome.i18n.getMessage('notConnect', [project.rating, String(response.status)]), 'error', {element})
             return
         }
 
@@ -1303,9 +1304,9 @@ async function addProject(project, element) {
             const notFound = allProjects[project.rating].notFound?.(doc, project)
             if (notFound) {
                 if (notFound === true) {
-                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', null, element)
+                    createNotif(chrome.i18n.getMessage('notFoundProject'), 'error', {element})
                 } else {
-                    createNotif(notFound, 'error', null, element)
+                    createNotif(notFound, 'error', {element})
                 }
                 return
             }
@@ -1316,21 +1317,21 @@ async function addProject(project, element) {
             console.error(error.message)
             if (!project.name) project.name = ''
         }
-        createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, null, element)
+        createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, {element})
 
         //Проверка авторизации ВКонтакте
         if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-            createNotif(chrome.i18n.getMessage('checkAuthVK'), null, null, element)
+            createNotif(chrome.i18n.getMessage('checkAuthVK'), null, {element})
             let url2 = authVKUrls.get(project.rating)
             let response2
             try {
                 response2 = await fetch(url2, {redirect: 'manual', credentials: 'include'})
             } catch (error) {
                 if (error === 'TypeError: Failed to fetch') {
-                    createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error', null, element)
+                    createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error', {element})
                     return
                 } else {
-                    createNotif(error.message, 'error', null, element)
+                    createNotif(error.message, 'error', {element})
                     return
                 }
             }
@@ -1346,7 +1347,7 @@ async function addProject(project, element) {
                 const text = document.createElement('div')
                 text.textContent = chrome.i18n.getMessage('authButton')
                 button.append(text)
-                createNotif([message, document.createElement('br'), button], 'warn', 30000, element)
+                createNotif([message, document.createElement('br'), button], 'warn', {delay: 30000, element})
                 button.addEventListener('click', event => {
                     if (element != null) {
                         openPopup(url2, ()=> document.location.reload(true))
@@ -1360,10 +1361,10 @@ async function addProject(project, element) {
                 })
                 return
             } else if (response2.status !== 0) {
-                createNotif(chrome.i18n.getMessage('notConnect', [extractHostname(response.url), String(response2.status)]), 'error', null, element)
+                createNotif(chrome.i18n.getMessage('notConnect', [extractHostname(response.url), String(response2.status)]), 'error', {element})
                 return
             }
-            createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), null, null, element)
+            createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), null, {element})
         }
     }
 
@@ -1394,9 +1395,9 @@ async function addProject(project, element) {
     //     array.push(a)
     // }
     if (array.length > 1) {
-        createNotif(array, 'success', 15000, element)
+        createNotif(array, 'success', {delay: 15000, element})
     } else {
-        createNotif(array, 'success', null, element)
+        createNotif(array, 'success', {element})
     }
 
     if (allProjects[project.rating].alertManualCaptcha?.()) {
@@ -1411,10 +1412,10 @@ function addProjectsBonus(project, element) {
 //      document.getElementById('secondBonusMythicalWorld').addEventListener('click', async()=>{
 //          let response = await fetch('https://mythicalworld.su/bonus')
 //          if (!response.ok) {
-//              createNotif(chrome.i18n.getMessage('notConnect', [response.url, String(response.status)]), 'error', null, element)
+//              createNotif(chrome.i18n.getMessage('notConnect', [response.url, String(response.status)]), 'error', {element})
 //              return
 //          } else if (response.redirected) {
-//              createNotif(chrome.i18n.getMessage('redirectedSecondBonus', response.url), 'error', null, element)
+//              createNotif(chrome.i18n.getMessage('redirectedSecondBonus', response.url), 'error', {element})
 //              return
 //          }
 //          await addProject('Custom', 'MythicalWorldBonus1Day', '{"credentials":"include","headers":{"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9","accept-language":"ru,en;q=0.9,en-US;q=0.8","cache-control":"max-age=0","content-type":"application/x-www-form-urlencoded","sec-fetch-dest":"document","sec-fetch-mode":"navigate","sec-fetch-site":"same-origin","sec-fetch-user":"?1","upgrade-insecure-requests":"1"},"referrer":"https://mythicalworld.su/bonus","referrerPolicy":"no-referrer-when-downgrade","body":"give=1&item=1","method":"POST","mode":"cors"}', null, 'https://mythicalworld.su/bonus', {ms: 86400000}, priorityOption, null)
@@ -1484,14 +1485,14 @@ async function checkPermissions(projects, element) {
                 // noinspection JSVoidFunctionReturnValueUsed
                 granted = await chrome.permissions.request({origins, permissions})
                 if (!granted) {
-                    createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
+                    createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', {element})
                     return false
                 } else {
                     return true
                 }
             } catch (error) {
                 if (!error.message.includes('must be called during a user gesture') && !error.message.includes('may only be called from a user input handler')) {
-                    createNotif(error.message, 'error', null, element)
+                    createNotif(error.message, 'error', {element})
                     return false
                 }
             }
@@ -1500,29 +1501,29 @@ async function checkPermissions(projects, element) {
         const button = document.createElement('button')
         button.textContent = chrome.i18n.getMessage('grant')
         button.classList.add('submitBtn')
-        createNotif([chrome.i18n.getMessage('grantUrl'), button], null, null, element)
+        createNotif([chrome.i18n.getMessage('grantUrl'), button], null, {element})
         granted = await new Promise(resolve=>{
             button.addEventListener('click', async ()=>{
                 try {
                     // noinspection JSVoidFunctionReturnValueUsed
                     granted = await chrome.permissions.request({origins, permissions})
                 } catch (error) {
-                    createNotif(error.message, 'error', null, element)
+                    createNotif(error.message, 'error', {element})
                     resolve(false)
                 }
                 if (element == null) removeNotif(button.parentElement.parentElement)
                 if (!granted) {
-                    createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', null, element)
+                    createNotif(chrome.i18n.getMessage('notGrantUrl'), 'error', {element})
                     resolve(false)
                 } else {
-                    if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', null, element)
+                    if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', {element})
                     resolve(true)
                 }
             })
         })
         return granted
     }
-    if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', null, element)
+    if (element != null) createNotif(chrome.i18n.getMessage('granted'), 'success', {element})
     return true
 }
 
@@ -1543,7 +1544,7 @@ function createMessage(text, level) {
 
 //Слушатель на экспорт настроек
 document.getElementById('file-download').addEventListener('click', async ()=>{
-    createNotif(chrome.i18n.getMessage('exporting'))
+    createNotif(chrome.i18n.getMessage('exporting'), 'hint')
     generalStats = await db.get('other', 'generalStats')
     todayStats = await db.get('other', 'todayStats')
     const allSetting = {
@@ -2353,6 +2354,28 @@ async function onMessage(request) {
         document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})
         highlight(document.getElementById('projects' + project.key))
         window.history.replaceState(null, null, 'options.html')
+    } else if (request.notification) {
+        if (request.notification.type !== 'warn' && request.notification.type !== 'error') request.notification.type = 'hint'
+        let onClick
+        if (request.notification.notificationId.startsWith('openTab_')) {
+            onClick = async () => {
+                const tabId = Number(request.notification.notificationId.replace('openTab_', ''))
+                if (!tabId) return
+                const tab = await chrome.tabs.update(tabId, {active: true})
+                if (!tab) return
+                await chrome.windows.update(tab.windowId, {focused: true})
+            }
+        } else if (request.notification.notificationId.startsWith('openProject_')) {
+            onClick = () => {
+                try {
+                    const projectKey = Number(request.notification.notificationId.replace('openProject_', ''))
+                    onMessage({openProject: projectKey})
+                } catch (error) {
+                    console.warn('Ошибка открытия настроек с определённым проектом', error.message)
+                }
+            }
+        }
+        createNotif([request.notification.title, document.createElement('br'), request.notification.message], request.notification.type, {onClick})
     }
 }
 

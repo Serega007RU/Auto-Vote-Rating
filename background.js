@@ -126,7 +126,7 @@ async function checkOpen(project, transaction) {
             // TODO к сожалению в Service Worker отсутствует слушатель на восстановление соединения с интернетом, у нас остаётся только 1 вариант, это попытаться снова запустить checkVote через минуту
             chrome.alarms.create('checkVote', {when: Date.now() + 65000})
 
-            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'), 'openProject_' + project.key)
+            sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'), 'error', 'openProject_' + project.key)
             console.warn(getProjectPrefix(project, true), chrome.i18n.getMessage('internetDisconected'))
             onLine = false
             db.put('other', onLine, 'onLine')
@@ -154,7 +154,7 @@ async function checkOpen(project, transaction) {
                     console.warn(getProjectPrefix(projectTimeout, true), 'nextAttempt is undefined, maybe it\'s an error')
                 }
                 console.warn(getProjectPrefix(projectTimeout, true), chrome.i18n.getMessage('timeout'))
-                if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(projectTimeout, false), chrome.i18n.getMessage('timeout'), 'openProject_' + project.key)
+                sendNotification(getProjectPrefix(projectTimeout, false), chrome.i18n.getMessage('timeout'), 'warn', 'openProject_' + project.key)
 
                 if (/*settings.enabledReportTimeout*/ value.rating === 'MMoTopRU' && Number.isInteger(tab) && !settings.disabledSendErrorSentry && value.nextAttempt && value.countInject) {
                     (async() => {
@@ -269,7 +269,7 @@ async function newWindow(project, opened) {
     }
 
     console.log(getProjectPrefix(project, true), chrome.i18n.getMessage('startedAutoVote'))
-    if (!settings.disabledNotifStart) sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'), 'openProject_' + project.key)
+    sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('startedAutoVote'), 'start', 'openProject_' + project.key)
 
     if (new Date(project.stats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(project.stats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         project.stats.lastMonthSuccessVotes = project.stats.monthSuccessVotes
@@ -785,7 +785,7 @@ async function catchTabError(error, project) {
             message += ' Try this solution: https://github.com/Serega007RU/Auto-Vote-Rating/wiki/Problems-with-Opera'
         }
         console.error(getProjectPrefix(project, true), error.message)
-        if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
+        sendNotification(getProjectPrefix(project, false), error.message, 'error', 'openProject_' + project.key)
         project.error = message
         updateValue('projects', project)
     }
@@ -1019,7 +1019,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         }
         if (!(request.captcha && settings.disabledWarnCaptcha)) {
             console.warn(getProjectPrefix(project, true), message)
-            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), message, 'openTab_' + sender.tab.id)
+            sendNotification(getProjectPrefix(project, false), message, 'warn', 'openTab_' + sender.tab.id)
             project.error = message
         }
         updateValue('projects', project)
@@ -1053,7 +1053,7 @@ async function tryCloseTab(tabId, project, attempt) {
         }
         if (!error.message.includes('No tab with id')) {
             console.warn(getProjectPrefix(project, true), error.message)
-            if (!settings.disabledNotifError) sendNotification(getProjectPrefix(project, false), error.message, 'openProject_' + project.key)
+            sendNotification(getProjectPrefix(project, false), error.message, 'error', 'openProject_' + project.key)
         }
     }
 }
@@ -1301,7 +1301,7 @@ async function endVote(request, sender, project) {
                 sendMessage = chrome.i18n.getMessage('successAutoVote')
             }
 
-            if (!settings.disabledNotifInfo) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
+            sendNotification(getProjectPrefix(project, false), sendMessage, 'info', 'openProject_' + project.key)
 
             project.stats.successVotes++
             project.stats.monthSuccessVotes++
@@ -1320,7 +1320,7 @@ async function endVote(request, sender, project) {
                 sendMessage = chrome.i18n.getMessage('alreadyVoted')
             }
 
-            if (!settings.disabledNotifWarn) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
+            sendNotification(getProjectPrefix(project, false), sendMessage, project.warn ? 'warn' : 'info', 'openProject_' + project.key)
 
             project.stats.laterVotes++
 
@@ -1363,7 +1363,7 @@ async function endVote(request, sender, project) {
         project.time = Date.now() + retryCoolDown
         project.error = message
         console.error(getProjectPrefix(project, true), sendMessage + ', ' + chrome.i18n.getMessage('timeStamp') + ' ' + project.time)
-        if (!settings.disabledNotifError && !(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage, 'openProject_' + project.key)
+        if (!(request.errorVote && request.errorVote[0].charAt(0) === '5')) sendNotification(getProjectPrefix(project, false), sendMessage, 'error', 'openProject_' + project.key)
 
         project.stats.errorVotes++
 
@@ -1572,15 +1572,26 @@ function concatTypedArrays(a, b) { // a, b TypedArray of same type
 }
 
 //Отправитель уведомлений
-function sendNotification(title, message, notificationId) {
+function sendNotification(title, message, type, notificationId) {
     if (!message) message = ''
+    if (!notificationId) notificationId = ''
+
+    if (settings?.disabledNotifStart && type === 'start') return
+    if (settings?.disabledNotifInfo && type === 'info') return
+
+    if (type === 'warn' || type === 'error') {
+        chrome.runtime.sendMessage({notification: {title, message, type, notificationId}})
+    }
+
+    if (settings?.disabledNotifWarn && type === 'warn') return
+    if (settings?.disabledNotifError && type === 'error') return
+
     let notification = {
         type: 'basic',
         iconUrl: 'images/icon128.png',
         title: title,
         message: message
     }
-    if (!notificationId) notificationId = ''
     chrome.notifications.create(notificationId, notification, function() {})
 }
 chrome.notifications.onClicked.addListener(async function (notificationId) {
