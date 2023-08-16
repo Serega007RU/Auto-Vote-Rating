@@ -122,6 +122,25 @@
 <a href="https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481">hoyolab.com</a>
 <a href="https://trackingservers.cloud/">trackingservers.cloud</a>
 <a href="https://mclist.io/">mclist.io</a>
+<a href="https://loliland.ru/">loliland.ru</a>
+<a href="https://mcservers.top/">mcservers.top</a>
+<a href="https://discadia.com/">discadia.com</a>
+<a href="https://minecraftsurvivalservers.net/">minecraftsurvivalservers.net</a>
+<a href="https://topservers.com/">topservers.com</a>
+<a href="https://genshindrop.com/">genshindrop.com</a>
+<a href="https://emeraldservers.com/">emeraldservers.com</a>
+<a href="https://loliland.ru/">loliland.ru</a>
+<a href="https://40servidoresmc.es/">40servidoresmc.es</a>
+<a href="https://minecraft-servers.biz/">minecraft-servers.biz</a>
+<a href="https://top-mc-servers.net/">top-mc-servers.net</a>
+<a href="https://minecraft-serverlist.com/">minecraft-serverlist.com</a>
+<a href="https://findmcserver.com/">findmcserver.com</a>
+<a href="https://serveurliste.com/">serveurliste.com</a>
+<a href="https://craftbook.cz/">craftbook.cz</a>
+<a href="https://rovelstars.com/">rovelstars.com</a>
+<a href="https://infinitybots.gg/">infinitybots.gg</a>
+<a href="https://botlist.me/">botlist.me</a>
+<a href="https://topminecraft.io/">topminecraft.io</a>
 </details>
 
 ### Links to the extension where you can install it:
