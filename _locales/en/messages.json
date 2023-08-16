@@ -1115,5 +1115,8 @@
   },
   "tooManyVoteAttempts": {
     "message": "There have been too many voting attempts at a time, it seems something has broken. Inform the extension developer about this error"
+  },
+  "access": {
+    "message": "Grant access"
   }
 }

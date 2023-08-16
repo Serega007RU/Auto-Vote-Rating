@@ -435,13 +435,37 @@ nav .logo img {
 	border-radius: 5px;
 }
 
+.projectStats img.access {
+	animation-duration: 1s;
+	animation-name: backgroundColorPalette;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+}
+
+.highlight {
+	animation-duration: 1s;
+	animation-name: backgroundColorPalette;
+	animation-iteration-count: 2;
+	animation-direction: alternate;
+}
+
+@keyframes backgroundColorPalette {
+	from {
+		background-color: unset;
+	}
+
+	to {
+		background-color: #a0a11e;
+	}
+}
+
 .projectsBlock .contentBlock .listcontent li img:hover {
 	cursor: pointer;
 	opacity: 1;
 }
 
 .projectStats img:hover {
-	background: #1a7bee;
+	background: #1a7bee !important;;
 }
 
 .projectStats img[src="images/icons/delete.svg"]:hover {

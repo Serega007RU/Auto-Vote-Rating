@@ -2421,6 +2421,33 @@ async function updateProjectText(project) {
         warnElement.textContent = ''
         if (project.error) {
             conventPlainTextToLinks(project.error, errorElement)
+            if (project.error.includes('Cannot access contents of the page')) {
+                const controlItems = el.querySelector('.controlItems')
+                if (!controlItems.querySelector('img.access')) {
+                    const img = document.createElement('div')
+                    const imgsvg = document.createElement('img')
+                    const imgtext = document.createElement('span')
+                    imgtext.classList.add('tooltiptext')
+                    imgtext.textContent = chrome.i18n.getMessage('access')
+                    img.classList.add('projectStats')
+                    imgsvg.src = 'images/icons/access.svg'
+                    imgsvg.classList.add('access')
+                    img.appendChild(imgsvg)
+                    img.appendChild(imgtext)
+                    controlItems.prepend(img)
+                    img.addEventListener('click', async() => {
+                        if (await checkPermissions([project])) {
+                            delete project.error
+                            await chrome.runtime.sendMessage({projectRestart: project, confirmed: true})
+                            createNotif(chrome.i18n.getMessage('restarted'), 'success')
+                        }
+                    })
+                }
+            } else if (el.querySelector('.controlItems img.access')) {
+                el.querySelector('.controlItems img.access').parentElement.remove()
+            }
+        } else if (el.querySelector('.controlItems img.access')) {
+            el.querySelector('.controlItems img.access').parentElement.remove()
         }
         if (project.warn) {
             conventPlainTextToLinks(project.warn, warnElement)
@@ -2534,16 +2561,9 @@ document.querySelector('button[data-resource="limitedModeButton2"]').addEventLis
 })
 
 function highlight(element) {
-    let defaultBG = element.style.backgroundColor
-    let defaultTransition = element.style.transition
+    if (element.classList.contains('highlight')) return
 
-    element.style.transition = "background 1s"
-    element.style.backgroundColor = "#a0a11e"
+    element.classList.add('highlight')
 
-    setTimeout(function() {
-        element.style.backgroundColor = defaultBG;
-        setTimeout(function() {
-            element.style.transition = defaultTransition;
-        }, 1000)
-    }, 1000)
+    element.addEventListener('animationend', () => element.classList.remove('highlight'))
 }
