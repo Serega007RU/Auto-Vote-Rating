@@ -1216,7 +1216,7 @@ document.getElementById('timeoutVote').addEventListener('submit', async (event)=
 })
 
 async function addProject(project, element) {
-    createNotif(chrome.i18n.getMessage('adding'), {element})
+    createNotif(chrome.i18n.getMessage('adding'), 'hint', {element})
 
     //Получение бонусов на проектах где требуется подтвердить получение бонуса
     let secondBonusText
@@ -1261,7 +1261,7 @@ async function addProject(project, element) {
     if (!await checkPermissions([project])) return
 
     if (!(document.getElementById('disableCheckProjects').checked || project.rating === 'Custom')) {
-        createNotif(chrome.i18n.getMessage('checkHasProject'), null, {element})
+        createNotif(chrome.i18n.getMessage('checkHasProject'), 'hint', {element})
 
         let response
         try {
@@ -1317,11 +1317,11 @@ async function addProject(project, element) {
             console.error(error.message)
             if (!project.name) project.name = ''
         }
-        createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), null, {element})
+        createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), 'hint', {element})
 
         //Проверка авторизации ВКонтакте
         if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
-            createNotif(chrome.i18n.getMessage('checkAuthVK'), null, {element})
+            createNotif(chrome.i18n.getMessage('checkAuthVK'), 'hint', {element})
             let url2 = authVKUrls.get(project.rating)
             let response2
             try {
@@ -1364,7 +1364,7 @@ async function addProject(project, element) {
                 createNotif(chrome.i18n.getMessage('notConnect', [extractHostname(response.url), String(response2.status)]), 'error', {element})
                 return
             }
-            createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), null, {element})
+            createNotif(chrome.i18n.getMessage('checkAuthVKSuccess'), 'hint', {element})
         }
     }
 
@@ -1501,7 +1501,7 @@ async function checkPermissions(projects, element) {
         const button = document.createElement('button')
         button.textContent = chrome.i18n.getMessage('grant')
         button.classList.add('submitBtn')
-        createNotif([chrome.i18n.getMessage('grantUrl'), button], null, {element})
+        createNotif([chrome.i18n.getMessage('grantUrl'), button], 'hint', {element})
         granted = await new Promise(resolve=>{
             button.addEventListener('click', async ()=>{
                 try {
@@ -1566,7 +1566,7 @@ document.getElementById('file-download').addEventListener('click', async ()=>{
 })
 
 document.getElementById('logs-download').addEventListener('click', async ()=>{
-    createNotif(chrome.i18n.getMessage('exporting'))
+    createNotif(chrome.i18n.getMessage('exporting'), 'hint')
     const logs = await dbLogs.getAll('logs')
     let text = ''
     for (const log of logs) {
@@ -1611,7 +1611,7 @@ async function usageSpace() {
 }
 //Очистка логов
 document.getElementById('logs-clear').addEventListener('click', async ()=>{
-    createNotif(chrome.i18n.getMessage('clearingLogs'))
+    createNotif(chrome.i18n.getMessage('clearingLogs'), 'hint')
     await dbLogs.clear('logs')
     usageSpace()
     createNotif(chrome.i18n.getMessage('clearedLogs'), 'success')
@@ -1619,7 +1619,7 @@ document.getElementById('logs-clear').addEventListener('click', async ()=>{
 
 //Слушатель на импорт настроек
 document.getElementById('file-upload').addEventListener('change', async (event)=>{
-    createNotif(chrome.i18n.getMessage('importing'))
+    createNotif(chrome.i18n.getMessage('importing'), 'hint')
     try {
         if (event.target.files.length === 0) return
         const [file] = event.target.files
