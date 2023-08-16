@@ -6,8 +6,14 @@ async function silentVoteLoliLand(project) {
         return
     }
 
-    const cashedLogin = (await chrome.cookies.get({name: 'cashedLogin', url: 'https://loliland.net/'}))?.value
-    const accessToken = (await chrome.cookies.get({name: 'accessToken', url: 'https://loliland.net/'}))?.value
+    let cashedLogin = (await chrome.cookies.get({name: 'cashedLogin', url: 'https://loliland.ru/'}))?.value
+    let accessToken = (await chrome.cookies.get({name: 'accessToken', url: 'https://loliland.ru/'}))?.value
+
+
+    if (!cashedLogin || !accessToken) {
+        cashedLogin = (await chrome.cookies.get({name: 'cashedLogin', url: 'https://loliland.net/'}))?.value
+        accessToken = (await chrome.cookies.get({name: 'accessToken', url: 'https://loliland.net/'}))?.value
+    }
 
     if (!cashedLogin || !accessToken) {
         endVote({message: 'Не удалось найти куки loliland\'а, скорее всего вы не авторизовались на сайте https://loliland.net/'}, null, project)
