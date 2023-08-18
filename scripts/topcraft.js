@@ -111,7 +111,7 @@ const timer = setInterval(()=>{
 //Фикс-костыль на случай если у нас ошибка в vote запросе
 const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-        if (entry.name === 'https://topcraft.ru/projects/vote/') {
+        if (entry.name === 'https://topcraft.club/projects/vote/') {
             fixTimer = setTimeout(()=>{
                 chrome.runtime.sendMessage({message: 'Мы получили что vote запрос прошёл но ответ от TopCraft так и не поступил, скорее всего в vote запросе произошла ошибка, смотрите подробности в консоли в момент голосования', ignoreReport: true})
             }, 5000)

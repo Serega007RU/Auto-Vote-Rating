@@ -3,14 +3,14 @@
 
 var allProjects = {
     TopCraft: {
-        voteURL: (project) => 'https://topcraft.ru/servers/' + project.id + '/',
-        pageURL: (project) => 'https://topcraft.ru/servers/' + project.id + '/',
+        voteURL: (project) => 'https://topcraft.club/servers/' + project.id + '/',
+        pageURL: (project) => 'https://topcraft.club/servers/' + project.id + '/',
         projectName: (doc) => doc.querySelector('.project-header > h1').textContent,
-        exampleURL: () => ['https://topcraft.ru/servers/', '10496', '/'],
-        URL: () => 'topcraft.ru',
+        exampleURL: () => ['https://topcraft.club/servers/', '10496', '/'],
+        URL: () => 'topcraft.club',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
         timeout: () => ({hour: 21}),
-        needAdditionalOrigins: ()=> ['*://*.vk.com/*']
+        needAdditionalOrigins: ()=> ['https://*.topcraft.ru/*', '*://*.vk.com/*']
     },
     McTOP: {
         voteURL: (project) => 'https://mctop.su/servers/' + project.id + '/',
@@ -1618,6 +1618,7 @@ var allProjects = {
 
 var projectByURL = new Map([
     ['topcraft.ru', 'TopCraft'],
+    ['topcraft.club', 'TopCraft'],
     ['mctop.su', 'McTOP'],
     ['mcrate.su', 'MCRate'],
     ['minecraftrating.ru', 'MinecraftRating'],

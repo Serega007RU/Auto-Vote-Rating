@@ -1,7 +1,7 @@
 # Auto Vote Rating - Chrome Extension
 <details>
 <summary>List of sites that the extension supports</summary>
-<a href="http://topcraft.ru/">topcraft.ru</a>  
+<a href="http://topcraft.club/">topcraft.club</a>  
 <a href="https://mctop.su/">mctop.su</a>  
 <a href="http://mcrate.su/">mcrate.su</a>  
 <a href="http://minecraftrating.ru/">minecraftrating.ru</a>  
