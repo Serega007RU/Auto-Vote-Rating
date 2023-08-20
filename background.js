@@ -9,7 +9,7 @@ importScripts('main.js')
 // TODO отложенный importScripts пока не работают, подробнее https://bugs.chromium.org/p/chromium/issues/detail?id=1198822
 self.addEventListener('install', () => {
     importScripts('libs/linkedom.js')
-    importScripts('libs/evalCore.umd.js')
+    // importScripts('libs/evalCore.umd.js')
     importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/serverpact_silentvote.js', 'scripts/hoyolab_silentvote.js', 'scripts/loliland_silentvote.js', 'scripts/genshindrop_silentvote.js')
 })
 
