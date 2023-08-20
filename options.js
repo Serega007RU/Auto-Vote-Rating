@@ -214,7 +214,8 @@ document.addEventListener('DOMContentLoaded', async()=>{
 
 window.addEventListener('load', async () => {
     await initializeFunc
-    if (!settings.disabledUseRemoteCode) {
+    // noinspection PointlessBooleanExpressionJS
+    if (false && !settings.disabledUseRemoteCode) {
         if (!evil) { // noinspection JSUnresolvedVariable,JSUnresolvedFunction
             evil = evalCore.getEvalInstance(self)
         }

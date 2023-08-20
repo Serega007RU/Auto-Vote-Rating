@@ -156,7 +156,8 @@ async function checkOpen(project, transaction) {
                 console.warn(getProjectPrefix(projectTimeout, true), chrome.i18n.getMessage('timeout'))
                 sendNotification(getProjectPrefix(projectTimeout, false), chrome.i18n.getMessage('timeout'), 'warn', 'openProject_' + project.key)
 
-                if (/*settings.enabledReportTimeout*/ value.rating === 'MMoTopRU' && Number.isInteger(tab) && !settings.disabledSendErrorSentry && value.nextAttempt && value.countInject) {
+                // noinspection PointlessBooleanExpressionJS
+                if (false && /*settings.enabledReportTimeout*/ value.rating === 'MMoTopRU' && Number.isInteger(tab) && !settings.disabledSendErrorSentry && value.nextAttempt && value.countInject) {
                     (async() => {
                         try {
                             // noinspection JSCheckFunctionSignatures
@@ -232,7 +233,8 @@ async function checkOpen(project, transaction) {
         }
     }
 
-    if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
+    // noinspection PointlessBooleanExpressionJS
+    if (false && !settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
         evilProjects = Date.now() + 300000
         promises.push(fetchProjects())
         async function fetchProjects() {
@@ -416,7 +418,8 @@ async function silentVote(project) {
             return
         }
 
-        if (!settings.disabledUseRemoteCode) {
+        // noinspection PointlessBooleanExpressionJS
+        if (false && !settings.disabledUseRemoteCode) {
             try {
                 const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_silentvote.js')
                 const textScript = await response.text()
@@ -455,7 +458,8 @@ async function silentVote(project) {
         } else {
             let message
             if (error.stack) {
-                if (!settings.disabledUseRemoteCode) {
+                // noinspection PointlessBooleanExpressionJS
+                if (false && !settings.disabledUseRemoteCode) {
                     message = error.toString()
                 } else {
                     message = error.stack
@@ -656,7 +660,8 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
         let eval = true
         let textApi, textScript, textWorld
-        if (!settings.disabledUseRemoteCode) {
+        // noinspection PointlessBooleanExpressionJS
+        if (false && !settings.disabledUseRemoteCode) {
             try {
                 const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/api.js')
                 textApi = await responseApi.text()
@@ -1114,7 +1119,8 @@ async function endVote(request, sender, project) {
             }
         }
 
-        if (!settings.disabledSendErrorSentry && !settings.disabledUseRemoteCode && !request.ignoreReport && !request.incorrectDomain && (request.message != null || request.errorVoteNoElement || request.emptyError || (request.timeout && settings.enabledReportTimeout) || (request.tooManyVoteAttempts && settings.enabledReportTooManyAttempts))) {
+        // noinspection PointlessBooleanExpressionJS
+        if (false && !settings.disabledSendErrorSentry && !settings.disabledUseRemoteCode && !request.ignoreReport && !request.incorrectDomain && (request.message != null || request.errorVoteNoElement || request.emptyError || (request.timeout && settings.enabledReportTimeout) || (request.tooManyVoteAttempts && settings.enabledReportTooManyAttempts))) {
             try {
                 await reportError(request, sender, project)
             } catch (error) {
@@ -1131,7 +1137,8 @@ async function endVote(request, sender, project) {
         }
     }
 
-    if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
+    // noinspection PointlessBooleanExpressionJS
+    if (false && !settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
         evilProjects = Date.now() + 300000
         try {
             const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
