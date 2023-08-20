@@ -43,9 +43,9 @@ async function createNotif(message, type, options = {}) {
     if (!message || message === '') message = 'An empty error, see the details in the console'
     if (!type) type = 'hint'
     if (!options.dontLog) {
-        if (type === 'error') console.error('['+type+']', message)
-        else if (type === 'warn') console.warn('['+type+']', message)
-        else console.log('['+type+']', message)
+        if (type === 'error' && (message instanceof Error || message.stack || message.message)) console.error('['+type+']', message)
+        // else if (type === 'warn') console.warn('['+type+']', message)
+        // else console.log('['+type+']', message)
     }
     if (options.element != null) {
         options.element.textContent = ''
@@ -420,7 +420,7 @@ async function addProjectList(project, preBend) {
                         // noinspection JSVoidFunctionReturnValueUsed
                         await chrome.runtime.sendMessage({projectRestart: project, confirmed: true})
                     } catch (error) {
-                        createNotif(error.message, 'error')
+                        createNotif(error, 'error')
                         return
                     } finally {
                         clearTimeout(timer)
@@ -430,7 +430,7 @@ async function addProjectList(project, preBend) {
                 }
             }
         } catch (error) {
-            createNotif(error.message, 'error')
+            createNotif(error, 'error')
             return
         } finally {
             event.target.disabled = false
@@ -556,7 +556,7 @@ async function removeProjectList(project, editing, event) {
                 return false
             }
         } catch (error) {
-            createNotif(error.message, 'error')
+            createNotif(error, 'error')
             return false
         } finally {
             clearTimeout(timer)
@@ -989,7 +989,7 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
                 return
             }
         } catch (error) {
-            createNotif(error.message, 'error')
+            createNotif(error, 'error')
             event.submitter.disabled = false
             return
         }
@@ -1125,7 +1125,7 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
         try {
             body = JSON.parse(document.getElementById('customBody').value)
         } catch (error) {
-            createNotif(error.message, 'error')
+            createNotif(error, 'error')
             event.submitter.disabled = false
             return
         }
@@ -1277,7 +1277,7 @@ async function addProject(project, element) {
                 createNotif(chrome.i18n.getMessage('notConnectInternet'), 'error', {element})
                 return
             } else {
-                createNotif(error.message, 'error', {element})
+                createNotif(error, 'error', {element})
                 return
             }
         }
@@ -1332,7 +1332,7 @@ async function addProject(project, element) {
                     createNotif(chrome.i18n.getMessage('notConnectInternetVPN'), 'error', {element})
                     return
                 } else {
-                    createNotif(error.message, 'error', {element})
+                    createNotif(error, 'error', {element})
                     return
                 }
             }
@@ -1493,7 +1493,7 @@ async function checkPermissions(projects, element) {
                 }
             } catch (error) {
                 if (!error.message.includes('must be called during a user gesture') && !error.message.includes('may only be called from a user input handler')) {
-                    createNotif(error.message, 'error', {element})
+                    createNotif(error, 'error', {element})
                     return false
                 }
             }
@@ -1509,7 +1509,7 @@ async function checkPermissions(projects, element) {
                     // noinspection JSVoidFunctionReturnValueUsed
                     granted = await chrome.permissions.request({origins, permissions})
                 } catch (error) {
-                    createNotif(error.message, 'error', {element})
+                    createNotif(error, 'error', {element})
                     resolve(false)
                 }
                 if (element == null) removeNotif(button.parentElement.parentElement)
@@ -1656,7 +1656,7 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
 
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
     } catch (error) {
-        createNotif(error.message, 'error')
+        createNotif(error, 'error')
     } finally {
         document.getElementById('file-upload').value = ''
     }
