@@ -3,7 +3,13 @@ async function vote(first) {
 
     const project = await getProject('ServeurPrive', true)
     document.querySelector('#username').value = project.nick
-    chrome.runtime.sendMessage({captcha: true})
+
+    //Если у нас не настоящая капча, значит голосуем сразу без капчи
+    if (document.querySelector('div.form > div.captcha img[alt="Captcha"]')) {
+        document.querySelector('#voteBtn').click()
+    } else {
+        chrome.runtime.sendMessage({captcha: true})
+    }
 }
 
 const timer = setInterval(()=>{
