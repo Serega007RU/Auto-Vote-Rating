@@ -653,7 +653,6 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById("timeoutError").parentElement.removeAttribute('style')
                 document.getElementById('timeoutVote').parentElement.removeAttribute('style')
                 document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
-                document.getElementById("disabledFocusedTab").parentElement.removeAttribute('style')
                 document.getElementById("disabledDebug").parentElement.removeAttribute('style')
                 document.getElementById("disableCloseTabsOnSuccess").parentElement.removeAttribute('style')
                 document.getElementById("disableCloseTabsOnError").parentElement.removeAttribute('style')
@@ -667,7 +666,6 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById("timeoutError").parentElement.style.display = 'none'
                 document.getElementById('timeoutVote').parentElement.style.display = 'none'
                 document.getElementById("disabledOneVote").parentElement.style.display = 'none'
-                document.getElementById("disabledFocusedTab").parentElement.style.display = 'none'
                 document.getElementById("disabledDebug").parentElement.style.display = 'none'
                 document.getElementById("disableCloseTabsOnSuccess").parentElement.style.display = 'none'
                 document.getElementById("disableCloseTabsOnError").parentElement.style.display = 'none'
@@ -1403,6 +1401,9 @@ async function addProject(project, element) {
 
     if (allProjects[project.rating].alertManualCaptcha?.()) {
         alert(chrome.i18n.getMessage('alertCaptcha'))
+    }
+    if (allProjects[project.rating].focusedTab?.(project)) {
+        alert(chrome.i18n.getMessage('alertFocusedTab'))
     }
 
     addProjectsBonus(project, element)

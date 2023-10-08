@@ -79,6 +79,11 @@ async function checkVote() {
     if (doubleCheck) {
         doubleCheck = false
         checkVote()
+    } else {
+        // Голосование завершилось и более не планируется
+        if (!openedProjects.size) {
+            promises = []
+        }
     }
 }
 
@@ -341,7 +346,7 @@ async function newWindow(project, opened) {
 
         const url = allProjects[project.rating].voteURL(project)
 
-        let tab = await tryOpenTab({url, active: settings.disabledFocusedTab}, project, 0)
+        let tab = await tryOpenTab({url, active: settings.disabledFocusedTab || Boolean(allProjects[project.rating].focusedTab?.(project))}, project, 0)
         if (tab == null) return
         openedProjects.set(tab.id, opened)
         openedProjects.delete('start_' + project.key)
@@ -712,7 +717,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 }
             } else {
                 if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'.js, scripts/main/api.js to ' + details.url)
-                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/main/hacktimer.js', 'scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
                 // noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 if (allProjects[project.rating]?.needWorld?.()) {
                     if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'_world.js to ' + details.url + ' in MAIN world')
@@ -765,7 +770,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             //     await chrome.tabs.sendMessage(details.tabId, {textEval: true, textCaptcha})
             // } else {
                 if (settings.debug) console.log('Injecting scripts/main/captchaclicker.js to ' + details.url)
-                await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['scripts/main/captchaclicker.js']})
+                await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['scripts/main/hacktimer.js', 'scripts/main/captchaclicker.js']})
             // }
 
             // Если вкладка уже загружена, повторно туда высылаем sendProject который обозначает что мы готовы к голосованию
@@ -884,6 +889,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 })
 
+let fakeIdToId = {};
 async function onRuntimeMessage(request, sender, sendResponse) {
     if (request === 'reloadCaptcha') {
         // noinspection JSVoidFunctionReturnValueUsed,JSCheckFunctionSignatures
@@ -910,6 +916,24 @@ async function onRuntimeMessage(request, sender, sendResponse) {
             if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
                 console.warn(error.message)
             }
+        }
+        return
+    } else if (request.HackTimer) {
+        if (request.name === 'setInterval') {
+            fakeIdToId[request.fakeId] = setInterval(function () {
+                triggerTimer(request.name, sender, request.fakeId);
+            }, request.time);
+        } else if (request.name === 'clearInterval') {
+            clearInterval(fakeIdToId[request.fakeId]);
+            delete fakeIdToId[request.fakeId];
+        } else if (request.name === 'setTimeout') {
+            fakeIdToId[request.fakeId] = setTimeout(function () {
+                triggerTimer(request.name, sender, request.fakeId);
+                delete fakeIdToId[request.fakeId];
+            }, request.time);
+        } else if (request.name === 'clearTimeout') {
+            clearTimeout(fakeIdToId[request.fakeId]);
+            delete fakeIdToId[request.fakeId];
         }
         return
     }
@@ -1030,6 +1054,15 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         updateValue('projects', project)
     } else {
         endVote(request, sender, opened)
+    }
+}
+
+async function triggerTimer(name, sender, fakeId) {
+    try {
+        await chrome.tabs.sendMessage(sender.tab.id, {HackTimer: true, fakeId}, {documentId: sender.documentId, frameId: sender.frameId});
+    } catch (error) {
+        if (name === 'setInterval') clearInterval(fakeIdToId[fakeId]);
+        delete fakeIdToId[fakeId];
     }
 }
 
@@ -1411,9 +1444,6 @@ async function endVote(request, sender, project) {
             }
         }
         db.put('other', openedProjects, 'openedProjects')
-        if (openedProjects.size === 0) {
-            promises = []
-        }
         checkVote()
     }
 
@@ -1587,7 +1617,15 @@ function sendNotification(title, message, type, notificationId) {
     if (settings?.disabledNotifInfo && type === 'info') return
 
     if (type === 'warn' || type === 'error') {
-        chrome.runtime.sendMessage({notification: {title, message, type, notificationId}})
+        (async () => {
+            try {
+                await chrome.runtime.sendMessage({notification: {title, message, type, notificationId}})
+            } catch (error) {
+                if (!error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received')) {
+                    console.warn(error.message)
+                }
+            }
+        })()
     }
 
     if (settings?.disabledNotifWarn && type === 'warn') return

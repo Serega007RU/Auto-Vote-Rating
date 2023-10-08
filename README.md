@@ -166,3 +166,4 @@ Here is a short guide how to install an unpacked extension on Google Chrome or C
 ### [IDB](https://github.com/jakearchibald/idb)
 ### [LinkeDOM](https://github.com/WebReflection/linkedom) (also [Polyfill](https://github.com/regseb/castkodi/tree/main/src/polyfill))
 ### [eval5](https://github.com/bplok20010/eval5) & [babel](https://github.com/babel/babel) (also [chrome-inject-eval](https://github.com/GrinZero/chrome-inject-eval))
+### [HackTimer](https://github.com/turuslan/HackTimer)

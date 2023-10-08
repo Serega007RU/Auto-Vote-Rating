@@ -431,6 +431,7 @@ var allProjects = {
             ['servers', 'Guilds']
         ]),
         notRequiredNick: () => true,
+        focusedTab: () => true,
         additionExampleURL: () => ['https://top.gg/bot/617037497574359050/vote', '?currency=DOGE', ''],
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
