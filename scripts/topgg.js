@@ -34,7 +34,7 @@ async function vote(first) {
                     chrome.runtime.sendMessage({successfully: true})
                     clearInterval(timer1)
                 } else if (result.textContent.toLowerCase().includes('already voted')) {
-                    if (countAlreadyVoted > 5) {
+                    if (countAlreadyVoted > 15) {
                         chrome.runtime.sendMessage({later: true})
                         clearInterval(timer1)
                     } else {
@@ -57,7 +57,7 @@ async function vote(first) {
     }, 1000)
 
     // TODO этот костыль сделан из-за того что сайт сначало показывает что вот голосуй, а потом через несколько секунд пишет "Вы уже голосовали"
-    await wait(Math.floor(Math.random() * (10000 - 5000) + 5000))
+    await wait(Math.floor(Math.random() * (15000 - 10000) + 10000))
 
     const timer2 = setInterval(() => {
         try {
