@@ -23,6 +23,18 @@ const timer = setInterval(()=>{
     }
 }, 1000)
 
+const timer2 = setInterval(() => {
+    try {
+        if (document.querySelector('div.iconcaptcha-modal__body-title')?.textContent?.includes?.('Complété')) {
+            clearInterval(timer2)
+            document.querySelector('#voteBtn').click()
+        }
+    } catch (error) {
+        clearInterval(timer2)
+        throwError(error)
+    }
+}, 1000)
+
 function checkAnswer() {
     //Если есть ошибка
     if (document.querySelector('.alert.alert-danger')?.innerText?.length) {
@@ -40,6 +52,14 @@ function checkAnswer() {
             }
             chrome.runtime.sendMessage(request)
         }
+        return true
+    }
+    // Если мы видим таймер показывающий сколько осталось до следующего голосования
+    if (document.querySelector('#cooldown div.counter')) {
+        const message = document.querySelector('#cooldown div.counter').innerText
+        const numbers = message.match(/\d+/g).map(Number)
+        const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000) + (numbers[2] * 1000)
+        chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         return true
     }
     //Если успешное авто-голосование
