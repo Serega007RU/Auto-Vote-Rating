@@ -4,8 +4,8 @@ async function vote(first) {
     if (first) return
 
     const project = await getProject('MinecraftServersOrg')
-    document.querySelector('#vote-form input[name="username"]').value = project.nick
-    document.querySelector('#vote-btn').click()
+    document.querySelector('#vote-form #username').value = project.nick
+    document.querySelector('#vote-form button[type="submit"]').click()
 }
 
 const timer = setInterval(()=>{
@@ -23,9 +23,9 @@ function checkAnswer() {
     //     clearInterval(timer)
     //     return true
     // }
-    if (document.querySelector('#error-message')) {
+    if (document.querySelector('#vote div[class="auth-msg"]')) {
         const request = {}
-        request.message = document.querySelector('#error-message').innerText
+        request.message = document.querySelector('#vote div[class="auth-msg"]').innerText
         if (request.message.includes('already voted') || request.message.includes('reached your daily voting limit')) {
             const numbers = request.message.match(/\d+/g).map(Number)
             const milliseconds = (numbers[0] * 60 * 60 * 1000) + (numbers[1] * 60 * 1000)/* + (sec * 1000)*/

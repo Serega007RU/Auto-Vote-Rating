@@ -75,12 +75,11 @@ var allProjects = {
     MinecraftServersOrg: {
         voteURL: (project) => 'https://minecraftservers.org/vote/' + project.id,
         pageURL: (project) => 'https://minecraftservers.org/server/' + project.id,
-        projectName: (doc) => doc.querySelector('#left h1').textContent,
+        projectName: (doc) => doc.querySelector('div.header-bar div.text').innerText,
         exampleURL: () => ['https://minecraftservers.org/vote/', '25531', ''],
         URL: () => 'minecraftservers.org',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        timeout: () => ({hour: 0}),
-        oneProject: () => 1
+        timeout: () => ({hour: 0})
     },
     ServeurPrive: {
         voteURL: (project) => 'https://serveur-prive.net/' + (project.lang === 'fr' ? '' : project.lang + '/') + project.game + '/' + project.id + '/vote',
