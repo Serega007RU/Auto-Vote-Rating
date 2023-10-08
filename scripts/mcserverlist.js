@@ -2,7 +2,7 @@ async function vote() {
     if (document.querySelector('div.alert')) {
         if (document.querySelector('div.alert-danger')) {
             const message = document.querySelector('div.alert-danger').textContent
-            if (message.includes('jsi hlasoval')) {
+            if (message.includes('already voted')) {
                 chrome.runtime.sendMessage({later: true})
             } else {
                 chrome.runtime.sendMessage({message})
@@ -24,7 +24,7 @@ const timer = setInterval(()=>{
             clearInterval(timer)
             if (document.querySelector('div.alert-danger')) {
                 const message = document.querySelector('div.alert-danger').textContent
-                if (message.includes('jsi hlasoval')) {
+                if (message.includes('already voted')) {
                     chrome.runtime.sendMessage({later: true})
                 } else {
                     chrome.runtime.sendMessage({message})

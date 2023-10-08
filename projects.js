@@ -557,12 +557,21 @@ var allProjects = {
         alertManualCaptcha: () => true
     },
     MCServerList: {
-        voteURL: (project) => 'https://mcserver-list.eu/hlasovat/' + project.id,
-        pageURL: (project) => 'https://mcserver-list.eu/hlasovat/' + project.id,
+        voteURL: (project) => 'https://mcserver-list.eu/vote/' + project.id,
+        pageURL: (project) => 'https://mcserver-list.eu/server/' + project.id,
         projectName: (doc) => doc.querySelector('.serverdetail h1').textContent,
-        exampleURL: () => ['https://mcserver-list.eu/hlasovat/', '416', ''],
+        exampleURL: () => ['https://mcserver-list.eu/server/', '416', ''],
         URL: () => 'mcserver-list.eu',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        parseURL: (url) => {
+            const project = {}
+            const paths = url.pathname.split('/')
+            if (paths[1].length === 2) {
+                project.id = url.pathname.split('/')[3]
+            } else {
+                project.id = url.pathname.split('/')[2]
+            }
+            return project
+        },
         timeout: () => ({hours: 2}),
         silentVote: () => true,
         limitedCountVote: () => true,
