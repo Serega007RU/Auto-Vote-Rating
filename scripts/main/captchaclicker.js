@@ -153,7 +153,7 @@ function run() {
 
         // Если мы прошли капчу CloudFlare
         const timer8 = setInterval(() => {
-            if (document.querySelector('#cf-stage #success')?.style.display !== 'none') {
+            if (document.querySelector('#success') && document.querySelector('#success').style.display !== 'none') {
                 clearInterval(timer8)
                 chrome.runtime.sendMessage('captchaPassed')
             }
