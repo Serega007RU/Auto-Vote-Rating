@@ -373,7 +373,7 @@ async function checkWindow() {
         .catch(error => console.warn(chrome.i18n.getMessage('errorOpenTab', error.message)))
     if (!windows?.length) {
         const window = await chrome.windows.create({focused: false})
-        await chrome.windows.update(window.id, {focused: false})
+        await chrome.windows.update(window.id, {focused: false, drawAttention: false})
     }
 }
 
