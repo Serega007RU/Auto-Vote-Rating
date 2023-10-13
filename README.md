@@ -141,6 +141,9 @@
 <a href="https://infinitybots.gg/">infinitybots.gg</a>
 <a href="https://botlist.me/">botlist.me</a>
 <a href="https://topminecraft.io/">topminecraft.io</a>
+<a href="https://minelist.net/">minelist.net</a>
+<a href="https://liste-serv-minecraft.fr/">liste-serv-minecraft.fr</a>
+<a href="https://play-minecraft-servers.com/">play-minecraft-servers.com</a>
 </details>
 
 ### Links to the extension where you can install it:

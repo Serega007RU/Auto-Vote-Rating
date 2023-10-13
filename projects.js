@@ -1613,6 +1613,37 @@ var allProjects = {
             ['fr', 'Français']
         ])
     },
+    MineListNet: {
+        voteURL: (project) => 'https://minelist.net/vote/' + project.id,
+        pageURL: (project) => 'https://minelist.net/server/' + project.id,
+        projectName: (doc) => doc.querySelector('.panel-heading h1').innerText,
+        exampleURL: () => ['https://minelist.net/server/', '2496', ''],
+        URL: () => 'minelist.net',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 6})
+    },
+    ListeServMinecraftFr: {
+        voteURL: (project) => 'https://liste-serv-minecraft.fr/serveur?id=' + project.id,
+        pageURL: (project) => 'https://liste-serv-minecraft.fr/serveur?id=' + project.id,
+        projectName: (doc) => doc.querySelector('#page h1').innerText,
+        exampleURL: () => ['https://liste-serv-minecraft.fr/serveur?id=', '353', ''],
+        URL: () => 'liste-serv-minecraft.fr',
+        parseURL: (url) => ({id: url.searchParams.get('id')}),
+        // TODO должен быть такой таймаут, но пока ещё не реализован таймаут по минутам, будем на 30 минут позже голосовать
+        // timeout: () => ({hour: 0, minute: 30})
+        timeout: () => ({hour: 1})
+    },
+    PlayMinecraftServersCom: {
+        voteURL: (project) => 'https://play-minecraft-servers.com/minecraft-servers/' + project.id + '/?tab=vote',
+        pageURL: (project) => 'https://play-minecraft-servers.com/minecraft-servers/' + project.id + '/',
+        projectName: (doc) => doc.querySelector('.server-title h2').innerText,
+        exampleURL: () => ['https://play-minecraft-servers.com/minecraft-servers/', 'opblocks', '/?tab=vote'],
+        URL: () => 'play-minecraft-servers.com',
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hour: 23}),
+        notRequiredCaptcha: () => true,
+        oneProject: () => 1
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1776,6 +1807,9 @@ var projectByURL = new Map([
     ['infinitybots.gg', 'InfinityBots'],
     ['botlist.me', 'BotListMe'],
     ['topminecraft.io', 'TopMinecraftIo'],
+    ['minelist.net', 'MineListNet'],
+    ['liste-serv-minecraft.fr', 'ListeServMinecraftFr'],
+    ['play-minecraft-servers.com', 'PlayMinecraftServersCom'],
     ['Custom', 'Custom']
 ])
 
