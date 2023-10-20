@@ -159,10 +159,10 @@ async function checkAll(first) {
 
     //Если мы находися на странице авторизации Дискорд
     if (document.URL.match(/discord.com\/*/)) {
-        if ((!document.location.search.includes('client_id=423718605226639361') && (document.URL.includes('%20guilds') || document.URL.includes('%20email') || document.URL.includes('+email'))) || !document.URL.includes('prompt=none')) {
+        if ((!document.location.search.includes('client_id=477949690848083968') && (document.URL.includes('%20guilds') || document.URL.includes('%20email') || document.URL.includes('+email'))) || !document.URL.includes('prompt=none')) {
             let url = document.URL
             //Пилюля от жадности в правах
-            if (!document.location.search.includes('client_id=423718605226639361')) {
+            if (!document.location.search.includes('client_id=477949690848083968')) { // discordbotlist.com
                 url = url.replace('%20guilds.join', '')
                 url = url.replace('%20guilds', '')
                 url = url.replace('+guilds.join', '')
