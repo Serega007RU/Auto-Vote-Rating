@@ -13,7 +13,7 @@ async function vote(first) {
     if (document.querySelector('div.alert.alert-danger')) {
         const request = {}
         request.message = document.querySelector('div.alert.alert-danger').innerText.trim()
-        if (request.message.includes('Je mag maar') || request.message.includes('can only vote once per')) {
+        if (request.message.includes('Je mag maar') || request.message.includes('can only vote once per') || request.message.includes('can only vote once a day')) {
             chrome.runtime.sendMessage({later: true})
             return
         } else if (request.message.includes('not validated the captcha')) {
