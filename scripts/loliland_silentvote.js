@@ -20,7 +20,7 @@ async function silentVoteLoliLand(project) {
         return
     }
 
-    const socket = new WebSocket('wss://api.loliland.io/ws')
+    const socket = new WebSocket('wss://loliland.net:443/ws')
 
     socket.onopen = function(event) {
         socket.send(JSON.stringify({data: {login: cashedLogin, key: accessToken}, packet: 'account.authToken'}))
@@ -86,11 +86,11 @@ async function silentVoteLoliLand(project) {
 
     socket.onclose = function(event) {
         if (!event.wasClean) {
-            endVote({message: 'Соединение с веб сокетом прервано сервером, ' + event.code + ' ' + event.reason, url: socket.url}, null, project)
+            endVote({message: 'Соединение с веб сокетом прервано сервером, причина (код ошибки): ' + event.code + ' ' + event.reason, url: socket.url}, null, project)
         }
     }
 
-    socket.onerror = function(error) {
-        endVote({message: 'Ошибка с веб сокетом, ' + error.toString(), url: socket.url}, null, project)
-    }
+    // socket.onerror = function(error) {
+    //     endVote({message: 'Ошибка с веб сокетом, ' + error.toString(), url: socket.url}, null, project)
+    // }
 }
