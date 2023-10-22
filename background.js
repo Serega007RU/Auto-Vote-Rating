@@ -9,7 +9,7 @@ importScripts('main.js')
 // TODO отложенный importScripts пока не работают, подробнее https://bugs.chromium.org/p/chromium/issues/detail?id=1198822
 self.addEventListener('install', () => {
     importScripts('libs/linkedom.js')
-    // importScripts('libs/evalCore.umd.js')
+    importScripts('libs/evalCore.umd.js')
     importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/serverpact_silentvote.js', 'scripts/hoyolab_silentvote.js', 'scripts/loliland_silentvote.js', 'scripts/genshindrop_silentvote.js')
 })
 
@@ -238,8 +238,7 @@ async function checkOpen(project, transaction) {
         }
     }
 
-    // noinspection PointlessBooleanExpressionJS
-    if (false && !settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
+    if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
         evilProjects = Date.now() + 300000
         promises.push(fetchProjects())
         async function fetchProjects() {
@@ -423,8 +422,7 @@ async function silentVote(project) {
             return
         }
 
-        // noinspection PointlessBooleanExpressionJS
-        if (false && !settings.disabledUseRemoteCode) {
+        if (!settings.disabledUseRemoteCode) {
             try {
                 const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_silentvote.js')
                 const textScript = await response.text()
@@ -463,8 +461,7 @@ async function silentVote(project) {
         } else {
             let message
             if (error.stack) {
-                // noinspection PointlessBooleanExpressionJS
-                if (false && !settings.disabledUseRemoteCode) {
+                if (!settings.disabledUseRemoteCode) {
                     message = error.toString()
                 } else {
                     message = error.stack
@@ -665,8 +662,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
         let eval = true
         let textApi, textScript, textWorld
-        // noinspection PointlessBooleanExpressionJS
-        if (false && !settings.disabledUseRemoteCode) {
+        if (!settings.disabledUseRemoteCode) {
             try {
                 const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/api.js')
                 textApi = await responseApi.text()
@@ -1152,8 +1148,7 @@ async function endVote(request, sender, project) {
             }
         }
 
-        // noinspection PointlessBooleanExpressionJS
-        if (false && !settings.disabledSendErrorSentry && !settings.disabledUseRemoteCode && !request.ignoreReport && !request.incorrectDomain && (request.message != null || request.errorVoteNoElement || request.emptyError || (request.timeout && settings.enabledReportTimeout) || (request.tooManyVoteAttempts && settings.enabledReportTooManyAttempts))) {
+        if (!settings.disabledSendErrorSentry && !settings.disabledUseRemoteCode && !request.ignoreReport && !request.incorrectDomain && (request.message != null || request.errorVoteNoElement || request.emptyError || (request.timeout && settings.enabledReportTimeout) || (request.tooManyVoteAttempts && settings.enabledReportTooManyAttempts))) {
             try {
                 await reportError(request, sender, project)
             } catch (error) {
@@ -1170,8 +1165,7 @@ async function endVote(request, sender, project) {
         }
     }
 
-    // noinspection PointlessBooleanExpressionJS
-    if (false && !settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
+    if (!settings.disabledUseRemoteCode && (!evilProjects || evilProjects < Date.now())) {
         evilProjects = Date.now() + 300000
         try {
             const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/projects.js')
