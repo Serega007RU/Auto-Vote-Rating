@@ -51,7 +51,8 @@
 			"matches": [
 				"https://*.dogecraft.net/*",
 				"https://*.mythicalworld.su/*",
-				"https://votify.mrspeedy.tk/*"
+				"https://votify.mrspeedy.tk/*",
+				"https://*.cubixworld.net/*"
 			]
 		}
 	],
