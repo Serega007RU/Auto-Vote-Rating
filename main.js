@@ -64,7 +64,7 @@ async function initializeConfig(background, version) {
     }
     // noinspection JSUnusedGlobalSymbols
     try {
-        db = await idb.openDB('avr', version ? version : 12, {upgrade})
+        db = await idb.openDB('avr', version ? version : 13, {upgrade})
     } catch (error) {
         //На случай если это версия MultiVote
         if (error.name === 'VersionError') {
@@ -73,7 +73,7 @@ async function initializeConfig(background, version) {
                 return
             }
             console.log('Ошибка версии базы данных, возможно вы на версии MultiVote, пытаемся загрузить настройки версии MultiVote')
-            await initializeConfig(background, 120)
+            await initializeConfig(background, 130)
             return
         }
         dbError({target: {source: {name: 'avr'}, error: error}})
@@ -293,6 +293,18 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
     if (oldVersion <= 11) {
         onLine = true
         await transaction.objectStore('other').put(onLine, 'onLine')
+    }
+
+    if (oldVersion <= 12) {
+        const store = transaction.objectStore('projects')
+        let cursor = await store.index('rating').openCursor('CraftList')
+        while (cursor) {
+            const project = cursor.value
+            project.randomize = {min: 0, max: 3600000}
+            await cursor.update(project)
+            // noinspection JSVoidFunctionReturnValueUsed
+            cursor = await cursor.continue()
+        }
     }
 
     if (!todayStats) {

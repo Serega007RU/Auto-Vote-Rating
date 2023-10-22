@@ -584,7 +584,8 @@ var allProjects = {
         exampleURL: () => ['https://craftlist.org/', 'basicland', ''],
         URL: () => 'craftlist.org',
         parseURL: (url) => ({id: url.pathname.split('/')[1]}),
-        timeout: () => ({hours: 24})
+        timeout: () => ({hours: 24}),
+        banAttention: () => true
     },
     CzechCraft: {
         voteURL: (project) => 'https://czech-craft.eu/server/' + project.id + '/vote/',

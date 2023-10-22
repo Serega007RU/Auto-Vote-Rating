@@ -116,8 +116,8 @@ async function vote(first) {
 
     if (first) return
 
-    querySelectorAll('.modal-body input', true).value = project.nick
-    querySelectorAll('.modal-footer button', true).click()
+    querySelectorAll('.modal-body input[name="nick"]', true).value = project.nick
+    querySelectorAll('.modal-footer button[type="submit"]', true).click()
 }
 
 const timer = setInterval(() => {
@@ -180,7 +180,7 @@ function isVisible(elem) {
     }
 
     // 1 пиксель?
-    if (elem.offsetHeight < 16 || elem.offsetWidth < 16) {
+    if (elem.offsetHeight < 16 || elem.offsetWidth < 48) {
         return 'offset'
     }
     // if (!getText(elem)) return false // Есть текст?
@@ -190,7 +190,7 @@ function isVisible(elem) {
         return 'offset bounding'
     }
 
-    return true // TODO временный код, внимательно следует следить если автор сайта снова начнёт играться с невидимыми элементами
+    // return true // TODO временный код, внимательно следует следить если автор сайта снова начнёт играться с невидимыми элементами
 
     const elemCenter   = {
         x: elem.getBoundingClientRect().left + elem.offsetWidth / 2,
