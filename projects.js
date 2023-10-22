@@ -1406,7 +1406,6 @@ var allProjects = {
             hours: 24,
             minutes: 1 // TODO 1-на минутная задержка так как LoliLand не умеет считать правильно 24 часа
         }),
-        silentVote: () => true,
         notRequiredCaptcha: () => true,
         notRequiredNick: () => true,
         notRequiredId: () => true,

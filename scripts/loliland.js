@@ -1,10 +1,11 @@
 async function vote(first) {
     if (first === false) return
 
-    if (document.querySelector('.preloader_malc')) {
+    // LoliLand неверно сообщает браузеру что страница полностью загружена, приходится извращаться и дожидаться полной загрузки страницы через querySelector
+    if (document.querySelector('.preloader_malc') || document.querySelector('#loader-wrapper')) {
         await new Promise(resolve => {
             const timer2 = setInterval(() => {
-                if (!document.querySelector('.preloader_malc')) {
+                if (!document.querySelector('.preloader_malc') && !document.querySelector('#loader-wrapper')) {
                     clearInterval(timer2)
                     resolve()
                 }
