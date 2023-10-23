@@ -94,7 +94,7 @@ const timer3 = setInterval(()=>{
                     request.message = el.textContent
                 }
             }
-            if (request.message.includes('must watch the ad to upvote')) {
+            if (request.message.includes('must watch the ad to upvote') || request.message.includes('Invalid')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)
