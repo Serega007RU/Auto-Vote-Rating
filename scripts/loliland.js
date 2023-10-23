@@ -13,16 +13,25 @@ async function vote(first) {
         })
     }
 
-    if (document.querySelector('.bonus_box_wrapper').nextElementSibling.textContent.includes('Залогинтесь, чтобы получить доступ к данному разделу')) {
-        chrome.runtime.sendMessage({auth: true})
-        await new Promise(resolve => {
-            const timer3 = setInterval(() => {
-                if (!document.querySelector('.bonus_box_wrapper').nextElementSibling.textContent.includes('Залогинтесь, чтобы получить доступ к данному разделу')) {
-                    clearInterval(timer3)
-                    resolve()
-                }
-            }, 1000)
-        })
+    if (document.querySelector('.bonus_box_wrapper')?.nextElementSibling.textContent) {
+        let message = document.querySelector('.bonus_box_wrapper').nextElementSibling.textContent
+        if (message.includes('Залогинтесь, чтобы получить доступ к данному разделу') || message.includes('Подтвердите двухфакторную аунтификацию')) {
+            chrome.runtime.sendMessage({auth: true})
+            await new Promise(resolve => {
+                const timer3 = setInterval(() => {
+                    try {
+                        message = document.querySelector('.bonus_box_wrapper').nextElementSibling.textContent
+                        if (!message.includes('Залогинтесь, чтобы получить доступ к данному разделу') && !message.includes('Подтвердите двухфакторную аунтификацию')) {
+                            clearInterval(timer3)
+                            resolve()
+                        }
+                    } catch (error) {
+                        clearInterval(timer3)
+                        throwError(error)
+                    }
+                }, 1000)
+            })
+        }
     }
 
     if (document.querySelector('.give_disable')) {
@@ -57,7 +66,7 @@ const timer = setInterval(() => {
         } else if (message.toLowerCase().includes('вы успешно получили')) {
             chrome.runtime.sendMessage({successfully: true})
             clearInterval(timer)
-        } else if (message.toLowerCase().includes('вы успешно авторизовались')) {
+        } else if (message.toLowerCase().includes('вы успешно авторизовались') || message.toLowerCase().includes('логин или пароль введен не верно') || message.toLowerCase().includes('подтвердите двухфакторную авторизацию')) {
             // None
         } else {
             chrome.runtime.sendMessage({message})
