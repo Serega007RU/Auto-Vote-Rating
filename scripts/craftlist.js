@@ -1,5 +1,5 @@
 async function vote(first) {
-    // if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
+    if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
 
     if (querySelector('div.alert.alert-success')) {
         const message = querySelector('div.alert.alert-success', true).textContent
@@ -45,6 +45,17 @@ async function vote(first) {
             chrome.runtime.sendMessage({message})
             return
         }
+    }
+
+    if (querySelector('div.alert.alert-danger')) {
+        const request = {}
+        request.message = querySelector('div.alert.alert-error', true).innerText
+        if (request.message.includes('Ban')) {
+            request.retryCoolDown = 43200000
+            request.ignoreReport = true
+        }
+        chrome.runtime.sendMessage(request)
+        return
     }
 
     if (querySelector('body #tracy-error')) {
