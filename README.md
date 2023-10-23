@@ -144,6 +144,7 @@
 <a href="https://minelist.net/">minelist.net</a>
 <a href="https://liste-serv-minecraft.fr/">liste-serv-minecraft.fr</a>
 <a href="https://play-minecraft-servers.com/">play-minecraft-servers.com</a>
+<a href="https://minecraft.menu/">minecraft.menu</a>
 </details>
 
 ### Links to the extension where you can install it:

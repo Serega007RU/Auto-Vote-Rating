@@ -1644,6 +1644,15 @@ var allProjects = {
         notRequiredCaptcha: () => true,
         oneProject: () => 1
     },
+    MinecraftMenu: {
+        voteURL: (project) => 'https://minecraft.menu/' + project.id + '/vote',
+        pageURL: (project) => 'https://minecraft.menu/' + project.id,
+        projectName: (doc) => doc.querySelector('.server.icon').nextSibling.textContent,
+        exampleURL: () => ['https://minecraft.menu/', 'server-insanitycraft-1-20.1279', '/vote'],
+        URL: () => 'minecraft.menu',
+        parseURL: (url) => ({id: url.pathname.split('/')[1]}),
+        timeout: () => ({hours: 24})
+    },
     Custom: {
         voteURL: (project) => project.responseURL,
         pageURL: (project) => project.responseURL,
@@ -1810,6 +1819,7 @@ var projectByURL = new Map([
     ['minelist.net', 'MineListNet'],
     ['liste-serv-minecraft.fr', 'ListeServMinecraftFr'],
     ['play-minecraft-servers.com', 'PlayMinecraftServersCom'],
+    ['minecraft.menu', 'MinecraftMenu'],
     ['Custom', 'Custom']
 ])
 
