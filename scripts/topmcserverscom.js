@@ -1,20 +1,30 @@
 async function vote(first) {
-    if (document.querySelector('div.success.message') != null) {
-        chrome.runtime.sendMessage({successfully: true})
-        return
-    }
-    if (document.querySelector('div.error.message') != null) {
-        if (document.querySelector('div.error.message').textContent.includes('must wait until tomorrow')) {
-            chrome.runtime.sendMessage({later: true})
-            return
-        }
-        chrome.runtime.sendMessage({message: document.querySelector('div.error.message').textContent})
+    if (document.querySelector('#server-metadata').nextElementSibling.innerText.includes('already voted')) {
+        chrome.runtime.sendMessage({later: true})
         return
     }
 
     if (first) return
 
-    const project = await getProject('TopMCServersCom')
-    document.querySelector('input[name="username"]').value = project.nick
-    document.querySelector('#main-content button[type="submit"]').click()
+    // TODO почему-то нет никнейма, возможно сайт не доделан
+    // const project = await getProject('TopMCServersCom')
+    // document.querySelector('input[name="username"]').value = project.nick
+    document.querySelector('#server-metadata').nextElementSibling.querySelector('button').click()
 }
+
+const timer = setInterval(() => {
+    try {
+        if (document.querySelector('#server-metadata').nextElementSibling.innerText.includes('Vote added'))  {
+            clearInterval(timer)
+            chrome.runtime.sendMessage({successfully: true})
+        } else if (document.querySelector('.toastify')) {
+            clearInterval(timer)
+            const request = {}
+            request.message = document.querySelector('.toastify').innerText
+            chrome.runtime.sendMessage(request)
+        }
+    } catch (error) {
+        clearInterval(timer)
+        throwError(error)
+    }
+}, 1000)

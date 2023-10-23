@@ -6,24 +6,27 @@ if (typeof loaded2 === 'undefined') {
 }
 
 async function vote(first) {
-    await new Promise(resolve => {
-        const timer = setInterval(()=>{
-            try {
-                //Ожидаем загрузки reCAPTCHA
-                if (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value && document.getElementById('g-recaptcha-response').value !== '') {
+    if (document.querySelector('#voteform #voteButton').disabled) {
+        await new Promise(resolve => {
+            const timer = setInterval(()=>{
+                try {
+                    if (!document.querySelector('#voteform #voteButton').disabled) {
+                        clearInterval(timer)
+                        resolve()
+                    }
+                } catch (e) {
                     clearInterval(timer)
-                    resolve()
+                    throwError(e)
                 }
-            } catch (e) {
-                clearInterval(timer)
-                throwError(e)
-            }
-        }, 1000)
-    })
+            }, 1000)
+        })
+    }
+
     if (first === false) return
+
     const project = await getProject('MinecraftServerList')
-    document.querySelector('#voteform > #ignn').value = project.nick
-    document.querySelector('#voteform > input[value="Click to Vote"]').click()
+    document.querySelector('#voteform #ignn').value = project.nick
+    document.querySelector('#voteform #voteButton').click()
 }
 
 function runVote() {

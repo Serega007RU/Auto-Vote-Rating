@@ -260,21 +260,12 @@ var allProjects = {
         notRequiredCaptcha: () => true
     },
     MinecraftIpList: {
-        voteURL: (project) => 'https://www.minecraftiplist.com/index.php?action=vote&listingID=' + project.id,
-        pageURL: (project) => 'https://www.minecraftiplist.com/server/-' + project.id,
-        projectName: (doc) => doc.querySelector('h2.motdservername').textContent,
-        exampleURL: () => ['https://www.minecraftiplist.com/index.php?action=vote&listingID=', '2576', ''],
+        voteURL: (project) => 'https://www.minecraftiplist.com/server/' + project.id + '/vote',
+        pageURL: (project) => 'https://www.minecraftiplist.com/server/' + project.id,
+        projectName: (doc) => doc.querySelector('.server-info-title').innerText,
+        exampleURL: () => ['https://www.minecraftiplist.com/server/', 'PurplePrison1SponsoredServer-5020', '/vote'],
         URL: () => 'minecraftiplist.com',
-        parseURL: (url) => {
-            const project = {}
-            const paths = url.pathname.split('/')
-            if (paths[1] === 'server') {
-                project.id = paths[2]
-            } else {
-                project.id = url.searchParams.get('listingID')
-            }
-            return project
-        },
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
         timeout: () => ({hours: 24})
     },
     TopMinecraftServers: {
@@ -696,13 +687,14 @@ var allProjects = {
         timeout: () => ({hours: 12})
     },
     TopMCServersCom: {
-        voteURL: (project) => 'https://topmcservers.com/server/' + project.id + '/vote',
+        voteURL: (project) => 'https://topmcservers.com/server/' + project.id,
         pageURL: (project) => 'https://topmcservers.com/server/' + project.id,
-        projectName: (doc) => doc.querySelector('#serverPage h1.header').textContent,
-        exampleURL: () => ['https://topmcservers.com/server/', '17', '/vote'],
+        projectName: (doc) => doc.querySelector('#server-metadata td').innerText,
+        exampleURL: () => ['https://topmcservers.com/server/', '17', ''],
         URL: () => 'topmcservers.com',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        timeout: () => ({hours: 24})
+        timeout: () => ({hour: 0}),
+        optionalNick: () => true // TODO почему-то нет никнейма, возможно сайт не доделан
     },
     BestServersCom: {
         voteURL: (project) => 'https://bestservers.com/server/' + project.id + '/vote',
@@ -1497,7 +1489,8 @@ var allProjects = {
         projectName: (doc) => doc.querySelector('.container h1.ibmpm').innerText.trim(),
         exampleURL: () => ['https://top-mc-servers.net/server/', '5', ''],
         URL: () => 'top-mc-servers.net',
-        parseURL: (url) => ({id: url.pathname.split('/')[2]})
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        timeout: () => ({hours: 24})
     },
     MinecraftServerListCom: {
         voteURL: (project) => 'https://minecraft-serverlist.com/server/' + project.id + '/vote',

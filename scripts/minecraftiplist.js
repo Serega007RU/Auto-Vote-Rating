@@ -1,25 +1,31 @@
 async function vote(first) {
-    if (document.querySelector('div.Good')) {
-        chrome.runtime.sendMessage({successfully: true})
-        return
-    }
-    if (document.querySelector('div.Error')) {
-        const request = {}
-        request.message = document.querySelector("div.Error").textContent
-        if (request.message.includes('last voted for this server')) {
-            chrome.runtime.sendMessage({later: true})
-        } else {
-            if (request.message.includes('Error while sending the vote')) {
-                request.ignoreReport = true
-            }
-            chrome.runtime.sendMessage(request)
-        }
-        return
-    }
-
     if (first) return
 
     const project = await getProject('MinecraftIpList')
-    document.querySelector('input[name="userign"]').value = project.nick
-    document.querySelector('#votebutton').click()
+    document.querySelector('#username').value = project.nick
+    document.querySelector('button[type="submit"] img[alt="Login"]').parentElement.click()
 }
+
+const timer = setInterval(() => {
+    try {
+        if (document.querySelector('.vue-notification.success')) {
+            clearInterval(timer)
+            chrome.runtime.sendMessage({successfully: true})
+        } else if (document.querySelector('.vue-notification.error')) {
+            clearInterval(timer)
+            const request = {}
+            request.message = document.querySelector('.vue-notification.error').innerText
+            if (request.message.includes('already voted')) {
+                chrome.runtime.sendMessage({later: true})
+            } else {
+                if (request.message.includes('Something went wrong')) {
+                    request.ignoreReport = true
+                }
+                chrome.runtime.sendMessage(request)
+            }
+        }
+    } catch (error) {
+        clearInterval(timer)
+        throwError(error)
+    }
+}, 1000)

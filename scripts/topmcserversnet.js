@@ -24,7 +24,7 @@ function checkAnswer() {
         } else if (request.message.includes('Vote sent successfully')) {
             chrome.runtime.sendMessage({successfully: true})
             return true
-        } else if (request.message.includes('already voted')) {
+        } else if (request.message.includes('already voted') || request.message.includes('can vote next in')) {
             chrome.runtime.sendMessage({later: true})
             return true
         } else {

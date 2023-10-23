@@ -1,17 +1,7 @@
 async function vote(first) {
     if (first === false) return
 
-    // LoliLand неверно сообщает браузеру что страница полностью загружена, приходится извращаться и дожидаться полной загрузки страницы через querySelector
-    if (document.querySelector('.preloader_malc') || document.querySelector('#loader-wrapper')) {
-        await new Promise(resolve => {
-            const timer2 = setInterval(() => {
-                if (!document.querySelector('.preloader_malc') && !document.querySelector('#loader-wrapper')) {
-                    clearInterval(timer2)
-                    resolve()
-                }
-            }, 1000)
-        })
-    }
+    await waitCompleteLoading()
 
     if (document.querySelector('.bonus_box_wrapper')?.nextElementSibling.textContent) {
         let message = document.querySelector('.bonus_box_wrapper').nextElementSibling.textContent
@@ -34,6 +24,8 @@ async function vote(first) {
         }
     }
 
+    await waitCompleteLoading()
+
     if (document.querySelector('.give_disable')) {
         chrome.runtime.sendMessage({
             message: 'Не выполнены условия для получения бонуса',
@@ -43,6 +35,31 @@ async function vote(first) {
     }
 
     document.querySelector('.give').click()
+}
+
+// LoliLand неверно сообщает браузеру что страница полностью загружена, приходится извращаться и дожидаться полной загрузки страницы через querySelector
+async function waitCompleteLoading() {
+    if (document.querySelector('.preloader_malc') || document.querySelector('#loader-wrapper') || document.querySelector('.lds-ring') || document.querySelector('.loading-text')) {
+        await new Promise(resolve => {
+            const timer2 = setInterval(() => {
+                if (!document.querySelector('.preloader_malc') && !document.querySelector('#loader-wrapper') && !document.querySelector('.lds-ring') && !document.querySelector('.loading-text')) {
+                    clearInterval(timer2)
+                    resolve()
+                }
+            }, 1000)
+        })
+    }
+    //Иногда мы получаем тупо пустую страницу (опять LoliLand неверно сообщает браузеру о готовности страницы?)
+    if (!document.body.innerText.trim().length) {
+        await new Promise(resolve => {
+            const timer4 = setInterval(() => {
+                if (document.body.innerText.trim().length) {
+                    clearInterval(timer4)
+                    resolve()
+                }
+            }, 1000)
+        })
+    }
 }
 
 const timer = setInterval(() => {
@@ -66,7 +83,7 @@ const timer = setInterval(() => {
         } else if (message.toLowerCase().includes('вы успешно получили')) {
             chrome.runtime.sendMessage({successfully: true})
             clearInterval(timer)
-        } else if (message.toLowerCase().includes('вы успешно авторизовались') || message.toLowerCase().includes('логин или пароль введен не верно') || message.toLowerCase().includes('подтвердите двухфакторную авторизацию')) {
+        } else if (message.toLowerCase().includes('вы успешно авторизовались') || message.toLowerCase().includes('логин или пароль введен не верно') || message.toLowerCase().includes('подтвердите двухфакторную авторизацию') || message.toLowerCase().includes('текущая сессия истекла')) {
             // None
         } else {
             chrome.runtime.sendMessage({message})

@@ -14,7 +14,7 @@ const timer = setInterval(() => {
         const response = document.querySelector('#response')
         if (response.style.display !== 'none') {
             const message = response.innerText.trim()
-            if (message.includes('Příkaz byl úspěšně odeslán')) {
+            if (message.includes('Příkaz byl úspěšně odeslán') || message.includes('success')) {
                 clearInterval(timer)
                 chrome.runtime.sendMessage({successfully: true})
             } else if (message.includes('Již si hlasoval')) {
