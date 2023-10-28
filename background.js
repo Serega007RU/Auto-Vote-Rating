@@ -339,9 +339,11 @@ async function newWindow(project, opened) {
         db.put('other', openedProjects, 'openedProjects')
         silentVote(project)
     } else {
-        await promiseWindow
-        promiseWindow = checkWindow()
-        await promiseWindow
+        let result = await promiseWindow
+        if (result === false) return
+        promiseWindow = checkWindow(project)
+        result = await promiseWindow
+        if (result === false) return
 
         const url = allProjects[project.rating].voteURL(project)
 
@@ -367,13 +369,19 @@ async function newWindow(project, opened) {
     }
 }
 
-async function checkWindow() {
+async function checkWindow(project) {
     const windows = await chrome.windows.getAll()
         .catch(error => console.warn(chrome.i18n.getMessage('errorOpenTab', error.message)))
     if (!windows?.length) {
-        const window = await chrome.windows.create({focused: false})
-        await chrome.windows.update(window.id, {focused: false, drawAttention: false})
+        try {
+            const window = await chrome.windows.create({focused: false})
+            await chrome.windows.update(window.id, {focused: false, drawAttention: false})
+        } catch (error) {
+            endVote({errorOpenTab: error.message}, null, project)
+            return false
+        }
     }
+    return true
 }
 
 async function groupTabs(tab) {
