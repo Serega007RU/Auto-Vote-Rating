@@ -569,6 +569,7 @@ chrome.webNavigation.onCommitted.addListener(async function(details) {
     await initializeFunc
     let opened = openedProjects.get(details.tabId)
     if (!opened) return
+    if (details.url.startsWith('blob:')) return
     const filesIsolated = []
     const filesMain = []
     if (details.frameId === 0) {
