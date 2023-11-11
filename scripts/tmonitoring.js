@@ -1,6 +1,6 @@
 async function vote(first) {
     if (document.querySelector('#content')?.textContent.includes('Страница которую Вы запрашиваете не существует!')) {
-        chrome.runtime.sendMessage({message: document.querySelector('#content').textContent, ignoreReport: true})
+        chrome.runtime.sendMessage({message: document.querySelector('#content').textContent, ignoreReport: true, retryCoolDown: 21600000})
         return
     }
     if (first) {

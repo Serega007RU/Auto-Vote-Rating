@@ -1,12 +1,8 @@
 async function vote(first) {
     const project = await getProject('Discords')
-    if (document.querySelector('a[href="/bots/auth"]') != null) {
+    if (document.querySelector('a[href="/bots/auth"]')) {
         document.querySelector('a[href="/bots/auth"]').click()
-        //Старый код BotsForDiscord
-        // document.querySelector('a[href="/bots/login"]').click()
         return
-    } else if (document.URL === 'https://discords.com/bots/me' || document.URL === 'https://discords.com/u/dashboard') {//Костыль переадресации на страницу голосования (на время перехода с BotsForDiscord на Discords)
-        document.location.replace('https://discords.com/' + project.game + '/' + project.id + (project.game === 'servers' ? '/upvote' : '/vote'))
     }
 
     if (project.game === 'servers') {
@@ -40,35 +36,53 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
         }
     } else {
-        if (document.querySelector('#votecontainer')?.nextElementSibling.textContent.includes('already voted')) {
-            chrome.runtime.sendMessage({later: true})
-            return
-        }
-
-        if (document.getElementById('errorsubtitle')) {
+        if (document.querySelector('.four-o-four')) {
             const request = {}
-            request.message = document.getElementById('errorsubtitle').textContent.trim()
-            if (request.message.toLowerCase().includes('successfully')) {
-                chrome.runtime.sendMessage({successfully: true})
-                return
-            } else if (request.message.toLowerCase().includes('already voted')) {
-                chrome.runtime.sendMessage({later: true})
-                return
-            } else if (request.message.includes('did not complete the captcha')) {
-                chrome.runtime.sendMessage({captcha: true})
-                return
+            request.message = document.querySelector('.four-o-four').innerText.trim()
+            if (request.message.includes('404')) {
+                request.retryCoolDown = 21600000
             }
+            request.ignoreReport = true
             chrome.runtime.sendMessage(request)
             return
         }
-
-        if (document.querySelector('.upvotes-result-up') != null && document.querySelector('.upvotes-result-up').textContent.includes('uccessfully')) {
-            chrome.runtime.sendMessage({successfully: true})
-            return
+        //Сайт неверно сообщает о том что страница загружена когда на самом деле она не полностью загружена, приходится извращаться такими костылями
+        if (!document.querySelector('.upvote-hero').innerText.trim().length) {
+            await new Promise(resolve => {
+                const timer = setInterval(() => {
+                    try {
+                        if (document.querySelector('.upvote-hero').innerText.trim().length) {
+                            resolve()
+                            clearInterval(timer)
+                        }
+                    } catch (error) {
+                        clearInterval(timer)
+                        throwError(error)
+                    }
+                })
+            })
         }
 
-        if (first) return
+        document.querySelector('.upvote-hero button').click()
 
-        document.querySelector('button[type="submit"]').click()
+        const timer = setInterval(() => {
+            try {
+                const message = document.querySelector('.upvote-hero').innerText.trim()
+                if (message.length) {
+                    if (message.includes('Thank you for voting')) {
+                        clearInterval(timer)
+                        chrome.runtime.sendMessage({successfully: true})
+                    } else if (message.includes('You can upvote again in')) {
+                        clearInterval(timer)
+                        const numbers = message.match(/\d+/g).map(Number)
+                        const milliseconds = (numbers[numbers.length - 2] * 60 * 60 * 1000) + (numbers[numbers.length - 1] * 60 * 1000)
+                        chrome.runtime.sendMessage({later: Date.now() + milliseconds})
+                    }
+                }
+            } catch (error) {
+                clearInterval(timer)
+                throwError(error)
+            }
+        }, 1000)
     }
 }

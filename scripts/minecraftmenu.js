@@ -8,10 +8,13 @@ async function vote(first) {
         const message = document.querySelector('div.ui.error').innerText
         if (message.includes('must wait') && message.includes('before voting again')) {
             chrome.runtime.sendMessage({later: true})
+            return
+        } else if (message.includes('Captcha wasn\'t entered correctly')) {
+            // None
         } else {
             chrome.runtime.sendMessage({message})
+            return
         }
-        return
     }
 
     if (first) return

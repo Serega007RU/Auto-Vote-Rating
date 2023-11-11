@@ -11,7 +11,7 @@ async function vote(first) {
     }
 
     if (document.querySelector('.container .text-center')?.textContent.includes('Страница не найдена')) {
-        chrome.runtime.sendMessage({message: document.querySelector('.container .text-center').textContent, ignoreReport: true})
+        chrome.runtime.sendMessage({message: document.querySelector('.container .text-center').textContent, ignoreReport: true, retryCoolDown: 21600000})
         return
     }
     if (document.body.innerText.trim().length < 150) {

@@ -20,6 +20,7 @@ async function vote(/*first*/) {
         const request = {}
         request.message = document.querySelector('.ui.segments').textContent.trim()
         if (request.message.includes('Page Not Found')) {
+            request.retryCoolDown = 21600000
             request.ignoreReport = true
         }
         chrome.runtime.sendMessage(request)

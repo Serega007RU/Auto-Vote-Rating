@@ -37,17 +37,18 @@ const timer2 = setInterval(() => {
 
 function checkAnswer() {
     //Если есть ошибка
-    if (document.querySelector('.alert.alert-danger')?.innerText?.length) {
+    if (document.querySelector('.alert.alert-danger')?.innerText.trim?.()?.length) {
         const request = {}
-        request.message = document.querySelector('.alert.alert-danger').innerText
+        request.message = document.querySelector('.alert.alert-danger').innerText.trim()
         //Если не удалось пройти капчу
         if (request.message.includes('captcha') || request.message.includes('pseudo')) {
             return false
             //Если вы уже голосовали
         } else if (request.message.includes('Vous avez déjà voté pour ce serveur')) {
             chrome.runtime.sendMessage({later: true})
+            return true
         } else {
-            if (request.message.toLowerCase().includes('proxy') && request.message.toLowerCase().includes('vpn')) {
+            if ((request.message.toLowerCase().includes('proxy') && request.message.toLowerCase().includes('vpn')) || request.message.toLowerCase().includes('votre ip') || request.message.toLowerCase().includes('erreur interne')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)

@@ -8,12 +8,15 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: Date.now() + milliseconds})
             return
         }
-        if (request.message.includes('Server existiert nicht') || request.message.includes('Da ist irgendetwas schief gelaufen')) {
-            request.ignoreReport = true
-        }
         if (request.message.toLowerCase().includes('captcha')) {
             // None
         } else {
+            if (request.message.includes('Server existiert nicht')) {
+                request.ignoreReport = true
+                request.retryCoolDown = 21600000
+            } else if (request.message.includes('Da ist irgendetwas schief gelaufen')) {
+                request.ignoreReport = true
+            }
             chrome.runtime.sendMessage(request)
             return
         }

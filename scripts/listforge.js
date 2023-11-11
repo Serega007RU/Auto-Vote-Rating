@@ -1,10 +1,10 @@
 async function vote(first) {
     //Пилюля от жадности
-    document.getElementById('adblock-notice')?.remove()
-    document.getElementById('adsense-notice')?.remove()
-    document.getElementById('vote-loading-block')?.remove()
-    document.getElementById('blocked-notice')?.remove()
-    document.getElementById('privacysettings-notice')?.remove()
+    if (document.getElementById('adblock-notice')) document.getElementById('adblock-notice').style.display = 'none'
+    if (document.getElementById('adsense-notice')) document.getElementById('adsense-notice').style.display = 'none'
+    if (document.getElementById('vote-loading-block')) document.getElementById('vote-loading-block').style.display = 'none'
+    if (document.getElementById('blocked-notice')) document.getElementById('blocked-notice').style.display = 'none'
+    if (document.getElementById('privacysettings-notice')) document.getElementById('privacysettings-notice').style.display = 'none'
     document.getElementById('vote-form-block')?.removeAttribute('style')
     document.getElementById('vote-button-block')?.removeAttribute('style')
     document.querySelector('.alert-danger a[href*="/servers/premium/"]')?.parentElement?.remove()
@@ -12,7 +12,7 @@ async function vote(first) {
 
     for (const el of document.querySelectorAll('div.alert.alert-info')) {
         if (el.textContent.includes('server has been removed')) {
-            chrome.runtime.sendMessage({message: el.textContent.trim(), ignoreReport: true})
+            chrome.runtime.sendMessage({message: el.textContent.trim(), ignoreReport: true, retryCoolDown: 21600000})
             return
         }
     }
@@ -64,6 +64,7 @@ async function vote(first) {
         request.message = document.querySelector('.container h1').textContent + ' ' + document.querySelector('.container p').textContent
         if (request.message.includes('page you were looking for cannot be found') || request.message.includes('page you were looking does not exist anymore')) {
             request.ignoreReport = true
+            request.retryCoolDown = 21600000
         }
         chrome.runtime.sendMessage(request)
     }
@@ -78,7 +79,7 @@ async function vote(first) {
     }
 
     //Если на странице есть hCaptcha то мы ждём её решения
-    if ((document.querySelector('div.h-captcha') || document.querySelector('.cf-turnstile')) && first) {
+    if ((document.querySelector('div.h-captcha') || document.querySelector('.cf-turnstile') || document.querySelector('#captcha-block')) && first) {
         return
     }
 

@@ -4,6 +4,7 @@ async function vote(first) {
         request.message = document.querySelector('div.alert-error').innerText.trim()
         if (request.message.includes('not found')) {
             request.ignoreReport = true
+            request.retryCoolDown = 21600000
         }
         chrome.runtime.sendMessage(request)
         return

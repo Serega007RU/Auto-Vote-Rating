@@ -13,7 +13,10 @@ async function vote(first) {
             if (request.message.toLowerCase().includes('captcha') || request.message.toLowerCase().includes('že nejste robot')) {
                 // None
             } else {
-                if (request.message.includes('server byl označen jako neaktivní') || request.message.includes('Přezdívka je v nesprávném formátu')) {
+                if (request.message.includes('server byl označen jako neaktivní')) {
+                    request.ignoreReport = true
+                    request.retryCoolDown = 21600000
+                } else if (request.message.includes('Přezdívka je v nesprávném formátu')) {
                     request.ignoreReport = true
                 }
                 chrome.runtime.sendMessage(request)
@@ -26,6 +29,7 @@ async function vote(first) {
         request.message = document.querySelector('body > .container > h1.title').textContent
         if (request.message.includes('stránka nebyla nalezena')) {
             request.ignoreReport = true
+            request.retryCoolDown = 21600000
         }
         chrome.runtime.sendMessage(request)
         return

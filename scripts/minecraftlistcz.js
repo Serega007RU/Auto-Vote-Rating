@@ -44,6 +44,7 @@ async function vote(first) {
         request.message = document.querySelector('div.content.content-full h1').textContent.trim() + ' ' + document.querySelector('div.content.content-full h2').textContent.trim()
         if (request.message.includes('ale tato stránka nebyla nalezena')) {
             request.ignoreReport = true
+            request.retryCoolDown = 21600000
         }
         chrome.runtime.sendMessage(request)
         return

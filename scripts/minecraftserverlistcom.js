@@ -11,6 +11,10 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: true})
             return
         } else {
+            if (request.message.includes('server you are trying to visit has been removed')) {
+                request.ignoreReport = true
+                request.retryCoolDown = 21600000
+            }
             chrome.runtime.sendMessage(request)
             return
         }

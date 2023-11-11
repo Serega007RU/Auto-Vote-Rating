@@ -33,9 +33,12 @@ async function vote(first) {
             request.retryCoolDown = 604800000
             chrome.runtime.sendMessage(request)
             return
-        } else if (request.message.includes('response parameter is missing') || request.message.includes('field is required')) {
+        } else if (request.message.includes('field is required')) {
             // None
         } else {
+            if (request.message.includes('response parameter is missing') || request.message.includes('response parameter is invalid')) {
+                request.ignoreReport = true
+            }
             chrome.runtime.sendMessage(request)
             return
         }

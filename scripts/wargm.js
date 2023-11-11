@@ -26,6 +26,7 @@ async function vote(first) {
         request.message = document.querySelector('div.general > .card > div.card-body').innerText
         if (request.message.includes('Страница не найдена')) {
             request.ignoreReport = true
+            request.retryCoolDown = 21600000
         }
         chrome.runtime.sendMessage(request)
         return
@@ -35,7 +36,7 @@ async function vote(first) {
     const timer2 = setInterval(async () => {
         try {
             if (waiting) return
-            const button = document.querySelector('#main .card-footer .btn.btn-blue')
+            let button = document.querySelector('#main .card-footer .btn.btn-blue')
             if (!button) return
             const message = button.textContent
             if (message.includes('ч.') || message.includes('м.')) {
@@ -49,6 +50,7 @@ async function vote(first) {
             if ((button.disabled == null || button.disabled === false) && button.getAttribute('disabled') == null) {
                 waiting = true
                 await wait(Math.floor(Math.random() * 9000 + 1000))
+                button = document.querySelector('#main .card-footer .btn.btn-blue[data-send="/server/vote"]')
                 button.click()
                 clearInterval(timer2)
             }
@@ -70,13 +72,13 @@ const timer = setInterval(async ()=>{
             request.message = msg.innerText
             if (request.message.includes('уже проголосовали')) {
                 clearInterval(timer)
-                await wait(Math.floor(Math.random() * 9000 + 1000))
+                // await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage({later: true})
             } else if (request.message.includes('Голос принят')) {
                 clearInterval(timer)
                 // TODO кринж кринжа, сайт уведомление об успешном голосовании отображает буквально на секунду, ничего дибильнее придумать автор сайта не может
                 // await wait(Math.floor(Math.random() * 9000 + 1000))
-                // chrome.runtime.sendMessage({successfully: true})
+                chrome.runtime.sendMessage({successfully: true})
             } else if (request.message.includes('Авторизация')) {
                 clearInterval(timer)
                 chrome.runtime.sendMessage({auth: true})
@@ -96,6 +98,11 @@ const timer = setInterval(async ()=>{
                     request.ignoreReport = true
                     request.retryCoolDown = 3600000 // 24 часа
                 }
+
+                // TODO временный код, пользователи слишком часто вмешиваются в процесс голосования
+                request.message = 'Похоже вы вмешались в процесс авто-голосования, если это не так и это является ошибкой - сообщите разработчику, вот что известно: ' + request.message
+                request.ignoreReport = true
+
                 clearInterval(timer)
                 await wait(Math.floor(Math.random() * 9000 + 1000))
                 chrome.runtime.sendMessage(request)

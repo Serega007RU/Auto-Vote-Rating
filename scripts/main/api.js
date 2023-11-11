@@ -159,21 +159,44 @@ async function checkAll(first) {
 
     //Если мы находися на странице авторизации Дискорд
     if (document.URL.match(/discord.com\/*/)) {
-        if ((!document.location.search.includes('client_id=477949690848083968') && (document.URL.includes('%20guilds') || document.URL.includes('%20email') || document.URL.includes('+email'))) || !document.URL.includes('prompt=none')) {
+        let replaced = false
+        if (document.location.search.includes('%20guilds.join') || document.location.search.includes('%20guilds') || document.location.search.includes('+guilds.join') || document.location.search.includes('+guilds') || document.location.search.includes('%20email') || document.location.search.includes('+email') || !document.location.search.includes('prompt=none')) {
             let url = document.URL
             //Пилюля от жадности в правах
             if (!document.location.search.includes('client_id=477949690848083968')) { // discordbotlist.com
-                url = url.replace('%20guilds.join', '')
-                url = url.replace('%20guilds', '')
-                url = url.replace('+guilds.join', '')
-                url = url.replace('+guilds', '')
-                url = url.replace('%20email', '')
-                url = url.replace('+email', '')
+                if (document.location.search.includes('%20guilds.join')) {
+                    url = url.replace('%20guilds.join', '')
+                    replaced = true
+                }
+                if (document.location.search.includes('%20guilds')) {
+                    url = url.replace('%20guilds', '')
+                    replaced = true
+                }
+                if (document.location.search.includes('+guilds.join')) {
+                    url = url.replace('+guilds.join', '')
+                    replaced = true
+                }
+                if (document.location.search.includes('+guilds')) {
+                    url = url.replace('+guilds', '')
+                    replaced = true
+                }
+                if (document.location.search.includes('%20email')) {
+                    url = url.replace('%20email', '')
+                    replaced = true
+                }
+                if (document.location.search.includes('+email')) {
+                    url = url.replace('+email', '')
+                    replaced = true
+                }
             }
             //Заставляем авторизацию авторизоваться не беспокоя пользователя если права уже были предоставлены
-            if (!document.URL.includes('prompt=none')) url = url.concat('&prompt=none')
-            document.location.replace(url)
-        } else {
+            if (!document.location.search.includes('prompt=none')) {
+                url = url.concat('&prompt=none')
+                replaced = true
+            }
+            if (replaced) document.location.replace(url)
+        }
+        if (!replaced) {
             const timer4 = setTimeout(()=>{//Да это костыль, а есть вариант по лучше?
                 chrome.runtime.sendMessage({discordLogIn: true})
             }, 10000)
@@ -199,7 +222,9 @@ async function checkAll(first) {
     }
 
     //Если мы находимся на странице проверки CloudFlare https://i.imgur.com/BVk3z6y.png
-    if (document.querySelector('div.main-wrapper div.main-content #challenge-body-text') || document.querySelector('div.main-wrapper div.main-content #challenge-running') || document.querySelector('div.main-wrapper div.main-content #challenge-success')) {
+    // TODO CloudFlare выдаёт пустую страницу и сообщает браузеру типо всё загружено. Всё что там известно это то что указано в селекторе ниже, возможны конфликты с сайтами (мониторингами)
+    if (document.querySelector('div.main-wrapper > div.main-content')) {
+    // if (document.querySelector('div.main-wrapper div.main-content #challenge-body-text') || document.querySelector('div.main-wrapper div.main-content #challenge-running') || document.querySelector('div.main-wrapper div.main-content #challenge-success')) {
         return
     }
 
@@ -281,6 +306,14 @@ async function startVote(first) {
         })
     }
 
+    if (isUsedTranslator()) {
+        chrome.runtime.sendMessage({
+            message: 'It looks like you have used the translator built into the browser, please disable the translator, it interferes with the work of the extension. If this is not the case and you have disabled the translator, inform the extension developer!',
+            ignoreReport: true
+        })
+        return
+    }
+
     try {
         await vote(first)
     } catch (e) {
@@ -311,15 +344,14 @@ function throwError(error) {
     }
 
     const siteText = document.body.innerText.trim()
-    // TODO временные меры против mmotop.ru
-    // if (siteText.length === 0) {
-    //     request.emptySite = true
-    // } else {
+    if (siteText.length === 0) {
+        request.emptySite = true
+    } else {
         request.errorVoteNoElement = message + (siteText.length < 300 ? ' ' + siteText : '')
         if (document.location.pathname === '/' && document.location.search === '') {
             ignoreReport = true
         }
-    // }
+    }
 
     if (isUsedTranslator()) {
         ignoreReport = true

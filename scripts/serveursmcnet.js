@@ -13,13 +13,14 @@ async function vote(first) {
         } else {
             if (request.message.includes('Aucun serveur n\'a été trouvé')) {
                 request.ignoreReport = true
+                request.retryCoolDown = 21600000
             }
             chrome.runtime.sendMessage(request)
         }
         return
     }
     if (document.querySelector('div.content-body.justify-content-center')?.innerText.includes('Erreur 404')) {
-        chrome.runtime.sendMessage({message: document.querySelector('div.content-body.justify-content-center').innerText, ignoreReport: true})
+        chrome.runtime.sendMessage({message: document.querySelector('div.content-body.justify-content-center').innerText, ignoreReport: true, retryCoolDown: 21600000})
         return
     }
 

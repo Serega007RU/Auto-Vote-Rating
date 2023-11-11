@@ -44,14 +44,18 @@ async function vote(first) {
 
 const timer = setInterval(()=>{
     try {
-        if (document.querySelector('.ZebraDialog') && document.querySelector('.ZebraDialog').textContent) {
-            const text = document.querySelector('.ZebraDialog').textContent
-            if (text.includes('captcha a expiré')) {
+        if (document.querySelector('.ZebraDialog')?.innerText?.length) {
+            const request = {}
+            request.message = document.querySelector('.ZebraDialog').innerText.trim()
+            if (request.message.includes('captcha a expiré')) {
                 document.querySelector('.ZebraDialog_Button_0').click()
-            } else if (text.includes('vote a bien été enregistré') || text.includes('erci pour ton vote')) {
+            } else if (request.message.includes('vote a bien été enregistré') || request.message.includes('erci pour ton vote')) {
                 chrome.runtime.sendMessage({successfully: true})
             } else {
-                chrome.runtime.sendMessage({message: text})
+                if (request.message.includes('captcha est invalide')) {
+                    request.ignoreReport = true
+                }
+                chrome.runtime.sendMessage(request)
             }
             clearInterval(timer)
         }

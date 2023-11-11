@@ -1,7 +1,7 @@
 async function vote(first) {
-    if (document.querySelector('div.main-panel > span.red') || document.querySelector('div.main-panel > div.red')) {
+    if (document.querySelector('div.main-panel span.red') || document.querySelector('div.main-panel div.red')) {
         const request = {}
-        request.message = document.querySelector('div.main-panel > span.red')?.textContent || document.querySelector('div.main-panel > div.red')?.textContent
+        request.message = document.querySelector('div.main-panel span.red')?.textContent || document.querySelector('div.main-panel div.red')?.textContent
         if (request.message.toLowerCase().includes('already voted')) {
             chrome.runtime.sendMessage({later: true})
             return

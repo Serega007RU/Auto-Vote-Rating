@@ -35,21 +35,25 @@ async function vote(first) {
 }
 
 const timer = setInterval(() => {
-    const message = document.querySelector('div.sign-wrapper')?.innerText ||
+    const request = {}
+    request.message = document.querySelector('div.sign-wrapper')?.innerText ||
         document.querySelector('div.van-toast__text')?.innerText ||
         document.querySelector('div.m-dialog-body')?.innerText ||
         document.querySelector('div[class*="sign-guide"]')?.innerText
-    if (message && message.length > 3) {
-        if (message.includes('checked in today')) {
+    if (request.message && request.message.length > 3) {
+        if (request.message.includes('checked in today')) {
             clearInterval(timer)
             chrome.runtime.sendMessage({successfully: true})
-        } else if (message.includes('You may set up check-in notifications') || message.includes('You can set up check-in reminders')) {
+        } else if (request.message.includes('You may set up check-in notifications') || request.message.includes('You can set up check-in reminders')) {
             // None
             document.querySelector('div[class*="dialog-close"]')?.click()
             document.querySelector('span[class*="guide-close"]')?.click()
         } else {
             clearInterval(timer)
-            chrome.runtime.sendMessage({message})
+            if (request.message.includes('network timed out')) {
+                request.ignoreReport = true
+            }
+            chrome.runtime.sendMessage(request)
         }
     }
 }, 1000)

@@ -275,7 +275,7 @@ var allProjects = {
         exampleURL: () => ['https://topminecraftservers.org/vote/', '9126', ''],
         URL: () => 'topminecraftservers.org',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        timeout: () => ({hour: 4})
+        timeout: () => ({hour: 5})
     },
     MinecraftServersBiz: {
         voteURL: (project) => 'https://minecraftservers.biz/' + project.id + '/',
@@ -439,7 +439,15 @@ var allProjects = {
     Discords: {
         voteURL: (project) => 'https://discords.com/' + project.game + '/' + project.id + (project.game === 'servers' ? '/upvote' : '/vote'),
         pageURL: (project) => 'https://discords.com/' + project.game + '/' + project.id,
-        projectName: (doc, project) => project.game === 'servers' ? doc.querySelector('.servernameh1').textContent : doc.querySelector('.bot-title-bp h2').textContent,
+        projectName: (doc, project) => {
+            if (project.game === 'servers') {
+                return doc.querySelector('.servernameh1').textContent
+            } else {
+                // doc.querySelector('.bot-title-bp h2').textContent
+                // TODO к сожалению сайт не даёт в html сведений о названии бота
+                return null
+            }
+        },
         exampleURL: () => ['https://discords.com/bots/bot/', '469610550159212554', '/vote'],
         URL: () => 'discords.com',
         parseURL: (url) => {
@@ -703,7 +711,8 @@ var allProjects = {
         exampleURL: () => ['https://bestservers.com/server/', '1135', '/vote'],
         URL: () => 'bestservers.com',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        optionalNick: () => true
+        optionalNick: () => true,
+        needAdditionalOrigins: ()=> ['*://*.steamcommunity.com/*']
     },
     CraftListNet: {
         voteURL: (project) => 'https://craft-list.net/minecraft-server/' + project.id + '/vote',
@@ -1633,7 +1642,7 @@ var allProjects = {
         exampleURL: () => ['https://play-minecraft-servers.com/minecraft-servers/', 'opblocks', '/?tab=vote'],
         URL: () => 'play-minecraft-servers.com',
         parseURL: (url) => ({id: url.pathname.split('/')[2]}),
-        timeout: () => ({hour: 23}),
+        timeout: () => ({hour: 0}),
         notRequiredCaptcha: () => true,
         oneProject: () => 1
     },

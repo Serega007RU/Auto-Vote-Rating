@@ -14,6 +14,7 @@ async function silentVoteMCServerList(project) {
                 request.message = json.data.error
                 if (request.message === 'server_not_found') {
                     request.ignoreReport = true
+                    request.retryCoolDown = 21600000
                 }
                 endVote(request, null, project)
             }

@@ -4,6 +4,7 @@ async function vote(/*first*/) {
         request.message = document.querySelector('#__next > div > div').innerText
         if (request.message.includes('page could not be found')) {
             request.ignoreReport = true
+            request.retryCoolDown = 21600000
         }
         chrome.runtime.sendMessage(request)
         return

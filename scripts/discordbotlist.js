@@ -84,20 +84,23 @@ const timer2 = setInterval(()=>{
 const timer3 = setInterval(()=>{
     try {
         if (document.querySelector('div[role="status"]')?.children.length > 0) {
-            clearTimeout(timer3)
-            let request = {}
+            const request = {}
+            request.message = ''
             for (const el of document.querySelector('.toasted-container').children) {
-                if (el.textContent.includes('already voted')) {
-                    chrome.runtime.sendMessage({later: true})
-                    return
-                } else {
-                    request.message = el.textContent
+                request.message = request.message + el.textContent + ' '
+            }
+
+            if (request.message.includes('already voted')) {
+                clearTimeout(timer3)
+                chrome.runtime.sendMessage({later: true})
+            } else if (request.message.includes('Captcha failed')) {
+                // None
+            } else {
+                if (request.message.includes('must watch the ad to upvote') || request.message.includes('Invalid')) {
+                    request.ignoreReport = true
                 }
+                chrome.runtime.sendMessage(request)
             }
-            if (request.message.includes('must watch the ad to upvote') || request.message.includes('Invalid')) {
-                request.ignoreReport = true
-            }
-            chrome.runtime.sendMessage(request)
         }
     } catch (e) {
         clearInterval(timer3)

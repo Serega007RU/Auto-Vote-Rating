@@ -56,7 +56,7 @@ async function vote(first) {
     }
 
     if (document.querySelector('.site-body .text-center')?.textContent.includes('Page Not Found')) {
-        chrome.runtime.sendMessage({message: document.querySelector('.site-body .text-center')?.textContent.trim(), ignoreReport: true})
+        chrome.runtime.sendMessage({message: document.querySelector('.site-body .text-center')?.textContent.trim(), ignoreReport: true, retryCoolDown: 21600000})
     }
 
     //Костыль, reCAPTCHA загружается только после scroll, странно, да?

@@ -18,7 +18,10 @@ async function vote(first) {
             chrome.runtime.sendMessage({later: true})
             return
         } else {
-            if (request.message.includes('Server does not exist') || request.message.toLowerCase().includes('could not send vote via votifier')) {
+            if (request.message.includes('Server does not exist')) {
+                request.ignoreReport = true
+                request.retryCoolDown = 21600000
+            } else if (request.message.toLowerCase().includes('could not send vote via votifier')) {
                 request.ignoreReport = true
             }
             chrome.runtime.sendMessage(request)
