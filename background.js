@@ -67,6 +67,9 @@ async function checkVote() {
     const transaction = db.transaction('projects')
     let cursor = await transaction.objectStore('projects').openCursor()
     while (cursor) {
+        // TODO это временная мера, следует при обновлении версии базы данных исправить все битые key
+        if (!cursor.value.key) cursor.value.key = cursor.key
+
         const project = cursor.value
         if (!project.time || project.time < Date.now()) {
             await checkOpen(project, transaction)
@@ -949,14 +952,15 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         checkVote()
         return
     } else if (request === 'reloadAllSettings') {
-        settings = await db.get('other', 'settings')
-        generalStats = await db.get('other', 'generalStats')
-        todayStats = await db.get('other', 'todayStats')
+        const store = db.transaction('other', 'readwrite').store
+        settings = await store.get('settings')
+        generalStats = await store.get('generalStats')
+        todayStats = await store.get('todayStats')
         for (const[key,value] of openedProjects) {
             openedProjects.delete(key)
             tryCloseTab(key, value, 0)
         }
-        await db.put('other', openedProjects, 'openedProjects')
+        await store.put(openedProjects, 'openedProjects')
         reloadAllAlarms()
         checkVote()
         return
@@ -964,6 +968,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         settings = await db.get('other', 'settings')
         return
     } else if (request.projectDeleted) {
+        const transaction = db.transaction(['projects', 'other'], 'readwrite')
         let nowVoting = false
         //Если эта вкладка была уже открыта, он закрывает её
         for (const[key,value] of openedProjects) {
@@ -975,11 +980,11 @@ async function onRuntimeMessage(request, sender, sendResponse) {
                 nowVoting = true
                 openedProjects.delete(key)
                 tryCloseTab(key, request.projectDeleted, 0)
-                await db.put('other', openedProjects, 'openedProjects')
+                await transaction.objectStore('other').put(openedProjects, 'openedProjects')
                 break
             }
         }
-        await db.delete('projects', request.projectDeleted.key)
+        await transaction.objectStore('projects').delete(request.projectDeleted.key)
         await chrome.alarms.clear(String(request.projectDeleted.key))
         if (nowVoting) {
             checkVote()
@@ -988,11 +993,12 @@ async function onRuntimeMessage(request, sender, sendResponse) {
         sendResponse('success')
         return
     } else if (request.projectRestart) {
+        const transaction = db.transaction(['projects', 'other'], 'readwrite')
         for (const[key,value] of openedProjects) {
             if (request.projectRestart.key === value.key) {
                 if (request.confirmed) {
                     openedProjects.delete(key)
-                    db.put('other', openedProjects, 'openedProjects')
+                    transaction.objectStore('other').put(openedProjects, 'openedProjects')
                     tryCloseTab(key, request.projectRestart, 0)
                     console.log(getProjectPrefix(request.projectRestart, true), chrome.i18n.getMessage('canceledVote'))
                 } else {
@@ -1005,8 +1011,8 @@ async function onRuntimeMessage(request, sender, sendResponse) {
             if (request.projectRestart.rating === value.rating || settings.disabledOneVote) {
                 if (request.confirmed) {
                     openedProjects.delete(key)
-                    await db.put('other', openedProjects, 'openedProjects')
-                    const project = await db.get('projects', value.key)
+                    await transaction.objectStore('other').put(openedProjects, 'openedProjects')
+                    const project = await transaction.objectStore('projects').get(value.key)
                     tryCloseTab(key, project, 0)
                     console.log(getProjectPrefix(project, true), chrome.i18n.getMessage('canceledVote'))
                 } else {
@@ -1198,6 +1204,9 @@ async function endVote(request, sender, project) {
     //         fetchProjects.delete(key)
     //     }
     // }
+
+    // Повторно достаём project так как за время отправки отчёта или использования удалённого кода он мог измениться
+    project = await db.get('projects', project.key)
 
     //Если усё успешно
     let sendMessage
@@ -1711,9 +1720,10 @@ function wait(ms) {
 }
 
 async function updateValue(objStore, value) {
-    const found = await db.count(objStore, value.key)
+    const store = db.transaction(objStore, 'readwrite').store
+    const found = await store.count(value.key)
     if (found) {
-        await db.put(objStore, value, value.key);
+        await store.put(value, value.key);
         (async () => {
             try {
                 await chrome.runtime.sendMessage({updateValue: objStore, value})

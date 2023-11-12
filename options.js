@@ -274,16 +274,18 @@ async function addProjectList(project, preBend) {
     if (!project.key) {
         if (project.priority) {
             preBend = true
-            const cursor = await db.transaction('projects').store.openCursor()
+            const store = db.transaction('projects', 'readwrite').store
+            const cursor = await store.openCursor()
             if (!cursor || cursor.key === 1) {
                 project.key = -1
             } else {
                 project.key = cursor.key - 1
             }
-            await db.put('projects', project, project.key)
+            await store.put(project, project.key)
         } else {
-            project.key = await db.put('projects', project)
-            await db.put('projects', project, project.key)
+            const store = db.transaction('projects', 'readwrite').store
+            project.key = await store.put(project)
+            await store.put(project, project.key)
         }
         usageSpace()
 
@@ -1140,13 +1142,14 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
                 event.submitter.disabled = false
                 return
             }
-            const cursor = await db.transaction('projects').store.openCursor()
+            const store = db.transaction('projects', 'readwrite').store
+            const cursor = await store.openCursor()
             if (!cursor || cursor.key === 1) {
                 project.key = -1
             } else {
                 project.key = cursor.key - 1
             }
-            await db.put('projects', project, project.key)
+            await store.put(project, project.key)
             await addProjectList(project, true)
         } else if (!document.getElementById('priority').checked && project.priority) {
             delete project.priority
@@ -1154,8 +1157,9 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
                 event.submitter.disabled = false
                 return
             }
-            project.key = await db.put('projects', project)
-            await db.put('projects', project, project.key)
+            const store = db.transaction('projects', 'readwrite').store
+            project.key = await store.put(project)
+            await store.put(project, project.key)
             await addProjectList(project)
         } else {
             await db.put('projects', project, project.key)
@@ -1639,19 +1643,21 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
 
         if (!await checkPermissions(projects)) return
 
-        await db.clear('projects')
-        const tx = db.transaction(['projects', 'other'], 'readwrite')
+        const transaction = db.transaction(['projects', 'other'], 'readwrite')
+
+        await transaction.objectStore('projects').clear()
+
         let key = 0
         for (const project of projects) {
             if (project.key == null) {
                 key++
                 project.key = key
             }
-            await tx.objectStore('projects').add(project, project.key)
+            await transaction.objectStore('projects').add(project, project.key)
         }
-        await tx.objectStore('other').put(data.settings, 'settings')
-        await tx.objectStore('other').put(data.generalStats, 'generalStats')
-        await tx.objectStore('other').put(data.todayStats, 'todayStats')
+        await transaction.objectStore('other').put(data.settings, 'settings')
+        await transaction.objectStore('other').put(data.generalStats, 'generalStats')
+        await transaction.objectStore('other').put(data.todayStats, 'todayStats')
 
         settings = data.settings
         generalStats = data.generalStats
@@ -1967,10 +1973,13 @@ async function listSelect(event, tabs) {
         div.setAttribute('data-resource', 'load')
         div.textContent = chrome.i18n.getMessage('load')
         list.append(div)
-        openedProjects = await db.get('other', 'openedProjects')
-        let cursor = await db.transaction('projects').store.index('rating').openCursor(tabs)
+        const transaction = db.transaction(['projects', 'other'])
+        openedProjects = await transaction.objectStore('other').get('openedProjects')
+        let cursor = await transaction.objectStore('projects').index('rating').openCursor(tabs)
         while (cursor) {
+            // TODO это временная мера, следует при обновлении версии базы данных исправить все битые key
             if (!cursor.value.key) cursor.value.key = cursor.key
+
             const project = cursor.value
             addProjectList(project)
             // noinspection JSVoidFunctionReturnValueUsed
@@ -2003,13 +2012,14 @@ function resetModalStats() {
 
 //Слушатель общей статистики и вывод её в модалку
 document.getElementById('generalStats').addEventListener('click', async()=> {
-    generalStats = await db.get('other', 'generalStats')
+    const store = db.transaction('other', 'readwrite').store
+    generalStats = await store.get('generalStats')
     if (new Date(generalStats.lastAttemptVote).getMonth() < new Date().getMonth() || new Date(generalStats.lastAttemptVote).getFullYear() < new Date().getFullYear()) {
         generalStats.lastMonthSuccessVotes = generalStats.monthSuccessVotes
         generalStats.monthSuccessVotes = 0
     }
     toggleModal('stats')
-    await db.put('other', generalStats, 'generalStats')
+    await store.put(generalStats, 'generalStats')
     document.querySelector('.statsSubtitle').textContent = chrome.i18n.getMessage('generalStats')
     document.querySelector('td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = generalStats.successVotes
     document.querySelector('td[data-resource="statsMonthSuccessVotes"]').nextElementSibling.textContent = generalStats.monthSuccessVotes
@@ -2024,7 +2034,8 @@ document.getElementById('generalStats').addEventListener('click', async()=> {
 
 //Слушатель сегодняшней статистики и вывод её в модалку
 document.getElementById('todayStats').addEventListener('click', async()=> {
-    todayStats = await db.get('other', 'todayStats')
+    const store = db.transaction('other', 'readwrite').store
+    todayStats = await store.get('todayStats')
     if (new Date(todayStats.lastAttemptVote).getDay() < new Date().getDay()) {
         todayStats = {
             successVotes: 0,
@@ -2035,7 +2046,7 @@ document.getElementById('todayStats').addEventListener('click', async()=> {
         }
     }
     toggleModal('statsToday')
-    await db.put('other', todayStats, 'todayStats')
+    await store.put(todayStats, 'todayStats')
     document.querySelector('#statsToday td[data-resource="statsSuccessVotes"]').nextElementSibling.textContent = todayStats.successVotes
     document.querySelector('#statsToday td[data-resource="statsErrorVotes"]').nextElementSibling.textContent = todayStats.errorVotes
     document.querySelector('#statsToday td[data-resource="statsLaterVotes"]').nextElementSibling.textContent = todayStats.laterVotes
