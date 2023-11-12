@@ -1121,5 +1121,11 @@
   },
   "alertFocusedTab": {
     "message": "Warning! At this monitoring, it is required that the extensions tab be active (focused), when you start auto-voting, the extension will automatically switch to the tab, which may distract your attention"
+  },
+  "nickWithSpace": {
+    "message": "A space has been found in your nickname"
+  },
+  "nickWithSpaceConfirm": {
+    "message": "A space has been found in your nickname, do you really want to add with a space in your nickname?"
   }
 }

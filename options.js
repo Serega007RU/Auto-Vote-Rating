@@ -1231,6 +1231,15 @@ async function addProject(project, element) {
         secondBonusButton.className = 'secondBonus'
     }
 
+    if (project.rating !== 'Custom' && !allProjects[project.rating].notRequiredNick?.(project)) {
+        if (project.nick?.includes?.(' ')) {
+            createNotif(chrome.i18n.getMessage('nickWithSpace'), 'warn')
+            if (!confirm(chrome.i18n.getMessage('nickWithSpaceConfirm'))) {
+                return
+            }
+        }
+    }
+
     if (!document.getElementById('disableCheckProjects').checked) {
         if (project.id == null || allProjects[project.rating].oneProject?.() > 0) {
             // noinspection JSUnresolvedFunction
