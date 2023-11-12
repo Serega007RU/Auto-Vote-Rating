@@ -578,13 +578,13 @@ chrome.webNavigation.onCommitted.addListener(async function(details) {
             return
         }
         // Если пользователь авторизовывается через эти сайты, но у расширения на это нет прав, всё равно не мешаем ему, пускай сам авторизуется не смотря, на то что есть автоматизация авторизации
-        if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login') || details.url.startsWith('https://steamcommunity.com/login/home')) {
-            // noinspection JSUnresolvedFunction
-            let granted = await chrome.permissions.contains({origins: [details.url]})
-            if (!granted) {
-                return
-            }
-        }
+        // if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login') || details.url.startsWith('https://steamcommunity.com/login/home')) {
+        //     // noinspection JSUnresolvedFunction
+        //     let granted = await chrome.permissions.contains({origins: [details.url]})
+        //     if (!granted) {
+        //         return
+        //     }
+        // }
 
         filesMain.push('scripts/main/visible.js')
         if (allProjects[projectByURL.get(getDomainWithoutSubdomain(details.url))]?.needIsTrusted?.()) {
@@ -655,14 +655,14 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
         const project = await db.get('projects', opened.key)
 
         // Если пользователь авторизовывается через эти сайты, но у расширения на это нет прав, всё равно не мешаем ему, пускай сам авторизуется не смотря, на то что есть автоматизация авторизации
-        if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login') || details.url.startsWith('https://steamcommunity.com/login/home')) {
-            // noinspection JSUnresolvedFunction
-            let granted = await chrome.permissions.contains({origins: [details.url]})
-            if (!granted) {
-                console.warn(getProjectPrefix(project, true), 'Not granted permissions for ' + details.url)
-                return
-            }
-        }
+        // if (details.url.match(/vk.com\/*/) || details.url.match(/discord.com\/*/) || details.url.startsWith('https://steamcommunity.com/openid/login') || details.url.startsWith('https://steamcommunity.com/login/home')) {
+        //     // noinspection JSUnresolvedFunction
+        //     let granted = await chrome.permissions.contains({origins: [details.url]})
+        //     if (!granted) {
+        //         console.warn(getProjectPrefix(project, true), 'Not granted permissions for ' + details.url)
+        //         return
+        //     }
+        // }
 
         if (opened.countInject >= 10) {
             endVote({tooManyVoteAttempts: true}, {tab: {id: details.tabId}, url: details.url}, opened)
