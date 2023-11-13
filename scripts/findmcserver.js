@@ -43,6 +43,7 @@ async function vote(first) {
         if (document.querySelector('.ant-result').innerText.trim().includes('404') && document.querySelector('.ant-result').innerText.trim().includes('not found')) {
             const request = {}
             request.message = document.querySelector('.ant-result').innerText.trim()
+            request.ignoreReport = true
             request.retryCoolDown = 21600000
             chrome.runtime.sendMessage(request)
             return
