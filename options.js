@@ -268,7 +268,7 @@ async function restoreOptions(first) {
 
 //Добавить проект в список проекта
 async function addProjectList(project, preBend) {
-    if (document.getElementById(project.rating + 'Button') == null) {
+    if (!document.querySelector('[data-rating-button="' + project.rating + '"]')) {
         generateBtnListRating(project.rating, 0)
     }
     if (!project.key) {
@@ -289,8 +289,8 @@ async function addProjectList(project, preBend) {
         }
         usageSpace()
 
-        const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent)
-        document.querySelector('#' + project.rating + 'Button > span').textContent = String(count + 1)
+        const count = Number(document.querySelector('[data-rating-button="' + project.rating + '"] > span').textContent)
+        document.querySelector('[data-rating-button="' + project.rating + '"] > span').textContent = String(count + 1)
 
         if (project.time != null && project.time > Date.now()) {
             let create = true
@@ -310,7 +310,7 @@ async function addProjectList(project, preBend) {
         }
     }
 
-    const listProject = document.getElementById(project.rating + 'List')
+    const listProject = document.querySelector('[data-rating-list="' + project.rating + '"]')
     if (listProject.childElementCount === 0 && listProject.parentElement.style.display === 'none') return
     const li = document.createElement('li')
     li.id = 'projects' + project.key
@@ -480,9 +480,9 @@ async function updateModalStats(project, toggle) {
 function generateBtnListRating(rating, count) {
     const button = document.createElement('button')
     button.setAttribute('class', 'selectsite')
-    button.setAttribute('id', rating + 'Button')
+    button.setAttribute('data-rating-button', rating)
     button.style.order = String(Object.keys(allProjects).indexOf(rating))
-    button.textContent = allProjects[rating].URL()
+    button.textContent = rating
     const span = document.createElement('span')
     span.textContent = count
     button.append(span)
@@ -490,7 +490,7 @@ function generateBtnListRating(rating, count) {
     button.addEventListener('click', event => listSelect(event, rating))
 
     const ul = document.createElement('ul')
-    ul.id = rating + 'Tab'
+    ul.setAttribute('data-rating-tab', rating)
     ul.classList.add('listcontent')
     ul.style.display = 'none'
 //  const div = document.createElement('div')
@@ -512,7 +512,7 @@ function generateBtnListRating(rating, count) {
         ul.append(label)
     }
     const div2 = document.createElement('div')
-    div2.id = rating + 'List'
+    div2.setAttribute('data-rating-list', rating)
     ul.append(div2)
     const dellAll = document.createElement('button')
     dellAll.className = 'submitBtn redBtn'
@@ -526,8 +526,8 @@ function generateBtnListRating(rating, count) {
                 // noinspection JSVoidFunctionReturnValueUsed
                 cursor = await cursor.continue()
             }
-            document.getElementById(rating + 'Tab').remove()
-            document.getElementById(rating + 'Button').remove()
+            document.querySelector('[data-rating-tab="' + rating + '"]').remove()
+            document.querySelector('[data-rating-button="' + rating + '"]').remove()
             if (document.querySelector('.buttonBlock').childElementCount <= 0) {
                 document.getElementById('notAddedAll').textContent = chrome.i18n.getMessage('notAddedAll')
             }
@@ -565,16 +565,16 @@ async function removeProjectList(project, editing, event) {
         usageSpace()
 
         if (!editing) {
-            const count = Number(document.querySelector('#' + project.rating + 'Button > span').textContent) - 1
+            const count = Number(document.querySelector('[data-rating-button="' + project.rating + '"] > span').textContent) - 1
             if (count <= 0) {
-                document.getElementById(project.rating + 'Tab').remove()
-                document.getElementById(project.rating + 'Button').remove()
+                document.querySelector('[data-rating-tab="' + project.rating + '"]').remove()
+                document.querySelector('[data-rating-button="' + project.rating + '"]').remove()
                 if (document.querySelector('.buttonBlock').childElementCount <= 0) {
                     document.getElementById('notAddedAll').textContent = chrome.i18n.getMessage('notAddedAll')
                 }
             } else {
                 li.remove()
-                document.querySelector('#' + project.rating + 'Button > span').textContent = String(count)
+                document.querySelector('[data-rating-button="' + project.rating + '"] > span').textContent = String(count)
             }
         } else {
             li.remove()
@@ -586,7 +586,7 @@ async function removeProjectList(project, editing, event) {
 //Перезагрузка списка проектов
 async function reloadProjectList() {
     for (const item of Object.keys(allProjects)) {
-        if (document.getElementById(item + 'List') != null) document.getElementById(item + 'List').parentNode.replaceChild(document.getElementById(item + 'List').cloneNode(false), document.getElementById(item + 'List'))
+        if (document.querySelector('[data-rating-list="' + item + '"]')) document.querySelector('[data-rating-list="' + item + '"]').parentNode.replaceChild(document.querySelector('[data-rating-list="' + item + '"]').cloneNode(false), document.querySelector('[data-rating-list="' + item + '"]'))
     }
     document.querySelector('div.buttonBlock').parentNode.replaceChild(document.querySelector('div.buttonBlock').cloneNode(false), document.querySelector('div.buttonBlock'))
     if (document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]') != null) {
@@ -816,7 +816,7 @@ function resetEdit(project) {
 
     if (project) {
         document.getElementById('addedTab').click()
-        document.getElementById(project.rating + 'Button').click()
+        document.querySelector('[data-rating-button="' + project.rating + '"]').click()
         document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})
         highlight(document.getElementById('projects' + project.key))
     }
@@ -836,7 +836,7 @@ function editProject(project, switchToEdit) {
     document.getElementById('rating').disabled = true
 
     const funcRating = allProjects[project.rating]
-    document.getElementById('rating').value = funcRating.URL()
+    document.getElementById('rating').value = project.rating
     if (project.rating === 'Custom') {
         document.getElementById('nick').value = project.id
     } else if (!funcRating.notRequiredId?.()) {
@@ -945,7 +945,7 @@ function editProject(project, switchToEdit) {
 document.getElementById('append').addEventListener('submit', async(event)=>{
     event.preventDefault()
     event.submitter.disabled = true
-    let rating, domain, funcRating
+    let domain, funcRating
     let project = {}
     if (event.submitter.id === 'submitEditProject') {
         project = editingProject
@@ -954,15 +954,20 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
         const url = document.getElementById('link').value
         try {
             domain = getDomainWithoutSubdomain(url)
-            rating = projectByURL.get(domain)
-            if (!rating) {
+            funcRating = allProjects[domain]
+            if (!funcRating) {
                 createNotif(chrome.i18n.getMessage('errorLink', domain), 'error')
                 event.submitter.disabled = false
                 return
             }
-            funcRating = allProjects[rating]
             project = funcRating.parseURL(new URL(url))
-            project.rating = rating
+            project.rating = domain
+            if (funcRating.URLMain) {
+                const domain2 = funcRating.URLMain?.()
+                if (domain2 !== domain) {
+                    project.ratingMain = domain2
+                }
+            }
 
             if (!funcRating.notRequiredId?.() && (project.id == null || project.id === '')) {
                 createNotif(chrome.i18n.getMessage('errorLinkParam', 'id'), 'error')
@@ -994,16 +999,14 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
         }
     } else {
         domain = document.getElementById('rating').value
-        rating = projectByURL.get(domain)
-        if (!rating) {
+        funcRating = allProjects[domain]
+        if (!funcRating) {
             createNotif(chrome.i18n.getMessage('errorSelectSiteRating'), 'error')
             event.submitter.disabled = false
             return
         }
-        project.rating = rating
-        funcRating = allProjects[rating]
 
-        if (project.rating === 'Custom') {
+        if (domain === 'Custom') {
             project.id = document.getElementById('nick').value
         } else if (!funcRating.notRequiredId?.()) {
             project.id = document.getElementById('id').value
@@ -1013,7 +1016,7 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
             project.game = document.getElementById('chooseGame').value
         }
 
-        if (funcRating.exampleURLGame) {
+        if (funcRating.exampleURLListing) {
             project.listing = document.getElementById('chooseListing').value
         }
 
@@ -1023,6 +1026,20 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
 
         if (funcRating.additionExampleURL) {
             project.addition = document.getElementById('additionURL').value
+        }
+
+        const domain2 = getDomainWithoutSubdomain(funcRating.voteURL(project))
+        if (domain2 !== domain && domain !== 'Custom') {
+            if (!allProjects[domain2]) {
+                if (!confirm(chrome.i18n.getMessage('notSupportedSiteRating', domain2))) {
+                    event.submitter.disabled = false
+                    return
+                }
+                project.rating = domain
+            } else {
+                project.rating = domain2
+                project.ratingMain = domain
+            }
         }
     }
 
@@ -1476,7 +1493,7 @@ async function checkPermissions(projects, element) {
     const origins = []
     const permissions = []
     for (const project of projects) {
-        const url = allProjects[project.rating].pageURL(project)
+        const url = allProjects[project.rating].voteURL(project)
         const domain = getDomainWithoutSubdomain(url)
         if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
         if (allProjects[project.rating].needAdditionalOrigins) {
@@ -1641,8 +1658,6 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
 
         const projects = data.projects
 
-        if (!await checkPermissions(projects)) return
-
         const transaction = db.transaction(['projects', 'other'], 'readwrite')
 
         await transaction.objectStore('projects').clear()
@@ -1663,10 +1678,16 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         generalStats = data.generalStats
         todayStats = data.todayStats
 
-        await upgrade(db, data.version, db.version, tx)
+        await upgrade(db, data.version, db.version, transaction)
+
+        if (!await checkPermissions(await transaction.objectStore('projects').getAll())) {
+            await db.clear('projects')
+            chrome.runtime.sendMessage('reloadAllSettings')
+            await restoreOptions()
+            return
+        }
 
         chrome.runtime.sendMessage('reloadAllSettings')
-
         await restoreOptions()
 
         createNotif(chrome.i18n.getMessage('importingEnd'), 'success')
@@ -1964,10 +1985,10 @@ async function listSelect(event, tabs) {
         selectsite[x].className = selectsite[x].className.replace(' activeList', '')
     }
 
-    document.getElementById(tabs + 'Tab').style.display = 'block'
+    document.querySelector('[data-rating-tab="' + tabs + '"]').style.display = 'block'
     event.currentTarget.className += ' activeList'
 
-    const list = document.getElementById(tabs + 'List')
+    const list = document.querySelector('[data-rating-list="' + tabs + '"]')
     if (list.childElementCount === 0) {//Если список проектов данного рейтинга пустой - заполняем его
         let div = document.createElement('div')
         div.setAttribute('data-resource', 'load')
@@ -2070,18 +2091,18 @@ document.getElementById('link').addEventListener('input', function() {
         laterChoose = false
     }
 
-    let rating, project, funcRating
+    let domain, project, funcRating
     try {
-        rating = projectByURL.get(getDomainWithoutSubdomain(this.value))
-        if (!rating) return
-        funcRating = allProjects[rating]
+        domain = getDomainWithoutSubdomain(this.value)
+        funcRating = allProjects[domain]
+        if (!funcRating) return
         project = funcRating.parseURL(new URL(this.value))
     } catch (error) {
         return
     }
     laterChoose = true
 
-    project.rating = rating
+    project.rating = domain
     if (!funcRating.notRequiredNick?.(project)) {
         document.getElementById('nick').parentElement.removeAttribute('style')
         document.getElementById('nick').required = true
@@ -2177,12 +2198,11 @@ document.getElementById('rating').addEventListener('input', function() {
         return
     }
 
-    let rating = projectByURL.get(this.value)
-
-    if (!rating) return
-    laterChooseManual = true
-
+    let rating = this.value
     let funcRating = allProjects[rating]
+
+    if (!funcRating) return
+    laterChooseManual = true
 
     if (!funcRating.notRequiredId?.()) {
         document.getElementById('id').parentElement.removeAttribute('style')
@@ -2201,13 +2221,13 @@ document.getElementById('rating').addEventListener('input', function() {
         }
     }
 
-    if (this.value !== funcRating.URL()) {
+    if (funcRating.URLMain?.() && this.value !== funcRating.URLMain()) {
         if (funcRating.exampleURLGame && !funcRating.defaultGame) document.getElementById('chooseGame').value = this.value
-        this.value = funcRating.URL()
+        this.value = funcRating.URLMain()
     }
     if (funcRating.exampleURLGame) {
         document.getElementById('chooseGame').parentElement.removeAttribute('style')
-        document.getElementById('chooseGame').name = 'chooseGame' + rating
+        document.getElementById('chooseGame').name = 'chooseGame' + this.value
         if (funcRating.defaultGame && !editingProject) document.getElementById('chooseGame').value = funcRating.defaultGame()
         document.getElementById('urlGameTooltip1').textContent = funcRating.exampleURLGame()[0]
         document.getElementById('urlGameTooltip2').textContent = funcRating.exampleURLGame()[1]
@@ -2329,10 +2349,10 @@ document.getElementById('chooseGame').addEventListener('change', function () {
 
 function generateDataList() {
     const datalist = document.getElementById('ratingList')
-    for (const [url, rating] of projectByURL) {
+    for (const rating of Object.keys(allProjects)) {
         const option = document.createElement('option')
         option.setAttribute('name', rating)
-        option.value = url
+        option.value = rating
         if (rating === 'Custom') {
             option.disabled = !settings.enableCustom
             option.textContent = chrome.i18n.getMessage('Custom')
@@ -2371,7 +2391,7 @@ async function onMessage(request) {
         document.getElementById('addedTab').click()
         await loaded
         const project = await db.get('projects', request.openProject)
-        await listSelect({currentTarget: document.querySelector('#' + project.rating + 'Button')}, project.rating)
+        await listSelect({currentTarget: document.querySelector('[data-rating-button="' + project.rating + '"]')}, project.rating)
         document.getElementById('projects' + project.key).scrollIntoView({block: 'center'})
         highlight(document.getElementById('projects' + project.key))
         window.history.replaceState(null, null, 'options.html')

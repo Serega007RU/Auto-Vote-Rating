@@ -10,7 +10,7 @@ importScripts('main.js')
 self.addEventListener('install', () => {
     importScripts('libs/linkedom.js')
     importScripts('libs/evalCore.umd.js')
-    importScripts('scripts/mcserverlist_silentvote.js', 'scripts/misterlauncher_silentvote.js', 'scripts/serverpact_silentvote.js', 'scripts/hoyolab_silentvote.js', 'scripts/loliland_silentvote.js', 'scripts/genshindrop_silentvote.js')
+    importScripts('scripts/mcserver-list.eu_silentvote.js', 'scripts/misterlauncher.org_silentvote.js', 'scripts/serverpact.com_silentvote.js', 'scripts/genshindrop.com_silentvote.js')
 })
 
 //Текущие fetch запросы
@@ -173,7 +173,7 @@ async function checkOpen(project, transaction) {
                             if (details.url) {
                                 const domain = getDomainWithoutSubdomain(details.url)
                                 // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
-                                if (projectByURL.get(domain) !== value.rating) {
+                                if (domain !== value.rating) {
                                     return
                                 }
                             }
@@ -435,7 +435,7 @@ async function silentVote(project) {
 
         if (!settings.disabledUseRemoteCode) {
             try {
-                const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_silentvote.js')
+                const response = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + (project.ratingMain || project.rating) + '_silentvote.js')
                 const textScript = await response.text()
                 if (!evil) {
                     // noinspection JSUnresolvedVariable
@@ -447,12 +447,12 @@ async function silentVote(project) {
                 }
                 evil(textScript)
             } catch (error) {
-                console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода scripts/' + project.rating.toLowerCase() + '_silentvote.js, использую вместо этого локальный код', error.message)
+                console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода scripts/' + (project.ratingMain || project.rating) + '_silentvote.js, использую вместо этого локальный код', error.message)
             }
         }
 
         if (!self['silentVote' + project.rating]) {
-            importScripts('scripts/' + project.rating.toLowerCase() + '_silentvote.js')
+            importScripts('scripts/' + (project.ratingMain || project.rating) + '_silentvote.js')
         }
 
         await self['silentVote' + project.rating](project)
@@ -590,11 +590,11 @@ chrome.webNavigation.onCommitted.addListener(async function(details) {
         // }
 
         filesMain.push('scripts/main/visible.js')
-        if (allProjects[projectByURL.get(getDomainWithoutSubdomain(details.url))]?.needIsTrusted?.()) {
+        if (allProjects[getDomainWithoutSubdomain(details.url)]?.needIsTrusted?.()) {
             filesIsolated.push('scripts/main/istrusted_isolated.js')
             filesMain.push('scripts/main/istrusted_main.js')
         }
-        if (allProjects[projectByURL.get(getDomainWithoutSubdomain(details.url))]?.needAlert?.()) {
+        if (allProjects[getDomainWithoutSubdomain(details.url)]?.needAlert?.()) {
             filesIsolated.push('scripts/main/alert_isolated.js')
             filesMain.push('scripts/main/alert_main.js')
         }
@@ -678,11 +678,11 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             try {
                 const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/api.js')
                 textApi = await responseApi.text()
-                const responseScript = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '.js')
+                const responseScript = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + (project.ratingMain || project.rating) + '.js')
                 textScript = await responseScript.text()
                 // noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 if (allProjects[project.rating]?.needWorld?.()) {
-                    const responseWorld = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + project.rating.toLowerCase() + '_world.js')
+                    const responseWorld = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/' + (project.ratingMain || project.rating) + '_world.js')
                     textWorld = await responseWorld.text()
                 }
             } catch (error) {
@@ -725,11 +725,11 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
                 }
             } else {
                 if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'.js, scripts/main/api.js to ' + details.url)
-                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/main/hacktimer.js', 'scripts/' + project.rating.toLowerCase() +'.js', 'scripts/main/api.js']})
+                await chrome.scripting.executeScript({target: {tabId: details.tabId}, files: ['scripts/main/hacktimer.js', 'scripts/' + (project.ratingMain || project.rating) +'.js', 'scripts/main/api.js']})
                 // noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 if (allProjects[project.rating]?.needWorld?.()) {
                     if (settings.debug) console.log('Injecting scripts/' + project.rating.toLowerCase() +'_world.js to ' + details.url + ' in MAIN world')
-                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + project.rating.toLowerCase() +'_world.js']})
+                    await chrome.scripting.executeScript({target: {tabId: details.tabId}, world: 'MAIN', files: ['scripts/' + (project.ratingMain || project.rating) +'_world.js']})
                 }
             }
 
@@ -1158,7 +1158,7 @@ async function endVote(request, sender, project) {
             const url = sender?.url || request.url
             const domain = getDomainWithoutSubdomain(url)
             // Если мы попали не по адресу, ну значит не надо отсылать отчёт об ошибке
-            if (projectByURL.get(domain) !== project.rating) {
+            if (domain !== project.rating) {
                 request.incorrectDomain = domain
             }
         }
@@ -1708,10 +1708,10 @@ function getProjectPrefix(project, detailed) {
         }
     }
     if (text === '') {
-        return '[' + allProjects[project.rating]?.URL() + ']'
+        return '[' + project.rating + ']'
     } else {
         text = text.replace(' – ', '')
-        return '[' + allProjects[project.rating]?.URL() + '] ' + text
+        return '[' + project.rating + '] ' + text
     }
 }
 

@@ -1127,5 +1127,13 @@
   },
   "nickWithSpaceConfirm": {
     "message": "A space has been found in your nickname, do you really want to add with a space in your nickname?"
+  },
+  "notSupportedSiteRating": {
+    "message": "It seems that according to the parameters you specified, the extension does not provide support for $rating$, are you sure that the data was entered correctly?",
+    "placeholders": {
+      "rating": {
+        "content": "$1"
+      }
+    }
   }
 }
