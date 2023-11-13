@@ -34,20 +34,20 @@ var allProjects = {
         needAdditionalOrigins: ()=> ['*://*.vk.com/*']
     },
     'minecraftrating.ru': {
-        pageURL: (project) => (project.game === 'projects') ? 'https://minecraftrating.ru/projects/' + project.id + '/' : 'https://minecraftrating.ru/vote/' + project.id + '/',
-        voteURL: (project) => (project.game === 'projects') ? 'https://minecraftrating.ru/projects/' + project.id + '/' : 'https://minecraftrating.ru/vote/' + project.id + '/',
-        projectName: (doc, project) => (project.game === 'projects') ? doc.querySelector('h1[itemprop="name"]').textContent.trim().replace('Проект ', '') : doc.querySelector('.page-header a').textContent,
+        pageURL: (project) => (project.listing === 'projects') ? 'https://minecraftrating.ru/projects/' + project.id + '/' : 'https://minecraftrating.ru/vote/' + project.id + '/',
+        voteURL: (project) => (project.listing === 'projects') ? 'https://minecraftrating.ru/projects/' + project.id + '/' : 'https://minecraftrating.ru/vote/' + project.id + '/',
+        projectName: (doc, project) => (project.listing === 'projects') ? doc.querySelector('h1[itemprop="name"]').textContent.trim().replace('Проект ', '') : doc.querySelector('.page-header a').textContent,
         exampleURL: () => ['https://minecraftrating.ru/projects/', 'cubixworld', '/'],
-        parseURL: (url) => ({game: url.pathname.split('/')[1] === 'projects' ? 'projects': 'servers', id: url.pathname.split('/')[2]}),
-        timeout: (project) => project.game === 'projects' ? ({hour: 21}) : ({hours: 24}),
-        exampleURLGame: () => ['https://minecraftrating.ru/', 'projects', '/mcskill/'],
-        defaultGame: () => 'projects',
-        gameList: () => new Map([
+        parseURL: (url) => ({listing: url.pathname.split('/')[1] === 'projects' ? 'projects': 'servers', id: url.pathname.split('/')[2]}),
+        timeout: (project) => project.listing === 'projects' ? ({hour: 21}) : ({hours: 24}),
+        exampleURLListing: () => ['https://minecraftrating.ru/', 'projects', '/mcskill/'],
+        defaultListing: () => 'projects',
+        listingList: () => new Map([
             ['projects', 'Проекты'],
             ['servers', 'Сервера (нет награды за голосование)']
         ]),
-        notRequiredNick: (project) => project?.game === 'servers',
-        needAdditionalOrigins: (project)=> project?.game === 'projects' ? ['*://*.vk.com/*'] : []
+        notRequiredNick: (project) => project?.listing === 'servers',
+        needAdditionalOrigins: (project)=> project?.listing === 'projects' ? ['*://*.vk.com/*'] : []
     },
     'monitoringminecraft.ru': {
         pageURL: (project) => 'https://monitoringminecraft.ru/top/' + project.id + '/',
@@ -126,20 +126,8 @@ var allProjects = {
         timeout: () => ({hour: 5})
     },
     'topg.org': {
-        pageURL: (project) => {
-            // noinspection JSCheckFunctionSignatures
-            if (!isNaN(project.id.at(0))) { // TODO временное решение, следует в следующей версии перевести на новый формат id
-                project.id = 'server-' + project.id
-            }
-            return 'https://topg.org/' + project.game + '/' + project.id
-        },
-        voteURL: (project) => {
-            // noinspection JSCheckFunctionSignatures
-            if (!isNaN(project.id.at(0))) { // TODO временное решение, следует в следующей версии перевести на новый формат id
-                project.id = 'server-' + project.id
-            }
-            return 'https://topg.org/' + project.game + '/' + project.id
-        },
+        pageURL: (project) => 'https://topg.org/' + project.game + '/' + project.id,
+        voteURL: (project) => 'https://topg.org/' + project.game + '/' + project.id,
         projectName: (doc) => doc.querySelector('div.sheader').textContent,
         exampleURL: () => ['https://topg.org/minecraft-servers/', 'server-405637', ''],
         parseURL: (url) => ({ game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
@@ -408,8 +396,8 @@ var allProjects = {
         timeout: () => ({hours: 24})
     },
     'top.gg': {
-        pageURL: (project) => 'https://top.gg/' + project.game + '/' + project.id + '/vote',
-        voteURL: (project) => 'https://top.gg/' + project.game + '/' + project.id + '/vote' + project.addition,
+        pageURL: (project) => 'https://top.gg/' + project.listing + '/' + project.id + '/vote',
+        voteURL: (project) => 'https://top.gg/' + project.listing + '/' + project.id + '/vote' + project.addition,
         projectName: (doc) => {
             for (const element of doc.querySelectorAll('h1')) {
                 if (element.textContent.includes('Voting for ')) {
@@ -421,7 +409,7 @@ var allProjects = {
         parseURL: (url) => {
             const project = {}
             const paths = url.pathname.split('/')
-            project.game = paths[1]
+            project.listing = paths[1]
             project.id = paths[2]
             if (url.search && url.search.length > 0) {
                 project.addition = url.search
@@ -431,9 +419,9 @@ var allProjects = {
             return project
         },
         timeout: () => ({hours: 12}),
-        exampleURLGame: () => ['https://top.gg/', 'bot', '/270904126974590976/vote'],
-        defaultGame: () => 'bot',
-        gameList: () => new Map([
+        exampleURLListing: () => ['https://top.gg/', 'bot', '/270904126974590976/vote'],
+        defaultListing: () => 'bot',
+        listingList: () => new Map([
             ['bot', 'Bots'],
             ['servers', 'Guilds']
         ]),
@@ -443,18 +431,24 @@ var allProjects = {
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
     'discordbotlist.com': {
-        pageURL: (project) => 'https://discordbotlist.com/' + project.game + '/' + project.id,
-        voteURL: (project) => 'https://discordbotlist.com/' + project.game + '/' + project.id + '/upvote',
+        pageURL: (project) => 'https://discordbotlist.com/' + project.listing + '/' + project.id,
+        voteURL: (project) => 'https://discordbotlist.com/' + project.listing + '/' + project.id + '/upvote',
         projectName: (doc) => doc.querySelector('h1.bot-name').textContent.trim(),
         exampleURL: () => ['https://discordbotlist.com/bots/', 'dank-memer', '/upvote'],
-        parseURL: (url) => ({game: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
+        parseURL: (url) => ({listing: url.pathname.split('/')[1], id: url.pathname.split('/')[2]}),
         timeout: () => ({hours: 12}),
+        exampleURLListing: () => ['https://discordbotlist.com/', 'bots', '/dank-memer/upvote'],
+        defaultListing: () => 'bots',
+        listingList: () => new Map([
+            ['bots', 'Bots'],
+            ['servers', 'Guilds']
+        ]),
         notRequiredNick: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
     'discords.com': {
-        pageURL: (project) => 'https://discords.com/' + project.game + '/' + project.id,
-        voteURL: (project) => 'https://discords.com/' + project.game + '/' + project.id + (project.game === 'servers' ? '/upvote' : '/vote'),
+        pageURL: (project) => 'https://discords.com/' + project.listing + '/' + project.id,
+        voteURL: (project) => 'https://discords.com/' + project.listing + '/' + project.id + (project.listing === 'servers' ? '/upvote' : '/vote'),
         projectName: (doc, project) => {
             if (project.game === 'servers') {
                 return doc.querySelector('.servernameh1').textContent
@@ -470,14 +464,20 @@ var allProjects = {
             const paths = url.pathname.split('/')
             if (paths[1] === 'servers') {
                 project.id = paths[2]
-                project.game = 'servers'
+                project.listing = 'servers'
             } else {
                 project.id = paths[3]
-                project.game = 'bots/bot'
+                project.listing = 'bots/bot'
             }
             return project
         },
-        timeout: (project) => project.game === 'bots/bot' ? ({hours: 12}) : ({hours: 6}),
+        timeout: (project) => project.listing === 'bots/bot' ? ({hours: 12}) : ({hours: 6}),
+        exampleURLListing: () => ['https://discords.com/', 'bots/bot', '/469610550159212554/vote'],
+        defaultListing: () => 'bots',
+        listingList: () => new Map([
+            ['bots/bot', 'Bots'],
+            ['servers', 'Guilds']
+        ]),
         notRequiredNick: () => true,
         needAdditionalOrigins: ()=> ['https://discord.com/oauth2/*']
     },
@@ -655,26 +655,27 @@ var allProjects = {
     },
     'minecraftkrant.nl': {
         pageURL: (project) => {
-            if (!project.game) project.game = 'www.minecraftkrant.nl'
-            const serverlist = project.game === 'www.minecraftkrant.nl' ? 'serverlijst' : 'servers'
-            return 'https://' + project.game + '/' + serverlist + '/' + project.id
+            if (!project.lang) project.lang = 'www.minecraftkrant.nl'
+            const serverlist = project.lang === 'www.minecraftkrant.nl' ? 'serverlijst' : 'servers'
+            return 'https://' + project.lang + '/' + serverlist + '/' + project.id
         },
         voteURL: (project) => {
-            if (!project.game) project.game = 'www.minecraftkrant.nl'
-            const serverlist = project.game === 'www.minecraftkrant.nl' ? 'serverlijst' : 'servers'
-            return 'https://' + project.game + '/' + serverlist + '/' + project.id + '/vote'
+            if (!project.lang) project.lang = 'www.minecraftkrant.nl'
+            const serverlist = project.lang === 'www.minecraftkrant.nl' ? 'serverlijst' : 'servers'
+            return 'https://' + project.lang + '/' + serverlist + '/' + project.id + '/vote'
         },
         projectName: (doc) => doc.querySelector('div.s_HeadTitle h1').firstChild.textContent.trim(),
         exampleURL: () => ['https://www.minecraftkrant.nl/serverlijst/', 'torchcraft', '/vote'],
         URLMain: () => 'minecraftkrant.nl',
         parseURL: (url) => {
             const project = {}
-            project.game = url.host
+            project.lang = url.host
             project.id = url.pathname.split('/')[2]
             return project
         },
-        exampleURLGame: () => ['https://', 'minecraftkrant.nl', '/serverlijst/torchcraft/vote'],
-        gameList: () => new Map([
+        exampleURLLang: () => ['https://www.', 'minecraftkrant.nl', '/serverlijst/torchcraft/vote'],
+        defaultLand: () => 'www.minecraftkrant.nl',
+        langList: () => new Map([
             ['www.minecraftkrant.nl', 'Nederlands'],
             ['minecraft-news.net', 'English']
         ])
@@ -843,30 +844,30 @@ var allProjects = {
     },
     'misterlauncher.org': {
         pageURL: (project) => {
-            if (project.game === 'projects') return 'https://misterlauncher.org/projects/' + project.id + '/'
+            if (project.listing === 'projects') return 'https://misterlauncher.org/projects/' + project.id + '/'
             else return 'https://misterlauncher.org/vote/' + project.id + '/'
         },
         voteURL: (project) => {
-            if (project.game === 'projects') return 'https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code'
+            if (project.listing === 'projects') return 'https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code'
             else return 'https://misterlauncher.org/vote/' + project.id + '/'
         },
         projectName: (doc, project) => {
-            if (project.game === 'projects') return doc.querySelector('h1[itemprop="name"]').textContent.trim().replace('Проект ', '')
+            if (project.listing === 'projects') return doc.querySelector('h1[itemprop="name"]').textContent.trim().replace('Проект ', '')
             else return doc.querySelector('.page-vote a').textContent
         },
         exampleURL: () => ['https://misterlauncher.org/projects/', 'omegamc', '/'],
-        parseURL: (url) => ({game: url.pathname.split('/')[1] === 'projects' ? 'projects' : 'servers', id: url.pathname.split('/')[2]}),
-        timeout: (project) => project.game === 'projects' ? ({hour: 21}) : ({hours: 24}),
-        exampleURLGame: () => ['https://misterlauncher.org/', 'projects', '/omegamc/'],
-        defaultGame: () => 'projects',
-        gameList: () => new Map([
+        parseURL: (url) => ({listing: url.pathname.split('/')[1] === 'projects' ? 'projects' : 'servers', id: url.pathname.split('/')[2]}),
+        timeout: (project) => project.listing === 'projects' ? ({hour: 21}) : ({hours: 24}),
+        exampleURLListing: () => ['https://misterlauncher.org/', 'projects', '/omegamc/'],
+        defaultListing: () => 'projects',
+        listingList: () => new Map([
             ['projects', 'Проекты'],
             ['servers', 'Сервера (нет награды за голосование)']
         ]),
-        silentVote: (project) => project.game === 'projects',
-        notRequiredNick: (project) => project?.game === 'servers',
-        notRequiredCaptcha: (project) => project?.game === 'projects',
-        needAdditionalOrigins: (project)=> project?.game === 'projects' ? ['*://*.vk.com/*'] : []
+        silentVote: (project) => project.listing === 'projects',
+        notRequiredNick: (project) => project?.listing === 'servers',
+        notRequiredCaptcha: (project) => project?.listing === 'projects',
+        needAdditionalOrigins: (project)=> project?.listing === 'projects' ? ['*://*.vk.com/*'] : []
     },
     'minecraft-servers.de': {
         pageURL: (project) => 'https://minecraft-servers.de/server/' + project.id,

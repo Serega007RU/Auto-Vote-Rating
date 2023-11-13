@@ -426,6 +426,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
         let cursor = await transaction.objectStore('projects').openCursor()
         while (cursor) {
             const project = cursor.value
+
             const domain = oldNames.get(project.rating)
             const voteURL = allProjects[domain]?.voteURL?.(project)
             if (!domain || !voteURL) {
@@ -442,6 +443,20 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             } else {
                 project.rating = domain
             }
+
+            if (project.rating === 'topg.org') {
+                // noinspection JSCheckFunctionSignatures
+                if (!isNaN(project.id.at(0))) {
+                    project.id = 'server-' + project.id
+                }
+            } else if (project.rating === 'minecraftrating.ru' || project.rating === 'top.gg' || project.rating === 'discordbotlist.com' || project.rating === 'discords.com' || project.rating === 'misterlauncher.org') {
+                project.listing = project.game
+                delete project.game
+            } else if (project.rating === 'minecraftkrant.nl') {
+                project.lang = project.game
+                delete project.game
+            }
+
             await cursor.update(project)
             // noinspection JSVoidFunctionReturnValueUsed
             cursor = await cursor.continue()
