@@ -457,6 +457,10 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
                 delete project.game
             }
 
+            if (project.key == null) {
+                project.key = cursor.key
+            }
+
             await cursor.update(project)
             // noinspection JSVoidFunctionReturnValueUsed
             cursor = await cursor.continue()
