@@ -457,6 +457,16 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
                 delete project.game
             }
 
+            if (((project.rating === 'topcraft.club' || project.rating === 'topcraft.ru') && project.id === '7666') || (project.id === 'arago' && (project.rating === 'minecraftrating.ru' || project.rating === 'tmonitoring.com'))) {
+                project.error = 'Отключено расширением. Проект закрыт. Если это не так - сообщите разработчику расширения'
+                project.time = Infinity
+            }
+
+            if (project.rating === 'craftlist.org') {
+                project.error = 'Auto-voting is suspended for craftlist.org, use other automation methods or vote manually. The risk of being banned for auto-voting is too high.'
+                project.time = Infinity
+            }
+
             if (project.key == null) {
                 project.key = cursor.key
             }

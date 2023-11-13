@@ -7,16 +7,8 @@ async function vote(first) {
         document.querySelector('span[data-target="#voteModal"]').click()
         return
     }
-    const project = await getProject()
 
-    if (project.id === 'arago') {
-        const request = {}
-        request.message = 'Отключено расширением. Проект закрыт. Если это не так - сообщите разработчику расширения'
-        request.ignoreReport = true
-        request.retryCoolDown = 604800000
-        chrome.runtime.sendMessage(request)
-        return
-    }
+    const project = await getProject()
 
     if (document.getElementById("nickname")) document.getElementById("nickname").value = project.nick
     document.querySelector("#voteModal > div.modal-dialog > div > div.modal-footer.clearfix > div.pull-right > a").click()

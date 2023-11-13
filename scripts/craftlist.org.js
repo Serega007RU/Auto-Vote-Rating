@@ -1,11 +1,4 @@
 async function vote(first) {
-    const request = {}
-    request.message = 'Auto-voting is suspended for craftlist.org , use other automation methods or vote manually. The risk of being banned for auto-voting is too high.'
-    request.retryCoolDown = 1814400000
-    request.ignoreReport = true
-    chrome.runtime.sendMessage(request)
-    if (true) return
-
     if (first) await wait(Math.floor(Math.random() * 3000 + 1000))
 
     if (document.querySelector('div.alert.alert-success')) {

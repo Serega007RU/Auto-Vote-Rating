@@ -870,8 +870,13 @@ function editProject(project, switchToEdit) {
         // TODO сомнительный код, я не знаю как ещё вынести обратно в input Date без смещений во времени из-за часового пояса
         // https://stackoverflow.com/a/61082536/11235240
         const time = new Date(project.time)
-        time.setMinutes(time.getMinutes() - time.getTimezoneOffset())
-        document.getElementById('scheduleTime').value = time.toISOString().slice(0,23)
+        // noinspection JSCheckFunctionSignatures
+        if (!isNaN(time)) {
+            time.setMinutes(time.getMinutes() - time.getTimezoneOffset())
+            document.getElementById('scheduleTime').value = time.toISOString().slice(0,23)
+        } else {
+            document.getElementById('scheduleTime').value = null
+        }
     }
     if (project.timeout != null || project.timeoutHour != null || project.rating === 'Custom') {
         document.getElementById('customTimeOut').checked = true

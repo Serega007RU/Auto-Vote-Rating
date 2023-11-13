@@ -1,15 +1,4 @@
 async function vote(first) {
-    const project = await getProject()
-
-    if (project.id === 'arago') {
-        const request = {}
-        request.message = 'Отключено расширением. Проект закрыт. Если это не так - сообщите разработчику расширения'
-        request.ignoreReport = true
-        request.retryCoolDown = 604800000
-        chrome.runtime.sendMessage(request)
-        return
-    }
-
     if (document.querySelector('.container .text-center')?.textContent.includes('Страница не найдена')) {
         chrome.runtime.sendMessage({message: document.querySelector('.container .text-center').textContent, ignoreReport: true, retryCoolDown: 21600000})
         return
@@ -24,6 +13,9 @@ async function vote(first) {
             return
         }
     }
+
+    const project = await getProject()
+
     if (project.game === 'projects') {
         if (document.querySelector('div.alert.alert-danger') != null) {
             if (document.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {

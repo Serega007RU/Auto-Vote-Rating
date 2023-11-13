@@ -23,17 +23,6 @@ async function vote(first) {
         return
     }
 
-    const project = await getProject()
-
-    if (project.id === '7666') {
-        const request = {}
-        request.message = 'Отключено расширением. Проект закрыт. Если это не так - сообщите разработчику расширения'
-        request.ignoreReport = true
-        request.retryCoolDown = 604800000
-        chrome.runtime.sendMessage(request)
-        return
-    }
-
     //Авторизованы ли мы в аккаунте?
     if (!document.querySelector('#userLoginWrap').classList.contains('hidden')) {
         const timerLogin = setInterval(() => {
@@ -46,6 +35,9 @@ async function vote(first) {
         }, 1000)
         return
     }
+
+    const project = await getProject()
+
     if (!document.querySelector('#voteModal').classList.contains('in')) {
         if (document.querySelector('button.openVoteModal') === null) {
             //Костыль для владельцев проектов если они голосуют за свой же проект
