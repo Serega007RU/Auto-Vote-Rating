@@ -1384,10 +1384,14 @@ async function endVote(request, sender, project) {
     } else {
         let message
         if (!request.message) {
+            const name = Object.keys(request)[0]
             if (Object.values(request)[0] === true) {
-                message = chrome.i18n.getMessage(Object.keys(request)[0])
+                message = chrome.i18n.getMessage(name)
             } else {
-                message = chrome.i18n.getMessage(Object.keys(request)[0], Object.values(request)[0])
+                message = chrome.i18n.getMessage(name, Object.values(request)[0])
+            }
+            if (request.usedTranslator && name !== 'usedTranslator') {
+                message += ' ' + chrome.i18n.getMessage('usedTranslator')
             }
         } else {
             message = request.message

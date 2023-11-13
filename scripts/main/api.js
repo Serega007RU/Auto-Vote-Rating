@@ -64,10 +64,7 @@ async function run() {
 
 async function checkAll(first) {
     if (isUsedTranslator()) {
-        chrome.runtime.sendMessage({
-            message: 'It looks like you have used the translator built into the browser, please disable the translator, it interferes with the work of the extension. If this is not the case and you have disabled the translator, inform the extension developer!',
-            ignoreReport: true
-        })
+        chrome.runtime.sendMessage({usedTranslator: true, ignoreReport: true})
         return
     }
 
@@ -307,10 +304,7 @@ async function startVote(first) {
     }
 
     if (isUsedTranslator()) {
-        chrome.runtime.sendMessage({
-            message: 'It looks like you have used the translator built into the browser, please disable the translator, it interferes with the work of the extension. If this is not the case and you have disabled the translator, inform the extension developer!',
-            ignoreReport: true
-        })
+        chrome.runtime.sendMessage({usedTranslator: true, ignoreReport: true})
         return
     }
 
@@ -354,6 +348,7 @@ function throwError(error) {
     }
 
     if (isUsedTranslator()) {
+        request.usedTranslator = true
         ignoreReport = true
     }
 
