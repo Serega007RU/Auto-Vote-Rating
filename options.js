@@ -1714,11 +1714,12 @@ function getUrlProjects(element) {
     const projects = []
     let project = {}
     const url = new URL(document.location.href)
-    for(const [key, value] of url.searchParams) {
-        if (key === 'top' || key === 'nick' || key === 'id' || key === 'game' || key === 'listing' || key === 'lang' || key === 'maxCountVote' || key === 'ordinalWorld' || key === 'addition') {
-            if (key !== 'top' && !project.rating) continue
+    for(let [key, value] of url.searchParams) {
+        if (key === 'top') key = 'rating' // TODO временный код
+        if (key === 'rating' || key === 'nick' || key === 'id' || key === 'game' || key === 'listing' || key === 'lang' || key === 'maxCountVote' || key === 'ordinalWorld' || key === 'addition') {
+            if (key !== 'rating' && !project.rating) continue
 
-            if (key === 'top' && Object.keys(project).length > 0) {
+            if (key === 'rating' && Object.keys(project).length > 0) {
                 project.time = null
                 project.stats = {
                     successVotes: 0,
@@ -1730,11 +1731,17 @@ function getUrlProjects(element) {
                     lastAttemptVote: null,
                     added: Date.now()
                 }
+                if (allProjects[project.rating].URLMain) {
+                    const domain2 = allProjects[project.rating].URLMain?.()
+                    if (domain2 !== project.rating) {
+                        project.ratingMain = domain2
+                    }
+                }
                 projects.push(project)
                 project = {}
             }
 
-            if (key === 'top') {
+            if (key === 'rating') {
                 if (!allProjects[value]) {
                     const html = document.createElement('div')
                     html.classList.add('fastAddEl')
@@ -1773,6 +1780,12 @@ function getUrlProjects(element) {
             lastSuccessVote: null,
             lastAttemptVote: null,
             added: Date.now()
+        }
+        if (allProjects[project.rating].URLMain) {
+            const domain2 = allProjects[project.rating].URLMain?.()
+            if (domain2 !== project.rating) {
+                project.ratingMain = domain2
+            }
         }
         projects.push(project)
     }
