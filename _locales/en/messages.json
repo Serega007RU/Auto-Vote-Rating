@@ -1099,5 +1099,11 @@
         "content": "$2"
       }
     }
+  },
+  "captchaPassedDouble": {
+    "message": "It looks like the captcha was solved twice, and this is bad, maybe the page was loaded before the captcha was solved or there were some failures with the captcha, contact the extension developer for help."
+  },
+  "notReadyInject": {
+    "message": "It looks like the tab started loading when the extension was not ready for it, this may lead to errors in voting"
   }
 }

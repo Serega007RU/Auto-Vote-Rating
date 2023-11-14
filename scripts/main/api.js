@@ -14,7 +14,7 @@ async function run() {
             window.proj = request.project
             if (request.vkontakte) window.vkontakte = request.vkontakte
             resolveProject()
-        } else if (request === 'captchaPassed') {
+        } else if (request.captchaPassed) {
             // noinspection JSIgnoredPromiseFromCall
             checkAll(false)
         }

@@ -1,11 +1,17 @@
-let dontSolve = false
+window.dontSolve = false
+window.solvedCaptcha = false
 chrome.runtime.onMessage.addListener(function(request/*, sender, sendResponse*/) {
-    if (!window.loadedCaptcha && request.sendProject) {
-        window.loadedCaptcha = true
-        if (request.settings.disabledClickCaptcha) {
-            dontSolve = true
+    if (request.sendProject) {
+        if (!window.loadedCaptcha) {
+            window.loadedCaptcha = true
+            if (request.settings.disabledClickCaptcha) {
+                window.dontSolve = true
+            }
+            run()
+        // на случай если капча была решена раньше чем страница загрузилась
+        } else if (window.solvedCaptcha) {
+            chrome.runtime.sendMessage({captchaPassed: 'double'})
         }
-        run()
     }
 })
 
@@ -19,7 +25,7 @@ function run() {
     if (window.location.href.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/api\d\/anchor/) || window.location.href.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/enterprise\/anchor*/) || window.location.href.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/enterprise\/anchor*/)) {
         const timer1 = setInterval(()=>{
             // noinspection CssInvalidHtmlTagReference
-            if (dontSolve || document.querySelector('head > captcha-widgets')) {
+            if (window.dontSolve || document.querySelector('head > captcha-widgets')) {
                 clearInterval(timer1)
                 return
             }
@@ -39,7 +45,8 @@ function run() {
             //Если капча пройдена
             if (document.getElementsByClassName('recaptcha-checkbox-checked').length >= 1 || (document.getElementById('g-recaptcha-response') != null && document.getElementById('g-recaptcha-response').value.length > 0)) {
                 clearInterval(timer2)
-                chrome.runtime.sendMessage('captchaPassed')
+                window.solvedCaptcha = true
+                chrome.runtime.sendMessage({captchaPassed: true})
             }
 
             if (document.querySelector('.rc-anchor-error-msg-container').style.display !== 'none' && document.querySelector('.rc-anchor-error-msg-container').textContent.length > 0) {
@@ -66,7 +73,7 @@ function run() {
                     repeat = 3
                 }
                 if (count >= repeat) {
-                    chrome.runtime.sendMessage('reloadCaptcha')
+                    chrome.runtime.sendMessage({reloadCaptcha: true})
                     clearInterval(timer7)
                     return
                 }
@@ -99,7 +106,7 @@ function run() {
     } else if (window.location.href.match(/.hcaptcha.com\/captcha.v\d\//)) {
         const timer4 = setInterval(()=>{
             // noinspection CssInvalidHtmlTagReference
-            if (dontSolve || document.querySelector('head > captcha-widgets')) {
+            if (window.dontSolve || document.querySelector('head > captcha-widgets')) {
                 clearInterval(timer4)
                 return
             }
@@ -116,7 +123,8 @@ function run() {
         const timer5 = setInterval(()=>{
             if (document.getElementById('checkbox') != null && document.getElementById('checkbox').getAttribute('aria-checked') === 'true') {
                 clearInterval(timer5)
-                chrome.runtime.sendMessage('captchaPassed')
+                window.solvedCaptcha = true
+                chrome.runtime.sendMessage({captchaPassed: true})
             }
         }, 1000)
 
@@ -155,7 +163,8 @@ function run() {
         const timer8 = setInterval(() => {
             if (document.querySelector('#success') && document.querySelector('#success').style.display !== 'none') {
                 clearInterval(timer8)
-                chrome.runtime.sendMessage('captchaPassed')
+                window.solvedCaptcha = true
+                chrome.runtime.sendMessage({captchaPassed: true})
             }
         })
     }

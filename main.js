@@ -115,6 +115,10 @@ async function initializeConfig(background, version) {
 
         // noinspection ES6MissingAwait
         checkVote()
+    } else {
+        if (!openedProjects.size) {
+            updateListeners(false)
+        }
     }
 }
 

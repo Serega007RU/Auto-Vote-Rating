@@ -33,6 +33,7 @@ let silentResponseBody = {}
 //Инициализация настроек расширения
 // noinspection JSIgnoredPromiseFromCall
 const initializeFunc = initializeConfig(true)
+initializeFunc.finally(() => initializeFunc.done = true)
 
 //Проверка: нужно ли голосовать, сверяет время текущее с временем из конфига
 async function checkVote() {
@@ -75,15 +76,15 @@ async function checkVote() {
         cursor = await cursor.continue()
     }
 
+    check = true
     if (doubleCheck) {
-        check = true
         doubleCheck = false
         checkVote()
     } else {
         // Голосование завершилось и более не планируется
-        check = true
         if (!openedProjects.size) {
             promises = []
+            updateListeners(false)
         }
     }
 }
@@ -212,6 +213,11 @@ async function checkOpen(project, transaction) {
             retryCoolDown = settings.timeoutVote
         }
         opened.nextAttempt = Date.now() + retryCoolDown
+    }
+
+    // Голосование запускается впервые
+    if (!openedProjects.size) {
+        updateListeners(true)
     }
 
     openedProjects.set('start_' + project.key, opened)
@@ -543,27 +549,23 @@ async function checkResponseError(project, response, url, bypassCodes, vk) {
     return true
 }
 
-chrome.webNavigation.onErrorOccurred.addListener(async function (details) {
-    await initializeFunc
-    if (openedProjects.has(details.tabId)) {
-        if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/*/) || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
-            const opened = openedProjects.get(details.tabId)
-            if (
-                //Chrome
-                details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
-                //FireFox
-                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
-                // console.warn(getProjectPrefix(project, true), details.error)
-                return
-            }
-            const sender = {tab: {id: details.tabId}, url: details.url}
-            endVote({errorVoteNetwork: [details.error, details.url]}, sender, opened)
-        }
+const webNavigationOnCommittedListener = function(details) {
+    if (!initializeFunc.done) {
+        (async () => {
+            await initializeFunc
+            let opened = openedProjects.get(details.tabId)
+            if (!opened) return
+            const project = await db.get('projects', opened.key)
+            let message = chrome.i18n.getMessage('notReadyInject')
+            if (project.error === message) return
+            console.warn(getProjectPrefix(project, true), message)
+            sendNotification(getProjectPrefix(project, false), message, 'warn', 'openProject_' + project.key)
+            project.error = message
+            updateValue('projects', project)
+        })()
+        return
     }
-})
 
-chrome.webNavigation.onCommitted.addListener(async function(details) {
-    await initializeFunc
     let opened = openedProjects.get(details.tabId)
     if (!opened) return
     if (details.url.startsWith('blob:')) return
@@ -616,29 +618,25 @@ chrome.webNavigation.onCommitted.addListener(async function(details) {
     if (details.frameId) target.frameIds = [details.frameId]
 
     if (filesIsolated.length) {
-        (async() => {
-            try {
-                // noinspection JSCheckFunctionSignatures
-                await chrome.scripting.executeScript({target, files: filesIsolated, injectImmediately: true})
-            } catch (error) {
+        chrome.scripting.executeScript({target, files: filesIsolated, injectImmediately: true}, () => {
+            const error = chrome.runtime.lastError
+            if (error) {
                 catchTabError(error, opened)
             }
-        })()
+        })
     }
     if (filesMain.length) {
-        (async() => {
-            try {
-                // noinspection JSCheckFunctionSignatures
-                await chrome.scripting.executeScript({target, files: filesMain, world: 'MAIN', injectImmediately: true})
-            } catch (error) {
+        chrome.scripting.executeScript({target, files: filesMain, world: 'MAIN', injectImmediately: true}, () => {
+            const error = chrome.runtime.lastError
+            if (error) {
                 catchTabError(error, opened)
             }
-        })()
+        })
     }
-})
+}
 
 //Слушатель на обновление вкладок, если вкладка полностью загрузилась, загружает туда скрипт который сам нажимает кнопку проголосовать
-chrome.webNavigation.onCompleted.addListener(async function(details) {
+const webNavigationOnCompletedListener = async function(details) {
     await initializeFunc
     let opened = openedProjects.get(details.tabId)
     if (!opened) return
@@ -751,29 +749,9 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
 
         const project = await db.get('projects', opened.key)
 
-        // let eval = true
-        // let textCaptcha
-        // if (!settings.disabledUseRemoteCode) {
-        //     try {
-        //         const responseApi = await fetch('https://serega007ru.github.io/Auto-Vote-Rating/scripts/main/captchaclicker.js')
-        //         textCaptcha = await responseApi.text()
-        //     } catch (error) {
-        //         console.warn(getProjectPrefix(project, true), 'Ошибка при получении удалённого кода scripts/main/captchaclicker.js, использую вместо этого локальный код', error.message)
-        //         eval = false
-        //     }
-        // } else {
-        //     eval = false
-        // }
-
         try {
-            // if (eval) {
-            //     if (settings.debug) console.log('Injecting libs/evalCore.umd.js, scripts/main/injectEval.js to ' + details.url + ' in MAIN world')
-            //     await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['libs/evalCore.umd.js', 'scripts/main/injectEval.js']})
-            //     await chrome.tabs.sendMessage(details.tabId, {textEval: true, textCaptcha})
-            // } else {
-                if (settings.debug) console.log('Injecting scripts/main/captchaclicker.js to ' + details.url)
-                await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['scripts/main/hacktimer.js', 'scripts/main/captchaclicker.js']})
-            // }
+            if (settings.debug) console.log('Injecting scripts/main/captchaclicker.js to ' + details.url)
+            await chrome.scripting.executeScript({target: {tabId: details.tabId, frameIds: [details.frameId]}, files: ['scripts/main/hacktimer.js', 'scripts/main/captchaclicker.js']})
 
             // Если вкладка уже загружена, повторно туда высылаем sendProject который обозначает что мы готовы к голосованию
             const tab = await chrome.tabs.get(details.tabId)
@@ -787,7 +765,7 @@ chrome.webNavigation.onCompleted.addListener(async function(details) {
             catchTabError(error, project)
         }
     }
-})
+}
 
 async function catchTabError(error, project) {
     if (error.message !== 'The frame was removed.' && !error.message.includes('No frame with id') && error.message !== 'The tab was closed.' && !error.message.includes('PrecompiledScript.executeInGlobal')/*Для FireFox мы игнорируем эту ошибку*/ && !error.message.includes('Could not establish connection. Receiving end does not exist') && !error.message.includes('The message port closed before a response was received') && (!error.message.includes('Frame with ID') && !error.message.includes('was removed'))) {
@@ -803,14 +781,14 @@ async function catchTabError(error, project) {
     }
 }
 
-chrome.tabs.onRemoved.addListener(async function(tabId) {
+const tabsOnRemovedListener = async function(tabId) {
     await initializeFunc
     let opened = openedProjects.get(tabId)
     if (!opened) return
     endVote({closedTab: true}, {tab: {id: tabId}}, opened)
-})
+}
 
-chrome.webRequest.onCompleted.addListener(async function(details) {
+const webRequestOnCompletedListener = async function(details) {
     await initializeFunc
     let opened = openedProjects.get(details.tabId)
     if (!opened) return
@@ -827,9 +805,9 @@ chrome.webRequest.onCompleted.addListener(async function(details) {
             endVote({errorVote: [String(details.statusCode), details.url]}, sender, opened)
         }
     }
-}, {urls: ['<all_urls>']})
+}
 
-chrome.webRequest.onErrorOccurred.addListener(async function(details) {
+const webRequestOnErrorOccurredListener = async function (details) {
     await initializeFunc
     // noinspection JSUnresolvedVariable
     /*if ((details.initiator && details.initiator.includes(self.location.hostname) || (details.originUrl && details.originUrl.includes(self.location.hostname))) && fetchProjects.has(details.requestId)) {
@@ -843,14 +821,78 @@ chrome.webRequest.onErrorOccurred.addListener(async function(details) {
                 details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
                 //FireFox
                 || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
-                    // console.warn(getProjectPrefix(project, true), details.error)
-                    return
+                // console.warn(getProjectPrefix(project, true), details.error)
+                return
             }
             const sender = {tab: {id: details.tabId}, url: details.url}
             endVote({errorVoteNetwork: [details.error, details.url]}, sender, opened)
         }
     }
-}, {urls: ['<all_urls>']})
+}
+
+const webNavigationOnErrorOccurredListener = async function (details) {
+    await initializeFunc
+    if (openedProjects.has(details.tabId)) {
+        if (details.frameId === 0 || details.url.match(/hcaptcha.com\/captcha\/*/) || details.url.match(/https?:\/\/(.+?\.)?google.com\/recaptcha\/*/) || details.url.match(/https?:\/\/(.+?\.)?recaptcha.net\/recaptcha\/*/) || details.url.match(/https:\/\/challenges.cloudflare.com\/*/)) {
+            const opened = openedProjects.get(details.tabId)
+            if (
+                //Chrome
+                details.error.includes('net::ERR_ABORTED') || details.error.includes('net::ERR_CONNECTION_RESET') || details.error.includes('net::ERR_NETWORK_CHANGED') || details.error.includes('net::ERR_CACHE_MISS') || details.error.includes('net::ERR_BLOCKED_BY_CLIENT')
+                //FireFox
+                || details.error.includes('NS_BINDING_ABORTED') || details.error.includes('NS_ERROR_NET_ON_RESOLVED') || details.error.includes('NS_ERROR_NET_ON_RESOLVING') || details.error.includes('NS_ERROR_NET_ON_WAITING_FOR') || details.error.includes('NS_ERROR_NET_ON_CONNECTING_TO') || details.error.includes('NS_ERROR_FAILURE') || details.error.includes('NS_ERROR_DOCSHELL_DYING') || details.error.includes('NS_ERROR_NET_ON_TRANSACTION_CLOSE')) {
+                // console.warn(getProjectPrefix(project, true), details.error)
+                return
+            }
+            const sender = {tab: {id: details.tabId}, url: details.url}
+            endVote({errorVoteNetwork: [details.error, details.url]}, sender, opened)
+        }
+    }
+}
+
+// Регистрация и разрегистрация слушателей сделана в целях оптимизации работы фонового процесса расширения
+// Фоновый процесс расширения слишком часто пробуждается лишний раз при веб сёрфинге (при использовании браузера пользователем)
+// поэтому если голосование в данный момент не происходит - мы отключаем все эти слушатели и спим
+// в случае если голосование запускается вновь - мы обратно регистрируем слушателей на время авто-голосования
+function updateListeners(enable) {
+    if (settings?.debug) console.log('Регистрация слушателей, включение', enable, 'openedProjects.size', openedProjects.size, 'openedProjects', openedProjects)
+    if (enable) {
+        if (!chrome.webNavigation.onErrorOccurred.hasListeners()) {
+            if (settings?.debug) console.log('Регистрация слушателя webNavigation.onErrorOccurred')
+            chrome.webNavigation.onErrorOccurred.addListener(webNavigationOnErrorOccurredListener)
+        }
+        if (!chrome.webNavigation.onCommitted.hasListeners()) {
+            if (settings?.debug) console.log('Регистрация слушателя webNavigation.onCommitted')
+            chrome.webNavigation.onCommitted.addListener(webNavigationOnCommittedListener)
+        }
+        if (!chrome.webNavigation.onCompleted.hasListeners()) {
+            if (settings?.debug) console.log('Регистрация слушателя webNavigation.onCompleted')
+            chrome.webNavigation.onCompleted.addListener(webNavigationOnCompletedListener)
+        }
+        if (!chrome.tabs.onRemoved.hasListeners()) {
+            if (settings?.debug) console.log('Регистрация слушателя tabs.onRemoved')
+            chrome.tabs.onRemoved.addListener(tabsOnRemovedListener)
+        }
+        if (!chrome.webRequest.onCompleted.hasListeners()) {
+            if (settings?.debug) console.log('Регистрация слушателя webRequest.onCompleted')
+            chrome.webRequest.onCompleted.addListener(webRequestOnCompletedListener, {urls: ['<all_urls>']})
+        }
+        if (!chrome.webRequest.onErrorOccurred.hasListeners()) {
+            if (settings?.debug) console.log('Регистрация слушателя webRequest.onErrorOccurred')
+            chrome.webRequest.onErrorOccurred.addListener(webRequestOnErrorOccurredListener, {urls: ['<all_urls>']})
+        }
+    } else {
+        chrome.webNavigation.onErrorOccurred.removeListener(webNavigationOnErrorOccurredListener)
+        chrome.webNavigation.onCommitted.removeListener(webNavigationOnCommittedListener)
+        chrome.webNavigation.onCompleted.removeListener(webNavigationOnCompletedListener)
+        chrome.tabs.onRemoved.removeListener(tabsOnRemovedListener)
+        chrome.webRequest.onCompleted.removeListener(webRequestOnCompletedListener)
+        chrome.webRequest.onErrorOccurred.removeListener(webRequestOnErrorOccurredListener)
+    }
+}
+
+// Так как Service Worker может уснуть прямо во время голосования, мы прям при запуске всё равно регистрируем слушателей
+// после инициализации базы данных если обнаруживается что сейчас мы не голосуем и нет необходимости голосовать - мы разрегистрируем слушатели
+updateListeners(true)
 
 // async function _fetch(url, options, project) {
 //     let listener
@@ -893,7 +935,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 let fakeIdToId = {};
 async function onRuntimeMessage(request, sender, sendResponse) {
-    if (request === 'reloadCaptcha') {
+    if (request.reloadCaptcha) {
         // noinspection JSVoidFunctionReturnValueUsed,JSCheckFunctionSignatures
         const frames = await chrome.webNavigation.getAllFrames({tabId: sender.tab.id})
         for (const frame of frames) {
@@ -911,7 +953,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
             }
         }
         return
-    } else if (request === 'captchaPassed') {
+    } else if (request.captchaPassed) {
         try {
             await chrome.tabs.sendMessage(sender.tab.id, request)
         } catch (error) {
@@ -919,7 +961,7 @@ async function onRuntimeMessage(request, sender, sendResponse) {
                 console.warn(error.message)
             }
         }
-        return
+        if (request.captchaPassed !== 'double') return
     } else if (request.HackTimer) {
         if (request.name === 'setInterval') {
             fakeIdToId[request.fakeId] = setInterval(function () {
@@ -1037,11 +1079,13 @@ async function onRuntimeMessage(request, sender, sendResponse) {
     }
 
     let opened = openedProjects.get(sender.tab.id)
-    if (request.captcha || request.authSteam || request.discordLogIn || request.auth || request.requiredConfirmTOS || (request.errorCaptcha && !request.restartVote) || request.restartVote === false) {//Если требует ручное прохождение капчи
+    if (request.captcha || request.authSteam || request.discordLogIn || request.auth || request.requiredConfirmTOS || (request.errorCaptcha && !request.restartVote) || request.restartVote === false || request.captchaPassed === 'double') {//Если требует ручное прохождение капчи
         const project = await db.get('projects', opened.key)
         let message
         if (request.captcha) {
             message = chrome.i18n.getMessage('requiresCaptcha')
+        } else if (request.captchaPassed === 'double') {
+            message = chrome.i18n.getMessage('captchaPassedDouble')
         } else if (request.message) {
             message = request.message
         } else {
