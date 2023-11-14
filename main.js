@@ -453,6 +453,7 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
                 project.listing = project.game
                 delete project.game
             } else if (project.rating === 'minecraftkrant.nl') {
+                if (!project.game) project.game = 'www.minecraftkrant.nl'
                 project.lang = project.game
                 delete project.game
             }
