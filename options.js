@@ -2612,4 +2612,5 @@ function highlight(element) {
     element.classList.add('highlight')
 
     element.addEventListener('animationend', () => element.classList.remove('highlight'))
+    element.addEventListener('animationcancel', () => element.classList.remove('highlight'))
 }
