@@ -10,12 +10,13 @@ let evil
 let editingProject
 
 const authVKUrls = new Map([
-    ['TopCraft', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
-    ['McTOP', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
-    ['MCRate', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
-    ['MinecraftRating', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
-    ['MonitoringMinecraft', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
-    ['MisterLauncher', 'https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=close.html&response_type=token']
+    ['topcraft.ru', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
+    ['topcraft.club', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=Pxjb0wSdLe1y&redirect_uri=close.html&response_type=token&client_id=5128935&scope=email'],
+    ['mctop.su', 'https://oauth.vk.com/authorize?auth_type=reauthenticate&state=4KpbnTjl0Cmc&redirect_uri=close.html&response_type=token&client_id=5113650&scope=email'],
+    ['mcrate.su', 'https://oauth.vk.com/authorize?client_id=3059117&redirect_uri=close.html&response_type=token&scope=0&v=&state=&display=page&__q_hash=a11ee68ba006307dbef29f34297bee9a'],
+    ['minecraftrating.ru', 'https://oauth.vk.com/authorize?client_id=5216838&display=page&redirect_uri=close.html&response_type=token&v=5.45'],
+    ['monitoringminecraft.ru', 'https://oauth.vk.com/authorize?client_id=3697128&scope=0&response_type=token&redirect_uri=close.html'],
+    ['misterlauncher.org', 'https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=close.html&response_type=token']
 ])
 
 const svgFail = document.createElement('img')
@@ -198,7 +199,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
     }
 
     if (!onLine && !navigator.onLine) {
-        createNotif(chrome.i18n.getMessage('internetDisconected'), 'warn', {delay: 15000})
+        createNotif(chrome.i18n.getMessage('internetDisconnected'), 'warn', {delay: 15000})
     }
 
     document.getElementById('rating').dispatchEvent(new Event('input'))
@@ -1294,7 +1295,7 @@ async function addProject(project, element) {
         let response
         try {
             const url = allProjects[project.rating].pageURL(project)
-            if (project.rating === 'MinecraftIpList') {
+            if (project.rating === 'minecraftiplist.com') {
                 response = await fetch(url, {credentials: 'omit'})
             } else {
                 response = await fetch(url, {credentials: 'include'})
@@ -1348,7 +1349,7 @@ async function addProject(project, element) {
         createNotif(chrome.i18n.getMessage('checkHasProjectSuccess'), 'hint', {element})
 
         //Проверка авторизации ВКонтакте
-        if (project.rating === 'TopCraft' || project.rating === 'McTOP' || project.rating === 'MCRate' || (project.rating === 'MinecraftRating' && project.game === 'projects') || project.rating === 'MonitoringMinecraft' || (project.rating === 'MisterLauncher' && project.game === 'projects')) {
+        if (allProjects[project.rating].needAdditionalOrigins?.(project)?.includes?.('*://*.vk.com/*')) {
             createNotif(chrome.i18n.getMessage('checkAuthVK'), 'hint', {element})
             let url2 = authVKUrls.get(project.rating)
             let response2
@@ -1998,9 +1999,6 @@ async function listSelect(event, tabs) {
         openedProjects = await transaction.objectStore('other').get('openedProjects')
         let cursor = await transaction.objectStore('projects').index('rating').openCursor(tabs)
         while (cursor) {
-            // TODO это временная мера, следует при обновлении версии базы данных исправить все битые key
-            if (!cursor.value.key) cursor.value.key = cursor.key
-
             const project = cursor.value
             addProjectList(project)
             // noinspection JSVoidFunctionReturnValueUsed
@@ -2121,7 +2119,7 @@ document.getElementById('link').addEventListener('input', function() {
     if (funcRating.banAttention?.(project)) {
         document.getElementById('banAttention').removeAttribute('style')
     }
-    if (project.rating === 'MinecraftRating' && project.game === 'servers') {
+    if (project.rating === 'minecraftrating.ru' && project.listing === 'servers') {
         document.getElementById('rewardAttention').removeAttribute('style')
     }
     // noinspection JSUnresolvedVariable

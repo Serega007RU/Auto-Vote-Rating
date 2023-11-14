@@ -67,9 +67,6 @@ async function checkVote() {
     const transaction = db.transaction('projects')
     let cursor = await transaction.objectStore('projects').openCursor()
     while (cursor) {
-        // TODO это временная мера, следует при обновлении версии базы данных исправить все битые key
-        if (!cursor.value.key) cursor.value.key = cursor.key
-
         const project = cursor.value
         if (!project.time || project.time < Date.now()) {
             await checkOpen(project, transaction)
@@ -78,12 +75,13 @@ async function checkVote() {
         cursor = await cursor.continue()
     }
 
-    check = true
     if (doubleCheck) {
+        check = true
         doubleCheck = false
         checkVote()
     } else {
         // Голосование завершилось и более не планируется
+        check = true
         if (!openedProjects.size) {
             promises = []
         }
@@ -134,8 +132,8 @@ async function checkOpen(project, transaction) {
             // TODO к сожалению в Service Worker отсутствует слушатель на восстановление соединения с интернетом, у нас остаётся только 1 вариант, это попытаться снова запустить checkVote через минуту
             chrome.alarms.create('checkVote', {when: Date.now() + 65000})
 
-            sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconected'), 'error', 'openProject_' + project.key)
-            console.warn(getProjectPrefix(project, true), chrome.i18n.getMessage('internetDisconected'))
+            sendNotification(getProjectPrefix(project, false), chrome.i18n.getMessage('internetDisconnected'), 'error', 'openProject_' + project.key)
+            console.warn(getProjectPrefix(project, true), chrome.i18n.getMessage('internetDisconnected'))
             onLine = false
             db.put('other', onLine, 'onLine')
             return
@@ -165,7 +163,7 @@ async function checkOpen(project, transaction) {
                 sendNotification(getProjectPrefix(projectTimeout, false), chrome.i18n.getMessage('timeout'), 'warn', 'openProject_' + project.key)
 
                 // noinspection PointlessBooleanExpressionJS
-                if (false && /*settings.enabledReportTimeout*/ value.rating === 'MMoTopRU' && Number.isInteger(tab) && !settings.disabledSendErrorSentry && value.nextAttempt && value.countInject) {
+                if (false && /*settings.enabledReportTimeout*/ value.rating === 'mmotop.ru' && Number.isInteger(tab) && !settings.disabledSendErrorSentry && value.nextAttempt && value.countInject) {
                     (async() => {
                         try {
                             // noinspection JSCheckFunctionSignatures
@@ -195,10 +193,6 @@ async function checkOpen(project, transaction) {
         }
     }
 
-    // TODO временный код
-    delete project.openedTimeoutQueue
-    delete project.openedNextAttempt
-    delete project.openedCountInject
     delete project.timeoutQueue
     delete project.nextAttempt
     delete project.countInject
@@ -225,11 +219,11 @@ async function checkOpen(project, transaction) {
 
     if (settings.debug) console.log(getProjectPrefix(project, true), 'пред запуск')
 
-    if (project.rating === 'MonitoringMinecraft') {
+    if (project.rating === 'monitoringminecraft.ru') {
         promises.push(clearMonitoringMinecraftCookies())
         async function clearMonitoringMinecraftCookies() {
             let url
-            if (project.rating === 'MonitoringMinecraft') {
+            if (project.rating === 'monitoringminecraft.ru') {
                 url = '.monitoringminecraft.ru'
             }
             let cookies = await chrome.cookies.getAll({domain: url})
@@ -1337,7 +1331,7 @@ async function endVote(request, sender, project) {
                 project.randomize.max = 43200000
             }
             project.time = project.time + Math.floor(Math.random() * (project.randomize.max - project.randomize.min) + project.randomize.min)
-        } else if ((project.rating === 'TopCraft' || project.rating === 'McTOP' || (project.rating === 'MinecraftRating' && project.game === 'projects')) && !project.priority && project.timeoutHour == null) {
+        } else if ((project.rating === 'topcraft.ru' || project.rating === 'topcraft.club' || project.rating === 'mctop.su' || (project.rating === 'minecraftrating.ru' && project.listing === 'projects')) && !project.priority && project.timeoutHour == null) {
             //Рандомизация по умолчанию (в пределах 5-10 минут) для бедного TopCraft/McTOP который легко ддосится от массового автоматического голосования
             project.time = project.time + Math.floor(Math.random() * (600000 - 300000) + 300000)
         }
@@ -1401,7 +1395,7 @@ async function endVote(request, sender, project) {
             message += ' Incorrect domain ' + request.incorrectDomain
         }
         let retryCoolDown
-        if ((request.errorVote && request.errorVote[0] === '404') || (request.message && project.rating === 'WARGM' && project.randomize)) {
+        if ((request.errorVote && request.errorVote[0] === '404') || (request.message && project.rating === 'wargm.ru' && project.randomize)) {
             retryCoolDown = 21600000
         } else if (request.retryCoolDown) {
             retryCoolDown = request.retryCoolDown

@@ -445,7 +445,7 @@
   "internetRestored": {
     "message": "Internet connection restored"
   },
-  "internetDisconected": {
+  "internetDisconnected": {
     "message": "Vote is initiated, but Internet connection is lost, waiting for it to resume..."
   },
   "startedAutoVote": {
@@ -532,56 +532,6 @@
   },
   "timeStamp": {
     "message": "the time stamp is set to"
-  },
-  "errorClock": {
-    "message": "Failed to connect to api.cifrazia.com, $error$ If you don't have precise time set, extension will not work properly",
-    "placeholders": {
-      "error": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorClock2": {
-    "message": "Failed to connect to api.cifrazia.com, HTTP response: $httpCode$. If you don't have precise time set, extension will not work properly",
-    "placeholders": {
-      "httpCode": {
-        "content": "$1"
-      }
-    }
-  },
-  "clockHurry": {
-    "message": "fast"
-  },
-  "clockLagging": {
-    "message": "slow"
-  },
-  "clockhours": {
-    "message": "hours"
-  },
-  "clockMinutes": {
-    "message": "minutes"
-  },
-  "clockInaccurate": {
-    "message": "It seems that your time is $count$ $unit$ $inaccurate$. The extension will not work properly, please set the precise time",
-    "placeholders": {
-      "inaccurate": {
-        "content": "$1"
-      },
-      "count": {
-        "content": "$2"
-      },
-      "unit": {
-        "content": "$3"
-      }
-    }
-  },
-  "clockInaccurateLog": {
-    "message": "Your time is $text$!",
-    "placeholders": {
-      "text": {
-        "content": "$1"
-      }
-    }
   },
   "projectID": {
     "message": "ID project"

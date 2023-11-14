@@ -472,6 +472,13 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
                 project.key = cursor.key
             }
 
+            // noinspection JSUnresolvedReference
+            delete project.openedTimeoutQueue
+            // noinspection JSUnresolvedReference
+            delete project.openedNextAttempt
+            // noinspection JSUnresolvedReference
+            delete project.openedCountInject
+
             await cursor.update(project)
             // noinspection JSVoidFunctionReturnValueUsed
             cursor = await cursor.continue()

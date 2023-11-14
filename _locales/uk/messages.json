@@ -370,7 +370,7 @@
   "internetRestored": {
     "message": "Підключення до інтернету відновлено"
   },
-  "internetDisconected": {
+  "internetDisconnected": {
     "message": "Прийшов час голосовати але зникло з'єднання з інтернетом, очікую коли відновиться підключення до інтернету..."
   },
   "startedAutoVote": {
@@ -446,56 +446,6 @@
   },
   "timeStamp": {
     "message": "мітка часу встановлена на"
-  },
-  "errorClock": {
-    "message": "Не вдалось зв'язатися з сервером api.cifrazia.com, $error$ Якщо у вас неправильно встановлено час на комп'ютері - розширення буде не коректно працювати",
-    "placeholders": {
-      "error": {
-        "content": "$1"
-      }
-    }
-  },
-  "errorClock2": {
-    "message": "Не вдалось зв'язатися с сервером api.cifrazia.com, Код стану HTTP: $httpCode$. Якщо у вас неправильно встановлено час на комп'ютері - розширення буде не коректно працювати",
-    "placeholders": {
-      "httpCode": {
-        "content": "$1"
-      }
-    }
-  },
-  "clockHurry": {
-    "message": "спішать"
-  },
-  "clockLagging": {
-    "message": "відстають"
-  },
-  "clockHourns": {
-    "message": "годин"
-  },
-  "clockMinutes": {
-    "message": "хвилин"
-  },
-  "clockInaccurate": {
-    "message": "Здається ваші години $inaccurate$ на $count$ $unit$. Розширення будет некоректно працювати, будь ласка налаштуйте час правильно",
-    "placeholders": {
-      "inaccurate": {
-        "content": "$1"
-      },
-      "count": {
-        "content": "$2"
-      },
-      "unit": {
-        "content": "$3"
-      }
-    }
-  },
-  "clockInaccurateLog": {
-    "message": "Ваші години $text$!",
-    "placeholders": {
-      "text": {
-        "content": "$1"
-      }
-    }
   },
   "projectID": {
     "message": "ID проекта"
