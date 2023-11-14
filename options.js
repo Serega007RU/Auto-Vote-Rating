@@ -1710,11 +1710,14 @@ modeVote.addEventListener('change', async event => {
 })
 
 //Достаёт все проекты указанные в URL
-function getUrlProjects() {
-    let projects = []
+function getUrlProjects(element) {
+    const projects = []
     let project = {}
-    /*let parts = */window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        if (key === 'top' || key === 'nick' || key === 'id' || key === 'game' || key === 'lang' || key === 'maxCountVote' || key === 'ordinalWorld' || key === 'randomize' || key === 'addition' || key === 'silentMode' || key === 'emulateMode') {
+    const url = new URL(document.location.href)
+    for(const [key, value] of url.searchParams) {
+        if (key === 'top' || key === 'nick' || key === 'id' || key === 'game' || key === 'listing' || key === 'lang' || key === 'maxCountVote' || key === 'ordinalWorld' || key === 'addition') {
+            if (key !== 'top' && !project.rating) continue
+
             if (key === 'top' && Object.keys(project).length > 0) {
                 project.time = null
                 project.stats = {
@@ -1730,13 +1733,35 @@ function getUrlProjects() {
                 projects.push(project)
                 project = {}
             }
-            if (key === 'top' || key === 'randomize' || key === 'silentMode' || key === 'emulateMode') {
+
+            if (key === 'top') {
+                if (!allProjects[value]) {
+                    const html = document.createElement('div')
+                    html.classList.add('fastAddEl')
+                    html.append(svgFail.cloneNode(true))
+                    const div = document.createElement('div')
+                    const p = document.createElement('p')
+                    p.textContent = chrome.i18n.getMessage('failParseUrlFastAdd', [value, url.searchParams.get('name')])
+                    div.append(p)
+                    html.append(div)
+                    element.append(html)
+                    element.scrollTop = element.scrollHeight
+                    continue
+                }
                 project.rating = value
+            } else if (key === 'maxCountVote' || key === 'ordinalWorld') {
+                const number = Number(value)
+                if (!isNaN(number)) {
+                    project[key] = number
+                } else {
+                    project[key] = 1
+                }
             } else {
                 project[key] = value
             }
         }
-    })
+    }
+
     if (Object.keys(project).length > 0) {
         project.time = null
         project.stats = {
@@ -1754,25 +1779,16 @@ function getUrlProjects() {
     return projects
 }
 
-//Достаёт все указанные аргументы из URL
-function getUrlVars() {
-    const vars = {}
-    /*const parts = */window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-        vars[key] = value
-    })
-    return vars
-}
-
 //Если страница настроек была открыта сторонним проектом то, расширение переходит к быстрому добавлению проектов
 async function fastAdd() {
-    if (window.location.href.includes('addFastProject')) {
+    if (document.location.href.includes('addFastProject')) {
         toggleModal('addFastProject')
-        const vars = getUrlVars()
-        if (vars['name'] != null) document.querySelector('[data-resource="fastAdd"]').textContent = getUrlVars()['name']
+        const searchParams = new URL(document.location.href).searchParams
+        if (searchParams.get('name')) document.querySelector('[data-resource="fastAdd"]').textContent = searchParams.get('name')
         const listFastAdd = document.querySelector('#addFastProject > div.content > .message')
         listFastAdd.textContent = ''
 
-        if (vars['disableNotifInfo'] != null && vars['disableNotifInfo'] === 'true') {
+        if (searchParams.get('disableNotifInfo') === 'true') {
             settings.disabledNotifInfo = true
             await db.put('other', settings, 'settings')
             chrome.runtime.sendMessage('reloadSettings')
@@ -1789,7 +1805,7 @@ async function fastAdd() {
             listFastAdd.append(html)
             listFastAdd.scrollTop = listFastAdd.scrollHeight
         }
-        if (vars['disableNotifWarn'] != null && vars['disableNotifWarn'] === 'true') {
+        if (searchParams.get('disableNotifWarn') === 'true') {
             settings.disabledNotifWarn = true
             await db.put('other', settings, 'settings')
             chrome.runtime.sendMessage('reloadSettings')
@@ -1806,7 +1822,7 @@ async function fastAdd() {
             listFastAdd.append(html)
             listFastAdd.scrollTop = listFastAdd.scrollHeight
         }
-        if (vars['disableNotifStart'] != null && vars['disableNotifStart'] === 'true') {
+        if (searchParams.get('disableNotifStart') === 'true') {
             settings.disabledNotifStart = true
             await db.put('other', settings, 'settings')
             chrome.runtime.sendMessage('reloadSettings')
@@ -1823,7 +1839,7 @@ async function fastAdd() {
             listFastAdd.scrollTop = listFastAdd.scrollHeight
         }
 
-        const projects = getUrlProjects()
+        const projects = getUrlProjects(listFastAdd)
         const html2 = document.createElement('div')
         html2.classList.add('fastAddEl')
         html2.append(svgFail.cloneNode(true))
