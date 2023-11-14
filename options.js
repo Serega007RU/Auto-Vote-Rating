@@ -585,13 +585,8 @@ async function removeProjectList(project, editing, event) {
 
 //Перезагрузка списка проектов
 async function reloadProjectList() {
-    for (const item of Object.keys(allProjects)) {
-        if (document.querySelector('[data-rating-list="' + item + '"]')) document.querySelector('[data-rating-list="' + item + '"]').parentNode.replaceChild(document.querySelector('[data-rating-list="' + item + '"]').cloneNode(false), document.querySelector('[data-rating-list="' + item + '"]'))
-    }
-    document.querySelector('div.buttonBlock').parentNode.replaceChild(document.querySelector('div.buttonBlock').cloneNode(false), document.querySelector('div.buttonBlock'))
-    if (document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]') != null) {
-        document.querySelector('div.projectsBlock > div.contentBlock > ul[style="display: block;"]').style.display = 'none'
-    }
+    document.querySelector('.projectsBlock .buttonBlock').replaceChildren()
+    document.querySelector('.projectsBlock .contentBlock').replaceChildren()
     const index = db.transaction('projects').store.index('rating')
     for (const item of Object.keys(allProjects)) {
         const count = await index.count(item)
