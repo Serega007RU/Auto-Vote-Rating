@@ -1,6 +1,7 @@
 async function vote(first) {
     const project = await getProject()
-    if (project.game === 'projects') {
+    // TODO позже надо убрать отсюда project.game
+    if (project.game === 'projects' || project.listing === 'projects') {
         if (first === false) return
 
         if (document.querySelector('.container div.alert.alert-danger') && document.querySelector('.container div.alert.alert-danger').style.display !== 'none') {

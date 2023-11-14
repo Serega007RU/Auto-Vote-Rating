@@ -16,7 +16,8 @@ async function vote(first) {
 
     const project = await getProject()
 
-    if (project.game === 'projects') {
+    // TODO позже надо убрать отсюда project.game
+    if (project.game === 'projects' || project.listing === 'projects') {
         if (document.querySelector('div.alert.alert-danger') != null) {
             if (document.querySelector('div.alert.alert-danger').textContent.includes('Вы уже голосовали за этот проект')) {
                 chrome.runtime.sendMessage({later: true})
