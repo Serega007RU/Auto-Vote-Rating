@@ -1,6 +1,6 @@
 // noinspection ES6MissingAwait
 
-async function silentVoteGenshinDrop(project) {
+self['silentVote_genshindrop.com'] = async function (project) {
     const response = await fetch('https://genshindrop.com/case/24-chasa-oskolki/give_me_drop')
 
     const text = await response.text()

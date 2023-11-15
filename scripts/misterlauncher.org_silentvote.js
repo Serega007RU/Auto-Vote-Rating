@@ -1,6 +1,6 @@
 // noinspection ES6MissingAwait
 
-async function silentVoteMisterLauncher(project) {
+self['silentVote_misterlauncher.org'] = async function (project) {
     let response = await fetch('https://oauth.vk.com/authorize?client_id=7636705&display=page&redirect_uri=https://misterlauncher.org/projects/' + project.id + '/&state=' + project.nick + '&response_type=code')
     if (!await checkResponseError(project, response, 'misterlauncher.org', null, true)) return
 

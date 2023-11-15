@@ -1,6 +1,6 @@
 // noinspection ES6MissingAwait
 
-async function silentVoteLoliLand(project) {
+self['silentVote_loliland.ru'] = async function (project) {
     if (!chrome.cookies) {
         endVote({message: 'У расширения нет доступа к куки которые нужны для авторизации с loliland, пожалуйста передобавьте данный проект что бы предоставить расширению доступ к куки'}, null, project)
         return

@@ -451,7 +451,7 @@ async function silentVote(project) {
             importScripts('scripts/' + (project.ratingMain || project.rating) + '_silentvote.js')
         }
 
-        await self['silentVote' + project.rating](project)
+        await self['silentVote_' + project.rating](project)
     } catch (error) {
         if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError when attempting to fetch resource')) {
             // let found = false

@@ -1494,7 +1494,7 @@ async function checkPermissions(projects, element) {
     const origins = []
     const permissions = []
     for (const project of projects) {
-        const url = allProjects[project.rating].voteURL(project)
+        const url = allProjects[project.rating].pageURL(project)
         const domain = getDomainWithoutSubdomain(url)
         if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
         if (allProjects[project.rating].needAdditionalOrigins) {

@@ -1,6 +1,6 @@
 // noinspection ES6MissingAwait
 
-async function silentVoteServerPact(project) {
+self['silentVote_serverpact.com'] = async function (project) {
     let response = await fetch('https://www.serverpact.com/vote-' + project.id, {
         'headers': {
             'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',

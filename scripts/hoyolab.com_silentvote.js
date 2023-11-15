@@ -1,6 +1,6 @@
 // noinspection ES6MissingAwait
 
-async function silentVoteHoYoLAB(project) {
+self['silentVote_hoyolab.com'] = async function (project) {
     let url, body
     if (!project.id || project.id === 'genshin impact daily') {
         url = 'https://sg-hk4e-api.hoyolab.com/event/sol/sign?lang=en-us'
