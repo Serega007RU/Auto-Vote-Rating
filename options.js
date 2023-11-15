@@ -241,7 +241,6 @@ async function restoreOptions(first) {
     document.getElementById('disabledNotifInfo').checked = settings.disabledNotifInfo
     document.getElementById('disabledNotifWarn').checked = settings.disabledNotifWarn
     document.getElementById('disabledNotifError').checked = settings.disabledNotifError
-    if (!settings.enabledSilentVote) document.getElementById('enabledSilentVote').value = 'disabled'
     document.getElementById('disabledCheckInternet').checked = settings.disabledCheckInternet
     document.getElementById('disabledOneVote').checked = settings.disabledOneVote
     document.getElementById('disabledRestartOnTimeout').checked = settings.disabledRestartOnTimeout
@@ -645,7 +644,6 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
         else if (this.id === 'expertMode') {
             settings.expertMode = this.checked
             if (this.checked) {
-                document.getElementById("enabledSilentVote").parentElement.removeAttribute('style')
                 document.getElementById("timeout").parentElement.removeAttribute('style')
                 document.getElementById("timeoutError").parentElement.removeAttribute('style')
                 document.getElementById('timeoutVote').parentElement.removeAttribute('style')
@@ -658,7 +656,6 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 document.getElementById('advSettingsAdd').removeAttribute('style')
                 document.getElementById('emptyDiv')?.remove()
             } else {
-                document.getElementById("enabledSilentVote").parentElement.style.display = 'none'
                 document.getElementById("timeout").parentElement.style.display = 'none'
                 document.getElementById("timeoutError").parentElement.style.display = 'none'
                 document.getElementById('timeoutVote').parentElement.style.display = 'none'
@@ -900,6 +897,9 @@ function editProject(project, switchToEdit) {
     if (project.lastDayMonth) {
         document.getElementById('lastDayMonth').checked = true
         document.getElementById('lastDayMonth').dispatchEvent(new Event('change'))
+    }
+    if (project.rating !== 'Custom' && !funcRating.silentVote?.(project)) {
+        document.getElementById('voteMode').disabled = true
     }
     if (project.rating !== 'Custom' && (project.silentMode || project.emulateMode)) {
         if (project.silentMode) {
@@ -1698,16 +1698,6 @@ document.getElementById('file-upload').addEventListener('change', async (event)=
         document.getElementById('file-upload').value = ''
     }
 }, false)
-
-//Слушатель переключателя режима голосования
-let modeVote = document.getElementById('enabledSilentVote')
-modeVote.addEventListener('change', async event => {
-    event.target.disabled = true
-    settings.enabledSilentVote = modeVote.value === 'enabled'
-    await db.put('other', settings, 'settings')
-    chrome.runtime.sendMessage('reloadSettings')
-    event.target.disabled = false
-})
 
 //Достаёт все проекты указанные в URL
 function getUrlProjects(element) {

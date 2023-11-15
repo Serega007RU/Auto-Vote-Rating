@@ -329,11 +329,7 @@ async function newWindow(project, opened) {
     let silentVoteMode = false
     if (project.rating === 'Custom') {
         silentVoteMode = true
-    } else if (settings.enabledSilentVote) {
-        if (!project.emulateMode && allProjects[project.rating].silentVote?.(project)) {
-            silentVoteMode = true
-        }
-    } else if (project.silentMode && allProjects[project.rating].silentVote?.(project)) {
+    } else if (!project.emulateMode && allProjects[project.rating].silentVote?.(project)) {
         silentVoteMode = true
     }
     if (silentVoteMode) {
