@@ -487,6 +487,10 @@ async function upgrade(db, oldVersion, newVersion, transaction) {
             // noinspection JSVoidFunctionReturnValueUsed
             cursor = await cursor.continue()
         }
+
+        settings = await transaction.objectStore('other').get('settings')
+        settings.temporarilyDisabledUseRemoteCode = true
+        await transaction.objectStore('other').put(settings, 'settings')
     }
 
     if (!todayStats) {

@@ -864,7 +864,7 @@ var allProjects = {
             ['projects', 'Проекты'],
             ['servers', 'Сервера (нет награды за голосование)']
         ]),
-        silentVote: (project) => project.listing === 'projects',
+        silentVote: (project) => project?.listing === 'projects',
         notRequiredNick: (project) => project?.listing === 'servers',
         notRequiredCaptcha: (project) => project?.listing === 'projects',
         needAdditionalOrigins: (project)=> project?.listing === 'projects' ? ['*://*.vk.com/*'] : []

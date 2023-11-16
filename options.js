@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async()=>{
 
 window.addEventListener('load', async () => {
     await initializeFunc
-    if (!settings.disabledUseRemoteCode) {
+    if (!settings.disabledUseRemoteCode && !settings.temporarilyDisabledUseRemoteCode) {
         if (!evil) { // noinspection JSUnresolvedVariable,JSUnresolvedFunction
             evil = evalCore.getEvalInstance(self)
         }
@@ -257,6 +257,12 @@ async function restoreOptions(first) {
     document.getElementById('disabledSendErrorSentry').checked = settings.disabledSendErrorSentry
     document.getElementById('expertMode').checked = settings.expertMode
     document.getElementById('expertMode').dispatchEvent(new Event('change'))
+    if (settings.temporarilyDisabledUseRemoteCode) {
+        document.getElementById('disabledUseRemoteCode').checked = true
+        document.getElementById('disabledUseRemoteCode').disabled = true
+        document.getElementById('disabledSendErrorSentry').checked = true
+        document.getElementById('disabledSendErrorSentry').disabled = true
+    }
     if (first) {
         document.getElementById('addTab').classList.add('active')
         document.getElementById('load').style.display = 'none'
@@ -602,7 +608,6 @@ async function reloadProjectList() {
 //Слушатель дополнительных настроек
 for (const check of document.querySelectorAll('input[name=checkbox]')) {
     check.addEventListener('change', async function (event) {
-        event.target.disabled = true
         let _return = false
         if (this.id === 'disabledNotifStart')
             settings.disabledNotifStart = this.checked
@@ -745,11 +750,12 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
             _return = true
         }
         if (!_return) {
+            event.target.disabled = true
             await db.put('other', settings, 'settings')
             chrome.runtime.sendMessage('reloadSettings')
             usageSpace()
+            event.target.disabled = false
         }
-        event.target.disabled = false
     })
     if (check.checked && check.parentElement.parentElement.parentElement.getAttribute('id') === 'addProject') {
         check.dispatchEvent(new Event('change'))
@@ -2105,6 +2111,9 @@ document.getElementById('link').addEventListener('input', function() {
         document.getElementById('banAttention').style.display = 'none'
         document.getElementById('rewardAttention').style.display = 'none'
         document.getElementById('operaAttention').style.display = 'none'
+        document.getElementById('voteMode').disabled = true
+        document.getElementById('voteMode').checked = false
+        document.getElementById('voteMode').dispatchEvent(new Event('change'))
         laterChoose = false
     }
 
@@ -2134,6 +2143,9 @@ document.getElementById('link').addEventListener('input', function() {
     if (funcRating.ordinalWorld?.()) {
         document.getElementById('ordinalWorld').parentElement.removeAttribute('style')
         document.getElementById('ordinalWorld').required = true
+    }
+    if (funcRating.silentVote?.(project)) {
+        document.getElementById('voteMode').disabled = false
     }
     if (funcRating.banAttention?.(project)) {
         document.getElementById('banAttention').removeAttribute('style')
@@ -2186,7 +2198,9 @@ document.getElementById('rating').addEventListener('input', function() {
         document.getElementById('additionURLTooltip3').textContent = ''
         document.getElementById('customTimeOut').disabled = false
         document.getElementById('lastDayMonth').disabled = false
-        document.getElementById('voteMode').disabled = false
+        document.getElementById('voteMode').disabled = true
+        document.getElementById('voteMode').checked = false
+        document.getElementById('voteMode').dispatchEvent(new Event('change'))
         if (!document.getElementById('customTimeOut').checked) document.getElementById('selectTime').parentElement.style.display = 'none'
         document.getElementById('customBody').parentElement.style.display = 'none'
         document.getElementById('responseURL').parentElement.style.display = 'none'
@@ -2201,6 +2215,7 @@ document.getElementById('rating').addEventListener('input', function() {
         document.getElementById('lastDayMonth').checked = false
         document.getElementById('voteMode').disabled = true
         document.getElementById('voteMode').checked = false
+        document.getElementById('voteMode').dispatchEvent(new Event('change'))
         document.getElementById('nick').parentElement.removeAttribute('style')
         document.getElementById('nick').required = true
         document.getElementById('id').required = false
@@ -2299,6 +2314,10 @@ document.getElementById('rating').addEventListener('input', function() {
     if (funcRating.ordinalWorld?.()) {
         document.getElementById('ordinalWorld').parentElement.removeAttribute('style')
         document.getElementById('ordinalWorld').required = true
+    }
+
+    if (funcRating.silentVote?.()) {
+        document.getElementById('voteMode').disabled = false
     }
 
     if (funcRating.banAttention?.()) {

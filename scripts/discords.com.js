@@ -5,8 +5,7 @@ async function vote(first) {
         return
     }
 
-    // TODO позже надо убрать отсюда project.game
-    if (project.game === 'servers' || project.listing === 'servers') {
+    if (project.listing === 'servers') {
         const button = document.querySelector('.card-body button')
         if (button.disabled && button.textContent === 'Upvote') {
             await new Promise(resolve => {
