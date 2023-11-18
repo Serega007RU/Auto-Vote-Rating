@@ -1013,6 +1013,8 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
             return
         }
 
+        project.rating = domain
+
         if (domain === 'Custom') {
             project.id = document.getElementById('nick').value
         } else if (!funcRating.notRequiredId?.()) {
@@ -1042,7 +1044,6 @@ document.getElementById('append').addEventListener('submit', async(event)=>{
                     event.submitter.disabled = false
                     return
                 }
-                project.rating = domain
             } else {
                 project.rating = domain2
                 project.ratingMain = domain
@@ -1500,16 +1501,23 @@ async function checkPermissions(projects, element) {
     const origins = []
     const permissions = []
     for (const project of projects) {
-        const url = allProjects[project.rating].pageURL(project)
+        const funcProject = allProjects[project.rating]
+        const url = funcProject.pageURL(project)
         const domain = getDomainWithoutSubdomain(url)
         if (!origins.includes('*://*.' + domain + '/*')) origins.push('*://*.' + domain + '/*')
-        if (allProjects[project.rating].needAdditionalOrigins) {
-            for (const origin of allProjects[project.rating].needAdditionalOrigins(project)) {
+        if (!funcProject.notRequiredCaptcha?.(project)) {
+            // noinspection JSUnresolvedReference
+            for (const origin of chrome.runtime.getManifest().host_permissions) {
                 if (!origins.includes(origin)) origins.push(origin)
             }
         }
-        if (allProjects[project.rating].needAdditionalPermissions) {
-            for (const permission of allProjects[project.rating].needAdditionalPermissions(project)) {
+        if (funcProject.needAdditionalOrigins) {
+            for (const origin of funcProject.needAdditionalOrigins(project)) {
+                if (!origins.includes(origin)) origins.push(origin)
+            }
+        }
+        if (funcProject.needAdditionalPermissions) {
+            for (const permission of funcProject.needAdditionalPermissions(project)) {
                 if (!permissions.includes(permission)) permissions.push(permission)
             }
         }
