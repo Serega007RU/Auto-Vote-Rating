@@ -202,8 +202,12 @@ document.addEventListener('DOMContentLoaded', async()=>{
         createNotif(chrome.i18n.getMessage('internetDisconnected'), 'warn', {delay: 15000})
     }
 
-    document.getElementById('rating').dispatchEvent(new Event('input'))
-    document.getElementById('link').dispatchEvent(new Event('input'))
+    document.getElementById('switchAddMode').dispatchEvent(new Event('change'))
+
+    document.getElementById('customTimeOut').dispatchEvent(new Event('change'))
+    document.getElementById('scheduleTimeCheckbox').dispatchEvent(new Event('change'))
+    document.getElementById('randomize').dispatchEvent(new Event('change'))
+    document.getElementById('voteMode').dispatchEvent(new Event('change'))
 
     // noinspection JSUnresolvedReference
     if (!settings.operaAttention2 && (navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' || (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0)) {
@@ -608,7 +612,7 @@ async function reloadProjectList() {
 //Слушатель дополнительных настроек
 for (const check of document.querySelectorAll('input[name=checkbox]')) {
     check.addEventListener('change', async function (event) {
-        let _return = false
+        event.target.disabled = true
         if (this.id === 'disabledNotifStart')
             settings.disabledNotifStart = this.checked
         else if (this.id === 'disabledNotifInfo')
@@ -620,7 +624,7 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 settings.disabledNotifError = this.checked
             } else if (this.checked) {
                 this.checked = false
-                _return = true
+                return
             } else {
                 settings.disabledNotifError = this.checked
             }
@@ -649,28 +653,32 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
         else if (this.id === 'expertMode') {
             settings.expertMode = this.checked
             if (this.checked) {
-                document.getElementById("timeout").parentElement.removeAttribute('style')
-                document.getElementById("timeoutError").parentElement.removeAttribute('style')
+                document.getElementById('timeout').parentElement.removeAttribute('style')
+                document.getElementById('timeoutError').parentElement.removeAttribute('style')
                 document.getElementById('timeoutVote').parentElement.removeAttribute('style')
-                document.getElementById("disabledOneVote").parentElement.removeAttribute('style')
-                document.getElementById("disabledDebug").parentElement.removeAttribute('style')
-                document.getElementById("disableCloseTabsOnSuccess").parentElement.removeAttribute('style')
-                document.getElementById("disableCloseTabsOnError").parentElement.removeAttribute('style')
+                document.getElementById('disabledOneVote').parentElement.removeAttribute('style')
+                document.getElementById('disabledDebug').parentElement.removeAttribute('style')
+                document.getElementById('disableCloseTabsOnSuccess').parentElement.removeAttribute('style')
+                document.getElementById('disableCloseTabsOnError').parentElement.removeAttribute('style')
                 document.getElementById('addProject').classList.add('addProjectExpert')
                 document.getElementById('addProject').classList.remove('addProjectExpertManual')
                 document.getElementById('advSettingsAdd').removeAttribute('style')
                 document.getElementById('emptyDiv')?.remove()
             } else {
-                document.getElementById("timeout").parentElement.style.display = 'none'
-                document.getElementById("timeoutError").parentElement.style.display = 'none'
+                document.getElementById('timeout').parentElement.style.display = 'none'
+                document.getElementById('timeoutError').parentElement.style.display = 'none'
                 document.getElementById('timeoutVote').parentElement.style.display = 'none'
-                document.getElementById("disabledOneVote").parentElement.style.display = 'none'
-                document.getElementById("disabledDebug").parentElement.style.display = 'none'
-                document.getElementById("disableCloseTabsOnSuccess").parentElement.style.display = 'none'
-                document.getElementById("disableCloseTabsOnError").parentElement.style.display = 'none'
+                document.getElementById('disabledOneVote').parentElement.style.display = 'none'
+                document.getElementById('disabledDebug').parentElement.style.display = 'none'
+                document.getElementById('disableCloseTabsOnSuccess').parentElement.style.display = 'none'
+                document.getElementById('disableCloseTabsOnError').parentElement.style.display = 'none'
                 document.getElementById('addProject').classList.add('addProjectExpertManual')
                 document.getElementById('addProject').classList.remove('addProjectExpert')
                 document.getElementById('advSettingsAdd').style.display = 'none'
+                document.getElementById('advSettingsAdd').querySelectorAll('input[type="checkbox"]').forEach(el => {
+                    el.checked = false
+                    el.dispatchEvent(new Event('change'))
+                })
                 if (!document.getElementById('emptyDiv')) {
                     const div = document.createElement('div')
                     div.id = 'emptyDiv'
@@ -678,102 +686,98 @@ for (const check of document.querySelectorAll('input[name=checkbox]')) {
                 }
             }
             if (event.isTrusted) reloadProjectList()
-        } else if (this.id === 'disableCheckProjects') {
-            if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
-                this.checked = false
-            }
-            _return = true
-        } else if (this.id === 'priority') {
-            if (this.checked && !confirm(chrome.i18n.getMessage('confirmPriority'))) {
-                this.checked = false
-            }
-            _return = true
-        } else if (this.id === 'customTimeOut') {
-            document.getElementById('hour').parentElement.style.display = 'none'
-            document.getElementById('hour').required = false
-            document.getElementById('time').parentElement.style.display = 'none'
-            document.getElementById('time').required = false
-            document.getElementById('week').parentElement.style.display = 'none'
-            document.getElementById('week').required = false
-            document.getElementById('month').parentElement.style.display = 'none'
-            document.getElementById('month').required = false
-            if (this.checked) {
-                document.getElementById('lastDayMonth').disabled = false
-                document.getElementById('selectTime').parentElement.removeAttribute('style')
-                if (document.getElementById('selectTime').value === 'ms') {
-                    document.getElementById('time').parentElement.removeAttribute('style')
-                    document.getElementById('time').required = true
-                } else {
-                    if (document.getElementById('selectTime').value === 'week') {
-                        document.getElementById('week').parentElement.removeAttribute('style')
-                        document.getElementById('week').required = true
-                    } else if (document.getElementById('selectTime').value === 'month') {
-                        document.getElementById('month').parentElement.removeAttribute('style')
-                        document.getElementById('month').required = true
-                    }
-                    document.getElementById('hour').parentElement.removeAttribute('style')
-                    document.getElementById('hour').required = true
-                }
-            } else {
-                document.getElementById('lastDayMonth').disabled = true
-                document.getElementById('selectTime').parentElement.style.display = 'none'
-            }
-            _return = true
-        } else if (this.id === 'lastDayMonth') {
-            _return = true
-        } else if (this.id === 'randomize') {
-            if (this.checked) {
-                document.getElementById('randomizeMin').parentElement.removeAttribute('style')
-                document.getElementById('randomizeMin').required = true
-                document.getElementById('randomizeMax').required = true
-            } else {
-                document.getElementById('randomizeMin').parentElement.style.display = 'none'
-                document.getElementById('randomizeMin').required = false
-                document.getElementById('randomizeMax').required = false
-            }
-            _return = true
-        } else if (this.id === 'scheduleTimeCheckbox') {
-            if (this.checked) {
-                document.getElementById('scheduleTime').parentElement.removeAttribute('style')
-                document.getElementById('scheduleTime').required = true
-            } else {
-                document.getElementById('scheduleTime').parentElement.style.display = 'none'
-                document.getElementById('scheduleTime').required = false
-            }
-            _return = true
-        } else if (this.id === 'voteMode') {
-            if (this.checked) {
-                document.getElementById('voteModeSelect').parentElement.removeAttribute('style')
-            } else {
-                document.getElementById('voteModeSelect').parentElement.style.display = 'none'
-            }
-            _return = true
+        } else {
+            return
         }
-        if (!_return) {
-            event.target.disabled = true
-            await db.put('other', settings, 'settings')
-            chrome.runtime.sendMessage('reloadSettings')
-            usageSpace()
-            event.target.disabled = false
-        }
+        await db.put('other', settings, 'settings')
+        chrome.runtime.sendMessage('reloadSettings')
+        usageSpace()
+        event.target.disabled = false
     })
-    if (check.checked && check.parentElement.parentElement.parentElement.getAttribute('id') === 'addProject') {
-        check.dispatchEvent(new Event('change'))
-    }
 }
 
+//Слушатели дополнительных параметров в добавлении нового проекта
+document.getElementById('disableCheckProjects').addEventListener('change', function() {
+    if (this.checked && !confirm(chrome.i18n.getMessage('confirmDisableCheckProjects'))) {
+        this.checked = false
+    }
+})
+document.getElementById('priority').addEventListener('change', function() {
+    if (this.checked && !confirm(chrome.i18n.getMessage('confirmPriority'))) {
+        this.checked = false
+    }
+})
+document.getElementById('customTimeOut').addEventListener('change', function() {
+    document.getElementById('hour').parentElement.style.display = 'none'
+    document.getElementById('hour').required = false
+    document.getElementById('time').parentElement.style.display = 'none'
+    document.getElementById('time').required = false
+    document.getElementById('week').parentElement.style.display = 'none'
+    document.getElementById('week').required = false
+    document.getElementById('month').parentElement.style.display = 'none'
+    document.getElementById('month').required = false
+    if (this.checked) {
+        document.getElementById('lastDayMonth').disabled = false
+        document.getElementById('selectTime').parentElement.removeAttribute('style')
+        if (document.getElementById('selectTime').value === 'ms') {
+            document.getElementById('time').parentElement.removeAttribute('style')
+            document.getElementById('time').required = true
+        } else {
+            if (document.getElementById('selectTime').value === 'week') {
+                document.getElementById('week').parentElement.removeAttribute('style')
+                document.getElementById('week').required = true
+            } else if (document.getElementById('selectTime').value === 'month') {
+                document.getElementById('month').parentElement.removeAttribute('style')
+                document.getElementById('month').required = true
+            }
+            document.getElementById('hour').parentElement.removeAttribute('style')
+            document.getElementById('hour').required = true
+        }
+    } else {
+        document.getElementById('lastDayMonth').disabled = true
+        document.getElementById('selectTime').parentElement.style.display = 'none'
+    }
+})
+document.getElementById('randomize').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('randomizeMin').parentElement.removeAttribute('style')
+        document.getElementById('randomizeMin').required = true
+        document.getElementById('randomizeMax').required = true
+    } else {
+        document.getElementById('randomizeMin').parentElement.style.display = 'none'
+        document.getElementById('randomizeMin').required = false
+        document.getElementById('randomizeMax').required = false
+    }
+})
+document.getElementById('scheduleTimeCheckbox').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('scheduleTime').parentElement.removeAttribute('style')
+        document.getElementById('scheduleTime').required = true
+    } else {
+        document.getElementById('scheduleTime').parentElement.style.display = 'none'
+        document.getElementById('scheduleTime').required = false
+    }
+})
+document.getElementById('voteMode').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('voteModeSelect').parentElement.removeAttribute('style')
+    } else {
+        document.getElementById('voteModeSelect').parentElement.style.display = 'none'
+    }
+})
+
 //Слушатель на переключение ручного режима в добавлении
-document.getElementById('switchAddMode').addEventListener('change', (event)=>{
-    document.getElementById('link').value = ''
-    document.getElementById('link').dispatchEvent(new Event('input'))
-    document.getElementById('rating').value = ''
-    document.getElementById('rating').dispatchEvent(new Event('input'))
+document.getElementById('switchAddMode').addEventListener('change', function(event) {
     if (event.target.checked) {
+        linkChanged(null, true)
+        document.getElementById('rating').dispatchEvent(new Event('input'))
         document.getElementById('rating').parentElement.removeAttribute('style')
         document.getElementById('rating').required = true
         document.getElementById('link').parentElement.style.display = 'none'
         document.getElementById('link').required = false
     } else {
+        ratingChanged(null, true)
+        document.getElementById('link').dispatchEvent(new Event('input'))
         document.getElementById('rating').parentElement.style.display = 'none'
         document.getElementById('rating').required = false
         document.getElementById('link').parentElement.removeAttribute('style')
@@ -2107,8 +2111,9 @@ document.getElementById('todayStats').addEventListener('click', async()=> {
 })
 
 let laterChoose = false
-document.getElementById('link').addEventListener('input', function() {
-    if (laterChoose) {
+document.getElementById('link').addEventListener('input', linkChanged)
+function linkChanged(event, reset) {
+    if (laterChoose || reset) {
         document.getElementById('nick').parentElement.style.display = 'none'
         document.getElementById('nick').required = false
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
@@ -2123,6 +2128,7 @@ document.getElementById('link').addEventListener('input', function() {
         document.getElementById('voteMode').checked = false
         document.getElementById('voteMode').dispatchEvent(new Event('change'))
         laterChoose = false
+        if (reset) return
     }
 
     let domain, project, funcRating
@@ -2165,14 +2171,14 @@ document.getElementById('link').addEventListener('input', function() {
     if (!settings.operaAttention && (navigator?.userAgentData?.brands?.[0]?.brand === 'Opera' || (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) && !(funcRating.notRequiredCaptcha?.(project) || funcRating.alertManualCaptcha?.())) {
         document.getElementById('operaAttention').removeAttribute('style')
     }
-})
+}
 
 let laterChooseManual = false
-document.getElementById('rating').addEventListener('input', function() {
-    if (laterChooseManual) {
-        document.getElementById('id').value = ''
+document.getElementById('rating').addEventListener('input', ratingChanged)
+function ratingChanged(event, reset) {
+    if (laterChooseManual || reset) {
         document.getElementById('id').parentElement.style.display = 'none'
-        document.getElementById('id').name = 'name'
+        document.getElementById('id').name = 'id'
         document.getElementById('id').required = false
         document.getElementById('projectIDTooltip1').textContent = ''
         document.getElementById('projectIDTooltip2').textContent = ''
@@ -2182,14 +2188,18 @@ document.getElementById('rating').addEventListener('input', function() {
         document.getElementById('nick').required = false
         document.getElementById('nick').placeholder = chrome.i18n.getMessage('enterNick')
         document.getElementById('chooseGame').parentElement.style.display = 'none'
-        document.getElementById('chooseGame').value = ''
         document.getElementById('chooseGame').name = 'chooseGame'
         document.getElementById('urlGameTooltip1').textContent = ''
         document.getElementById('urlGameTooltip2').textContent = ''
         document.getElementById('urlGameTooltip3').textContent = ''
         document.getElementById('gameList').replaceChildren()
+        document.getElementById('chooseListing').parentElement.style.display = 'none'
+        document.getElementById('chooseListing').name = 'chooseListing'
+        document.getElementById('urlListingTooltip1').textContent = ''
+        document.getElementById('urlListingTooltip2').textContent = ''
+        document.getElementById('urlListingTooltip3').textContent = ''
+        document.getElementById('listingList').replaceChildren()
         document.getElementById('chooseLang').parentElement.style.display = 'none'
-        document.getElementById('chooseLang').value = ''
         document.getElementById('chooseLang').name = 'chooseLang'
         document.getElementById('langList').replaceChildren()
         document.getElementById('countVote').parentElement.style.display = 'none'
@@ -2205,7 +2215,7 @@ document.getElementById('rating').addEventListener('input', function() {
         document.getElementById('additionURLTooltip2').textContent = ''
         document.getElementById('additionURLTooltip3').textContent = ''
         document.getElementById('customTimeOut').disabled = false
-        document.getElementById('lastDayMonth').disabled = false
+        document.getElementById('customTimeOut').dispatchEvent(new Event('change'))
         document.getElementById('voteMode').disabled = true
         document.getElementById('voteMode').checked = false
         document.getElementById('voteMode').dispatchEvent(new Event('change'))
@@ -2213,6 +2223,7 @@ document.getElementById('rating').addEventListener('input', function() {
         document.getElementById('customBody').parentElement.style.display = 'none'
         document.getElementById('responseURL').parentElement.style.display = 'none'
         laterChooseManual = false
+        if (reset) return
     }
 
     if (this.value === 'Custom') {
@@ -2250,7 +2261,7 @@ document.getElementById('rating').addEventListener('input', function() {
         document.getElementById('projectIDTooltip1').textContent = funcRating.exampleURL()[0]
         document.getElementById('projectIDTooltip2').textContent = funcRating.exampleURL()[1]
         document.getElementById('projectIDTooltip3').textContent = funcRating.exampleURL()[2]
-        document.getElementById('id').name = 'id' + rating
+        document.getElementById('id').name = 'id_' + rating
     }
 
     if (!funcRating.notRequiredNick?.()) {
@@ -2267,8 +2278,10 @@ document.getElementById('rating').addEventListener('input', function() {
     }
     if (funcRating.exampleURLGame) {
         document.getElementById('chooseGame').parentElement.removeAttribute('style')
-        document.getElementById('chooseGame').name = 'chooseGame' + this.value
-        if (funcRating.defaultGame && !editingProject) document.getElementById('chooseGame').value = funcRating.defaultGame()
+        document.getElementById('chooseGame').name = 'chooseGame_' + this.value
+        if (funcRating.defaultGame && !editingProject && !funcRating.gameList().has(document.getElementById('chooseGame').value)) {
+            document.getElementById('chooseGame').value = funcRating.defaultGame()
+        }
         document.getElementById('urlGameTooltip1').textContent = funcRating.exampleURLGame()[0]
         document.getElementById('urlGameTooltip2').textContent = funcRating.exampleURLGame()[1]
         document.getElementById('urlGameTooltip3').textContent = funcRating.exampleURLGame()[2]
@@ -2285,8 +2298,11 @@ document.getElementById('rating').addEventListener('input', function() {
 
     if (funcRating.exampleURLListing) {
         document.getElementById('chooseListing').parentElement.removeAttribute('style')
-        document.getElementById('chooseListing').name = 'chooseListing' + rating
-        if (funcRating.defaultListing && !editingProject) document.getElementById('chooseListing').value = funcRating.defaultListing()
+        document.getElementById('chooseListing').name = 'chooseListing_' + rating
+        if (funcRating.defaultListing && !editingProject && !funcRating.listingList().has(document.getElementById('chooseListing').value)) {
+            document.getElementById('chooseListing').value = funcRating.defaultListing()
+        }
+        document.getElementById('chooseListing').dispatchEvent(new Event('change'))
         document.getElementById('urlListingTooltip1').textContent = funcRating.exampleURLListing()[0]
         document.getElementById('urlListingTooltip2').textContent = funcRating.exampleURLListing()[1]
         document.getElementById('urlListingTooltip3').textContent = funcRating.exampleURLListing()[2]
@@ -2303,8 +2319,10 @@ document.getElementById('rating').addEventListener('input', function() {
 
     if (funcRating.langList) {
         document.getElementById('chooseLang').parentElement.removeAttribute('style')
-        document.getElementById('chooseLang').name = 'chooseLang' + rating
-        if (funcRating.defaultLand && !editingProject) document.getElementById('chooseLang').value = funcRating.defaultLand()
+        document.getElementById('chooseLang').name = 'chooseLang_' + rating
+        if (funcRating.defaultLand && !editingProject && !funcRating.langList().has(document.getElementById('chooseLang').value)) {
+            document.getElementById('chooseLang').value = funcRating.defaultLand()
+        }
         const langList = document.getElementById('langList')
         for (const [value, name] of funcRating.langList()) {
             const option = document.createElement('option')
@@ -2344,12 +2362,12 @@ document.getElementById('rating').addEventListener('input', function() {
 
     if (funcRating.additionExampleURL) {
         document.getElementById('additionURL').parentElement.removeAttribute('style')
-        document.getElementById('additionURL').name = 'additionURL' + rating
+        document.getElementById('additionURL').name = 'additionURL_' + rating
         document.getElementById('additionURLTooltip1').textContent = funcRating.additionExampleURL()[0]
         document.getElementById('additionURLTooltip2').textContent = funcRating.additionExampleURL()[1]
         document.getElementById('additionURLTooltip3').textContent = funcRating.additionExampleURL()[2]
     }
-})
+}
 
 //Слушатель на выбор типа timeout для Custom
 document.getElementById('selectTime').addEventListener('change', function() {
@@ -2377,8 +2395,8 @@ document.getElementById('selectTime').addEventListener('change', function() {
     }
 })
 
-document.getElementById('chooseGame').addEventListener('change', function () {
-    if (this.name === 'chooseGameMinecraftRating') {
+document.getElementById('chooseListing').addEventListener('change', function () {
+    if (this.name === 'chooseListing_minecraftrating.ru') {
         if (this.value === 'servers') {
             document.getElementById('nick').required = false
             document.getElementById('nick').parentElement.style.display = 'none'
