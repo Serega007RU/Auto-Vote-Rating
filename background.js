@@ -1842,8 +1842,12 @@ console._collect = function (type, args) {
     let log = '[' + time + ' ' + type.toUpperCase() + ']:'
 
     for (let arg of args) {
-        if (typeof arg != 'string') arg = JSON.stringify(arg)
-        log += ' ' + arg
+        if (arg.stack) {
+            log += ' ' + arg.stack
+        } else {
+            if (typeof arg != 'string') arg = JSON.stringify(arg)
+            log += ' ' + arg
+        }
     }
 
     if (dbLogs) dbLogs.add('logs', log)

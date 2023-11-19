@@ -23,9 +23,9 @@ self.addEventListener('unhandledrejection', (event) => onUnhandledError(event))
 function onUnhandledError(event) {
     let error
     if (event.reason) {
-        error = event.reason.message
+        error = event.reason
     } else if (event.error) {
-        error = event.error.message
+        error = event.error
     } else {
         error = 'Unidentified error, see the details in the console '
         if (console._error) console._error(event)
@@ -41,6 +41,7 @@ function onUnhandledError(event) {
     if (!dbLogs) return
 
     const time = new Date().toLocaleString().replace(',', '')
+    if (error.stack) error = error.stack
     const log = '[' + time + ' ERROR]: ' + error
     try {
         dbLogs.put('logs', log).catch(e => {
