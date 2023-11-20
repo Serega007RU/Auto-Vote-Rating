@@ -1592,6 +1592,14 @@ var allProjects = {
         parseURL: (url) => ({id: url.pathname.split('/')[1]}),
         timeout: () => ({hours: 24})
     },
+    'minehut.com': {
+        pageURL: (project) => 'https://minehut.com/sl/server/' + project.id,
+        voteURL: (project) => 'https://minehut.com/sl/server/' + project.id,
+        projectName: (doc) => doc.querySelector('.ant-card-body h5').innerText,
+        exampleURL: () => ['https://minehut.com/sl/server/', '3fNN/scufflemc', ''],
+        parseURL: (url) => ({id: url.pathname.split('/')[3] + '/' + url.pathname.split('/')[4]}),
+        timeout: () => ({hours: 6})
+    },
     Custom: {
         pageURL: (project) => project.responseURL,
         voteURL: (project) => project.responseURL,
