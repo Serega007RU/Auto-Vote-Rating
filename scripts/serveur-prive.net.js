@@ -5,7 +5,7 @@ async function vote(first) {
     document.querySelector('#username').value = project.nick
 
     //Если у нас не настоящая капча, значит голосуем сразу без капчи
-    if (document.querySelector('div.form > div.captcha img[alt="Captcha"]')) {
+    if (document.querySelector('#voteForm img[alt="Hcaptcha"]')) {
         document.querySelector('#voteBtn').click()
     } else {
         chrome.runtime.sendMessage({captcha: true})
