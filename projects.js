@@ -1600,6 +1600,14 @@ var allProjects = {
         parseURL: (url) => ({id: url.pathname.split('/')[3] + '/' + url.pathname.split('/')[4]}),
         timeout: () => ({hours: 6})
     },
+    'mc-liste.de': {
+        pageURL: (project) => 'https://www.mc-liste.de/server/' + project.id,
+        voteURL: (project) => 'https://www.mc-liste.de/server/' + project.id + '/vote',
+        projectName: (doc) => doc.querySelector('.srvName').innerText,
+        exampleURL: () => ['https://www.mc-liste.de/server/', '54', '/vote'],
+        parseURL: (url) => ({id: url.pathname.split('/')[2]}),
+        alertManualCaptcha: () => true
+    },
     Custom: {
         pageURL: (project) => project.responseURL,
         voteURL: (project) => project.responseURL,
