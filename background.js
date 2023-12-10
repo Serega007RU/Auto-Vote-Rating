@@ -1842,7 +1842,7 @@ console._collect = function (type, args) {
     let log = '[' + time + ' ' + type.toUpperCase() + ']:'
 
     for (let arg of args) {
-        if (arg.stack) {
+        if (arg?.stack) {
             log += ' ' + arg.stack
         } else {
             if (typeof arg != 'string') arg = JSON.stringify(arg)
