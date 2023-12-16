@@ -89,49 +89,36 @@ async function vote(first) {
         return
     }
 
-    //Делаем форму голосования видимой
-    document.querySelector('div.vote-fields').removeAttribute('style')
+    if (first) {
+        //Проходим капчу-слайдер
+        //https://stackoverflow.com/a/61547444/11235240
+        const slider = document.querySelector('div.QapTcha div.Slider')
+        const mouseDownEvent = new MouseEvent('mousedown', {
+            clientX: slider.getBoundingClientRect().left,
+            clientY: slider.getBoundingClientRect().top,
+            bubbles: true,
+            cancelable: true
+        })
+        const mouseMoveEvent = new MouseEvent('mousemove', {
+            clientX: slider.getBoundingClientRect().left + 999,
+            clientY: slider.getBoundingClientRect().top,
+            bubbles: true,
+            cancelable: true
+        })
+        const mouseUpEvent = new MouseEvent('mouseup', {
+            bubbles: true,
+            cancelable: true
+        })
+        slider.dispatchEvent(mouseDownEvent)
+        slider.dispatchEvent(mouseMoveEvent)
+        slider.dispatchEvent(mouseUpEvent)
 
-    if (document.querySelector("div.g-recaptcha > div > div > iframe") && first) {
-        return
+        if (document.querySelector("div.g-recaptcha > div > div > iframe")) {
+            return
+        }
     }
 
     const project = await getProject()
-
-    //Отправка запроса на прохождение капчи (мы типо прошли капчу)
-    try {
-        const response = await fetch('https://' + project.game + '.mmotop.ru/votes/quaptcha.json', {
-            'headers': {
-                'accept': 'application/json, text/javascript, */*; q=0.01',
-                'accept-language': 'ru,en;q=0.9,en-US;q=0.8',
-                'cache-control': 'no-cache',
-                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'pragma': 'no-cache',
-                'sec-ch-ua': '\"Google Chrome\";v=\"87\", \" Not;A Brand\";v=\"99\", \"Chromium\";v=\"87\"',
-                'sec-ch-ua-mobile': "?0",
-                'sec-fetch-dest': "empty",
-                'sec-fetch-mode': "cors",
-                'sec-fetch-site': "same-origin",
-                'x-csrf-token': document.querySelector('input[name="authenticity_token"]').value,
-                'x-requested-with': "XMLHttpRequest"
-            },
-            'body': 'action=qaptcha&qaptcha_key=' + document.querySelector('div.QapTcha > input[type=hidden]').name,
-            'method': 'POST',
-            'mode': 'cors',
-            'credentials': 'include'
-        })
-        if (!response.ok) {
-            chrome.runtime.sendMessage({errorVote: [String(response.status), response.url]})
-            return
-        }
-    } catch (error) {
-        chrome.runtime.sendMessage({message: error.toString(), ignoreReport: true})
-        return
-    }
-    //Убираем здесь value иначе капча не будет пройдена
-    document.querySelector('div.QapTcha > input[type=hidden]').value = ''
-    //Делаем кнопку 'Проголосовать' кликабельной
-    document.getElementById('check_vote_form').disabled = false
 
     //Вписываем никнейм
     document.getElementById('charname').firstElementChild.value = project.nick
