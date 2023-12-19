@@ -57,7 +57,7 @@ async function vote(first) {
     if (document.querySelector('div.notice div.alert')) {
         const request = {}
         request.message = document.querySelector('div.notice div.alert').innerText
-        if (request.message.includes('News')) {
+        if (request.message.includes('News') || request.message.includes('Объявление!')) {
             // None
         } else {
             if (request.message.includes('требуется активировать аккаунт')) {
