@@ -18,7 +18,7 @@ async function vote(first) {
         })
     }
 
-    const login = findElement('a', ['log in'])
+    const login = findElement('button', ['log in with discord'])
     if (login) {
         login.click()
         return
