@@ -53,19 +53,15 @@ async function vote(first) {
     if (document.querySelector('.vote-content [href*="resend_confirmation_token"]')) {
         chrome.runtime.sendMessage({message: document.querySelector('.vote-content').innerText, ignoreReport: true})
     }
-
-    if (document.querySelector('div.notice div.alert')) {
-        const request = {}
-        request.message = document.querySelector('div.notice div.alert').innerText
-        if (request.message.includes('News') || request.message.includes('Объявление!')) {
-            // None
-        } else {
-            if (request.message.includes('требуется активировать аккаунт')) {
-                request.ignoreReport = true
-            }
-            chrome.runtime.sendMessage(request)
-            return
+    
+    const alertDiv = document.querySelector('div.notice div.alert');
+    if (alertDiv) {
+        const msg = alertDiv.innerText.trim();
+        if (msg.includes('требуется активировать аккаунт')) {
+            console.log("Аккаунт не активирован (игнорируем):", msg);
+            return;
         }
+        // все остальные сообщения игнорируем и продолжаем выполнение
     }
 
     if (document.querySelector('#vote_loading')) {
